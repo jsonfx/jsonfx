@@ -52,7 +52,7 @@ namespace JsonFx.Json
 		#region Fields
 
 		public readonly JsonTokenType TokenType;
-		private string value;
+		public readonly string Value;
 
 		#endregion Fields
 
@@ -75,29 +75,9 @@ namespace JsonFx.Json
 		public JsonToken(JsonTokenType tokenType, string value)
 		{
 			this.TokenType = tokenType;
-			this.value = value ?? String.Empty;
+			this.Value = value ?? String.Empty;
 		}
 
 		#endregion Init
-
-		#region Properties
-
-		/// <summary>
-		/// Gets and sets the tokenized lexeme
-		/// </summary>
-		public string Value
-		{
-			get
-			{
-				if (this.value == null)
-				{
-					return String.Empty;
-				}
-				return this.value;
-			}
-			internal set { this.value = value; }
-		}
-
-		#endregion Properties
 	}
 }
