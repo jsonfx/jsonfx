@@ -35,7 +35,7 @@ namespace JsonFx.Json
 	/// <summary>
 	/// Represents a single token in a JSON stream
 	/// </summary>
-	public class JsonToken
+	public sealed class JsonToken
 	{
 		#region Constants
 
