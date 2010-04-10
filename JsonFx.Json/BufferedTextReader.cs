@@ -319,7 +319,7 @@ namespace JsonFx.Json
 			this.EnsureBuffer(count);
 			if (this.count < count)
 			{
-				throw new ArgumentOutOfRangeException("count", "End of char stream");
+				throw new ArgumentOutOfRangeException("count", "Attempted to flush beyond end of input.");
 			}
 
 			this.start += count;
