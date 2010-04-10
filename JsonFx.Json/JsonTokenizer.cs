@@ -31,9 +31,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
-using System.Globalization;
 
 namespace JsonFx.Json
 {
@@ -44,7 +44,8 @@ namespace JsonFx.Json
 	{
 		#region Constants
 
-		private const int LongestLiteral = 9;
+		private const int PeakBufferLength = 128;
+
 		internal const string LiteralUndefined = "undefined";
 		internal const string LiteralNull = "null";
 		internal const string LiteralFalse = "false";
@@ -92,7 +93,7 @@ namespace JsonFx.Json
 		#region Fields
 
 		private readonly BufferedTextReader Reader;
-		private readonly char[] PeekBuffer = new char[JsonTokenizer.LongestLiteral];
+		private readonly char[] PeekBuffer = new char[JsonTokenizer.PeakBufferLength];
 		private readonly bool allowUnquotedKeys;
 		private JsonToken current;
 
@@ -274,10 +275,39 @@ namespace JsonFx.Json
 			throw new NotImplementedException();
 		}
 
-		private string ScanString(char startStringDelim)
+		private string ScanString(char stringDelim)
 		{
-			// TODO: scan string
-			throw new NotImplementedException();
+			StringBuilder builder = new StringBuilder(JsonTokenizer.PeakBufferLength);
+
+			// fill buffer
+			int count = this.Reader.Peek(this.PeekBuffer, 0, JsonTokenizer.PeakBufferLength);
+			while (count > 0)
+			{
+				for (int i=0; i<count; i++)
+				{
+					// check each character for line ending
+					if (this.PeekBuffer[i] == stringDelim)
+					{
+						// append final segment
+						builder.Append(this.PeekBuffer, 0, i);
+
+						// flush string and closing delim
+						this.Reader.Flush(i+1);
+
+						// output string
+						return builder.ToString();
+					}
+				}
+
+				// append buffered segment and flush
+				builder.Append(this.PeekBuffer, 0, count);
+
+				// refill buffer
+				count = this.Reader.Peek(this.PeekBuffer, 0, JsonTokenizer.PeakBufferLength);
+			}
+
+			// reached END before string delim
+			throw new JsonDeserializationException(JsonTokenizer.ErrorUnterminatedString, this.Reader.Position);
 		}
 
 		private string ScanUnquotedKey()
