@@ -138,7 +138,7 @@ namespace JsonFx.Json
 		private JsonToken Tokenize()
 		{
 			// read next char
-			int ch = this.Reader.Read();
+			int ch = this.Reader.Peek();
 
 			// skip comments and whitespace between tokens
 			ch = this.SkipCommentsAndWhitespace(ch);
@@ -147,43 +147,50 @@ namespace JsonFx.Json
 			{
 				case JsonTokenizer.EndOfSequence:
 				{
+					this.Reader.Flush(1);
 					return JsonToken.None;
 				}
 				case JsonTokenizer.OperatorArrayStart:
 				{
+					this.Reader.Flush(1);
 					return JsonToken.ArrayStart;
 				}
 				case JsonTokenizer.OperatorArrayEnd:
 				{
+					this.Reader.Flush(1);
 					return JsonToken.ArrayEnd;
 				}
 				case JsonTokenizer.OperatorObjectStart:
 				{
+					this.Reader.Flush(1);
 					return JsonToken.ObjectStart;
 				}
 				case JsonTokenizer.OperatorObjectEnd:
 				{
+					this.Reader.Flush(1);
 					return JsonToken.ObjectEnd;
 				}
 				case JsonTokenizer.OperatorValueDelim:
 				{
+					this.Reader.Flush(1);
 					return JsonToken.ValueDelim;
 				}
 				case JsonTokenizer.OperatorPairDelim:
 				{
+					this.Reader.Flush(1);
 					return JsonToken.PairDelim;
 				}
 				case JsonTokenizer.OperatorStringDelim:
 				case JsonTokenizer.OperatorStringDelimAlt:
 				{
-					return new JsonToken(JsonTokenType.String, this.ScanString((char)ch));
+					return new JsonToken(JsonTokenType.String, this.ScanString());
 				}
 			}
 
 			// number
 			if (Char.IsDigit((char)ch) || (JsonTokenizer.IsNumberChar((char)ch) && JsonTokenizer.IsNumberChar((char)this.Reader.Peek())))
 			{
-				return new JsonToken(JsonTokenType.Number, this.ScanNumber((char)ch));
+				return new JsonToken(JsonTokenType.Number, this.ScanNumber());
 			}
 
 			JsonToken token = this.ScanKeywords((char)ch);
@@ -194,7 +201,7 @@ namespace JsonFx.Json
 
 			// TODO: scan for identifiers then check if they are keywords
 
-			string ident = this.ScanIdentifier((char)ch);
+			string ident = this.ScanIdentifier();
 			if (!String.IsNullOrEmpty(ident))
 			{
 				return new JsonToken(JsonTokenType.Identifier, ident);
@@ -217,7 +224,7 @@ namespace JsonFx.Json
 			long commentStart = this.Reader.Position;
 
 			// read second char of comment start
-			ch = this.Reader.Read();
+			ch = this.Reader.NextPeek();
 			if (ch < 0)
 			{
 				throw new JsonDeserializationException(JsonTokenizer.ErrorUnterminatedComment, commentStart);
@@ -238,28 +245,28 @@ namespace JsonFx.Json
 			}
 
 			// start reading comment content
-			ch = this.Reader.Read();
+			ch = this.Reader.NextPeek();
+
 			if (isBlockComment)
 			{
 				// skip over everything until reach block comment ending
 				do
 				{
-					if (this.Reader.Peek() < 0)
+					if (ch < 0)
 					{
 						throw new JsonDeserializationException(JsonTokenizer.ErrorUnterminatedComment, commentStart);
 					}
-				} while ((ch = this.Reader.Read()) != JsonTokenizer.CommentEnd[0] || this.Reader.Peek() != JsonTokenizer.CommentEnd[1]);
+				} while (ch != JsonTokenizer.CommentEnd[0] || (ch = this.Reader.NextPeek()) != JsonTokenizer.CommentEnd[1]);
 
 				// move past block comment end token
-				ch = this.Reader.Read();
-				ch = this.Reader.Read();
+				ch = this.Reader.NextPeek();
 			}
 			else
 			{
 				// skip over everything until reach line ending
 				while (ch >= 0 && JsonTokenizer.LineEndings.IndexOf((char)ch) < 0)
 				{
-					ch = this.Reader.Read();
+					ch = this.Reader.NextPeek();
 				}
 			}
 
@@ -271,18 +278,17 @@ namespace JsonFx.Json
 		{
 			while (ch >= 0 && Char.IsWhiteSpace((char)ch))
 			{
-				ch = this.Reader.Read();
+				ch = this.Reader.NextPeek();
 			}
 
 			return ch;
 		}
 
-		private ValueType ScanNumber(char ch)
+		private ValueType ScanNumber()
 		{
 			long numberStart = this.Reader.Position;
 
-			this.PeekBuffer[0] = ch;
-			int bufferSize = 1+this.Reader.Peek(this.PeekBuffer, 1, this.PeekBuffer.Length-1);
+			int bufferSize = this.Reader.Peek(this.PeekBuffer);
 			int start = 0;
 			int pos = 0;
 
@@ -375,7 +381,7 @@ namespace JsonFx.Json
 
 			// at this point, we have the full number string and know its characteristics
 			string numberString = new String(this.PeekBuffer, start, pos-start);
-			this.Reader.Flush(pos-1);
+			this.Reader.Flush(pos);
 
 			if (!hasDecimal && !hasExponent && precision < 19)
 			{
@@ -440,15 +446,19 @@ namespace JsonFx.Json
 			}
 		}
 
-		private string ScanString(char stringDelim)
+		private string ScanString()
 		{
+			// TODO: simplify this so that it just leverages the BufferedTextReader's buffer
+			// then do a performance comparison with original
+
 			// store for unterminated case
-			long stringStart = this.Reader.Position-1L;
+			long stringStart = this.Reader.Position;
+			char stringDelim = (char)this.Reader.Read();
 
 			StringBuilder builder = new StringBuilder(JsonTokenizer.MinBufferLength);
 
 			// fill buffer
-			int count = this.Reader.Peek(this.PeekBuffer, 0, this.PeekBuffer.Length);
+			int count = this.Reader.Peek(this.PeekBuffer);
 			while (count > 0)
 			{
 				int start = 0;
@@ -480,7 +490,7 @@ namespace JsonFx.Json
 					this.Reader.Flush(i+1);
 
 					// ensure full buffer
-					count = this.Reader.Peek(this.PeekBuffer, 0, this.PeekBuffer.Length);
+					count = this.Reader.Peek(this.PeekBuffer);
 					start = i = 0;
 
 					if (count < 1)
@@ -571,7 +581,7 @@ namespace JsonFx.Json
 				this.Reader.Flush(count);
 
 				// refill buffer
-				count = this.Reader.Peek(this.PeekBuffer, 0, this.PeekBuffer.Length);
+				count = this.Reader.Peek(this.PeekBuffer);
 			}
 
 			// reached END before string delim
@@ -588,27 +598,26 @@ namespace JsonFx.Json
 				return null;
 			}
 
-			this.PeekBuffer[0] = ch;
-			int bufferSize = 1+this.Reader.Peek(this.PeekBuffer, 1, this.PeekBuffer.Length-1);
+			int bufferSize = this.Reader.Peek(this.PeekBuffer);
 
 			// "false" keyword
 			if (JsonTokenizer.IsKeyword(JsonTokenizer.KeywordFalse, this.PeekBuffer, 0, bufferSize))
 			{
-				this.Reader.Flush(JsonTokenizer.KeywordFalse.Length-1);
+				this.Reader.Flush(JsonTokenizer.KeywordFalse.Length);
 				return JsonToken.False;
 			}
 
 			// "true" keyword
 			if (JsonTokenizer.IsKeyword(JsonTokenizer.KeywordTrue, this.PeekBuffer, 0, bufferSize))
 			{
-				this.Reader.Flush(JsonTokenizer.KeywordTrue.Length-1);
+				this.Reader.Flush(JsonTokenizer.KeywordTrue.Length);
 				return JsonToken.True;
 			}
 
 			// "null" keyword
 			if (JsonTokenizer.IsKeyword(JsonTokenizer.KeywordNull, this.PeekBuffer, 0, bufferSize))
 			{
-				this.Reader.Flush(JsonTokenizer.KeywordNull.Length-1);
+				this.Reader.Flush(JsonTokenizer.KeywordNull.Length);
 				return JsonToken.Null;
 			}
 
@@ -622,14 +631,14 @@ namespace JsonFx.Json
 			// "NaN" keyword
 			if (JsonTokenizer.IsKeyword(JsonTokenizer.KeywordNaN, this.PeekBuffer, unaryOpShift, bufferSize-unaryOpShift))
 			{
-				this.Reader.Flush(unaryOpShift+JsonTokenizer.KeywordNaN.Length-1);
+				this.Reader.Flush(unaryOpShift+JsonTokenizer.KeywordNaN.Length);
 				return JsonToken.NaN;
 			}
 
 			// "Infinity" keyword
 			if (JsonTokenizer.IsKeyword(JsonTokenizer.KeywordInfinity, this.PeekBuffer, unaryOpShift, bufferSize-unaryOpShift))
 			{
-				this.Reader.Flush(unaryOpShift+JsonTokenizer.KeywordInfinity.Length-1);
+				this.Reader.Flush(unaryOpShift+JsonTokenizer.KeywordInfinity.Length);
 				if (ch == JsonTokenizer.OperatorUnaryMinus)
 				{
 					return JsonToken.NegativeInfinity;
@@ -640,16 +649,16 @@ namespace JsonFx.Json
 			// "undefined" keyword
 			if (JsonTokenizer.IsKeyword(JsonTokenizer.KeywordUndefined, this.PeekBuffer, 0, bufferSize))
 			{
-				this.Reader.Flush(JsonTokenizer.KeywordUndefined.Length-1);
+				this.Reader.Flush(JsonTokenizer.KeywordUndefined.Length);
 				return JsonToken.Undefined;
 			}
 
 			return null;
 		}
 
-		private static bool IsKeyword(string literal, char[] buffer, int index, int bufferSize)
+		private static bool IsKeyword(string keyword, char[] buffer, int index, int bufferSize)
 		{
-			int length = literal.Length;
+			int length = keyword.Length;
 
 			if (bufferSize < length)
 			{
@@ -658,7 +667,7 @@ namespace JsonFx.Json
 
 			for (int i=0; i<length; i++)
 			{
-				if (literal[i] != buffer[i+index])
+				if (keyword[i] != buffer[i+index])
 				{
 					return false;
 				}
@@ -670,8 +679,7 @@ namespace JsonFx.Json
 		/// <summary>
 		/// Scans the longest
 		/// </summary>
-		/// <param name="ch"></param>
-		/// <returns></returns>
+		/// <returns>identifier</returns>
 		/// <remarks>
 		/// http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-262.pdf
 		/// 
@@ -682,13 +690,11 @@ namespace JsonFx.Json
 		/// IdentifierPart =
 		///		IdentifierStart | Digit
 		/// </remarks>
-		private string ScanIdentifier(char ch)
+		private string ScanIdentifier()
 		{
 			StringBuilder ident = new StringBuilder(JsonTokenizer.MinBufferLength);
 
-			this.PeekBuffer[0] = ch;
-			int shift = 1;
-			int bufferSize = shift + this.Reader.Peek(this.PeekBuffer, shift, this.PeekBuffer.Length-1);
+			int bufferSize = this.Reader.Peek(this.PeekBuffer);
 
 			bool identPart = false;
 			while (bufferSize > 0)
@@ -696,7 +702,7 @@ namespace JsonFx.Json
 				int i;
 				for (i=0; i<bufferSize; i++)
 				{
-					ch = this.PeekBuffer[i];
+					char ch = this.PeekBuffer[i];
 
 					// digits are only allowed after first char
 					// rest can be in head or tail
@@ -709,21 +715,20 @@ namespace JsonFx.Json
 
 					// append partial
 					ident.Append(this.PeekBuffer, 0, i);
-					if (i-shift > 0)
+					if (i > 0)
 					{
-						this.Reader.Flush(i-shift);
+						this.Reader.Flush(i);
 					}
 					return ident.ToString();
 				}
 
 				// append entire buffer
 				ident.Append(this.PeekBuffer, 0, bufferSize);
-				if (bufferSize - shift > 0)
+				if (bufferSize > 0)
 				{
-					this.Reader.Flush(bufferSize - shift);
+					this.Reader.Flush(bufferSize);
 				}
-				shift = 0;
-				bufferSize = this.Reader.Peek(this.PeekBuffer, 0, this.PeekBuffer.Length);
+				bufferSize = this.Reader.Peek(this.PeekBuffer);
 			}
 
 			return ident.ToString();

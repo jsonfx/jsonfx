@@ -124,7 +124,22 @@ namespace JsonFx.Json
 		}
 
 		/// <summary>
-		/// 
+		/// Fills the buffer with the next character without advancing the input position.
+		/// </summary>
+		/// <param name="buffer"></param>
+		/// <returns></returns>
+		public virtual int Peek(char[] buffer)
+		{
+			if (buffer == null)
+			{
+				throw new ArgumentNullException("buffer");
+			}
+
+			return this.Peek(buffer, 0, buffer.Length);
+		}
+
+		/// <summary>
+		/// Fills the buffer with the next character without advancing the input position.
 		/// </summary>
 		/// <param name="buffer"></param>
 		/// <param name="index"></param>
@@ -177,36 +192,50 @@ namespace JsonFx.Json
 		}
 
 		/// <summary>
+		/// Reads characters from the input and writes the data to buffer.
+		/// </summary>
+		/// <param name="destBuffer"></param>
+		/// <returns></returns>
+		public virtual int Read(char[] buffer)
+		{
+			if (buffer == null)
+			{
+				throw new ArgumentNullException("buffer");
+			}
+			return this.Read(buffer, 0, buffer.Length);
+		}
+
+		/// <summary>
 		/// Reads a maximum of count characters from the input and writes the data to buffer, beginning at index.
 		/// </summary>
 		/// <param name="destBuffer"></param>
 		/// <param name="destIndex"></param>
 		/// <param name="destCount"></param>
 		/// <returns></returns>
-		public override int Read(char[] destBuffer, int destIndex, int destCount)
+		public override int Read(char[] buffer, int index, int count)
 		{
-			if (destBuffer == null)
+			if (buffer == null)
 			{
 				throw new ArgumentNullException("buffer");
 			}
-			if (destIndex < 0)
+			if (index < 0)
 			{
 				throw new ArgumentOutOfRangeException("index");
 			}
-			if (destCount < 0)
+			if (count < 0)
 			{
 				throw new ArgumentOutOfRangeException("count");
 			}
-			if ((destBuffer.Length - destIndex) < destCount)
+			if ((buffer.Length - index) < count)
 			{
 				throw new ArgumentException("Invalid buffer offset or length");
 			}
 
-			int readCount = 0;
-			while (destCount > 0)
+			int total = 0;
+			while (count > 0)
 			{
 				// fill buffer
-				this.EnsureBuffer(Math.Min(destCount, this.buffer.Length));
+				this.EnsureBuffer(Math.Min(count, this.buffer.Length));
 				if (this.count < 1)
 				{
 					// end of input
@@ -214,21 +243,21 @@ namespace JsonFx.Json
 				}
 
 				// determine how many are left
-				int max = Math.Min(destCount, this.count);
+				int max = Math.Min(count, this.count);
 
 				// copy into user buffer
-				Array.Copy(this.buffer, this.start, destBuffer, destIndex, max);
+				Array.Copy(this.buffer, this.start, buffer, index, max);
 
 				// adjust read counts
-				readCount += max;
-				destIndex += max;
-				destCount -= max;
+				total += max;
+				index += max;
+				count -= max;
 
 				// adjust buffer counts
 				this.start += max;
 				this.count -= max;
 			}
-			return readCount;
+			return total;
 		}
 
 		/// <summary>
@@ -309,6 +338,29 @@ namespace JsonFx.Json
 		#endregion TextReader Methods
 
 		#region Buffer Methods
+
+		/// <summary>
+		/// Advances the character position by 1 characters and peeks the next character.
+		/// </summary>
+		/// <returns>the next character to be read or -1 if no more characters are available</returns>
+		public int NextPeek()
+		{
+			this.EnsureBuffer(2);
+			if (this.count < 1)
+			{
+				throw new ArgumentOutOfRangeException("count", "Attempted to flush beyond end of input.");
+			}
+
+			this.start++;
+			this.count--;
+
+			if (this.count < 1)
+			{
+				return -1;
+			}
+
+			return this.buffer[this.start];
+		}
 
 		/// <summary>
 		/// Advances the character position by count characters.
