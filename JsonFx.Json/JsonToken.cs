@@ -46,14 +46,14 @@ namespace JsonFx.Json
 		internal static readonly JsonToken ArrayEnd = new JsonToken(JsonTokenType.ArrayEnd);
 		internal static readonly JsonToken ObjectStart = new JsonToken(JsonTokenType.ObjectStart);
 		internal static readonly JsonToken ObjectEnd = new JsonToken(JsonTokenType.ObjectEnd);
-		internal static readonly JsonToken NameDelim = new JsonToken(JsonTokenType.NameDelim);
+		internal static readonly JsonToken PairDelim = new JsonToken(JsonTokenType.PairDelim);
 		internal static readonly JsonToken ValueDelim = new JsonToken(JsonTokenType.ValueDelim);
 
-		internal static readonly JsonToken Undefined = new JsonToken(JsonTokenType.Undefined, null);
-		internal static readonly JsonToken Null = new JsonToken(JsonTokenType.Null, null);
+		internal static readonly JsonToken Undefined = new JsonToken(JsonTokenType.Undefined);
+		internal static readonly JsonToken Null = new JsonToken(JsonTokenType.Null);
 		internal static readonly JsonToken False = new JsonToken(JsonTokenType.Boolean, false);
 		internal static readonly JsonToken True = new JsonToken(JsonTokenType.Boolean, true);
-		internal static readonly JsonToken NotANumber = new JsonToken(JsonTokenType.Number, Double.NaN);
+		internal static readonly JsonToken NaN = new JsonToken(JsonTokenType.Number, Double.NaN);
 		internal static readonly JsonToken PositiveInfinity = new JsonToken(JsonTokenType.Number, Double.PositiveInfinity);
 		internal static readonly JsonToken NegativeInfinity = new JsonToken(JsonTokenType.Number, Double.NegativeInfinity);
 
@@ -96,11 +96,11 @@ namespace JsonFx.Json
 		{
 			StringBuilder builder = new StringBuilder();
 
-			builder.Append("{ TokenType=");
+			builder.Append("{ ");
 			builder.Append(this.TokenType);
 			if (this.Value != null)
 			{
-				builder.Append(", Value=");
+				builder.Append("=");
 				builder.Append(this.Value);
 			}
 			builder.Append(" }");

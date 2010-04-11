@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -33,72 +33,72 @@ using System;
 namespace JsonFx.Json
 {
 	/// <summary>
-	/// Lexical Analysis Tokens
+	/// JSON Lexical Analysis Tokens
 	/// </summary>
 	public enum JsonTokenType
 	{
 		/// <summary>
-		/// End of input sequence
+		/// Not specified
 		/// </summary>
 		None,
 
 		/// <summary>
-		/// undefined keyword
+		/// Undefined value
 		/// </summary>
 		Undefined,
 
 		/// <summary>
-		/// null keyword
+		/// Null value
 		/// </summary>
 		Null,
 
 		/// <summary>
-		/// JSON Boolean
+		/// Boolean value
 		/// </summary>
 		Boolean,
 
 		/// <summary>
-		/// JSON Number
+		/// Number value
 		/// </summary>
 		Number,
 
 		/// <summary>
-		/// JSON String
+		/// String value
 		/// </summary>
 		String,
 
 		/// <summary>
-		/// Start of JSON Array
+		/// Start of Array
 		/// </summary>
 		ArrayStart,
 
 		/// <summary>
-		/// End of JSON Array
+		/// End of Array
 		/// </summary>
 		ArrayEnd,
 
 		/// <summary>
-		/// Start of JSON Object
+		/// Start of Object
 		/// </summary>
 		ObjectStart,
 
 		/// <summary>
-		/// End of JSON Object
+		/// End of Object
 		/// </summary>
 		ObjectEnd,
 
 		/// <summary>
-		/// JSON Object Property name/value deliminator
+		/// JSON Object name/value pair deliminator
 		/// </summary>
-		NameDelim,
+		PairDelim,
 
 		/// <summary>
-		/// JSON Object Property deliminator
+		/// JSON value deliminator
 		/// </summary>
 		ValueDelim,
 
 		/// <summary>
-		/// unquoted Object Property name
+		/// Unquoted Object Property name
 		/// </summary>
 		UnquotedName
 	}

@@ -46,13 +46,12 @@ namespace JsonFx.Json
 
 		private const int PeakBufferLength = 128;
 
-		internal const string LiteralUndefined = "undefined";
-		internal const string LiteralNull = "null";
-		internal const string LiteralFalse = "false";
-		internal const string LiteralTrue = "true";
-		internal const string LiteralNotANumber = "NaN";
-		internal const string LiteralPositiveInfinity = "Infinity";
-		internal const string LiteralNegativeInfinity = "-Infinity";
+		internal const string KeywordUndefined = "undefined";
+		internal const string KeywordNull = "null";
+		internal const string KeywordFalse = "false";
+		internal const string KeywordTrue = "true";
+		internal const string KeywordNaN = "NaN";
+		internal const string KeywordInfinity = "Infinity";
 
 		private const int EndOfSequence = -1;
 		private const char OperatorNegate = '-';
@@ -155,7 +154,7 @@ namespace JsonFx.Json
 				}
 				case JsonTokenizer.OperatorNameDelim:
 				{
-					return JsonToken.NameDelim;
+					return JsonToken.PairDelim;
 				}
 				case JsonTokenizer.OperatorStringDelim:
 				case JsonTokenizer.OperatorStringDelimAlt:
@@ -166,8 +165,8 @@ namespace JsonFx.Json
 
 			// number
 			if (Char.IsDigit((char)ch) ||
-				(ch == JsonTokenizer.OperatorNegate) ||
-				(ch == JsonTokenizer.OperatorUnaryPlus))
+				Char.IsDigit((char)this.Reader.Peek()) &&
+				((ch == JsonTokenizer.OperatorNegate) || (ch == JsonTokenizer.OperatorUnaryPlus)))
 			{
 				return new JsonToken(JsonTokenType.Number, this.ScanNumber(ch));
 			}
@@ -305,6 +304,12 @@ namespace JsonFx.Json
 						return builder.ToString();
 					}
 
+					//if (Char.IsControl(this.PeekBuffer[i]))
+					//{
+					//    // control characters not allowed within strings
+					//    throw new JsonDeserializationException(JsonTokenizer.ErrorUnterminatedString, stringStart);
+					//}
+
 					if (this.PeekBuffer[i] != JsonTokenizer.OperatorCharEscape)
 					{
 						// accumulate
@@ -423,59 +428,63 @@ namespace JsonFx.Json
 			this.PeekBuffer[0] = ch;
 			int bufferSize = this.Reader.Peek(this.PeekBuffer, 1, this.PeekBuffer.Length-1);
 
-			// "false" literal
-			if (this.IsLiteral(JsonTokenizer.LiteralFalse, this.PeekBuffer, bufferSize))
+			// "false" keyword
+			if (this.IsKeyword(JsonTokenizer.KeywordFalse, this.PeekBuffer, 0, bufferSize))
 			{
-				this.Reader.Flush(JsonTokenizer.LiteralFalse.Length-1);
+				this.Reader.Flush(JsonTokenizer.KeywordFalse.Length-1);
 				return JsonToken.False;
 			}
 
-			// "true" literal
-			if (this.IsLiteral(JsonTokenizer.LiteralTrue, this.PeekBuffer, bufferSize))
+			// "true" keyword
+			if (this.IsKeyword(JsonTokenizer.KeywordTrue, this.PeekBuffer, 0, bufferSize))
 			{
-				this.Reader.Flush(JsonTokenizer.LiteralTrue.Length-1);
+				this.Reader.Flush(JsonTokenizer.KeywordTrue.Length-1);
 				return JsonToken.True;
 			}
 
-			// "null" literal
-			if (this.IsLiteral(JsonTokenizer.LiteralNull, this.PeekBuffer, bufferSize))
+			// "null" keyword
+			if (this.IsKeyword(JsonTokenizer.KeywordNull, this.PeekBuffer, 0, bufferSize))
 			{
-				this.Reader.Flush(JsonTokenizer.LiteralNull.Length-1);
+				this.Reader.Flush(JsonTokenizer.KeywordNull.Length-1);
 				return JsonToken.Null;
 			}
 
-			// "NaN" literal
-			if (this.IsLiteral(JsonTokenizer.LiteralNotANumber, this.PeekBuffer, bufferSize))
+			// numbers can be modified with unary +/- operators
+			int unaryOpShift = 0;
+			if ((ch == JsonTokenizer.OperatorNegate) || (ch == JsonTokenizer.OperatorUnaryPlus))
 			{
-				this.Reader.Flush(JsonTokenizer.LiteralNotANumber.Length-1);
-				return JsonToken.NotANumber;
+				unaryOpShift++;
 			}
 
-			// "Infinity" literal
-			if (this.IsLiteral(JsonTokenizer.LiteralPositiveInfinity, this.PeekBuffer, bufferSize))
+			// "NaN" keyword
+			if (this.IsKeyword(JsonTokenizer.KeywordNaN, this.PeekBuffer, unaryOpShift, bufferSize-unaryOpShift))
 			{
-				this.Reader.Flush(JsonTokenizer.LiteralPositiveInfinity.Length-1);
+				this.Reader.Flush(unaryOpShift+JsonTokenizer.KeywordNaN.Length-1);
+				return JsonToken.NaN;
+			}
+
+			// "Infinity" keyword
+			if (this.IsKeyword(JsonTokenizer.KeywordInfinity, this.PeekBuffer, unaryOpShift, bufferSize-unaryOpShift))
+			{
+				this.Reader.Flush(unaryOpShift+JsonTokenizer.KeywordInfinity.Length-1);
+				if (ch == JsonTokenizer.OperatorNegate)
+				{
+					return JsonToken.NegativeInfinity;
+				}
 				return JsonToken.PositiveInfinity;
 			}
 
-			// "-Infinity" literal
-			if (this.IsLiteral(JsonTokenizer.LiteralNegativeInfinity, this.PeekBuffer, bufferSize))
+			// "undefined" keyword
+			if (this.IsKeyword(JsonTokenizer.KeywordUndefined, this.PeekBuffer, 0, bufferSize))
 			{
-				this.Reader.Flush(JsonTokenizer.LiteralNegativeInfinity.Length-1);
-				return JsonToken.NegativeInfinity;
-			}
-
-			// "undefined" literal
-			if (this.IsLiteral(JsonTokenizer.LiteralUndefined, this.PeekBuffer, bufferSize))
-			{
-				this.Reader.Flush(JsonTokenizer.LiteralUndefined.Length-1);
+				this.Reader.Flush(JsonTokenizer.KeywordUndefined.Length-1);
 				return JsonToken.Undefined;
 			}
 
 			return null;
 		}
 
-		private bool IsLiteral(string literal, char[] buffer, int bufferSize)
+		private bool IsKeyword(string literal, char[] buffer, int index, int bufferSize)
 		{
 			int length = literal.Length;
 
@@ -486,7 +495,7 @@ namespace JsonFx.Json
 
 			for (int i=0; i<length; i++)
 			{
-				if (literal[i] != buffer[i])
+				if (literal[i] != buffer[i+index])
 				{
 					return false;
 				}
