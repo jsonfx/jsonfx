@@ -40,7 +40,7 @@ namespace JsonFx.Json
 	/// <summary>
 	/// Performs JSON lexical analysis over the input reader.
 	/// </summary>
-	public class JsonTokenizer : IEnumerator<JsonToken>
+	public class JsonTokenizer : IEnumerable<JsonToken>
 	{
 		#region Constants
 
@@ -54,17 +54,18 @@ namespace JsonFx.Json
 		internal const string LiteralPositiveInfinity = "Infinity";
 		internal const string LiteralNegativeInfinity = "-Infinity";
 
-		internal const char OperatorNegate = '-';
-		internal const char OperatorUnaryPlus = '+';
+		private const int EndOfSequence = -1;
+		private const char OperatorNegate = '-';
+		private const char OperatorUnaryPlus = '+';
 		internal const char OperatorArrayStart = '[';
 		internal const char OperatorArrayEnd = ']';
 		internal const char OperatorObjectStart = '{';
 		internal const char OperatorObjectEnd = '}';
-		internal const char OperatorStringDelim = '"';
-		internal const char OperatorStringDelimAlt = '\'';
+		private const char OperatorStringDelim = '"';
+		private const char OperatorStringDelimAlt = '\'';
 		internal const char OperatorValueDelim = ',';
 		internal const char OperatorNameDelim = ':';
-		internal const char OperatorCharEscape = '\\';
+		private const char OperatorCharEscape = '\\';
 
 		private const string CommentStart = "/*";
 		private const string CommentEnd = "*/";
@@ -95,7 +96,6 @@ namespace JsonFx.Json
 		private readonly BufferedTextReader Reader;
 		private readonly char[] PeekBuffer = new char[JsonTokenizer.PeakBufferLength];
 		private readonly bool allowUnquotedKeys;
-		private JsonToken current;
 
 		#endregion Fields
 
@@ -107,7 +107,7 @@ namespace JsonFx.Json
 		/// <param name="reader">the input reader</param>
 		public JsonTokenizer(TextReader reader, bool allowUnquotedKeys)
 		{
-			this.Reader = new BufferedTextReader(reader);
+			this.Reader = new BufferedTextReader(reader, JsonTokenizer.PeakBufferLength);
 			this.allowUnquotedKeys = allowUnquotedKeys;
 		}
 
@@ -115,6 +115,10 @@ namespace JsonFx.Json
 
 		#region Methods
 
+		/// <summary>
+		/// Returns the next JSON token in the sequence.
+		/// </summary>
+		/// <returns></returns>
 		private JsonToken Tokenize()
 		{
 			// read next char
@@ -125,6 +129,10 @@ namespace JsonFx.Json
 
 			switch (ch)
 			{
+				case JsonTokenizer.EndOfSequence:
+				{
+					return JsonToken.None;
+				}
 				case JsonTokenizer.OperatorArrayStart:
 				{
 					return JsonToken.ArrayStart;
@@ -154,11 +162,6 @@ namespace JsonFx.Json
 				{
 					return new JsonToken(JsonTokenType.String, this.ScanString((char)ch));
 				}
-			}
-
-			if (ch < 0)
-			{
-				return JsonToken.End;
 			}
 
 			// number
@@ -214,26 +217,20 @@ namespace JsonFx.Json
 			ch = this.Reader.Read();
 			if (isBlockComment)
 			{
-				// store index for unterminated cases
+				// store index for unterminated case
 				long commentStart = this.Reader.Position-2L;
 
-				if (this.Reader.Peek() < 0)
-				{
-					throw new JsonDeserializationException(JsonTokenizer.ErrorUnterminatedComment, commentStart);
-				}
-
 				// skip over everything until reach block comment ending
-				while (this.Reader.Read() != JsonTokenizer.CommentEnd[0] ||
-					this.Reader.Peek() != JsonTokenizer.CommentEnd[1])
+				do
 				{
-					ch = this.Reader.Read();
 					if (this.Reader.Peek() < 0)
 					{
 						throw new JsonDeserializationException(JsonTokenizer.ErrorUnterminatedComment, commentStart);
 					}
-				}
+				} while ((ch = this.Reader.Read()) != JsonTokenizer.CommentEnd[0] || this.Reader.Peek() != JsonTokenizer.CommentEnd[1]);
 
-				// skip block comment end token
+				// move past block comment end token
+				ch = this.Reader.Read();
 				ch = this.Reader.Read();
 			}
 			else
@@ -277,19 +274,23 @@ namespace JsonFx.Json
 
 		private string ScanString(char stringDelim)
 		{
+			// store for unterminated case
+			long stringStart = this.Reader.Position-1L;
+
 			StringBuilder builder = new StringBuilder(JsonTokenizer.PeakBufferLength);
 
 			// fill buffer
 			int count = this.Reader.Peek(this.PeekBuffer, 0, JsonTokenizer.PeakBufferLength);
 			while (count > 0)
 			{
-				for (int i=0; i<count; i++)
+				int lastWritten = 0;
+				for (int i=lastWritten; i<count; i++)
 				{
-					// check each character for line ending
+					// check each character for ending delim
 					if (this.PeekBuffer[i] == stringDelim)
 					{
 						// append final segment
-						builder.Append(this.PeekBuffer, 0, i);
+						builder.Append(this.PeekBuffer, lastWritten, i-lastWritten);
 
 						// flush string and closing delim
 						this.Reader.Flush(i+1);
@@ -297,17 +298,118 @@ namespace JsonFx.Json
 						// output string
 						return builder.ToString();
 					}
+
+					if (this.PeekBuffer[i] != JsonTokenizer.OperatorCharEscape)
+					{
+						// accumulate
+						continue;
+					}
+
+					// append before 
+					builder.Append(this.PeekBuffer, lastWritten, i-lastWritten);
+
+					// flush prefix and escape char
+					this.Reader.Flush(i+1);
+
+					// ensure full buffer
+					count = this.Reader.Peek(this.PeekBuffer, 0, JsonTokenizer.PeakBufferLength);
+					lastWritten = i = 0;
+
+					if (count < 1)
+					{
+						throw new JsonDeserializationException(JsonTokenizer.ErrorUnterminatedString, stringStart);
+					}
+
+					// decode
+					switch (this.PeekBuffer[i])
+					{
+						case '0':
+						{
+							// don't allow NULL char '\0'
+							// causes CStrings to terminate
+							break;
+						}
+						case 'b':
+						{
+							// backspace
+							builder.Append('\b');
+							break;
+						}
+						case 'f':
+						{
+							// formfeed
+							builder.Append('\f');
+							break;
+						}
+						case 'n':
+						{
+							// newline
+							builder.Append('\n');
+							break;
+						}
+						case 'r':
+						{
+							// carriage return
+							builder.Append('\r');
+							break;
+						}
+						case 't':
+						{
+							// tab
+							builder.Append('\t');
+							break;
+						}
+						case 'u':
+						{
+							// Unicode escape sequence
+							// e.g. Copyright: "\u00A9"
+
+							const int UnicodeEscapeLength = 4;
+
+							// unicode ordinal
+							int utf16;
+							if (lastWritten+UnicodeEscapeLength < count &&
+						        Int32.TryParse(
+									new String(this.PeekBuffer, i+1, UnicodeEscapeLength),
+									NumberStyles.AllowHexSpecifier,
+									NumberFormatInfo.InvariantInfo,
+									out utf16))
+							{
+								builder.Append(Char.ConvertFromUtf32(utf16));
+								i += UnicodeEscapeLength;
+								lastWritten += UnicodeEscapeLength;
+							}
+							else
+							{
+								// using FireFox style recovery, if not a valid hex
+								// escape sequence then treat as single escaped 'u'
+								// followed by rest of string
+								goto default;
+							}
+							break;
+						}
+						default:
+						{
+							builder.Append(this.PeekBuffer[i]);
+							break;
+						}
+					}
+
+					lastWritten++;
 				}
 
-				// append buffered segment and flush
-				builder.Append(this.PeekBuffer, 0, count);
+				// append remaining buffered segment and flush
+				if (count > 1)
+				{
+					builder.Append(this.PeekBuffer, lastWritten, count-1);
+				}
 
 				// refill buffer
 				count = this.Reader.Peek(this.PeekBuffer, 0, JsonTokenizer.PeakBufferLength);
 			}
 
 			// reached END before string delim
-			throw new JsonDeserializationException(JsonTokenizer.ErrorUnterminatedString, this.Reader.Position);
+			throw new JsonDeserializationException(JsonTokenizer.ErrorUnterminatedString, stringStart);
 		}
 
 		private string ScanUnquotedKey()
@@ -387,48 +489,31 @@ namespace JsonFx.Json
 
 		#endregion Scanning Methods
 
-		#region IEnumerator<JsonToken> Members
+		#region IEnumerable<JsonToken> Members
 
-		/// <summary>
-		/// Gets the current token from the input reader.
-		/// </summary>
-		public JsonToken Current
+		public IEnumerator<JsonToken> GetEnumerator()
 		{
-			get { return this.current; }
+			while (true)
+			{
+				JsonToken token = this.Tokenize();
+				if (token.TokenType == JsonTokenType.None)
+				{
+					yield break;
+				}
+				yield return token;
+			};
 		}
 
-		#endregion IEnumerator<JsonToken> Members
+		#endregion IEnumerable<JsonToken> Members
 
-		#region IEnumerator Members
+		#region IEnumerable Members
 
-		/// <summary>
-		/// Gets the current token from the input reader.
-		/// </summary>
-		object IEnumerator.Current
+		IEnumerator IEnumerable.GetEnumerator()
 		{
-			get { return this.current; }
+			return this.GetEnumerator();
 		}
 
-		/// <summary>
-		/// Moves to the next token, returning if any more tokens are available.
-		/// </summary>
-		/// <returns></returns>
-		public bool MoveNext()
-		{
-			this.Tokenize();
-
-			return (this.current.TokenType != JsonTokenType.End);
-		}
-
-		/// <summary>
-		/// Throws NotSupportedException
-		/// </summary>
-		void IEnumerator.Reset()
-		{
-			throw new NotSupportedException("JsonTokenizer cannot reset the token sequence.");
-		}
-
-		#endregion IEnumerator Members
+		#endregion IEnumerable Members
 
 		#region IDisposable Members
 

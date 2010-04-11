@@ -40,7 +40,7 @@ namespace JsonFx.Json
 		/// <summary>
 		/// End of input sequence
 		/// </summary>
-		End,
+		None,
 
 		/// <summary>
 		/// undefined, null, false, true, NaN, Infinity, -Infinity

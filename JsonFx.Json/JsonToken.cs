@@ -29,6 +29,7 @@
 #endregion License
 
 using System;
+using System.Text;
 
 namespace JsonFx.Json
 {
@@ -39,13 +40,13 @@ namespace JsonFx.Json
 	{
 		#region Constants
 
-		internal static readonly JsonToken End = new JsonToken(JsonTokenType.End);
-		internal static readonly JsonToken ArrayStart = new JsonToken(JsonTokenType.ArrayStart);
-		internal static readonly JsonToken ArrayEnd = new JsonToken(JsonTokenType.ArrayEnd);
-		internal static readonly JsonToken ObjectStart = new JsonToken(JsonTokenType.ObjectStart);
-		internal static readonly JsonToken ObjectEnd = new JsonToken(JsonTokenType.ObjectEnd);
-		internal static readonly JsonToken NameDelim = new JsonToken(JsonTokenType.NameDelim);
-		internal static readonly JsonToken ValueDelim = new JsonToken(JsonTokenType.ValueDelim);
+		internal static readonly JsonToken None = new JsonToken(JsonTokenType.None);
+		internal static readonly JsonToken ArrayStart = new JsonToken(JsonTokenType.ArrayStart, JsonTokenizer.OperatorArrayStart.ToString());
+		internal static readonly JsonToken ArrayEnd = new JsonToken(JsonTokenType.ArrayEnd, JsonTokenizer.OperatorArrayEnd.ToString());
+		internal static readonly JsonToken ObjectStart = new JsonToken(JsonTokenType.ObjectStart, JsonTokenizer.OperatorObjectStart.ToString());
+		internal static readonly JsonToken ObjectEnd = new JsonToken(JsonTokenType.ObjectEnd, JsonTokenizer.OperatorObjectEnd.ToString());
+		internal static readonly JsonToken NameDelim = new JsonToken(JsonTokenType.NameDelim, JsonTokenizer.OperatorNameDelim.ToString());
+		internal static readonly JsonToken ValueDelim = new JsonToken(JsonTokenType.ValueDelim, JsonTokenizer.OperatorValueDelim.ToString());
 
 		#endregion Constants
 
@@ -79,5 +80,25 @@ namespace JsonFx.Json
 		}
 
 		#endregion Init
+
+		#region Object Overrides
+
+		public override string ToString()
+		{
+			StringBuilder builder = new StringBuilder();
+
+			builder.Append("{ TokenType=");
+			builder.Append(this.TokenType);
+			if (!String.IsNullOrEmpty(this.Value))
+			{
+				builder.Append(", Value=");
+				builder.Append(this.Value);
+			}
+			builder.Append(" }");
+
+			return builder.ToString();
+		}
+
+		#endregion Object Overrides
 	}
 }
