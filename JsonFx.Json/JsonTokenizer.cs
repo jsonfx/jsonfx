@@ -44,7 +44,7 @@ namespace JsonFx.Json
 	{
 		#region Constants
 
-		private const int MinBufferLength = 128;
+		private const int MinBufferLength = 10;
 		private const int DefaultBufferSize = 1024;
 
 		private const string KeywordUndefined = "undefined";
@@ -282,7 +282,7 @@ namespace JsonFx.Json
 			long numberStart = this.Reader.Position;
 
 			this.PeekBuffer[0] = ch;
-			int bufferSize = this.Reader.Peek(this.PeekBuffer, 1, this.PeekBuffer.Length-1);
+			int bufferSize = 1+this.Reader.Peek(this.PeekBuffer, 1, this.PeekBuffer.Length-1);
 			int start = 0;
 			int pos = 0;
 
@@ -445,7 +445,7 @@ namespace JsonFx.Json
 			// store for unterminated case
 			long stringStart = this.Reader.Position-1L;
 
-			StringBuilder builder = new StringBuilder(this.PeekBuffer.Length);
+			StringBuilder builder = new StringBuilder(JsonTokenizer.MinBufferLength);
 
 			// fill buffer
 			int count = this.Reader.Peek(this.PeekBuffer, 0, this.PeekBuffer.Length);
@@ -466,12 +466,6 @@ namespace JsonFx.Json
 						// output string
 						return builder.ToString();
 					}
-
-					//if (Char.IsControl(this.PeekBuffer[i]))
-					//{
-					//    // control characters not allowed within strings
-					//    throw new JsonDeserializationException(JsonTokenizer.ErrorUnterminatedString, stringStart);
-					//}
 
 					if (this.PeekBuffer[i] != JsonTokenizer.OperatorCharEscape)
 					{
@@ -573,10 +567,8 @@ namespace JsonFx.Json
 				}
 
 				// append remaining buffered segment and flush
-				if (count > 1)
-				{
-					builder.Append(this.PeekBuffer, start, count-1);
-				}
+				builder.Append(this.PeekBuffer, start, count-start);
+				this.Reader.Flush(count);
 
 				// refill buffer
 				count = this.Reader.Peek(this.PeekBuffer, 0, this.PeekBuffer.Length);
@@ -597,7 +589,7 @@ namespace JsonFx.Json
 			}
 
 			this.PeekBuffer[0] = ch;
-			int bufferSize = this.Reader.Peek(this.PeekBuffer, 1, this.PeekBuffer.Length-1);
+			int bufferSize = 1+this.Reader.Peek(this.PeekBuffer, 1, this.PeekBuffer.Length-1);
 
 			// "false" keyword
 			if (JsonTokenizer.IsKeyword(JsonTokenizer.KeywordFalse, this.PeekBuffer, 0, bufferSize))
@@ -695,7 +687,8 @@ namespace JsonFx.Json
 			StringBuilder ident = new StringBuilder(JsonTokenizer.MinBufferLength);
 
 			this.PeekBuffer[0] = ch;
-			int bufferSize = this.Reader.Peek(this.PeekBuffer, 1, this.PeekBuffer.Length-1);
+			int shift = 1;
+			int bufferSize = shift + this.Reader.Peek(this.PeekBuffer, shift, this.PeekBuffer.Length-1);
 
 			bool identPart = false;
 			while (bufferSize > 0)
@@ -716,16 +709,20 @@ namespace JsonFx.Json
 
 					// append partial
 					ident.Append(this.PeekBuffer, 0, i);
-					if (i > 1)
+					if (i-shift > 0)
 					{
-						this.Reader.Flush(i-1);
+						this.Reader.Flush(i-shift);
 					}
 					return ident.ToString();
 				}
 
 				// append entire buffer
 				ident.Append(this.PeekBuffer, 0, bufferSize);
-				this.Reader.Flush(bufferSize);
+				if (bufferSize - shift > 0)
+				{
+					this.Reader.Flush(bufferSize - shift);
+				}
+				shift = 0;
 				bufferSize = this.Reader.Peek(this.PeekBuffer, 0, this.PeekBuffer.Length);
 			}
 
