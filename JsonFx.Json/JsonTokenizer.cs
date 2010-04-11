@@ -181,9 +181,7 @@ namespace JsonFx.Json
 			}
 
 			// number
-			if (Char.IsDigit((char)ch) ||
-				Char.IsDigit((char)this.Reader.Peek()) &&
-				((ch == JsonTokenizer.OperatorUnaryMinus) || (ch == JsonTokenizer.OperatorUnaryPlus)))
+			if (Char.IsDigit((char)ch) || (JsonTokenizer.IsNumberChar((char)ch) && JsonTokenizer.IsNumberChar((char)this.Reader.Peek())))
 			{
 				return new JsonToken(JsonTokenType.Number, this.ScanNumber((char)ch));
 			}
@@ -338,7 +336,6 @@ namespace JsonFx.Json
 			}
 
 			bool hasExponent = false;
-			int exponent = 0;
 
 			// optional exponent part
 			if ((pos < bufferSize) && (this.PeekBuffer[pos] == 'e' || this.PeekBuffer[pos] == 'E'))
@@ -352,42 +349,25 @@ namespace JsonFx.Json
 					throw new JsonDeserializationException(JsonTokenizer.ErrorIllegalNumber, numberStart);
 				}
 
-				int expStart = pos;
-
 				// optional minus/plus part
 				if (this.PeekBuffer[pos] == JsonTokenizer.OperatorUnaryMinus ||
 					this.PeekBuffer[pos] == JsonTokenizer.OperatorUnaryPlus)
 				{
 					// consume sign
 					pos++;
-					if (pos >= bufferSize || !Char.IsDigit(this.PeekBuffer[pos]))
-					{
-						throw new JsonDeserializationException(JsonTokenizer.ErrorIllegalNumber, numberStart);
-					}
-				}
-				else
-				{
-					if (!Char.IsDigit(this.PeekBuffer[pos]))
-					{
-						throw new JsonDeserializationException(JsonTokenizer.ErrorIllegalNumber, numberStart);
-					}
 				}
 
-				// exp part
-				while (pos < bufferSize && Char.IsDigit(this.PeekBuffer[pos]))
-				{
-					// consume digit
-					pos++;
-				}
-
-				if (!Int32.TryParse(
-						new String(this.PeekBuffer, expStart, pos-expStart),
-						NumberStyles.Integer,
-						NumberFormatInfo.InvariantInfo,
-						out exponent))
+				if (pos >= bufferSize || !Char.IsDigit(this.PeekBuffer[pos]))
 				{
 					throw new JsonDeserializationException(JsonTokenizer.ErrorIllegalNumber, numberStart);
 				}
+
+				// exp part
+				do
+				{
+					// consume digit
+					pos++;
+				} while (pos < bufferSize && Char.IsDigit(this.PeekBuffer[pos]));
 			}
 
 			// at this point, we have the full number string and know its characteristics
@@ -437,6 +417,23 @@ namespace JsonFx.Json
 				}
 
 				return number;
+			}
+		}
+
+		private static bool IsNumberChar(char ch)
+		{
+			switch (ch)
+			{
+				case JsonTokenizer.OperatorDecimal:
+				case JsonTokenizer.OperatorUnaryMinus:
+				case JsonTokenizer.OperatorUnaryPlus:
+				{
+					return true;
+				}
+				default:
+				{
+					return Char.IsDigit(ch);
+				}
 			}
 		}
 
@@ -592,21 +589,21 @@ namespace JsonFx.Json
 			int bufferSize = this.Reader.Peek(this.PeekBuffer, 1, this.PeekBuffer.Length-1);
 
 			// "false" keyword
-			if (this.IsKeyword(JsonTokenizer.KeywordFalse, this.PeekBuffer, 0, bufferSize))
+			if (JsonTokenizer.IsKeyword(JsonTokenizer.KeywordFalse, this.PeekBuffer, 0, bufferSize))
 			{
 				this.Reader.Flush(JsonTokenizer.KeywordFalse.Length-1);
 				return JsonToken.False;
 			}
 
 			// "true" keyword
-			if (this.IsKeyword(JsonTokenizer.KeywordTrue, this.PeekBuffer, 0, bufferSize))
+			if (JsonTokenizer.IsKeyword(JsonTokenizer.KeywordTrue, this.PeekBuffer, 0, bufferSize))
 			{
 				this.Reader.Flush(JsonTokenizer.KeywordTrue.Length-1);
 				return JsonToken.True;
 			}
 
 			// "null" keyword
-			if (this.IsKeyword(JsonTokenizer.KeywordNull, this.PeekBuffer, 0, bufferSize))
+			if (JsonTokenizer.IsKeyword(JsonTokenizer.KeywordNull, this.PeekBuffer, 0, bufferSize))
 			{
 				this.Reader.Flush(JsonTokenizer.KeywordNull.Length-1);
 				return JsonToken.Null;
@@ -620,14 +617,14 @@ namespace JsonFx.Json
 			}
 
 			// "NaN" keyword
-			if (this.IsKeyword(JsonTokenizer.KeywordNaN, this.PeekBuffer, unaryOpShift, bufferSize-unaryOpShift))
+			if (JsonTokenizer.IsKeyword(JsonTokenizer.KeywordNaN, this.PeekBuffer, unaryOpShift, bufferSize-unaryOpShift))
 			{
 				this.Reader.Flush(unaryOpShift+JsonTokenizer.KeywordNaN.Length-1);
 				return JsonToken.NaN;
 			}
 
 			// "Infinity" keyword
-			if (this.IsKeyword(JsonTokenizer.KeywordInfinity, this.PeekBuffer, unaryOpShift, bufferSize-unaryOpShift))
+			if (JsonTokenizer.IsKeyword(JsonTokenizer.KeywordInfinity, this.PeekBuffer, unaryOpShift, bufferSize-unaryOpShift))
 			{
 				this.Reader.Flush(unaryOpShift+JsonTokenizer.KeywordInfinity.Length-1);
 				if (ch == JsonTokenizer.OperatorUnaryMinus)
@@ -638,7 +635,7 @@ namespace JsonFx.Json
 			}
 
 			// "undefined" keyword
-			if (this.IsKeyword(JsonTokenizer.KeywordUndefined, this.PeekBuffer, 0, bufferSize))
+			if (JsonTokenizer.IsKeyword(JsonTokenizer.KeywordUndefined, this.PeekBuffer, 0, bufferSize))
 			{
 				this.Reader.Flush(JsonTokenizer.KeywordUndefined.Length-1);
 				return JsonToken.Undefined;
@@ -647,7 +644,7 @@ namespace JsonFx.Json
 			return null;
 		}
 
-		private bool IsKeyword(string literal, char[] buffer, int index, int bufferSize)
+		private static bool IsKeyword(string literal, char[] buffer, int index, int bufferSize)
 		{
 			int length = literal.Length;
 
