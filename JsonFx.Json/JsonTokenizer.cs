@@ -44,26 +44,29 @@ namespace JsonFx.Json
 	{
 		#region Constants
 
-		private const int PeakBufferLength = 128;
+		private const int MinBufferLength = 128;
+		private const int DefaultBufferSize = 1024;
 
-		internal const string KeywordUndefined = "undefined";
-		internal const string KeywordNull = "null";
-		internal const string KeywordFalse = "false";
-		internal const string KeywordTrue = "true";
-		internal const string KeywordNaN = "NaN";
-		internal const string KeywordInfinity = "Infinity";
+		private const string KeywordUndefined = "undefined";
+		private const string KeywordNull = "null";
+		private const string KeywordFalse = "false";
+		private const string KeywordTrue = "true";
+		private const string KeywordNaN = "NaN";
+		private const string KeywordInfinity = "Infinity";
 
 		private const int EndOfSequence = -1;
-		private const char OperatorNegate = '-';
+
+		private const char OperatorUnaryMinus = '-';
 		private const char OperatorUnaryPlus = '+';
-		internal const char OperatorArrayStart = '[';
-		internal const char OperatorArrayEnd = ']';
-		internal const char OperatorObjectStart = '{';
-		internal const char OperatorObjectEnd = '}';
+		private const char OperatorDecimal = '.';
+		private const char OperatorArrayStart = '[';
+		private const char OperatorArrayEnd = ']';
+		private const char OperatorObjectStart = '{';
+		private const char OperatorObjectEnd = '}';
 		private const char OperatorStringDelim = '"';
 		private const char OperatorStringDelimAlt = '\'';
-		internal const char OperatorValueDelim = ',';
-		internal const char OperatorNameDelim = ':';
+		private const char OperatorValueDelim = ',';
+		private const char OperatorPairDelim = ':';
 		private const char OperatorCharEscape = '\\';
 
 		private const string CommentStart = "/*";
@@ -74,27 +77,26 @@ namespace JsonFx.Json
 		// tokenizing errors
 		private const string ErrorUnrecognizedToken = "Illegal JSON sequence.";
 		private const string ErrorUnterminatedComment = "Unterminated comment block.";
-		private const string ErrorUnterminatedObject = "Unterminated JSON object.";
-		private const string ErrorUnterminatedArray = "Unterminated JSON array.";
 		private const string ErrorUnterminatedString = "Unterminated JSON string.";
 		private const string ErrorIllegalNumber = "Illegal JSON number.";
 
 		// parse errors
-		private const string ErrorExpectedString = "Expected JSON string.";
-		private const string ErrorExpectedObject = "Expected JSON object.";
-		private const string ErrorExpectedArray = "Expected JSON array.";
-		private const string ErrorExpectedPropertyName = "Expected JSON object property name.";
-		private const string ErrorExpectedPropertyNameDelim = "Expected JSON object property name delimiter.";
-		private const string ErrorGenericIDictionary = "Types which implement Generic IDictionary<TKey, TValue> also need to implement IDictionary to be deserialized. ({0})";
-		private const string ErrorGenericIDictionaryKeys = "Types which implement Generic IDictionary<TKey, TValue> need to have string keys to be deserialized. ({0})";
+		//private const string ErrorUnterminatedObject = "Unterminated JSON object.";
+		//private const string ErrorUnterminatedArray = "Unterminated JSON array.";
+		//private const string ErrorExpectedString = "Expected JSON string.";
+		//private const string ErrorExpectedObject = "Expected JSON object.";
+		//private const string ErrorExpectedArray = "Expected JSON array.";
+		//private const string ErrorExpectedPropertyName = "Expected JSON object property name.";
+		//private const string ErrorExpectedPropertyPairDelim = "Expected JSON object property name/value delimiter.";
+		//private const string ErrorGenericIDictionary = "Types which implement Generic IDictionary<TKey, TValue> also need to implement IDictionary to be deserialized. ({0})";
+		//private const string ErrorGenericIDictionaryKeys = "Types which implement Generic IDictionary<TKey, TValue> need to have string keys to be deserialized. ({0})";
 
 		#endregion Constants
 
 		#region Fields
 
 		private readonly BufferedTextReader Reader;
-		private readonly char[] PeekBuffer = new char[JsonTokenizer.PeakBufferLength];
-		private readonly bool allowUnquotedKeys;
+		private readonly char[] PeekBuffer;
 
 		#endregion Fields
 
@@ -103,11 +105,26 @@ namespace JsonFx.Json
 		/// <summary>
 		/// Ctor
 		/// </summary>
-		/// <param name="reader">the input reader</param>
-		public JsonTokenizer(TextReader reader, bool allowUnquotedKeys)
+		/// <param name="reader">input reader</param>
+		public JsonTokenizer(TextReader reader)
+			: this(reader, JsonTokenizer.DefaultBufferSize)
 		{
-			this.Reader = new BufferedTextReader(reader, JsonTokenizer.PeakBufferLength);
-			this.allowUnquotedKeys = allowUnquotedKeys;
+		}
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="reader">input reader</param>
+		/// <param name="bufferSize">read buffer size</param>
+		public JsonTokenizer(TextReader reader, int bufferSize)
+		{
+			if (bufferSize < JsonTokenizer.MinBufferLength)
+			{
+				bufferSize = JsonTokenizer.MinBufferLength;
+			}
+
+			this.PeekBuffer = new char[bufferSize];
+			this.Reader = new BufferedTextReader(reader, bufferSize);
 		}
 
 		#endregion Init
@@ -152,7 +169,7 @@ namespace JsonFx.Json
 				{
 					return JsonToken.ValueDelim;
 				}
-				case JsonTokenizer.OperatorNameDelim:
+				case JsonTokenizer.OperatorPairDelim:
 				{
 					return JsonToken.PairDelim;
 				}
@@ -166,9 +183,9 @@ namespace JsonFx.Json
 			// number
 			if (Char.IsDigit((char)ch) ||
 				Char.IsDigit((char)this.Reader.Peek()) &&
-				((ch == JsonTokenizer.OperatorNegate) || (ch == JsonTokenizer.OperatorUnaryPlus)))
+				((ch == JsonTokenizer.OperatorUnaryMinus) || (ch == JsonTokenizer.OperatorUnaryPlus)))
 			{
-				return new JsonToken(JsonTokenType.Number, this.ScanNumber(ch));
+				return new JsonToken(JsonTokenType.Number, this.ScanNumber((char)ch));
 			}
 
 			JsonToken token = this.ScanKeywords((char)ch);
@@ -216,7 +233,7 @@ namespace JsonFx.Json
 			}
 			else
 			{
-				throw new JsonDeserializationException(JsonTokenizer.ErrorUnrecognizedToken, commentStart);
+				throw new JsonDeserializationException(JsonTokenizer.ErrorUnterminatedComment, commentStart);
 			}
 
 			// start reading comment content
@@ -259,22 +276,168 @@ namespace JsonFx.Json
 			return ch;
 		}
 
-		private ValueType ScanNumber(int ch)
+		private ValueType ScanNumber(char ch)
 		{
 			long numberStart = this.Reader.Position;
 
-			// consume positive signing (as is extraneous)
-			if (ch == JsonTokenizer.OperatorUnaryPlus)
+			this.PeekBuffer[0] = ch;
+			int bufferSize = this.Reader.Peek(this.PeekBuffer, 1, this.PeekBuffer.Length-1);
+			int start = 0;
+			int pos = 0;
+
+			if (this.PeekBuffer[pos] == JsonTokenizer.OperatorUnaryPlus)
 			{
-				ch = this.Reader.Read();
-				if (ch < 0)
+				// consume positive signing (as is extraneous)
+				start++;
+				pos++;
+			}
+			else if (this.PeekBuffer[pos] == JsonTokenizer.OperatorUnaryMinus)
+			{
+				// optional minus part
+				pos++;
+			}
+
+			// integer part
+			while ((pos < bufferSize) && Char.IsDigit(this.PeekBuffer[pos]))
+			{
+				// consume digit
+				pos++;
+			}
+
+			bool hasDecimal = false;
+
+			if ((pos < bufferSize) && (this.PeekBuffer[pos] == JsonTokenizer.OperatorDecimal))
+			{
+				hasDecimal = true;
+
+				// consume decimal
+				pos++;
+
+				// fraction part
+				while ((pos < bufferSize) && Char.IsDigit(this.PeekBuffer[pos]))
 				{
-					throw new JsonDeserializationException(JsonTokenizer.ErrorUnrecognizedToken, numberStart);
+					// consume digit
+					pos++;
 				}
 			}
 
-			// TODO: scan number
-			throw new NotImplementedException("TODO: scan number");
+			// note the number of significant digits
+			int precision = (pos - start);
+			if (hasDecimal)
+			{
+				precision--;
+			}
+			if (this.PeekBuffer[start] == JsonTokenizer.OperatorUnaryMinus)
+			{
+				precision--;
+			}
+
+			if (precision < 1)
+			{
+				throw new JsonDeserializationException(JsonTokenizer.ErrorIllegalNumber, numberStart);
+			}
+
+			bool hasExponent = false;
+			int exponent = 0;
+
+			// optional exponent part
+			if ((pos < bufferSize) && (this.PeekBuffer[pos] == 'e' || this.PeekBuffer[pos] == 'E'))
+			{
+				hasExponent = true;
+
+				// consume 'e'
+				pos++;
+				if (pos >= bufferSize)
+				{
+					throw new JsonDeserializationException(JsonTokenizer.ErrorIllegalNumber, numberStart);
+				}
+
+				int expStart = pos;
+
+				// optional minus/plus part
+				if (this.PeekBuffer[pos] == JsonTokenizer.OperatorUnaryMinus ||
+					this.PeekBuffer[pos] == JsonTokenizer.OperatorUnaryPlus)
+				{
+					// consume sign
+					pos++;
+					if (pos >= bufferSize || !Char.IsDigit(this.PeekBuffer[pos]))
+					{
+						throw new JsonDeserializationException(JsonTokenizer.ErrorIllegalNumber, numberStart);
+					}
+				}
+				else
+				{
+					if (!Char.IsDigit(this.PeekBuffer[pos]))
+					{
+						throw new JsonDeserializationException(JsonTokenizer.ErrorIllegalNumber, numberStart);
+					}
+				}
+
+				// exp part
+				while (pos < bufferSize && Char.IsDigit(this.PeekBuffer[pos]))
+				{
+					// consume digit
+					pos++;
+				}
+
+				if (!Int32.TryParse(
+						new String(this.PeekBuffer, expStart, pos-expStart),
+						NumberStyles.Integer,
+						NumberFormatInfo.InvariantInfo,
+						out exponent))
+				{
+					throw new JsonDeserializationException(JsonTokenizer.ErrorIllegalNumber, numberStart);
+				}
+			}
+
+			// at this point, we have the full number string and know its characteristics
+			string numberString = new String(this.PeekBuffer, start, pos-start);
+			this.Reader.Flush(pos-1);
+
+			if (!hasDecimal && !hasExponent && precision < 19)
+			{
+				// Integer value
+				decimal number;
+				if (!Decimal.TryParse(
+						numberString,
+						NumberStyles.Integer,
+						NumberFormatInfo.InvariantInfo,
+						out number))
+				{
+					throw new JsonDeserializationException(JsonTokenizer.ErrorIllegalNumber, numberStart);
+				}
+
+				if (number >= Int32.MinValue && number <= Int32.MaxValue)
+				{
+					// most common
+					return (int)number;
+				}
+
+				if (number >= Int64.MinValue && number <= Int64.MaxValue)
+				{
+					// more flexible
+					return (long)number;
+				}
+
+				// most flexible
+				return number;
+			}
+			else
+			{
+				// Floating Point value
+				// native EcmaScript number (IEEE-754)
+				double number;
+				if (!Double.TryParse(
+					 numberString,
+					 NumberStyles.Float,
+					 NumberFormatInfo.InvariantInfo,
+					 out number))
+				{
+					throw new JsonDeserializationException(JsonTokenizer.ErrorIllegalNumber, numberStart);
+				}
+
+				return number;
+			}
 		}
 
 		private string ScanString(char stringDelim)
@@ -282,20 +445,20 @@ namespace JsonFx.Json
 			// store for unterminated case
 			long stringStart = this.Reader.Position-1L;
 
-			StringBuilder builder = new StringBuilder(JsonTokenizer.PeakBufferLength);
+			StringBuilder builder = new StringBuilder(this.PeekBuffer.Length);
 
 			// fill buffer
-			int count = this.Reader.Peek(this.PeekBuffer, 0, JsonTokenizer.PeakBufferLength);
+			int count = this.Reader.Peek(this.PeekBuffer, 0, this.PeekBuffer.Length);
 			while (count > 0)
 			{
-				int lastWritten = 0;
-				for (int i=lastWritten; i<count; i++)
+				int start = 0;
+				for (int i=start; i<count; i++)
 				{
 					// check each character for ending delim
 					if (this.PeekBuffer[i] == stringDelim)
 					{
 						// append final segment
-						builder.Append(this.PeekBuffer, lastWritten, i-lastWritten);
+						builder.Append(this.PeekBuffer, start, i-start);
 
 						// flush string and closing delim
 						this.Reader.Flush(i+1);
@@ -317,14 +480,14 @@ namespace JsonFx.Json
 					}
 
 					// append before 
-					builder.Append(this.PeekBuffer, lastWritten, i-lastWritten);
+					builder.Append(this.PeekBuffer, start, i-start);
 
 					// flush prefix and escape char
 					this.Reader.Flush(i+1);
 
 					// ensure full buffer
-					count = this.Reader.Peek(this.PeekBuffer, 0, JsonTokenizer.PeakBufferLength);
-					lastWritten = i = 0;
+					count = this.Reader.Peek(this.PeekBuffer, 0, this.PeekBuffer.Length);
+					start = i = 0;
 
 					if (count < 1)
 					{
@@ -379,7 +542,7 @@ namespace JsonFx.Json
 
 							// unicode ordinal
 							int utf16;
-							if (lastWritten+UnicodeEscapeLength < count &&
+							if (start+UnicodeEscapeLength < count &&
 						        Int32.TryParse(
 									new String(this.PeekBuffer, i+1, UnicodeEscapeLength),
 									NumberStyles.AllowHexSpecifier,
@@ -388,7 +551,7 @@ namespace JsonFx.Json
 							{
 								builder.Append(Char.ConvertFromUtf32(utf16));
 								i += UnicodeEscapeLength;
-								lastWritten += UnicodeEscapeLength;
+								start += UnicodeEscapeLength;
 							}
 							else
 							{
@@ -406,17 +569,17 @@ namespace JsonFx.Json
 						}
 					}
 
-					lastWritten++;
+					start++;
 				}
 
 				// append remaining buffered segment and flush
 				if (count > 1)
 				{
-					builder.Append(this.PeekBuffer, lastWritten, count-1);
+					builder.Append(this.PeekBuffer, start, count-1);
 				}
 
 				// refill buffer
-				count = this.Reader.Peek(this.PeekBuffer, 0, JsonTokenizer.PeakBufferLength);
+				count = this.Reader.Peek(this.PeekBuffer, 0, this.PeekBuffer.Length);
 			}
 
 			// reached END before string delim
@@ -451,7 +614,7 @@ namespace JsonFx.Json
 
 			// numbers can be modified with unary +/- operators
 			int unaryOpShift = 0;
-			if ((ch == JsonTokenizer.OperatorNegate) || (ch == JsonTokenizer.OperatorUnaryPlus))
+			if ((ch == JsonTokenizer.OperatorUnaryMinus) || (ch == JsonTokenizer.OperatorUnaryPlus))
 			{
 				unaryOpShift++;
 			}
@@ -467,7 +630,7 @@ namespace JsonFx.Json
 			if (this.IsKeyword(JsonTokenizer.KeywordInfinity, this.PeekBuffer, unaryOpShift, bufferSize-unaryOpShift))
 			{
 				this.Reader.Flush(unaryOpShift+JsonTokenizer.KeywordInfinity.Length-1);
-				if (ch == JsonTokenizer.OperatorNegate)
+				if (ch == JsonTokenizer.OperatorUnaryMinus)
 				{
 					return JsonToken.NegativeInfinity;
 				}
