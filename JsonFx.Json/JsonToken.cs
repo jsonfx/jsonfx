@@ -41,19 +41,28 @@ namespace JsonFx.Json
 		#region Constants
 
 		internal static readonly JsonToken None = new JsonToken(JsonTokenType.None);
-		internal static readonly JsonToken ArrayStart = new JsonToken(JsonTokenType.ArrayStart, JsonTokenizer.OperatorArrayStart.ToString());
-		internal static readonly JsonToken ArrayEnd = new JsonToken(JsonTokenType.ArrayEnd, JsonTokenizer.OperatorArrayEnd.ToString());
-		internal static readonly JsonToken ObjectStart = new JsonToken(JsonTokenType.ObjectStart, JsonTokenizer.OperatorObjectStart.ToString());
-		internal static readonly JsonToken ObjectEnd = new JsonToken(JsonTokenType.ObjectEnd, JsonTokenizer.OperatorObjectEnd.ToString());
-		internal static readonly JsonToken NameDelim = new JsonToken(JsonTokenType.NameDelim, JsonTokenizer.OperatorNameDelim.ToString());
-		internal static readonly JsonToken ValueDelim = new JsonToken(JsonTokenType.ValueDelim, JsonTokenizer.OperatorValueDelim.ToString());
+
+		internal static readonly JsonToken ArrayStart = new JsonToken(JsonTokenType.ArrayStart);
+		internal static readonly JsonToken ArrayEnd = new JsonToken(JsonTokenType.ArrayEnd);
+		internal static readonly JsonToken ObjectStart = new JsonToken(JsonTokenType.ObjectStart);
+		internal static readonly JsonToken ObjectEnd = new JsonToken(JsonTokenType.ObjectEnd);
+		internal static readonly JsonToken NameDelim = new JsonToken(JsonTokenType.NameDelim);
+		internal static readonly JsonToken ValueDelim = new JsonToken(JsonTokenType.ValueDelim);
+
+		internal static readonly JsonToken Undefined = new JsonToken(JsonTokenType.Undefined, null);
+		internal static readonly JsonToken Null = new JsonToken(JsonTokenType.Null, null);
+		internal static readonly JsonToken False = new JsonToken(JsonTokenType.Boolean, false);
+		internal static readonly JsonToken True = new JsonToken(JsonTokenType.Boolean, true);
+		internal static readonly JsonToken NotANumber = new JsonToken(JsonTokenType.Number, Double.NaN);
+		internal static readonly JsonToken PositiveInfinity = new JsonToken(JsonTokenType.Number, Double.PositiveInfinity);
+		internal static readonly JsonToken NegativeInfinity = new JsonToken(JsonTokenType.Number, Double.NegativeInfinity);
 
 		#endregion Constants
 
 		#region Fields
 
 		public readonly JsonTokenType TokenType;
-		public readonly string Value;
+		public readonly object Value;
 
 		#endregion Fields
 
@@ -73,10 +82,10 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="tokenType"></param>
 		/// <param name="value"></param>
-		public JsonToken(JsonTokenType tokenType, string value)
+		public JsonToken(JsonTokenType tokenType, object value)
 		{
 			this.TokenType = tokenType;
-			this.Value = value ?? String.Empty;
+			this.Value = value;
 		}
 
 		#endregion Init
@@ -89,7 +98,7 @@ namespace JsonFx.Json
 
 			builder.Append("{ TokenType=");
 			builder.Append(this.TokenType);
-			if (!String.IsNullOrEmpty(this.Value))
+			if (this.Value != null)
 			{
 				builder.Append(", Value=");
 				builder.Append(this.Value);

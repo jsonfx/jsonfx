@@ -172,16 +172,16 @@ namespace JsonFx.Json
 				return new JsonToken(JsonTokenType.Number, this.ScanNumber(ch));
 			}
 
-			string literal = this.ScanKeywords();
-			if (literal != null)
+			JsonToken token = this.ScanKeywords((char)ch);
+			if (token != null)
 			{
-				return new JsonToken(JsonTokenType.Keyword, literal);
+				return token;
 			}
 
-			if (this.allowUnquotedKeys)
-			{
-				return new JsonToken(JsonTokenType.UnquotedName, this.ScanUnquotedKey());
-			}
+			//if (this.allowUnquotedKeys)
+			//{
+			//    return new JsonToken(JsonTokenType.UnquotedName, this.ScanUnquotedKey());
+			//}
 
 			throw new JsonDeserializationException(JsonTokenizer.ErrorUnrecognizedToken, this.Reader.Position);
 		}
@@ -196,30 +196,34 @@ namespace JsonFx.Json
 				return ch;
 			}
 
+			// store index for unterminated case
+			long commentStart = this.Reader.Position;
+
 			// read second char of comment start
 			ch = this.Reader.Read();
 			if (ch < 0)
 			{
-				throw new JsonDeserializationException(JsonTokenizer.ErrorUnterminatedComment, this.Reader.Position);
+				throw new JsonDeserializationException(JsonTokenizer.ErrorUnterminatedComment, commentStart);
 			}
 
-			bool isBlockComment = false;
+			bool isBlockComment;
 			if (ch == JsonTokenizer.CommentStart[1])
 			{
 				isBlockComment = true;
 			}
-			else if (ch != JsonTokenizer.CommentLine[1])
+			else if (ch == JsonTokenizer.CommentLine[1])
 			{
-				throw new JsonDeserializationException(JsonTokenizer.ErrorUnrecognizedToken, this.Reader.Position);
+				isBlockComment = false;
+			}
+			else
+			{
+				throw new JsonDeserializationException(JsonTokenizer.ErrorUnrecognizedToken, commentStart);
 			}
 
 			// start reading comment content
 			ch = this.Reader.Read();
 			if (isBlockComment)
 			{
-				// store index for unterminated case
-				long commentStart = this.Reader.Position-2L;
-
 				// skip over everything until reach block comment ending
 				do
 				{
@@ -256,20 +260,22 @@ namespace JsonFx.Json
 			return ch;
 		}
 
-		private string ScanNumber(int ch)
+		private ValueType ScanNumber(int ch)
 		{
+			long numberStart = this.Reader.Position;
+
 			// consume positive signing (as is extraneous)
 			if (ch == JsonTokenizer.OperatorUnaryPlus)
 			{
 				ch = this.Reader.Read();
 				if (ch < 0)
 				{
-					throw new JsonDeserializationException(JsonTokenizer.ErrorUnrecognizedToken, this.Reader.Position);
+					throw new JsonDeserializationException(JsonTokenizer.ErrorUnrecognizedToken, numberStart);
 				}
 			}
 
 			// TODO: scan number
-			throw new NotImplementedException();
+			throw new NotImplementedException("TODO: scan number");
 		}
 
 		private string ScanString(char stringDelim)
@@ -412,56 +418,58 @@ namespace JsonFx.Json
 			throw new JsonDeserializationException(JsonTokenizer.ErrorUnterminatedString, stringStart);
 		}
 
-		private string ScanUnquotedKey()
+		private JsonToken ScanKeywords(char ch)
 		{
-			// TODO: scan unquoted string
-			throw new NotImplementedException();
-		}
-
-		private string ScanKeywords()
-		{
-			int bufferSize = this.Reader.Peek(this.PeekBuffer, 0, this.PeekBuffer.Length);
+			this.PeekBuffer[0] = ch;
+			int bufferSize = this.Reader.Peek(this.PeekBuffer, 1, this.PeekBuffer.Length-1);
 
 			// "false" literal
 			if (this.IsLiteral(JsonTokenizer.LiteralFalse, this.PeekBuffer, bufferSize))
 			{
-				return JsonTokenizer.LiteralFalse;
+				this.Reader.Flush(JsonTokenizer.LiteralFalse.Length-1);
+				return JsonToken.False;
 			}
 
 			// "true" literal
 			if (this.IsLiteral(JsonTokenizer.LiteralTrue, this.PeekBuffer, bufferSize))
 			{
-				return JsonTokenizer.LiteralTrue;
+				this.Reader.Flush(JsonTokenizer.LiteralTrue.Length-1);
+				return JsonToken.True;
 			}
 
 			// "null" literal
 			if (this.IsLiteral(JsonTokenizer.LiteralNull, this.PeekBuffer, bufferSize))
 			{
-				return JsonTokenizer.LiteralNull;
+				this.Reader.Flush(JsonTokenizer.LiteralNull.Length-1);
+				return JsonToken.Null;
 			}
 
 			// "NaN" literal
 			if (this.IsLiteral(JsonTokenizer.LiteralNotANumber, this.PeekBuffer, bufferSize))
 			{
-				return JsonTokenizer.LiteralNotANumber;
+				this.Reader.Flush(JsonTokenizer.LiteralNotANumber.Length-1);
+				return JsonToken.NotANumber;
 			}
 
 			// "Infinity" literal
 			if (this.IsLiteral(JsonTokenizer.LiteralPositiveInfinity, this.PeekBuffer, bufferSize))
 			{
-				return JsonTokenizer.LiteralPositiveInfinity;
+				this.Reader.Flush(JsonTokenizer.LiteralPositiveInfinity.Length-1);
+				return JsonToken.PositiveInfinity;
 			}
 
 			// "-Infinity" literal
 			if (this.IsLiteral(JsonTokenizer.LiteralNegativeInfinity, this.PeekBuffer, bufferSize))
 			{
-				return JsonTokenizer.LiteralNegativeInfinity;
+				this.Reader.Flush(JsonTokenizer.LiteralNegativeInfinity.Length-1);
+				return JsonToken.NegativeInfinity;
 			}
 
 			// "undefined" literal
 			if (this.IsLiteral(JsonTokenizer.LiteralUndefined, this.PeekBuffer, bufferSize))
 			{
-				return JsonTokenizer.LiteralUndefined;
+				this.Reader.Flush(JsonTokenizer.LiteralUndefined.Length-1);
+				return JsonToken.Undefined;
 			}
 
 			return null;
@@ -485,6 +493,12 @@ namespace JsonFx.Json
 			}
 
 			return true;
+		}
+
+		private string ScanUnquotedKey()
+		{
+			// TODO: scan unquoted string
+			throw new NotImplementedException();
 		}
 
 		#endregion Scanning Methods

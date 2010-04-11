@@ -43,9 +43,19 @@ namespace JsonFx.Json
 		None,
 
 		/// <summary>
-		/// undefined, null, false, true, NaN, Infinity, -Infinity
+		/// undefined keyword
 		/// </summary>
-		Keyword,
+		Undefined,
+
+		/// <summary>
+		/// null keyword
+		/// </summary>
+		Null,
+
+		/// <summary>
+		/// JSON Boolean
+		/// </summary>
+		Boolean,
 
 		/// <summary>
 		/// JSON Number
