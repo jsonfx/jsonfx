@@ -192,10 +192,13 @@ namespace JsonFx.Json
 				return token;
 			}
 
-			//if (this.allowUnquotedKeys)
-			//{
-			//    return new JsonToken(JsonTokenType.UnquotedName, this.ScanUnquotedKey());
-			//}
+			// TODO: scan for identifiers then check if they are keywords
+
+			string ident = this.ScanIdentifier((char)ch);
+			if (!String.IsNullOrEmpty(ident))
+			{
+				return new JsonToken(JsonTokenType.Identifier, ident);
+			}
 
 			throw new JsonDeserializationException(JsonTokenizer.ErrorUnrecognizedToken, this.Reader.Position);
 		}
@@ -585,6 +588,14 @@ namespace JsonFx.Json
 
 		private JsonToken ScanKeywords(char ch)
 		{
+			if (!Char.IsLetter(ch) &&
+				(ch != JsonTokenizer.OperatorUnaryMinus) &&
+				(ch != JsonTokenizer.OperatorUnaryPlus))
+			{
+				// all keywords start with a letter
+				return null;
+			}
+
 			this.PeekBuffer[0] = ch;
 			int bufferSize = this.Reader.Peek(this.PeekBuffer, 1, this.PeekBuffer.Length-1);
 
@@ -664,10 +675,61 @@ namespace JsonFx.Json
 			return true;
 		}
 
-		private string ScanUnquotedKey()
+		/// <summary>
+		/// Scans the longest
+		/// </summary>
+		/// <param name="ch"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-262.pdf
+		/// 
+		/// IdentifierName =
+		///		IdentifierStart | IdentifierName IdentifierPart
+		/// IdentifierStart =
+		///		Letter | '$' | '_'
+		/// IdentifierPart =
+		///		IdentifierStart | Digit
+		/// </remarks>
+		private string ScanIdentifier(char ch)
 		{
-			// TODO: scan unquoted string
-			throw new NotImplementedException();
+			StringBuilder ident = new StringBuilder(JsonTokenizer.MinBufferLength);
+
+			this.PeekBuffer[0] = ch;
+			int bufferSize = this.Reader.Peek(this.PeekBuffer, 1, this.PeekBuffer.Length-1);
+
+			bool identPart = false;
+			while (bufferSize > 0)
+			{
+				int i;
+				for (i=0; i<bufferSize; i++)
+				{
+					ch = this.PeekBuffer[i];
+
+					// digits are only allowed after first char
+					// rest can be in head or tail
+					if ((identPart && Char.IsDigit(ch)) ||
+						Char.IsLetter(ch) || ch == '_' || ch == '$')
+					{
+						identPart = true;
+						continue;
+					}
+
+					// append partial
+					ident.Append(this.PeekBuffer, 0, i);
+					if (i > 1)
+					{
+						this.Reader.Flush(i-1);
+					}
+					return ident.ToString();
+				}
+
+				// append entire buffer
+				ident.Append(this.PeekBuffer, 0, bufferSize);
+				this.Reader.Flush(bufferSize);
+				bufferSize = this.Reader.Peek(this.PeekBuffer, 0, this.PeekBuffer.Length);
+			}
+
+			return ident.ToString();
 		}
 
 		#endregion Scanning Methods

@@ -100,6 +100,6 @@ namespace JsonFx.Json
 		/// <summary>
 		/// Unquoted Object Property name
 		/// </summary>
-		UnquotedName
+		Identifier
 	}
 }
