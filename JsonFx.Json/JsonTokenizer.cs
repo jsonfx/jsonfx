@@ -314,7 +314,8 @@ namespace JsonFx.Json
 				pos++;
 			}
 
-			if (Char.IsLetter(this.PeekBuffer[pos]))
+			if (!Char.IsDigit(this.PeekBuffer[pos]) &&
+				this.PeekBuffer[pos] != JsonTokenizer.DefaultBufferSize)
 			{
 				// possibly "-Infinity"
 				return null;
