@@ -96,7 +96,7 @@ namespace JsonFx.Json
 		#region Properties
 
 		/// <summary>
-		/// Gets the total number of characters read from TextReader
+		/// Gets the total number of characters read from the input
 		/// </summary>
 		public long Position
 		{

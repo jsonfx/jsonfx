@@ -129,6 +129,18 @@ namespace JsonFx.Json
 
 		#endregion Init
 
+		#region Properties
+
+		/// <summary>
+		/// Gets the total number of characters read from the input
+		/// </summary>
+		public long Position
+		{
+			get { return this.Reader.Position; }
+		}
+
+		#endregion Properties
+
 		#region Methods
 
 		/// <summary>
