@@ -390,23 +390,23 @@ namespace JsonFx.Json
 		/// Ensures that buffer is not disposed, large enough for destCount and fully populated
 		/// </summary>
 		/// <param name="destCount"></param>
-		private void EnsureBuffer(int destCount)
+		private void EnsureBuffer(int bufferSize)
 		{
 			if (this.isDisposed)
 			{
 				throw new ObjectDisposedException("Underlying TextReader has been disposed.");
 			}
 
-			if (destCount <= this.count)
+			if (bufferSize <= this.count)
 			{
 				// already contains enough data
 				return;
 			} 
 
-			if (destCount > this.buffer.Length)
+			if (bufferSize > this.buffer.Length)
 			{
 				// allocate a larger buffer
-				char[] temp = new char[destCount];
+				char[] temp = new char[bufferSize];
 				if (this.count > 0)
 				{
 					// shift and copy any existing chars

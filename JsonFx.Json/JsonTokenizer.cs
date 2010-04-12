@@ -44,7 +44,7 @@ namespace JsonFx.Json
 	{
 		#region Constants
 
-		private const int MinBufferLength = 10;
+		private const int MinBufferLength = 128; // must hold longest number sequence
 		private const int DefaultBufferSize = 1024;
 
 		private const string KeywordUndefined = "undefined";
