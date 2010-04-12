@@ -34,34 +34,13 @@ using System.Text;
 namespace JsonFx.Json
 {
 	/// <summary>
-	/// Represents a single token in a JSON stream
+	/// Represents a single token in an input character sequence
 	/// </summary>
-	public sealed class JsonToken
+	public sealed class Token<T>
 	{
-		#region Constants
-
-		internal static readonly JsonToken None = new JsonToken(JsonTokenType.None);
-
-		internal static readonly JsonToken ArrayStart = new JsonToken(JsonTokenType.ArrayStart);
-		internal static readonly JsonToken ArrayEnd = new JsonToken(JsonTokenType.ArrayEnd);
-		internal static readonly JsonToken ObjectStart = new JsonToken(JsonTokenType.ObjectStart);
-		internal static readonly JsonToken ObjectEnd = new JsonToken(JsonTokenType.ObjectEnd);
-		internal static readonly JsonToken PairDelim = new JsonToken(JsonTokenType.PairDelim);
-		internal static readonly JsonToken ValueDelim = new JsonToken(JsonTokenType.ValueDelim);
-
-		internal static readonly JsonToken Undefined = new JsonToken(JsonTokenType.Undefined);
-		internal static readonly JsonToken Null = new JsonToken(JsonTokenType.Null);
-		internal static readonly JsonToken False = new JsonToken(JsonTokenType.Boolean, false);
-		internal static readonly JsonToken True = new JsonToken(JsonTokenType.Boolean, true);
-		internal static readonly JsonToken NaN = new JsonToken(JsonTokenType.Number, Double.NaN);
-		internal static readonly JsonToken PositiveInfinity = new JsonToken(JsonTokenType.Number, Double.PositiveInfinity);
-		internal static readonly JsonToken NegativeInfinity = new JsonToken(JsonTokenType.Number, Double.NegativeInfinity);
-
-		#endregion Constants
-
 		#region Fields
 
-		public readonly JsonTokenType TokenType;
+		public readonly T TokenType;
 		public readonly object Value;
 
 		#endregion Fields
@@ -72,7 +51,7 @@ namespace JsonFx.Json
 		/// Ctor
 		/// </summary>
 		/// <param name="tokenType"></param>
-		public JsonToken(JsonTokenType tokenType)
+		public Token(T tokenType)
 			: this(tokenType, null)
 		{
 		}
@@ -82,7 +61,7 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="tokenType"></param>
 		/// <param name="value"></param>
-		public JsonToken(JsonTokenType tokenType, object value)
+		public Token(T tokenType, object value)
 		{
 			this.TokenType = tokenType;
 			this.Value = value;
@@ -92,6 +71,10 @@ namespace JsonFx.Json
 
 		#region Object Overrides
 
+		/// <summary>
+		/// Returns a string that represents the current token.
+		/// </summary>
+		/// <returns></returns>
 		public override string ToString()
 		{
 			StringBuilder builder = new StringBuilder();

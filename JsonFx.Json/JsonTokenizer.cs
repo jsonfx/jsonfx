@@ -40,8 +40,29 @@ namespace JsonFx.Json
 	/// <summary>
 	/// Performs JSON lexical analysis over the input reader.
 	/// </summary>
-	public class JsonTokenizer : IEnumerable<JsonToken>
+	public class JsonTokenizer : ITokenizer<JsonTokenType>
 	{
+		#region Reusable Tokens
+
+		private static readonly Token<JsonTokenType> None = new Token<JsonTokenType>(JsonTokenType.None);
+
+		private static readonly Token<JsonTokenType> ArrayStart = new Token<JsonTokenType>(JsonTokenType.ArrayStart);
+		private static readonly Token<JsonTokenType> ArrayEnd = new Token<JsonTokenType>(JsonTokenType.ArrayEnd);
+		private static readonly Token<JsonTokenType> ObjectStart = new Token<JsonTokenType>(JsonTokenType.ObjectStart);
+		private static readonly Token<JsonTokenType> ObjectEnd = new Token<JsonTokenType>(JsonTokenType.ObjectEnd);
+		private static readonly Token<JsonTokenType> PairDelim = new Token<JsonTokenType>(JsonTokenType.PairDelim);
+		private static readonly Token<JsonTokenType> ValueDelim = new Token<JsonTokenType>(JsonTokenType.ValueDelim);
+
+		private static readonly Token<JsonTokenType> Undefined = new Token<JsonTokenType>(JsonTokenType.Undefined);
+		private static readonly Token<JsonTokenType> Null = new Token<JsonTokenType>(JsonTokenType.Null);
+		private static readonly Token<JsonTokenType> False = new Token<JsonTokenType>(JsonTokenType.Boolean, false);
+		private static readonly Token<JsonTokenType> True = new Token<JsonTokenType>(JsonTokenType.Boolean, true);
+		private static readonly Token<JsonTokenType> NaN = new Token<JsonTokenType>(JsonTokenType.Number, Double.NaN);
+		private static readonly Token<JsonTokenType> PositiveInfinity = new Token<JsonTokenType>(JsonTokenType.Number, Double.PositiveInfinity);
+		private static readonly Token<JsonTokenType> NegativeInfinity = new Token<JsonTokenType>(JsonTokenType.Number, Double.NegativeInfinity);
+
+		#endregion Reusable Tokens
+
 		#region Constants
 
 		private const int MinBufferLength = 128; // must hold longest number sequence
@@ -80,6 +101,7 @@ namespace JsonFx.Json
 		private const string ErrorUnterminatedString = "Unterminated JSON string.";
 		private const string ErrorIllegalNumber = "Illegal JSON number.";
 
+		// TODO: move these into parser
 		// parse errors
 		//private const string ErrorUnterminatedObject = "Unterminated JSON object.";
 		//private const string ErrorUnterminatedArray = "Unterminated JSON array.";
@@ -147,7 +169,7 @@ namespace JsonFx.Json
 		/// Returns the next JSON token in the sequence.
 		/// </summary>
 		/// <returns></returns>
-		private JsonToken Tokenize()
+		private Token<JsonTokenType> Tokenize()
 		{
 			// read next char
 			int ch = this.Reader.Peek();
@@ -160,37 +182,37 @@ namespace JsonFx.Json
 			{
 				case JsonTokenizer.EndOfSequence:
 				{
-					return JsonToken.None;
+					return JsonTokenizer.None;
 				}
 				case JsonTokenizer.OperatorArrayStart:
 				{
 					this.Reader.Flush(1);
-					return JsonToken.ArrayStart;
+					return JsonTokenizer.ArrayStart;
 				}
 				case JsonTokenizer.OperatorArrayEnd:
 				{
 					this.Reader.Flush(1);
-					return JsonToken.ArrayEnd;
+					return JsonTokenizer.ArrayEnd;
 				}
 				case JsonTokenizer.OperatorObjectStart:
 				{
 					this.Reader.Flush(1);
-					return JsonToken.ObjectStart;
+					return JsonTokenizer.ObjectStart;
 				}
 				case JsonTokenizer.OperatorObjectEnd:
 				{
 					this.Reader.Flush(1);
-					return JsonToken.ObjectEnd;
+					return JsonTokenizer.ObjectEnd;
 				}
 				case JsonTokenizer.OperatorValueDelim:
 				{
 					this.Reader.Flush(1);
-					return JsonToken.ValueDelim;
+					return JsonTokenizer.ValueDelim;
 				}
 				case JsonTokenizer.OperatorPairDelim:
 				{
 					this.Reader.Flush(1);
-					return JsonToken.PairDelim;
+					return JsonTokenizer.PairDelim;
 				}
 				case JsonTokenizer.OperatorStringDelim:
 				case JsonTokenizer.OperatorStringDelimAlt:
@@ -206,7 +228,7 @@ namespace JsonFx.Json
 			}
 
 			// scan for numbers
-			JsonToken token = this.ScanNumber();
+			Token<JsonTokenType> token = this.ScanNumber();
 			if (token != null)
 			{
 				return token;
@@ -306,7 +328,7 @@ namespace JsonFx.Json
 			return ch;
 		}
 
-		private JsonToken ScanNumber()
+		private Token<JsonTokenType> ScanNumber()
 		{
 			long numberStart = this.Reader.Position;
 
@@ -428,17 +450,17 @@ namespace JsonFx.Json
 				if (number >= Int32.MinValue && number <= Int32.MaxValue)
 				{
 					// most common
-					return new JsonToken(JsonTokenType.Number, (int)number);
+					return new Token<JsonTokenType>(JsonTokenType.Number, (int)number);
 				}
 
 				if (number >= Int64.MinValue && number <= Int64.MaxValue)
 				{
 					// more flexible
-					return new JsonToken(JsonTokenType.Number, (long)number);
+					return new Token<JsonTokenType>(JsonTokenType.Number, (long)number);
 				}
 
 				// most flexible
-				return new JsonToken(JsonTokenType.Number, number);
+				return new Token<JsonTokenType>(JsonTokenType.Number, number);
 			}
 			else
 			{
@@ -454,11 +476,11 @@ namespace JsonFx.Json
 				}
 
 				// native EcmaScript number (IEEE-754)
-				return new JsonToken(JsonTokenType.Number, number);
+				return new Token<JsonTokenType>(JsonTokenType.Number, number);
 			}
 		}
 
-		private JsonToken ScanString()
+		private Token<JsonTokenType> ScanString()
 		{
 			// TODO: simplify this so that it just leverages the BufferedTextReader's buffer
 			// then do a performance comparison with original
@@ -486,7 +508,7 @@ namespace JsonFx.Json
 						this.Reader.Flush(i+1);
 
 						// output string
-						return new JsonToken(JsonTokenType.String, builder.ToString());
+						return new Token<JsonTokenType>(JsonTokenType.String, builder.ToString());
 					}
 
 					if (this.PeekBuffer[i] != JsonTokenizer.OperatorCharEscape)
@@ -600,7 +622,7 @@ namespace JsonFx.Json
 			throw new JsonDeserializationException(JsonTokenizer.ErrorUnterminatedString, stringStart);
 		}
 
-		private JsonToken ScanKeywords(string ident, int unary)
+		private Token<JsonTokenType> ScanKeywords(string ident, int unary)
 		{
 			switch (ident)
 			{
@@ -610,13 +632,13 @@ namespace JsonFx.Json
 					{
 						return null;
 					}
-					return JsonToken.False;
+					return JsonTokenizer.False;
 				}
 				case JsonTokenizer.KeywordTrue:
 				{
 					if (unary < 0)
 					{
-						return JsonToken.True;
+						return JsonTokenizer.True;
 					}
 
 					return null;
@@ -625,7 +647,7 @@ namespace JsonFx.Json
 				{
 					if (unary < 0)
 					{
-						return JsonToken.Null;
+						return JsonTokenizer.Null;
 					}
 
 					return null;
@@ -634,7 +656,7 @@ namespace JsonFx.Json
 				{
 					if (unary < 0)
 					{
-						return JsonToken.NaN;
+						return JsonTokenizer.NaN;
 					}
 
 					return null;
@@ -643,12 +665,12 @@ namespace JsonFx.Json
 				{
 					if (unary < 0 || unary == JsonTokenizer.OperatorUnaryPlus)
 					{
-						return JsonToken.PositiveInfinity;
+						return JsonTokenizer.PositiveInfinity;
 					}
 					
 					if (unary == JsonTokenizer.OperatorUnaryMinus)
 					{
-						return JsonToken.NegativeInfinity;
+						return JsonTokenizer.NegativeInfinity;
 					}
 
 					return null;
@@ -657,7 +679,7 @@ namespace JsonFx.Json
 				{
 					if (unary < 0)
 					{
-						return JsonToken.Undefined;
+						return JsonTokenizer.Undefined;
 					}
 
 					return null;
@@ -666,7 +688,7 @@ namespace JsonFx.Json
 
 			if (unary < 0)
 			{
-				return new JsonToken(JsonTokenType.Identifier, ident);
+				return new Token<JsonTokenType>(JsonTokenType.Identifier, ident);
 			}
 
 			return null;
@@ -732,13 +754,13 @@ namespace JsonFx.Json
 
 		#endregion Scanning Methods
 
-		#region IEnumerable<JsonToken> Members
+		#region IEnumerable<Token<JsonTokenType>> Members
 
-		public IEnumerator<JsonToken> GetEnumerator()
+		public IEnumerator<Token<JsonTokenType>> GetEnumerator()
 		{
 			while (true)
 			{
-				JsonToken token = this.Tokenize();
+				Token<JsonTokenType> token = this.Tokenize();
 				if (token.TokenType == JsonTokenType.None)
 				{
 					yield break;
@@ -747,7 +769,7 @@ namespace JsonFx.Json
 			};
 		}
 
-		#endregion IEnumerable<JsonToken> Members
+		#endregion IEnumerable<Token<JsonTokenType>> Members
 
 		#region IEnumerable Members
 
