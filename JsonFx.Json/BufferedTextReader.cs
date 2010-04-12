@@ -100,7 +100,6 @@ namespace JsonFx.Json
 		/// </summary>
 		public long Position
 		{
-			// TODO: advance this position every Read operation
 			get { return this.position; }
 		}
 
@@ -185,6 +184,7 @@ namespace JsonFx.Json
 		{
 			int ch = this.Peek();
 
+			this.position++;
 			this.start++;
 			this.count--;
 
@@ -254,6 +254,7 @@ namespace JsonFx.Json
 				count -= max;
 
 				// adjust buffer counts
+				this.position += max;
 				this.start += max;
 				this.count -= max;
 			}
@@ -303,6 +304,7 @@ namespace JsonFx.Json
 
 				// append buffered segment and flush
 				builder.Append(this.buffer, this.start, this.count);
+				this.position += this.count;
 				this.start += this.count;
 				this.count = 0;
 
@@ -351,6 +353,7 @@ namespace JsonFx.Json
 				throw new ArgumentOutOfRangeException("count", "Attempted to flush beyond end of input.");
 			}
 
+			this.position++;
 			this.start++;
 			this.count--;
 
@@ -374,6 +377,7 @@ namespace JsonFx.Json
 				throw new ArgumentOutOfRangeException("count", "Attempted to flush beyond end of input.");
 			}
 
+			this.position += count;
 			this.start += count;
 			this.count -= count;
 		}
