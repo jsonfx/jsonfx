@@ -51,14 +51,25 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataReaderSettings.cs" />
+    <Compile Include="DataWriterSettings.cs" />
+    <Compile Include="IDataReader.cs" />
+    <Compile Include="IDataWriter.cs" />
+    <Compile Include="ISerializable`1.cs" />
     <Compile Include="ITokenizer`1.cs" />
+    <Compile Include="JsonIgnoreAttribute.cs" />
+    <Compile Include="JsonNameAttribute.cs" />
     <Compile Include="JsonSerializationException.cs" />
+    <Compile Include="JsonSpecifiedPropertyAttribute.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="JsonTokenType.cs" />
     <Compile Include="JsonTokenizer.cs" />
     <Compile Include="BufferedTextReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\AssemblyVersion.cs" />
     <Compile Include="Token`1.cs" />
+    <Compile Include="TypeCoercionUtility.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

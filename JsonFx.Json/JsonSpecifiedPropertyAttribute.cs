@@ -29,22 +29,54 @@
 #endregion License
 
 using System;
-using System.Collections.Generic;
 
 namespace JsonFx.Json
 {
 	/// <summary>
-	/// The base interface for tokenizing an input sequence.
+	/// Specifies the name of the property which specifies if member should be serialized.
 	/// </summary>
-	/// <typeparam name="T">token type</typeparam>
-	public interface ITokenizer<T> : IEnumerable<Token<T>>, IDisposable
+	[AttributeUsage(AttributeTargets.Property|AttributeTargets.Field, AllowMultiple=false)]
+	public class JsonSpecifiedPropertyAttribute : Attribute
 	{
+		#region Fields
+
+		private string specifiedProperty;
+
+		#endregion Fields
+
+		#region Init
+
 		/// <summary>
-		/// Gets the current position of the underlying input character sequence
+		/// Ctor
 		/// </summary>
-		long Position
+		/// <param name="propertyName">the name of the property which controls serialization for this member</param>
+		public JsonSpecifiedPropertyAttribute()
 		{
-			get;
 		}
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="propertyName">the name of the property which controls serialization for this member</param>
+		public JsonSpecifiedPropertyAttribute(string propertyName)
+		{
+			this.specifiedProperty = propertyName;
+		}
+
+		#endregion Init
+
+		#region Properties
+
+		/// <summary>
+		/// Gets and sets the name of the property which
+		/// specifies if member should be serialized
+		/// </summary>
+		public string SpecifiedProperty
+		{
+			get { return this.specifiedProperty; }
+			set { this.specifiedProperty = value; }
+		}
+
+		#endregion Properties
 	}
 }

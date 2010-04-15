@@ -29,22 +29,16 @@
 #endregion License
 
 using System;
-using System.Collections.Generic;
 
 namespace JsonFx.Json
 {
 	/// <summary>
-	/// The base interface for tokenizing an input sequence.
+	/// Allows classes to control their own serialization
 	/// </summary>
-	/// <typeparam name="T">token type</typeparam>
-	public interface ITokenizer<T> : IEnumerable<Token<T>>, IDisposable
+	public interface ISerializable<T>
 	{
-		/// <summary>
-		/// Gets the current position of the underlying input character sequence
-		/// </summary>
-		long Position
-		{
-			get;
-		}
+		void ReadJson(IDataReader reader);
+
+		void WriteJson(IDataWriter writer);
 	}
 }

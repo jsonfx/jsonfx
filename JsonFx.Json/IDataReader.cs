@@ -29,22 +29,43 @@
 #endregion License
 
 using System;
-using System.Collections.Generic;
+using System.IO;
 
 namespace JsonFx.Json
 {
 	/// <summary>
-	/// The base interface for tokenizing an input sequence.
+	/// A common interface for data deserializers
 	/// </summary>
-	/// <typeparam name="T">token type</typeparam>
-	public interface ITokenizer<T> : IEnumerable<Token<T>>, IDisposable
+	public interface IDataReader
 	{
+		#region Properties
+
 		/// <summary>
-		/// Gets the current position of the underlying input character sequence
+		/// Gets the content type of the serialized data
 		/// </summary>
-		long Position
+		string ContentType
 		{
 			get;
 		}
+
+		#endregion Properties
+
+		#region Methods
+
+		/// <summary>
+		/// Serializes the data to the given output
+		/// </summary>
+		/// <param name="input">the input reader</param>
+		/// <param name="type">the expected type of the serialized data</param>
+		object Deserialize(TextReader input, Type type);
+
+		/// <summary>
+		/// Serializes the data to the given output
+		/// </summary>
+		/// <param name="input">the input reader</param>
+		/// <typeparam name="T">the expected type of the serialized data</typeparam>
+		T Deserialize<T>(TextReader input);
+
+		#endregion Methods
 	}
 }

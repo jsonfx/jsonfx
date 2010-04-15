@@ -29,22 +29,51 @@
 #endregion License
 
 using System;
-using System.Collections.Generic;
 
 namespace JsonFx.Json
 {
 	/// <summary>
-	/// The base interface for tokenizing an input sequence.
+	/// Controls the serialization settings for IDataWriter
 	/// </summary>
-	/// <typeparam name="T">token type</typeparam>
-	public interface ITokenizer<T> : IEnumerable<Token<T>>, IDisposable
+	public class DataWriterSettings
 	{
+		#region Fields
+
+		private bool prettyPrint;
+		private string tab = "\t";
+		private string newLine = Environment.NewLine;
+
+		#endregion Fields
+
+		#region Properties
+
 		/// <summary>
-		/// Gets the current position of the underlying input character sequence
+		/// Gets and sets if JSON will be formatted for human reading.
 		/// </summary>
-		long Position
+		public bool PrettyPrint
 		{
-			get;
+			get { return this.prettyPrint; }
+			set { this.prettyPrint = value; }
 		}
+
+		/// <summary>
+		/// Gets and sets the string to use for indentation
+		/// </summary>
+		public string Tab
+		{
+			get { return this.tab; }
+			set { this.tab = value; }
+		}
+
+		/// <summary>
+		/// Gets and sets the line terminator string
+		/// </summary>
+		public string NewLine
+		{
+			get { return this.newLine; }
+			set { this.newLine = value; }
+		}
+
+		#endregion Properties
 	}
 }

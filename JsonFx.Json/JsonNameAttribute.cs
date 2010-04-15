@@ -29,22 +29,56 @@
 #endregion License
 
 using System;
-using System.Collections.Generic;
 
 namespace JsonFx.Json
 {
 	/// <summary>
-	/// The base interface for tokenizing an input sequence.
+	/// Specifies the naming to use for a property or field when serializing
 	/// </summary>
-	/// <typeparam name="T">token type</typeparam>
-	public interface ITokenizer<T> : IEnumerable<Token<T>>, IDisposable
+	[AttributeUsage(AttributeTargets.All, AllowMultiple=false)]
+	public class JsonNameAttribute : Attribute
 	{
+		#region Fields
+
+		private string name;
+
+		#endregion Fields
+
+		#region Init
+
 		/// <summary>
-		/// Gets the current position of the underlying input character sequence
+		/// Ctor
 		/// </summary>
-		long Position
+		public JsonNameAttribute()
 		{
-			get;
 		}
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="name"></param>
+		public JsonNameAttribute(string name)
+		{
+			this.Name = name;
+		}
+
+		#endregion Init
+
+		#region Properties
+
+		/// <summary>
+		/// Gets and sets the name to be used in JSON
+		/// </summary>
+		public string Name
+		{
+			get { return this.name; }
+			set
+			{
+				// TODO: validate the name syntax here
+				this.name = value;
+			}
+		}
+
+		#endregion Properties
 	}
 }

@@ -29,22 +29,53 @@
 #endregion License
 
 using System;
-using System.Collections.Generic;
+using System.IO;
+using System.Text;
 
 namespace JsonFx.Json
 {
 	/// <summary>
-	/// The base interface for tokenizing an input sequence.
+	/// A common interface for data serializers
 	/// </summary>
-	/// <typeparam name="T">token type</typeparam>
-	public interface ITokenizer<T> : IEnumerable<Token<T>>, IDisposable
+	public interface IDataWriter
 	{
+		#region Properties
+
 		/// <summary>
-		/// Gets the current position of the underlying input character sequence
+		/// Gets the content encoding for the serialized data
 		/// </summary>
-		long Position
+		Encoding ContentEncoding
 		{
 			get;
 		}
+
+		/// <summary>
+		/// Gets the content type for the serialized data
+		/// </summary>
+		string ContentType
+		{
+			get;
+		}
+
+		/// <summary>
+		/// Gets the file extension for the serialized data
+		/// </summary>
+		string FileExtension
+		{
+			get;
+		}
+
+		#endregion Properties
+
+		#region Methods
+
+		/// <summary>
+		/// Serializes the data to the given output
+		/// </summary>
+		/// <param name="output">the output writer</param>
+		/// <param name="data">the data to be serialized</param>
+		void Serialize(TextWriter output, object data);
+
+		#endregion Methods
 	}
 }

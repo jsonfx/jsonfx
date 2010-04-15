@@ -29,22 +29,14 @@
 #endregion License
 
 using System;
-using System.Collections.Generic;
 
 namespace JsonFx.Json
 {
 	/// <summary>
-	/// The base interface for tokenizing an input sequence.
+	/// Designates a property or field to not be serialized.
 	/// </summary>
-	/// <typeparam name="T">token type</typeparam>
-	public interface ITokenizer<T> : IEnumerable<Token<T>>, IDisposable
+	[AttributeUsage(AttributeTargets.All, AllowMultiple=false)]
+	public sealed class JsonIgnoreAttribute : Attribute
 	{
-		/// <summary>
-		/// Gets the current position of the underlying input character sequence
-		/// </summary>
-		long Position
-		{
-			get;
-		}
 	}
 }
