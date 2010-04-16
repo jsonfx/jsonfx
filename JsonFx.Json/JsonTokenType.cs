@@ -68,22 +68,22 @@ namespace JsonFx.Json
 		String,
 
 		/// <summary>
-		/// Begin of Array
+		/// Begin Array
 		/// </summary>
 		ArrayBegin,
 
 		/// <summary>
-		/// End of Array
+		/// End Array
 		/// </summary>
 		ArrayEnd,
 
 		/// <summary>
-		/// Begin of Object
+		/// Begin Object
 		/// </summary>
 		ObjectBegin,
 
 		/// <summary>
-		/// End of Object
+		/// End Object
 		/// </summary>
 		ObjectEnd,
 
