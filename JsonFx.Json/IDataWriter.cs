@@ -50,16 +50,18 @@ namespace JsonFx.Json
 		}
 
 		/// <summary>
-		/// Gets the content type for the serialized data
+		/// Gets the supported content type for the serialized data
 		/// </summary>
+		// TODO: should this be IEnumerable<string>?
 		string ContentType
 		{
 			get;
 		}
 
 		/// <summary>
-		/// Gets the standard file extension for the serialized data
+		/// Gets the supported file extension for the serialized data
 		/// </summary>
+		// TODO: should this be IEnumerable<string>?
 		string FileExtension
 		{
 			get;
@@ -119,7 +121,7 @@ namespace JsonFx.Json
 		}
 
 		/// <summary>
-		/// Gets the content type for the serialized data
+		/// Gets the supported content type for the serialized data
 		/// </summary>
 		public abstract string ContentType
 		{
@@ -127,7 +129,7 @@ namespace JsonFx.Json
 		}
 
 		/// <summary>
-		/// Gets the standard file extension for the serialized data
+		/// Gets the supported file extension for the serialized data
 		/// </summary>
 		public abstract string FileExtension
 		{

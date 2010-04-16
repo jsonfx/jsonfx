@@ -89,7 +89,7 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="info"></param>
 		/// <returns></returns>
-		/// <remarks>default implementation is must be public field</remarks>
+		/// <remarks>default implementation is must be public, non-readonly field</remarks>
 		protected virtual bool IsFieldIgnored(FieldInfo info)
 		{
 			return (!info.IsPublic || info.IsInitOnly);
@@ -284,7 +284,7 @@ namespace JsonFx.Json
 					writeMap[info] = name;
 				}
 
-				// load public fields into property map
+				// load fields into property map
 				foreach (FieldInfo info in objectType.GetFields())
 				{
 					if (this.IsIgnored(info))

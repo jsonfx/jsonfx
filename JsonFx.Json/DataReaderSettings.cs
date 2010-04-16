@@ -224,6 +224,8 @@ namespace JsonFx.Json
 			bool isNullable = DataReaderSettings.IsNullable(targetType);
 			if (value == null)
 			{
+				// TODO: validate that this is what we want
+
 				if (!this.AllowNullValueTypes &&
 					targetType.IsValueType &&
 					!isNullable)

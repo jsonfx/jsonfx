@@ -41,8 +41,9 @@ namespace JsonFx.Json
 		#region Properties
 
 		/// <summary>
-		/// Gets the content type of the serialized data
+		/// Gets the supported content type of the serialized data
 		/// </summary>
+		// TODO: should this be IEnumerable<string>?
 		string ContentType
 		{
 			get;
@@ -64,8 +65,8 @@ namespace JsonFx.Json
 		/// Serializes the data to the given output
 		/// </summary>
 		/// <param name="input">the input reader</param>
-		/// <param name="type">the expected type of the serialized data</param>
-		object Deserialize(TextReader input, Type type);
+		/// <param name="targetType">the expected type of the serialized data</param>
+		object Deserialize(TextReader input, Type targetType);
 
 		/// <summary>
 		/// Serializes the data to the given output
@@ -101,7 +102,7 @@ namespace JsonFx.Json
 		#region Properties
 
 		/// <summary>
-		/// Gets the content type of the serialized data
+		/// Gets the supported content type of the serialized data
 		/// </summary>
 		public abstract string ContentType
 		{
@@ -124,8 +125,8 @@ namespace JsonFx.Json
 		/// Serializes the data to the given output
 		/// </summary>
 		/// <param name="input">the input reader</param>
-		/// <param name="type">the expected type of the serialized data</param>
-		public abstract object Deserialize(TextReader input, Type type);
+		/// <param name="targetType">the expected type of the serialized data</param>
+		public abstract object Deserialize(TextReader input, Type targetType);
 
 		/// <summary>
 		/// Serializes the data to the given output

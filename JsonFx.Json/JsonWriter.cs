@@ -34,6 +34,9 @@ using System.Text;
 
 namespace JsonFx.Json
 {
+	/// <summary>
+	/// JSON serializer
+	/// </summary>
 	public class JsonWriter : DataWriterBase
 	{
 		#region Init
@@ -60,7 +63,7 @@ namespace JsonFx.Json
 		}
 
 		/// <summary>
-		/// Gets the content type for the serialized data
+		/// Gets the supported content type for the serialized data
 		/// </summary>
 		public override string ContentType
 		{
@@ -68,7 +71,7 @@ namespace JsonFx.Json
 		}
 
 		/// <summary>
-		/// Gets the standard file extension for the serialized data
+		/// Gets the supported file extension for the serialized data
 		/// </summary>
 		public override string FileExtension
 		{

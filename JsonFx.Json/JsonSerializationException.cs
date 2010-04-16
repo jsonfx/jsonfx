@@ -68,7 +68,7 @@ namespace JsonFx.Json
 			this.position = index;
 		}
 
-		public JsonDeserializationException(string message, Exception innerException, long index)
+		public JsonDeserializationException(string message, long index, Exception innerException)
 			: base(message, innerException)
 		{
 			this.position = index;

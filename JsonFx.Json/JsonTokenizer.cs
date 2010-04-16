@@ -101,18 +101,6 @@ namespace JsonFx.Json
 		private const string ErrorUnterminatedString = "Unterminated JSON string.";
 		private const string ErrorIllegalNumber = "Illegal JSON number.";
 
-		// TODO: move these into parser
-		// parse errors
-		//private const string ErrorUnterminatedObject = "Unterminated JSON object.";
-		//private const string ErrorUnterminatedArray = "Unterminated JSON array.";
-		//private const string ErrorExpectedString = "Expected JSON string.";
-		//private const string ErrorExpectedObject = "Expected JSON object.";
-		//private const string ErrorExpectedArray = "Expected JSON array.";
-		//private const string ErrorExpectedPropertyName = "Expected JSON object property name.";
-		//private const string ErrorExpectedPropertyPairDelim = "Expected JSON object property name/value delimiter.";
-		//private const string ErrorGenericIDictionary = "Types which implement Generic IDictionary<TKey, TValue> also need to implement IDictionary to be deserialized. ({0})";
-		//private const string ErrorGenericIDictionaryKeys = "Types which implement Generic IDictionary<TKey, TValue> need to have string keys to be deserialized. ({0})";
-
 		#endregion Constants
 
 		#region Fields
