@@ -33,14 +33,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.Reflection;
+//using System.Reflection;
 
 namespace JsonFx.Json
 {
 	/// <summary>
-	/// Utility for forcing conversion between types
+	/// Controls deserialization settings for IDataReader
 	/// </summary>
-	internal class TypeCoercionUtility
+	public class DataReaderSettings
 	{
 		#region Constants
 
@@ -52,22 +52,45 @@ namespace JsonFx.Json
 
 		#region Fields
 
-		private readonly DataReaderSettings Settings;
+		private bool allowNullValueTypes = true;
+		private DataNameResolver resolver;
 
 		#endregion Fields
 
-		#region Init
+		#region Properties
 
 		/// <summary>
-		/// Ctor
+		/// Gets and sets if ValueTypes can accept values of null
 		/// </summary>
-		/// <param name="settings"></param>
-		public TypeCoercionUtility(DataReaderSettings settings)
+		/// <remarks>
+		/// Only affects deserialization, if a ValueType T is assigned the
+		/// value of null, it will receive the value of default(T).
+		/// Setting this to false, throws an exception if null is
+		/// specified for a ValueType member.
+		/// </remarks>
+		public bool AllowNullValueTypes
 		{
-			this.Settings = settings;
+			get { return this.allowNullValueTypes; }
+			set { this.allowNullValueTypes = value; }
 		}
 
-		#endregion Init
+		/// <summary>
+		/// Gets and sets the deserialization settings.
+		/// </summary>
+		public DataNameResolver Resolver
+		{
+			get
+			{
+				if (this.resolver == null)
+				{
+					this.resolver = new DataNameResolver();
+				}
+				return this.resolver;
+			}
+			set { this.resolver = value; }
+		}
+
+		#endregion Properties
 
 		#region object Methods
 
@@ -81,7 +104,7 @@ namespace JsonFx.Json
 			if (objectType.IsInterface || objectType.IsAbstract || objectType.IsValueType)
 			{
 				throw new JsonTypeCoercionException(String.Format(
-					TypeCoercionUtility.ErrorCannotInstantiate,
+					DataReaderSettings.ErrorCannotInstantiate,
 					objectType.FullName));
 			}
 
@@ -89,7 +112,7 @@ namespace JsonFx.Json
 			if (ctor == null)
 			{
 				throw new JsonTypeCoercionException(String.Format(
-					TypeCoercionUtility.ErrorDefaultCtor,
+					DataReaderSettings.ErrorDefaultCtor,
 					objectType.FullName));
 			}
 			object result;
@@ -122,11 +145,14 @@ namespace JsonFx.Json
 			PropertyInfo propertyInfo = memberInfo as PropertyInfo;
 			if (propertyInfo != null)
 			{
-				// set value of public property
-				propertyInfo.SetValue(
-					target,
-					this.CoerceType(propertyInfo.PropertyType, value),
-					null);
+				if (propertyInfo.CanWrite)
+				{
+					// set value of public property
+					propertyInfo.SetValue(
+						target,
+						this.CoerceType(propertyInfo.PropertyType, value),
+						null);
+				}
 
 				return;
 			}
@@ -157,15 +183,15 @@ namespace JsonFx.Json
 		/// <returns></returns>
 		public object CoerceType(Type targetType, object value)
 		{
-			bool isNullable = this.IsNullable(targetType);
+			bool isNullable = DataReaderSettings.IsNullable(targetType);
 			if (value == null)
 			{
-				if (!this.Settings.AllowNullValueTypes &&
+				if (!this.AllowNullValueTypes &&
 					targetType.IsValueType &&
 					!isNullable)
 				{
 					throw new JsonTypeCoercionException(String.Format(
-						TypeCoercionUtility.ErrorNullValueType,
+						DataReaderSettings.ErrorNullValueType,
 						targetType.FullName));
 				}
 				return value;
@@ -196,7 +222,7 @@ namespace JsonFx.Json
 						// if isn't a defined value perhaps it is the JsonName
 						foreach (FieldInfo field in targetType.GetFields())
 						{
-							string name = this.Settings.GetName(field);
+							string name = this.Resolver.GetName(field);
 							if (StringComparer.Ordinal.Equals((string)value, name))
 							{
 								value = field.Name;
@@ -308,7 +334,7 @@ namespace JsonFx.Json
 		{
 			object newValue = this.InstantiateObject(targetType);
 
-			Dictionary<string, MemberInfo> memberMap = this.Settings.GetMemberMap(targetType);
+			IDictionary<string, MemberInfo> memberMap = this.Resolver.GetReadMap(targetType);
 			if (memberMap != null)
 			{
 				// copy any values into new object
@@ -375,7 +401,7 @@ namespace JsonFx.Json
 			if (defaultCtor == null)
 			{
 				throw new JsonTypeCoercionException(String.Format(
-					TypeCoercionUtility.ErrorDefaultCtor,
+					DataReaderSettings.ErrorDefaultCtor,
 					targetType.FullName));
 			}
 			object collection;
@@ -496,7 +522,7 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="type"></param>
 		/// <returns></returns>
-		private bool IsNullable(Type type)
+		private static bool IsNullable(Type type)
 		{
 			return type.IsGenericType && (typeof(Nullable<>) == type.GetGenericTypeDefinition());
 		}

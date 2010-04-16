@@ -36,16 +36,16 @@ namespace JsonFx.Json
 	/// <summary>
 	/// A common interface for data deserializers
 	/// </summary>
-	public interface IDataReader
+	public class JsonReader : DataReaderBase
 	{
 		#region Properties
 
 		/// <summary>
 		/// Gets the content type of the serialized data
 		/// </summary>
-		string ContentType
+		public override string ContentType
 		{
-			get;
+			get { return "application/json"; }
 		}
 
 		#endregion Properties
@@ -57,51 +57,9 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="input">the input reader</param>
 		/// <param name="type">the expected type of the serialized data</param>
-		object Deserialize(TextReader input, Type type);
-
-		/// <summary>
-		/// Serializes the data to the given output
-		/// </summary>
-		/// <param name="input">the input reader</param>
-		/// <typeparam name="T">the expected type of the serialized data</typeparam>
-		T Deserialize<T>(TextReader input);
-
-		#endregion Methods
-	}
-
-	public abstract class DataReaderBase : IDataReader
-	{
-		#region Properties
-
-		/// <summary>
-		/// Gets the content type of the serialized data
-		/// </summary>
-		public abstract string ContentType
+		public override object Deserialize(TextReader input, Type type)
 		{
-			get;
-		}
-
-		#endregion Properties
-
-		#region Methods
-
-		/// <summary>
-		/// Serializes the data to the given output
-		/// </summary>
-		/// <param name="input">the input reader</param>
-		/// <param name="type">the expected type of the serialized data</param>
-		public abstract object Deserialize(TextReader input, Type type);
-
-		/// <summary>
-		/// Serializes the data to the given output
-		/// </summary>
-		/// <param name="input">the input reader</param>
-		/// <typeparam name="T">the expected type of the serialized data</typeparam>
-		public virtual T Deserialize<T>(TextReader input)
-		{
-			object value = this.Deserialize(input, typeof(T));
-
-			return (value is T) ? (T)value : default(T);
+			return null;
 		}
 
 		#endregion Methods
