@@ -68,9 +68,9 @@ namespace JsonFx.Json
 		String,
 
 		/// <summary>
-		/// Start of Array
+		/// Begin of Array
 		/// </summary>
-		ArrayStart,
+		ArrayBegin,
 
 		/// <summary>
 		/// End of Array
@@ -78,9 +78,9 @@ namespace JsonFx.Json
 		ArrayEnd,
 
 		/// <summary>
-		/// Start of Object
+		/// Begin of Object
 		/// </summary>
-		ObjectStart,
+		ObjectBegin,
 
 		/// <summary>
 		/// End of Object

@@ -46,9 +46,9 @@ namespace JsonFx.Json
 
 		private static readonly Token<JsonTokenType> None = new Token<JsonTokenType>(JsonTokenType.None);
 
-		private static readonly Token<JsonTokenType> ArrayStart = new Token<JsonTokenType>(JsonTokenType.ArrayStart);
+		private static readonly Token<JsonTokenType> ArrayBegin = new Token<JsonTokenType>(JsonTokenType.ArrayBegin);
 		private static readonly Token<JsonTokenType> ArrayEnd = new Token<JsonTokenType>(JsonTokenType.ArrayEnd);
-		private static readonly Token<JsonTokenType> ObjectStart = new Token<JsonTokenType>(JsonTokenType.ObjectStart);
+		private static readonly Token<JsonTokenType> ObjectBegin = new Token<JsonTokenType>(JsonTokenType.ObjectBegin);
 		private static readonly Token<JsonTokenType> ObjectEnd = new Token<JsonTokenType>(JsonTokenType.ObjectEnd);
 		private static readonly Token<JsonTokenType> PairDelim = new Token<JsonTokenType>(JsonTokenType.PairDelim);
 		private static readonly Token<JsonTokenType> ValueDelim = new Token<JsonTokenType>(JsonTokenType.ValueDelim);
@@ -80,9 +80,9 @@ namespace JsonFx.Json
 		private const char OperatorUnaryMinus = '-';
 		private const char OperatorUnaryPlus = '+';
 		private const char OperatorDecimalPoint = '.';
-		private const char OperatorArrayStart = '[';
+		private const char OperatorArrayBegin = '[';
 		private const char OperatorArrayEnd = ']';
-		private const char OperatorObjectStart = '{';
+		private const char OperatorObjectBegin = '{';
 		private const char OperatorObjectEnd = '}';
 		private const char OperatorStringDelim = '"';
 		private const char OperatorStringDelimAlt = '\'';
@@ -90,7 +90,7 @@ namespace JsonFx.Json
 		private const char OperatorPairDelim = ':';
 		private const char OperatorCharEscape = '\\';
 
-		private const string CommentStart = "/*";
+		private const string CommentBegin = "/*";
 		private const string CommentEnd = "*/";
 		private const string CommentLine = "//";
 		private const string LineEndings = "\r\n";
@@ -184,20 +184,20 @@ namespace JsonFx.Json
 				{
 					return JsonTokenizer.None;
 				}
-				case JsonTokenizer.OperatorArrayStart:
+				case JsonTokenizer.OperatorArrayBegin:
 				{
 					this.Reader.Flush(1);
-					return JsonTokenizer.ArrayStart;
+					return JsonTokenizer.ArrayBegin;
 				}
 				case JsonTokenizer.OperatorArrayEnd:
 				{
 					this.Reader.Flush(1);
 					return JsonTokenizer.ArrayEnd;
 				}
-				case JsonTokenizer.OperatorObjectStart:
+				case JsonTokenizer.OperatorObjectBegin:
 				{
 					this.Reader.Flush(1);
-					return JsonTokenizer.ObjectStart;
+					return JsonTokenizer.ObjectBegin;
 				}
 				case JsonTokenizer.OperatorObjectEnd:
 				{
@@ -256,7 +256,7 @@ namespace JsonFx.Json
 			ch = this.SkipWhitespace(ch);
 
 			// skip block and line comments
-			if (ch != JsonTokenizer.CommentStart[0])
+			if (ch != JsonTokenizer.CommentBegin[0])
 			{
 				return ch;
 			}
@@ -272,7 +272,7 @@ namespace JsonFx.Json
 			}
 
 			bool isBlockComment;
-			if (ch == JsonTokenizer.CommentStart[1])
+			if (ch == JsonTokenizer.CommentBegin[1])
 			{
 				isBlockComment = true;
 			}
