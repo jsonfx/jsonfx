@@ -75,7 +75,7 @@ namespace JsonFx.Json
 		/// Instantiates a new instance of objectType.
 		/// </summary>
 		/// <param name="objectType"></param>
-		/// <returns></returns>
+		/// <returns>objectType instance</returns>
 		public object InstantiateObject(Type objectType)
 		{
 			if (objectType.IsInterface || objectType.IsAbstract || objectType.IsValueType)
@@ -112,71 +112,37 @@ namespace JsonFx.Json
 		}
 
 		/// <summary>
-		/// Helper method to set value of either property or field
+		/// Helper method to set value of either a property or a field.
 		/// </summary>
-		/// <param name="result"></param>
-		/// <param name="memberType"></param>
-		/// <param name="memberInfo"></param>
-		/// <param name="value"></param>
-		public void SetMemberValue(object result, Type memberType, MemberInfo memberInfo, object value)
+		/// <param name="target">the object which owns the member</param>
+		/// <param name="memberType">the type of the meme</param>
+		/// <param name="value">the member value</param>
+		public void SetMemberValue(object target, MemberInfo memberInfo, object value)
 		{
-			if (memberInfo is PropertyInfo)
+			PropertyInfo propertyInfo = memberInfo as PropertyInfo;
+			if (propertyInfo != null)
 			{
 				// set value of public property
-				((PropertyInfo)memberInfo).SetValue(
-					result,
-					this.CoerceType(memberType, value),
+				propertyInfo.SetValue(
+					target,
+					this.CoerceType(propertyInfo.PropertyType, value),
 					null);
+
+				return;
 			}
-			else if (memberInfo is FieldInfo)
+
+			FieldInfo fieldInfo = memberInfo as FieldInfo;
+			if (fieldInfo != null)
 			{
 				// set value of public field
-				((FieldInfo)memberInfo).SetValue(
-					result,
-					this.CoerceType(memberType, value));
+				fieldInfo.SetValue(
+					target,
+					this.CoerceType(fieldInfo.FieldType, value));
+
+				return;
 			}
 
 			// all other values are ignored
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="memberMap"></param>
-		/// <param name="memberName"></param>
-		/// <param name="memberInfo"></param>
-		/// <returns></returns>
-		private Type GetMemberInfo(
-			Dictionary<string, MemberInfo> memberMap,
-			string memberName,
-			out MemberInfo memberInfo)
-		{
-			if (memberMap == null &&
-				memberMap.ContainsKey(memberName))
-			{
-				// Check properties for object member
-				memberInfo = memberMap[memberName];
-
-				if (memberInfo is PropertyInfo)
-				{
-					// maps to public property
-					return ((PropertyInfo)memberInfo).PropertyType;
-				}
-
-				if (memberInfo is FieldInfo)
-				{
-					// maps to public field
-					return ((FieldInfo)memberInfo).FieldType;
-				}
-
-				if (memberInfo is Type)
-				{
-					return (Type)memberInfo;
-				}
-			}
-
-			memberInfo = null;
-			return null;
 		}
 
 		#endregion object Methods
@@ -191,7 +157,7 @@ namespace JsonFx.Json
 		/// <returns></returns>
 		public object CoerceType(Type targetType, object value)
 		{
-			bool isNullable = TypeCoercionUtility.IsNullable(targetType);
+			bool isNullable = this.IsNullable(targetType);
 			if (value == null)
 			{
 				if (!this.Settings.AllowNullValueTypes &&
@@ -332,6 +298,12 @@ namespace JsonFx.Json
 			}
 		}
 
+		/// <summary>
+		/// Populates the properties of an object with the dictionary values.
+		/// </summary>
+		/// <param name="targetType"></param>
+		/// <param name="value"></param>
+		/// <returns></returns>
 		private object CoerceType(Type targetType, IDictionary value)
 		{
 			object newValue = this.InstantiateObject(targetType);
@@ -342,9 +314,13 @@ namespace JsonFx.Json
 				// copy any values into new object
 				foreach (object key in value.Keys)
 				{
-					MemberInfo memberInfo;
-					Type memberType = this.GetMemberInfo(memberMap, key as String, out memberInfo);
-					this.SetMemberValue(newValue, memberType, memberInfo, value[key]);
+					string memberName = (key as String);
+					if (String.IsNullOrEmpty(memberName) || !memberMap.ContainsKey(memberName))
+					{
+						continue;
+					}
+
+					this.SetMemberValue(newValue, memberMap[memberName], value[key]);
 				}
 			}
 
@@ -355,6 +331,7 @@ namespace JsonFx.Json
 		{
 			if (targetType.IsArray)
 			{
+				// arrays are much simpler to create
 				return this.CoerceArray(targetType.GetElementType(), value);
 			}
 
@@ -397,8 +374,9 @@ namespace JsonFx.Json
 
 			if (defaultCtor == null)
 			{
-				throw new JsonTypeCoercionException(
-					String.Format(TypeCoercionUtility.ErrorDefaultCtor, targetType.FullName));
+				throw new JsonTypeCoercionException(String.Format(
+					TypeCoercionUtility.ErrorDefaultCtor,
+					targetType.FullName));
 			}
 			object collection;
 			try
@@ -486,10 +464,21 @@ namespace JsonFx.Json
 			}
 			catch (Exception ex)
 			{
-				throw new JsonTypeCoercionException(String.Format("Error converting {0} to {1}", value.GetType().FullName, targetType.FullName), ex);
+				throw new JsonTypeCoercionException(
+					String.Format(
+						"Error converting {0} to {1}",
+						value.GetType().FullName,
+						targetType.FullName),
+					ex);
 			}
 		}
 
+		/// <summary>
+		/// Coerces an sequence of items into an array of Type elementType
+		/// </summary>
+		/// <param name="elementType"></param>
+		/// <param name="value"></param>
+		/// <returns></returns>
 		private Array CoerceArray(Type elementType, IEnumerable value)
 		{
 			ArrayList target = new ArrayList();
@@ -502,7 +491,12 @@ namespace JsonFx.Json
 			return target.ToArray(elementType);
 		}
 
-		private static bool IsNullable(Type type)
+		/// <summary>
+		/// Determines if type can be assigned a null value.
+		/// </summary>
+		/// <param name="type"></param>
+		/// <returns></returns>
+		private bool IsNullable(Type type)
 		{
 			return type.IsGenericType && (typeof(Nullable<>) == type.GetGenericTypeDefinition());
 		}

@@ -68,38 +68,78 @@ namespace JsonFx.Json
 
 		#region Name Resolution Methods
 
-		internal bool IsIgnored(object value)
+		/// <summary>
+		/// Determines if memberInfo is not to be serialized.
+		/// </summary>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		internal bool IsIgnored(MemberInfo memberInfo)
 		{
-			if ((value is PropertyInfo) && this.IsPropertyIgnored((PropertyInfo)value))
+			PropertyInfo propertyInfo = memberInfo as PropertyInfo;
+			if ((propertyInfo != null) && this.IsPropertyIgnored(propertyInfo))
 			{
 				return true;
 			}
 
-			if ((value is FieldInfo) && this.IsFieldIgnored((FieldInfo)value))
+			FieldInfo fieldInfo = memberInfo as FieldInfo;
+			if ((fieldInfo != null) && this.IsFieldIgnored(fieldInfo))
 			{
 				return true;
 			}
 
-			return this.IsCustomIgnored(value);
+			return this.IsCustomIgnored(memberInfo);
 		}
 
+		/// <summary>
+		/// Gets a value indicating if the property is to be serialized.
+		/// </summary>
+		/// <param name="info"></param>
+		/// <returns></returns>
+		/// <remarks>default implementation is must be read/write properties</remarks>
 		protected virtual bool IsPropertyIgnored(PropertyInfo info)
 		{
 			return (!info.CanRead || !info.CanWrite);
 		}
 
+		/// <summary>
+		/// Gets a value indicating if the field is to be serialized.
+		/// </summary>
+		/// <param name="info"></param>
+		/// <returns></returns>
+		/// <remarks>default implementation is must be public field</remarks>
 		protected virtual bool IsFieldIgnored(FieldInfo info)
 		{
 			return !info.IsPublic;
 		}
 
-		protected virtual bool IsCustomIgnored(object value)
+		/// <summary>
+		/// Gets a value indicating if the member is to be serialized.
+		/// </summary>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		/// <remarks>default implementation checks for JsonIgnoreAttribute</remarks>
+		protected virtual bool IsCustomIgnored(MemberInfo info)
 		{
-			// TODO: extend here for JsonIgnoreAttribute, XmlIgnoreAttribute, DataContractAttribute
-			return (DataReaderSettings.GetAttribute<JsonIgnoreAttribute>(value) != null);
+			// TODO: extend here for JsonIgnoreAttribute, XmlIgnoreAttribute, DataContractAttribute, JsonSpecifiedPropertyAttribute
+			return (DataReaderSettings.GetAttribute<JsonIgnoreAttribute>(info) != null);
 		}
 
-		protected internal virtual string GetName(object value)
+		/// <summary>
+		/// Gets the serialized name for the Enum value.
+		/// </summary>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		internal string GetName(Enum value)
+		{
+			return this.GetName(this.GetMemberInfo(value));
+		}
+
+		/// <summary>
+		/// Gets the serialized name for the member.
+		/// </summary>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		protected internal virtual string GetName(MemberInfo value)
 		{
 			JsonNameAttribute attribute = DataReaderSettings.GetAttribute<JsonNameAttribute>(value);
 
@@ -107,9 +147,9 @@ namespace JsonFx.Json
 			return (attribute == null) ? attribute.Name : null;
 		}
 
-		#endregion Methods
+		#endregion Name Resolution Methods
 
-		#region Methods
+		#region Reflection Methods
 
 		internal Dictionary<string, MemberInfo> GetMemberMap(Type objectType)
 		{
@@ -175,48 +215,39 @@ namespace JsonFx.Json
 		}
 
 		/// <summary>
+		/// Gets the Enum field for the given value.
+		/// </summary>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		private MemberInfo GetMemberInfo(Enum value)
+		{
+			Type type = value.GetType();
+
+			string name = Enum.GetName(type, value);
+			if (String.IsNullOrEmpty(name))
+			{
+				return null;
+			}
+
+			return type.GetField(name);
+		}
+
+		/// <summary>
 		/// Gets the attribute T for the given value.
 		/// </summary>
 		/// <param name="value"></param>
 		/// <typeparam name="T">Attribute Type</typeparam>
 		/// <returns>attribte</returns>
-		private static T GetAttribute<T>(object value)
+		protected static T GetAttribute<T>(MemberInfo memberInfo)
 			where T : Attribute
 		{
-			if (value == null)
-			{
-				return default(T);
-			}
-
-			Type type = value.GetType();
-			MemberInfo memberInfo = null;
-
-			if (type.IsEnum)
-			{
-				string name = Enum.GetName(type, value);
-				if (String.IsNullOrEmpty(name))
-				{
-					return default(T);
-				}
-				memberInfo = type.GetField(name);
-			}
-			else
-			{
-				memberInfo = value as MemberInfo;
-			}
-
-			if (memberInfo == null)
-			{
-				throw new ArgumentException("Value is not able to be reflected.", "value");
-			}
-
-			if (!Attribute.IsDefined(memberInfo, typeof(T)))
+			if (memberInfo == null || !Attribute.IsDefined(memberInfo, typeof(T)))
 			{
 				return default(T);
 			}
 			return (T)Attribute.GetCustomAttribute(memberInfo, typeof(T));
 		}
 
-		#endregion Methods
+		#endregion Reflection Methods
 	}
 }
