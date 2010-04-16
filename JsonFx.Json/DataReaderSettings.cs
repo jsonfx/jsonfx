@@ -75,7 +75,7 @@ namespace JsonFx.Json
 		}
 
 		/// <summary>
-		/// Gets and sets the deserialization settings.
+		/// Gets and sets the serialized name resolver
 		/// </summary>
 		public DataNameResolver Resolver
 		{
@@ -88,6 +88,44 @@ namespace JsonFx.Json
 				return this.resolver;
 			}
 			set { this.resolver = value; }
+		}
+
+		/// <summary>
+		/// Gets the serialized name for a member of a given type
+		/// </summary>
+		/// <param name="type"></param>
+		/// <param name="info">PropertyInfo or FieldInfo</param>
+		/// <returns>serialized name</returns>
+		public string this[Type type, MemberInfo info]
+		{
+			get
+			{
+				IDictionary<MemberInfo, string> map = this.Resolver.GetWriteMap(type);
+				if (map == null)
+				{
+					return null;
+				}
+				return map[info];
+			}
+		}
+
+		/// <summary>
+		/// Gets the member info for a serialized name of a given type.
+		/// </summary>
+		/// <param name="type"></param>
+		/// <param name="name"></param>
+		/// <returns>PropertyInfo or FieldInfo</returns>
+		public MemberInfo this[Type type, string name]
+		{
+			get
+			{
+				IDictionary<string, MemberInfo> map = this.Resolver.GetReadMap(type);
+				if (map == null)
+				{
+					return null;
+				}
+				return map[name];
+			}
 		}
 
 		#endregion Properties

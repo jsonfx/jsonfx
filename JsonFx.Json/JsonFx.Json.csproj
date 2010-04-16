@@ -51,6 +51,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="JsonWriter.cs" />
     <Compile Include="DataNameResolver.cs" />
     <Compile Include="DataReaderSettings.cs">
       <SubType>Code</SubType>

@@ -48,6 +48,14 @@ namespace JsonFx.Json
 			get;
 		}
 
+		/// <summary>
+		/// Gets the settings used for deserialization
+		/// </summary>
+		DataReaderSettings Settings
+		{
+			get;
+		}
+
 		#endregion Properties
 
 		#region Methods
@@ -71,6 +79,25 @@ namespace JsonFx.Json
 
 	public abstract class DataReaderBase : IDataReader
 	{
+		#region Fields
+
+		private readonly DataReaderSettings settings;
+
+		#endregion Fields
+
+		#region Init
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="settings"></param>
+		public DataReaderBase(DataReaderSettings settings)
+		{
+			this.settings = settings;
+		}
+
+		#endregion Init
+
 		#region Properties
 
 		/// <summary>
@@ -79,6 +106,14 @@ namespace JsonFx.Json
 		public abstract string ContentType
 		{
 			get;
+		}
+
+		/// <summary>
+		/// Gets the settings used for deserialization
+		/// </summary>
+		public DataReaderSettings Settings
+		{
+			get { return this.settings; }
 		}
 
 		#endregion Properties

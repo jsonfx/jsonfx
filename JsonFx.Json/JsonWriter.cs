@@ -34,76 +34,17 @@ using System.Text;
 
 namespace JsonFx.Json
 {
-	/// <summary>
-	/// A common interface for data serializers
-	/// </summary>
-	public interface IDataWriter
+	public class JsonWriter : DataWriterBase
 	{
-		#region Properties
-
-		/// <summary>
-		/// Gets the content encoding for the serialized data
-		/// </summary>
-		Encoding ContentEncoding
-		{
-			get;
-		}
-
-		/// <summary>
-		/// Gets the content type for the serialized data
-		/// </summary>
-		string ContentType
-		{
-			get;
-		}
-
-		/// <summary>
-		/// Gets the standard file extension for the serialized data
-		/// </summary>
-		string FileExtension
-		{
-			get;
-		}
-
-		/// <summary>
-		/// Gets the settings used for serialization
-		/// </summary>
-		DataWriterSettings Settings
-		{
-			get;
-		}
-
-		#endregion Properties
-
-		#region Methods
-
-		/// <summary>
-		/// Serializes the data to the given output
-		/// </summary>
-		/// <param name="output">the output writer</param>
-		/// <param name="data">the data to be serialized</param>
-		void Serialize(TextWriter output, object data);
-
-		#endregion Methods
-	}
-
-	public abstract class DataWriterBase : IDataWriter
-	{
-		#region Fields
-
-		private readonly DataWriterSettings settings;
-
-		#endregion Fields
-
 		#region Init
 
 		/// <summary>
 		/// Ctor
 		/// </summary>
 		/// <param name="settings"></param>
-		public DataWriterBase(DataWriterSettings settings)
+		public JsonWriter(DataWriterSettings settings)
+			: base(settings)
 		{
-			this.settings = settings;
 		}
 
 		#endregion Init
@@ -113,33 +54,25 @@ namespace JsonFx.Json
 		/// <summary>
 		/// Gets the content encoding for the serialized data
 		/// </summary>
-		public abstract Encoding ContentEncoding
+		public override Encoding ContentEncoding
 		{
-			get;
+			get { return Encoding.UTF8; }
 		}
 
 		/// <summary>
 		/// Gets the content type for the serialized data
 		/// </summary>
-		public abstract string ContentType
+		public override string ContentType
 		{
-			get;
+			get { return "application/json"; }
 		}
 
 		/// <summary>
 		/// Gets the standard file extension for the serialized data
 		/// </summary>
-		public abstract string FileExtension
+		public override string FileExtension
 		{
-			get;
-		}
-
-		/// <summary>
-		/// Gets the settings used for serialization
-		/// </summary>
-		public DataWriterSettings Settings
-		{
-			get { return this.settings; }
+			get { return ".json"; }
 		}
 
 		#endregion Properties
@@ -151,7 +84,10 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="output">the output writer</param>
 		/// <param name="data">the data to be serialized</param>
-		public abstract void Serialize(TextWriter output, object data);
+		public override void Serialize(TextWriter output, object data)
+		{
+			// TODO.
+		}
 
 		#endregion Methods
 	}

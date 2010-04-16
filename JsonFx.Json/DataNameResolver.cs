@@ -49,48 +49,6 @@ namespace JsonFx.Json
 
 		#endregion Fields
 
-		#region Properties
-
-		/// <summary>
-		/// Gets the serialized name for a member of a given type
-		/// </summary>
-		/// <param name="type"></param>
-		/// <param name="info">PropertyInfo or FieldInfo</param>
-		/// <returns>serialized name</returns>
-		public string this[Type type, MemberInfo info]
-		{
-			get
-			{
-				IDictionary<MemberInfo, string> map = this.GetWriteMap(type);
-				if (map == null)
-				{
-					return null;
-				}
-				return this.WriteMapCache[type][info];
-			}
-		}
-
-		/// <summary>
-		/// Gets the member info for a serialized name of a given type.
-		/// </summary>
-		/// <param name="type"></param>
-		/// <param name="name"></param>
-		/// <returns>PropertyInfo or FieldInfo</returns>
-		public MemberInfo this[Type type, string name]
-		{
-			get
-			{
-				IDictionary<string, MemberInfo> map = this.GetReadMap(type);
-				if (map == null)
-				{
-					return null;
-				}
-				return this.ReadMapCache[type][name];
-			}
-		}
-
-		#endregion Properties
-
 		#region Name Resolution Methods
 
 		/// <summary>
@@ -168,7 +126,7 @@ namespace JsonFx.Json
 		/// <returns></returns>
 		protected internal virtual bool IsValueIgnored(MemberInfo info, object target)
 		{
-			if (this.IsDefaultValue(info, DataNameResolver.GetMemberValue(info, target)))
+			if (this.IsDefaultValue(info, DataNameResolver.GetMemberValue(target, info)))
 			{
 				return true;
 			}
@@ -370,7 +328,7 @@ namespace JsonFx.Json
 			return (T)Attribute.GetCustomAttribute(info, typeof(T));
 		}
 
-		private static object GetMemberValue(MemberInfo info, object target)
+		private static object GetMemberValue(object target, MemberInfo info)
 		{
 			PropertyInfo propertyInfo = info as PropertyInfo;
 			if (propertyInfo != null && propertyInfo.CanRead)

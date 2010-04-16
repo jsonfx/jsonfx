@@ -42,6 +42,7 @@ namespace JsonFx.Json
 		private bool prettyPrint;
 		private string tab = "\t";
 		private string newLine = Environment.NewLine;
+		private DataNameResolver resolver;
 
 		#endregion Fields
 
@@ -72,6 +73,22 @@ namespace JsonFx.Json
 		{
 			get { return this.newLine; }
 			set { this.newLine = value; }
+		}
+
+		/// <summary>
+		/// Gets and sets the serialized name resolver
+		/// </summary>
+		public DataNameResolver Resolver
+		{
+			get
+			{
+				if (this.resolver == null)
+				{
+					this.resolver = new DataNameResolver();
+				}
+				return this.resolver;
+			}
+			set { this.resolver = value; }
 		}
 
 		#endregion Properties

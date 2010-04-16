@@ -38,6 +38,19 @@ namespace JsonFx.Json
 	/// </summary>
 	public class JsonReader : DataReaderBase
 	{
+		#region Init
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="settings"></param>
+		public JsonReader(DataReaderSettings settings)
+			: base(settings)
+		{
+		}
+
+		#endregion Init
+
 		#region Properties
 
 		/// <summary>
@@ -59,6 +72,7 @@ namespace JsonFx.Json
 		/// <param name="type">the expected type of the serialized data</param>
 		public override object Deserialize(TextReader input, Type type)
 		{
+			// TODO.
 			return null;
 		}
 
