@@ -51,7 +51,11 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataReaderSettings.cs" />
+    <Compile Include="DataNameResolver.cs" />
+    <Compile Include="DataReaderSettings.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="JsonReader.cs" />
     <Compile Include="DataWriterSettings.cs" />
     <Compile Include="IDataReader.cs" />
     <Compile Include="IDataWriter.cs" />
@@ -69,7 +73,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\AssemblyVersion.cs" />
     <Compile Include="Token`1.cs" />
-    <Compile Include="TypeCoercionUtility.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
