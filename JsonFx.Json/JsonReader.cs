@@ -32,6 +32,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 
 namespace JsonFx.Json
 {
@@ -113,7 +114,8 @@ namespace JsonFx.Json
 		{
 			if (!tokens.MoveNext())
 			{
-				if (targetType != null)
+				// end of input
+				if (targetType != null && targetType != typeof(object))
 				{
 					return this.Settings.CoerceType(targetType, null);
 				}
@@ -121,14 +123,17 @@ namespace JsonFx.Json
 				return null;
 			}
 
-			switch (tokens.Current.TokenType)
+			Token<JsonTokenType> token = tokens.Current;
+			switch (token.TokenType)
 			{
 				case JsonTokenType.ArrayBegin:
 				{
+					// found array
 					return this.ParseArray(tokens, targetType);
 				}
 				case JsonTokenType.ObjectBegin:
 				{
+					// found object
 					return this.ParseObject(tokens, targetType);
 				}
 				case JsonTokenType.Boolean:
@@ -137,66 +142,162 @@ namespace JsonFx.Json
 				case JsonTokenType.String:
 				case JsonTokenType.Undefined:
 				{
-					if (targetType != null)
+					// foudn primitive
+					if (targetType != null && targetType != typeof(object))
 					{
-						return this.Settings.CoerceType(targetType, tokens.Current.Value);
+						return this.Settings.CoerceType(targetType, token.Value);
 					}
-					return tokens.Current.Value;
+					return token.Value;
 				}
+				case JsonTokenType.ArrayEnd:
+				case JsonTokenType.Identifier:
+				case JsonTokenType.None:
+				case JsonTokenType.ObjectEnd:
+				case JsonTokenType.PairDelim:
+				case JsonTokenType.ValueDelim:
 				default:
 				{
+					// these are invalid here
 					throw new ArgumentException(String.Format(
 						JsonReader.ErrorUnexpectedToken,
-						tokens.Current.TokenType));
+						token.TokenType));
 				}
 			}
 		}
 
-		private object ParseArray(IEnumerator<Token<JsonTokenType>> tokens, Type arrayType)
+		private object ParseObject(IEnumerator<Token<JsonTokenType>> tokens, Type objectType)
 		{
-			bool isArrayItemTypeSet = (arrayType != null);
-			bool isArrayTypeAHint = !isArrayItemTypeSet;
-			Type arrayItemType = null;
+			Token<JsonTokenType> token = tokens.Current;
 
-			if (isArrayItemTypeSet)
+			// verify correct starting state
+			if (token.TokenType != JsonTokenType.ObjectBegin)
 			{
-				if (arrayType.HasElementType)
-				{
-					arrayItemType = arrayType.GetElementType();
-				}
-				else if (arrayType.IsGenericType)
-				{
-					Type[] generics = arrayType.GetGenericArguments();
-					if (generics.Length == 1)
-					{
-						// could use the first or last, but this more correct
-						arrayItemType = generics[0];
-					}
-				}
+				throw new ArgumentException(String.Format(
+					JsonReader.ErrorUnexpectedToken,
+					token.TokenType));
 			}
 
-			// using ArrayList since has .ToArray(Type) method
-			// cannot create generic list at runtime
-			ArrayList array = new ArrayList();
+			Dictionary<string, object> value = new Dictionary<string, object>();
 
-			do
+			while (!tokens.MoveNext())
 			{
-				if (!tokens.MoveNext())
+				token = tokens.Current;
+				if (value.Count > 0)
 				{
-					break;
+					// parse value delimiter
+					switch (token.TokenType)
+					{
+						case JsonTokenType.ValueDelim:
+						{
+							break;
+						}
+						case JsonTokenType.ObjectEnd:
+						{
+							// end of the object loop
+							if (objectType != null && objectType != typeof(object))
+							{
+								return this.Settings.CoerceType(objectType, value);
+							}
+
+							return value;
+						}
+						default:
+						{
+							// these are invalid here
+							throw new ArgumentException(String.Format(
+								JsonReader.ErrorUnexpectedToken,
+								token.TokenType));
+						}
+					}
+
+					// move past delim
+					if (!tokens.MoveNext())
+					{
+						// end of input
+						break;
+					}
+					token = tokens.Current;
 				}
 
-				Token<JsonTokenType> token = tokens.Current;
+				// parse the property key
+				string memberName;
 				switch (token.TokenType)
 				{
-					case JsonTokenType.ArrayEnd:
+					case JsonTokenType.Identifier:
+					case JsonTokenType.String:
+					case JsonTokenType.Number:
 					{
-						if (arrayType != null)
+						memberName = Convert.ToString(token.Value);
+						break;
+					}
+					case JsonTokenType.ObjectEnd:
+					{
+						if (value.Count > 0)
 						{
-							return this.Settings.CoerceType(arrayType, array);
+							goto default;
 						}
 
-						return array;
+						// end of the object loop
+						if (objectType != null && objectType != typeof(object))
+						{
+							return this.Settings.CoerceType(objectType, value);
+						}
+
+						return value;
+					}
+					default:
+					{
+						// these are invalid here
+						throw new ArgumentException(String.Format(
+							JsonReader.ErrorUnexpectedToken,
+							token.TokenType));
+					}
+				}
+
+				// parse pair delimiter
+				switch (token.TokenType)
+				{
+					case JsonTokenType.PairDelim:
+					{
+						break;
+					}
+					default:
+					{
+						// these are invalid here
+						throw new ArgumentException(String.Format(
+							JsonReader.ErrorUnexpectedToken,
+							token.TokenType));
+					}
+				}
+
+				// find the member type
+				Type memberType = null;
+				if (objectType != null && objectType != typeof(object))
+				{
+					MemberInfo info = this.Settings[objectType, memberName];
+					if (info is PropertyInfo)
+					{
+						memberType = ((PropertyInfo)info).PropertyType;
+					}
+					else if (info is FieldInfo)
+					{
+						memberType = ((FieldInfo)info).FieldType;
+					}
+				}
+
+				// parse the property value
+				object memberValue;
+				switch (token.TokenType)
+				{
+					case JsonTokenType.ArrayBegin:
+					{
+						memberValue = this.ParseArray(tokens, memberType);
+						break;
+					}
+					case JsonTokenType.ObjectBegin:
+					{
+						memberValue = this.ParseObject(tokens, memberType);
+						break;
 					}
 					case JsonTokenType.Boolean:
 					case JsonTokenType.Null:
@@ -204,57 +305,216 @@ namespace JsonFx.Json
 					case JsonTokenType.String:
 					case JsonTokenType.Undefined:
 					{
-						// primitives
-						object value = token.Value;
-
-						if (arrayItemType != null)
-						{
-							// TODO: establish common type
-						}
-
-						array.Add(value);
+						memberValue = token.Value;
 						break;
 					}
-					case JsonTokenType.ObjectBegin:
-					{
-						object value = this.ParseObject(tokens, arrayItemType);
-
-						// TODO: establish common type
-
-						array.Add(value);
-						break;
-					}
+					case JsonTokenType.ArrayEnd:
+					case JsonTokenType.Identifier:
+					case JsonTokenType.None:
+					case JsonTokenType.ObjectEnd:
+					case JsonTokenType.PairDelim:
 					case JsonTokenType.ValueDelim:
+					default:
 					{
-						throw new ArgumentException(JsonReader.ErrorMissingArrayValue);
+						// these are invalid here
+						throw new ArgumentException(String.Format(
+							JsonReader.ErrorUnexpectedToken,
+							token.TokenType));
 					}
 				}
-			} while (tokens.MoveNext() && tokens.Current.TokenType == JsonTokenType.ValueDelim);
 
-			throw new ArgumentException(JsonReader.ErrorUnterminatedArray);
+				if (memberType != null && memberType != typeof(object))
+				{
+					memberValue = this.Settings.CoerceType(memberType, memberValue);
+				}
+				value[memberName] = memberValue;
+
+				// move past delim
+				if (!tokens.MoveNext())
+				{
+					// end of input
+					break;
+				}
+				token = tokens.Current;
+			}
+
+			// end of input
+			throw new ArgumentException(JsonReader.ErrorUnterminatedObject);
 		}
 
-		private object ParseObject(IEnumerator<Token<JsonTokenType>> tokens, Type objectType)
+		private object ParseArray(IEnumerator<Token<JsonTokenType>> tokens, Type arrayType)
 		{
-			object value = null;
+			Token<JsonTokenType> token = tokens.Current;
 
-			while (tokens.MoveNext())
+			// verify correct starting state
+			if (token.TokenType != JsonTokenType.ArrayBegin)
 			{
-				switch (tokens.Current.TokenType)
-				{
-					case JsonTokenType.ObjectEnd:
-					{
-						if (objectType != null)
-						{
-							return this.Settings.CoerceType(objectType, value);
-						}
+				throw new ArgumentException(String.Format(
+					JsonReader.ErrorUnexpectedToken,
+					token.TokenType));
+			}
 
-						return value;
+			Type arrayItemType = null;
+			if (arrayType != null)
+			{
+				if (arrayType.HasElementType)
+				{
+					// found array element type
+					arrayItemType = arrayType.GetElementType();
+				}
+				else if (arrayType.IsGenericType)
+				{
+					Type[] generics = arrayType.GetGenericArguments();
+					if (generics.Length == 1)
+					{
+						// found list or enumerable type
+						arrayItemType = generics[0];
 					}
 				}
 			}
 
-			throw new ArgumentException(JsonReader.ErrorUnterminatedObject);
+			// if arrayItemType was specified by caller, then isn't just a hint
+			bool isArrayTypeHint = (arrayItemType != null);
+
+			// using ArrayList since has .ToArray(Type) method
+			// cannot create List<T> at runtime
+			ArrayList array = new ArrayList();
+
+			while (!tokens.MoveNext())
+			{
+				token = tokens.Current;
+				if (array.Count > 0)
+				{
+					// parse item delimiter
+					if (token.TokenType != JsonTokenType.ValueDelim)
+					{
+						// these are invalid here
+						throw new ArgumentException(String.Format(
+							JsonReader.ErrorUnexpectedToken,
+							token.TokenType));
+					}
+
+					if (!tokens.MoveNext())
+					{
+						// end of input
+						break;
+					}
+					token = tokens.Current;
+				}
+
+				// parse the item
+				switch (token.TokenType)
+				{
+					case JsonTokenType.ArrayEnd:
+					{
+						// end of the array
+						if (arrayType != null && arrayType != typeof(object))
+						{
+							// convert to requested array type
+							return this.Settings.CoerceType(arrayType, array);
+						}
+
+						if (arrayItemType != null && arrayItemType != typeof(object))
+						{
+							// if all items are of same type then convert to array of that type
+							return array.ToArray(arrayItemType);
+						}
+
+						// convert to an object array for consistency
+						return array.ToArray();
+					}
+					case JsonTokenType.ArrayBegin:
+					{
+						// array item
+						object item = this.ParseArray(tokens, isArrayTypeHint ? null : arrayItemType);
+
+						// establish common type
+						arrayItemType = this.FindCommonType(arrayItemType, item);
+
+						array.Add(item);
+						break;
+					}
+					case JsonTokenType.ObjectBegin:
+					{
+						// object item
+						object item = this.ParseObject(tokens, isArrayTypeHint ? null : arrayItemType);
+
+						// establish common type
+						arrayItemType = this.FindCommonType(arrayItemType, item);
+
+						array.Add(item);
+						break;
+					}
+					case JsonTokenType.Boolean:
+					case JsonTokenType.Null:
+					case JsonTokenType.Number:
+					case JsonTokenType.String:
+					case JsonTokenType.Undefined:
+					{
+						// primitive item
+						object item = token.Value;
+
+						// establish common type
+						arrayItemType = this.FindCommonType(arrayItemType, item);
+
+						array.Add(item);
+						break;
+					}
+					case JsonTokenType.ValueDelim:
+					{
+						// extraneous item delimiter
+						throw new ArgumentException(JsonReader.ErrorMissingArrayValue);
+					}
+					case JsonTokenType.Identifier:
+					case JsonTokenType.None:
+					case JsonTokenType.ObjectEnd:
+					case JsonTokenType.PairDelim:
+					default:
+					{
+						// these are invalid here
+						throw new ArgumentException(String.Format(
+							JsonReader.ErrorUnexpectedToken,
+							token.TokenType));
+					}
+				}
+			}
+
+			// end of input
+			throw new ArgumentException(JsonReader.ErrorUnterminatedArray);
+		}
+
+		private Type FindCommonType(Type arrayItemType, object value)
+		{
+			// establish if array is of common type
+			if (value == null)
+			{
+				if (arrayItemType != null && arrayItemType.IsValueType)
+				{
+					// must use plain object to hold null
+					arrayItemType = typeof(object);
+				}
+			}
+			else if (arrayItemType == null)
+			{
+				// try out a hint type
+				// if hasn't been set before
+				arrayItemType = value.GetType();
+			}
+			else if (!arrayItemType.IsAssignableFrom(value.GetType()))
+			{
+				if (value.GetType().IsAssignableFrom(arrayItemType))
+				{
+					// attempt to use the more general type
+					arrayItemType = value.GetType();
+				}
+				else
+				{
+					// use plain object to hold value
+					arrayItemType = typeof(object);
+				}
+			}
+
+			return arrayItemType;
 		}
 
 		private ITokenizer<JsonTokenType> GetTokenizer(TextReader input)
