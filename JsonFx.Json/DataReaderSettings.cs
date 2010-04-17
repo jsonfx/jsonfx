@@ -101,7 +101,7 @@ namespace JsonFx.Json
 			get
 			{
 				IDictionary<MemberInfo, string> map = this.Resolver.GetWriteMap(type);
-				if (map == null)
+				if (map == null || !map.ContainsKey(info))
 				{
 					return null;
 				}
@@ -120,7 +120,7 @@ namespace JsonFx.Json
 			get
 			{
 				IDictionary<string, MemberInfo> map = this.Resolver.GetReadMap(type);
-				if (map == null)
+				if (map == null || !map.ContainsKey(name))
 				{
 					return null;
 				}

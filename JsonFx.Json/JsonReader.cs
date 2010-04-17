@@ -382,7 +382,7 @@ namespace JsonFx.Json
 			}
 
 			// if arrayItemType was specified by caller, then isn't just a hint
-			bool isArrayTypeHint = (arrayItemType != null);
+			bool isArrayTypeHint = (arrayItemType == null);
 
 			// using ArrayList since has .ToArray(Type) method
 			// cannot create List<T> at runtime
@@ -394,12 +394,37 @@ namespace JsonFx.Json
 				if (array.Count > 0)
 				{
 					// parse item delimiter
-					if (token.TokenType != JsonTokenType.ValueDelim)
+					switch (token.TokenType)
 					{
-						// these are invalid here
-						throw new ArgumentException(String.Format(
-							JsonReader.ErrorUnexpectedToken,
-							token.TokenType));
+						case JsonTokenType.ValueDelim:
+						{
+							break;
+						}
+						case JsonTokenType.ArrayEnd:
+						{
+							// end of array loop
+							if (arrayType != null && arrayType != typeof(object))
+							{
+								// convert to requested array type
+								return this.Settings.CoerceType(arrayType, array);
+							}
+
+							if (arrayItemType != null && arrayItemType != typeof(object))
+							{
+								// if all items are of same type then convert to array of that type
+								return array.ToArray(arrayItemType);
+							}
+
+							// convert to an object array for consistency
+							return array.ToArray();
+						}
+						default:
+						{
+							// these are invalid here
+							throw new ArgumentException(String.Format(
+								JsonReader.ErrorUnexpectedToken,
+								token.TokenType));
+						}
 					}
 
 					if (!tokens.MoveNext())
@@ -415,7 +440,7 @@ namespace JsonFx.Json
 				{
 					case JsonTokenType.ArrayEnd:
 					{
-						// end of the array
+						// end of array loop
 						if (arrayType != null && arrayType != typeof(object))
 						{
 							// convert to requested array type
