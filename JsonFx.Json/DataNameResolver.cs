@@ -188,7 +188,7 @@ namespace JsonFx.Json
 			JsonNameAttribute attribute = DataNameResolver.GetAttribute<JsonNameAttribute>(value);
 
 			// TODO: extend here for JsonNameAttribute, XmlNameAttribute, DataContractAttribute
-			return (attribute == null) ? attribute.Name : null;
+			return (attribute != null) ? attribute.Name : null;
 		}
 
 		/// <summary>
