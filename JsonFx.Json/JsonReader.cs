@@ -179,7 +179,7 @@ namespace JsonFx.Json
 
 			Dictionary<string, object> value = new Dictionary<string, object>();
 
-			while (!tokens.MoveNext())
+			while (tokens.MoveNext())
 			{
 				token = tokens.Current;
 				if (value.Count > 0)
@@ -254,6 +254,14 @@ namespace JsonFx.Json
 					}
 				}
 
+				// move past delim
+				if (!tokens.MoveNext())
+				{
+					// end of input
+					break;
+				}
+				token = tokens.Current;
+
 				// parse pair delimiter
 				switch (token.TokenType)
 				{
@@ -269,6 +277,14 @@ namespace JsonFx.Json
 							token.TokenType));
 					}
 				}
+
+				// move past delim
+				if (!tokens.MoveNext())
+				{
+					// end of input
+					break;
+				}
+				token = tokens.Current;
 
 				// find the member type
 				Type memberType = null;
@@ -328,14 +344,6 @@ namespace JsonFx.Json
 					memberValue = this.Settings.CoerceType(memberType, memberValue);
 				}
 				value[memberName] = memberValue;
-
-				// move past delim
-				if (!tokens.MoveNext())
-				{
-					// end of input
-					break;
-				}
-				token = tokens.Current;
 			}
 
 			// end of input
@@ -380,7 +388,7 @@ namespace JsonFx.Json
 			// cannot create List<T> at runtime
 			ArrayList array = new ArrayList();
 
-			while (!tokens.MoveNext())
+			while (tokens.MoveNext())
 			{
 				token = tokens.Current;
 				if (array.Count > 0)
