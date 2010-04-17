@@ -44,9 +44,15 @@ namespace JsonFx.Json
 	{
 		#region Constants
 
+		private static readonly string TypeGenericIDictionary = typeof(IDictionary<,>).FullName;
+
 		private const string ErrorNullValueType = "{0} does not accept null as a value";
 		private const string ErrorDefaultCtor = "Only objects with default constructors can be deserialized. ({0})";
 		private const string ErrorCannotInstantiate = "Interfaces, Abstract classes, and unsupported ValueTypes cannot be deserialized. ({0})";
+		private const string ErrorCannotInstantiateAsT = "Type {0} is not of Type {1}";
+
+		private const string ErrorGenericIDictionary = "Types which implement Generic IDictionary<TKey, TValue> also need to implement IDictionary to be deserialized. ({0})";
+		private const string ErrorGenericIDictionaryKeys = "Types which implement Generic IDictionary<TKey, TValue> need to have string keys to be deserialized. ({0})";
 
 		#endregion Constants
 
@@ -133,25 +139,45 @@ namespace JsonFx.Json
 		#region object Methods
 
 		/// <summary>
+		/// Instantiates a new instance of objectType ensuring is a sub-Type of Type T.
+		/// </summary>
+		/// <param name="objectType"></param>
+		/// <returns>objectType instance</returns>
+		public T InstantiateObject<T>(Type objectType)
+		{
+			if (!objectType.IsSubclassOf(typeof(T)))
+			{
+				throw new JsonTypeCoercionException(String.Format(
+					DataReaderSettings.ErrorCannotInstantiateAsT,
+					objectType.FullName,
+					typeof(T).FullName));
+			}
+
+			return (T)this.InstantiateObject(objectType);
+		}
+
+		/// <summary>
 		/// Instantiates a new instance of objectType.
 		/// </summary>
 		/// <param name="objectType"></param>
 		/// <returns>objectType instance</returns>
-		public object InstantiateObject(Type objectType)
+		public object InstantiateObject(Type targetType)
 		{
-			if (objectType.IsInterface || objectType.IsAbstract || objectType.IsValueType)
+			targetType = DataReaderSettings.ResolveInterfaceType(targetType);
+
+			if (targetType.IsInterface || targetType.IsAbstract || targetType.IsValueType)
 			{
 				throw new JsonTypeCoercionException(String.Format(
 					DataReaderSettings.ErrorCannotInstantiate,
-					objectType.FullName));
+					targetType.FullName));
 			}
 
-			ConstructorInfo ctor = objectType.GetConstructor(Type.EmptyTypes);
+			ConstructorInfo ctor = targetType.GetConstructor(Type.EmptyTypes);
 			if (ctor == null)
 			{
 				throw new JsonTypeCoercionException(String.Format(
 					DataReaderSettings.ErrorDefaultCtor,
-					objectType.FullName));
+					targetType.FullName));
 			}
 			object result;
 			try
@@ -166,7 +192,7 @@ namespace JsonFx.Json
 					throw new JsonTypeCoercionException(ex.InnerException.Message, ex.InnerException);
 				}
 
-				throw new JsonTypeCoercionException("Error instantiating " + objectType.FullName, ex);
+				throw new JsonTypeCoercionException("Error instantiating " + targetType.FullName, ex);
 			}
 
 			return result;
@@ -178,8 +204,32 @@ namespace JsonFx.Json
 		/// <param name="target">the object which owns the member</param>
 		/// <param name="memberType">the type of the meme</param>
 		/// <param name="value">the member value</param>
+		public void SetMemberValue(object target, string memberName, object memberValue)
+		{
+			if (target is IDictionary)
+			{
+				((IDictionary)target)[memberName] = memberValue;
+			}
+			else if (target != null)
+			{
+				MemberInfo memberInfo = this[target.GetType(), memberName];
+				this.SetMemberValue(target, memberInfo, memberValue);
+			}
+		}
+
+		/// <summary>
+		/// Helper method to set value of either a property or a field.
+		/// </summary>
+		/// <param name="target">the object which owns the member</param>
+		/// <param name="memberType">the type of the meme</param>
+		/// <param name="value">the member value</param>
 		public void SetMemberValue(object target, MemberInfo memberInfo, object value)
 		{
+			if (target == null || memberInfo == null)
+			{
+				return;
+			}
+
 			PropertyInfo propertyInfo = memberInfo as PropertyInfo;
 			if (propertyInfo != null)
 			{
@@ -395,6 +445,8 @@ namespace JsonFx.Json
 
 		private object CoerceList(Type targetType, Type arrayType, IEnumerable value)
 		{
+			targetType = DataReaderSettings.ResolveInterfaceType(targetType);
+
 			if (targetType.IsArray)
 			{
 				// arrays are much simpler to create
@@ -466,6 +518,7 @@ namespace JsonFx.Json
 					null : method.GetParameters();
 			Type paramType = (parameters == null || parameters.Length != 1) ?
 					null : parameters[0].ParameterType;
+
 			if (paramType != null &&
 				paramType.IsAssignableFrom(arrayType))
 			{
@@ -496,6 +549,7 @@ namespace JsonFx.Json
 						null : method.GetParameters();
 				paramType = (parameters == null || parameters.Length != 1) ?
 						null : parameters[0].ParameterType;
+
 				if (paramType != null)
 				{
 					// loop through adding items to collection
@@ -547,14 +601,86 @@ namespace JsonFx.Json
 		/// <returns></returns>
 		private Array CoerceArray(Type elementType, IEnumerable value)
 		{
-			ArrayList target = new ArrayList();
+			// attempt to ensure enough room
+			ArrayList target = (value is ICollection) ?
+				new ArrayList(((ICollection)value).Count) :
+				new ArrayList();
 
 			foreach (object item in value)
 			{
+				// convert each as is added
 				target.Add(this.CoerceType(elementType, item));
 			}
 
 			return target.ToArray(elementType);
+		}
+
+		private static Type ResolveInterfaceType(Type targetType)
+		{
+			if (targetType.IsInterface)
+			{
+				if (targetType.IsGenericType)
+				{
+					Type genericType = targetType.GetGenericTypeDefinition();
+
+					if (genericType == typeof(IList<>) ||
+						genericType == typeof(IEnumerable<>) ||
+						genericType == typeof(ICollection<>))
+					{
+						targetType = typeof(List<>).MakeGenericType(targetType.GetGenericArguments());
+					}
+					else if (genericType == typeof(IDictionary<,>))
+					{
+						targetType = typeof(Dictionary<,>).MakeGenericType(targetType.GetGenericArguments());
+					}
+				}
+				else if (targetType == typeof(IList) ||
+					targetType == typeof(IEnumerable) ||
+					targetType == typeof(ICollection))
+				{
+					targetType = typeof(object[]);
+				}
+				else if (targetType == typeof(IDictionary))
+				{
+					targetType = typeof(Dictionary<object, object>);
+				}
+			}
+			return targetType;
+		}
+
+		/// <summary>
+		/// Allows specific IDictionary&lt;string, TVal&gt; to deserialize as TVal
+		/// </summary>
+		/// <param name="targetType">IDictionary&lt;string, TVal&gt; Type</param>
+		/// <returns>TVal Type</returns>
+		internal static Type GetDictionaryItemType(Type targetType)
+		{
+			if (targetType == null)
+			{
+				return null;
+			}
+
+			Type dictionaryType =
+				(targetType.IsGenericType && targetType.GetGenericTypeDefinition() == typeof(IDictionary<,>)) ?
+				targetType :
+				targetType.GetInterface(DataReaderSettings.TypeGenericIDictionary);
+
+			if (dictionaryType == null)
+			{
+				// not an IDictionary<TKey, TVal>
+				return null;
+			}
+
+			Type[] genericArgs = dictionaryType.GetGenericArguments();
+			if (genericArgs.Length != 2 || genericArgs[0] != typeof(String))
+			{
+				// only supports IDictionary<string, TVal>
+				throw new ArgumentException(String.Format(
+					DataReaderSettings.ErrorGenericIDictionaryKeys,
+					targetType));
+			}
+
+			return genericArgs[1];
 		}
 
 		/// <summary>

@@ -65,19 +65,28 @@ namespace JsonFx.Json
 		/// Serializes the data to the given output
 		/// </summary>
 		/// <param name="input">the input reader</param>
-		/// <param name="targetType">the expected type of the serialized data</param>
-		object Deserialize(TextReader input, Type targetType);
+		/// <typeparam name="T">the expected type of the serialized data</typeparam>
+		T Deserialize<T>(TextReader input);
 
 		/// <summary>
 		/// Serializes the data to the given output
 		/// </summary>
 		/// <param name="input">the input reader</param>
-		/// <typeparam name="T">the expected type of the serialized data</typeparam>
-		T Deserialize<T>(TextReader input);
+		object Deserialize(TextReader input);
+
+		/// <summary>
+		/// Serializes the data to the given output
+		/// </summary>
+		/// <param name="input">the input reader</param>
+		/// <param name="targetType">the expected type of the serialized data</param>
+		object Deserialize(TextReader input, Type targetType);
 
 		#endregion Methods
 	}
 
+	/// <summary>
+	/// Provides base implementation of standard deserializers
+	/// </summary>
 	public abstract class DataReaderBase : IDataReader
 	{
 		#region Fields
@@ -125,13 +134,6 @@ namespace JsonFx.Json
 		/// Serializes the data to the given output
 		/// </summary>
 		/// <param name="input">the input reader</param>
-		/// <param name="targetType">the expected type of the serialized data</param>
-		public abstract object Deserialize(TextReader input, Type targetType);
-
-		/// <summary>
-		/// Serializes the data to the given output
-		/// </summary>
-		/// <param name="input">the input reader</param>
 		/// <typeparam name="T">the expected type of the serialized data</typeparam>
 		public virtual T Deserialize<T>(TextReader input)
 		{
@@ -139,6 +141,22 @@ namespace JsonFx.Json
 
 			return (value is T) ? (T)value : default(T);
 		}
+
+		/// <summary>
+		/// Serializes the data to the given output
+		/// </summary>
+		/// <param name="input">the input reader</param>
+		public virtual object Deserialize(TextReader input)
+		{
+			return this.Deserialize(input, null);
+		}
+
+		/// <summary>
+		/// Serializes the data to the given output
+		/// </summary>
+		/// <param name="input">the input reader</param>
+		/// <param name="targetType">the expected type of the serialized data</param>
+		public abstract object Deserialize(TextReader input, Type targetType);
 
 		#endregion Methods
 	}

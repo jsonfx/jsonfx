@@ -89,6 +89,9 @@ namespace JsonFx.Json
 		#endregion Methods
 	}
 
+	/// <summary>
+	/// Provides base implementation of standard serializers
+	/// </summary>
 	public abstract class DataWriterBase : IDataWriter
 	{
 		#region Fields

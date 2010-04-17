@@ -61,9 +61,6 @@ namespace JsonFx.Json
 		private const string ErrorMissingObjectProperty = "Missing JSON object property";
 		private const string ErrorUnterminatedObject = "Unterminated JSON object";
 
-		//private const string ErrorGenericIDictionary = "Types which implement Generic IDictionary<TKey, TValue> also need to implement IDictionary to be deserialized. ({0})";
-		//private const string ErrorGenericIDictionaryKeys = "Types which implement Generic IDictionary<TKey, TValue> need to have string keys to be deserialized. ({0})";
-
 		#endregion Constants
 
 		#region Init
@@ -197,12 +194,16 @@ namespace JsonFx.Json
 					token.TokenType));
 			}
 
-			Dictionary<string, object> objectValue = new Dictionary<string, object>();
+			Type itemType = DataReaderSettings.GetDictionaryItemType(objectType);
+			object objectValue = (itemType != null) ?
+				this.Settings.InstantiateObject(objectType) :
+				new Dictionary<string, object>();
 
+			bool hasProperties = false;
 			while (tokens.MoveNext())
 			{
 				token = tokens.Current;
-				if (objectValue.Count > 0)
+				if (hasProperties)
 				{
 					// parse value delimiter
 					switch (token.TokenType)
@@ -253,7 +254,7 @@ namespace JsonFx.Json
 					}
 					case JsonTokenType.ObjectEnd:
 					{
-						if (objectValue.Count > 0)
+						if (hasProperties)
 						{
 							// not allowed after value delim
 							goto case JsonTokenType.ValueDelim;
@@ -313,18 +314,23 @@ namespace JsonFx.Json
 				}
 				token = tokens.Current;
 
-				// find the member type
+				// find the member type info
+				MemberInfo memberInfo = null;
 				Type memberType = null;
-				if (objectType != null && objectType != typeof(object))
+				if (itemType != null)
 				{
-					MemberInfo info = this.Settings[objectType, memberName];
-					if (info is PropertyInfo)
+					memberType = itemType;
+				}
+				else if (objectType != null && objectType != typeof(object))
+				{
+					memberInfo = this.Settings[objectType, memberName];
+					if (memberInfo is PropertyInfo)
 					{
-						memberType = ((PropertyInfo)info).PropertyType;
+						memberType = ((PropertyInfo)memberInfo).PropertyType;
 					}
-					else if (info is FieldInfo)
+					else if (memberInfo is FieldInfo)
 					{
-						memberType = ((FieldInfo)info).FieldType;
+						memberType = ((FieldInfo)memberInfo).FieldType;
 					}
 				}
 
@@ -348,7 +354,14 @@ namespace JsonFx.Json
 					case JsonTokenType.String:
 					case JsonTokenType.Undefined:
 					{
-						memberValue = token.Value;
+						if (memberType != null && memberType != typeof(object))
+						{
+							memberValue = this.Settings.CoerceType(memberType, token.Value);
+						}
+						else
+						{
+							memberValue = token.Value;
+						}
 						break;
 					}
 					case JsonTokenType.ArrayEnd:
@@ -366,11 +379,18 @@ namespace JsonFx.Json
 					}
 				}
 
-				if (memberType != null && memberType != typeof(object))
+				if (objectValue is IDictionary)
 				{
-					memberValue = this.Settings.CoerceType(memberType, memberValue);
+					((IDictionary)objectValue)[memberName] = memberValue;
 				}
-				objectValue[memberName] = memberValue;
+				else if (memberInfo != null)
+				{
+					this.Settings.SetMemberValue(objectValue, memberInfo, memberValue);
+				}
+
+				// ignore non-applicable members
+
+				hasProperties = true;
 			}
 
 			// end of input
