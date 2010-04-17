@@ -96,10 +96,10 @@ namespace JsonFx.Json
 		private const string LineEndings = "\r\n";
 
 		// tokenizing errors
-		private const string ErrorUnrecognizedToken = "Illegal JSON sequence.";
-		private const string ErrorUnterminatedComment = "Unterminated comment block.";
-		private const string ErrorUnterminatedString = "Unterminated JSON string.";
-		private const string ErrorIllegalNumber = "Illegal JSON number.";
+		private const string ErrorUnrecognizedToken = "Illegal JSON sequence";
+		private const string ErrorUnterminatedComment = "Unterminated comment block";
+		private const string ErrorUnterminatedString = "Unterminated JSON string";
+		private const string ErrorIllegalNumber = "Illegal JSON number";
 
 		#endregion Constants
 
@@ -486,8 +486,10 @@ namespace JsonFx.Json
 				int start = 0;
 				for (int i=start; i<count; i++)
 				{
+					char ch = this.PeekBuffer[i];
+
 					// check each character for ending delim
-					if (this.PeekBuffer[i] == stringDelim)
+					if (ch == stringDelim)
 					{
 						// append final segment
 						builder.Append(this.PeekBuffer, start, i-start);
@@ -499,7 +501,12 @@ namespace JsonFx.Json
 						return new Token<JsonTokenType>(JsonTokenType.String, builder.ToString());
 					}
 
-					if (this.PeekBuffer[i] != JsonTokenizer.OperatorCharEscape)
+					if (Char.IsControl(ch) && ch != '\t')
+					{
+						throw new JsonDeserializationException(JsonTokenizer.ErrorUnterminatedString, stringStart);
+					}
+
+					if (ch != JsonTokenizer.OperatorCharEscape)
 					{
 						// accumulate
 						continue;
@@ -517,11 +524,13 @@ namespace JsonFx.Json
 
 					if (count < 1)
 					{
+						// unexpected end of input
 						throw new JsonDeserializationException(JsonTokenizer.ErrorUnterminatedString, stringStart);
 					}
 
 					// decode
-					switch (this.PeekBuffer[i])
+					ch = this.PeekBuffer[i];
+					switch (ch)
 					{
 						case '0':
 						{
@@ -590,7 +599,12 @@ namespace JsonFx.Json
 						}
 						default:
 						{
-							builder.Append(this.PeekBuffer[i]);
+							if (Char.IsControl(ch) && ch != '\t')
+							{
+								throw new JsonDeserializationException(JsonTokenizer.ErrorUnterminatedString, stringStart);
+							}
+
+							builder.Append(ch);
 							break;
 						}
 					}

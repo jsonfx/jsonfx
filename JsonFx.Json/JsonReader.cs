@@ -44,17 +44,25 @@ namespace JsonFx.Json
 		#region Constants
 		
 		// parse errors
-		private const string ErrorUnexpectedToken = "Unexpected token ({0})";
-		private const string ErrorUnterminatedObject = "Unterminated JSON object.";
-		private const string ErrorUnterminatedArray = "Unterminated JSON array.";
-		private const string ErrorMissingArrayValue = "Missing array value";
-		private const string ErrorExpectedString = "Expected JSON string.";
-		private const string ErrorExpectedObject = "Expected JSON object.";
-		private const string ErrorExpectedArray = "Expected JSON array.";
-		private const string ErrorExpectedPropertyName = "Expected JSON object property name.";
-		private const string ErrorExpectedPropertyPairDelim = "Expected JSON object property name/value delimiter.";
-		private const string ErrorGenericIDictionary = "Types which implement Generic IDictionary<TKey, TValue> also need to implement IDictionary to be deserialized. ({0})";
-		private const string ErrorGenericIDictionaryKeys = "Types which implement Generic IDictionary<TKey, TValue> need to have string keys to be deserialized. ({0})";
+		private const string ErrorUnexpectedToken = "Unexpected JSON token ({0})";
+		private const string ErrorExtraTokens = "Extra JSON tokens at end ({0})";
+
+		private const string ErrorExpectedArray = "Expected JSON array start ({0})";
+		private const string ErrorExpectedArrayItem = "Expected JSON array item or end of JSON array ({0})";
+		private const string ErrorExpectedArrayItemDelim = "Expected JSON array item delimiter or end of JSON array ({0})";
+		private const string ErrorMissingArrayItem = "Missing JSON array item";
+		private const string ErrorUnterminatedArray = "Unterminated JSON array";
+
+		private const string ErrorExpectedObject = "Expected JSON object start ({0})";
+		private const string ErrorExpectedPropertyName = "Expected JSON object property name or end of JSON object ({0})";
+		private const string ErrorExpectedPropertyPairDelim = "Expected JSON object property name/value delimiter ({0})";
+		private const string ErrorExpectedPropertyValue = "Expected JSON object property value ({0})";
+		private const string ErrorExpectedObjectValueDelim = "Expected value delimiter or end of JSON object ({0})";
+		private const string ErrorMissingObjectProperty = "Missing JSON object property";
+		private const string ErrorUnterminatedObject = "Unterminated JSON object";
+
+		//private const string ErrorGenericIDictionary = "Types which implement Generic IDictionary<TKey, TValue> also need to implement IDictionary to be deserialized. ({0})";
+		//private const string ErrorGenericIDictionaryKeys = "Types which implement Generic IDictionary<TKey, TValue> need to have string keys to be deserialized. ({0})";
 
 		#endregion Constants
 
@@ -98,7 +106,20 @@ namespace JsonFx.Json
 
 			try
 			{
-				return this.Parse(tokenizer.GetEnumerator(), targetType);
+				IEnumerator<Token<JsonTokenType>> tokens = tokenizer.GetEnumerator();
+				object value = this.Parse(tokens, targetType);
+				if (tokens.MoveNext())
+				{
+					// TODO: evaluate if this is ever valid
+					throw new JsonDeserializationException(String.Format(
+						JsonReader.ErrorExtraTokens,
+						tokens.Current.TokenType), tokenizer.Position);
+				}
+				return value;
+			}
+			catch (JsonDeserializationException)
+			{
+				throw;
 			}
 			catch (Exception ex)
 			{
@@ -173,16 +194,16 @@ namespace JsonFx.Json
 			if (token.TokenType != JsonTokenType.ObjectBegin)
 			{
 				throw new ArgumentException(String.Format(
-					JsonReader.ErrorUnexpectedToken,
+					JsonReader.ErrorExpectedObject,
 					token.TokenType));
 			}
 
-			Dictionary<string, object> value = new Dictionary<string, object>();
+			Dictionary<string, object> objectValue = new Dictionary<string, object>();
 
 			while (tokens.MoveNext())
 			{
 				token = tokens.Current;
-				if (value.Count > 0)
+				if (objectValue.Count > 0)
 				{
 					// parse value delimiter
 					switch (token.TokenType)
@@ -196,16 +217,17 @@ namespace JsonFx.Json
 							// end of the object loop
 							if (objectType != null && objectType != typeof(object))
 							{
-								return this.Settings.CoerceType(objectType, value);
+								return this.Settings.CoerceType(objectType, objectValue);
 							}
 
-							return value;
+							return objectValue;
 						}
+
 						default:
 						{
 							// these are invalid here
 							throw new ArgumentException(String.Format(
-								JsonReader.ErrorUnexpectedToken,
+								JsonReader.ErrorExpectedObjectValueDelim,
 								token.TokenType));
 						}
 					}
@@ -232,24 +254,30 @@ namespace JsonFx.Json
 					}
 					case JsonTokenType.ObjectEnd:
 					{
-						if (value.Count > 0)
+						if (objectValue.Count > 0)
 						{
-							goto default;
+							// not allowed after value delim
+							goto case JsonTokenType.ValueDelim;
 						}
 
 						// end of the object loop
 						if (objectType != null && objectType != typeof(object))
 						{
-							return this.Settings.CoerceType(objectType, value);
+							return this.Settings.CoerceType(objectType, objectValue);
 						}
 
-						return value;
+						return objectValue;
+					}
+					case JsonTokenType.ValueDelim:
+					{
+						// extraneous item delimiter
+						throw new ArgumentException(JsonReader.ErrorMissingObjectProperty);
 					}
 					default:
 					{
 						// these are invalid here
 						throw new ArgumentException(String.Format(
-							JsonReader.ErrorUnexpectedToken,
+							JsonReader.ErrorExpectedPropertyName,
 							token.TokenType));
 					}
 				}
@@ -273,7 +301,7 @@ namespace JsonFx.Json
 					{
 						// these are invalid here
 						throw new ArgumentException(String.Format(
-							JsonReader.ErrorUnexpectedToken,
+							JsonReader.ErrorExpectedPropertyPairDelim,
 							token.TokenType));
 					}
 				}
@@ -334,7 +362,7 @@ namespace JsonFx.Json
 					{
 						// these are invalid here
 						throw new ArgumentException(String.Format(
-							JsonReader.ErrorUnexpectedToken,
+							JsonReader.ErrorExpectedPropertyValue,
 							token.TokenType));
 					}
 				}
@@ -343,7 +371,7 @@ namespace JsonFx.Json
 				{
 					memberValue = this.Settings.CoerceType(memberType, memberValue);
 				}
-				value[memberName] = memberValue;
+				objectValue[memberName] = memberValue;
 			}
 
 			// end of input
@@ -358,7 +386,7 @@ namespace JsonFx.Json
 			if (token.TokenType != JsonTokenType.ArrayBegin)
 			{
 				throw new ArgumentException(String.Format(
-					JsonReader.ErrorUnexpectedToken,
+					JsonReader.ErrorExpectedArray,
 					token.TokenType));
 			}
 
@@ -422,7 +450,7 @@ namespace JsonFx.Json
 						{
 							// these are invalid here
 							throw new ArgumentException(String.Format(
-								JsonReader.ErrorUnexpectedToken,
+								JsonReader.ErrorExpectedArrayItemDelim,
 								token.TokenType));
 						}
 					}
@@ -440,6 +468,12 @@ namespace JsonFx.Json
 				{
 					case JsonTokenType.ArrayEnd:
 					{
+						if (array.Count > 0)
+						{
+							// not allowed after value delim
+							goto case JsonTokenType.ValueDelim;
+						}
+
 						// end of array loop
 						if (arrayType != null && arrayType != typeof(object))
 						{
@@ -496,7 +530,7 @@ namespace JsonFx.Json
 					case JsonTokenType.ValueDelim:
 					{
 						// extraneous item delimiter
-						throw new ArgumentException(JsonReader.ErrorMissingArrayValue);
+						throw new ArgumentException(JsonReader.ErrorMissingArrayItem);
 					}
 					case JsonTokenType.Identifier:
 					case JsonTokenType.None:
@@ -506,7 +540,7 @@ namespace JsonFx.Json
 					{
 						// these are invalid here
 						throw new ArgumentException(String.Format(
-							JsonReader.ErrorUnexpectedToken,
+							JsonReader.ErrorExpectedArrayItem,
 							token.TokenType));
 					}
 				}
