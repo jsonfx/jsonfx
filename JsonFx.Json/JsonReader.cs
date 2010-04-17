@@ -97,7 +97,6 @@ namespace JsonFx.Json
 		/// <param name="targetType">the expected type of the serialized data</param>
 		public override object Deserialize(TextReader input, Type targetType)
 		{
-			// TODO: figure out how to generically surface ability to swap tokenizers without complicating interface
 			ITokenizer<JsonTokenType> tokenizer = this.GetTokenizer(input);
 
 			try
@@ -123,6 +122,11 @@ namespace JsonFx.Json
 			}
 		}
 
+		protected virtual ITokenizer<JsonTokenType> GetTokenizer(TextReader input)
+		{
+			return new JsonTokenizer(input);
+		}
+
 		#endregion IDataReader Methods
 
 		#region Parsing Methods
@@ -132,12 +136,7 @@ namespace JsonFx.Json
 			if (!tokens.MoveNext())
 			{
 				// end of input
-				if (targetType != null && targetType != typeof(object))
-				{
-					return this.Settings.CoerceType(targetType, null);
-				}
-
-				return null;
+				return this.Settings.CoerceType(targetType, null);
 			}
 
 			Token<JsonTokenType> token = tokens.Current;
@@ -159,12 +158,8 @@ namespace JsonFx.Json
 				case JsonTokenType.String:
 				case JsonTokenType.Undefined:
 				{
-					// foudn primitive
-					if (targetType != null && targetType != typeof(object))
-					{
-						return this.Settings.CoerceType(targetType, token.Value);
-					}
-					return token.Value;
+					// found primitive
+					return this.Settings.CoerceType(targetType, token.Value);
 				}
 				case JsonTokenType.ArrayEnd:
 				case JsonTokenType.Identifier:
@@ -215,12 +210,7 @@ namespace JsonFx.Json
 						case JsonTokenType.ObjectEnd:
 						{
 							// end of the object loop
-							if (objectType != null && objectType != typeof(object))
-							{
-								return this.Settings.CoerceType(objectType, objectValue);
-							}
-
-							return objectValue;
+							return this.Settings.CoerceType(objectType, objectValue);
 						}
 
 						default:
@@ -261,12 +251,7 @@ namespace JsonFx.Json
 						}
 
 						// end of the object loop
-						if (objectType != null && objectType != typeof(object))
-						{
-							return this.Settings.CoerceType(objectType, objectValue);
-						}
-
-						return objectValue;
+						return this.Settings.CoerceType(objectType, objectValue);
 					}
 					case JsonTokenType.ValueDelim:
 					{
@@ -315,24 +300,8 @@ namespace JsonFx.Json
 				token = tokens.Current;
 
 				// find the member type info
-				MemberInfo memberInfo = null;
-				Type memberType = null;
-				if (itemType != null)
-				{
-					memberType = itemType;
-				}
-				else if (objectType != null && objectType != typeof(object))
-				{
-					memberInfo = this.Settings[objectType, memberName];
-					if (memberInfo is PropertyInfo)
-					{
-						memberType = ((PropertyInfo)memberInfo).PropertyType;
-					}
-					else if (memberInfo is FieldInfo)
-					{
-						memberType = ((FieldInfo)memberInfo).FieldType;
-					}
-				}
+				MemberInfo memberInfo;
+				Type memberType = this.Settings.GetMemberInfo(objectType, itemType, memberName, out memberInfo);
 
 				// parse the property value
 				object memberValue;
@@ -354,14 +323,7 @@ namespace JsonFx.Json
 					case JsonTokenType.String:
 					case JsonTokenType.Undefined:
 					{
-						if (memberType != null && memberType != typeof(object))
-						{
-							memberValue = this.Settings.CoerceType(memberType, token.Value);
-						}
-						else
-						{
-							memberValue = token.Value;
-						}
+						memberValue = this.Settings.CoerceType(memberType, token.Value);
 						break;
 					}
 					case JsonTokenType.ArrayEnd:
@@ -379,16 +341,7 @@ namespace JsonFx.Json
 					}
 				}
 
-				if (objectValue is IDictionary)
-				{
-					((IDictionary)objectValue)[memberName] = memberValue;
-				}
-				else if (memberInfo != null)
-				{
-					this.Settings.SetMemberValue(objectValue, memberInfo, memberValue);
-				}
-
-				// ignore non-applicable members
+				this.Settings.SetMemberValue(objectValue, objectType, memberInfo, memberName, memberValue);
 
 				hasProperties = true;
 			}
@@ -409,32 +362,14 @@ namespace JsonFx.Json
 					token.TokenType));
 			}
 
-			Type arrayItemType = null;
-			if (arrayType != null)
-			{
-				if (arrayType.HasElementType)
-				{
-					// found array element type
-					arrayItemType = arrayType.GetElementType();
-				}
-				else if (arrayType.IsGenericType)
-				{
-					Type[] generics = arrayType.GetGenericArguments();
-					if (generics.Length == 1)
-					{
-						// found list or enumerable type
-						arrayItemType = generics[0];
-					}
-				}
-			}
+			Type itemType = DataReaderSettings.GetArrayItemType(arrayType);
 
-			// if arrayItemType was specified by caller, then isn't just a hint
-			bool isArrayTypeHint = (arrayItemType == null);
+			// if itemType was specified by caller, then isn't just a hint
+			bool isItemTypeHint = (itemType == null);
 
 			// using ArrayList since has .ToArray(Type) method
 			// cannot create List<T> at runtime
 			ArrayList array = new ArrayList();
-
 			while (tokens.MoveNext())
 			{
 				token = tokens.Current;
@@ -450,20 +385,7 @@ namespace JsonFx.Json
 						case JsonTokenType.ArrayEnd:
 						{
 							// end of array loop
-							if (arrayType != null && arrayType != typeof(object))
-							{
-								// convert to requested array type
-								return this.Settings.CoerceType(arrayType, array);
-							}
-
-							if (arrayItemType != null && arrayItemType != typeof(object))
-							{
-								// if all items are of same type then convert to array of that type
-								return array.ToArray(arrayItemType);
-							}
-
-							// convert to an object array for consistency
-							return array.ToArray();
+							return this.Settings.CoerceArrayList(arrayType, itemType, array);
 						}
 						default:
 						{
@@ -482,7 +404,8 @@ namespace JsonFx.Json
 					token = tokens.Current;
 				}
 
-				// parse the item
+				// parse the next item
+				object item;
 				switch (token.TokenType)
 				{
 					case JsonTokenType.ArrayEnd:
@@ -494,41 +417,18 @@ namespace JsonFx.Json
 						}
 
 						// end of array loop
-						if (arrayType != null && arrayType != typeof(object))
-						{
-							// convert to requested array type
-							return this.Settings.CoerceType(arrayType, array);
-						}
-
-						if (arrayItemType != null && arrayItemType != typeof(object))
-						{
-							// if all items are of same type then convert to array of that type
-							return array.ToArray(arrayItemType);
-						}
-
-						// convert to an object array for consistency
-						return array.ToArray();
+						return this.Settings.CoerceArrayList(arrayType, itemType, array);
 					}
 					case JsonTokenType.ArrayBegin:
 					{
 						// array item
-						object item = this.ParseArray(tokens, isArrayTypeHint ? null : arrayItemType);
-
-						// establish common type
-						arrayItemType = this.FindCommonType(arrayItemType, item);
-
-						array.Add(item);
+						item = this.ParseArray(tokens, isItemTypeHint ? null : itemType);
 						break;
 					}
 					case JsonTokenType.ObjectBegin:
 					{
 						// object item
-						object item = this.ParseObject(tokens, isArrayTypeHint ? null : arrayItemType);
-
-						// establish common type
-						arrayItemType = this.FindCommonType(arrayItemType, item);
-
-						array.Add(item);
+						item = this.ParseObject(tokens, isItemTypeHint ? null : itemType);
 						break;
 					}
 					case JsonTokenType.Boolean:
@@ -538,12 +438,14 @@ namespace JsonFx.Json
 					case JsonTokenType.Undefined:
 					{
 						// primitive item
-						object item = token.Value;
-
-						// establish common type
-						arrayItemType = this.FindCommonType(arrayItemType, item);
-
-						array.Add(item);
+						if (isItemTypeHint)
+						{
+							item = token.Value;
+						}
+						else
+						{
+							item = this.Settings.CoerceType(itemType, token.Value);
+						}
 						break;
 					}
 					case JsonTokenType.ValueDelim:
@@ -563,49 +465,16 @@ namespace JsonFx.Json
 							token.TokenType));
 					}
 				}
+
+				// establish common type
+				itemType = DataReaderSettings.FindCommonType(itemType, item);
+
+				// add item to the array
+				array.Add(item);
 			}
 
 			// end of input
 			throw new ArgumentException(JsonReader.ErrorUnterminatedArray);
-		}
-
-		private Type FindCommonType(Type arrayItemType, object value)
-		{
-			// establish if array is of common type
-			if (value == null)
-			{
-				if (arrayItemType != null && arrayItemType.IsValueType)
-				{
-					// must use plain object to hold null
-					arrayItemType = typeof(object);
-				}
-			}
-			else if (arrayItemType == null)
-			{
-				// try out a hint type
-				// if hasn't been set before
-				arrayItemType = value.GetType();
-			}
-			else if (!arrayItemType.IsAssignableFrom(value.GetType()))
-			{
-				if (value.GetType().IsAssignableFrom(arrayItemType))
-				{
-					// attempt to use the more general type
-					arrayItemType = value.GetType();
-				}
-				else
-				{
-					// use plain object to hold value
-					arrayItemType = typeof(object);
-				}
-			}
-
-			return arrayItemType;
-		}
-
-		private ITokenizer<JsonTokenType> GetTokenizer(TextReader input)
-		{
-			return new JsonTokenizer(input);
 		}
 
 		#endregion Parsing Methods

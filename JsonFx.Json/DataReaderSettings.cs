@@ -44,6 +44,7 @@ namespace JsonFx.Json
 	{
 		#region Constants
 
+		private static readonly string TypeGenericIEnumerable = typeof(IEnumerable<>).FullName;
 		private static readonly string TypeGenericIDictionary = typeof(IDictionary<,>).FullName;
 
 		private const string ErrorNullValueType = "{0} does not accept null as a value";
@@ -136,7 +137,7 @@ namespace JsonFx.Json
 
 		#endregion Properties
 
-		#region object Methods
+		#region Object Manipulation Methods
 
 		/// <summary>
 		/// Instantiates a new instance of objectType ensuring is a sub-Type of Type T.
@@ -199,26 +200,26 @@ namespace JsonFx.Json
 		}
 
 		/// <summary>
-		/// Helper method to set value of either a property or a field.
+		/// Helper method to set value of a member.
 		/// </summary>
 		/// <param name="target">the object which owns the member</param>
 		/// <param name="memberType">the type of the meme</param>
 		/// <param name="value">the member value</param>
 		public void SetMemberValue(object target, string memberName, object memberValue)
 		{
-			if (target is IDictionary)
+			if (target == null)
 			{
-				((IDictionary)target)[memberName] = memberValue;
+				return;
 			}
-			else if (target != null)
-			{
-				MemberInfo memberInfo = this[target.GetType(), memberName];
-				this.SetMemberValue(target, memberInfo, memberValue);
-			}
+
+			Type targetType = target.GetType();
+			MemberInfo memberInfo = this[targetType, memberName];
+
+			this.SetMemberValue(target, targetType, memberInfo, memberName, memberValue);
 		}
 
 		/// <summary>
-		/// Helper method to set value of either a property or a field.
+		/// Helper method to set value of a member.
 		/// </summary>
 		/// <param name="target">the object which owns the member</param>
 		/// <param name="memberType">the type of the meme</param>
@@ -259,9 +260,79 @@ namespace JsonFx.Json
 			// all other values are ignored
 		}
 
-		#endregion object Methods
+		/// <summary>
+		/// Helper method to set value of a member.
+		/// </summary>
+		/// <param name="target"></param>
+		/// <param name="targetType"></param>
+		/// <param name="memberInfo"></param>
+		/// <param name="memberName"></param>
+		/// <param name="memberValue"></param>
+		internal void SetMemberValue(object target, Type targetType, MemberInfo memberInfo, string memberName, object memberValue)
+		{
+			if (target == null)
+			{
+				return;
+			}
 
-		#region Type Methods
+			if (target is IDictionary)
+			{
+				((IDictionary)target)[memberName] = memberValue;
+			}
+			else if (targetType != null && targetType.GetInterface(DataReaderSettings.TypeGenericIDictionary) != null)
+			{
+				throw new JsonTypeCoercionException(String.Format(
+					DataReaderSettings.ErrorGenericIDictionary,
+					targetType));
+			}
+			else if (memberInfo != null)
+			{
+				this.SetMemberValue(target, memberInfo, memberValue);
+			}
+
+			// ignore non-applicable members
+		}
+
+		/// <summary>
+		/// Helper method to find the MemberInfo and Type of a member.
+		/// </summary>
+		/// <param name="objectType"></param>
+		/// <param name="commonItemType"></param>
+		/// <param name="memberName"></param>
+		/// <param name="memberInfo"></param>
+		/// <returns></returns>
+		internal Type GetMemberInfo(Type objectType, Type commonItemType, string memberName, out MemberInfo memberInfo)
+		{
+			if (commonItemType != null)
+			{
+				memberInfo = null;
+				return commonItemType;
+			}
+
+			if (objectType == null || objectType == typeof(object) || String.IsNullOrEmpty(memberName))
+			{
+				memberInfo = null;
+				return null;
+			}
+
+			memberInfo = this[objectType, memberName];
+
+			if (memberInfo is PropertyInfo)
+			{
+				return ((PropertyInfo)memberInfo).PropertyType;
+			}
+
+			if (memberInfo is FieldInfo)
+			{
+				return ((FieldInfo)memberInfo).FieldType;
+			}
+
+			return null;
+		}
+
+		#endregion Object Manipulation Methods
+
+		#region Coercion Methods
 
 		/// <summary>
 		/// Coerces the object value to the Type targetType
@@ -271,6 +342,11 @@ namespace JsonFx.Json
 		/// <returns></returns>
 		public object CoerceType(Type targetType, object value)
 		{
+			if (targetType == null || targetType == typeof(object))
+			{
+				return value;
+			}
+
 			bool isNullable = DataReaderSettings.IsNullable(targetType);
 			if (value == null)
 			{
@@ -443,7 +519,7 @@ namespace JsonFx.Json
 			return newValue;
 		}
 
-		private object CoerceList(Type targetType, Type arrayType, IEnumerable value)
+		private object CoerceList(Type targetType, Type valueType, IEnumerable value)
 		{
 			targetType = DataReaderSettings.ResolveInterfaceType(targetType);
 
@@ -473,7 +549,7 @@ namespace JsonFx.Json
 				}
 
 				if (paramList.Length == 1 &&
-					paramList[0].ParameterType.IsAssignableFrom(arrayType))
+					paramList[0].ParameterType.IsAssignableFrom(valueType))
 				{
 					try
 					{
@@ -520,7 +596,7 @@ namespace JsonFx.Json
 					null : parameters[0].ParameterType;
 
 			if (paramType != null &&
-				paramType.IsAssignableFrom(arrayType))
+				paramType.IsAssignableFrom(valueType))
 			{
 				try
 				{
@@ -593,27 +669,61 @@ namespace JsonFx.Json
 			}
 		}
 
+		internal object CoerceArrayList(Type targetType, Type itemType, ArrayList value)
+		{
+			if (targetType != null && targetType != typeof(object))
+			{
+				// convert to requested array type
+				return this.CoerceList(targetType, typeof(ArrayList), value);
+			}
+
+			if (itemType != null && itemType != typeof(object))
+			{
+				// if all items are of same type then convert to array of that type
+				return value.ToArray(itemType);
+			}
+
+			// convert to an object array for consistency
+			return value.ToArray();
+		}
+
 		/// <summary>
 		/// Coerces an sequence of items into an array of Type elementType
 		/// </summary>
 		/// <param name="elementType"></param>
 		/// <param name="value"></param>
 		/// <returns></returns>
-		private Array CoerceArray(Type elementType, IEnumerable value)
+		private Array CoerceArray(Type itemType, IEnumerable value)
 		{
-			// attempt to ensure enough room
-			ArrayList target = (value is ICollection) ?
-				new ArrayList(((ICollection)value).Count) :
-				new ArrayList();
+			ArrayList target = value as ArrayList;
 
-			foreach (object item in value)
+			if (target == null)
 			{
-				// convert each as is added
-				target.Add(this.CoerceType(elementType, item));
+				// attempt to ensure enough room
+				target = (value is ICollection) ?
+					new ArrayList(((ICollection)value).Count) :
+					new ArrayList();
+
+				foreach (object item in value)
+				{
+					// convert each as is added
+					target.Add(this.CoerceType(itemType, item));
+				}
 			}
 
-			return target.ToArray(elementType);
+			if (itemType != null && itemType != typeof(object))
+			{
+				// if all items are of same type then convert to array of that type
+				return target.ToArray(itemType);
+			}
+
+			// convert to an object array for consistency
+			return target.ToArray();
 		}
+
+		#endregion Coercion Methods
+
+		#region Type Methods
 
 		private static Type ResolveInterfaceType(Type targetType)
 		{
@@ -681,6 +791,81 @@ namespace JsonFx.Json
 			}
 
 			return genericArgs[1];
+		}
+
+		internal static Type GetArrayItemType(Type targetType)
+		{
+			if (targetType == null)
+			{
+				return null;
+			}
+
+			if (targetType.HasElementType)
+			{
+				// found array element type
+				return targetType.GetElementType();
+			}
+
+			Type arrayType =
+				(targetType.IsGenericType && targetType.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ?
+				targetType :
+				targetType.GetInterface(DataReaderSettings.TypeGenericIEnumerable);
+
+			if (arrayType == null)
+			{
+				// not an IEnumerable<T>
+				return null;
+			}
+
+			Type[] genericArgs = arrayType.GetGenericArguments();
+			if (genericArgs.Length == 1)
+			{
+				// list or enumerable type
+				return genericArgs[0];
+			}
+
+			return null;
+		}
+
+		/// <summary>
+		/// Returns a common type which can hold previous values and the new value
+		/// </summary>
+		/// <param name="itemType"></param>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		internal static Type FindCommonType(Type itemType, object value)
+		{
+			// establish if array is of common type
+			if (value == null)
+			{
+				if (itemType != null && itemType.IsValueType)
+				{
+					// must use plain object to hold null
+					itemType = typeof(object);
+				}
+			}
+			else if (itemType == null)
+			{
+				// try out a hint type
+				// if hasn't been set before
+				itemType = value.GetType();
+			}
+			else if (!itemType.IsAssignableFrom(value.GetType()))
+			{
+				if (value.GetType().IsAssignableFrom(itemType))
+				{
+					// attempt to use the more general type
+					itemType = value.GetType();
+				}
+				else
+				{
+					// use plain object to hold value
+					// TODO: find a common ancestor?
+					itemType = typeof(object);
+				}
+			}
+
+			return itemType;
 		}
 
 		/// <summary>
