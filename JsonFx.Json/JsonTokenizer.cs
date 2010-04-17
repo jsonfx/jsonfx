@@ -337,7 +337,7 @@ namespace JsonFx.Json
 			}
 
 			if (!Char.IsDigit(this.PeekBuffer[pos]) &&
-				this.PeekBuffer[pos] != JsonTokenizer.DefaultBufferSize)
+				this.PeekBuffer[pos] != JsonTokenizer.OperatorDecimalPoint)
 			{
 				// possibly "-Infinity"
 				return null;
