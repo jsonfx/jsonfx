@@ -100,8 +100,7 @@ namespace JsonFx.Json
 		/// <param name="targetType">the expected type of the serialized data</param>
 		public override object Deserialize(TextReader input, Type targetType)
 		{
-			// TODO: figure out how to generically surface ability to swap tokenizers without making interface cumbersome
-			// TODO: will buffering prevent multiple chunked reads?
+			// TODO: figure out how to generically surface ability to swap tokenizers without complicating interface
 			ITokenizer<JsonTokenType> tokenizer = this.GetTokenizer(input);
 
 			try
@@ -110,7 +109,7 @@ namespace JsonFx.Json
 				object value = this.Parse(tokens, targetType);
 				if (tokens.MoveNext())
 				{
-					// TODO: evaluate if this is ever valid
+					// TODO: evaluate if is ever valid to have tokens beyond JSON
 					throw new JsonDeserializationException(String.Format(
 						JsonReader.ErrorExtraTokens,
 						tokens.Current.TokenType), tokenizer.Position);

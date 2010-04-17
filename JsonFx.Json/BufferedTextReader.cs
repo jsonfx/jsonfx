@@ -34,6 +34,9 @@ using System.Text;
 
 namespace JsonFx.Json
 {
+	// TODO: will buffering prevent multiple chunked reads?
+	// TODO: evaluate performance differences if only buffer requested look aheads
+
 	internal class BufferedTextReader : TextReader
 	{
 		#region Constants
