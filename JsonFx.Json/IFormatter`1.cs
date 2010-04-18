@@ -30,6 +30,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace JsonFx.Json
 {
@@ -44,8 +45,9 @@ namespace JsonFx.Json
 		/// <summary>
 		/// Formats the token sequence
 		/// </summary>
+		/// <param name="writer"></param>
 		/// <param name="generator"></param>
-		void Format(IEnumerable<Token<T>> generator);
+		void Format(TextWriter writer, IEnumerable<Token<T>> generator);
 
 		#endregion Methods
 	}

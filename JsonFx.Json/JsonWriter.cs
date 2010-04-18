@@ -87,9 +87,9 @@ namespace JsonFx.Json
 			return new JsonGenerator(settings);
 		}
 
-		protected override IFormatter<JsonTokenType> GetFormatter(DataWriterSettings settings, TextWriter output)
+		protected override IFormatter<JsonTokenType> GetFormatter(DataWriterSettings settings)
 		{
-			return new JsonFormatter(settings, output);
+			return new JsonFormatter(settings);
 		}
 
 		#endregion DataWriter<JsonTokenType> Methods

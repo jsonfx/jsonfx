@@ -107,7 +107,7 @@ namespace JsonFx.Json
 		/// <param name="targetType">the expected type of the serialized data</param>
 		public virtual object Deserialize(TextReader input, Type targetType)
 		{
-			ITokenizer<T> tokenizer = this.GetTokenizer(this.Settings, input);
+			ITokenizer<T> tokenizer = this.GetTokenizer(this.Settings);
 			if (tokenizer == null)
 			{
 				throw new InvalidOperationException("Tokenizer is invalid");
@@ -121,7 +121,7 @@ namespace JsonFx.Json
 
 			try
 			{
-				return parser.Parse(tokenizer, targetType);
+				return parser.Parse(tokenizer.Tokenize(input), targetType);
 			}
 			catch (DeserializationException)
 			{
@@ -133,7 +133,7 @@ namespace JsonFx.Json
 			}
 		}
 
-		protected abstract ITokenizer<T> GetTokenizer(DataReaderSettings settings, TextReader input);
+		protected abstract ITokenizer<T> GetTokenizer(DataReaderSettings settings);
 
 		protected abstract IParser<T> GetParser(DataReaderSettings settings);
 

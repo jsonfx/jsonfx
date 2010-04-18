@@ -105,7 +105,7 @@ namespace JsonFx.Json
 
 		#region Fields
 
-		private readonly BufferedTextReader Reader;
+		private BufferedTextReader Reader;
 		private readonly char[] PeekBuffer;
 
 		#endregion Fields
@@ -115,9 +115,8 @@ namespace JsonFx.Json
 		/// <summary>
 		/// Ctor
 		/// </summary>
-		/// <param name="reader">input reader</param>
-		public JsonTokenizer(TextReader reader)
-			: this(reader, JsonTokenizer.DefaultBufferSize)
+		public JsonTokenizer()
+			: this(JsonTokenizer.DefaultBufferSize)
 		{
 		}
 
@@ -126,7 +125,7 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="reader">input reader</param>
 		/// <param name="bufferSize">read buffer size</param>
-		public JsonTokenizer(TextReader reader, int bufferSize)
+		public JsonTokenizer(int bufferSize)
 		{
 			if (bufferSize < JsonTokenizer.MinBufferLength)
 			{
@@ -134,7 +133,6 @@ namespace JsonFx.Json
 			}
 
 			this.PeekBuffer = new char[bufferSize];
-			this.Reader = new BufferedTextReader(reader, bufferSize);
 		}
 
 		#endregion Init
@@ -157,7 +155,7 @@ namespace JsonFx.Json
 		/// Returns the next JSON token in the sequence.
 		/// </summary>
 		/// <returns></returns>
-		private Token<JsonTokenType> Tokenize()
+		private Token<JsonTokenType> NextToken()
 		{
 			// read next char
 			int ch = this.Reader.Peek();
@@ -756,13 +754,15 @@ namespace JsonFx.Json
 
 		#endregion Scanning Methods
 
-		#region IEnumerable<Token<JsonTokenType>> Members
+		#region ITokenizer<JsonTokenType> Members
 
-		public IEnumerator<Token<JsonTokenType>> GetEnumerator()
+		public IEnumerable<Token<JsonTokenType>> Tokenize(TextReader reader)
 		{
+			this.Reader = new BufferedTextReader(reader, this.PeekBuffer.Length);
+
 			while (true)
 			{
-				Token<JsonTokenType> token = this.Tokenize();
+				Token<JsonTokenType> token = this.NextToken();
 				if (token.TokenType == JsonTokenType.None)
 				{
 					yield break;
@@ -771,27 +771,6 @@ namespace JsonFx.Json
 			};
 		}
 
-		#endregion IEnumerable<Token<JsonTokenType>> Members
-
-		#region IEnumerable Members
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return this.GetEnumerator();
-		}
-
-		#endregion IEnumerable Members
-
-		#region IDisposable Members
-
-		/// <summary>
-		/// Disposes the underlying input reader.
-		/// </summary>
-		public void Dispose()
-		{
-			this.Reader.Dispose();
-		}
-
-		#endregion IDisposable Members
+		#endregion ITokenizer<JsonTokenType> Members
 	}
 }

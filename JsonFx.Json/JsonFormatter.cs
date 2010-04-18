@@ -42,7 +42,6 @@ namespace JsonFx.Json
 		#region Fields
 
 		private readonly DataWriterSettings Settings;
-		private readonly TextWriter Writer;
 
 		#endregion Fields
 
@@ -52,11 +51,9 @@ namespace JsonFx.Json
 		/// Ctor
 		/// </summary>
 		/// <param name="settings"></param>
-		/// <param name="writer"></param>
-		public JsonFormatter(DataWriterSettings settings, TextWriter writer)
+		public JsonFormatter(DataWriterSettings settings)
 		{
 			this.Settings = settings;
-			this.Writer = writer;
 		}
 
 		#endregion Init
@@ -67,7 +64,7 @@ namespace JsonFx.Json
 		/// Formats the token sequence
 		/// </summary>
 		/// <param name="generator"></param>
-		public void Format(IEnumerable<Token<JsonTokenType>> generator)
+		public void Format(TextWriter writer, IEnumerable<Token<JsonTokenType>> generator)
 		{
 			foreach (Token<JsonTokenType> token in generator)
 			{
@@ -75,67 +72,67 @@ namespace JsonFx.Json
 				{
 					case JsonTokenType.ArrayBegin:
 					{
-						this.Writer.WriteLine(token);
+						writer.WriteLine(token);
 						break;
 					}
 					case JsonTokenType.ArrayEnd:
 					{
-						this.Writer.WriteLine(token);
+						writer.WriteLine(token);
 						break;
 					}
 					case JsonTokenType.Boolean:
 					{
-						this.Writer.WriteLine(token);
+						writer.WriteLine(token);
 						break;
 					}
 					case JsonTokenType.Identifier:
 					{
-						this.Writer.WriteLine(token);
+						writer.WriteLine(token);
 						break;
 					}
 					case JsonTokenType.None:
 					{
-						this.Writer.WriteLine(token);
+						writer.WriteLine(token);
 						break;
 					}
 					case JsonTokenType.Null:
 					{
-						this.Writer.WriteLine(token);
+						writer.WriteLine(token);
 						break;
 					}
 					case JsonTokenType.Number:
 					{
-						this.Writer.WriteLine(token);
+						writer.WriteLine(token);
 						break;
 					}
 					case JsonTokenType.ObjectBegin:
 					{
-						this.Writer.WriteLine(token);
+						writer.WriteLine(token);
 						break;
 					}
 					case JsonTokenType.ObjectEnd:
 					{
-						this.Writer.WriteLine(token);
+						writer.WriteLine(token);
 						break;
 					}
 					case JsonTokenType.PairDelim:
 					{
-						this.Writer.WriteLine(token);
+						writer.WriteLine(token);
 						break;
 					}
 					case JsonTokenType.String:
 					{
-						this.Writer.WriteLine(token);
+						writer.WriteLine(token);
 						break;
 					}
 					case JsonTokenType.Undefined:
 					{
-						this.Writer.WriteLine(token);
+						writer.WriteLine(token);
 						break;
 					}
 					case JsonTokenType.ValueDelim:
 					{
-						this.Writer.WriteLine(token);
+						writer.WriteLine(token);
 						break;
 					}
 				}

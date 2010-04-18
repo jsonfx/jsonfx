@@ -109,7 +109,7 @@ namespace JsonFx.Json
 				throw new InvalidOperationException("Generator is invalid");
 			}
 
-			IFormatter<T> formatter = this.GetFormatter(this.Settings, output);
+			IFormatter<T> formatter = this.GetFormatter(this.Settings);
 			if (formatter == null)
 			{
 				throw new InvalidOperationException("Formatter is invalid");
@@ -117,7 +117,7 @@ namespace JsonFx.Json
 
 			try
 			{
-				formatter.Format(generator.Generate(data));
+				formatter.Format(output, generator.Generate(data));
 			}
 			catch (SerializationException)
 			{
@@ -131,7 +131,7 @@ namespace JsonFx.Json
 
 		protected abstract IGenerator<T> GetGenerator(DataWriterSettings dataWriterSettings);
 
-		protected abstract IFormatter<T> GetFormatter(DataWriterSettings dataWriterSettings, TextWriter output);
+		protected abstract IFormatter<T> GetFormatter(DataWriterSettings dataWriterSettings);
 
 		#endregion Methods
 	}

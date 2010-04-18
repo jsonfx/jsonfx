@@ -30,6 +30,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace JsonFx.Json
 {
@@ -37,7 +38,7 @@ namespace JsonFx.Json
 	/// Tokenizes a sequence of characters
 	/// </summary>
 	/// <typeparam name="T">token type</typeparam>
-	public interface ITokenizer<T> : IEnumerable<Token<T>>, IDisposable
+	public interface ITokenizer<T>
 	{
 		#region Properties
 
@@ -50,5 +51,11 @@ namespace JsonFx.Json
 		}
 
 		#endregion Properties
+
+		#region Methods
+
+		IEnumerable<Token<T>> Tokenize(TextReader reader);
+
+		#endregion Methods
 	}
 }

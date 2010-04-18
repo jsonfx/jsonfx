@@ -65,9 +65,9 @@ namespace JsonFx.Json
 
 		#region IDataReader Methods
 
-		protected override ITokenizer<JsonTokenType> GetTokenizer(DataReaderSettings settings, TextReader input)
+		protected override ITokenizer<JsonTokenType> GetTokenizer(DataReaderSettings settings)
 		{
-			return new JsonTokenizer(input);
+			return new JsonTokenizer();
 		}
 
 		protected override IParser<JsonTokenType> GetParser(DataReaderSettings settings)
