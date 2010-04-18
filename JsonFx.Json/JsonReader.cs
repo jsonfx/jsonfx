@@ -101,16 +101,7 @@ namespace JsonFx.Json
 
 			try
 			{
-				IEnumerator<Token<JsonTokenType>> tokens = tokenizer.GetEnumerator();
-				object value = this.Parse(tokens, targetType);
-				if (tokens.MoveNext())
-				{
-					// TODO: evaluate if is ever valid to have tokens beyond JSON
-					throw new JsonDeserializationException(String.Format(
-						JsonReader.ErrorExtraTokens,
-						tokens.Current.TokenType), tokenizer.Position);
-				}
-				return value;
+				return this.Parse(tokenizer, targetType);
 			}
 			catch (JsonDeserializationException)
 			{
@@ -131,13 +122,16 @@ namespace JsonFx.Json
 
 		#region Parsing Methods
 
-		private object Parse(IEnumerator<Token<JsonTokenType>> tokens, Type targetType)
+		private object Parse(IEnumerable<Token<JsonTokenType>> tokenizer, Type targetType)
 		{
+			IEnumerator<Token<JsonTokenType>> tokens = tokenizer.GetEnumerator();
 			if (!tokens.MoveNext())
 			{
 				// end of input
 				return this.Settings.CoerceType(targetType, null);
 			}
+
+			object value;
 
 			Token<JsonTokenType> token = tokens.Current;
 			switch (token.TokenType)
@@ -145,12 +139,14 @@ namespace JsonFx.Json
 				case JsonTokenType.ArrayBegin:
 				{
 					// found array
-					return this.ParseArray(tokens, targetType);
+					value = this.ParseArray(tokens, targetType);
+					break;
 				}
 				case JsonTokenType.ObjectBegin:
 				{
 					// found object
-					return this.ParseObject(tokens, targetType);
+					value = this.ParseObject(tokens, targetType);
+					break;
 				}
 				case JsonTokenType.Boolean:
 				case JsonTokenType.Number:
@@ -159,7 +155,8 @@ namespace JsonFx.Json
 				case JsonTokenType.Undefined:
 				{
 					// found primitive
-					return this.Settings.CoerceType(targetType, token.Value);
+					value = this.Settings.CoerceType(targetType, token.Value);
+					break;
 				}
 				case JsonTokenType.ArrayEnd:
 				case JsonTokenType.Identifier:
@@ -175,6 +172,16 @@ namespace JsonFx.Json
 						token.TokenType));
 				}
 			}
+
+			if (tokens.MoveNext())
+			{
+				// TODO: evaluate if is ever valid to have tokens beyond JSON
+				throw new ArgumentException(String.Format(
+					JsonReader.ErrorExtraTokens,
+					tokens.Current.TokenType));
+			}
+
+			return value;
 		}
 
 		private object ParseObject(IEnumerator<Token<JsonTokenType>> tokens, Type objectType)
