@@ -34,17 +34,36 @@ using System.IO;
 namespace JsonFx.Json
 {
 	/// <summary>
-	/// A common interface for data deserializers
+	/// Provides base implementation for standard deserializers
 	/// </summary>
-	public interface IDataReader
+	public abstract class DataReader<T> : IDataReader
 	{
+		#region Fields
+
+		private readonly DataReaderSettings settings;
+		private readonly IParser<T> parser;
+
+		#endregion Fields
+
+		#region Init
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="settings"></param>
+		public DataReader(IParser<T> parser, DataReaderSettings settings)
+		{
+			this.settings = settings;
+		}
+
+		#endregion Init
+
 		#region Properties
 
 		/// <summary>
 		/// Gets the supported content type of the serialized data
 		/// </summary>
-		// TODO: should this be IEnumerable<string>?
-		string ContentType
+		public abstract string ContentType
 		{
 			get;
 		}
@@ -52,9 +71,17 @@ namespace JsonFx.Json
 		/// <summary>
 		/// Gets the settings used for deserialization
 		/// </summary>
-		DataReaderSettings Settings
+		public DataReaderSettings Settings
 		{
-			get;
+			get { return this.settings; }
+		}
+
+		/// <summary>
+		/// Gets the parser used for deserialization
+		/// </summary>
+		public IParser<T> Parser
+		{
+			get { return this.parser; }
 		}
 
 		#endregion Properties
@@ -65,21 +92,47 @@ namespace JsonFx.Json
 		/// Serializes the data to the given output
 		/// </summary>
 		/// <param name="input">the input reader</param>
-		/// <typeparam name="T">the expected type of the serialized data</typeparam>
-		T Deserialize<T>(TextReader input);
+		/// <typeparam name="TVal">the expected type of the serialized data</typeparam>
+		public virtual TVal Deserialize<TVal>(TextReader input)
+		{
+			object value = this.Deserialize(input, typeof(TVal));
+
+			return (value is TVal) ? (TVal)value : default(TVal);
+		}
 
 		/// <summary>
 		/// Serializes the data to the given output
 		/// </summary>
 		/// <param name="input">the input reader</param>
-		object Deserialize(TextReader input);
+		public virtual object Deserialize(TextReader input)
+		{
+			return this.Deserialize(input, null);
+		}
 
 		/// <summary>
 		/// Serializes the data to the given output
 		/// </summary>
 		/// <param name="input">the input reader</param>
 		/// <param name="targetType">the expected type of the serialized data</param>
-		object Deserialize(TextReader input, Type targetType);
+		public virtual object Deserialize(TextReader input, Type targetType)
+		{
+			ITokenizer<T> tokenizer = this.GetTokenizer(input);
+
+			try
+			{
+				return this.Parser.Parse(tokenizer, targetType);
+			}
+			catch (JsonDeserializationException)
+			{
+				throw;
+			}
+			catch (Exception ex)
+			{
+				throw new JsonDeserializationException(ex.Message, tokenizer.Position, ex);
+			}
+		}
+
+		protected abstract ITokenizer<T> GetTokenizer(TextReader input);
 
 		#endregion Methods
 	}

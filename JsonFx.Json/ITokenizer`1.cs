@@ -34,11 +34,13 @@ using System.Collections.Generic;
 namespace JsonFx.Json
 {
 	/// <summary>
-	/// The base interface for tokenizing an input sequence.
+	/// The base interface for tokenizing a sequence of characters.
 	/// </summary>
 	/// <typeparam name="T">token type</typeparam>
 	public interface ITokenizer<T> : IEnumerable<Token<T>>, IDisposable
 	{
+		#region Properties
+
 		/// <summary>
 		/// Gets the current position of the underlying input character sequence
 		/// </summary>
@@ -46,5 +48,7 @@ namespace JsonFx.Json
 		{
 			get;
 		}
+
+		#endregion Properties
 	}
 }
