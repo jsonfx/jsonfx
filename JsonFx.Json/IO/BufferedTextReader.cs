@@ -32,7 +32,7 @@ using System;
 using System.IO;
 using System.Text;
 
-namespace JsonFx.Json
+namespace JsonFx.IO
 {
 	// TODO: will buffering prevent multiple chunked reads?
 	// TODO: evaluate performance differences if only buffer requested look aheads

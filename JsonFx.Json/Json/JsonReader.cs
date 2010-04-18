@@ -30,16 +30,15 @@
 
 using System;
 using System.IO;
-using System.Text;
 
 using JsonFx.Serialization;
 
 namespace JsonFx.Json
 {
 	/// <summary>
-	/// JSON serializer
+	/// JSON deserializer
 	/// </summary>
-	public partial class JsonWriter : DataWriter<JsonTokenType>
+	public partial class JsonReader : DataReader<JsonTokenType>
 	{
 		#region Init
 
@@ -47,7 +46,7 @@ namespace JsonFx.Json
 		/// Ctor
 		/// </summary>
 		/// <param name="settings"></param>
-		public JsonWriter(DataWriterSettings settings)
+		public JsonReader(DataReaderSettings settings)
 			: base(settings)
 		{
 		}
@@ -57,43 +56,27 @@ namespace JsonFx.Json
 		#region Properties
 
 		/// <summary>
-		/// Gets the content encoding for the serialized data
-		/// </summary>
-		public override Encoding ContentEncoding
-		{
-			get { return Encoding.UTF8; }
-		}
-
-		/// <summary>
-		/// Gets the supported content type for the serialized data
+		/// Gets the supported content type of the serialized data
 		/// </summary>
 		public override string ContentType
 		{
 			get { return "application/json"; }
 		}
 
-		/// <summary>
-		/// Gets the supported file extension for the serialized data
-		/// </summary>
-		public override string FileExtension
-		{
-			get { return ".json"; }
-		}
-
 		#endregion Properties
 
-		#region DataWriter<JsonTokenType> Methods
+		#region IDataReader Methods
 
-		protected override IDataGenerator<JsonTokenType> GetGenerator(DataWriterSettings settings)
+		protected override IDataTokenizer<JsonTokenType> GetTokenizer(DataReaderSettings settings)
 		{
-			return new JsonGenerator(settings);
+			return new JsonReader.JsonTokenizer();
 		}
 
-		protected override IDataFormatter<JsonTokenType> GetFormatter(DataWriterSettings settings)
+		protected override IDataParser<JsonTokenType> GetParser(DataReaderSettings settings)
 		{
-			return new JsonFormatter(settings);
+			return new JsonReader.JsonParser(settings);
 		}
 
-		#endregion DataWriter<JsonTokenType> Methods
+		#endregion IDataReader Methods
 	}
 }

@@ -7,7 +7,7 @@
     <ProjectGuid>{3082284B-B579-4808-A4A4-D88DDA4025CB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>JsonFx.Json</RootNamespace>
+    <RootNamespace>JsonFx</RootNamespace>
     <AssemblyName>JsonFx.Json</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -51,34 +51,34 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataIgnoreAttribute.cs" />
-    <Compile Include="DataNameAttribute.cs" />
-    <Compile Include="DataSpecifiedPropertyAttribute.cs" />
-    <Compile Include="IDataFormatter`1.cs" />
-    <Compile Include="IDataGenerator`1.cs" />
-    <Compile Include="IDataParser`1.cs" />
-    <Compile Include="IDataTokenizer`1.cs" />
-    <Compile Include="JsonGenerator.cs" />
-    <Compile Include="JsonFormatter.cs" />
-    <Compile Include="DataWriter`1.cs" />
-    <Compile Include="DataReader`1.cs" />
-    <Compile Include="Exceptions.cs" />
-    <Compile Include="JsonParser.cs" />
-    <Compile Include="JsonGrammar.cs" />
-    <Compile Include="JsonWriter.cs" />
-    <Compile Include="DataNameResolver.cs" />
-    <Compile Include="DataReaderSettings.cs" />
-    <Compile Include="JsonReader.cs" />
-    <Compile Include="DataWriterSettings.cs" />
-    <Compile Include="IDataReader.cs" />
-    <Compile Include="IDataWriter.cs" />
-    <Compile Include="ISerializable`1.cs" />
-    <Compile Include="JsonTokenType.cs" />
-    <Compile Include="JsonTokenizer.cs" />
-    <Compile Include="BufferedTextReader.cs" />
+    <Compile Include="IO\BufferedTextReader.cs" />
+    <Compile Include="Json\JsonFormatter.cs" />
+    <Compile Include="Json\JsonGenerator.cs" />
+    <Compile Include="Json\JsonGrammar.cs" />
+    <Compile Include="Json\JsonParser.cs" />
+    <Compile Include="Json\JsonReader.cs" />
+    <Compile Include="Json\JsonTokenizer.cs" />
+    <Compile Include="Json\JsonTokenType.cs" />
+    <Compile Include="Json\JsonWriter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\AssemblyVersion.cs" />
-    <Compile Include="Token`1.cs" />
+    <Compile Include="Serialization\DataIgnoreAttribute.cs" />
+    <Compile Include="Serialization\DataNameAttribute.cs" />
+    <Compile Include="Serialization\DataNameResolver.cs" />
+    <Compile Include="Serialization\DataReaderSettings.cs" />
+    <Compile Include="Serialization\DataReader`1.cs" />
+    <Compile Include="Serialization\DataSpecifiedPropertyAttribute.cs" />
+    <Compile Include="Serialization\DataWriterSettings.cs" />
+    <Compile Include="Serialization\DataWriter`1.cs" />
+    <Compile Include="Serialization\Exceptions.cs" />
+    <Compile Include="Serialization\IDataFormatter`1.cs" />
+    <Compile Include="Serialization\IDataGenerator`1.cs" />
+    <Compile Include="Serialization\IDataParser`1.cs" />
+    <Compile Include="Serialization\IDataReader.cs" />
+    <Compile Include="Serialization\IDataTokenizer`1.cs" />
+    <Compile Include="Serialization\IDataWriter.cs" />
+    <Compile Include="Serialization\ISerializable`1.cs" />
+    <Compile Include="Serialization\Token`1.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Readme.txt" />
