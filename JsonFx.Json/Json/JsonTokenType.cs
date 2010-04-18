@@ -38,8 +38,11 @@ namespace JsonFx.Json
 	public enum JsonTokenType
 	{
 		/// <summary>
-		/// Not specified
+		/// No token
 		/// </summary>
+		/// <remarks>
+		/// The state before and after an object graph
+		/// </remarks>
 		None,
 
 		/// <summary>

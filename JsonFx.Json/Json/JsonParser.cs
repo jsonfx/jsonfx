@@ -169,8 +169,8 @@ namespace JsonFx.Json
 
 				Type itemType = DataReaderSettings.GetDictionaryItemType(objectType);
 				object objectValue = (itemType != null) ?
-				this.Settings.InstantiateObject(objectType) :
-				new Dictionary<string, object>();
+					this.Settings.InstantiateObject(objectType) :
+					new Dictionary<string, object>();
 
 				bool hasProperties = false;
 				while (tokens.MoveNext())

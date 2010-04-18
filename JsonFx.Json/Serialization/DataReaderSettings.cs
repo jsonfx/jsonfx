@@ -789,6 +789,8 @@ namespace JsonFx.Serialization
 				throw new ArgumentException(String.Format(
 					DataReaderSettings.ErrorGenericIDictionaryKeys,
 					targetType));
+
+				// TODO: support serialization as KeyValue<TKey, TVal>[]?
 			}
 
 			return genericArgs[1];

@@ -39,7 +39,7 @@ namespace JsonFx.Json
 	public partial class JsonWriter
 	{
 		/// <summary>
-		/// Formats a sequence of JSON tokens
+		/// Ouput JSON text from a SAX-like input stream of JSON tokens
 		/// </summary>
 		public class JsonFormatter : IDataFormatter<JsonTokenType>
 		{
@@ -97,10 +97,6 @@ namespace JsonFx.Json
 							writer.Write(token.Value);
 							break;
 						}
-						case JsonTokenType.None:
-						{
-							break;
-						}
 						case JsonTokenType.Null:
 						{
 							writer.Write(JsonGrammar.KeywordNull);
@@ -144,6 +140,11 @@ namespace JsonFx.Json
 						{
 							writer.Write(JsonGrammar.OperatorValueDelim);
 							this.WriteLine(writer);
+							break;
+						}
+						case JsonTokenType.None:
+						default:
+						{
 							break;
 						}
 					}
