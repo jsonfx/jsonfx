@@ -756,7 +756,7 @@ namespace JsonFx.Json
 
 		#region ITokenizer<JsonTokenType> Members
 
-		public IEnumerable<Token<JsonTokenType>> Tokenize(TextReader reader)
+		public IEnumerable<Token<JsonTokenType>> GetTokens(TextReader reader)
 		{
 			this.Reader = new BufferedTextReader(reader, this.PeekBuffer.Length);
 

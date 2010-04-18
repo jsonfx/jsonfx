@@ -41,7 +41,12 @@ namespace JsonFx.Json
 	{
 		#region Methods
 
-		IEnumerable<Token<T>> Generate(object data);
+		/// <summary>
+		/// Generates a sequence of tokens representing the value
+		/// </summary>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		IEnumerable<Token<T>> GetTokens(object value);
 
 		#endregion Methods
 	}

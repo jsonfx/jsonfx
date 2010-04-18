@@ -64,9 +64,10 @@ namespace JsonFx.Json
 		/// Formats the token sequence
 		/// </summary>
 		/// <param name="generator"></param>
-		public void Format(TextWriter writer, IEnumerable<Token<JsonTokenType>> generator)
+		public void Write(TextWriter writer, IEnumerable<Token<JsonTokenType>> tokens)
 		{
-			foreach (Token<JsonTokenType> token in generator)
+			// TODO: render tokens
+			foreach (Token<JsonTokenType> token in tokens)
 			{
 				switch (token.TokenType)
 				{

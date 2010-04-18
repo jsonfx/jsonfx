@@ -60,8 +60,14 @@ namespace JsonFx.Json
 
 		#region IGenerator<JsonTokenType> Members
 
-		public IEnumerable<Token<JsonTokenType>> Generate(object data)
+		/// <summary>
+		/// Generates a sequence of tokens representing the value
+		/// </summary>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		public IEnumerable<Token<JsonTokenType>> GetTokens(object value)
 		{
+			// TODO: walk the object graph
 			yield break;
 		}
 

@@ -43,11 +43,11 @@ namespace JsonFx.Json
 		#region Methods
 
 		/// <summary>
-		/// Formats the token sequence
+		/// Formats the token sequence to the output writer
 		/// </summary>
 		/// <param name="writer"></param>
 		/// <param name="generator"></param>
-		void Format(TextWriter writer, IEnumerable<Token<T>> generator);
+		void Write(TextWriter writer, IEnumerable<Token<T>> tokens);
 
 		#endregion Methods
 	}

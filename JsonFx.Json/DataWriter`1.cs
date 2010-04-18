@@ -117,7 +117,7 @@ namespace JsonFx.Json
 
 			try
 			{
-				formatter.Format(output, generator.Generate(data));
+				formatter.Write(output, generator.GetTokens(data));
 			}
 			catch (SerializationException)
 			{

@@ -54,7 +54,12 @@ namespace JsonFx.Json
 
 		#region Methods
 
-		IEnumerable<Token<T>> Tokenize(TextReader reader);
+		/// <summary>
+		/// Tokenizes the input sequence into tokens
+		/// </summary>
+		/// <param name="reader"></param>
+		/// <returns></returns>
+		IEnumerable<Token<T>> GetTokens(TextReader reader);
 
 		#endregion Methods
 	}

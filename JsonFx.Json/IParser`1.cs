@@ -44,10 +44,10 @@ namespace JsonFx.Json
 		/// <summary>
 		/// Parses the token sequence, coercing the result to Type targetType
 		/// </summary>
-		/// <param name="tokenizer"></param>
+		/// <param name="tokens"></param>
 		/// <param name="targetType"></param>
 		/// <returns></returns>
-		object Parse(IEnumerable<Token<T>> tokenizer, Type targetType);
+		object Parse(IEnumerable<Token<T>> tokens, Type targetType);
 
 		#endregion Methods
 	}

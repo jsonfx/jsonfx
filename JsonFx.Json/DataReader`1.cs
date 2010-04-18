@@ -121,7 +121,7 @@ namespace JsonFx.Json
 
 			try
 			{
-				return parser.Parse(tokenizer.Tokenize(input), targetType);
+				return parser.Parse(tokenizer.GetTokens(input), targetType);
 			}
 			catch (DeserializationException)
 			{
