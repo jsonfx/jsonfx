@@ -104,11 +104,20 @@ namespace JsonFx.Json
 		public virtual void Serialize(TextWriter output, object data)
 		{
 			IGenerator<T> generator = this.GetGenerator(this.Settings);
+			if (generator == null)
+			{
+				throw new InvalidOperationException("Generator is invalid");
+			}
+
 			IFormatter<T> formatter = this.GetFormatter(this.Settings, output);
+			if (formatter == null)
+			{
+				throw new InvalidOperationException("Formatter is invalid");
+			}
 
 			try
 			{
-				formatter.Format(generator);
+				formatter.Format(generator.Generate(data));
 			}
 			catch (SerializationException)
 			{

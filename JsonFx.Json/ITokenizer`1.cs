@@ -34,7 +34,7 @@ using System.Collections.Generic;
 namespace JsonFx.Json
 {
 	/// <summary>
-	/// The base interface for tokenizing a sequence of characters.
+	/// Tokenizes a sequence of characters
 	/// </summary>
 	/// <typeparam name="T">token type</typeparam>
 	public interface ITokenizer<T> : IEnumerable<Token<T>>, IDisposable

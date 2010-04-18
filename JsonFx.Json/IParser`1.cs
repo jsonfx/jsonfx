@@ -34,7 +34,7 @@ using System.Collections.Generic;
 namespace JsonFx.Json
 {
 	/// <summary>
-	/// The base interface for parsing a sequence of tokens.
+	/// Parses a sequence of tokens
 	/// </summary>
 	/// <typeparam name="T">token type</typeparam>
 	public interface IParser<T>

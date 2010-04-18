@@ -108,7 +108,16 @@ namespace JsonFx.Json
 		public virtual object Deserialize(TextReader input, Type targetType)
 		{
 			ITokenizer<T> tokenizer = this.GetTokenizer(this.Settings, input);
+			if (tokenizer == null)
+			{
+				throw new InvalidOperationException("Tokenizer is invalid");
+			}
+
 			IParser<T> parser = this.GetParser(this.Settings);
+			if (parser == null)
+			{
+				throw new InvalidOperationException("Parser is invalid");
+			}
 
 			try
 			{

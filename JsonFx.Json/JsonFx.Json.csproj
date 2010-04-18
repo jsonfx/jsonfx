@@ -51,6 +51,8 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="JsonGenerator.cs" />
+    <Compile Include="JsonFormatter.cs" />
     <Compile Include="DataWriter`1.cs" />
     <Compile Include="IGenerator`1.cs" />
     <Compile Include="IFormatter`1.cs" />

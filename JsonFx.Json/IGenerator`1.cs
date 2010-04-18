@@ -34,10 +34,15 @@ using System.Collections.Generic;
 namespace JsonFx.Json
 {
 	/// <summary>
-	/// The base interface for generating a sequence of tokens.
+	/// Generates a sequence of tokens
 	/// </summary>
 	/// <typeparam name="T">token type</typeparam>
-	public interface IGenerator<T> : IEnumerable<Token<T>>
+	public interface IGenerator<T>
 	{
+		#region Methods
+
+		IEnumerable<Token<T>> Generate(object data);
+
+		#endregion Methods
 	}
 }

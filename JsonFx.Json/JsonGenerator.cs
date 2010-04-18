@@ -29,69 +29,42 @@
 #endregion License
 
 using System;
-using System.IO;
-using System.Text;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace JsonFx.Json
 {
 	/// <summary>
-	/// JSON serializer
+	/// Generates a sequence of tokens
 	/// </summary>
-	public class JsonWriter : DataWriter<JsonTokenType>
+	public class JsonGenerator : IGenerator<JsonTokenType>
 	{
+		#region Fields
+
+		private readonly DataWriterSettings Settings;
+
+		#endregion Fields
+
 		#region Init
 
 		/// <summary>
 		/// Ctor
 		/// </summary>
 		/// <param name="settings"></param>
-		public JsonWriter(DataWriterSettings settings)
-			: base(settings)
+		public JsonGenerator(DataWriterSettings settings)
 		{
+			this.Settings = settings;
 		}
 
 		#endregion Init
 
-		#region Properties
+		#region IGenerator<JsonTokenType> Members
 
-		/// <summary>
-		/// Gets the content encoding for the serialized data
-		/// </summary>
-		public override Encoding ContentEncoding
+		public IEnumerable<Token<JsonTokenType>> Generate(object data)
 		{
-			get { return Encoding.UTF8; }
+			yield break;
 		}
 
-		/// <summary>
-		/// Gets the supported content type for the serialized data
-		/// </summary>
-		public override string ContentType
-		{
-			get { return "application/json"; }
-		}
-
-		/// <summary>
-		/// Gets the supported file extension for the serialized data
-		/// </summary>
-		public override string FileExtension
-		{
-			get { return ".json"; }
-		}
-
-		#endregion Properties
-
-		#region DataWriter<JsonTokenType> Methods
-
-		protected override IGenerator<JsonTokenType> GetGenerator(DataWriterSettings settings)
-		{
-			return new JsonGenerator(settings);
-		}
-
-		protected override IFormatter<JsonTokenType> GetFormatter(DataWriterSettings settings, TextWriter output)
-		{
-			return new JsonFormatter(settings, output);
-		}
-
-		#endregion DataWriter<JsonTokenType> Methods
+		#endregion IGenerator<JsonTokenType> Members
 	}
 }
