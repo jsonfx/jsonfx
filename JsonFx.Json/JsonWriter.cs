@@ -37,7 +37,7 @@ namespace JsonFx.Json
 	/// <summary>
 	/// JSON serializer
 	/// </summary>
-	public class JsonWriter : DataWriterBase
+	public class JsonWriter : DataWriter<JsonTokenType>
 	{
 		#region Init
 
@@ -80,18 +80,18 @@ namespace JsonFx.Json
 
 		#endregion Properties
 
-		#region Methods
+		#region DataWriter<JsonTokenType> Methods
 
-		/// <summary>
-		/// Serializes the data to the given output
-		/// </summary>
-		/// <param name="output">the output writer</param>
-		/// <param name="data">the data to be serialized</param>
-		public override void Serialize(TextWriter output, object data)
+		protected override IGenerator<JsonTokenType> GetGenerator(DataWriterSettings settings)
 		{
-			// TODO.
+			return null;
 		}
 
-		#endregion Methods
+		protected override IFormatter<JsonTokenType> GetFormatter(DataWriterSettings settings, TextWriter output)
+		{
+			return null;
+		}
+
+		#endregion DataWriter<JsonTokenType> Methods
 	}
 }

@@ -29,63 +29,15 @@
 #endregion License
 
 using System;
-using System.IO;
-using System.Text;
+using System.Collections.Generic;
 
 namespace JsonFx.Json
 {
 	/// <summary>
-	/// A common interface for data serializers
+	/// The base interface for generating a sequence of tokens.
 	/// </summary>
-	public interface IDataWriter
+	/// <typeparam name="T">token type</typeparam>
+	public interface IGenerator<T> : IEnumerable<Token<T>>
 	{
-		#region Properties
-
-		/// <summary>
-		/// Gets the content encoding for the serialized data
-		/// </summary>
-		Encoding ContentEncoding
-		{
-			get;
-		}
-
-		/// <summary>
-		/// Gets the supported content type for the serialized data
-		/// </summary>
-		// TODO: should this be IEnumerable<string>?
-		string ContentType
-		{
-			get;
-		}
-
-		/// <summary>
-		/// Gets the supported file extension for the serialized data
-		/// </summary>
-		// TODO: should this be IEnumerable<string>?
-		string FileExtension
-		{
-			get;
-		}
-
-		/// <summary>
-		/// Gets the settings used for serialization
-		/// </summary>
-		DataWriterSettings Settings
-		{
-			get;
-		}
-
-		#endregion Properties
-
-		#region Methods
-
-		/// <summary>
-		/// Serializes the data to the given output
-		/// </summary>
-		/// <param name="output">the output writer</param>
-		/// <param name="data">the data to be serialized</param>
-		void Serialize(TextWriter output, object data);
-
-		#endregion Methods
 	}
 }

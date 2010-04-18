@@ -30,17 +30,18 @@
 
 using System;
 using System.IO;
+using System.Text;
 
 namespace JsonFx.Json
 {
 	/// <summary>
-	/// Provides base implementation for standard deserializers
+	/// Provides base implementation of standard serializers
 	/// </summary>
-	public abstract class DataReader<T> : IDataReader
+	public abstract class DataWriter<T> : IDataWriter
 	{
 		#region Fields
 
-		private readonly DataReaderSettings settings;
+		private readonly DataWriterSettings settings;
 
 		#endregion Fields
 
@@ -50,7 +51,7 @@ namespace JsonFx.Json
 		/// Ctor
 		/// </summary>
 		/// <param name="settings"></param>
-		public DataReader(DataReaderSettings settings)
+		public DataWriter(DataWriterSettings settings)
 		{
 			this.settings = settings;
 		}
@@ -60,7 +61,15 @@ namespace JsonFx.Json
 		#region Properties
 
 		/// <summary>
-		/// Gets the supported content type of the serialized data
+		/// Gets the content encoding for the serialized data
+		/// </summary>
+		public abstract Encoding ContentEncoding
+		{
+			get;
+		}
+
+		/// <summary>
+		/// Gets the supported content type for the serialized data
 		/// </summary>
 		public abstract string ContentType
 		{
@@ -68,9 +77,17 @@ namespace JsonFx.Json
 		}
 
 		/// <summary>
-		/// Gets the settings used for deserialization
+		/// Gets the supported file extension for the serialized data
 		/// </summary>
-		public DataReaderSettings Settings
+		public abstract string FileExtension
+		{
+			get;
+		}
+
+		/// <summary>
+		/// Gets the settings used for serialization
+		/// </summary>
+		public DataWriterSettings Settings
 		{
 			get { return this.settings; }
 		}
@@ -82,51 +99,30 @@ namespace JsonFx.Json
 		/// <summary>
 		/// Serializes the data to the given output
 		/// </summary>
-		/// <param name="input">the input reader</param>
-		/// <typeparam name="TVal">the expected type of the serialized data</typeparam>
-		public virtual TVal Deserialize<TVal>(TextReader input)
+		/// <param name="output">the output writer</param>
+		/// <param name="data">the data to be serialized</param>
+		public virtual void Serialize(TextWriter output, object data)
 		{
-			object value = this.Deserialize(input, typeof(TVal));
-
-			return (value is TVal) ? (TVal)value : default(TVal);
-		}
-
-		/// <summary>
-		/// Serializes the data to the given output
-		/// </summary>
-		/// <param name="input">the input reader</param>
-		public virtual object Deserialize(TextReader input)
-		{
-			return this.Deserialize(input, null);
-		}
-
-		/// <summary>
-		/// Serializes the data to the given output
-		/// </summary>
-		/// <param name="input">the input reader</param>
-		/// <param name="targetType">the expected type of the serialized data</param>
-		public virtual object Deserialize(TextReader input, Type targetType)
-		{
-			ITokenizer<T> tokenizer = this.GetTokenizer(this.Settings, input);
-			IParser<T> parser = this.GetParser(this.Settings);
+			IGenerator<T> generator = this.GetGenerator(this.Settings);
+			IFormatter<T> formatter = this.GetFormatter(this.Settings, output);
 
 			try
 			{
-				return parser.Parse(tokenizer, targetType);
+				formatter.Format(generator);
 			}
-			catch (DeserializationException)
+			catch (SerializationException)
 			{
 				throw;
 			}
 			catch (Exception ex)
 			{
-				throw new DeserializationException(ex.Message, tokenizer.Position, ex);
+				throw new SerializationException(ex.Message, ex);
 			}
 		}
 
-		protected abstract ITokenizer<T> GetTokenizer(DataReaderSettings settings, TextReader input);
+		protected abstract IGenerator<T> GetGenerator(DataWriterSettings dataWriterSettings);
 
-		protected abstract IParser<T> GetParser(DataReaderSettings settings);
+		protected abstract IFormatter<T> GetFormatter(DataWriterSettings dataWriterSettings, TextWriter output);
 
 		#endregion Methods
 	}
