@@ -32,45 +32,50 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+using JsonFx.Serialization;
+
 namespace JsonFx.Json
 {
-	/// <summary>
-	/// Generates a sequence of tokens
-	/// </summary>
-	public class JsonGenerator : IGenerator<JsonTokenType>
+	public partial class JsonWriter
 	{
-		#region Fields
-
-		private readonly DataWriterSettings Settings;
-
-		#endregion Fields
-
-		#region Init
-
 		/// <summary>
-		/// Ctor
+		/// Generates a sequence of tokens
 		/// </summary>
-		/// <param name="settings"></param>
-		public JsonGenerator(DataWriterSettings settings)
+		public class JsonGenerator : IDataGenerator<JsonTokenType>
 		{
-			this.Settings = settings;
+			#region Fields
+
+			private readonly DataWriterSettings Settings;
+
+			#endregion Fields
+
+			#region Init
+
+			/// <summary>
+			/// Ctor
+			/// </summary>
+			/// <param name="settings"></param>
+			public JsonGenerator(DataWriterSettings settings)
+			{
+				this.Settings = settings;
+			}
+
+			#endregion Init
+
+			#region IGenerator<JsonTokenType> Members
+
+			/// <summary>
+			/// Generates a sequence of tokens representing the value
+			/// </summary>
+			/// <param name="value"></param>
+			/// <returns></returns>
+			public IEnumerable<Token<JsonTokenType>> GetTokens(object value)
+			{
+				// TODO: walk the object graph
+				yield break;
+			}
+
+			#endregion IGenerator<JsonTokenType> Members
 		}
-
-		#endregion Init
-
-		#region IGenerator<JsonTokenType> Members
-
-		/// <summary>
-		/// Generates a sequence of tokens representing the value
-		/// </summary>
-		/// <param name="value"></param>
-		/// <returns></returns>
-		public IEnumerable<Token<JsonTokenType>> GetTokens(object value)
-		{
-			// TODO: walk the object graph
-			yield break;
-		}
-
-		#endregion IGenerator<JsonTokenType> Members
 	}
 }

@@ -31,7 +31,7 @@
 using System;
 using System.IO;
 
-namespace JsonFx.Json
+namespace JsonFx.Serialization
 {
 	/// <summary>
 	/// Provides base implementation for standard deserializers
@@ -107,13 +107,13 @@ namespace JsonFx.Json
 		/// <param name="targetType">the expected type of the serialized data</param>
 		public virtual object Deserialize(TextReader input, Type targetType)
 		{
-			ITokenizer<T> tokenizer = this.GetTokenizer(this.Settings);
+			IDataTokenizer<T> tokenizer = this.GetTokenizer(this.Settings);
 			if (tokenizer == null)
 			{
 				throw new InvalidOperationException("Tokenizer is invalid");
 			}
 
-			IParser<T> parser = this.GetParser(this.Settings);
+			IDataParser<T> parser = this.GetParser(this.Settings);
 			if (parser == null)
 			{
 				throw new InvalidOperationException("Parser is invalid");
@@ -133,9 +133,9 @@ namespace JsonFx.Json
 			}
 		}
 
-		protected abstract ITokenizer<T> GetTokenizer(DataReaderSettings settings);
+		protected abstract IDataTokenizer<T> GetTokenizer(DataReaderSettings settings);
 
-		protected abstract IParser<T> GetParser(DataReaderSettings settings);
+		protected abstract IDataParser<T> GetParser(DataReaderSettings settings);
 
 		#endregion Methods
 	}

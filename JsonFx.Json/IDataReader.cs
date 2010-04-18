@@ -31,7 +31,7 @@
 using System;
 using System.IO;
 
-namespace JsonFx.Json
+namespace JsonFx.Serialization
 {
 	/// <summary>
 	/// A common interface for data deserializers

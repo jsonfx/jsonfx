@@ -35,7 +35,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 
-namespace JsonFx.Json
+namespace JsonFx.Serialization
 {
 	/// <summary>
 	/// Controls deserialization settings for IDataReader
@@ -242,18 +242,19 @@ namespace JsonFx.Json
 						this.CoerceType(propertyInfo.PropertyType, value),
 						null);
 				}
-
 				return;
 			}
 
 			FieldInfo fieldInfo = memberInfo as FieldInfo;
 			if (fieldInfo != null)
 			{
-				// set value of public field
-				fieldInfo.SetValue(
-					target,
-					this.CoerceType(fieldInfo.FieldType, value));
-
+				if (!fieldInfo.IsInitOnly)
+				{
+					// set value of public field
+					fieldInfo.SetValue(
+						target,
+						this.CoerceType(fieldInfo.FieldType, value));
+				}
 				return;
 			}
 

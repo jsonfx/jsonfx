@@ -29,54 +29,25 @@
 #endregion License
 
 using System;
+using System.Collections.Generic;
 
-namespace JsonFx.Json
+namespace JsonFx.Serialization
 {
 	/// <summary>
-	/// Specifies the name of the property which specifies if member should be serialized.
+	/// Generates a sequence of tokens
 	/// </summary>
-	[AttributeUsage(AttributeTargets.Property|AttributeTargets.Field, AllowMultiple=false)]
-	public class JsonSpecifiedPropertyAttribute : Attribute
+	/// <typeparam name="T">token type</typeparam>
+	public interface IDataGenerator<T>
 	{
-		#region Fields
-
-		private string specifiedProperty;
-
-		#endregion Fields
-
-		#region Init
+		#region Methods
 
 		/// <summary>
-		/// Ctor
+		/// Generates a sequence of tokens representing the value
 		/// </summary>
-		/// <param name="propertyName">the name of the property which controls serialization for this member</param>
-		public JsonSpecifiedPropertyAttribute()
-		{
-		}
+		/// <param name="value"></param>
+		/// <returns></returns>
+		IEnumerable<Token<T>> GetTokens(object value);
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="propertyName">the name of the property which controls serialization for this member</param>
-		public JsonSpecifiedPropertyAttribute(string propertyName)
-		{
-			this.specifiedProperty = propertyName;
-		}
-
-		#endregion Init
-
-		#region Properties
-
-		/// <summary>
-		/// Gets and sets the name of the property which
-		/// specifies if member should be serialized
-		/// </summary>
-		public string SpecifiedProperty
-		{
-			get { return this.specifiedProperty; }
-			set { this.specifiedProperty = value; }
-		}
-
-		#endregion Properties
+		#endregion Methods
 	}
 }

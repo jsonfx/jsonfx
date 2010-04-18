@@ -32,12 +32,14 @@ using System;
 using System.IO;
 using System.Text;
 
+using JsonFx.Serialization;
+
 namespace JsonFx.Json
 {
 	/// <summary>
 	/// JSON serializer
 	/// </summary>
-	public class JsonWriter : DataWriter<JsonTokenType>
+	public partial class JsonWriter : DataWriter<JsonTokenType>
 	{
 		#region Init
 
@@ -82,12 +84,12 @@ namespace JsonFx.Json
 
 		#region DataWriter<JsonTokenType> Methods
 
-		protected override IGenerator<JsonTokenType> GetGenerator(DataWriterSettings settings)
+		protected override IDataGenerator<JsonTokenType> GetGenerator(DataWriterSettings settings)
 		{
 			return new JsonGenerator(settings);
 		}
 
-		protected override IFormatter<JsonTokenType> GetFormatter(DataWriterSettings settings)
+		protected override IDataFormatter<JsonTokenType> GetFormatter(DataWriterSettings settings)
 		{
 			return new JsonFormatter(settings);
 		}

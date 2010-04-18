@@ -32,114 +32,137 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
+using JsonFx.Serialization;
+
 namespace JsonFx.Json
 {
-	/// <summary>
-	/// Formats a sequence of JSON tokens
-	/// </summary>
-	public class JsonFormatter : IFormatter<JsonTokenType>
+	public partial class JsonWriter
 	{
-		#region Fields
-
-		private readonly DataWriterSettings Settings;
-
-		#endregion Fields
-
-		#region Init
-
 		/// <summary>
-		/// Ctor
+		/// Formats a sequence of JSON tokens
 		/// </summary>
-		/// <param name="settings"></param>
-		public JsonFormatter(DataWriterSettings settings)
+		public class JsonFormatter : IDataFormatter<JsonTokenType>
 		{
-			this.Settings = settings;
-		}
+			#region Fields
 
-		#endregion Init
+			private readonly DataWriterSettings Settings;
+			private int depth = 0;
 
-		#region Methods
+			#endregion Fields
 
-		/// <summary>
-		/// Formats the token sequence
-		/// </summary>
-		/// <param name="generator"></param>
-		public void Write(TextWriter writer, IEnumerable<Token<JsonTokenType>> tokens)
-		{
-			// TODO: render tokens
-			foreach (Token<JsonTokenType> token in tokens)
+			#region Init
+
+			/// <summary>
+			/// Ctor
+			/// </summary>
+			/// <param name="settings"></param>
+			public JsonFormatter(DataWriterSettings settings)
 			{
-				switch (token.TokenType)
+				this.Settings = settings;
+			}
+
+			#endregion Init
+
+			#region Methods
+
+			/// <summary>
+			/// Formats the token sequence
+			/// </summary>
+			/// <param name="generator"></param>
+			public void Write(TextWriter writer, IEnumerable<Token<JsonTokenType>> tokens)
+			{
+				// TODO: render tokens
+				foreach (Token<JsonTokenType> token in tokens)
 				{
-					case JsonTokenType.ArrayBegin:
+					switch (token.TokenType)
 					{
-						writer.WriteLine(token);
-						break;
-					}
-					case JsonTokenType.ArrayEnd:
-					{
-						writer.WriteLine(token);
-						break;
-					}
-					case JsonTokenType.Boolean:
-					{
-						writer.WriteLine(token);
-						break;
-					}
-					case JsonTokenType.Identifier:
-					{
-						writer.WriteLine(token);
-						break;
-					}
-					case JsonTokenType.None:
-					{
-						writer.WriteLine(token);
-						break;
-					}
-					case JsonTokenType.Null:
-					{
-						writer.WriteLine(token);
-						break;
-					}
-					case JsonTokenType.Number:
-					{
-						writer.WriteLine(token);
-						break;
-					}
-					case JsonTokenType.ObjectBegin:
-					{
-						writer.WriteLine(token);
-						break;
-					}
-					case JsonTokenType.ObjectEnd:
-					{
-						writer.WriteLine(token);
-						break;
-					}
-					case JsonTokenType.PairDelim:
-					{
-						writer.WriteLine(token);
-						break;
-					}
-					case JsonTokenType.String:
-					{
-						writer.WriteLine(token);
-						break;
-					}
-					case JsonTokenType.Undefined:
-					{
-						writer.WriteLine(token);
-						break;
-					}
-					case JsonTokenType.ValueDelim:
-					{
-						writer.WriteLine(token);
-						break;
+						case JsonTokenType.ArrayBegin:
+						{
+							writer.Write(JsonGrammar.OperatorArrayBegin);
+							this.WriteLine(writer);
+							break;
+						}
+						case JsonTokenType.ArrayEnd:
+						{
+							writer.Write(JsonGrammar.OperatorArrayEnd);
+							break;
+						}
+						case JsonTokenType.Boolean:
+						{
+							writer.Write(true.Equals(token.Value) ? JsonGrammar.KeywordTrue : JsonGrammar.KeywordFalse);
+							break;
+						}
+						case JsonTokenType.Literal:
+						{
+							writer.Write(token.Value);
+							break;
+						}
+						case JsonTokenType.None:
+						{
+							break;
+						}
+						case JsonTokenType.Null:
+						{
+							writer.Write(JsonGrammar.KeywordNull);
+							break;
+						}
+						case JsonTokenType.Number:
+						{
+							writer.Write(token.Value);
+							break;
+						}
+						case JsonTokenType.ObjectBegin:
+						{
+							writer.Write(JsonGrammar.OperatorObjectBegin);
+							break;
+						}
+						case JsonTokenType.ObjectEnd:
+						{
+							this.WriteLine(writer);
+							writer.Write(JsonGrammar.OperatorObjectEnd);
+							break;
+						}
+						case JsonTokenType.PairDelim:
+						{
+							writer.Write(JsonGrammar.OperatorPairDelim);
+							break;
+						}
+						case JsonTokenType.String:
+						{
+							writer.Write(JsonGrammar.OperatorStringDelim);
+							// TODO: escape string
+							writer.Write(token.Value);
+							writer.Write(JsonGrammar.OperatorStringDelim);
+							break;
+						}
+						case JsonTokenType.Undefined:
+						{
+							writer.Write(JsonGrammar.KeywordUndefined);
+							break;
+						}
+						case JsonTokenType.ValueDelim:
+						{
+							writer.Write(JsonGrammar.OperatorValueDelim);
+							this.WriteLine(writer);
+							break;
+						}
 					}
 				}
 			}
-		}
 
-		#endregion Methods
+			private void WriteLine(TextWriter writer)
+			{
+				if (this.Settings.PrettyPrint)
+				{
+					writer.Write(this.Settings.NewLine);
+					for (int i=0; i<this.depth; i++)
+					{
+						writer.Write(this.Settings.Tab);
+					}
+				}
+			}
+
+			#endregion Methods
+		}
 	}
 }

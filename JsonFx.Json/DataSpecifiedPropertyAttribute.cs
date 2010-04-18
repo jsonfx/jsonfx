@@ -29,26 +29,54 @@
 #endregion License
 
 using System;
-using System.Collections.Generic;
 
-namespace JsonFx.Json
+namespace JsonFx.Serialization
 {
 	/// <summary>
-	/// Parses a sequence of tokens
+	/// Specifies the name of the property which specifies if member should be serialized.
 	/// </summary>
-	/// <typeparam name="T">token type</typeparam>
-	public interface IParser<T>
+	[AttributeUsage(AttributeTargets.Property|AttributeTargets.Field, AllowMultiple=false)]
+	public class DataSpecifiedPropertyAttribute : Attribute
 	{
-		#region Methods
+		#region Fields
+
+		private string specifiedProperty;
+
+		#endregion Fields
+
+		#region Init
 
 		/// <summary>
-		/// Parses the token sequence, coercing the result to Type targetType
+		/// Ctor
 		/// </summary>
-		/// <param name="tokens"></param>
-		/// <param name="targetType"></param>
-		/// <returns></returns>
-		object Parse(IEnumerable<Token<T>> tokens, Type targetType);
+		/// <param name="propertyName">the name of the property which controls serialization for this member</param>
+		public DataSpecifiedPropertyAttribute()
+		{
+		}
 
-		#endregion Methods
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="propertyName">the name of the property which controls serialization for this member</param>
+		public DataSpecifiedPropertyAttribute(string propertyName)
+		{
+			this.specifiedProperty = propertyName;
+		}
+
+		#endregion Init
+
+		#region Properties
+
+		/// <summary>
+		/// Gets and sets the name of the property which
+		/// specifies if member should be serialized
+		/// </summary>
+		public string SpecifiedProperty
+		{
+			get { return this.specifiedProperty; }
+			set { this.specifiedProperty = value; }
+		}
+
+		#endregion Properties
 	}
 }

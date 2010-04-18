@@ -32,7 +32,7 @@ using System;
 using System.IO;
 using System.Text;
 
-namespace JsonFx.Json
+namespace JsonFx.Serialization
 {
 	/// <summary>
 	/// Provides base implementation of standard serializers
@@ -103,13 +103,13 @@ namespace JsonFx.Json
 		/// <param name="data">the data to be serialized</param>
 		public virtual void Serialize(TextWriter output, object data)
 		{
-			IGenerator<T> generator = this.GetGenerator(this.Settings);
+			IDataGenerator<T> generator = this.GetGenerator(this.Settings);
 			if (generator == null)
 			{
 				throw new InvalidOperationException("Generator is invalid");
 			}
 
-			IFormatter<T> formatter = this.GetFormatter(this.Settings);
+			IDataFormatter<T> formatter = this.GetFormatter(this.Settings);
 			if (formatter == null)
 			{
 				throw new InvalidOperationException("Formatter is invalid");
@@ -129,9 +129,9 @@ namespace JsonFx.Json
 			}
 		}
 
-		protected abstract IGenerator<T> GetGenerator(DataWriterSettings dataWriterSettings);
+		protected abstract IDataGenerator<T> GetGenerator(DataWriterSettings dataWriterSettings);
 
-		protected abstract IFormatter<T> GetFormatter(DataWriterSettings dataWriterSettings);
+		protected abstract IDataFormatter<T> GetFormatter(DataWriterSettings dataWriterSettings);
 
 		#endregion Methods
 	}

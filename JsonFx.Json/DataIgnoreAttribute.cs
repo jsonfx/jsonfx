@@ -30,13 +30,13 @@
 
 using System;
 
-namespace JsonFx.Json
+namespace JsonFx.Serialization
 {
 	/// <summary>
 	/// Designates a property or field to not be serialized.
 	/// </summary>
 	[AttributeUsage(AttributeTargets.All, AllowMultiple=false)]
-	public sealed class JsonIgnoreAttribute : Attribute
+	public sealed class DataIgnoreAttribute : Attribute
 	{
 	}
 }

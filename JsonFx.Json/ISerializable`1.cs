@@ -30,15 +30,17 @@
 
 using System;
 
-namespace JsonFx.Json
+namespace JsonFx.Serialization
 {
 	/// <summary>
 	/// Allows classes to control their own serialization
 	/// </summary>
 	public interface ISerializable<T>
 	{
-		void ReadJson(IDataReader reader);
+		// TODO: determine best interface to hook into
 
-		void WriteJson(IDataWriter writer);
+		//void ReadData(IDataReader reader);
+
+		//void WriteData(IDataWriter writer);
 	}
 }

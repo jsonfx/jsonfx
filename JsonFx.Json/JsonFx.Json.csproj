@@ -51,33 +51,28 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataIgnoreAttribute.cs" />
+    <Compile Include="DataNameAttribute.cs" />
+    <Compile Include="DataSpecifiedPropertyAttribute.cs" />
+    <Compile Include="IDataFormatter`1.cs" />
+    <Compile Include="IDataGenerator`1.cs" />
+    <Compile Include="IDataParser`1.cs" />
+    <Compile Include="IDataTokenizer`1.cs" />
     <Compile Include="JsonGenerator.cs" />
     <Compile Include="JsonFormatter.cs" />
     <Compile Include="DataWriter`1.cs" />
-    <Compile Include="IGenerator`1.cs" />
-    <Compile Include="IFormatter`1.cs" />
     <Compile Include="DataReader`1.cs" />
     <Compile Include="Exceptions.cs" />
-    <Compile Include="IParser`1.cs" />
-    <Compile Include="JsonParser.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="JsonParser.cs" />
+    <Compile Include="JsonGrammar.cs" />
     <Compile Include="JsonWriter.cs" />
     <Compile Include="DataNameResolver.cs" />
-    <Compile Include="DataReaderSettings.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="DataReaderSettings.cs" />
     <Compile Include="JsonReader.cs" />
     <Compile Include="DataWriterSettings.cs" />
     <Compile Include="IDataReader.cs" />
     <Compile Include="IDataWriter.cs" />
     <Compile Include="ISerializable`1.cs" />
-    <Compile Include="ITokenizer`1.cs" />
-    <Compile Include="JsonIgnoreAttribute.cs" />
-    <Compile Include="JsonNameAttribute.cs" />
-    <Compile Include="JsonSpecifiedPropertyAttribute.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="JsonTokenType.cs" />
     <Compile Include="JsonTokenizer.cs" />
     <Compile Include="BufferedTextReader.cs" />

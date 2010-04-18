@@ -31,7 +31,7 @@
 using System;
 using System.Text;
 
-namespace JsonFx.Json
+namespace JsonFx.Serialization
 {
 	/// <summary>
 	/// Represents a single token in an input character sequence

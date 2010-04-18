@@ -34,13 +34,19 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
 
-namespace JsonFx.Json
+namespace JsonFx.Serialization
 {
 	/// <summary>
 	/// Controls name resolution for IDataReader / IDataWriter
 	/// </summary>
 	public class DataNameResolver
 	{
+		#region Constants
+
+		private const string AnonymousTypePrefix = "<>f__AnonymousType";
+
+		#endregion Constants
+
 		#region Fields
 
 		private readonly object SyncLock = new object();
@@ -52,36 +58,14 @@ namespace JsonFx.Json
 		#region Name Resolution Methods
 
 		/// <summary>
-		/// Determines if memberInfo is not to be serialized.
-		/// </summary>
-		/// <param name="value"></param>
-		/// <returns></returns>
-		internal bool IsIgnored(MemberInfo memberInfo)
-		{
-			PropertyInfo propertyInfo = memberInfo as PropertyInfo;
-			if ((propertyInfo != null) && this.IsPropertyIgnored(propertyInfo))
-			{
-				return true;
-			}
-
-			FieldInfo fieldInfo = memberInfo as FieldInfo;
-			if ((fieldInfo != null) && this.IsFieldIgnored(fieldInfo))
-			{
-				return true;
-			}
-
-			return this.IsCustomIgnored(memberInfo);
-		}
-
-		/// <summary>
 		/// Gets a value indicating if the property is to be serialized.
 		/// </summary>
 		/// <param name="info"></param>
 		/// <returns></returns>
-		/// <remarks>default implementation is must be read/write properties</remarks>
-		protected virtual bool IsPropertyIgnored(PropertyInfo info)
+		/// <remarks>default implementation is must be read/write properties, or read-only anonymous</remarks>
+		protected virtual bool IsPropertyIgnored(PropertyInfo info, bool isAnonymousType)
 		{
-			return (!info.CanRead || !info.CanWrite);
+			return (!info.CanRead || (!info.CanWrite && !isAnonymousType));
 		}
 
 		/// <summary>
@@ -92,7 +76,7 @@ namespace JsonFx.Json
 		/// <remarks>default implementation is must be public, non-readonly field</remarks>
 		protected virtual bool IsFieldIgnored(FieldInfo info)
 		{
-			return (!info.IsPublic || info.IsInitOnly);
+			return (!info.IsPublic || info.IsStatic || info.IsInitOnly);
 		}
 
 		/// <summary>
@@ -101,9 +85,9 @@ namespace JsonFx.Json
 		/// <param name="value"></param>
 		/// <returns></returns>
 		/// <remarks>default implementation checks for JsonIgnoreAttribute</remarks>
-		protected virtual bool IsCustomIgnored(MemberInfo info)
+		protected virtual bool IsIgnored(MemberInfo info)
 		{
-			if (DataNameResolver.GetAttribute<JsonIgnoreAttribute>(info) != null)
+			if (DataNameResolver.GetAttribute<DataIgnoreAttribute>(info) != null)
 			{
 				return true;
 			}
@@ -124,16 +108,17 @@ namespace JsonFx.Json
 		/// <param name="member"></param>
 		/// <param name="value"></param>
 		/// <returns></returns>
-		protected internal virtual bool IsValueIgnored(MemberInfo info, object target)
+		protected internal virtual bool IsValueIgnored(MemberInfo info, object target, out object value)
 		{
-			if (this.IsDefaultValue(info, DataNameResolver.GetMemberValue(target, info)))
+			value = DataNameResolver.GetMemberValue(target, info);
+			if (this.IsDefaultValue(info, value))
 			{
 				return true;
 			}
 
 			Type objType = info.ReflectedType ?? info.DeclaringType;
 
-			JsonSpecifiedPropertyAttribute specifiedProperty = DataNameResolver.GetAttribute<JsonSpecifiedPropertyAttribute>(info);
+			DataSpecifiedPropertyAttribute specifiedProperty = DataNameResolver.GetAttribute<DataSpecifiedPropertyAttribute>(info);
 			if (!String.IsNullOrEmpty(specifiedProperty.SpecifiedProperty))
 			{
 				PropertyInfo specProp = objType.GetProperty(specifiedProperty.SpecifiedProperty);
@@ -185,9 +170,9 @@ namespace JsonFx.Json
 		/// <returns></returns>
 		protected internal virtual string GetName(MemberInfo value)
 		{
-			JsonNameAttribute attribute = DataNameResolver.GetAttribute<JsonNameAttribute>(value);
+			DataNameAttribute attribute = DataNameResolver.GetAttribute<DataNameAttribute>(value);
 
-			// TODO: extend here for JsonNameAttribute, XmlNameAttribute, DataContractAttribute
+			// TODO: extend here for XmlNameAttribute, DataContractAttribute
 			return (attribute != null) ? attribute.Name : null;
 		}
 
@@ -266,10 +251,13 @@ namespace JsonFx.Json
 				IDictionary<string, MemberInfo> readMap = new Dictionary<string, MemberInfo>();
 				IDictionary<MemberInfo, string> writeMap = new Dictionary<MemberInfo, string>();
 
+				bool isAnonymousType = objectType.IsGenericType && objectType.Name.StartsWith(DataNameResolver.AnonymousTypePrefix);
+
 				// load properties into property map
 				foreach (PropertyInfo info in objectType.GetProperties())
 				{
-					if (this.IsIgnored(info))
+					if (this.IsPropertyIgnored(info, isAnonymousType) ||
+						this.IsIgnored(info))
 					{
 						continue;
 					}
@@ -287,7 +275,8 @@ namespace JsonFx.Json
 				// load fields into property map
 				foreach (FieldInfo info in objectType.GetFields())
 				{
-					if (this.IsIgnored(info))
+					if (this.IsFieldIgnored(info) ||
+						this.IsIgnored(info))
 					{
 						continue;
 					}

@@ -30,7 +30,7 @@
 
 using System;
 
-namespace JsonFx.Json
+namespace JsonFx.Serialization
 {
 	/// <summary>
 	/// Controls the serialization settings for IDataWriter

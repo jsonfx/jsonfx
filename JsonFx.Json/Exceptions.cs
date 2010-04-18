@@ -30,7 +30,7 @@
 
 using System;
 
-namespace JsonFx.Json
+namespace JsonFx.Serialization
 {
 	public class SerializationException : InvalidOperationException
 	{

@@ -31,12 +31,14 @@
 using System;
 using System.IO;
 
+using JsonFx.Serialization;
+
 namespace JsonFx.Json
 {
 	/// <summary>
 	/// JSON deserializer
 	/// </summary>
-	public class JsonReader : DataReader<JsonTokenType>
+	public partial class JsonReader : DataReader<JsonTokenType>
 	{
 		#region Init
 
@@ -65,12 +67,12 @@ namespace JsonFx.Json
 
 		#region IDataReader Methods
 
-		protected override ITokenizer<JsonTokenType> GetTokenizer(DataReaderSettings settings)
+		protected override IDataTokenizer<JsonTokenType> GetTokenizer(DataReaderSettings settings)
 		{
 			return new JsonTokenizer();
 		}
 
-		protected override IParser<JsonTokenType> GetParser(DataReaderSettings settings)
+		protected override IDataParser<JsonTokenType> GetParser(DataReaderSettings settings)
 		{
 			return new JsonParser(settings);
 		}

@@ -32,13 +32,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace JsonFx.Json
+namespace JsonFx.Serialization
 {
 	/// <summary>
 	/// Formats a sequence of tokens
 	/// </summary>
 	/// <typeparam name="T">token type</typeparam>
-	public interface IFormatter<T>
+	public interface IDataFormatter<T>
 	{
 		#region Methods
 

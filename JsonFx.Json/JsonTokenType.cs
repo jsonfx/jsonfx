@@ -98,8 +98,8 @@ namespace JsonFx.Json
 		ValueDelim,
 
 		/// <summary>
-		/// Unquoted Object Property name
+		/// Identifiers, Literal text
 		/// </summary>
-		Identifier
+		Literal
 	}
 }

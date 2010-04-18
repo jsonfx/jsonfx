@@ -30,36 +30,24 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 
-namespace JsonFx.Json
+namespace JsonFx.Serialization
 {
 	/// <summary>
-	/// Tokenizes a sequence of characters
+	/// Parses a sequence of tokens
 	/// </summary>
 	/// <typeparam name="T">token type</typeparam>
-	public interface ITokenizer<T>
+	public interface IDataParser<T>
 	{
-		#region Properties
-
-		/// <summary>
-		/// Gets the current position of the underlying input character sequence
-		/// </summary>
-		long Position
-		{
-			get;
-		}
-
-		#endregion Properties
-
 		#region Methods
 
 		/// <summary>
-		/// Tokenizes the input sequence into tokens
+		/// Parses the token sequence, coercing the result to Type targetType
 		/// </summary>
-		/// <param name="reader"></param>
+		/// <param name="tokens"></param>
+		/// <param name="targetType"></param>
 		/// <returns></returns>
-		IEnumerable<Token<T>> GetTokens(TextReader reader);
+		object Parse(IEnumerable<Token<T>> tokens, Type targetType);
 
 		#endregion Methods
 	}
