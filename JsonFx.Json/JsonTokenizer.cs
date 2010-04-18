@@ -38,7 +38,7 @@ using System.Text;
 namespace JsonFx.Json
 {
 	/// <summary>
-	/// Performs JSON lexical analysis over the input reader.
+	/// Performs JSON lexical analysis over the input reader
 	/// </summary>
 	public class JsonTokenizer : ITokenizer<JsonTokenType>
 	{
@@ -236,7 +236,7 @@ namespace JsonFx.Json
 				}
 			}
 
-			throw new JsonDeserializationException(JsonTokenizer.ErrorUnrecognizedToken, this.Reader.Position);
+			throw new DeserializationException(JsonTokenizer.ErrorUnrecognizedToken, this.Reader.Position);
 		}
 
 		private int SkipCommentsAndWhitespace(int ch)
@@ -256,7 +256,7 @@ namespace JsonFx.Json
 			ch = this.Reader.NextPeek();
 			if (ch < 0)
 			{
-				throw new JsonDeserializationException(JsonTokenizer.ErrorUnterminatedComment, commentStart);
+				throw new DeserializationException(JsonTokenizer.ErrorUnterminatedComment, commentStart);
 			}
 
 			bool isBlockComment;
@@ -270,7 +270,7 @@ namespace JsonFx.Json
 			}
 			else
 			{
-				throw new JsonDeserializationException(JsonTokenizer.ErrorUnterminatedComment, commentStart);
+				throw new DeserializationException(JsonTokenizer.ErrorUnterminatedComment, commentStart);
 			}
 
 			// start reading comment content
@@ -283,7 +283,7 @@ namespace JsonFx.Json
 					{
 						if (ch < 0)
 						{
-							throw new JsonDeserializationException(JsonTokenizer.ErrorUnterminatedComment, commentStart);
+							throw new DeserializationException(JsonTokenizer.ErrorUnterminatedComment, commentStart);
 						}
 					}
 
@@ -380,7 +380,7 @@ namespace JsonFx.Json
 
 			if (precision < 1)
 			{
-				throw new JsonDeserializationException(JsonTokenizer.ErrorIllegalNumber, numberStart);
+				throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, numberStart);
 			}
 
 			bool hasExponent = false;
@@ -394,7 +394,7 @@ namespace JsonFx.Json
 				pos++;
 				if (pos >= bufferSize)
 				{
-					throw new JsonDeserializationException(JsonTokenizer.ErrorIllegalNumber, numberStart);
+					throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, numberStart);
 				}
 
 				// optional minus/plus part
@@ -407,7 +407,7 @@ namespace JsonFx.Json
 
 				if (pos >= bufferSize || !Char.IsDigit(this.PeekBuffer[pos]))
 				{
-					throw new JsonDeserializationException(JsonTokenizer.ErrorIllegalNumber, numberStart);
+					throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, numberStart);
 				}
 
 				// exp part
@@ -432,7 +432,7 @@ namespace JsonFx.Json
 						NumberFormatInfo.InvariantInfo,
 						out number))
 				{
-					throw new JsonDeserializationException(JsonTokenizer.ErrorIllegalNumber, numberStart);
+					throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, numberStart);
 				}
 
 				if (number >= Int32.MinValue && number <= Int32.MaxValue)
@@ -460,7 +460,7 @@ namespace JsonFx.Json
 					 NumberFormatInfo.InvariantInfo,
 					 out number))
 				{
-					throw new JsonDeserializationException(JsonTokenizer.ErrorIllegalNumber, numberStart);
+					throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, numberStart);
 				}
 
 				// native EcmaScript number (IEEE-754)
@@ -503,7 +503,7 @@ namespace JsonFx.Json
 
 					if (Char.IsControl(ch) && ch != '\t')
 					{
-						throw new JsonDeserializationException(JsonTokenizer.ErrorUnterminatedString, stringStart);
+						throw new DeserializationException(JsonTokenizer.ErrorUnterminatedString, stringStart);
 					}
 
 					if (ch != JsonTokenizer.OperatorCharEscape)
@@ -525,7 +525,7 @@ namespace JsonFx.Json
 					if (count < 1)
 					{
 						// unexpected end of input
-						throw new JsonDeserializationException(JsonTokenizer.ErrorUnterminatedString, stringStart);
+						throw new DeserializationException(JsonTokenizer.ErrorUnterminatedString, stringStart);
 					}
 
 					// decode
@@ -601,7 +601,7 @@ namespace JsonFx.Json
 						{
 							if (Char.IsControl(ch) && ch != '\t')
 							{
-								throw new JsonDeserializationException(JsonTokenizer.ErrorUnterminatedString, stringStart);
+								throw new DeserializationException(JsonTokenizer.ErrorUnterminatedString, stringStart);
 							}
 
 							builder.Append(ch);
@@ -621,7 +621,7 @@ namespace JsonFx.Json
 			}
 
 			// reached END before string delim
-			throw new JsonDeserializationException(JsonTokenizer.ErrorUnterminatedString, stringStart);
+			throw new DeserializationException(JsonTokenizer.ErrorUnterminatedString, stringStart);
 		}
 
 		private Token<JsonTokenType> ScanKeywords(string ident, int unary)

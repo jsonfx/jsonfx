@@ -41,7 +41,6 @@ namespace JsonFx.Json
 		#region Fields
 
 		private readonly DataReaderSettings settings;
-		private readonly IParser<T> parser;
 
 		#endregion Fields
 
@@ -51,7 +50,7 @@ namespace JsonFx.Json
 		/// Ctor
 		/// </summary>
 		/// <param name="settings"></param>
-		public DataReader(IParser<T> parser, DataReaderSettings settings)
+		public DataReader(DataReaderSettings settings)
 		{
 			this.settings = settings;
 		}
@@ -74,14 +73,6 @@ namespace JsonFx.Json
 		public DataReaderSettings Settings
 		{
 			get { return this.settings; }
-		}
-
-		/// <summary>
-		/// Gets the parser used for deserialization
-		/// </summary>
-		public IParser<T> Parser
-		{
-			get { return this.parser; }
 		}
 
 		#endregion Properties
@@ -117,22 +108,25 @@ namespace JsonFx.Json
 		public virtual object Deserialize(TextReader input, Type targetType)
 		{
 			ITokenizer<T> tokenizer = this.GetTokenizer(input);
+			IParser<T> parser = this.GetParser(this.Settings);
 
 			try
 			{
-				return this.Parser.Parse(tokenizer, targetType);
+				return parser.Parse(tokenizer, targetType);
 			}
-			catch (JsonDeserializationException)
+			catch (DeserializationException)
 			{
 				throw;
 			}
 			catch (Exception ex)
 			{
-				throw new JsonDeserializationException(ex.Message, tokenizer.Position, ex);
+				throw new DeserializationException(ex.Message, tokenizer.Position, ex);
 			}
 		}
 
 		protected abstract ITokenizer<T> GetTokenizer(TextReader input);
+
+		protected abstract IParser<T> GetParser(DataReaderSettings settings);
 
 		#endregion Methods
 	}

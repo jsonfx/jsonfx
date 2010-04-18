@@ -148,7 +148,7 @@ namespace JsonFx.Json
 		{
 			if (!objectType.IsSubclassOf(typeof(T)))
 			{
-				throw new JsonTypeCoercionException(String.Format(
+				throw new TypeCoercionException(String.Format(
 					DataReaderSettings.ErrorCannotInstantiateAsT,
 					objectType.FullName,
 					typeof(T).FullName));
@@ -168,7 +168,7 @@ namespace JsonFx.Json
 
 			if (targetType.IsInterface || targetType.IsAbstract || targetType.IsValueType)
 			{
-				throw new JsonTypeCoercionException(String.Format(
+				throw new TypeCoercionException(String.Format(
 					DataReaderSettings.ErrorCannotInstantiate,
 					targetType.FullName));
 			}
@@ -176,7 +176,7 @@ namespace JsonFx.Json
 			ConstructorInfo ctor = targetType.GetConstructor(Type.EmptyTypes);
 			if (ctor == null)
 			{
-				throw new JsonTypeCoercionException(String.Format(
+				throw new TypeCoercionException(String.Format(
 					DataReaderSettings.ErrorDefaultCtor,
 					targetType.FullName));
 			}
@@ -190,10 +190,10 @@ namespace JsonFx.Json
 			{
 				if (ex.InnerException != null)
 				{
-					throw new JsonTypeCoercionException(ex.InnerException.Message, ex.InnerException);
+					throw new TypeCoercionException(ex.InnerException.Message, ex.InnerException);
 				}
 
-				throw new JsonTypeCoercionException("Error instantiating " + targetType.FullName, ex);
+				throw new TypeCoercionException("Error instantiating " + targetType.FullName, ex);
 			}
 
 			return result;
@@ -281,7 +281,7 @@ namespace JsonFx.Json
 			}
 			else if (targetType != null && targetType.GetInterface(DataReaderSettings.TypeGenericIDictionary) != null)
 			{
-				throw new JsonTypeCoercionException(String.Format(
+				throw new TypeCoercionException(String.Format(
 					DataReaderSettings.ErrorGenericIDictionary,
 					targetType));
 			}
@@ -356,7 +356,7 @@ namespace JsonFx.Json
 					targetType.IsValueType &&
 					!isNullable)
 				{
-					throw new JsonTypeCoercionException(String.Format(
+					throw new TypeCoercionException(String.Format(
 						DataReaderSettings.ErrorNullValueType,
 						targetType.FullName));
 				}
@@ -481,7 +481,7 @@ namespace JsonFx.Json
 			}
 			catch (Exception ex)
 			{
-				throw new JsonTypeCoercionException(
+				throw new TypeCoercionException(
 					String.Format(
 						"Error converting {0} to {1}",
 						value.GetType().FullName,
@@ -568,7 +568,7 @@ namespace JsonFx.Json
 
 			if (defaultCtor == null)
 			{
-				throw new JsonTypeCoercionException(String.Format(
+				throw new TypeCoercionException(String.Format(
 					DataReaderSettings.ErrorDefaultCtor,
 					targetType.FullName));
 			}
@@ -582,9 +582,9 @@ namespace JsonFx.Json
 			{
 				if (ex.InnerException != null)
 				{
-					throw new JsonTypeCoercionException(ex.InnerException.Message, ex.InnerException);
+					throw new TypeCoercionException(ex.InnerException.Message, ex.InnerException);
 				}
-				throw new JsonTypeCoercionException("Error instantiating " + targetType.FullName, ex);
+				throw new TypeCoercionException("Error instantiating " + targetType.FullName, ex);
 			}
 
 			// many ICollection types have an AddRange method
@@ -610,9 +610,9 @@ namespace JsonFx.Json
 				{
 					if (ex.InnerException != null)
 					{
-						throw new JsonTypeCoercionException(ex.InnerException.Message, ex.InnerException);
+						throw new TypeCoercionException(ex.InnerException.Message, ex.InnerException);
 					}
-					throw new JsonTypeCoercionException("Error calling AddRange on " + targetType.FullName, ex);
+					throw new TypeCoercionException("Error calling AddRange on " + targetType.FullName, ex);
 				}
 				return collection;
 			}
@@ -644,9 +644,9 @@ namespace JsonFx.Json
 						{
 							if (ex.InnerException != null)
 							{
-								throw new JsonTypeCoercionException(ex.InnerException.Message, ex.InnerException);
+								throw new TypeCoercionException(ex.InnerException.Message, ex.InnerException);
 							}
-							throw new JsonTypeCoercionException("Error calling Add on " + targetType.FullName, ex);
+							throw new TypeCoercionException("Error calling Add on " + targetType.FullName, ex);
 						}
 					}
 					return collection;
@@ -660,7 +660,7 @@ namespace JsonFx.Json
 			}
 			catch (Exception ex)
 			{
-				throw new JsonTypeCoercionException(
+				throw new TypeCoercionException(
 					String.Format(
 						"Error converting {0} to {1}",
 						value.GetType().FullName,

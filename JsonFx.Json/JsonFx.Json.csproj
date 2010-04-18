@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataReader`1.cs" />
+    <Compile Include="Exceptions.cs" />
     <Compile Include="IParser`1.cs" />
     <Compile Include="JsonParser.cs">
       <SubType>Code</SubType>
@@ -69,7 +70,6 @@
     <Compile Include="ITokenizer`1.cs" />
     <Compile Include="JsonIgnoreAttribute.cs" />
     <Compile Include="JsonNameAttribute.cs" />
-    <Compile Include="JsonSerializationException.cs" />
     <Compile Include="JsonSpecifiedPropertyAttribute.cs">
       <SubType>Code</SubType>
     </Compile>

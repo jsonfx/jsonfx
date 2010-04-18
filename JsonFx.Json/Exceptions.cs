@@ -32,17 +32,17 @@ using System;
 
 namespace JsonFx.Json
 {
-	public class JsonSerializationException : InvalidOperationException
+	public class SerializationException : InvalidOperationException
 	{
 		#region Init
 
-		public JsonSerializationException() : base() { }
+		public SerializationException() : base() { }
 
-		public JsonSerializationException(string message) : base(message) { }
+		public SerializationException(string message) : base(message) { }
 
-		public JsonSerializationException(string message, Exception innerException) : base(message, innerException) { }
+		public SerializationException(string message, Exception innerException) : base(message, innerException) { }
 
-		public JsonSerializationException(
+		public SerializationException(
 			System.Runtime.Serialization.SerializationInfo info,
 			System.Runtime.Serialization.StreamingContext context)
 			: base(info, context)
@@ -52,7 +52,7 @@ namespace JsonFx.Json
 		#endregion Init
 	}
 
-	public class JsonDeserializationException : JsonSerializationException
+	public class DeserializationException : SerializationException
 	{
 		#region Fields
 
@@ -62,19 +62,19 @@ namespace JsonFx.Json
 
 		#region Init
 
-		public JsonDeserializationException(string message, long index)
+		public DeserializationException(string message, long index)
 			: base(message)
 		{
 			this.position = index;
 		}
 
-		public JsonDeserializationException(string message, long index, Exception innerException)
+		public DeserializationException(string message, long index, Exception innerException)
 			: base(message, innerException)
 		{
 			this.position = index;
 		}
 
-		public JsonDeserializationException(
+		public DeserializationException(
 			System.Runtime.Serialization.SerializationInfo info,
 			System.Runtime.Serialization.StreamingContext context)
 			: base(info, context)
@@ -132,17 +132,17 @@ namespace JsonFx.Json
 		#endregion Methods
 	}
 
-	public class JsonTypeCoercionException : ArgumentException
+	public class TypeCoercionException : ArgumentException
 	{
 		#region Init
 
-		public JsonTypeCoercionException() : base() { }
+		public TypeCoercionException() : base() { }
 
-		public JsonTypeCoercionException(string message) : base(message) { }
+		public TypeCoercionException(string message) : base(message) { }
 
-		public JsonTypeCoercionException(string message, Exception innerException) : base(message, innerException) { }
+		public TypeCoercionException(string message, Exception innerException) : base(message, innerException) { }
 
-		public JsonTypeCoercionException(
+		public TypeCoercionException(
 			System.Runtime.Serialization.SerializationInfo info,
 			System.Runtime.Serialization.StreamingContext context)
 			: base(info, context)

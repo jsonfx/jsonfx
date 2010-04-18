@@ -45,7 +45,7 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="settings"></param>
 		public JsonReader(DataReaderSettings settings)
-			: base(new JsonParser(settings), settings)
+			: base(settings)
 		{
 		}
 
@@ -68,6 +68,11 @@ namespace JsonFx.Json
 		protected override ITokenizer<JsonTokenType> GetTokenizer(TextReader input)
 		{
 			return new JsonTokenizer(input);
+		}
+
+		protected override IParser<JsonTokenType> GetParser(DataReaderSettings settings)
+		{
+			return new JsonParser(settings);
 		}
 
 		#endregion IDataReader Methods
