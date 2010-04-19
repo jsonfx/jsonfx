@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IO\BufferedTextReader.cs" />
+    <Compile Include="Json\IJsonSerializable.cs" />
     <Compile Include="Json\JsonFormatter.cs" />
     <Compile Include="Json\JsonGenerator.cs" />
     <Compile Include="Json\JsonGrammar.cs" />

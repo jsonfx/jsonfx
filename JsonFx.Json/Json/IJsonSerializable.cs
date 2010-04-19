@@ -29,30 +29,12 @@
 #endregion License
 
 using System;
-using System.Collections.Generic;
-using System.IO;
 
-namespace JsonFx.Serialization
+using JsonFx.Serialization;
+
+namespace JsonFx.Json
 {
-	/// <summary>
-	/// Allows classes to control their own serialization
-	/// </summary>
-	public interface ISerializable<T>
+	public interface IJsonSerializable : ISerializable<JsonTokenType>
 	{
-		/// <summary>
-		/// Allows a class to act as a factory for its type via input Token&lt;T&gt; sequence
-		/// </summary>
-		/// <param name="tokens">input tokens</param>
-		/// <returns>the deserialized value</returns>
-		/// <remarks>
-		/// Can act as a factory returning result or can populate and return self.
-		/// </remarks>
-		object Read(IEnumerable<Token<T>> tokens);
-
-		/// <summary>
-		/// Allows a class to serialize itself as Token&lt;T&gt; sequence
-		/// </summary>
-		/// <returns>output tokens</returns>
-		IEnumerable<Token<T>> Write();
 	}
 }
