@@ -34,6 +34,9 @@ using JsonFx.Serialization;
 
 namespace JsonFx.Json
 {
+	/// <summary>
+	/// Allows classes to control their own JSON serialization
+	/// </summary>
 	public interface IJsonSerializable : ISerializable<JsonTokenType>
 	{
 	}
