@@ -35,7 +35,7 @@ using System.IO;
 namespace JsonFx.Serialization
 {
 	/// <summary>
-	/// Formats a sequence of tokens
+	/// Ouputs text from a SAX-like input stream of JSON tokens
 	/// </summary>
 	/// <typeparam name="T">token type</typeparam>
 	public interface IDataFormatter<T>

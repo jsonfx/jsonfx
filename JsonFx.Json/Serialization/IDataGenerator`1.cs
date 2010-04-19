@@ -34,7 +34,7 @@ using System.Collections.Generic;
 namespace JsonFx.Serialization
 {
 	/// <summary>
-	/// Generates a sequence of tokens
+	/// Generates a SAX-like sequence of tokens from an object graph
 	/// </summary>
 	/// <typeparam name="T">token type</typeparam>
 	public interface IDataGenerator<T>

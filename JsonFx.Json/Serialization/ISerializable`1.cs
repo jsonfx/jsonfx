@@ -29,6 +29,8 @@
 #endregion License
 
 using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace JsonFx.Serialization
 {
@@ -37,10 +39,16 @@ namespace JsonFx.Serialization
 	/// </summary>
 	public interface ISerializable<T>
 	{
-		// TODO: determine best interface to hook into
+		/// <summary>
+		/// Allows a class to populate itself via input Token&lt;T&gt; sequence
+		/// </summary>
+		/// <param name="tokens">input tokens</param>
+		void Read(IEnumerable<Token<T>> tokens);
 
-		//void ReadData(IDataReader reader);
-
-		//void WriteData(IDataWriter writer);
+		/// <summary>
+		/// Allows a class to serialize itself as Token&lt;T&gt; sequence
+		/// </summary>
+		/// <returns>output tokens</returns>
+		IEnumerable<Token<T>> Write();
 	}
 }

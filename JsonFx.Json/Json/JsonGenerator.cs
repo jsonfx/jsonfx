@@ -39,7 +39,7 @@ namespace JsonFx.Json
 	public partial class JsonWriter
 	{
 		/// <summary>
-		/// Generates a sequence of tokens
+		/// Generates a SAX-like sequence of JSON tokens from an object graph
 		/// </summary>
 		public class JsonGenerator : IDataGenerator<JsonTokenType>
 		{
@@ -71,6 +71,16 @@ namespace JsonFx.Json
 			/// <returns></returns>
 			public IEnumerable<Token<JsonTokenType>> GetTokens(object value)
 			{
+				ISerializable<JsonTokenType> serializable = value as ISerializable<JsonTokenType>;
+				if (serializable != null)
+				{
+					foreach (Token<JsonTokenType> token in serializable.Write())
+					{
+						yield return token;
+					}
+					yield break;
+				}
+
 				// TODO: walk the object graph
 				yield break;
 			}

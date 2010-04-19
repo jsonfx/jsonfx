@@ -40,7 +40,7 @@ namespace JsonFx.Json
 	public partial class JsonReader
 	{
 		/// <summary>
-		/// JSON deserializer
+		/// Consumes a SAX-like sequence of JSON tokens to produce an object graph optionally coerced to a given type
 		/// </summary>
 		public class JsonParser : IDataParser<JsonTokenType>
 		{
@@ -95,6 +95,16 @@ namespace JsonFx.Json
 			/// <returns></returns>
 			public object Parse(IEnumerable<Token<JsonTokenType>> tokenizer, Type targetType)
 			{
+				if (typeof(ISerializable<JsonTokenType>).IsAssignableFrom(targetType))
+				{
+					ISerializable<JsonTokenType> serializable = this.Settings.InstantiateObject<ISerializable<JsonTokenType>>(targetType);
+					if (serializable != null)
+					{
+						serializable.Read(tokenizer);
+						return serializable;
+					}
+				}
+
 				IEnumerator<Token<JsonTokenType>> tokens = tokenizer.GetEnumerator();
 				if (!tokens.MoveNext())
 				{

@@ -43,7 +43,7 @@ namespace JsonFx.Json
 	public partial class JsonReader
 	{
 		/// <summary>
-		/// Performs JSON lexical analysis over the input reader
+		/// Generates a SAX-like sequence of JSON tokens from text
 		/// </summary>
 		public class JsonTokenizer : IDataTokenizer<JsonTokenType>
 		{
@@ -62,7 +62,7 @@ namespace JsonFx.Json
 
 			#region Fields
 
-			private BufferedTextReader Reader;
+			private BufferedTextReader Reader = BufferedTextReader.Null;
 			private readonly char[] PeekBuffer;
 
 			#endregion Fields
@@ -102,6 +102,14 @@ namespace JsonFx.Json
 			public long Position
 			{
 				get { return this.Reader.Position; }
+			}
+
+			/// <summary>
+			/// Gets the underlying TextReader
+			/// </summary>
+			public TextReader TextReader
+			{
+				get { return this.Reader; }
 			}
 
 			#endregion Properties
@@ -715,7 +723,8 @@ namespace JsonFx.Json
 
 			public IEnumerable<Token<JsonTokenType>> GetTokens(TextReader reader)
 			{
-				this.Reader = new BufferedTextReader(reader, this.PeekBuffer.Length);
+				// use the reader directly if is a BufferedTextReader
+				this.Reader = (reader as BufferedTextReader) ?? new BufferedTextReader(reader, this.PeekBuffer.Length);
 
 				while (true)
 				{

@@ -39,13 +39,14 @@ namespace JsonFx.Json
 	public partial class JsonWriter
 	{
 		/// <summary>
-		/// Ouput JSON text from a SAX-like input stream of JSON tokens
+		/// Ouputs JSON text from a SAX-like input stream of JSON tokens
 		/// </summary>
 		public class JsonFormatter : IDataFormatter<JsonTokenType>
 		{
 			#region Fields
 
 			private readonly DataWriterSettings Settings;
+			private TextWriter Writer = TextWriter.Null;
 			private int depth = 0;
 
 			#endregion Fields
@@ -62,6 +63,26 @@ namespace JsonFx.Json
 			}
 
 			#endregion Init
+
+			#region Properties
+
+			/// <summary>
+			/// Gets the total number of characters read from the input
+			/// </summary>
+			public int Depth
+			{
+				get { return this.depth; }
+			}
+
+			/// <summary>
+			/// Gets the underlying TextWriter
+			/// </summary>
+			public TextWriter TextWriter
+			{
+				get { return this.Writer; }
+			}
+
+			#endregion Properties
 
 			#region Methods
 

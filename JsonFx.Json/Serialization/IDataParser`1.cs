@@ -34,7 +34,7 @@ using System.Collections.Generic;
 namespace JsonFx.Serialization
 {
 	/// <summary>
-	/// Parses a sequence of tokens
+	/// Consumes a SAX-like sequence of tokens to produce an object graph, optionally coerced to a given type
 	/// </summary>
 	/// <typeparam name="T">token type</typeparam>
 	public interface IDataParser<T>
@@ -45,7 +45,7 @@ namespace JsonFx.Serialization
 		/// Parses the token sequence, coercing the result to Type targetType
 		/// </summary>
 		/// <param name="tokens"></param>
-		/// <param name="targetType"></param>
+		/// <param name="targetType">optional type for coercion</param>
 		/// <returns></returns>
 		object Parse(IEnumerable<Token<T>> tokens, Type targetType);
 

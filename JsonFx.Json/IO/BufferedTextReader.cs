@@ -41,6 +41,7 @@ namespace JsonFx.IO
 	{
 		#region Constants
 
+		public new static readonly BufferedTextReader Null = new BufferedTextReader(TextReader.Null, 1);
 		private const int DefaultBufferSize = 1024;
 		private const int MinBufferSize = 128;
 
