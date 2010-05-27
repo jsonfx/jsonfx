@@ -281,6 +281,7 @@ namespace JsonFx.Json
 
 			private Token<JsonTokenType> ScanNumber()
 			{
+				// store for error cases
 				long numberStart = this.Reader.Position;
 
 				int bufferSize = this.Reader.Peek(this.PeekBuffer);
@@ -362,7 +363,7 @@ namespace JsonFx.Json
 
 					// optional minus/plus part
 					if (this.PeekBuffer[pos] == JsonGrammar.OperatorUnaryMinus ||
-					this.PeekBuffer[pos] == JsonGrammar.OperatorUnaryPlus)
+						this.PeekBuffer[pos] == JsonGrammar.OperatorUnaryPlus)
 					{
 						// consume sign
 						pos++;
@@ -440,9 +441,9 @@ namespace JsonFx.Json
 				long stringStart = this.Reader.Position;
 				char stringDelim = (char)this.Reader.Read();
 
-				StringBuilder builder = new StringBuilder(JsonTokenizer.MinBufferLength);
+				StringBuilder builder = new StringBuilder(this.PeekBuffer.Length);
 
-				// fill buffer
+				// fill initial buffer
 				int count = this.Reader.Peek(this.PeekBuffer);
 				while (count > 0)
 				{
@@ -476,7 +477,10 @@ namespace JsonFx.Json
 						}
 
 						// append before 
-						builder.Append(this.PeekBuffer, start, i-start);
+						if (i > start)
+						{
+							builder.Append(this.PeekBuffer, start, i-start);
+						}
 
 						// flush prefix and escape char
 						this.Reader.Flush(i+1);
