@@ -436,165 +436,6 @@ namespace JsonFx.Json
 				}
 			}
 
-			private Token<JsonTokenType> ScanStringBuffered()
-			{
-				// TODO: simplify this so that it just leverages the BufferedTextReader's buffer
-				// then do a performance comparison with original
-
-				// store for unterminated case
-				long stringStart = this.Reader.Position;
-				char stringDelim = (char)this.Reader.Read();
-
-				StringBuilder builder = new StringBuilder(this.BufferSize);
-
-				// fill initial buffer
-				int count = this.Reader.Peek(this.PeekBuffer);
-				while (count > 0)
-				{
-					int start = 0;
-					for (int i=start; i<count; i++)
-					{
-						char ch = this.PeekBuffer[i];
-
-						// check each character for ending delim
-						if (ch == stringDelim)
-						{
-							// append final segment
-							builder.Append(this.PeekBuffer, start, i-start);
-
-							// flush string and closing delim
-							this.Reader.Flush(i+1);
-
-							// output string
-							return new Token<JsonTokenType>(JsonTokenType.String, builder.ToString());
-						}
-
-						if (Char.IsControl(ch) && ch != '\t')
-						{
-							throw new DeserializationException(JsonTokenizer.ErrorUnterminatedString, stringStart);
-						}
-
-						if (ch != JsonGrammar.OperatorCharEscape)
-						{
-							// accumulate
-							continue;
-						}
-
-						if (i > start)
-						{
-							// append segment before escape
-							builder.Append(this.PeekBuffer, start, i-start);
-						}
-
-						// flush prefix and escape char
-						this.Reader.Flush(i+1);
-
-						// ensure full buffer
-						count = this.Reader.Peek(this.PeekBuffer);
-						start = i = 0;
-
-						if (count < 1)
-						{
-							// unexpected end of input
-							throw new DeserializationException(JsonTokenizer.ErrorUnterminatedString, stringStart);
-						}
-
-						// decode
-						ch = this.PeekBuffer[i];
-						switch (ch)
-						{
-							case '0':
-							{
-								// don't allow NULL char '\0'
-								// causes CStrings to terminate
-								break;
-							}
-							case 'b':
-							{
-								// backspace
-								builder.Append('\b');
-								break;
-							}
-							case 'f':
-							{
-								// formfeed
-								builder.Append('\f');
-								break;
-							}
-							case 'n':
-							{
-								// newline
-								builder.Append('\n');
-								break;
-							}
-							case 'r':
-							{
-								// carriage return
-								builder.Append('\r');
-								break;
-							}
-							case 't':
-							{
-								// tab
-								builder.Append('\t');
-								break;
-							}
-							case 'u':
-							{
-								// Unicode escape sequence
-								// e.g. Copyright: "\u00A9"
-
-								const int UnicodeEscapeLength = 4;
-
-								// unicode ordinal
-								int utf16;
-								if (start+UnicodeEscapeLength < count &&
-						        Int32.TryParse(
-									new String(this.PeekBuffer, i+1, UnicodeEscapeLength),
-									NumberStyles.AllowHexSpecifier,
-									NumberFormatInfo.InvariantInfo,
-									out utf16))
-								{
-									builder.Append(Char.ConvertFromUtf32(utf16));
-									i += UnicodeEscapeLength;
-									start += UnicodeEscapeLength;
-								}
-								else
-								{
-									// using FireFox style recovery, if not a valid hex
-									// escape sequence then treat as single escaped 'u'
-									// followed by rest of string
-									goto default;
-								}
-								break;
-							}
-							default:
-							{
-								if (Char.IsControl(ch) && ch != '\t')
-								{
-									throw new DeserializationException(JsonTokenizer.ErrorUnterminatedString, stringStart);
-								}
-
-								builder.Append(ch);
-								break;
-							}
-						}
-
-						start++;
-					}
-
-					// append remaining buffered segment and flush
-					builder.Append(this.PeekBuffer, start, count-start);
-					this.Reader.Flush(count);
-
-					// refill buffer
-					count = this.Reader.Peek(this.PeekBuffer);
-				}
-
-				// reached END before string delim
-				throw new DeserializationException(JsonTokenizer.ErrorUnterminatedString, stringStart);
-			}
-
 			private Token<JsonTokenType> ScanString()
 			{
 				// store for unterminated case
@@ -834,46 +675,34 @@ namespace JsonFx.Json
 			/// </remarks>
 			private string ScanIdentifier()
 			{
-				StringBuilder ident = new StringBuilder(JsonTokenizer.MinBufferLength);
-
-				int bufferSize = this.Reader.Peek(this.PeekBuffer);
-
 				bool identPart = false;
-				while (bufferSize > 0)
+
+				int i = 0;
+				while (true)
 				{
-					int i;
-					for (i=0; i<bufferSize; i++)
-					{
-						char ch = this.PeekBuffer[i];
+					char ch = (char)this.Reader.Peek(i);
 
-						// digits are only allowed after first char
-						// rest can be in head or tail
-						if ((identPart && Char.IsDigit(ch)) ||
+					// digits are only allowed after first char
+					// rest can be in head or tail
+					if ((ch > 0) &&
+						(identPart && Char.IsDigit(ch)) ||
 						Char.IsLetter(ch) || ch == '_' || ch == '$')
-						{
-							identPart = true;
-							continue;
-						}
-
-						// append partial
-						ident.Append(this.PeekBuffer, 0, i);
-						if (i > 0)
-						{
-							this.Reader.Flush(i);
-						}
-						return ident.ToString();
-					}
-
-					// append entire buffer
-					ident.Append(this.PeekBuffer, 0, bufferSize);
-					if (bufferSize > 0)
 					{
-						this.Reader.Flush(bufferSize);
+						identPart = true;
+						i++;
+						continue;
 					}
-					bufferSize = this.Reader.Peek(this.PeekBuffer);
-				}
 
-				return ident.ToString();
+					// append partial
+					if (i < 0)
+					{
+						return String.Empty;
+					}
+
+					StringBuilder ident = new StringBuilder(i, i);
+					this.Reader.Flush(i, ident);
+					return ident.ToString();
+				}
 			}
 
 			#endregion Scanning Methods
