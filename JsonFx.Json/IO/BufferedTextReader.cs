@@ -111,19 +111,24 @@ namespace JsonFx.IO
 
 		#region TextReader Methods
 
+		public override int Peek()
+		{
+			return this.Peek(0);
+		}
+
 		/// <summary>
 		/// Reads the next character without advancing the input position.
 		/// </summary>
 		/// <returns>the next character to be read or -1 if no more characters are available</returns>
-		public override int Peek()
+		public virtual int Peek(int i)
 		{
-			this.EnsureBuffer(1);
-			if (this.count < 1)
+			this.EnsureBuffer(i+1);
+			if (this.count < i+1)
 			{
 				return -1;
 			}
 
-			return this.buffer[this.start];
+			return this.buffer[this.start+i];
 		}
 
 		/// <summary>
@@ -375,10 +380,25 @@ namespace JsonFx.IO
 		/// <param name="count"></param>
 		public void Flush(int count)
 		{
+			this.Flush(count, null);
+		}
+
+		/// <summary>
+		/// Advances the character position by count characters.
+		/// </summary>
+		/// <param name="count"></param>
+		/// <param name="builder"></param>
+		public void Flush(int count, StringBuilder builder)
+		{
 			this.EnsureBuffer(count);
 			if (this.count < count)
 			{
 				throw new ArgumentOutOfRangeException("count", "Attempted to flush beyond end of input.");
+			}
+
+			if (builder != null)
+			{
+				builder.Append(this.buffer, this.start, count);
 			}
 
 			this.position += count;

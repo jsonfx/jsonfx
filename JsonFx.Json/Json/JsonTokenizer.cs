@@ -51,6 +51,7 @@ namespace JsonFx.Json
 
 			private const int MinBufferLength = 128; // must hold longest number sequence
 			private const int DefaultBufferSize = 1024;
+			private const int UnicodeEscapeLength = 4;
 
 			// tokenizing errors
 			private const string ErrorUnrecognizedToken = "Illegal JSON sequence";
@@ -64,6 +65,8 @@ namespace JsonFx.Json
 
 			private BufferedTextReader Reader = BufferedTextReader.Null;
 			private readonly char[] PeekBuffer;
+			private readonly int BufferSize;
+			private char[] escapeBuffer;
 
 			#endregion Fields
 
@@ -84,12 +87,13 @@ namespace JsonFx.Json
 			/// <param name="bufferSize">read buffer size</param>
 			public JsonTokenizer(int bufferSize)
 			{
-				if (bufferSize < JsonTokenizer.MinBufferLength)
+				this.BufferSize = bufferSize;
+				if (this.BufferSize < JsonTokenizer.MinBufferLength)
 				{
-					bufferSize = JsonTokenizer.MinBufferLength;
+					this.BufferSize = JsonTokenizer.MinBufferLength;
 				}
 
-				this.PeekBuffer = new char[bufferSize];
+				this.PeekBuffer = new char[this.BufferSize];
 			}
 
 			#endregion Init
@@ -432,7 +436,7 @@ namespace JsonFx.Json
 				}
 			}
 
-			private Token<JsonTokenType> ScanString()
+			private Token<JsonTokenType> ScanStringBuffered()
 			{
 				// TODO: simplify this so that it just leverages the BufferedTextReader's buffer
 				// then do a performance comparison with original
@@ -441,7 +445,7 @@ namespace JsonFx.Json
 				long stringStart = this.Reader.Position;
 				char stringDelim = (char)this.Reader.Read();
 
-				StringBuilder builder = new StringBuilder(this.PeekBuffer.Length);
+				StringBuilder builder = new StringBuilder(this.BufferSize);
 
 				// fill initial buffer
 				int count = this.Reader.Peek(this.PeekBuffer);
@@ -476,9 +480,9 @@ namespace JsonFx.Json
 							continue;
 						}
 
-						// append before 
 						if (i > start)
 						{
+							// append segment before escape
 							builder.Append(this.PeekBuffer, start, i-start);
 						}
 
@@ -589,6 +593,157 @@ namespace JsonFx.Json
 
 				// reached END before string delim
 				throw new DeserializationException(JsonTokenizer.ErrorUnterminatedString, stringStart);
+			}
+
+			private Token<JsonTokenType> ScanString()
+			{
+				// store for unterminated case
+				long stringStart = this.Reader.Position;
+				char stringDelim = (char)this.Reader.Read();
+
+				StringBuilder builder = new StringBuilder();
+
+				int i=0;
+				while (true)
+				{
+					char ch = (char)this.Reader.Peek(i);
+					if (ch < 0)
+					{
+						// reached END before string delim
+						throw new DeserializationException(JsonTokenizer.ErrorUnterminatedString, stringStart);
+					}
+
+					// check each character for ending delim
+					if (ch == stringDelim)
+					{
+						if (i > 0)
+						{
+							// append final segment and flush string
+							this.Reader.Flush(i, builder);
+						}
+
+						// flush closing delim
+						this.Reader.Flush(1);
+
+						// output string
+						return new Token<JsonTokenType>(JsonTokenType.String, builder.ToString());
+					}
+
+					if (Char.IsControl(ch) && ch != '\t')
+					{
+						throw new DeserializationException(JsonTokenizer.ErrorUnterminatedString, stringStart);
+					}
+
+					if (ch != JsonGrammar.OperatorCharEscape)
+					{
+						// accumulate
+						i++;
+						continue;
+					}
+
+					if (i > 0)
+					{
+						// append segment before escape
+						this.Reader.Flush(i, builder);
+						i = 0;
+					}
+
+					// flush escape char
+					this.Reader.Flush(1);
+
+					// decode
+					ch = (char)this.Reader.Read();
+					if (ch < 0)
+					{
+						// unexpected end of input
+						throw new DeserializationException(JsonTokenizer.ErrorUnterminatedString, stringStart);
+					}
+
+					switch (ch)
+					{
+						case '0':
+						{
+							// don't allow NULL char '\0'
+							// causes CStrings to terminate
+							break;
+						}
+						case 'b':
+						{
+							// backspace
+							builder.Append('\b');
+							break;
+						}
+						case 'f':
+						{
+							// formfeed
+							builder.Append('\f');
+							break;
+						}
+						case 'n':
+						{
+							// newline
+							builder.Append('\n');
+							break;
+						}
+						case 'r':
+						{
+							// carriage return
+							builder.Append('\r');
+							break;
+						}
+						case 't':
+						{
+							// tab
+							builder.Append('\t');
+							break;
+						}
+						case 'u':
+						{
+							// Unicode escape sequence
+							// e.g. Copyright: "\u00A9"
+
+							if (this.escapeBuffer == null)
+							{
+								this.escapeBuffer = new char[JsonTokenizer.UnicodeEscapeLength];
+							}
+
+							int count = this.Reader.Peek(this.escapeBuffer, 0, JsonTokenizer.UnicodeEscapeLength);
+
+							// unicode ordinal
+							int utf16;
+							if (count == JsonTokenizer.UnicodeEscapeLength &&
+						        Int32.TryParse(
+									new String(this.escapeBuffer),
+									NumberStyles.AllowHexSpecifier,
+									NumberFormatInfo.InvariantInfo,
+									out utf16))
+							{
+								builder.Append(Char.ConvertFromUtf32(utf16));
+
+								// flush escape char
+								this.Reader.Flush(JsonTokenizer.UnicodeEscapeLength);
+							}
+							else
+							{
+								// using FireFox style recovery, if not a valid hex
+								// escape sequence then treat as single escaped 'u'
+								// followed by rest of string
+								goto default;
+							}
+							break;
+						}
+						default:
+						{
+							if (Char.IsControl(ch) && ch != '\t')
+							{
+								throw new DeserializationException(JsonTokenizer.ErrorUnterminatedString, stringStart);
+							}
+
+							builder.Append(ch);
+							break;
+						}
+					}
+				}
 			}
 
 			private Token<JsonTokenType> ScanKeywords(string ident, int unary)
@@ -728,7 +883,7 @@ namespace JsonFx.Json
 			public IEnumerable<Token<JsonTokenType>> GetTokens(TextReader reader)
 			{
 				// use the reader directly if is a BufferedTextReader
-				this.Reader = (reader as BufferedTextReader) ?? new BufferedTextReader(reader, this.PeekBuffer.Length);
+				this.Reader = (reader as BufferedTextReader) ?? new BufferedTextReader(reader, this.BufferSize);
 
 				while (true)
 				{
