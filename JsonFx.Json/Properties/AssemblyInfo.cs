@@ -46,4 +46,4 @@ using System.Runtime.InteropServices;
 #endif
 [assembly: ComVisible(false)]
 [assembly: Guid("D98A5EF8-4709-4FF8-B162-8EA04B281400")]
-[assembly: InternalsVisibleTo("JsonFx.Json.Test")]
+[assembly: InternalsVisibleTo("JsonFx.Json.Tests")]
