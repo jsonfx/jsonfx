@@ -49,9 +49,6 @@ namespace JsonFx.Json
 		{
 			#region Constants
 
-			private const int DefaultBufferSize = 1024;
-			private const int UnicodeEscapeLength = 4;
-
 			// tokenizing errors
 			private const string ErrorUnrecognizedToken = "Illegal JSON sequence";
 			private const string ErrorUnterminatedComment = "Unterminated comment block";
@@ -62,33 +59,9 @@ namespace JsonFx.Json
 
 			#region Fields
 
-			private BufferedTextReader Reader = BufferedTextReader.Null;
-			private readonly int ReaderBufferSize;
-			private char[] EscapeBuffer;
+			private PeekTextReader Reader = BufferedTextReader.Null;
 
 			#endregion Fields
-
-			#region Init
-
-			/// <summary>
-			/// Ctor
-			/// </summary>
-			public JsonTokenizer()
-				: this(JsonTokenizer.DefaultBufferSize)
-			{
-			}
-
-			/// <summary>
-			/// Ctor
-			/// </summary>
-			/// <param name="reader">input reader</param>
-			/// <param name="bufferSize">read buffer size</param>
-			public JsonTokenizer(int bufferSize)
-			{
-				this.ReaderBufferSize = bufferSize;
-			}
-
-			#endregion Init
 
 			#region Properties
 
@@ -443,10 +416,11 @@ namespace JsonFx.Json
 
 				StringBuilder builder = new StringBuilder();
 
-				int i=0;
+				int pos = 0;
 				while (true)
 				{
-					char ch = (char)this.Reader.Peek(i);
+					// look ahead
+					char ch = (char)this.Reader.Peek(pos);
 					if (ch < 0)
 					{
 						// reached END before string delim
@@ -456,10 +430,10 @@ namespace JsonFx.Json
 					// check each character for ending delim
 					if (ch == stringDelim)
 					{
-						if (i > 0)
+						if (pos > 0)
 						{
 							// append final segment and flush string
-							this.Reader.Flush(i, builder);
+							this.Reader.Flush(pos, builder);
 						}
 
 						// flush closing delim
@@ -477,15 +451,17 @@ namespace JsonFx.Json
 					if (ch != JsonGrammar.OperatorCharEscape)
 					{
 						// accumulate
-						i++;
+						pos++;
 						continue;
 					}
 
-					if (i > 0)
+					if (pos > 0)
 					{
 						// append segment before escape
-						this.Reader.Flush(i, builder);
-						i = 0;
+						this.Reader.Flush(pos, builder);
+
+						// reset counter
+						pos = 0;
 					}
 
 					// flush escape char
@@ -541,19 +517,17 @@ namespace JsonFx.Json
 						{
 							// Unicode escape sequence
 							// e.g. Copyright: "\u00A9"
+							const int UnicodeEscapeLength = 4;
 
-							if (this.EscapeBuffer == null)
-							{
-								this.EscapeBuffer = new char[JsonTokenizer.UnicodeEscapeLength];
-							}
-
-							int count = this.Reader.Peek(this.EscapeBuffer);
+							string escapeSeq;
+							this.Reader.Peek(UnicodeEscapeLength, out escapeSeq);
 
 							// unicode ordinal
 							int utf16;
-							if (count == this.EscapeBuffer.Length &&
+							if (escapeSeq != null &&
+								escapeSeq.Length == UnicodeEscapeLength &&
 						        Int32.TryParse(
-									new String(this.EscapeBuffer),
+									escapeSeq,
 									NumberStyles.AllowHexSpecifier,
 									NumberFormatInfo.InvariantInfo,
 									out utf16))
@@ -561,7 +535,7 @@ namespace JsonFx.Json
 								builder.Append(Char.ConvertFromUtf32(utf16));
 
 								// flush escape char
-								this.Reader.Flush(count);
+								this.Reader.Flush(escapeSeq.Length);
 							}
 							else
 							{
@@ -676,10 +650,11 @@ namespace JsonFx.Json
 			{
 				bool identPart = false;
 
-				int i = 0;
+				int pos = 0;
 				while (true)
 				{
-					char ch = (char)this.Reader.Peek(i);
+					// look ahead
+					char ch = (char)this.Reader.Peek(pos);
 
 					// digits are only allowed after first char
 					// rest can be in head or tail
@@ -688,18 +663,22 @@ namespace JsonFx.Json
 						Char.IsLetter(ch) || ch == '_' || ch == '$')
 					{
 						identPart = true;
-						i++;
+						pos++;
 						continue;
 					}
 
-					// append partial
-					if (i < 0)
+					// get ident string
+					string ident;
+
+					if (pos > 0)
 					{
-						return String.Empty;
+						this.Reader.Flush(pos, out ident);
+					}
+					else
+					{
+						ident = String.Empty;
 					}
 
-					string ident;
-					this.Reader.Flush(i, out ident);
 					return ident;
 				}
 			}
@@ -711,7 +690,7 @@ namespace JsonFx.Json
 			public IEnumerable<Token<JsonTokenType>> GetTokens(TextReader reader)
 			{
 				// use the reader directly if is a BufferedTextReader
-				this.Reader = (reader as BufferedTextReader) ?? new BufferedTextReader(reader, this.ReaderBufferSize);
+				this.Reader = (reader as PeekTextReader) ?? new BufferedTextReader(reader);
 
 				while (true)
 				{

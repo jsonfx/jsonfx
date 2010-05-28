@@ -34,9 +34,7 @@ using System.Text;
 
 namespace JsonFx.IO
 {
-	// TODO: evaluate performance differences if only buffer requested look aheads
-
-	internal class BufferedTextReader : TextReader
+	internal class BufferedTextReader : PeekTextReader
 	{
 		#region Constants
 
@@ -101,7 +99,7 @@ namespace JsonFx.IO
 		/// <summary>
 		/// Gets the total number of characters read from the input
 		/// </summary>
-		public long Position
+		public override long Position
 		{
 			get { return this.position; }
 		}
@@ -110,6 +108,9 @@ namespace JsonFx.IO
 
 		#region TextReader Methods
 
+		/// <summary>
+		/// Reads the next character without advancing the input position.
+		/// </summary>
 		public override int Peek()
 		{
 			return this.Peek(0);
@@ -118,24 +119,56 @@ namespace JsonFx.IO
 		/// <summary>
 		/// Reads the next character without advancing the input position.
 		/// </summary>
+		/// <param name="index">the position to look ahead</param>
 		/// <returns>the next character to be read or -1 if no more characters are available</returns>
-		public virtual int Peek(int i)
+		public override int Peek(int index)
 		{
-			this.EnsureBuffer(i+1);
-			if (this.count < i+1)
+			this.EnsureBuffer(index+1);
+			if (this.count < index+1)
 			{
 				return -1;
 			}
 
-			return this.buffer[this.start+i];
+			return this.buffer[this.start+index];
+		}
+
+		/// <summary>
+		/// Reads the next count characters without advancing the input position.
+		/// </summary>
+		/// <param name="count">the number of characters to read</param>
+		/// <param name="value">the resulting string</param>
+		/// <returns>the number of characters read or -1 if not enough characters are available</returns>
+		public override int Peek(int count, out string value)
+		{
+			this.EnsureBuffer(count);
+			if (this.count < 1)
+			{
+				value = null;
+				return -1;
+			}
+
+			if (this.count < count)
+			{
+				count = this.count;
+			}
+
+			if (count > 0)
+			{
+				value = new String(this.buffer, this.start, count);
+			}
+			else
+			{
+				value = String.Empty;
+			}
+			return value.Length;
 		}
 
 		/// <summary>
 		/// Fills the buffer with the next character without advancing the input position.
 		/// </summary>
 		/// <param name="buffer"></param>
-		/// <returns></returns>
-		public virtual int Peek(char[] buffer)
+		/// <returns>the number of characters read or -1 if not enough characters are available</returns>
+		public override int Peek(char[] buffer)
 		{
 			if (buffer == null)
 			{
@@ -151,8 +184,8 @@ namespace JsonFx.IO
 		/// <param name="buffer"></param>
 		/// <param name="index"></param>
 		/// <param name="count"></param>
-		/// <returns></returns>
-		public virtual int Peek(char[] buffer, int index, int count)
+		/// <returns>the number of characters read or -1 if not enough characters are available</returns>
+		public override int Peek(char[] buffer, int index, int count)
 		{
 			if (buffer == null)
 			{
@@ -192,9 +225,7 @@ namespace JsonFx.IO
 		{
 			int ch = this.Peek();
 
-			this.position++;
-			this.start++;
-			this.count--;
+			this.FlushInternal(1);
 
 			return ch;
 		}
@@ -202,9 +233,9 @@ namespace JsonFx.IO
 		/// <summary>
 		/// Reads characters from the input and writes the data to buffer.
 		/// </summary>
-		/// <param name="destBuffer"></param>
+		/// <param name="buffer"></param>
 		/// <returns></returns>
-		public virtual int Read(char[] buffer)
+		public override int Read(char[] buffer)
 		{
 			if (buffer == null)
 			{
@@ -357,7 +388,7 @@ namespace JsonFx.IO
 		/// Advances the character position by 1 characters and peeks the next character.
 		/// </summary>
 		/// <returns>the next character to be read or -1 if no more characters are available</returns>
-		public int NextPeek()
+		public override int NextPeek()
 		{
 			this.EnsureBuffer(2);
 			if (this.count < 1)
@@ -365,9 +396,7 @@ namespace JsonFx.IO
 				throw new ArgumentOutOfRangeException("count", "Attempted to flush beyond end of input.");
 			}
 
-			this.position++;
-			this.start++;
-			this.count--;
+			this.FlushInternal(1);
 
 			if (this.count < 1)
 			{
@@ -381,7 +410,7 @@ namespace JsonFx.IO
 		/// Advances the character position by count characters.
 		/// </summary>
 		/// <param name="count"></param>
-		public void Flush(int count)
+		public override void Flush(int count)
 		{
 			this.EnsureFlush(count);
 			this.FlushInternal(count);
@@ -392,7 +421,7 @@ namespace JsonFx.IO
 		/// </summary>
 		/// <param name="count"></param>
 		/// <param name="builder"></param>
-		public void Flush(int count, StringBuilder builder)
+		public override void Flush(int count, StringBuilder builder)
 		{
 			if (builder == null)
 			{
@@ -412,7 +441,7 @@ namespace JsonFx.IO
 		/// </summary>
 		/// <param name="count"></param>
 		/// <param name="builder"></param>
-		public void Flush(int count, out string value)
+		public override void Flush(int count, out string value)
 		{
 			this.EnsureBuffer(count);
 			if (this.count < count)
@@ -459,6 +488,11 @@ namespace JsonFx.IO
 			if (this.isDisposed)
 			{
 				throw new ObjectDisposedException("Underlying TextReader has been disposed.");
+			}
+
+			if (bufferSize < 0)
+			{
+				throw new ArgumentOutOfRangeException("bufferSize", "bufferSize cannot be negative");
 			}
 
 			if (bufferSize <= this.count)
