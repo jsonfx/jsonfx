@@ -34,7 +34,6 @@ using System.Text;
 
 namespace JsonFx.IO
 {
-	// TODO: will buffering prevent multiple chunked reads?
 	// TODO: evaluate performance differences if only buffer requested look aheads
 
 	internal class BufferedTextReader : TextReader
@@ -298,13 +297,17 @@ namespace JsonFx.IO
 						{
 							// append final segment
 							int lineLength = i-this.start;
-							builder.Append(this.buffer, this.start, lineLength);
-							this.Flush(lineLength+1);
+							this.Flush(lineLength, builder);
 
 							if ((ch == '\r') && (this.Peek() == '\n'))
 							{
 								// treat CRLF as single char
-								this.Read();
+								this.FlushInternal(2);
+							}
+							else
+							{
+								// consume line ending
+								this.FlushInternal(1);
 							}
 							return builder.ToString();
 						}
@@ -380,7 +383,8 @@ namespace JsonFx.IO
 		/// <param name="count"></param>
 		public void Flush(int count)
 		{
-			this.Flush(count, null);
+			this.EnsureFlush(count);
+			this.FlushInternal(count);
 		}
 
 		/// <summary>
@@ -390,17 +394,49 @@ namespace JsonFx.IO
 		/// <param name="builder"></param>
 		public void Flush(int count, StringBuilder builder)
 		{
+			if (builder == null)
+			{
+				throw new ArgumentNullException("builder");
+			}
+
+			this.EnsureFlush(count);
+
+			// append flushed value
+			builder.Append(this.buffer, this.start, count);
+
+			this.FlushInternal(count);
+		}
+
+		/// <summary>
+		/// Advances the character position by count characters.
+		/// </summary>
+		/// <param name="count"></param>
+		/// <param name="builder"></param>
+		public void Flush(int count, out string value)
+		{
 			this.EnsureBuffer(count);
 			if (this.count < count)
 			{
 				throw new ArgumentOutOfRangeException("count", "Attempted to flush beyond end of input.");
 			}
 
-			if (builder != null)
-			{
-				builder.Append(this.buffer, this.start, count);
-			}
+			// extract flushed value as string
+			value = new String(this.buffer, this.start, count);
 
+			this.FlushInternal(count);
+		}
+
+		private void EnsureFlush(int count)
+		{
+			this.EnsureBuffer(count);
+			if (this.count < count)
+			{
+				throw new ArgumentOutOfRangeException("count", "Attempted to flush beyond end of input.");
+			}
+		}
+
+		private void FlushInternal(int count)
+		{
 			this.position += count;
 			this.start += count;
 			this.count -= count;

@@ -49,7 +49,6 @@ namespace JsonFx.Json
 		{
 			#region Constants
 
-			private const int MinBufferLength = 128; // must hold longest number sequence
 			private const int DefaultBufferSize = 1024;
 			private const int UnicodeEscapeLength = 4;
 
@@ -64,9 +63,8 @@ namespace JsonFx.Json
 			#region Fields
 
 			private BufferedTextReader Reader = BufferedTextReader.Null;
-			private readonly char[] PeekBuffer;
-			private readonly int BufferSize;
-			private char[] escapeBuffer;
+			private readonly int ReaderBufferSize;
+			private char[] EscapeBuffer;
 
 			#endregion Fields
 
@@ -87,13 +85,7 @@ namespace JsonFx.Json
 			/// <param name="bufferSize">read buffer size</param>
 			public JsonTokenizer(int bufferSize)
 			{
-				this.BufferSize = bufferSize;
-				if (this.BufferSize < JsonTokenizer.MinBufferLength)
-				{
-					this.BufferSize = JsonTokenizer.MinBufferLength;
-				}
-
-				this.PeekBuffer = new char[this.BufferSize];
+				this.ReaderBufferSize = bufferSize;
 			}
 
 			#endregion Init
@@ -288,60 +280,64 @@ namespace JsonFx.Json
 				// store for error cases
 				long numberStart = this.Reader.Position;
 
-				int bufferSize = this.Reader.Peek(this.PeekBuffer);
-				int start = 0;
 				int pos = 0;
+				char ch = (char)this.Reader.Peek(pos);
 
-				if (this.PeekBuffer[pos] == JsonGrammar.OperatorUnaryPlus)
+				bool isNeg = false;
+				if (ch == JsonGrammar.OperatorUnaryPlus)
 				{
 					// consume positive signing (as is extraneous)
-					start++;
-					pos++;
+					ch = (char)this.Reader.NextPeek();
 				}
-				else if (this.PeekBuffer[pos] == JsonGrammar.OperatorUnaryMinus)
+				else if (ch == JsonGrammar.OperatorUnaryMinus)
 				{
 					// optional minus part
 					pos++;
+					ch = (char)this.Reader.Peek(pos);
+					isNeg = true;
 				}
 
-				if (!Char.IsDigit(this.PeekBuffer[pos]) &&
-				this.PeekBuffer[pos] != JsonGrammar.OperatorDecimalPoint)
+				if (!Char.IsDigit(ch) &&
+					ch != JsonGrammar.OperatorDecimalPoint)
 				{
 					// possibly "-Infinity"
 					return null;
 				}
 
 				// integer part
-				while ((pos < bufferSize) && Char.IsDigit(this.PeekBuffer[pos]))
+				while ((ch >= 0) && Char.IsDigit(ch))
 				{
 					// consume digit
 					pos++;
+					ch = (char)this.Reader.Peek(pos);
 				}
 
 				bool hasDecimal = false;
 
-				if ((pos < bufferSize) && (this.PeekBuffer[pos] == JsonGrammar.OperatorDecimalPoint))
+				if ((ch >= 0) && (ch == JsonGrammar.OperatorDecimalPoint))
 				{
 					hasDecimal = true;
 
 					// consume decimal
 					pos++;
+					ch = (char)this.Reader.Peek(pos);
 
 					// fraction part
-					while ((pos < bufferSize) && Char.IsDigit(this.PeekBuffer[pos]))
+					while ((ch >= 0) && Char.IsDigit(ch))
 					{
 						// consume digit
 						pos++;
+						ch = (char)this.Reader.Peek(pos);
 					}
 				}
 
 				// note the number of significant digits
-				int precision = (pos - start);
+				int precision = pos;
 				if (hasDecimal)
 				{
 					precision--;
 				}
-				if (this.PeekBuffer[start] == JsonGrammar.OperatorUnaryMinus)
+				if (isNeg)
 				{
 					precision--;
 				}
@@ -354,26 +350,28 @@ namespace JsonFx.Json
 				bool hasExponent = false;
 
 				// optional exponent part
-				if ((pos < bufferSize) && (this.PeekBuffer[pos] == 'e' || this.PeekBuffer[pos] == 'E'))
+				if ((ch >= 0) && (ch == 'e' || ch == 'E'))
 				{
 					hasExponent = true;
 
 					// consume 'e'
 					pos++;
-					if (pos >= bufferSize)
+					ch = (char)this.Reader.Peek(pos);
+					if (ch < 0)
 					{
 						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, numberStart);
 					}
 
 					// optional minus/plus part
-					if (this.PeekBuffer[pos] == JsonGrammar.OperatorUnaryMinus ||
-						this.PeekBuffer[pos] == JsonGrammar.OperatorUnaryPlus)
+					if (ch == JsonGrammar.OperatorUnaryMinus ||
+						ch == JsonGrammar.OperatorUnaryPlus)
 					{
 						// consume sign
 						pos++;
+						ch = (char)this.Reader.Peek(pos);
 					}
 
-					if (pos >= bufferSize || !Char.IsDigit(this.PeekBuffer[pos]))
+					if ((ch < 0) || !Char.IsDigit(ch))
 					{
 						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, numberStart);
 					}
@@ -383,12 +381,13 @@ namespace JsonFx.Json
 					{
 						// consume digit
 						pos++;
-					} while (pos < bufferSize && Char.IsDigit(this.PeekBuffer[pos]));
+						ch = (char)this.Reader.Peek(pos);
+					} while ((ch >= 0) && Char.IsDigit(ch));
 				}
 
 				// at this point, we have the full number string and know its characteristics
-				string numberString = new String(this.PeekBuffer, start, pos-start);
-				this.Reader.Flush(pos);
+				string numberString;
+				this.Reader.Flush(pos, out numberString);
 
 				if (!hasDecimal && !hasExponent && precision < 19)
 				{
@@ -543,18 +542,18 @@ namespace JsonFx.Json
 							// Unicode escape sequence
 							// e.g. Copyright: "\u00A9"
 
-							if (this.escapeBuffer == null)
+							if (this.EscapeBuffer == null)
 							{
-								this.escapeBuffer = new char[JsonTokenizer.UnicodeEscapeLength];
+								this.EscapeBuffer = new char[JsonTokenizer.UnicodeEscapeLength];
 							}
 
-							int count = this.Reader.Peek(this.escapeBuffer, 0, JsonTokenizer.UnicodeEscapeLength);
+							int count = this.Reader.Peek(this.EscapeBuffer);
 
 							// unicode ordinal
 							int utf16;
-							if (count == JsonTokenizer.UnicodeEscapeLength &&
+							if (count == this.EscapeBuffer.Length &&
 						        Int32.TryParse(
-									new String(this.escapeBuffer),
+									new String(this.EscapeBuffer),
 									NumberStyles.AllowHexSpecifier,
 									NumberFormatInfo.InvariantInfo,
 									out utf16))
@@ -562,7 +561,7 @@ namespace JsonFx.Json
 								builder.Append(Char.ConvertFromUtf32(utf16));
 
 								// flush escape char
-								this.Reader.Flush(JsonTokenizer.UnicodeEscapeLength);
+								this.Reader.Flush(count);
 							}
 							else
 							{
@@ -699,9 +698,9 @@ namespace JsonFx.Json
 						return String.Empty;
 					}
 
-					StringBuilder ident = new StringBuilder(i, i);
-					this.Reader.Flush(i, ident);
-					return ident.ToString();
+					string ident;
+					this.Reader.Flush(i, out ident);
+					return ident;
 				}
 			}
 
@@ -712,7 +711,7 @@ namespace JsonFx.Json
 			public IEnumerable<Token<JsonTokenType>> GetTokens(TextReader reader)
 			{
 				// use the reader directly if is a BufferedTextReader
-				this.Reader = (reader as BufferedTextReader) ?? new BufferedTextReader(reader, this.BufferSize);
+				this.Reader = (reader as BufferedTextReader) ?? new BufferedTextReader(reader, this.ReaderBufferSize);
 
 				while (true)
 				{
