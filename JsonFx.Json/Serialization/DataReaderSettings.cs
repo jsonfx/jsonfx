@@ -35,8 +35,6 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 
-using JsonFx.IO;
-
 namespace JsonFx.Serialization
 {
 	/// <summary>
@@ -62,7 +60,6 @@ namespace JsonFx.Serialization
 		#region Fields
 
 		private bool allowNullValueTypes = true;
-		private PerformanceType performance;
 		private DataNameResolver resolver;
 
 		#endregion Fields
@@ -82,18 +79,6 @@ namespace JsonFx.Serialization
 		{
 			get { return this.allowNullValueTypes; }
 			set { this.allowNullValueTypes = value; }
-		}
-
-		/// <summary>
-		/// Gets and sets the preferred read performance characteristics
-		/// </summary>
-		/// <remarks>
-		/// Switches read behavior between typically less memory and typically faster time
-		/// </remarks>
-		public PerformanceType Performance
-		{
-			get { return this.performance; }
-			set { this.performance = value; }
 		}
 
 		/// <summary>

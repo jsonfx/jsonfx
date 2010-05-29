@@ -43,8 +43,33 @@ namespace JsonFx.Serialization
 		#region Properties
 
 		/// <summary>
+		/// Gets the current column of the underlying input character sequence
+		/// </summary>
+		/// <remarks>
+		/// Tokenizers not tracking columns should return -1.
+		/// </remarks>
+		int Column
+		{
+			get;
+		}
+
+		/// <summary>
+		/// Gets the current line of the underlying input character sequence
+		/// </summary>
+		/// <remarks>
+		/// Tokenizers not tracking lines should return -1.
+		/// </remarks>
+		int Line
+		{
+			get;
+		}
+
+		/// <summary>
 		/// Gets the current position of the underlying input character sequence
 		/// </summary>
+		/// <remarks>
+		/// Tokenizers not tracking position should return -1.
+		/// </remarks>
 		long Position
 		{
 			get;

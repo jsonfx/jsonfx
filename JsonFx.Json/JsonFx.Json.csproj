@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.50727</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{3082284B-B579-4808-A4A4-D88DDA4025CB}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -52,10 +52,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="About.cs" />
-    <Compile Include="IO\PerformanceType.cs" />
-    <Compile Include="IO\PeekReader.cs" />
-    <Compile Include="IO\StreamPeekReader.cs" />
-    <Compile Include="IO\StringPeekReader.cs" />
     <Compile Include="Json\IJsonSerializable.cs" />
     <Compile Include="Json\JsonFormatter.cs" />
     <Compile Include="Json\JsonGenerator.cs" />
