@@ -695,7 +695,7 @@ namespace JsonFx.Json
 
 			public IEnumerable<Token<JsonTokenType>> GetTokens(TextReader reader)
 			{
-				this.Reader = PeekReader.CreateReader(reader, this.Settings.Performance);
+				this.Reader = PeekReader.Create(reader, this.Settings.Performance);
 
 				while (true)
 				{

@@ -101,13 +101,16 @@ namespace JsonFx.IO
 		public abstract int Peek(char[] buffer, int index, int count);
 
 		/// <summary>
-		/// Reads the next character from the input.
+		/// Reads the next character from the input and advances the character position by one character.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>the next character to be read or -1 if no more characters are available</returns>
 		public override int Read()
 		{
-			// force an implementation
-			throw new NotImplementedException();
+			int ch = this.Peek();
+
+			this.Flush(1);
+
+			return ch;
 		}
 
 		/// <summary>
@@ -155,7 +158,24 @@ namespace JsonFx.IO
 
 		#region Factory Methods
 
-		public static PeekReader CreateReader(TextReader reader, PerformanceType performance)
+		/// <summary>
+		/// Creates a PeekReader attempting to choose the best performance characteristics.
+		/// </summary>
+		/// <param name="reader"></param>
+		/// <param name="performance"></param>
+		/// <returns></returns>
+		public static PeekReader Create(TextReader reader)
+		{
+			return PeekReader.Create(reader, PerformanceType.Auto);
+		}
+
+		/// <summary>
+		/// Creates a PeekReader with the specified performance preference.
+		/// </summary>
+		/// <param name="reader"></param>
+		/// <param name="performance">performance preference</param>
+		/// <returns></returns>
+		public static PeekReader Create(TextReader reader, PerformanceType performance)
 		{
 			if (reader is PeekReader)
 			{
