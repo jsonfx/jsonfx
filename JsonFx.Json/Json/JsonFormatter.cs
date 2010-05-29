@@ -146,10 +146,12 @@ namespace JsonFx.Json
 						}
 						case JsonTokenType.String:
 						{
-							writer.Write(JsonGrammar.OperatorStringDelim);
-							// TODO: escape string
-							writer.Write(token.Value);
-							writer.Write(JsonGrammar.OperatorStringDelim);
+							if (token.Value == null)
+							{
+								goto case JsonTokenType.Null;
+							}
+
+							this.EscapeString(writer, (string)token.Value);
 							break;
 						}
 						case JsonTokenType.Undefined:
@@ -170,6 +172,81 @@ namespace JsonFx.Json
 						}
 					}
 				}
+			}
+
+			private void EscapeString(TextWriter writer, string value)
+			{
+				int start = 0,
+					length = value.Length;
+
+				writer.Write(JsonGrammar.OperatorStringDelim);
+
+				for (int i=start; i<length; i++)
+				{
+					char ch = value[i];
+
+					if (ch <= '\u001F' ||
+						ch >= '\u007F' ||
+						ch == '<' || // improves compatibility within script blocks
+						ch == JsonGrammar.OperatorStringDelim ||
+						ch == JsonGrammar.OperatorCharEscape)
+					{
+						if (i > start)
+						{
+							writer.Write(value.Substring(start, i-start));
+						}
+						start = i+1;
+
+						switch (ch)
+						{
+							case JsonGrammar.OperatorStringDelim:
+							case JsonGrammar.OperatorCharEscape:
+							{
+								writer.Write(JsonGrammar.OperatorCharEscape);
+								writer.Write(ch);
+								continue;
+							}
+							case '\b':
+							{
+								writer.Write("\\b");
+								continue;
+							}
+							case '\f':
+							{
+								writer.Write("\\f");
+								continue;
+							}
+							case '\n':
+							{
+								writer.Write("\\n");
+								continue;
+							}
+							case '\r':
+							{
+								writer.Write("\\r");
+								continue;
+							}
+							case '\t':
+							{
+								writer.Write("\\t");
+								continue;
+							}
+							default:
+							{
+								writer.Write("\\u");
+								writer.Write(Char.ConvertToUtf32(value, i).ToString("X4"));
+								continue;
+							}
+						}
+					}
+				}
+
+				if (length > start)
+				{
+					writer.Write(value.Substring(start, length-start));
+				}
+
+				writer.Write(JsonGrammar.OperatorStringDelim);
 			}
 
 			private void WriteLine(TextWriter writer)
