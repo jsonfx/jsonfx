@@ -36,12 +36,29 @@ namespace JsonFx.Serialization
 	{
 		#region Init
 
+		/// <summary>
+		/// Ctor
+		/// </summary>
 		public SerializationException() : base() { }
 
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="message"></param>
 		public SerializationException(string message) : base(message) { }
 
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="message"></param>
+		/// <param name="innerException"></param>
 		public SerializationException(string message, Exception innerException) : base(message, innerException) { }
 
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="info"></param>
+		/// <param name="context"></param>
 		public SerializationException(
 			System.Runtime.Serialization.SerializationInfo info,
 			System.Runtime.Serialization.StreamingContext context)
@@ -56,24 +73,69 @@ namespace JsonFx.Serialization
 	{
 		#region Fields
 
+		private int column = -1;
+		private int line = -1;
 		private long position = -1L;
 
 		#endregion Fields
 
 		#region Init
 
-		public DeserializationException(string message, long index)
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="message"></param>
+		/// <param name="position"></param>
+		public DeserializationException(string message, long position)
+			: this(message, position, -1, -1)
+		{
+		}
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="message"></param>
+		/// <param name="position"></param>
+		/// <param name="line"></param>
+		/// <param name="column"></param>
+		public DeserializationException(string message, long position, int line, int column)
 			: base(message)
 		{
-			this.position = index;
+			this.column = column;
+			this.line = line;
+			this.position = position;
 		}
 
-		public DeserializationException(string message, long index, Exception innerException)
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="message"></param>
+		/// <param name="index"></param>
+		/// <param name="innerException"></param>
+		public DeserializationException(string message, long position, Exception innerException)
+			: this(message, position, -1, -1, innerException)
+		{
+		}
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="message"></param>
+		/// <param name="index"></param>
+		/// <param name="innerException"></param>
+		public DeserializationException(string message, long position, int line, int column, Exception innerException)
 			: base(message, innerException)
 		{
-			this.position = index;
+			this.column = column;
+			this.line = line;
+			this.position = position;
 		}
 
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="info"></param>
+		/// <param name="context"></param>
 		public DeserializationException(
 			System.Runtime.Serialization.SerializationInfo info,
 			System.Runtime.Serialization.StreamingContext context)
@@ -86,11 +148,27 @@ namespace JsonFx.Serialization
 		#region Properties
 
 		/// <summary>
+		/// Gets the character column in the stream where the error occurred.
+		/// </summary>
+		public int Column
+		{
+			get { return this.column; }
+		}
+
+		/// <summary>
 		/// Gets the character position in the stream where the error occurred.
 		/// </summary>
 		public long Position
 		{
 			get { return this.position; }
+		}
+
+		/// <summary>
+		/// Gets the character line in the stream where the error occurred.
+		/// </summary>
+		public int Line
+		{
+			get { return this.line; }
 		}
 
 		#endregion Properties
@@ -136,12 +214,29 @@ namespace JsonFx.Serialization
 	{
 		#region Init
 
+		/// <summary>
+		/// Ctor
+		/// </summary>
 		public TypeCoercionException() : base() { }
 
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="message"></param>
 		public TypeCoercionException(string message) : base(message) { }
 
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="message"></param>
+		/// <param name="innerException"></param>
 		public TypeCoercionException(string message, Exception innerException) : base(message, innerException) { }
 
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="info"></param>
+		/// <param name="context"></param>
 		public TypeCoercionException(
 			System.Runtime.Serialization.SerializationInfo info,
 			System.Runtime.Serialization.StreamingContext context)
