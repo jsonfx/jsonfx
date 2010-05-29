@@ -41,12 +41,25 @@ namespace JsonFx.Serialization
 
 		private bool prettyPrint;
 		private string tab = "\t";
+		private int maxDepth = 100;
 		private string newLine = Environment.NewLine;
 		private DataNameResolver resolver;
 
 		#endregion Fields
 
 		#region Properties
+
+		/// <summary>
+		/// Gets and sets the maximum nesting depth
+		/// </summary>
+		/// <remarks>
+		/// Depth is fast and easy safegaurd against detecting graph cycles.
+		/// </remarks>
+		public int MaxDepth
+		{
+			get { return this.maxDepth; }
+			set { this.maxDepth = value; }
+		}
 
 		/// <summary>
 		/// Gets and sets if JSON will be formatted for human reading.

@@ -174,7 +174,7 @@ namespace JsonFx.Json
 				}
 			}
 
-			private void WriteString(TextWriter writer, string value)
+			protected virtual void WriteString(TextWriter writer, string value)
 			{
 				int start = 0,
 					length = value.Length;
@@ -249,12 +249,10 @@ namespace JsonFx.Json
 				writer.Write(JsonGrammar.OperatorStringDelim);
 			}
 
-			private void WriteUnknown(TextWriter writer, Token<JsonTokenType> token)
+			protected virtual void WriteUnknown(TextWriter writer, Token<JsonTokenType> token)
 			{
-#if DEBUG
-				// TODO: determine if this is ever valid
+				// TODO: evaluate if this is ever valid
 				throw new NotSupportedException("Unexpected JSON token: "+token);
-#endif
 			}
 
 			private void WriteLine(TextWriter writer)
