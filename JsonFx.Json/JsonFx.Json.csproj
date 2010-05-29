@@ -51,8 +51,11 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IO\BufferedTextReader.cs" />
-    <Compile Include="IO\PeekTextReader.cs" />
+    <Compile Include="About.cs" />
+    <Compile Include="IO\PerformanceType.cs" />
+    <Compile Include="IO\PeekReader.cs" />
+    <Compile Include="IO\StreamPeekReader.cs" />
+    <Compile Include="IO\StringPeekReader.cs" />
     <Compile Include="Json\IJsonSerializable.cs" />
     <Compile Include="Json\JsonFormatter.cs" />
     <Compile Include="Json\JsonGenerator.cs" />

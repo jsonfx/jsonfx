@@ -35,6 +35,8 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 
+using JsonFx.IO;
+
 namespace JsonFx.Serialization
 {
 	/// <summary>
@@ -60,6 +62,7 @@ namespace JsonFx.Serialization
 		#region Fields
 
 		private bool allowNullValueTypes = true;
+		private PerformanceType performance;
 		private DataNameResolver resolver;
 
 		#endregion Fields
@@ -70,8 +73,8 @@ namespace JsonFx.Serialization
 		/// Gets and sets if ValueTypes can accept values of null
 		/// </summary>
 		/// <remarks>
-		/// Only affects deserialization, if a ValueType T is assigned the
-		/// value of null, it will receive the value of default(T).
+		/// If this is true and a ValueType T is assigned the value of null,
+		/// it will receive the value of default(T).
 		/// Setting this to false, throws an exception if null is
 		/// specified for a ValueType member.
 		/// </remarks>
@@ -79,6 +82,18 @@ namespace JsonFx.Serialization
 		{
 			get { return this.allowNullValueTypes; }
 			set { this.allowNullValueTypes = value; }
+		}
+
+		/// <summary>
+		/// Gets and sets the preferred read performance characteristics
+		/// </summary>
+		/// <remarks>
+		/// Switches read behavior between typically less memory and typically faster time
+		/// </remarks>
+		public PerformanceType Performance
+		{
+			get { return this.performance; }
+			set { this.performance = value; }
 		}
 
 		/// <summary>

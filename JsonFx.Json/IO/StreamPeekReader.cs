@@ -34,11 +34,14 @@ using System.Text;
 
 namespace JsonFx.IO
 {
-	internal class BufferedTextReader : PeekTextReader
+	/// <summary>
+	/// PeekReader implementation which only buffers lookahead for lower memory.
+	/// </summary>
+	internal class StreamPeekReader : PeekReader
 	{
 		#region Constants
 
-		public new static readonly BufferedTextReader Null = new BufferedTextReader(TextReader.Null, 1);
+		public new static readonly StreamPeekReader Null = new StreamPeekReader(TextReader.Null, 1);
 		private const int DefaultBufferSize = 1024;
 		private const int MinBufferSize = 128;
 
@@ -61,7 +64,7 @@ namespace JsonFx.IO
 		/// Ctor
 		/// </summary>
 		/// <param name="reader"></param>
-		public BufferedTextReader(TextReader reader)
+		public StreamPeekReader(TextReader reader)
 			: this(reader, DefaultBufferSize)
 		{
 		}
@@ -71,7 +74,7 @@ namespace JsonFx.IO
 		/// </summary>
 		/// <param name="reader"></param>
 		/// <param name="bufferSize"></param>
-		public BufferedTextReader(TextReader reader, int bufferSize)
+		public StreamPeekReader(TextReader reader, int bufferSize)
 		{
 			if (reader == null)
 			{
@@ -82,9 +85,9 @@ namespace JsonFx.IO
 				throw new ArgumentOutOfRangeException("bufferSize", "bufferSize must be a positive number.");
 			}
 
-			if (bufferSize < BufferedTextReader.MinBufferSize)
+			if (bufferSize < StreamPeekReader.MinBufferSize)
 			{
-				bufferSize = BufferedTextReader.MinBufferSize;
+				bufferSize = StreamPeekReader.MinBufferSize;
 			}
 
 			this.Reader = reader;
@@ -342,13 +345,13 @@ namespace JsonFx.IO
 
 		#endregion TextReader Methods
 
-		#region Buffer Methods
+		#region PeekReader Methods
 
 		/// <summary>
 		/// Advances the character position by 1 characters and peeks the next character.
 		/// </summary>
 		/// <returns>the next character to be read or -1 if no more characters are available</returns>
-		public override int NextPeek()
+		public override int FlushPeek()
 		{
 			this.EnsureBuffer(2);
 			if (this.count < 1)
@@ -414,6 +417,10 @@ namespace JsonFx.IO
 
 			this.FlushInternal(count);
 		}
+
+		#endregion PeekReader Methods
+
+		#region Buffer Methods
 
 		private void EnsureFlush(int count)
 		{

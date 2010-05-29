@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -29,54 +29,27 @@
 #endregion License
 
 using System;
-using System.IO;
 
-using JsonFx.Serialization;
-
-namespace JsonFx.Json
+namespace JsonFx.IO
 {
 	/// <summary>
-	/// JSON deserializer
+	/// Indicates preference for performance optimizations
 	/// </summary>
-	public partial class JsonReader : DataReader<JsonTokenType>
+	public enum PerformanceType
 	{
-		#region Init
+		/// <summary>
+		/// Automatically switches perf type
+		/// </summary>
+		Auto,
 
 		/// <summary>
-		/// Ctor
+		/// Smaller memory
 		/// </summary>
-		/// <param name="settings"></param>
-		public JsonReader(DataReaderSettings settings)
-			: base(settings)
-		{
-		}
-
-		#endregion Init
-
-		#region Properties
+		Smaller,
 
 		/// <summary>
-		/// Gets the supported content type of the serialized data
+		/// Faster performance
 		/// </summary>
-		public override string ContentType
-		{
-			get { return "application/json"; }
-		}
-
-		#endregion Properties
-
-		#region IDataReader Methods
-
-		protected override IDataTokenizer<JsonTokenType> GetTokenizer(DataReaderSettings settings)
-		{
-			return new JsonReader.JsonTokenizer(settings);
-		}
-
-		protected override IDataParser<JsonTokenType> GetParser(DataReaderSettings settings)
-		{
-			return new JsonReader.JsonParser(settings);
-		}
-
-		#endregion IDataReader Methods
+		Faster
 	}
 }

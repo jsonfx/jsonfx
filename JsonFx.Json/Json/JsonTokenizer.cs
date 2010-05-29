@@ -58,9 +58,23 @@ namespace JsonFx.Json
 
 			#region Fields
 
-			private PeekTextReader Reader = BufferedTextReader.Null;
+			private readonly DataReaderSettings Settings;
+			private PeekReader Reader = StringPeekReader.Null;
 
 			#endregion Fields
+
+			#region Init
+
+			/// <summary>
+			/// Ctor
+			/// </summary>
+			/// <param name="settings"></param>
+			public JsonTokenizer(DataReaderSettings settings)
+			{
+				this.Settings = settings;
+			}
+
+			#endregion Init
 
 			#region Properties
 
@@ -184,7 +198,7 @@ namespace JsonFx.Json
 				long commentStart = this.Reader.Position;
 
 				// read second char of comment start
-				ch = this.Reader.NextPeek();
+				ch = this.Reader.FlushPeek();
 				if (ch < 0)
 				{
 					throw new DeserializationException(JsonTokenizer.ErrorUnterminatedComment, commentStart);
@@ -210,7 +224,7 @@ namespace JsonFx.Json
 					// skip over everything until reach block comment ending
 					while (true)
 					{
-						while ((ch = this.Reader.NextPeek()) != JsonGrammar.OperatorCommentEnd[0])
+						while ((ch = this.Reader.FlushPeek()) != JsonGrammar.OperatorCommentEnd[0])
 						{
 							if (ch < 0)
 							{
@@ -218,19 +232,19 @@ namespace JsonFx.Json
 							}
 						}
 
-						if ((ch = this.Reader.NextPeek()) == JsonGrammar.OperatorCommentEnd[1])
+						if ((ch = this.Reader.FlushPeek()) == JsonGrammar.OperatorCommentEnd[1])
 						{
 							break;
 						}
 					}
 
 					// move past block comment end token
-					ch = this.Reader.NextPeek();
+					ch = this.Reader.FlushPeek();
 				}
 				else
 				{
 					// skip over everything until reach line ending or end of chars
-					while ((ch = this.Reader.NextPeek()) >= 0 && JsonGrammar.LineEndings.IndexOf((char)ch) < 0) ;
+					while ((ch = this.Reader.FlushPeek()) >= 0 && JsonGrammar.LineEndings.IndexOf((char)ch) < 0) ;
 				}
 
 				// skip whitespace
@@ -241,7 +255,7 @@ namespace JsonFx.Json
 			{
 				while (ch >= 0 && Char.IsWhiteSpace((char)ch))
 				{
-					ch = this.Reader.NextPeek();
+					ch = this.Reader.FlushPeek();
 				}
 
 				return ch;
@@ -249,9 +263,6 @@ namespace JsonFx.Json
 
 			private Token<JsonTokenType> ScanNumber()
 			{
-				// store for error cases
-				long numberStart = this.Reader.Position;
-
 				int pos = 0;
 				int ch = this.Reader.Peek(pos);
 
@@ -259,7 +270,7 @@ namespace JsonFx.Json
 				if (ch == JsonGrammar.OperatorUnaryPlus)
 				{
 					// consume positive signing (as is extraneous)
-					ch = this.Reader.NextPeek();
+					ch = this.Reader.FlushPeek();
 				}
 				else if (ch == JsonGrammar.OperatorUnaryMinus)
 				{
@@ -316,7 +327,7 @@ namespace JsonFx.Json
 
 				if (precision < 1)
 				{
-					throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, numberStart);
+					throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.Reader.Position);
 				}
 
 				bool hasExponent = false;
@@ -331,7 +342,7 @@ namespace JsonFx.Json
 					ch = this.Reader.Peek(pos);
 					if (ch < 0)
 					{
-						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, numberStart);
+						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.Reader.Position);
 					}
 
 					// optional minus/plus part
@@ -345,7 +356,7 @@ namespace JsonFx.Json
 
 					if ((ch < 0) || !Char.IsDigit((char)ch))
 					{
-						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, numberStart);
+						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.Reader.Position);
 					}
 
 					// exp part
@@ -371,7 +382,7 @@ namespace JsonFx.Json
 							NumberFormatInfo.InvariantInfo,
 							out number))
 					{
-						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, numberStart);
+						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.Reader.Position);
 					}
 
 					if (number >= Int32.MinValue && number <= Int32.MaxValue)
@@ -399,7 +410,7 @@ namespace JsonFx.Json
 						 NumberFormatInfo.InvariantInfo,
 						 out number))
 					{
-						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, numberStart);
+						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.Reader.Position);
 					}
 
 					// native EcmaScript number (IEEE-754)
@@ -409,10 +420,7 @@ namespace JsonFx.Json
 
 			private Token<JsonTokenType> ScanString()
 			{
-				// store for unterminated case
-				long stringStart = this.Reader.Position;
 				int stringDelim = this.Reader.Read();
-
 				StringBuilder builder = new StringBuilder();
 
 				int pos = 0;
@@ -423,7 +431,7 @@ namespace JsonFx.Json
 					if (ch < 0)
 					{
 						// reached END before string delim
-						throw new DeserializationException(JsonTokenizer.ErrorUnterminatedString, stringStart);
+						throw new DeserializationException(JsonTokenizer.ErrorUnterminatedString, this.Reader.Position-1);
 					}
 
 					// check each character for ending delim
@@ -444,7 +452,7 @@ namespace JsonFx.Json
 
 					if (Char.IsControl((char)ch) && ch != '\t')
 					{
-						throw new DeserializationException(JsonTokenizer.ErrorUnterminatedString, stringStart);
+						throw new DeserializationException(JsonTokenizer.ErrorUnterminatedString, this.Reader.Position-1);
 					}
 
 					if (ch != JsonGrammar.OperatorCharEscape)
@@ -471,7 +479,7 @@ namespace JsonFx.Json
 					if (ch < 0)
 					{
 						// unexpected end of input
-						throw new DeserializationException(JsonTokenizer.ErrorUnterminatedString, stringStart);
+						throw new DeserializationException(JsonTokenizer.ErrorUnterminatedString, this.Reader.Position-1);
 					}
 
 					switch (ch)
@@ -549,7 +557,7 @@ namespace JsonFx.Json
 						{
 							if (Char.IsControl((char)ch) && ch != '\t')
 							{
-								throw new DeserializationException(JsonTokenizer.ErrorUnterminatedString, stringStart);
+								throw new DeserializationException(JsonTokenizer.ErrorUnterminatedString, this.Reader.Position-1);
 							}
 
 							builder.Append(ch);
@@ -657,8 +665,7 @@ namespace JsonFx.Json
 
 					// digits are only allowed after first char
 					// rest can be in head or tail
-					if ((ch > 0) &&
-						(identPart && Char.IsDigit((char)ch)) ||
+					if ((identPart && Char.IsDigit((char)ch)) ||
 						Char.IsLetter((char)ch) || ch == '_' || ch == '$')
 					{
 						identPart = true;
@@ -688,8 +695,7 @@ namespace JsonFx.Json
 
 			public IEnumerable<Token<JsonTokenType>> GetTokens(TextReader reader)
 			{
-				// use the reader directly if is a BufferedTextReader
-				this.Reader = (reader as PeekTextReader) ?? new BufferedTextReader(reader);
+				this.Reader = PeekReader.CreateReader(reader, this.Settings.Performance);
 
 				while (true)
 				{

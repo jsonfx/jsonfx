@@ -34,7 +34,10 @@ using System.Text;
 
 namespace JsonFx.IO
 {
-	internal abstract class PeekTextReader : TextReader
+	/// <summary>
+	/// TextReader which allows arbitrary amount of look aheads
+	/// </summary>
+	internal abstract class PeekReader : TextReader
 	{
 		#region Properties
 
@@ -146,8 +149,41 @@ namespace JsonFx.IO
 		/// Advances the character position by 1 characters and peeks the next character.
 		/// </summary>
 		/// <returns>the next character to be read or -1 if no more characters are available</returns>
-		public abstract int NextPeek();
+		public abstract int FlushPeek();
 
 		#endregion Methods
+
+		#region Factory Methods
+
+		public static PeekReader CreateReader(TextReader reader, PerformanceType performance)
+		{
+			if (reader is PeekReader)
+			{
+				// use the reader directly if is already PeekReader
+				return (PeekReader)reader;
+			}
+
+			switch (performance)
+			{
+				case PerformanceType.Faster:
+				{
+					return new StringPeekReader(reader.ReadToEnd());
+				}
+				case PerformanceType.Smaller:
+				{
+					return new StreamPeekReader(reader);
+				}
+			}
+
+			if (reader is StringReader)
+			{
+				// reading will be more efficient since entire string is already in memory
+				return new StringPeekReader(reader.ReadToEnd());
+			}
+
+			return new StreamPeekReader(reader);
+		}
+
+		#endregion Factory Methods
 	}
 }
