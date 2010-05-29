@@ -53,6 +53,14 @@ namespace JsonFx.IO
 		/// <summary>
 		/// Reads the next character without advancing the input position.
 		/// </summary>
+		public override int Peek()
+		{
+			return this.Peek(0);
+		}
+
+		/// <summary>
+		/// Reads the next character without advancing the input position.
+		/// </summary>
 		/// <param name="index">the position to look ahead</param>
 		/// <returns>the next character to be read or -1 if no more characters are available</returns>
 		public abstract int Peek(int index);
