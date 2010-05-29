@@ -253,23 +253,23 @@ namespace JsonFx.Json
 				long numberStart = this.Reader.Position;
 
 				int pos = 0;
-				char ch = (char)this.Reader.Peek(pos);
+				int ch = this.Reader.Peek(pos);
 
 				bool isNeg = false;
 				if (ch == JsonGrammar.OperatorUnaryPlus)
 				{
 					// consume positive signing (as is extraneous)
-					ch = (char)this.Reader.NextPeek();
+					ch = this.Reader.NextPeek();
 				}
 				else if (ch == JsonGrammar.OperatorUnaryMinus)
 				{
 					// optional minus part
 					pos++;
-					ch = (char)this.Reader.Peek(pos);
+					ch = this.Reader.Peek(pos);
 					isNeg = true;
 				}
 
-				if (!Char.IsDigit(ch) &&
+				if (!Char.IsDigit((char)ch) &&
 					ch != JsonGrammar.OperatorDecimalPoint)
 				{
 					// possibly "-Infinity"
@@ -277,11 +277,11 @@ namespace JsonFx.Json
 				}
 
 				// integer part
-				while ((ch >= 0) && Char.IsDigit(ch))
+				while ((ch >= 0) && Char.IsDigit((char)ch))
 				{
 					// consume digit
 					pos++;
-					ch = (char)this.Reader.Peek(pos);
+					ch = this.Reader.Peek(pos);
 				}
 
 				bool hasDecimal = false;
@@ -292,14 +292,14 @@ namespace JsonFx.Json
 
 					// consume decimal
 					pos++;
-					ch = (char)this.Reader.Peek(pos);
+					ch = this.Reader.Peek(pos);
 
 					// fraction part
-					while ((ch >= 0) && Char.IsDigit(ch))
+					while ((ch >= 0) && Char.IsDigit((char)ch))
 					{
 						// consume digit
 						pos++;
-						ch = (char)this.Reader.Peek(pos);
+						ch = this.Reader.Peek(pos);
 					}
 				}
 
@@ -328,7 +328,7 @@ namespace JsonFx.Json
 
 					// consume 'e'
 					pos++;
-					ch = (char)this.Reader.Peek(pos);
+					ch = this.Reader.Peek(pos);
 					if (ch < 0)
 					{
 						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, numberStart);
@@ -340,10 +340,10 @@ namespace JsonFx.Json
 					{
 						// consume sign
 						pos++;
-						ch = (char)this.Reader.Peek(pos);
+						ch = this.Reader.Peek(pos);
 					}
 
-					if ((ch < 0) || !Char.IsDigit(ch))
+					if ((ch < 0) || !Char.IsDigit((char)ch))
 					{
 						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, numberStart);
 					}
@@ -353,8 +353,8 @@ namespace JsonFx.Json
 					{
 						// consume digit
 						pos++;
-						ch = (char)this.Reader.Peek(pos);
-					} while ((ch >= 0) && Char.IsDigit(ch));
+						ch = this.Reader.Peek(pos);
+					} while ((ch >= 0) && Char.IsDigit((char)ch));
 				}
 
 				// at this point, we have the full number string and know its characteristics
@@ -411,7 +411,7 @@ namespace JsonFx.Json
 			{
 				// store for unterminated case
 				long stringStart = this.Reader.Position;
-				char stringDelim = (char)this.Reader.Read();
+				int stringDelim = this.Reader.Read();
 
 				StringBuilder builder = new StringBuilder();
 
@@ -419,7 +419,7 @@ namespace JsonFx.Json
 				while (true)
 				{
 					// look ahead
-					char ch = (char)this.Reader.Peek(pos);
+					int ch = this.Reader.Peek(pos);
 					if (ch < 0)
 					{
 						// reached END before string delim
@@ -442,7 +442,7 @@ namespace JsonFx.Json
 						return new Token<JsonTokenType>(JsonTokenType.String, builder.ToString());
 					}
 
-					if (Char.IsControl(ch) && ch != '\t')
+					if (Char.IsControl((char)ch) && ch != '\t')
 					{
 						throw new DeserializationException(JsonTokenizer.ErrorUnterminatedString, stringStart);
 					}
@@ -547,7 +547,7 @@ namespace JsonFx.Json
 						}
 						default:
 						{
-							if (Char.IsControl(ch) && ch != '\t')
+							if (Char.IsControl((char)ch) && ch != '\t')
 							{
 								throw new DeserializationException(JsonTokenizer.ErrorUnterminatedString, stringStart);
 							}
@@ -653,13 +653,13 @@ namespace JsonFx.Json
 				while (true)
 				{
 					// look ahead
-					char ch = (char)this.Reader.Peek(pos);
+					int ch = this.Reader.Peek(pos);
 
 					// digits are only allowed after first char
 					// rest can be in head or tail
 					if ((ch > 0) &&
-						(identPart && Char.IsDigit(ch)) ||
-						Char.IsLetter(ch) || ch == '_' || ch == '$')
+						(identPart && Char.IsDigit((char)ch)) ||
+						Char.IsLetter((char)ch) || ch == '_' || ch == '$')
 					{
 						identPart = true;
 						pos++;
