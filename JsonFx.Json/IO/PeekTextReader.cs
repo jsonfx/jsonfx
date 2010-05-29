@@ -78,7 +78,15 @@ namespace JsonFx.IO
 		/// </summary>
 		/// <param name="buffer"></param>
 		/// <returns>the number of characters read or -1 if not enough characters are available</returns>
-		public abstract int Peek(char[] buffer);
+		public virtual int Peek(char[] buffer)
+		{
+			if (buffer == null)
+			{
+				throw new ArgumentNullException("buffer");
+			}
+
+			return this.Peek(buffer, 0, buffer.Length);
+		}
 
 		/// <summary>
 		/// Fills the buffer with the next character without advancing the input position.
@@ -90,11 +98,29 @@ namespace JsonFx.IO
 		public abstract int Peek(char[] buffer, int index, int count);
 
 		/// <summary>
+		/// Reads the next character from the input.
+		/// </summary>
+		/// <returns></returns>
+		public override int Read()
+		{
+			// force an implementation
+			throw new NotImplementedException();
+		}
+
+		/// <summary>
 		/// Reads characters from the input and writes the data to buffer.
 		/// </summary>
 		/// <param name="buffer"></param>
 		/// <returns></returns>
-		public abstract int Read(char[] buffer);
+		public virtual int Read(char[] buffer)
+		{
+			if (buffer == null)
+			{
+				throw new ArgumentNullException("buffer");
+			}
+
+			return this.Read(buffer, 0, buffer.Length);
+		}
 
 		/// <summary>
 		/// Advances the character position by count characters.

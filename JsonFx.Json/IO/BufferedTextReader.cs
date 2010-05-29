@@ -81,12 +81,11 @@ namespace JsonFx.IO
 			{
 				throw new ArgumentOutOfRangeException("bufferSize", "bufferSize must be a positive number.");
 			}
-#if !DEBUG
+
 			if (bufferSize < BufferedTextReader.MinBufferSize)
 			{
 				bufferSize = BufferedTextReader.MinBufferSize;
 			}
-#endif
 
 			this.Reader = reader;
 			this.buffer = new char[bufferSize];
@@ -159,21 +158,6 @@ namespace JsonFx.IO
 		/// Fills the buffer with the next character without advancing the input position.
 		/// </summary>
 		/// <param name="buffer"></param>
-		/// <returns>the number of characters read or -1 if not enough characters are available</returns>
-		public override int Peek(char[] buffer)
-		{
-			if (buffer == null)
-			{
-				throw new ArgumentNullException("buffer");
-			}
-
-			return this.Peek(buffer, 0, buffer.Length);
-		}
-
-		/// <summary>
-		/// Fills the buffer with the next character without advancing the input position.
-		/// </summary>
-		/// <param name="buffer"></param>
 		/// <param name="index"></param>
 		/// <param name="count"></param>
 		/// <returns>the number of characters read or -1 if not enough characters are available</returns>
@@ -204,7 +188,7 @@ namespace JsonFx.IO
 
 			int copyCount = Math.Min(this.count, count);
 
-			Array.Copy(this.buffer, this.start, buffer, index, copyCount);
+			Buffer.BlockCopy(this.buffer, this.start, buffer, index, copyCount);
 
 			return copyCount;
 		}
@@ -223,25 +207,11 @@ namespace JsonFx.IO
 		}
 
 		/// <summary>
-		/// Reads characters from the input and writes the data to buffer.
-		/// </summary>
-		/// <param name="buffer"></param>
-		/// <returns></returns>
-		public override int Read(char[] buffer)
-		{
-			if (buffer == null)
-			{
-				throw new ArgumentNullException("buffer");
-			}
-			return this.Read(buffer, 0, buffer.Length);
-		}
-
-		/// <summary>
 		/// Reads a maximum of count characters from the input and writes the data to buffer, beginning at index.
 		/// </summary>
-		/// <param name="destBuffer"></param>
-		/// <param name="destIndex"></param>
-		/// <param name="destCount"></param>
+		/// <param name="buffer"></param>
+		/// <param name="index"></param>
+		/// <param name="count"></param>
 		/// <returns></returns>
 		public override int Read(char[] buffer, int index, int count)
 		{
@@ -277,7 +247,7 @@ namespace JsonFx.IO
 				int max = Math.Min(count, this.count);
 
 				// copy into user buffer
-				Array.Copy(this.buffer, this.start, buffer, index, max);
+				Buffer.BlockCopy(this.buffer, this.start, buffer, index, max);
 
 				// adjust read counts
 				total += max;
@@ -306,7 +276,7 @@ namespace JsonFx.IO
 				return null;
 			}
 
-			StringBuilder builder = new StringBuilder(this.buffer.Length);
+			StringBuilder builder = new StringBuilder();
 			while (this.count > 0)
 			{
 				for (int i=this.start; i<this.count; i++)
@@ -339,9 +309,7 @@ namespace JsonFx.IO
 
 				// append buffered segment and flush
 				builder.Append(this.buffer, this.start, this.count);
-				this.position += this.count;
-				this.start += this.count;
-				this.count = 0;
+				this.FlushInternal(this.count);
 
 				// refill buffer
 				this.EnsureBuffer();
@@ -472,7 +440,7 @@ namespace JsonFx.IO
 		}
 
 		/// <summary>
-		/// Ensures that buffer is not disposed, large enough for destCount and fully populated
+		/// Ensures that buffer is not disposed, large enough for bufferSize and fully populated
 		/// </summary>
 		/// <param name="destCount"></param>
 		private void EnsureBuffer(int bufferSize)
@@ -500,12 +468,16 @@ namespace JsonFx.IO
 				if (this.count > 0)
 				{
 					// shift and copy any existing chars
-					Array.Copy(this.buffer, this.start, temp, 0, this.count);
+					Buffer.BlockCopy(this.buffer, this.start, temp, 0, this.count);
 				}
 				this.buffer = temp;
 			}
 			else if (this.start > 0 && this.count > 0)
 			{
+				// according to MSDN, this is safe: "If sourceArray and destinationArray overlap,
+				// this method behaves as if the original values of sourceArray were preserved in
+				// a temporary location before destinationArray is overwritten. "
+
 				// shift buffer to zero aligned
 				Array.Copy(this.buffer, this.start, this.buffer, 0, this.count);
 			}
