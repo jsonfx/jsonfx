@@ -92,7 +92,6 @@ namespace JsonFx.Json
 			/// <param name="generator"></param>
 			public void Write(TextWriter writer, IEnumerable<Token<JsonTokenType>> tokens)
 			{
-				// TODO: render tokens
 				foreach (Token<JsonTokenType> token in tokens)
 				{
 					switch (token.TokenType)
@@ -101,48 +100,48 @@ namespace JsonFx.Json
 						{
 							writer.Write(JsonGrammar.OperatorArrayBegin);
 							this.WriteLine(writer);
-							break;
+							continue;
 						}
 						case JsonTokenType.ArrayEnd:
 						{
 							writer.Write(JsonGrammar.OperatorArrayEnd);
-							break;
+							continue;
 						}
 						case JsonTokenType.Boolean:
 						{
 							writer.Write(true.Equals(token.Value) ? JsonGrammar.KeywordTrue : JsonGrammar.KeywordFalse);
-							break;
+							continue;
 						}
 						case JsonTokenType.Literal:
 						{
 							writer.Write(token.Value);
-							break;
+							continue;
 						}
 						case JsonTokenType.Null:
 						{
 							writer.Write(JsonGrammar.KeywordNull);
-							break;
+							continue;
 						}
 						case JsonTokenType.Number:
 						{
 							writer.Write(token.Value);
-							break;
+							continue;
 						}
 						case JsonTokenType.ObjectBegin:
 						{
 							writer.Write(JsonGrammar.OperatorObjectBegin);
-							break;
+							continue;
 						}
 						case JsonTokenType.ObjectEnd:
 						{
 							this.WriteLine(writer);
 							writer.Write(JsonGrammar.OperatorObjectEnd);
-							break;
+							continue;
 						}
 						case JsonTokenType.PairDelim:
 						{
 							writer.Write(JsonGrammar.OperatorPairDelim);
-							break;
+							continue;
 						}
 						case JsonTokenType.String:
 						{
@@ -151,30 +150,31 @@ namespace JsonFx.Json
 								goto case JsonTokenType.Null;
 							}
 
-							this.EscapeString(writer, (string)token.Value);
-							break;
+							this.WriteString(writer, (string)token.Value);
+							continue;
 						}
 						case JsonTokenType.Undefined:
 						{
 							writer.Write(JsonGrammar.KeywordUndefined);
-							break;
+							continue;
 						}
 						case JsonTokenType.ValueDelim:
 						{
 							writer.Write(JsonGrammar.OperatorValueDelim);
 							this.WriteLine(writer);
-							break;
+							continue;
 						}
 						case JsonTokenType.None:
 						default:
 						{
-							break;
+							this.WriteUnknown(writer, token);
+							continue;
 						}
 					}
 				}
 			}
 
-			private void EscapeString(TextWriter writer, string value)
+			private void WriteString(TextWriter writer, string value)
 			{
 				int start = 0,
 					length = value.Length;
@@ -247,6 +247,14 @@ namespace JsonFx.Json
 				}
 
 				writer.Write(JsonGrammar.OperatorStringDelim);
+			}
+
+			private void WriteUnknown(TextWriter writer, Token<JsonTokenType> token)
+			{
+#if DEBUG
+				// TODO: determine if this is ever valid
+				throw new NotSupportedException("Unexpected JSON token: "+token);
+#endif
 			}
 
 			private void WriteLine(TextWriter writer)
