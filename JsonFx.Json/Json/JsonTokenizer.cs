@@ -75,6 +75,11 @@ namespace JsonFx.Json
 			/// <param name="settings"></param>
 			public JsonTokenizer(DataReaderSettings settings)
 			{
+				if (settings == null)
+				{
+					throw new ArgumentNullException("settings");
+				}
+
 				this.Settings = settings;
 			}
 
@@ -124,6 +129,8 @@ namespace JsonFx.Json
 			/// <returns></returns>
 			private Token<JsonTokenType> NextToken()
 			{
+				this.Peek();
+
 				// skip comments and whitespace between tokens
 				this.SkipCommentsAndWhitespace();
 
@@ -210,8 +217,6 @@ namespace JsonFx.Json
 
 			private void SkipCommentsAndWhitespace()
 			{
-				this.Peek();
-
 				// skip leading whitespace
 				this.SkipWhitespace();
 
@@ -294,7 +299,7 @@ namespace JsonFx.Json
 						{
 							throw new DeserializationException(JsonTokenizer.ErrorUnterminatedComment, commentStart, commentLine, commentCol);
 						}
-					} while (!this.isEnd && (JsonGrammar.LineEndings.IndexOf(this.next) < 0));
+					} while (!this.isEnd && ('\r' != this.next) && ('\n' != this.next));
 				}
 
 				// skip trailing whitespace
@@ -312,8 +317,7 @@ namespace JsonFx.Json
 
 			private Token<JsonTokenType> ScanNumber()
 			{
-				StringBuilder buffer = new StringBuilder();
-				this.Peek();
+				StringBuilder buffer = new StringBuilder(0x20);
 
 				bool isNeg = false;
 				if (this.next == JsonGrammar.OperatorUnaryPlus)
@@ -395,6 +399,7 @@ namespace JsonFx.Json
 					buffer.Append(this.next);
 					this.Read();
 					this.Peek();
+
 					if (this.isEnd)
 					{
 						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.position, this.line, this.column);
@@ -483,7 +488,7 @@ namespace JsonFx.Json
 				char stringDelim = this.next;
 				this.Read();
 
-				StringBuilder buffer = new StringBuilder();
+				StringBuilder buffer = new StringBuilder(0x100);
 				while (true)
 				{
 					// look ahead
@@ -715,12 +720,9 @@ namespace JsonFx.Json
 			{
 				bool identPart = false;
 
-				StringBuilder buffer = new StringBuilder();
+				StringBuilder buffer = new StringBuilder(0x20);
 				while (true)
 				{
-					// look ahead
-					this.Peek();
-
 					// digits are only allowed after first char
 					// rest can be in head or tail
 					if ((identPart && Char.IsDigit(this.next)) ||
@@ -764,14 +766,16 @@ namespace JsonFx.Json
 				this.next = (char)ch;
 
 				// check for lines
-				if (JsonGrammar.LineEndings.IndexOf(this.next) < 0)
+				if ('\r' == this.next ||
+					'\n' == this.next)
 				{
-					this.column++;
+					// TODO: dedup CRLF
+					this.line++;
+					this.column = 1;
 				}
 				else
 				{
-					this.line++;
-					this.column = 1;
+					this.column++;
 				}
 				this.position++;
 			}
@@ -787,6 +791,7 @@ namespace JsonFx.Json
 				this.line = 1;
 				this.position = 0;
 				this.isEnd = false;
+				this.next = '\0';
 
 				while (true)
 				{

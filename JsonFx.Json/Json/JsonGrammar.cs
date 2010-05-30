@@ -92,10 +92,6 @@ namespace JsonFx.Json
 		public const string OperatorCommentEnd = "*/";
 		public const string OperatorCommentLine = "//";
 
-		public const string LineEndings = "\r\n";
-
-		public const int EndOfSequence = -1;
-
 		#endregion Operators
 	}
 }
