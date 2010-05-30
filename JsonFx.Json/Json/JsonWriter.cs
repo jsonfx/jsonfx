@@ -84,11 +84,21 @@ namespace JsonFx.Json
 
 		#region DataWriter<JsonTokenType> Methods
 
+		/// <summary>
+		/// Gets the generator for JSON
+		/// </summary>
+		/// <param name="settings"></param>
+		/// <returns></returns>
 		protected override IDataGenerator<JsonTokenType> GetGenerator(DataWriterSettings settings)
 		{
 			return new JsonWriter.JsonGenerator(settings);
 		}
 
+		/// <summary>
+		/// Gets the formatter for JSON
+		/// </summary>
+		/// <param name="settings"></param>
+		/// <returns></returns>
 		protected override IDataFormatter<JsonTokenType> GetFormatter(DataWriterSettings settings)
 		{
 			return new JsonWriter.JsonFormatter(settings);

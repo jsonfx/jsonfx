@@ -51,7 +51,7 @@ namespace JsonFx.Serialization
 		}
 
 		/// <summary>
-		/// Gets the supported content type for the serialized data
+		/// Gets the supported content types for the serialized data
 		/// </summary>
 		IEnumerable<string> ContentType
 		{
@@ -59,7 +59,7 @@ namespace JsonFx.Serialization
 		}
 
 		/// <summary>
-		/// Gets the supported file extension for the serialized data
+		/// Gets the supported file extensions for the serialized data
 		/// </summary>
 		IEnumerable<string> FileExtension
 		{

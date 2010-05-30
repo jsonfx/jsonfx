@@ -70,7 +70,7 @@ namespace JsonFx.Serialization
 		}
 
 		/// <summary>
-		/// Gets the supported content type for the serialized data
+		/// Gets the supported content types for the serialized data
 		/// </summary>
 		public abstract IEnumerable<string> ContentType
 		{
@@ -78,7 +78,7 @@ namespace JsonFx.Serialization
 		}
 
 		/// <summary>
-		/// Gets the supported file extension for the serialized data
+		/// Gets the supported file extensions for the serialized data
 		/// </summary>
 		public abstract IEnumerable<string> FileExtension
 		{
@@ -130,8 +130,18 @@ namespace JsonFx.Serialization
 			}
 		}
 
+		/// <summary>
+		/// Gets the generator for this DataWriter
+		/// </summary>
+		/// <param name="dataWriterSettings"></param>
+		/// <returns></returns>
 		protected abstract IDataGenerator<T> GetGenerator(DataWriterSettings dataWriterSettings);
 
+		/// <summary>
+		/// Gets the formatter for this DataWriter
+		/// </summary>
+		/// <param name="dataWriterSettings"></param>
+		/// <returns></returns>
 		protected abstract IDataFormatter<T> GetFormatter(DataWriterSettings dataWriterSettings);
 
 		#endregion Methods
