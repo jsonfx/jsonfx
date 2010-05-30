@@ -29,6 +29,7 @@
 #endregion License
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace JsonFx.Serialization
@@ -62,7 +63,7 @@ namespace JsonFx.Serialization
 		/// <summary>
 		/// Gets the supported content type of the serialized data
 		/// </summary>
-		public abstract string ContentType
+		public abstract IEnumerable<string> ContentType
 		{
 			get;
 		}

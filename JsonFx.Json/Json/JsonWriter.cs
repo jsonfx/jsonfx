@@ -29,7 +29,7 @@
 #endregion License
 
 using System;
-using System.IO;
+using System.Collections.Generic;
 using System.Text;
 
 using JsonFx.Serialization;
@@ -67,17 +67,17 @@ namespace JsonFx.Json
 		/// <summary>
 		/// Gets the supported content type for the serialized data
 		/// </summary>
-		public override string ContentType
+		public override IEnumerable<string> ContentType
 		{
-			get { return "application/json"; }
+			get { yield return "application/json"; }
 		}
 
 		/// <summary>
 		/// Gets the supported file extension for the serialized data
 		/// </summary>
-		public override string FileExtension
+		public override IEnumerable<string> FileExtension
 		{
-			get { return ".json"; }
+			get { yield return ".json"; }
 		}
 
 		#endregion Properties
