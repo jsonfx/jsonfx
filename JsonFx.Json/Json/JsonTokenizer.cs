@@ -58,12 +58,7 @@ namespace JsonFx.Json
 			#region Fields
 
 			private readonly DataReaderSettings Settings;
-			private TextReader Reader = TextReader.Null;
-			private int column;
-			private int line;
-			private long position;
-			private bool isEnd;
-			private char next;
+			private TextEnumerator source = TextEnumerator.Null;
 
 			#endregion Fields
 
@@ -92,7 +87,7 @@ namespace JsonFx.Json
 			/// </summary>
 			public int Column
 			{
-				get { return this.column; }
+				get { return this.source.Column; }
 			}
 
 			/// <summary>
@@ -100,7 +95,7 @@ namespace JsonFx.Json
 			/// </summary>
 			public int Line
 			{
-				get { return this.line; }
+				get { return this.source.Line; }
 			}
 
 			/// <summary>
@@ -108,7 +103,7 @@ namespace JsonFx.Json
 			/// </summary>
 			public long Position
 			{
-				get { return this.position; }
+				get { return this.source.Position; }
 			}
 
 			/// <summary>
@@ -116,7 +111,7 @@ namespace JsonFx.Json
 			/// </summary>
 			public TextReader TextReader
 			{
-				get { return this.Reader; }
+				get { return this.source.TextReader; }
 			}
 
 			#endregion Properties
@@ -132,48 +127,42 @@ namespace JsonFx.Json
 				// skip comments and whitespace between tokens
 				this.SkipCommentsAndWhitespace();
 
-				if (this.isEnd)
+				if (this.source.IsEnd)
 				{
 					return JsonGrammar.TokenNone;
 				}
 
 				bool hasUnaryOp = false;
-				switch (this.next)
+				switch (this.source.Current)
 				{
 					case JsonGrammar.OperatorArrayBegin:
 					{
-						this.Read();
-						this.Peek();
+						this.source.MoveNext();
 						return JsonGrammar.TokenArrayBegin;
 					}
 					case JsonGrammar.OperatorArrayEnd:
 					{
-						this.Read();
-						this.Peek();
+						this.source.MoveNext();
 						return JsonGrammar.TokenArrayEnd;
 					}
 					case JsonGrammar.OperatorObjectBegin:
 					{
-						this.Read();
-						this.Peek();
+						this.source.MoveNext();
 						return JsonGrammar.TokenObjectBegin;
 					}
 					case JsonGrammar.OperatorObjectEnd:
 					{
-						this.Read();
-						this.Peek();
+						this.source.MoveNext();
 						return JsonGrammar.TokenObjectEnd;
 					}
 					case JsonGrammar.OperatorValueDelim:
 					{
-						this.Read();
-						this.Peek();
+						this.source.MoveNext();
 						return JsonGrammar.TokenValueDelim;
 					}
 					case JsonGrammar.OperatorPairDelim:
 					{
-						this.Read();
-						this.Peek();
+						this.source.MoveNext();
 						return JsonGrammar.TokenPairDelim;
 					}
 					case JsonGrammar.OperatorStringDelim:
@@ -200,9 +189,8 @@ namespace JsonFx.Json
 				char unaryOp = '\0';
 				if (hasUnaryOp)
 				{
-					unaryOp = this.next;
-					this.Read();
-					this.Peek();
+					unaryOp = this.source.Current;
+					this.source.MoveNext();
 				}
 
 				// scan for identifiers, then check if they are keywords
@@ -216,7 +204,7 @@ namespace JsonFx.Json
 					}
 				}
 
-				throw new DeserializationException(JsonTokenizer.ErrorUnrecognizedToken, this.position, this.line, this.column);
+				throw new DeserializationException(JsonTokenizer.ErrorUnrecognizedToken, this.source.Position, this.source.Line, this.source.Column);
 			}
 
 			private void SkipCommentsAndWhitespace()
@@ -225,30 +213,29 @@ namespace JsonFx.Json
 				this.SkipWhitespace();
 
 				// check for block and line comments
-				if (this.next != JsonGrammar.OperatorCommentBegin[0])
+				if (this.source.Current != JsonGrammar.OperatorCommentBegin[0])
 				{
 					return;
 				}
 
 				// store for unterminated case
-				long commentStart = this.position;
-				int commentCol = this.column;
-				int commentLine = this.line;
+				long commentStart = this.source.Position;
+				int commentCol = this.source.Column;
+				int commentLine = this.source.Line;
 
 				// read second char of comment start
-				this.Read();
-				this.Peek();
-				if (this.isEnd)
+				this.source.MoveNext();
+				if (this.source.IsEnd)
 				{
 					throw new DeserializationException(JsonTokenizer.ErrorUnterminatedComment, commentStart, commentLine, commentCol);
 				}
 
 				bool isBlockComment;
-				if (this.next == JsonGrammar.OperatorCommentBegin[1])
+				if (this.source.Current == JsonGrammar.OperatorCommentBegin[1])
 				{
 					isBlockComment = true;
 				}
-				else if (this.next == JsonGrammar.OperatorCommentLine[1])
+				else if (this.source.Current == JsonGrammar.OperatorCommentLine[1])
 				{
 					isBlockComment = false;
 				}
@@ -265,28 +252,25 @@ namespace JsonFx.Json
 					{
 						do
 						{
-							this.Read();
-							this.Peek();
+							this.source.MoveNext();
 
-							if (this.isEnd)
+							if (this.source.IsEnd)
 							{
 								throw new DeserializationException(JsonTokenizer.ErrorUnterminatedComment, commentStart, commentLine, commentCol);
 							}
-						} while (this.next != JsonGrammar.OperatorCommentEnd[0]);
+						} while (this.source.Current != JsonGrammar.OperatorCommentEnd[0]);
 
-						this.Read();
-						this.Peek();
+						this.source.MoveNext();
 
-						if (this.isEnd)
+						if (this.source.IsEnd)
 						{
 							throw new DeserializationException(JsonTokenizer.ErrorUnterminatedComment, commentStart, commentLine, commentCol);
 						}
 
-						if (this.next == JsonGrammar.OperatorCommentEnd[1])
+						if (this.source.Current == JsonGrammar.OperatorCommentEnd[1])
 						{
 							// move past block comment end token
-							this.Read();
-							this.Peek();
+							this.source.MoveNext();
 							break;
 						}
 					}
@@ -296,14 +280,13 @@ namespace JsonFx.Json
 					// skip over everything until reach line ending or end of input
 					do
 					{
-						this.Read();
-						this.Peek();
+						this.source.MoveNext();
 
-						if (this.isEnd)
+						if (this.source.IsEnd)
 						{
 							throw new DeserializationException(JsonTokenizer.ErrorUnterminatedComment, commentStart, commentLine, commentCol);
 						}
-					} while (!this.isEnd && ('\r' != this.next) && ('\n' != this.next));
+					} while (!this.source.IsEnd && ('\r' != this.source.Current) && ('\n' != this.source.Current));
 				}
 
 				// skip trailing whitespace
@@ -312,10 +295,9 @@ namespace JsonFx.Json
 
 			private void SkipWhitespace()
 			{
-				while (!this.isEnd && Char.IsWhiteSpace(this.next))
+				while (!this.source.IsEnd && Char.IsWhiteSpace(this.source.Current))
 				{
-					this.Read();
-					this.Peek();
+					this.source.MoveNext();
 				}
 			}
 
@@ -324,55 +306,50 @@ namespace JsonFx.Json
 				StringBuilder buffer = new StringBuilder();
 
 				bool isNeg = false;
-				if (this.next == JsonGrammar.OperatorUnaryPlus)
+				if (this.source.Current == JsonGrammar.OperatorUnaryPlus)
 				{
 					// consume positive signing (as is extraneous)
-					this.Read();
-					this.Peek();
+					this.source.MoveNext();
 				}
-				else if (this.next == JsonGrammar.OperatorUnaryMinus)
+				else if (this.source.Current == JsonGrammar.OperatorUnaryMinus)
 				{
 					// optional minus part
-					buffer.Append(this.next);
-					this.Read();
-					this.Peek();
+					buffer.Append(this.source.Current);
+					this.source.MoveNext();
 					isNeg = true;
 				}
 
-				if (!Char.IsDigit(this.next) &&
-					this.next != JsonGrammar.OperatorDecimalPoint)
+				if (!Char.IsDigit(this.source.Current) &&
+					this.source.Current != JsonGrammar.OperatorDecimalPoint)
 				{
 					// possibly "-Infinity"
 					return null;
 				}
 
 				// integer part
-				while (!this.isEnd && Char.IsDigit(this.next))
+				while (!this.source.IsEnd && Char.IsDigit(this.source.Current))
 				{
 					// consume digit
-					buffer.Append(this.next);
-					this.Read();
-					this.Peek();
+					buffer.Append(this.source.Current);
+					this.source.MoveNext();
 				}
 
 				bool hasDecimal = false;
 
-				if (!this.isEnd && (this.next == JsonGrammar.OperatorDecimalPoint))
+				if (!this.source.IsEnd && (this.source.Current == JsonGrammar.OperatorDecimalPoint))
 				{
 					hasDecimal = true;
 
 					// consume decimal
-					buffer.Append(this.next);
-					this.Read();
-					this.Peek();
+					buffer.Append(this.source.Current);
+					this.source.MoveNext();
 
 					// fraction part
-					while (!this.isEnd && Char.IsDigit(this.next))
+					while (!this.source.IsEnd && Char.IsDigit(this.source.Current))
 					{
 						// consume digit
-						buffer.Append(this.next);
-						this.Read();
-						this.Peek();
+						buffer.Append(this.source.Current);
+						this.source.MoveNext();
 					}
 				}
 
@@ -389,49 +366,46 @@ namespace JsonFx.Json
 
 				if (precision < 1)
 				{
-					throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.position, this.line, this.column);
+					throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.source.Position, this.source.Line, this.source.Column);
 				}
 
 				bool hasExponent = false;
 
 				// optional exponent part
-				if (!this.isEnd && (this.next == 'e' || this.next == 'E'))
+				if (!this.source.IsEnd && (this.source.Current == 'e' || this.source.Current == 'E'))
 				{
 					hasExponent = true;
 
 					// consume 'e'
-					buffer.Append(this.next);
-					this.Read();
-					this.Peek();
+					buffer.Append(this.source.Current);
+					this.source.MoveNext();
 
-					if (this.isEnd)
+					if (this.source.IsEnd)
 					{
-						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.position, this.line, this.column);
+						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.source.Position, this.source.Line, this.source.Column);
 					}
 
 					// optional minus/plus part
-					if (this.next == JsonGrammar.OperatorUnaryMinus ||
-						this.next == JsonGrammar.OperatorUnaryPlus)
+					if (this.source.Current == JsonGrammar.OperatorUnaryMinus ||
+						this.source.Current == JsonGrammar.OperatorUnaryPlus)
 					{
 						// consume sign
-						buffer.Append(this.next);
-						this.Read();
-						this.Peek();
+						buffer.Append(this.source.Current);
+						this.source.MoveNext();
 					}
 
-					if (this.isEnd || !Char.IsDigit(this.next))
+					if (this.source.IsEnd || !Char.IsDigit(this.source.Current))
 					{
-						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.position, this.line, this.column);
+						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.source.Position, this.source.Line, this.source.Column);
 					}
 
 					// exp part
 					do
 					{
 						// consume digit
-						buffer.Append(this.next);
-						this.Read();
-						this.Peek();
-					} while (!this.isEnd && Char.IsDigit(this.next));
+						buffer.Append(this.source.Current);
+						this.source.MoveNext();
+					} while (!this.source.IsEnd && Char.IsDigit(this.source.Current));
 				}
 
 				// at this point, we have the full number string and know its characteristics
@@ -446,7 +420,7 @@ namespace JsonFx.Json
 						NumberFormatInfo.InvariantInfo,
 						out number))
 					{
-						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.position, this.line, this.column);
+						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.source.Position, this.source.Line, this.source.Column);
 					}
 
 					if (number >= Int32.MinValue && number <= Int32.MaxValue)
@@ -474,7 +448,7 @@ namespace JsonFx.Json
 						 NumberFormatInfo.InvariantInfo,
 						 out number))
 					{
-						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.position, this.line, this.column);
+						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.source.Position, this.source.Line, this.source.Column);
 					}
 
 					// native EcmaScript number (IEEE-754)
@@ -485,107 +459,97 @@ namespace JsonFx.Json
 			private Token<JsonTokenType> ScanString()
 			{
 				// store for unterminated cases
-				long strPos = this.position;
-				int strLine = this.line;
-				int strCol = this.column;
+				long strPos = this.source.Position;
+				int strLine = this.source.Line;
+				int strCol = this.source.Column;
 
-				char stringDelim = this.next;
-				this.Read();
-				this.Peek();
+				char stringDelim = this.source.Current;
+				this.source.MoveNext();
 
 				StringBuilder buffer = new StringBuilder();
 				while (true)
 				{
 					// look ahead
-					if (this.isEnd)
+					if (this.source.IsEnd)
 					{
 						// reached END before string delim
 						throw new DeserializationException(JsonTokenizer.ErrorUnterminatedString, strPos, strLine, strCol);
 					}
 
 					// check each character for ending delim
-					if (this.next == stringDelim)
+					if (this.source.Current == stringDelim)
 					{
 						// flush closing delim
-						this.Read();
-						this.Peek();
+						this.source.MoveNext();
 
 						// output string
 						return new Token<JsonTokenType>(JsonTokenType.String, buffer.ToString());
 					}
 
-					if (Char.IsControl(this.next) && this.next != '\t')
+					if (Char.IsControl(this.source.Current) && this.source.Current != '\t')
 					{
 						throw new DeserializationException(JsonTokenizer.ErrorUnterminatedString, strPos, strLine, strCol);
 					}
 
-					if (this.next != JsonGrammar.OperatorCharEscape)
+					if (this.source.Current != JsonGrammar.OperatorCharEscape)
 					{
 						// accumulate
-						buffer.Append(this.next);
-						this.Read();
-						this.Peek();
+						buffer.Append(this.source.Current);
+						this.source.MoveNext();
 						continue;
 					}
 
 					// flush escape char
-					this.Read();
-					this.Peek();
-					if (this.isEnd)
+					this.source.MoveNext();
+					if (this.source.IsEnd)
 					{
 						// unexpected end of input
 						throw new DeserializationException(JsonTokenizer.ErrorUnterminatedString, strPos, strLine, strCol);
 					}
 
 					// begin decode
-					switch (this.next)
+					switch (this.source.Current)
 					{
 						case '0':
 						{
 							// don't allow NULL char '\0'
 							// causes CStrings to terminate
-							this.Read();
-							this.Peek();
+							this.source.MoveNext();
 							break;
 						}
 						case 'b':
 						{
 							// backspace
 							buffer.Append('\b');
-							this.Read();
-							this.Peek();
+							this.source.MoveNext();
 							break;
 						}
 						case 'f':
 						{
 							// formfeed
 							buffer.Append('\f');
-							this.Read();
-							this.Peek();
+							this.source.MoveNext();
 							break;
 						}
 						case 'n':
 						{
 							// newline
 							buffer.Append('\n');
-							this.Read();
-							this.Peek();
+							this.source.MoveNext();
 							break;
 						}
 						case 'r':
 						{
 							// carriage return
 							buffer.Append('\r');
-							this.Read();
-							this.Peek();
+							this.source.MoveNext();
 							break;
 						}
 						case 't':
 						{
 							// tab
 							buffer.Append('\t');
-							this.Read();
-							this.Peek();
+							this.source.MoveNext();
 							break;
 						}
 						case 'u':
@@ -596,13 +560,11 @@ namespace JsonFx.Json
 
 							string escapeSeq = String.Empty;
 
-							this.Read();
-							this.Peek();
-							for (int i=0; Char.IsDigit(this.next) && (i < UnicodeEscapeLength); i++)
+							this.source.MoveNext();
+							for (int i=0; Char.IsDigit(this.source.Current) && (i < UnicodeEscapeLength); i++)
 							{
-								escapeSeq += this.next;
-								this.Read();
-								this.Peek();
+								escapeSeq += this.source.Current;
+								this.source.MoveNext();
 							}
 
 							// unicode ordinal
@@ -628,14 +590,13 @@ namespace JsonFx.Json
 						}
 						default:
 						{
-							if (Char.IsControl(this.next) && this.next != '\t')
+							if (Char.IsControl(this.source.Current) && this.source.Current != '\t')
 							{
 								throw new DeserializationException(JsonTokenizer.ErrorUnterminatedString, strPos, strLine, strCol);
 							}
 
-							buffer.Append(this.next);
-							this.Read();
-							this.Peek();
+							buffer.Append(this.source.Current);
+							this.source.MoveNext();
 							break;
 						}
 					}
@@ -738,13 +699,12 @@ namespace JsonFx.Json
 				{
 					// digits are only allowed after first char
 					// rest can be in head or tail
-					if ((identPart && Char.IsDigit(this.next)) ||
-						Char.IsLetter(this.next) || this.next == '_' || this.next == '$')
+					if ((identPart && Char.IsDigit(this.source.Current)) ||
+						Char.IsLetter(this.source.Current) || this.source.Current == '_' || this.source.Current == '$')
 					{
 						identPart = true;
-						buffer.Append(this.next);
-						this.Read();
-						this.Peek();
+						buffer.Append(this.source.Current);
+						this.source.MoveNext();
 						continue;
 					}
 
@@ -753,66 +713,23 @@ namespace JsonFx.Json
 				}
 			}
 
-			private void Peek()
-			{
-				int ch = this.Reader.Peek();
-				if (ch < 0)
-				{
-					this.isEnd = true;
-					this.next = '\0';
-					return;
-				}
-
-				this.next = (char)ch;
-			}
-
-			private void Read()
-			{
-				int ch = this.Reader.Read();
-				if (ch < 0)
-				{
-					this.isEnd = true;
-					this.next = '\0';
-					return;
-				}
-
-				this.next = (char)ch;
-
-				// check for lines
-				if ('\r' == this.next ||
-					'\n' == this.next)
-				{
-					// TODO: dedup CRLF
-					this.line++;
-					this.column = 1;
-				}
-				else
-				{
-					this.column++;
-				}
-				this.position++;
-			}
-
 			#endregion Scanning Methods
 
 			#region ITokenizer<JsonTokenType> Members
 
 			public IEnumerable<Token<JsonTokenType>> GetTokens(TextReader reader)
 			{
-				this.Reader = reader;
-				this.column = 1;
-				this.line = 1;
-				this.position = 0;
-				this.isEnd = false;
-				this.next = '\0';
+				this.source = new TextEnumerator(reader);
+
+				// initialize
+				this.source.MoveNext();
 
 				while (true)
 				{
-					this.Peek();
-
 					Token<JsonTokenType> token = this.NextToken();
 					if (token.TokenType == JsonTokenType.None)
 					{
+						this.source.Dispose();
 						yield break;
 					}
 					yield return token;

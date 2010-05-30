@@ -79,6 +79,7 @@
     <Compile Include="Serialization\IDataTokenizer`1.cs" />
     <Compile Include="Serialization\IDataWriter.cs" />
     <Compile Include="Serialization\ISerializable`1.cs" />
+    <Compile Include="Serialization\TextEnumerator.cs" />
     <Compile Include="Serialization\Token`1.cs" />
   </ItemGroup>
   <ItemGroup>
