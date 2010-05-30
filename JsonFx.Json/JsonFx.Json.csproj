@@ -79,7 +79,9 @@
     <Compile Include="Serialization\IDataTokenizer`1.cs" />
     <Compile Include="Serialization\IDataWriter.cs" />
     <Compile Include="Serialization\ISerializable`1.cs" />
-    <Compile Include="Serialization\TextEnumerator.cs" />
+    <Compile Include="Serialization\ITextScanner.cs" />
+    <Compile Include="Serialization\StringScanner.cs" />
+    <Compile Include="Serialization\TextReaderScanner.cs" />
     <Compile Include="Serialization\Token`1.cs" />
   </ItemGroup>
   <ItemGroup>

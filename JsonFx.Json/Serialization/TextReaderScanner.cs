@@ -35,13 +35,13 @@ using System.IO;
 namespace JsonFx.Serialization
 {
 	/// <summary>
-	/// Supports a simple iteration over a text input
+	/// Supports a simple iteration over a TextReader tracking line/column/position
 	/// </summary>
-	public class TextEnumerator : ITextEnumerator
+	public class TextReaderScanner : ITextScanner
 	{
 		#region Constants
 
-		public static readonly TextEnumerator Null = new TextEnumerator(TextReader.Null);
+		public static readonly TextReaderScanner Null = new TextReaderScanner(TextReader.Null);
 
 		#endregion Constants
 
@@ -49,7 +49,7 @@ namespace JsonFx.Serialization
 
 		private readonly TextReader Reader;
 		private char current;
-		private bool isInit;
+		private bool isInited;
 		private bool isEnd;
 		private int column;
 		private int line;
@@ -63,7 +63,7 @@ namespace JsonFx.Serialization
 		/// Ctor
 		/// </summary>
 		/// <param name="reader"></param>
-		public TextEnumerator(TextReader reader)
+		public TextReaderScanner(TextReader reader)
 		{
 			this.Reader = reader;
 			this.index = -1L;
@@ -71,7 +71,7 @@ namespace JsonFx.Serialization
 
 		#endregion Fields
 
-		#region Properties
+		#region ITextScanner Members
 
 		/// <summary>
 		/// Gets the total number of characters read from the input
@@ -105,15 +105,7 @@ namespace JsonFx.Serialization
 			get { return this.isEnd; }
 		}
 
-		/// <summary>
-		/// Gets the underlying TextReader input
-		/// </summary>
-		public TextReader TextReader
-		{
-			get { return this.Reader; }
-		}
-
-		#endregion Properties
+		#endregion ITextScanner Members
 
 		#region IEnumerator<char> Members
 
@@ -152,7 +144,7 @@ namespace JsonFx.Serialization
 				return false;
 			}
 
-			if (this.isInit)
+			if (this.isInited)
 			{
 				// consume current peek char
 				this.Reader.Read();
@@ -160,7 +152,7 @@ namespace JsonFx.Serialization
 			else
 			{
 				// flag as initialized
-				this.isInit = true;
+				this.isInited = true;
 			}
 
 			int ch = this.Reader.Peek();
@@ -178,8 +170,8 @@ namespace JsonFx.Serialization
 				{
 					if (this.current == '\r')
 					{
-						// account for CRLF being one line ending
-						this.line--;
+						// consider CRLF to be one line ending
+						break;
 					}
 					// fall through
 					goto case '\r';

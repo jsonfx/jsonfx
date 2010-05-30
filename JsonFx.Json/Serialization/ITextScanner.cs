@@ -34,9 +34,9 @@ using System.Collections.Generic;
 namespace JsonFx.Serialization
 {
 	/// <summary>
-	/// Supports a simple iteration over a text input
+	/// Supports a simple iteration over a text input tracking line/column/position
 	/// </summary>
-	public interface ITextEnumerator : IEnumerator<char>
+	public interface ITextScanner : IEnumerator<char>
 	{
 		#region Properties
 

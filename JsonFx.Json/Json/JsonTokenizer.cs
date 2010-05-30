@@ -58,7 +58,7 @@ namespace JsonFx.Json
 			#region Fields
 
 			private readonly DataReaderSettings Settings;
-			private TextEnumerator source = TextEnumerator.Null;
+			private ITextScanner source = TextReaderScanner.Null;
 
 			#endregion Fields
 
@@ -99,19 +99,11 @@ namespace JsonFx.Json
 			}
 
 			/// <summary>
-			/// Gets the total number of characters read from the input
+			/// Gets the current position within the input
 			/// </summary>
-			public long Position
+			public long Index
 			{
-				get { return this.source.Position; }
-			}
-
-			/// <summary>
-			/// Gets the underlying TextReader
-			/// </summary>
-			public TextReader TextReader
-			{
-				get { return this.source.TextReader; }
+				get { return this.source.Index; }
 			}
 
 			#endregion Properties
@@ -133,7 +125,9 @@ namespace JsonFx.Json
 				}
 
 				bool hasUnaryOp = false;
-				switch (this.source.Current)
+
+				char ch = this.source.Current;
+				switch (ch)
 				{
 					case JsonGrammar.OperatorArrayBegin:
 					{
@@ -186,25 +180,27 @@ namespace JsonFx.Json
 				}
 
 				// hold for Infinity
-				char unaryOp = '\0';
 				if (hasUnaryOp)
 				{
-					unaryOp = this.source.Current;
 					this.source.MoveNext();
+				}
+				else
+				{
+					ch = '\0';
 				}
 
 				// scan for identifiers, then check if they are keywords
 				string ident = this.ScanIdentifier();
 				if (!String.IsNullOrEmpty(ident))
 				{
-					token = this.ScanKeywords(ident, unaryOp);
+					token = this.ScanKeywords(ident, ch);
 					if (token != null)
 					{
 						return token;
 					}
 				}
 
-				throw new DeserializationException(JsonTokenizer.ErrorUnrecognizedToken, this.source.Position, this.source.Line, this.source.Column);
+				throw new DeserializationException(JsonTokenizer.ErrorUnrecognizedToken, this.source.Index, this.source.Line, this.source.Column);
 			}
 
 			private void SkipCommentsAndWhitespace()
@@ -213,13 +209,13 @@ namespace JsonFx.Json
 				this.SkipWhitespace();
 
 				// check for block and line comments
-				if (this.source.Current != JsonGrammar.OperatorCommentBegin[0])
+				if (this.source.IsEnd || this.source.Current != JsonGrammar.OperatorCommentBegin[0])
 				{
 					return;
 				}
 
 				// store for unterminated case
-				long commentStart = this.source.Position;
+				long commentStart = this.source.Index;
 				int commentCol = this.source.Column;
 				int commentLine = this.source.Line;
 
@@ -366,7 +362,7 @@ namespace JsonFx.Json
 
 				if (precision < 1)
 				{
-					throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.source.Position, this.source.Line, this.source.Column);
+					throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.source.Index, this.source.Line, this.source.Column);
 				}
 
 				bool hasExponent = false;
@@ -382,7 +378,7 @@ namespace JsonFx.Json
 
 					if (this.source.IsEnd)
 					{
-						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.source.Position, this.source.Line, this.source.Column);
+						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.source.Index, this.source.Line, this.source.Column);
 					}
 
 					// optional minus/plus part
@@ -396,7 +392,7 @@ namespace JsonFx.Json
 
 					if (this.source.IsEnd || !Char.IsDigit(this.source.Current))
 					{
-						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.source.Position, this.source.Line, this.source.Column);
+						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.source.Index, this.source.Line, this.source.Column);
 					}
 
 					// exp part
@@ -420,7 +416,7 @@ namespace JsonFx.Json
 						NumberFormatInfo.InvariantInfo,
 						out number))
 					{
-						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.source.Position, this.source.Line, this.source.Column);
+						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.source.Index, this.source.Line, this.source.Column);
 					}
 
 					if (number >= Int32.MinValue && number <= Int32.MaxValue)
@@ -448,7 +444,7 @@ namespace JsonFx.Json
 						 NumberFormatInfo.InvariantInfo,
 						 out number))
 					{
-						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.source.Position, this.source.Line, this.source.Column);
+						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.source.Index, this.source.Line, this.source.Column);
 					}
 
 					// native EcmaScript number (IEEE-754)
@@ -459,7 +455,7 @@ namespace JsonFx.Json
 			private Token<JsonTokenType> ScanString()
 			{
 				// store for unterminated cases
-				long strPos = this.source.Position;
+				long strPos = this.source.Index;
 				int strLine = this.source.Line;
 				int strCol = this.source.Column;
 
@@ -697,13 +693,15 @@ namespace JsonFx.Json
 				StringBuilder buffer = new StringBuilder();
 				while (true)
 				{
+					char ch = this.source.Current;
+
 					// digits are only allowed after first char
 					// rest can be in head or tail
-					if ((identPart && Char.IsDigit(this.source.Current)) ||
-						Char.IsLetter(this.source.Current) || this.source.Current == '_' || this.source.Current == '$')
+					if ((identPart && Char.IsDigit(ch)) ||
+						Char.IsLetter(ch) || ch == '_' || ch == '$')
 					{
 						identPart = true;
-						buffer.Append(this.source.Current);
+						buffer.Append(ch);
 						this.source.MoveNext();
 						continue;
 					}
@@ -719,7 +717,7 @@ namespace JsonFx.Json
 
 			public IEnumerable<Token<JsonTokenType>> GetTokens(TextReader reader)
 			{
-				this.source = new TextEnumerator(reader);
+				this.source = new TextReaderScanner(reader);
 
 				// initialize
 				this.source.MoveNext();
