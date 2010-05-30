@@ -60,7 +60,6 @@ namespace JsonFx.Serialization
 		#region Fields
 
 		private bool allowNullValueTypes = true;
-		private int defaultBufferSize = 0x1000;
 		private DataNameResolver resolver;
 
 		#endregion Fields
@@ -80,23 +79,6 @@ namespace JsonFx.Serialization
 		{
 			get { return this.allowNullValueTypes; }
 			set { this.allowNullValueTypes = value; }
-		}
-
-		/// <summary>
-		/// Gets and sets the default read buffer size
-		/// </summary>
-		public int DefaultBufferSize
-		{
-			get { return this.defaultBufferSize; }
-			set
-			{
-				if (value < 1)
-				{
-					throw new ArgumentOutOfRangeException("DefaultBufferSize");
-				}
-
-				this.defaultBufferSize = value;
-			}
 		}
 
 		/// <summary>

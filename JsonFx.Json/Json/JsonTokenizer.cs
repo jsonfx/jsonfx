@@ -58,7 +58,6 @@ namespace JsonFx.Json
 			#region Fields
 
 			private readonly DataReaderSettings Settings;
-			private readonly TextBuffer Buffer;
 			private TextReader Reader = TextReader.Null;
 			private int column;
 			private int line;
@@ -76,13 +75,7 @@ namespace JsonFx.Json
 			/// <param name="settings"></param>
 			public JsonTokenizer(DataReaderSettings settings)
 			{
-				if (settings == null)
-				{
-					throw new ArgumentNullException("settings");
-				}
-
 				this.Settings = settings;
-				this.Buffer = new TextBuffer(this.Settings.DefaultBufferSize);
 			}
 
 			#endregion Init
@@ -319,7 +312,7 @@ namespace JsonFx.Json
 
 			private Token<JsonTokenType> ScanNumber()
 			{
-				this.Buffer.Clear();
+				StringBuilder buffer = new StringBuilder();
 				this.Peek();
 
 				bool isNeg = false;
@@ -332,7 +325,7 @@ namespace JsonFx.Json
 				else if (this.next == JsonGrammar.OperatorUnaryMinus)
 				{
 					// optional minus part
-					this.Buffer.Append(this.next);
+					buffer.Append(this.next);
 					this.Read();
 					this.Peek();
 					isNeg = true;
@@ -349,7 +342,7 @@ namespace JsonFx.Json
 				while (!this.isEnd && Char.IsDigit(this.next))
 				{
 					// consume digit
-					this.Buffer.Append(this.next);
+					buffer.Append(this.next);
 					this.Read();
 					this.Peek();
 				}
@@ -361,7 +354,7 @@ namespace JsonFx.Json
 					hasDecimal = true;
 
 					// consume decimal
-					this.Buffer.Append(this.next);
+					buffer.Append(this.next);
 					this.Read();
 					this.Peek();
 
@@ -369,14 +362,14 @@ namespace JsonFx.Json
 					while (!this.isEnd && Char.IsDigit(this.next))
 					{
 						// consume digit
-						this.Buffer.Append(this.next);
+						buffer.Append(this.next);
 						this.Read();
 						this.Peek();
 					}
 				}
 
 				// note the number of significant digits
-				int precision = this.Buffer.Length;
+				int precision = buffer.Length;
 				if (hasDecimal)
 				{
 					precision--;
@@ -399,7 +392,7 @@ namespace JsonFx.Json
 					hasExponent = true;
 
 					// consume 'e'
-					this.Buffer.Append(this.next);
+					buffer.Append(this.next);
 					this.Read();
 					this.Peek();
 					if (this.isEnd)
@@ -412,7 +405,7 @@ namespace JsonFx.Json
 						this.next == JsonGrammar.OperatorUnaryPlus)
 					{
 						// consume sign
-						this.Buffer.Append(this.next);
+						buffer.Append(this.next);
 						this.Read();
 						this.Peek();
 					}
@@ -426,7 +419,7 @@ namespace JsonFx.Json
 					do
 					{
 						// consume digit
-						this.Buffer.Append(this.next);
+						buffer.Append(this.next);
 						this.Read();
 						this.Peek();
 					} while (!this.isEnd && Char.IsDigit(this.next));
@@ -439,7 +432,7 @@ namespace JsonFx.Json
 					// Integer value
 					decimal number;
 					if (!Decimal.TryParse(
-						this.Buffer.ToString(),
+						buffer.ToString(),
 						NumberStyles.Integer,
 						NumberFormatInfo.InvariantInfo,
 						out number))
@@ -467,7 +460,7 @@ namespace JsonFx.Json
 					// Floating Point value
 					double number;
 					if (!Double.TryParse(
-						 this.Buffer.ToString(),
+						 buffer.ToString(),
 						 NumberStyles.Float,
 						 NumberFormatInfo.InvariantInfo,
 						 out number))
@@ -490,7 +483,7 @@ namespace JsonFx.Json
 				char stringDelim = this.next;
 				this.Read();
 
-				this.Buffer.Clear();
+				StringBuilder buffer = new StringBuilder();
 				while (true)
 				{
 					// look ahead
@@ -508,7 +501,7 @@ namespace JsonFx.Json
 						this.Read();
 
 						// output string
-						return new Token<JsonTokenType>(JsonTokenType.String, this.Buffer.ToString());
+						return new Token<JsonTokenType>(JsonTokenType.String, buffer.ToString());
 					}
 
 					if (Char.IsControl(this.next) && this.next != '\t')
@@ -519,7 +512,7 @@ namespace JsonFx.Json
 					if (this.next != JsonGrammar.OperatorCharEscape)
 					{
 						// accumulate
-						this.Buffer.Append(this.next);
+						buffer.Append(this.next);
 						this.Read();
 						continue;
 					}
@@ -546,35 +539,35 @@ namespace JsonFx.Json
 						case 'b':
 						{
 							// backspace
-							this.Buffer.Append('\b');
+							buffer.Append('\b');
 							this.Read();
 							break;
 						}
 						case 'f':
 						{
 							// formfeed
-							this.Buffer.Append('\f');
+							buffer.Append('\f');
 							this.Read();
 							break;
 						}
 						case 'n':
 						{
 							// newline
-							this.Buffer.Append('\n');
+							buffer.Append('\n');
 							this.Read();
 							break;
 						}
 						case 'r':
 						{
 							// carriage return
-							this.Buffer.Append('\r');
+							buffer.Append('\r');
 							this.Read();
 							break;
 						}
 						case 't':
 						{
 							// tab
-							this.Buffer.Append('\t');
+							buffer.Append('\t');
 							this.Read();
 							break;
 						}
@@ -604,15 +597,15 @@ namespace JsonFx.Json
 									NumberFormatInfo.InvariantInfo,
 									out utf16))
 							{
-								this.Buffer.Append(Char.ConvertFromUtf32(utf16));
+								buffer.Append(Char.ConvertFromUtf32(utf16));
 							}
 							else
 							{
 								// using FireFox style recovery, if not a valid hex
 								// escape sequence then treat as single escaped 'u'
 								// followed by rest of string
-								this.Buffer.Append('u');
-								this.Buffer.Append(escapeSeq);
+								buffer.Append('u');
+								buffer.Append(escapeSeq);
 							}
 							break;
 						}
@@ -623,7 +616,7 @@ namespace JsonFx.Json
 								throw new DeserializationException(JsonTokenizer.ErrorUnterminatedString, strPos, strLine, strCol);
 							}
 
-							this.Buffer.Append(this.next);
+							buffer.Append(this.next);
 							this.Read();
 							break;
 						}
@@ -722,7 +715,7 @@ namespace JsonFx.Json
 			{
 				bool identPart = false;
 
-				this.Buffer.Clear();
+				StringBuilder buffer = new StringBuilder();
 				while (true)
 				{
 					// look ahead
@@ -734,14 +727,14 @@ namespace JsonFx.Json
 						Char.IsLetter(this.next) || this.next == '_' || this.next == '$')
 					{
 						identPart = true;
-						this.Buffer.Append(this.next);
+						buffer.Append(this.next);
 						this.Read();
 						this.Peek();
 						continue;
 					}
 
 					// get ident string
-					return this.Buffer.ToString();
+					return buffer.ToString();
 				}
 			}
 

@@ -63,7 +63,6 @@
     <Compile Include="Json\JsonWriter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\AssemblyVersion.cs" />
-    <Compile Include="Serialization\TextBuffer.cs" />
     <Compile Include="Serialization\DataIgnoreAttribute.cs" />
     <Compile Include="Serialization\DataNameAttribute.cs" />
     <Compile Include="Serialization\DataNameResolver.cs" />
