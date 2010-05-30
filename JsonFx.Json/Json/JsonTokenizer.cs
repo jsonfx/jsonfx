@@ -129,8 +129,6 @@ namespace JsonFx.Json
 			/// <returns></returns>
 			private Token<JsonTokenType> NextToken()
 			{
-				this.Peek();
-
 				// skip comments and whitespace between tokens
 				this.SkipCommentsAndWhitespace();
 
@@ -145,31 +143,37 @@ namespace JsonFx.Json
 					case JsonGrammar.OperatorArrayBegin:
 					{
 						this.Read();
+						this.Peek();
 						return JsonGrammar.TokenArrayBegin;
 					}
 					case JsonGrammar.OperatorArrayEnd:
 					{
 						this.Read();
+						this.Peek();
 						return JsonGrammar.TokenArrayEnd;
 					}
 					case JsonGrammar.OperatorObjectBegin:
 					{
 						this.Read();
+						this.Peek();
 						return JsonGrammar.TokenObjectBegin;
 					}
 					case JsonGrammar.OperatorObjectEnd:
 					{
 						this.Read();
+						this.Peek();
 						return JsonGrammar.TokenObjectEnd;
 					}
 					case JsonGrammar.OperatorValueDelim:
 					{
 						this.Read();
+						this.Peek();
 						return JsonGrammar.TokenValueDelim;
 					}
 					case JsonGrammar.OperatorPairDelim:
 					{
 						this.Read();
+						this.Peek();
 						return JsonGrammar.TokenPairDelim;
 					}
 					case JsonGrammar.OperatorStringDelim:
@@ -487,12 +491,12 @@ namespace JsonFx.Json
 
 				char stringDelim = this.next;
 				this.Read();
+				this.Peek();
 
 				StringBuilder buffer = new StringBuilder();
 				while (true)
 				{
 					// look ahead
-					this.Peek();
 					if (this.isEnd)
 					{
 						// reached END before string delim
@@ -504,6 +508,7 @@ namespace JsonFx.Json
 					{
 						// flush closing delim
 						this.Read();
+						this.Peek();
 
 						// output string
 						return new Token<JsonTokenType>(JsonTokenType.String, buffer.ToString());
@@ -519,6 +524,7 @@ namespace JsonFx.Json
 						// accumulate
 						buffer.Append(this.next);
 						this.Read();
+						this.Peek();
 						continue;
 					}
 
@@ -539,6 +545,7 @@ namespace JsonFx.Json
 							// don't allow NULL char '\0'
 							// causes CStrings to terminate
 							this.Read();
+							this.Peek();
 							break;
 						}
 						case 'b':
@@ -546,6 +553,7 @@ namespace JsonFx.Json
 							// backspace
 							buffer.Append('\b');
 							this.Read();
+							this.Peek();
 							break;
 						}
 						case 'f':
@@ -553,6 +561,7 @@ namespace JsonFx.Json
 							// formfeed
 							buffer.Append('\f');
 							this.Read();
+							this.Peek();
 							break;
 						}
 						case 'n':
@@ -560,6 +569,7 @@ namespace JsonFx.Json
 							// newline
 							buffer.Append('\n');
 							this.Read();
+							this.Peek();
 							break;
 						}
 						case 'r':
@@ -567,6 +577,7 @@ namespace JsonFx.Json
 							// carriage return
 							buffer.Append('\r');
 							this.Read();
+							this.Peek();
 							break;
 						}
 						case 't':
@@ -574,6 +585,7 @@ namespace JsonFx.Json
 							// tab
 							buffer.Append('\t');
 							this.Read();
+							this.Peek();
 							break;
 						}
 						case 'u':
@@ -623,6 +635,7 @@ namespace JsonFx.Json
 
 							buffer.Append(this.next);
 							this.Read();
+							this.Peek();
 							break;
 						}
 					}
@@ -795,6 +808,8 @@ namespace JsonFx.Json
 
 				while (true)
 				{
+					this.Peek();
+
 					Token<JsonTokenType> token = this.NextToken();
 					if (token.TokenType == JsonTokenType.None)
 					{
