@@ -63,6 +63,8 @@ namespace JsonFx.Json
 			private const string ErrorMissingObjectProperty = "Missing JSON object property";
 			private const string ErrorUnterminatedObject = "Unterminated JSON object";
 
+			private static readonly Type SerializableType = typeof(ISerializable<JsonTokenType>);
+
 			#endregion Constants
 
 			#region Fields
@@ -116,7 +118,7 @@ namespace JsonFx.Json
 
 			private object ParseValue(IEnumerator<Token<JsonTokenType>> tokens, Type targetType)
 			{
-				if (targetType != null && typeof(ISerializable<JsonTokenType>).IsAssignableFrom(targetType))
+				if (targetType != null && JsonParser.SerializableType.IsAssignableFrom(targetType))
 				{
 					ISerializable<JsonTokenType> serializable = this.Settings.InstantiateObject<ISerializable<JsonTokenType>>(targetType);
 					return serializable.Read(this.Enumerate(tokens));
@@ -162,7 +164,7 @@ namespace JsonFx.Json
 
 			private object ParseObject(IEnumerator<Token<JsonTokenType>> tokens, Type targetType)
 			{
-				if (targetType != null && typeof(ISerializable<JsonTokenType>).IsAssignableFrom(targetType))
+				if (targetType != null && JsonParser.SerializableType.IsAssignableFrom(targetType))
 				{
 					ISerializable<JsonTokenType> serializable = this.Settings.InstantiateObject<ISerializable<JsonTokenType>>(targetType);
 					return serializable.Read(this.Enumerate(tokens));
@@ -307,7 +309,7 @@ namespace JsonFx.Json
 
 			private object ParseArray(IEnumerator<Token<JsonTokenType>> tokens, Type arrayType)
 			{
-				if (arrayType != null && typeof(ISerializable<JsonTokenType>).IsAssignableFrom(arrayType))
+				if (arrayType != null && JsonParser.SerializableType.IsAssignableFrom(arrayType))
 				{
 					ISerializable<JsonTokenType> serializable = this.Settings.InstantiateObject<ISerializable<JsonTokenType>>(arrayType);
 					return serializable.Read(this.Enumerate(tokens));
@@ -398,7 +400,7 @@ namespace JsonFx.Json
 						case JsonTokenType.String:
 						case JsonTokenType.Undefined:
 						{
-							if (itemType != null && typeof(ISerializable<JsonTokenType>).IsAssignableFrom(itemType))
+							if (itemType != null && JsonParser.SerializableType.IsAssignableFrom(itemType))
 							{
 								ISerializable<JsonTokenType> serializable = this.Settings.InstantiateObject<ISerializable<JsonTokenType>>(itemType);
 								item = serializable.Read(this.Enumerate(tokens));
@@ -451,7 +453,7 @@ namespace JsonFx.Json
 			#region Utility Methods
 
 			/// <summary>
-			/// Allows an IEnumerator&lt;T&gt; to be used as a IEnumerable&lt;T&gt;.
+			/// Allows an IEnumerator&lt;T&gt; to be used as an IEnumerable&lt;T&gt;.
 			/// </summary>
 			/// <param name="enumerator"></param>
 			/// <returns></returns>
