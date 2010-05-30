@@ -317,7 +317,7 @@ namespace JsonFx.Json
 
 			private Token<JsonTokenType> ScanNumber()
 			{
-				StringBuilder buffer = new StringBuilder(0x20);
+				StringBuilder buffer = new StringBuilder();
 
 				bool isNeg = false;
 				if (this.next == JsonGrammar.OperatorUnaryPlus)
@@ -488,7 +488,7 @@ namespace JsonFx.Json
 				char stringDelim = this.next;
 				this.Read();
 
-				StringBuilder buffer = new StringBuilder(0x100);
+				StringBuilder buffer = new StringBuilder();
 				while (true)
 				{
 					// look ahead
@@ -720,7 +720,7 @@ namespace JsonFx.Json
 			{
 				bool identPart = false;
 
-				StringBuilder buffer = new StringBuilder(0x20);
+				StringBuilder buffer = new StringBuilder();
 				while (true)
 				{
 					// digits are only allowed after first char
