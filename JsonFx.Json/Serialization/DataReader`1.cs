@@ -130,7 +130,7 @@ namespace JsonFx.Serialization
 			}
 			catch (Exception ex)
 			{
-				throw new DeserializationException(ex.Message, tokenizer.Position, tokenizer.Line, tokenizer.Column, ex);
+				throw new DeserializationException(ex.Message, tokenizer.Index, tokenizer.Line, tokenizer.Column, ex);
 			}
 		}
 

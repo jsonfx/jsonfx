@@ -30,15 +30,14 @@
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 
 namespace JsonFx.Serialization
 {
 	/// <summary>
-	/// An extremely generalized mechanism for reading text input
+	/// Supports a simple iteration over a text input
 	/// </summary>
-	public class TextEnumerator : IEnumerator<char>
+	public class TextEnumerator : ITextEnumerator
 	{
 		#region Constants
 
@@ -54,7 +53,7 @@ namespace JsonFx.Serialization
 		private bool isEnd;
 		private int column;
 		private int line;
-		private long position;
+		private long index;
 
 		#endregion Fields
 
@@ -67,7 +66,7 @@ namespace JsonFx.Serialization
 		public TextEnumerator(TextReader reader)
 		{
 			this.Reader = reader;
-			this.position = -1L;
+			this.index = -1L;
 		}
 
 		#endregion Fields
@@ -91,11 +90,11 @@ namespace JsonFx.Serialization
 		}
 
 		/// <summary>
-		/// Gets the total number of characters read from the input
+		/// Gets the current position within the input
 		/// </summary>
-		public long Position
+		public long Index
 		{
-			get { return this.position; }
+			get { return this.index; }
 		}
 
 		/// <summary>
@@ -139,7 +138,7 @@ namespace JsonFx.Serialization
 		}
 
 		/// <summary>
-		/// Advances the position of the underlying reader
+		/// Advances the position of the underlying input
 		/// </summary>
 		/// <returns>
 		/// true if the enumerator was successfully advanced to the next element;
@@ -197,7 +196,7 @@ namespace JsonFx.Serialization
 					break;
 				}
 			}
-			this.position++;
+			this.index++;
 
 			this.current = (char)ch;
 

@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -30,62 +30,48 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 
 namespace JsonFx.Serialization
 {
 	/// <summary>
-	/// Generates a SAX-like sequence of tokens from a sequence of characters
+	/// Supports a simple iteration over a text input
 	/// </summary>
-	/// <typeparam name="T">token type</typeparam>
-	public interface IDataTokenizer<T>
+	public interface ITextEnumerator : IEnumerator<char>
 	{
 		#region Properties
 
 		/// <summary>
-		/// Gets the current column of the underlying input character sequence
+		/// Gets the total number of characters read from the input
 		/// </summary>
-		/// <remarks>
-		/// Tokenizers not tracking columns should return -1.
-		/// </remarks>
 		int Column
 		{
 			get;
 		}
 
 		/// <summary>
-		/// Gets the current line of the underlying input character sequence
+		/// Gets the total number of lines read from the input
 		/// </summary>
-		/// <remarks>
-		/// Tokenizers not tracking lines should return -1.
-		/// </remarks>
 		int Line
 		{
 			get;
 		}
 
 		/// <summary>
-		/// Gets the current position of the underlying input character sequence
+		/// Gets the current position within the input
 		/// </summary>
-		/// <remarks>
-		/// Tokenizers not tracking index should return -1.
-		/// </remarks>
 		long Index
 		{
 			get;
 		}
 
-		#endregion Properties
-
-		#region Methods
-
 		/// <summary>
-		/// Tokenizes the input sequence into tokens
+		/// Gets if at the end of the input
 		/// </summary>
-		/// <param name="reader"></param>
-		/// <returns></returns>
-		IEnumerable<Token<T>> GetTokens(TextReader reader);
+		bool IsEnd
+		{
+			get;
+		}
 
-		#endregion Methods
+		#endregion Properties
 	}
 }

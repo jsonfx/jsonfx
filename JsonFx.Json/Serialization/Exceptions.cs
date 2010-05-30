@@ -75,7 +75,7 @@ namespace JsonFx.Serialization
 
 		private int column = -1;
 		private int line = -1;
-		private long position = -1L;
+		private long index = -1L;
 
 		#endregion Fields
 
@@ -85,9 +85,9 @@ namespace JsonFx.Serialization
 		/// Ctor
 		/// </summary>
 		/// <param name="message"></param>
-		/// <param name="position"></param>
-		public DeserializationException(string message, long position)
-			: this(message, position, -1, -1)
+		/// <param name="index"></param>
+		public DeserializationException(string message, long index)
+			: this(message, index, -1, -1)
 		{
 		}
 
@@ -95,15 +95,15 @@ namespace JsonFx.Serialization
 		/// Ctor
 		/// </summary>
 		/// <param name="message"></param>
-		/// <param name="position"></param>
+		/// <param name="index"></param>
 		/// <param name="line"></param>
 		/// <param name="column"></param>
-		public DeserializationException(string message, long position, int line, int column)
+		public DeserializationException(string message, long index, int line, int column)
 			: base(message)
 		{
 			this.column = column;
 			this.line = line;
-			this.position = position;
+			this.index = index;
 		}
 
 		/// <summary>
@@ -112,8 +112,8 @@ namespace JsonFx.Serialization
 		/// <param name="message"></param>
 		/// <param name="index"></param>
 		/// <param name="innerException"></param>
-		public DeserializationException(string message, long position, Exception innerException)
-			: this(message, position, -1, -1, innerException)
+		public DeserializationException(string message, long index, Exception innerException)
+			: this(message, index, -1, -1, innerException)
 		{
 		}
 
@@ -123,12 +123,12 @@ namespace JsonFx.Serialization
 		/// <param name="message"></param>
 		/// <param name="index"></param>
 		/// <param name="innerException"></param>
-		public DeserializationException(string message, long position, int line, int column, Exception innerException)
+		public DeserializationException(string message, long index, int line, int column, Exception innerException)
 			: base(message, innerException)
 		{
 			this.column = column;
 			this.line = line;
-			this.position = position;
+			this.index = index;
 		}
 
 		/// <summary>
@@ -148,7 +148,7 @@ namespace JsonFx.Serialization
 		#region Properties
 
 		/// <summary>
-		/// Gets the character column in the stream where the error occurred.
+		/// Gets the character column in the stream where the error occurred
 		/// </summary>
 		public int Column
 		{
@@ -156,15 +156,15 @@ namespace JsonFx.Serialization
 		}
 
 		/// <summary>
-		/// Gets the character position in the stream where the error occurred.
+		/// Gets the character position in the stream where the error occurred
 		/// </summary>
-		public long Position
+		public long Index
 		{
-			get { return this.position; }
+			get { return this.index; }
 		}
 
 		/// <summary>
-		/// Gets the character line in the stream where the error occurred.
+		/// Gets the character line in the stream where the error occurred
 		/// </summary>
 		public int Line
 		{
@@ -192,7 +192,7 @@ namespace JsonFx.Serialization
 			line = 1;
 
 			bool foundLF = false;
-			int i = Math.Min((int)this.position, source.Length);
+			int i = Math.Min((int)this.index, source.Length);
 			for (; i>0; i--)
 			{
 				if (!foundLF)
