@@ -45,7 +45,7 @@ namespace JsonFx.Serialization
 		/// Parses the token sequence, coercing the result to Type targetType
 		/// </summary>
 		/// <param name="tokens"></param>
-		/// <param name="targetType">optional type for coercion</param>
+		/// <param name="targetType">optional type for coercion (null if not specified)</param>
 		/// <returns></returns>
 		object Parse(IEnumerable<Token<T>> tokens, Type targetType);
 

@@ -48,7 +48,6 @@ namespace JsonFx.Json
 
 			// parse errors
 			private const string ErrorUnexpectedToken = "Unexpected JSON token ({0})";
-			private const string ErrorExtraTokens = "Extra JSON tokens at end ({0})";
 
 			private const string ErrorExpectedArray = "Expected JSON array start ({0})";
 			private const string ErrorExpectedArrayItem = "Expected JSON array item or end of JSON array ({0})";
@@ -105,13 +104,9 @@ namespace JsonFx.Json
 
 				object value = this.ParseValue(tokenizer, targetType);
 
-				if (tokenizer.MoveNext())
-				{
-					// TODO: evaluate if is ever valid to have tokens beyond JSON
-					throw new ArgumentException(String.Format(
-						JsonParser.ErrorExtraTokens,
-						tokenizer.Current.TokenType));
-				}
+				// not checking for trailing tokens allows this
+				// JSON stream to be parsed inside of another structure
+				// for example inside <[CDATA[ ... ]]>
 
 				return value;
 			}
