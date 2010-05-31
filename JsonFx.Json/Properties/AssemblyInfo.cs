@@ -38,31 +38,23 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCopyright("Copyright © 2006-2010 Stephen M. McKamey. All rights reserved.")]
 [assembly: AssemblyCompany("http://jsonfx.net")]
 
-#if NET40 && DEBUG
-[assembly: AssemblyConfiguration("Debug (NET40)")]
-#elif NET40 && STRONG
-[assembly: AssemblyConfiguration("Signed (NET40)")]
-#elif NET40
-[assembly: AssemblyConfiguration("Release (NET40)")]
-#elif NET35 && DEBUG
-[assembly: AssemblyConfiguration("Debug (NET35)")]
-#elif NET35 && STRONG
-[assembly: AssemblyConfiguration("Signed (NET35)")]
-#elif NET35
-[assembly: AssemblyConfiguration("Release (NET35)")]
-#elif NET20 && DEBUG
-[assembly: AssemblyConfiguration("Debug (NET20)")]
-#elif NET20 && STRONG
-[assembly: AssemblyConfiguration("Signed (NET20)")]
-#elif NET20
-[assembly: AssemblyConfiguration("Release (NET20)")]
-#elif DEBUG
-[assembly: AssemblyConfiguration("Debug")]
+[assembly: AssemblyConfiguration(
+#if DEBUG
+"Debug"
 #elif STRONG
-[assembly: AssemblyConfiguration("Signed")]
+"Signed"
 #else
-[assembly: AssemblyConfiguration("Release")]
+"Release"
 #endif
+
+#if NET40
++" (NET40)"
+#elif NET35
++" (NET35)"
+#elif NET20
++" (NET20)"
+#endif
+)]
 
 [assembly: ComVisible(false)]
 [assembly: Guid("D98A5EF8-4709-4FF8-B162-8EA04B281400")]
