@@ -39,20 +39,20 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCompany("http://jsonfx.net")]
 
 [assembly: AssemblyConfiguration(
+#if NET40
+".NET 4.0, "+
+#elif NET35
+".NET 3.5, "+
+#elif NET20
+".NET 2.0, "+
+#endif
+
 #if DEBUG
 "Debug"
 #elif STRONG
 "Signed"
 #else
 "Release"
-#endif
-
-#if NET40
-+" (NET40)"
-#elif NET35
-+" (NET35)"
-#elif NET20
-+" (NET20)"
 #endif
 )]
 

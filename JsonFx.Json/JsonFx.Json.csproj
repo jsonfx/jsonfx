@@ -11,8 +11,8 @@
 		<AppDesignerFolder>Properties</AppDesignerFolder>
 		<RootNamespace>JsonFx</RootNamespace>
 		<AssemblyName>JsonFx.Json</AssemblyName>
-		<OutputPath>..\build\$(Configuration)_$(TargetFrameworkVersion)</OutputPath>
-		<DocumentationFile>..\build\$(Configuration)_$(TargetFrameworkVersion)\JsonFx.Json.XML</DocumentationFile>
+		<OutputPath>$(SolutionDir)Builds\$(Configuration)_$(TargetFrameworkVersion)</OutputPath>
+		<DocumentationFile>$(SolutionDir)Builds\$(Configuration)_$(TargetFrameworkVersion)\JsonFx.Json.XML</DocumentationFile>
 		<PublishUrl>publish\</PublishUrl>
 		<Install>true</Install>
 		<InstallFrom>Disk</InstallFrom>
@@ -72,6 +72,8 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<Reference Include="System" />
+	</ItemGroup>
+	<ItemGroup Condition=" '$(TargetFrameworkVersion)' != 'v2.0' ">
 		<Reference Include="System.Core">
 			<RequiredTargetFramework>3.5</RequiredTargetFramework>
 		</Reference>
@@ -113,29 +115,5 @@
 	<ItemGroup>
 		<Content Include="Readme.txt" />
 	</ItemGroup>
-	<ItemGroup>
-		<BootstrapperPackage Include="Microsoft.Net.Client.3.5">
-			<Visible>False</Visible>
-			<ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
-			<Install>false</Install>
-		</BootstrapperPackage>
-		<BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-			<Visible>False</Visible>
-			<ProductName>.NET Framework 3.5 SP1</ProductName>
-			<Install>true</Install>
-		</BootstrapperPackage>
-		<BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
-			<Visible>False</Visible>
-			<ProductName>Windows Installer 3.1</ProductName>
-			<Install>true</Install>
-		</BootstrapperPackage>
-	</ItemGroup>
 	<Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-	<!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>
