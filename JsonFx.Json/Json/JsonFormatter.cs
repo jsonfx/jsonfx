@@ -39,7 +39,7 @@ namespace JsonFx.Json
 	public partial class JsonWriter
 	{
 		/// <summary>
-		/// Ouputs JSON text from a SAX-like input stream of JSON tokens
+		/// Outputs JSON text from a SAX-like input stream of JSON tokens
 		/// </summary>
 		public class JsonFormatter : IDataFormatter<JsonTokenType>
 		{
@@ -64,32 +64,26 @@ namespace JsonFx.Json
 
 			#endregion Init
 
-			#region Properties
-
-			/// <summary>
-			/// Gets the total number of characters read from the input
-			/// </summary>
-			public int Depth
-			{
-				get { return this.depth; }
-			}
-
-			/// <summary>
-			/// Gets the underlying TextWriter
-			/// </summary>
-			public TextWriter TextWriter
-			{
-				get { return this.Writer; }
-			}
-
-			#endregion Properties
-
 			#region Methods
 
 			/// <summary>
-			/// Formats the token sequence
+			/// Formats the token sequence as a string
 			/// </summary>
-			/// <param name="generator"></param>
+			/// <param name="tokens"></param>
+			public string Format(IEnumerable<Token<JsonTokenType>> tokens)
+			{
+				StringWriter writer = new StringWriter();
+
+				this.Write(writer, tokens);
+
+				return writer.GetStringBuilder().ToString();
+			}
+
+			/// <summary>
+			/// Formats the token sequence to the output writer
+			/// </summary>
+			/// <param name="writer"></param>
+			/// <param name="tokens"></param>
 			public void Write(TextWriter writer, IEnumerable<Token<JsonTokenType>> tokens)
 			{
 				foreach (Token<JsonTokenType> token in tokens)

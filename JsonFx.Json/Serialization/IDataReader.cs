@@ -81,6 +81,26 @@ namespace JsonFx.Serialization
 		/// <param name="targetType">the expected type of the serialized data</param>
 		object Deserialize(TextReader input, Type targetType);
 
+		/// <summary>
+		/// Serializes the data to the given output
+		/// </summary>
+		/// <param name="input">the input text</param>
+		/// <typeparam name="T">the expected type of the serialized data</typeparam>
+		T Deserialize<T>(string input);
+
+		/// <summary>
+		/// Serializes the data to the given output
+		/// </summary>
+		/// <param name="input">the input text</param>
+		object Deserialize(string input);
+
+		/// <summary>
+		/// Serializes the data to the given output
+		/// </summary>
+		/// <param name="input">the input text</param>
+		/// <param name="targetType">the expected type of the serialized data</param>
+		object Deserialize(string input, Type targetType);
+
 		#endregion Methods
 	}
 }

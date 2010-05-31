@@ -118,7 +118,42 @@ namespace JsonFx.Serialization
 
 			try
 			{
+				// objects => tokens => characters
 				formatter.Write(output, generator.GetTokens(data));
+			}
+			catch (SerializationException)
+			{
+				throw;
+			}
+			catch (Exception ex)
+			{
+				throw new SerializationException(ex.Message, ex);
+			}
+		}
+
+		/// <summary>
+		/// Serializes the data to the given output
+		/// </summary>
+		/// <param name="data">the data to be serialized</param>
+		/// <returns>the serialized data</returns>
+		public virtual string Serialize(object data)
+		{
+			IDataGenerator<T> generator = this.GetGenerator(this.Settings);
+			if (generator == null)
+			{
+				throw new InvalidOperationException("Generator is invalid");
+			}
+
+			IDataFormatter<T> formatter = this.GetFormatter(this.Settings);
+			if (formatter == null)
+			{
+				throw new InvalidOperationException("Formatter is invalid");
+			}
+
+			try
+			{
+				// objects => tokens => characters
+				return formatter.Format(generator.GetTokens(data));
 			}
 			catch (SerializationException)
 			{

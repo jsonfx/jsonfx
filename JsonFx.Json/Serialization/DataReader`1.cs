@@ -81,7 +81,7 @@ namespace JsonFx.Serialization
 		#region Methods
 
 		/// <summary>
-		/// Serializes the data to the given output
+		/// Deserializes the data from the given input
 		/// </summary>
 		/// <param name="input">the input reader</param>
 		/// <typeparam name="TVal">the expected type of the serialized data</typeparam>
@@ -93,7 +93,7 @@ namespace JsonFx.Serialization
 		}
 
 		/// <summary>
-		/// Serializes the data to the given output
+		/// Deserializes the data from the given input
 		/// </summary>
 		/// <param name="input">the input reader</param>
 		public virtual object Deserialize(TextReader input)
@@ -102,7 +102,7 @@ namespace JsonFx.Serialization
 		}
 
 		/// <summary>
-		/// Serializes the data to the given output
+		/// Deserializes the data from the given input
 		/// </summary>
 		/// <param name="input">the input reader</param>
 		/// <param name="targetType">the expected type of the serialized data</param>
@@ -122,6 +122,62 @@ namespace JsonFx.Serialization
 
 			try
 			{
+				// characters => tokens => objects
+				return parser.Parse(tokenizer.GetTokens(input), targetType);
+			}
+			catch (DeserializationException)
+			{
+				throw;
+			}
+			catch (Exception ex)
+			{
+				throw new DeserializationException(ex.Message, tokenizer.Index, tokenizer.Line, tokenizer.Column, ex);
+			}
+		}
+
+		/// <summary>
+		/// Deserializes the data from the given input
+		/// </summary>
+		/// <param name="input">the input text</param>
+		/// <typeparam name="TVal">the expected type of the serialized data</typeparam>
+		public virtual TVal Deserialize<TVal>(string input)
+		{
+			object value = this.Deserialize(input, typeof(TVal));
+
+			return (value is TVal) ? (TVal)value : default(TVal);
+		}
+
+		/// <summary>
+		/// Deserializes the data from the given input
+		/// </summary>
+		/// <param name="input">the input text</param>
+		public virtual object Deserialize(string input)
+		{
+			return this.Deserialize(input, null);
+		}
+
+		/// <summary>
+		/// Deserializes the data from the given input
+		/// </summary>
+		/// <param name="input">the input text</param>
+		/// <param name="targetType">the expected type of the serialized data</param>
+		public virtual object Deserialize(string input, Type targetType)
+		{
+			IDataTokenizer<T> tokenizer = this.GetTokenizer(this.Settings);
+			if (tokenizer == null)
+			{
+				throw new InvalidOperationException("Tokenizer is invalid");
+			}
+
+			IDataParser<T> parser = this.GetParser(this.Settings);
+			if (parser == null)
+			{
+				throw new InvalidOperationException("Parser is invalid");
+			}
+
+			try
+			{
+				// characters => tokens => objects
 				return parser.Parse(tokenizer.GetTokens(input), targetType);
 			}
 			catch (DeserializationException)

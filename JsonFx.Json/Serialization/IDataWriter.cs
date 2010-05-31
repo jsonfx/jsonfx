@@ -85,6 +85,13 @@ namespace JsonFx.Serialization
 		/// <param name="data">the data to be serialized</param>
 		void Serialize(TextWriter output, object data);
 
+		/// <summary>
+		/// Serializes the data to the given output
+		/// </summary>
+		/// <param name="data">the data to be serialized</param>
+		/// <returns>the serialized data</returns>
+		string Serialize(object data);
+
 		#endregion Methods
 	}
 }
