@@ -448,7 +448,7 @@ namespace JsonFx.Json
 			#region Utility Methods
 
 			/// <summary>
-			/// Allows an IEnumerator&lt;T&gt; to be used as an IEnumerable&lt;T&gt;.
+			/// Allows an IEnumerator&lt;T&gt; to be continue to be used as an IEnumerable&lt;T&gt;.
 			/// </summary>
 			/// <param name="enumerator"></param>
 			/// <returns></returns>

@@ -161,8 +161,7 @@ namespace JsonFx.Json
 						case JsonTokenType.None:
 						default:
 						{
-							this.WriteUnknown(writer, token);
-							continue;
+							throw new NotSupportedException("Unexpected JSON token: "+token);
 						}
 					}
 				}
@@ -241,12 +240,6 @@ namespace JsonFx.Json
 				}
 
 				writer.Write(JsonGrammar.OperatorStringDelim);
-			}
-
-			protected virtual void WriteUnknown(TextWriter writer, Token<JsonTokenType> token)
-			{
-				// TODO: evaluate if this is ever valid
-				throw new NotSupportedException("Unexpected JSON token: "+token);
 			}
 
 			private void WriteLine(TextWriter writer)
