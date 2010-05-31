@@ -1,119 +1,108 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
-	<PropertyGroup>
-		<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-		<TargetFrameworkVersion Condition=" '$(TargetFrameworkVersion)' == '' ">v4.0</TargetFrameworkVersion>
-		<Platform>AnyCPU</Platform>
-		<ProductVersion>9.0.30729</ProductVersion>
-		<SchemaVersion>2.0</SchemaVersion>
-		<ProjectGuid>{3082284B-B579-4808-A4A4-D88DDA4025CB}</ProjectGuid>
-		<OutputType>Library</OutputType>
-		<AppDesignerFolder>Properties</AppDesignerFolder>
-		<RootNamespace>JsonFx</RootNamespace>
-		<AssemblyName>JsonFx.Json</AssemblyName>
-		<OutputPath>$(SolutionDir)Builds\$(Configuration)_$(TargetFrameworkVersion)</OutputPath>
-		<DocumentationFile>$(SolutionDir)Builds\$(Configuration)_$(TargetFrameworkVersion)\JsonFx.Json.XML</DocumentationFile>
-		<PublishUrl>publish\</PublishUrl>
-		<Install>true</Install>
-		<InstallFrom>Disk</InstallFrom>
-		<UpdateEnabled>false</UpdateEnabled>
-		<UpdateMode>Foreground</UpdateMode>
-		<UpdateInterval>7</UpdateInterval>
-		<UpdateIntervalUnits>Days</UpdateIntervalUnits>
-		<UpdatePeriodically>false</UpdatePeriodically>
-		<UpdateRequired>false</UpdateRequired>
-		<MapFileExtensions>true</MapFileExtensions>
-		<IsWebBootstrapper>false</IsWebBootstrapper>
-		<UseApplicationTrust>false</UseApplicationTrust>
-		<BootstrapperEnabled>true</BootstrapperEnabled>
-		<TargetFrameworkProfile />
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-		<DebugSymbols>true</DebugSymbols>
-		<DebugType>full</DebugType>
-		<Optimize>false</Optimize>
-		<DefineConstants>DEBUG;TRACE</DefineConstants>
-		<ErrorReport>prompt</ErrorReport>
-		<WarningLevel>4</WarningLevel>
-		<UseVSHostingProcess>false</UseVSHostingProcess>
-		<NoWarn>1570,1571,1572,1573,1591,1592</NoWarn>
-		<CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-		<DebugType>pdbonly</DebugType>
-		<Optimize>true</Optimize>
-		<DefineConstants>TRACE</DefineConstants>
-		<ErrorReport>prompt</ErrorReport>
-		<WarningLevel>4</WarningLevel>
-		<UseVSHostingProcess>false</UseVSHostingProcess>
-		<NoWarn>1570,1571,1572,1573,1591,1592</NoWarn>
-		<CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)' == 'Signed' ">
-		<DefineConstants>TRACE;STRONG</DefineConstants>
-		<Optimize>true</Optimize>
-		<DebugType>none</DebugType>
-		<UseVSHostingProcess>false</UseVSHostingProcess>
-		<ErrorReport>prompt</ErrorReport>
-		<SignAssembly>true</SignAssembly>
-		<DelaySign>false</DelaySign>
-		<AssemblyOriginatorKeyFile>$(SolutionDir)_Keys\JsonFx_Key.pfx</AssemblyOriginatorKeyFile>
-		<NoWarn>1570,1571,1572,1573,1591,1592</NoWarn>
-		<CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(TargetFrameworkVersion)' == 'v4.0' ">
-		<DefineConstants>$(DefineConstants);NET40</DefineConstants>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(TargetFrameworkVersion)' == 'v3.5' ">
-		<DefineConstants>$(DefineConstants);NET35</DefineConstants>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(TargetFrameworkVersion)' == 'v2.0' ">
-		<DefineConstants>$(DefineConstants);NET20</DefineConstants>
-	</PropertyGroup>
-	<ItemGroup>
-		<Reference Include="System" />
-	</ItemGroup>
-	<ItemGroup Condition=" '$(TargetFrameworkVersion)' != 'v2.0' ">
-		<Reference Include="System.Core">
-			<RequiredTargetFramework>3.5</RequiredTargetFramework>
-		</Reference>
-	</ItemGroup>
-	<ItemGroup>
-		<Compile Include="About.cs" />
-		<Compile Include="Json\IJsonSerializable.cs" />
-		<Compile Include="Json\JsonFormatter.cs" />
-		<Compile Include="Json\JsonGenerator.cs" />
-		<Compile Include="Json\JsonGrammar.cs" />
-		<Compile Include="Json\JsonParser.cs" />
-		<Compile Include="Json\JsonReader.cs" />
-		<Compile Include="Json\JsonTokenizer.cs" />
-		<Compile Include="Json\JsonTokenType.cs" />
-		<Compile Include="Json\JsonWriter.cs" />
-		<Compile Include="Properties\AssemblyInfo.cs" />
-		<Compile Include="Properties\AssemblyVersion.cs" />
-		<Compile Include="Serialization\DataIgnoreAttribute.cs" />
-		<Compile Include="Serialization\DataNameAttribute.cs" />
-		<Compile Include="Serialization\DataNameResolver.cs" />
-		<Compile Include="Serialization\DataReaderSettings.cs" />
-		<Compile Include="Serialization\DataReader`1.cs" />
-		<Compile Include="Serialization\DataSpecifiedPropertyAttribute.cs" />
-		<Compile Include="Serialization\DataWriterSettings.cs" />
-		<Compile Include="Serialization\DataWriter`1.cs" />
-		<Compile Include="Serialization\Exceptions.cs" />
-		<Compile Include="Serialization\IDataFormatter`1.cs" />
-		<Compile Include="Serialization\IDataGenerator`1.cs" />
-		<Compile Include="Serialization\IDataParser`1.cs" />
-		<Compile Include="Serialization\IDataReader.cs" />
-		<Compile Include="Serialization\IDataTokenizer`1.cs" />
-		<Compile Include="Serialization\IDataWriter.cs" />
-		<Compile Include="Serialization\ISerializable`1.cs" />
-		<Compile Include="Serialization\ITextScanner.cs" />
-		<Compile Include="Serialization\StringScanner.cs" />
-		<Compile Include="Serialization\TextReaderScanner.cs" />
-		<Compile Include="Serialization\Token`1.cs" />
-	</ItemGroup>
-	<ItemGroup>
-		<Content Include="Readme.txt" />
-	</ItemGroup>
-	<Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <TargetFrameworkVersion Condition=" '$(TargetFrameworkVersion)' == '' ">v4.0</TargetFrameworkVersion>
+    <Platform>AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{3082284B-B579-4808-A4A4-D88DDA4025CB}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>JsonFx</RootNamespace>
+    <AssemblyName>JsonFx.Json</AssemblyName>
+    <OutputPath>$(SolutionDir)Builds\$(Configuration)_$(TargetFrameworkVersion)</OutputPath>
+    <DocumentationFile>$(SolutionDir)Builds\$(Configuration)_$(TargetFrameworkVersion)\JsonFx.Json.XML</DocumentationFile>
+    <MapFileExtensions>true</MapFileExtensions>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <NoWarn>1570,1571,1572,1573,1591,1592</NoWarn>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <NoWarn>1570,1571,1572,1573,1591,1592</NoWarn>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Signed' ">
+    <DefineConstants>TRACE;STRONG</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>none</DebugType>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>false</DelaySign>
+    <AssemblyOriginatorKeyFile>$(SolutionDir)_Keys\JsonFx_Key.pfx</AssemblyOriginatorKeyFile>
+    <NoWarn>1570,1571,1572,1573,1591,1592</NoWarn>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFrameworkVersion)' == 'v4.0' ">
+    <DefineConstants>$(DefineConstants);NET40</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFrameworkVersion)' == 'v3.5' ">
+    <DefineConstants>$(DefineConstants);NET35</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFrameworkVersion)' == 'v2.0' Or '$(TargetFrameworkVersion)' == 'v3.0' ">
+    <DefineConstants>$(DefineConstants);NET20</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFrameworkVersion)' != 'v2.0' And '$(TargetFrameworkVersion)' != 'v3.0' ">
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="About.cs" />
+    <Compile Include="Json\IJsonSerializable.cs" />
+    <Compile Include="Json\JsonFormatter.cs" />
+    <Compile Include="Json\JsonGenerator.cs" />
+    <Compile Include="Json\JsonGrammar.cs" />
+    <Compile Include="Json\JsonParser.cs" />
+    <Compile Include="Json\JsonReader.cs" />
+    <Compile Include="Json\JsonTokenizer.cs" />
+    <Compile Include="Json\JsonTokenType.cs" />
+    <Compile Include="Json\JsonWriter.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\AssemblyVersion.cs" />
+    <Compile Include="Serialization\DataIgnoreAttribute.cs" />
+    <Compile Include="Serialization\DataNameAttribute.cs" />
+    <Compile Include="Serialization\DataNameResolver.cs" />
+    <Compile Include="Serialization\DataReaderSettings.cs" />
+    <Compile Include="Serialization\DataReader`1.cs" />
+    <Compile Include="Serialization\DataSpecifiedPropertyAttribute.cs" />
+    <Compile Include="Serialization\DataWriterSettings.cs" />
+    <Compile Include="Serialization\DataWriter`1.cs" />
+    <Compile Include="Serialization\Exceptions.cs" />
+    <Compile Include="Serialization\IDataFormatter`1.cs" />
+    <Compile Include="Serialization\IDataGenerator`1.cs" />
+    <Compile Include="Serialization\IDataParser`1.cs" />
+    <Compile Include="Serialization\IDataReader.cs" />
+    <Compile Include="Serialization\IDataTokenizer`1.cs" />
+    <Compile Include="Serialization\IDataWriter.cs" />
+    <Compile Include="Serialization\ISerializable`1.cs" />
+    <Compile Include="Serialization\ITextScanner.cs" />
+    <Compile Include="Serialization\StringScanner.cs" />
+    <Compile Include="Serialization\TextReaderScanner.cs" />
+    <Compile Include="Serialization\Token`1.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Readme.txt" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

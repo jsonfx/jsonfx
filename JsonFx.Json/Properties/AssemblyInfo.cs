@@ -40,11 +40,11 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyConfiguration(
 #if NET40
-".NET 4.0, "+
+".NET 4.0 "+
 #elif NET35
-".NET 3.5, "+
+".NET 3.5 "+
 #elif NET20
-".NET 2.0, "+
+".NET 2.0 "+
 #endif
 
 #if DEBUG
@@ -58,4 +58,6 @@ using System.Runtime.InteropServices;
 
 [assembly: ComVisible(false)]
 [assembly: Guid("D98A5EF8-4709-4FF8-B162-8EA04B281400")]
+#if !STRONG
 [assembly: InternalsVisibleTo("JsonFx.Json.Tests")]
+#endif
