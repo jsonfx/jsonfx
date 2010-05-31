@@ -728,6 +728,27 @@ namespace JsonFx.Json
 					if (token.TokenType == JsonTokenType.None)
 					{
 						this.source.Dispose();
+						this.source = TextReaderScanner.Null;
+						yield break;
+					}
+					yield return token;
+				};
+			}
+
+			public IEnumerable<Token<JsonTokenType>> GetTokens(string text)
+			{
+				this.source = new StringScanner(text);
+
+				// initialize
+				this.source.MoveNext();
+
+				while (true)
+				{
+					Token<JsonTokenType> token = this.NextToken();
+					if (token.TokenType == JsonTokenType.None)
+					{
+						this.source.Dispose();
+						this.source = StringScanner.Null;
 						yield break;
 					}
 					yield return token;

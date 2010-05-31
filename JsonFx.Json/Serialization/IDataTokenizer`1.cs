@@ -86,6 +86,13 @@ namespace JsonFx.Serialization
 		/// <returns></returns>
 		IEnumerable<Token<T>> GetTokens(TextReader reader);
 
+		/// <summary>
+		/// Tokenizes the input sequence into tokens
+		/// </summary>
+		/// <param name="text"></param>
+		/// <returns></returns>
+		IEnumerable<Token<T>> GetTokens(string text);
+
 		#endregion Methods
 	}
 }
