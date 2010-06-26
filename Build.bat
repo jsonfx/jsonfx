@@ -10,7 +10,7 @@ IF NOT EXIST "%MSBuild%" (
 	GOTO END
 )
 
-FOR %%i IN (v2.0 v3.5 v4.0) DO "%MSBuild%" JsonFx2.Json.sln /target:rebuild /property:TargetFrameworkVersion=%%i;Configuration=Release
+FOR %%i IN (v2.0 v3.5 v4.0) DO "%MSBuild%" JsonFx2.Json.sln /target:rebuild /property:TargetFrameworkVersion=%%i;Configuration=Signed
 
 :END
 POPD

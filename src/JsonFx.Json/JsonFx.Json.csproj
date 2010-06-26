@@ -11,8 +11,8 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>JsonFx</RootNamespace>
     <AssemblyName>JsonFx.Json</AssemblyName>
-    <OutputPath>$(SolutionDir)Builds\$(Configuration)_$(TargetFrameworkVersion)</OutputPath>
-    <DocumentationFile>$(SolutionDir)Builds\$(Configuration)_$(TargetFrameworkVersion)\JsonFx.Json.XML</DocumentationFile>
+    <OutputPath>$(SolutionDir)build\$(Configuration)_$(TargetFrameworkVersion)</OutputPath>
+    <DocumentationFile>$(SolutionDir)build\$(Configuration)_$(TargetFrameworkVersion)\JsonFx.Json.XML</DocumentationFile>
     <MapFileExtensions>true</MapFileExtensions>
     <UseApplicationTrust>false</UseApplicationTrust>
     <TargetFrameworkProfile />
@@ -46,7 +46,7 @@
     <ErrorReport>prompt</ErrorReport>
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
-    <AssemblyOriginatorKeyFile>$(SolutionDir)_Keys\JsonFx_Key.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>$(SolutionDir)keys\JsonFx_Key.pfx</AssemblyOriginatorKeyFile>
     <NoWarn>1570,1571,1572,1573,1591,1592</NoWarn>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
