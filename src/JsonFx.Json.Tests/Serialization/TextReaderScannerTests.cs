@@ -45,7 +45,7 @@ namespace JsonFx.Serialization
 		{
 			var scanner = new TextReaderScanner(TextReader.Null);
 
-			Assert.Equal(scanner.Current, '\0');
+			Assert.Equal('\0', scanner.Current);
 		}
 
 		[Fact]
@@ -53,7 +53,7 @@ namespace JsonFx.Serialization
 		{
 			var scanner = new TextReaderScanner(TextReader.Null);
 
-			Assert.Equal(scanner.Index, -1);
+			Assert.Equal(-1, scanner.Index);
 		}
 
 		[Fact]
@@ -61,7 +61,7 @@ namespace JsonFx.Serialization
 		{
 			var scanner = new TextReaderScanner(TextReader.Null);
 
-			Assert.Equal(scanner.Line, 0);
+			Assert.Equal(0, scanner.Line);
 		}
 
 		[Fact]
@@ -69,7 +69,7 @@ namespace JsonFx.Serialization
 		{
 			var scanner = new TextReaderScanner(TextReader.Null);
 
-			Assert.Equal(scanner.Column, 0);
+			Assert.Equal(0, scanner.Column);
 		}
 
 		[Fact]
@@ -77,7 +77,7 @@ namespace JsonFx.Serialization
 		{
 			var scanner = new TextReaderScanner(TextReader.Null);
 
-			Assert.Equal(scanner.IsEnd, false);
+			Assert.Equal(false, scanner.IsEnd);
 		}
 
 		#endregion Start State Tests
@@ -175,12 +175,65 @@ namespace JsonFx.Serialization
 
 			while (scanner.MoveNext())
 			{
-				Assert.Equal(scanner.IsEnd, false);
+				Assert.Equal(false, scanner.IsEnd);
 			}
 
-			Assert.Equal(scanner.IsEnd, true);
+			Assert.Equal(true, scanner.IsEnd);
 		}
 
 		#endregion IsEnd Tests
+
+		#region Line, Column, Index Tests
+
+		[Fact]
+		public void Line_MultilineString_CountsCorrectNumberOfLines()
+		{
+			const string value = @"Line one
+Line two
+Line three
+Line Four";
+
+			var scanner = new TextReaderScanner(new StringReader(value));
+
+			while (scanner.MoveNext());
+
+			Assert.Equal(4, scanner.Line);
+		}
+
+		[Fact]
+		public void Column_MultilineString_CountsCorrectNumberOfColumns()
+		{
+			const string value = @"Line one
+Line two
+Line three
+Line Four";
+
+			var scanner = new TextReaderScanner(new StringReader(value));
+
+			while (scanner.MoveNext());
+
+			Assert.Equal(9, scanner.Column);
+		}
+
+		[Fact]
+		public void Index_MultilineString_CountsCorrectNumberOfChars()
+		{
+			const string value = @"Line one
+Line two
+Line three
+Line Four";
+
+			var scanner = new TextReaderScanner(new StringReader(value));
+
+			long i;
+			for (i=0; scanner.MoveNext(); i++)
+			{
+				Assert.Equal(i, scanner.Index);
+			}
+
+			Assert.Equal(i-1, scanner.Index);
+		}
+
+		#endregion Line, Column, Index Tests
 	}
 }

@@ -163,33 +163,40 @@ namespace JsonFx.Serialization
 				return false;
 			}
 
-			// check for line endings
-			switch (ch)
+			if (this.index < 0)
 			{
-				case '\n':
+				this.line = this.column = 1;
+				this.index = 0;
+			}
+			else
+			{
+				// check for line endings
+				switch (ch)
 				{
-					if (this.current == '\r')
+					case '\n':
 					{
-						// consider CRLF to be one line ending
+						if (this.current == '\r')
+						{
+							// consider CRLF to be one line ending
+							break;
+						}
+						// fall through
+						goto case '\r';
+					}
+					case '\r':
+					{
+						this.line++;
+						this.column = 0;
 						break;
 					}
-					// fall through
-					goto case '\r';
+					default:
+					{
+						this.column++;
+						break;
+					}
 				}
-				case '\r':
-				{
-					this.line++;
-					this.column = 1;
-					break;
-				}
-				default:
-				{
-					this.column++;
-					break;
-				}
+				this.index++;
 			}
-			this.index++;
-
 			this.current = (char)ch;
 
 			return true;
