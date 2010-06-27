@@ -422,17 +422,17 @@ namespace JsonFx.Json
 					if (number >= Int32.MinValue && number <= Int32.MaxValue)
 					{
 						// most common
-						return new Token<JsonTokenType>(JsonTokenType.Number, (int)number);
+						return JsonGrammar.TokenNumber((int)number);
 					}
 
 					if (number >= Int64.MinValue && number <= Int64.MaxValue)
 					{
 						// more flexible
-						return new Token<JsonTokenType>(JsonTokenType.Number, (long)number);
+						return JsonGrammar.TokenNumber((long)number);
 					}
 
 					// most flexible
-					return new Token<JsonTokenType>(JsonTokenType.Number, number);
+					return JsonGrammar.TokenNumber(number);
 				}
 				else
 				{
@@ -448,7 +448,7 @@ namespace JsonFx.Json
 					}
 
 					// native EcmaScript number (IEEE-754)
-					return new Token<JsonTokenType>(JsonTokenType.Number, number);
+					return JsonGrammar.TokenNumber(number);
 				}
 			}
 
@@ -479,7 +479,7 @@ namespace JsonFx.Json
 						this.scanner.MoveNext();
 
 						// output string
-						return new Token<JsonTokenType>(JsonTokenType.String, buffer.ToString());
+						return JsonGrammar.TokenString(buffer.ToString());
 					}
 
 					if (Char.IsControl(this.scanner.Current) && this.scanner.Current != '\t')
@@ -669,7 +669,7 @@ namespace JsonFx.Json
 					ident = unary.ToString()+ident;
 				}
 
-				return new Token<JsonTokenType>(JsonTokenType.Literal, ident);
+				return JsonGrammar.TokenLiteral(ident);
 			}
 
 			/// <summary>
