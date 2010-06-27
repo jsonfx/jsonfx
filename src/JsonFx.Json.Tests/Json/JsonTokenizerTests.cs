@@ -38,7 +38,7 @@ namespace JsonFx.Json
 {
 	public class JsonTokenizerTests
 	{
-		#region Simple Passing Array Sequences
+		#region Array Tests
 
 		[Fact]
 		public void GetTokens_ArrayEmpty_ReturnsEmptyArrayTokens()
@@ -148,9 +148,9 @@ namespace JsonFx.Json
 			Assert.Equal(expected, actual);
 		}
 
-		#endregion Simple Passing Array Sequences
+		#endregion Array Tests
 
-		#region Simple Passing Object Sequences
+		#region Object Tests
 
 		[Fact]
 		public void GetTokens_ObjectEmpty_ReturnsEmptyObjectTokens()
@@ -222,9 +222,9 @@ namespace JsonFx.Json
 			Assert.Equal(expected, actual);
 		}
 
-		#endregion Simple Passing Object Sequences
+		#endregion Object Tests
 
-		#region Simple Passing String Sequences
+		#region String Tests
 
 		[Fact]
 		public void GetTokens_StringEmpty_ReturnsStringToken()
@@ -384,9 +384,70 @@ namespace JsonFx.Json
 			Assert.Equal(expected, actual);
 		}
 
-		#endregion Simple Passing String Sequences
+		[Fact]
+		public void GetTokens_StringUnquoted_ThrowsDeserializationException()
+		{
+			// input from fail16.json in test suite at http://www.json.org/JSON_checker/
+			const string input = @"[\naked]";
 
-		#region Simple Passing Number Sequences
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+
+			Assert.Throws<DeserializationException>(
+				delegate
+				{
+					var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+				});
+		}
+
+		[Fact]
+		public void GetTokens_StringLineBreak_ThrowsDeserializationException()
+		{
+			// input from fail27.json in test suite at http://www.json.org/JSON_checker/
+			const string input = @"[""line
+break""]";
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+
+			Assert.Throws<DeserializationException>(
+				delegate
+				{
+					var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+				});
+		}
+
+		[Fact]
+		public void GetTokens_StringEscapedLineBreak_ThrowsDeserializationException()
+		{
+			// input from fail28.json in test suite at http://www.json.org/JSON_checker/
+			const string input = @"[""line\
+break""]";
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+
+			Assert.Throws<DeserializationException>(
+				delegate
+				{
+					var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+				});
+		}
+
+		[Fact]
+		public void GetTokens_StringUnterminated_ThrowsDeserializationException()
+		{
+			const string input = @"""unterminated";
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+
+			Assert.Throws<DeserializationException>(
+				delegate
+				{
+					var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+				});
+		}
+
+		#endregion String Tests
+
+		#region Number Tests
 
 		[Fact]
 		public void GetTokens_NumberInteger_ReturnsNumberToken()
@@ -499,9 +560,97 @@ namespace JsonFx.Json
 			Assert.Equal(expected, actual);
 		}
 
-		#endregion Simple Passing Number Sequences
+		[Fact]
+		public void GetTokens_NumberHexValue_ThrowsDeserializationException()
+		{
+			// input from fail14.json in test suite at http://www.json.org/JSON_checker/
+			const string input = @"{""Numbers cannot be hex"": 0x14}";
 
-		#region Simple Passing Literal Sequences
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+
+			Assert.Throws<DeserializationException>(
+				delegate
+				{
+					var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+				});
+		}
+
+		[Fact]
+		public void GetTokens_NumberFloatMissingExp_ThrowsDeserializationException()
+		{
+			// input from fail29.json in test suite at http://www.json.org/JSON_checker/
+			const string input = @"[0e]";
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+
+			Assert.Throws<DeserializationException>(
+				delegate
+				{
+					var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+				});
+		}
+
+		[Fact]
+		public void GetTokens_NumberFloatMissingExpDigits_ThrowsDeserializationException()
+		{
+			// input from fail30.json in test suite at http://www.json.org/JSON_checker/
+			const string input = @"[0e+]";
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+
+			Assert.Throws<DeserializationException>(
+				delegate
+				{
+					var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+				});
+		}
+
+		[Fact]
+		public void GetTokens_NumberFloatExtraExpSign_ThrowsDeserializationException()
+		{
+			// input from fail31.json in test suite at http://www.json.org/JSON_checker/
+			const string input = @"[0e+-1]";
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+
+			Assert.Throws<DeserializationException>(
+				delegate
+				{
+					var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+				});
+		}
+
+		[Fact]
+		public void GetTokens_NumberUnfinishedFloat_ThrowsDeserializationException()
+		{
+			const string input = @"123.";
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+
+			Assert.Throws<DeserializationException>(
+				delegate
+				{
+					var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+				});
+		}
+
+		[Fact]
+		public void GetTokens_NumberFloatMissingFractional_ThrowsDeserializationException()
+		{
+			const string input = @"123.e5";
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+
+			Assert.Throws<DeserializationException>(
+				delegate
+				{
+					var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+				});
+		}
+
+		#endregion Number Tests
+
+		#region Literal Tests
 
 		[Fact]
 		public void GetTokens_LiteralNonQuotedKey_ReturnsObjectTokensWithLiteralKey()
@@ -561,24 +710,9 @@ namespace JsonFx.Json
 			Assert.Equal(expected, actual);
 		}
 
-		#endregion Simple Passing Literal Sequences
+		#endregion Literal Tests
 
-		#region Simple Passing Keyword Sequences
-
-		[Fact]
-		public void GetTokens_KeywordNull_ReturnsNullToken()
-		{
-			const string input = @"null";
-			var expected = new List<Token<JsonTokenType>>
-			{
-				JsonGrammar.TokenNull
-			};
-
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
-			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
-
-			Assert.Equal(expected, actual);
-		}
+		#region Keyword Tests
 
 		[Fact]
 		public void GetTokens_KeywordUndefined_ReturnsUndefinedToken()
@@ -587,6 +721,22 @@ namespace JsonFx.Json
 			var expected = new List<Token<JsonTokenType>>
 			{
 				JsonGrammar.TokenUndefined
+			};
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+
+			// this is not allowed according to strict JSON, but we're following Postel's Law
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_KeywordNull_ReturnsNullToken()
+		{
+			const string input = @"null";
+			var expected = new List<Token<JsonTokenType>>
+			{
+				JsonGrammar.TokenNull
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
@@ -637,6 +787,7 @@ namespace JsonFx.Json
 			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
 			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
 
+			// this is not allowed according to strict JSON, but we're following Postel's Law
 			Assert.Equal(expected, actual);
 		}
 
@@ -652,6 +803,7 @@ namespace JsonFx.Json
 			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
 			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
 
+			// this is not allowed according to strict JSON, but we're following Postel's Law
 			Assert.Equal(expected, actual);
 		}
 
@@ -667,6 +819,7 @@ namespace JsonFx.Json
 			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
 			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
 
+			// this is not allowed according to strict JSON, but we're following Postel's Law
 			Assert.Equal(expected, actual);
 		}
 
@@ -682,15 +835,16 @@ namespace JsonFx.Json
 			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
 			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
 
+			// this is not allowed according to strict JSON, but we're following Postel's Law
 			Assert.Equal(expected, actual);
 		}
 
-		#endregion Simple Passing Keyword Sequences
+		#endregion Keyword Tests
 
-		#region Complex Passing Graph Sequences
+		#region Complex Graph Tests
 
 		[Fact]
-		public void GetTokens_GraphComplex_ReturnsGraphTokenStream()
+		public void GetTokens_ComplexGraph_ReturnsGraphTokens()
 		{
 			// input from pass1.json in test suite at http://www.json.org/JSON_checker/
 			const string input = @"[
@@ -969,12 +1123,12 @@ namespace JsonFx.Json
 			Assert.Equal(expected, actual);
 		}
 
-		#endregion Complex Passing Graph Sequences
+		#endregion Complex Graph Tests
 
-		#region Failing Sequences
+		#region Illegal Sequence Tests
 
 		[Fact]
-		public void GetTokens_ObjectIllegalExpression_ThrowsDeserializationException()
+		public void GetTokens_IllegalExpression_ThrowsDeserializationException()
 		{
 			// input from fail11.json in test suite at http://www.json.org/JSON_checker/
 			const string input = @"{""Illegal expression"": 1 + 2}";
@@ -989,7 +1143,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ObjectIllegalInvocation_ThrowsDeserializationException()
+		public void GetTokens_IllegalInvocation_ThrowsDeserializationException()
 		{
 			// input from fail12.json in test suite at http://www.json.org/JSON_checker/
 			const string input = @"{""Illegal invocation"": alert()}";
@@ -1004,30 +1158,9 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ObjectHexValue_NotSupported()
+		public void GetTokens_IllegalFunction_ThrowsDeserializationException()
 		{
-			// input from fail14.json in test suite at http://www.json.org/JSON_checker/
-			const string input = @"{""Numbers cannot be hex"": 0x14}";
-			var expected = new List<Token<JsonTokenType>>
-			{
-				JsonGrammar.TokenObjectBegin,
-				JsonGrammar.TokenString("Numbers cannot be hex"),
-				JsonGrammar.TokenPairDelim,
-				JsonGrammar.TokenNumber(0x14),
-				JsonGrammar.TokenObjectEnd
-			};
-
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
-			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
-
-			Assert.NotEqual(expected, actual);
-		}
-
-		[Fact]
-		public void GetTokens_StringUnquoted_ThrowsDeserializationException()
-		{
-			// input from fail16.json in test suite at http://www.json.org/JSON_checker/
-			const string input = @"[\naked]";
+			const string input = @"new function() { }";
 
 			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
 
@@ -1038,97 +1171,6 @@ namespace JsonFx.Json
 				});
 		}
 
-		[Fact]
-		public void GetTokens_StringLineBreak_ThrowsDeserializationException()
-		{
-			// input from fail27.json in test suite at http://www.json.org/JSON_checker/
-			const string input = @"[""line
-break""]";
-
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
-
-			Assert.Throws<DeserializationException>(
-				delegate
-				{
-					var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
-				});
-		}
-
-		[Fact]
-		public void GetTokens_StringEscapedLineBreak_ThrowsDeserializationException()
-		{
-			// input from fail28.json in test suite at http://www.json.org/JSON_checker/
-			const string input = @"[""line\
-break""]";
-
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
-
-			Assert.Throws<DeserializationException>(
-				delegate
-				{
-					var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
-				});
-		}
-
-		[Fact]
-		public void GetTokens_NumberFloatMissingExp_ThrowsDeserializationException()
-		{
-			// input from fail29.json in test suite at http://www.json.org/JSON_checker/
-			const string input = @"[0e]";
-
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
-
-			Assert.Throws<DeserializationException>(
-				delegate
-				{
-					var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
-				});
-		}
-
-		[Fact]
-		public void GetTokens_NumberFloatMissingExpDigits_ThrowsDeserializationException()
-		{
-			// input from fail30.json in test suite at http://www.json.org/JSON_checker/
-			const string input = @"[0e+]";
-
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
-
-			Assert.Throws<DeserializationException>(
-				delegate
-				{
-					var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
-				});
-		}
-
-		[Fact]
-		public void GetTokens_NumberFloatExtraExpSign_ThrowsDeserializationException()
-		{
-			// input from fail31.json in test suite at http://www.json.org/JSON_checker/
-			const string input = @"[0e+-1]";
-
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
-
-			Assert.Throws<DeserializationException>(
-				delegate
-				{
-					var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
-				});
-		}
-
-		[Fact]
-		public void GetTokens_NumberUnfinishedFloat_ThrowsDeserializationException()
-		{
-			const string input = @"123.";
-
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
-
-			Assert.Throws<DeserializationException>(
-				delegate
-				{
-					var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
-				});
-		}
-
-		#endregion Failing Sequences
+		#endregion Illegal Sequence Tests
 	}
 }

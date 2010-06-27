@@ -403,6 +403,12 @@ namespace JsonFx.Json
 					}
 				}
 
+				// check for 0x-style hex numbers
+				if (!this.scanner.IsEnd && IsLetter(this.scanner.Current))
+				{
+					throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.scanner.Index, this.scanner.Line, this.scanner.Column);
+				}
+
 				// by this point, we have the full number string and know its characteristics
 
 				if (!hasDecimal && !hasExponent && precision < 19)
@@ -465,9 +471,10 @@ namespace JsonFx.Json
 				while (true)
 				{
 					// look ahead
-					if (this.scanner.IsEnd)
+					if (this.scanner.IsEnd ||
+						Char.IsControl(this.scanner.Current) && this.scanner.Current != '\t')
 					{
-						// reached END before string delim
+						// reached end or line break before string delim
 						throw new DeserializationException(JsonTokenizer.ErrorUnterminatedString, strPos, strLine, strCol);
 					}
 
@@ -481,11 +488,6 @@ namespace JsonFx.Json
 						return JsonGrammar.TokenString(buffer.ToString());
 					}
 
-					if (Char.IsControl(this.scanner.Current) && this.scanner.Current != '\t')
-					{
-						throw new DeserializationException(JsonTokenizer.ErrorUnterminatedString, strPos, strLine, strCol);
-					}
-
 					if (this.scanner.Current != JsonGrammar.OperatorCharEscape)
 					{
 						// accumulate
@@ -496,9 +498,10 @@ namespace JsonFx.Json
 
 					// flush escape char
 					this.scanner.MoveNext();
-					if (this.scanner.IsEnd)
+					if (this.scanner.IsEnd ||
+						Char.IsControl(this.scanner.Current) && this.scanner.Current != '\t')
 					{
-						// unexpected end of input
+						// reached end or line break before string delim
 						throw new DeserializationException(JsonTokenizer.ErrorUnterminatedString, strPos, strLine, strCol);
 					}
 
@@ -507,7 +510,7 @@ namespace JsonFx.Json
 					{
 						case '0':
 						{
-							// don't allow NULL char '\0'
+							// consume and do not allow NULL char '\0'
 							// causes CStrings to terminate
 							this.scanner.MoveNext();
 							break;
@@ -582,11 +585,7 @@ namespace JsonFx.Json
 						}
 						default:
 						{
-							if (Char.IsControl(this.scanner.Current) && this.scanner.Current != '\t')
-							{
-								throw new DeserializationException(JsonTokenizer.ErrorUnterminatedString, strPos, strLine, strCol);
-							}
-
+							// all unrecognized sequences are interpreted as plain chars
 							buffer.Append(this.scanner.Current);
 							this.scanner.MoveNext();
 							break;
