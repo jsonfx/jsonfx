@@ -101,9 +101,9 @@ namespace JsonFx.Serialization
 		[Fact]
 		public void MoveNext_EmptySequence_ProducesEmptySequence()
 		{
-			const string value = "";
+			const string input = "";
 
-			var scanner = new TextReaderScanner(new StringReader(value));
+			var scanner = new TextReaderScanner(new StringReader(input));
 
 			var buffer = new StringBuilder();
 			while (scanner.MoveNext())
@@ -111,15 +111,15 @@ namespace JsonFx.Serialization
 				buffer.Append(scanner.Current);
 			}
 
-			Assert.Equal(value, buffer.ToString());
+			Assert.Equal(input, buffer.ToString());
 		}
 
 		[Fact]
 		public void MoveNext_OneCharSequence_ProducesSameSequence()
 		{
-			const string value = "_";
+			const string input = "_";
 
-			var scanner = new TextReaderScanner(new StringReader(value));
+			var scanner = new TextReaderScanner(new StringReader(input));
 
 			var buffer = new StringBuilder();
 			while (scanner.MoveNext())
@@ -127,15 +127,15 @@ namespace JsonFx.Serialization
 				buffer.Append(scanner.Current);
 			}
 
-			Assert.Equal(value, buffer.ToString());
+			Assert.Equal(input, buffer.ToString());
 		}
 
 		[Fact]
 		public void MoveNext_LongSequence_ProducesSameSequence()
 		{
-			const string value = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+			const string input = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-			var scanner = new TextReaderScanner(new StringReader(value));
+			var scanner = new TextReaderScanner(new StringReader(input));
 
 			var buffer = new StringBuilder();
 			while (scanner.MoveNext())
@@ -143,15 +143,15 @@ namespace JsonFx.Serialization
 				buffer.Append(scanner.Current);
 			}
 
-			Assert.Equal(value, buffer.ToString());
+			Assert.Equal(input, buffer.ToString());
 		}
 
 		[Fact]
 		public void MoveNext_UnicodeSequence_ProducesSameSequence()
 		{
-			const string value = "私が日本語を話すことはありません。";
+			const string input = "私が日本語を話すことはありません。";
 
-			var scanner = new TextReaderScanner(new StringReader(value));
+			var scanner = new TextReaderScanner(new StringReader(input));
 
 			var buffer = new StringBuilder();
 			while (scanner.MoveNext())
@@ -159,7 +159,7 @@ namespace JsonFx.Serialization
 				buffer.Append(scanner.Current);
 			}
 
-			Assert.Equal(value, buffer.ToString());
+			Assert.Equal(input, buffer.ToString());
 		}
 
 		#endregion MoveNext Tests
@@ -169,9 +169,9 @@ namespace JsonFx.Serialization
 		[Fact]
 		public void IsEnd_LongString_ReturnsFalseUntilEnd()
 		{
-			const string value = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+			const string input = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-			var scanner = new TextReaderScanner(new StringReader(value));
+			var scanner = new TextReaderScanner(new StringReader(input));
 
 			while (scanner.MoveNext())
 			{
@@ -188,12 +188,12 @@ namespace JsonFx.Serialization
 		[Fact]
 		public void Line_MultilineString_CountsCorrectNumberOfLines()
 		{
-			const string value = @"Line one
+			const string input = @"Line one
 Line two
 Line three
 Line Four";
 
-			var scanner = new TextReaderScanner(new StringReader(value));
+			var scanner = new TextReaderScanner(new StringReader(input));
 
 			while (scanner.MoveNext());
 
@@ -203,12 +203,12 @@ Line Four";
 		[Fact]
 		public void Column_MultilineString_CountsCorrectNumberOfColumns()
 		{
-			const string value = @"Line one
+			const string input = @"Line one
 Line two
 Line three
 Line Four";
 
-			var scanner = new TextReaderScanner(new StringReader(value));
+			var scanner = new TextReaderScanner(new StringReader(input));
 
 			while (scanner.MoveNext());
 
@@ -218,12 +218,12 @@ Line Four";
 		[Fact]
 		public void Index_MultilineString_CountsCorrectNumberOfChars()
 		{
-			const string value = @"Line one
+			const string input = @"Line one
 Line two
 Line three
 Line Four";
 
-			var scanner = new TextReaderScanner(new StringReader(value));
+			var scanner = new TextReaderScanner(new StringReader(input));
 
 			long i;
 			for (i=0; scanner.MoveNext(); i++)
