@@ -171,13 +171,48 @@ namespace JsonFx.Json
 		[Fact]
 		public void GetTokens_ObjectOneProperty_ReturnsSimpleObjectTokens()
 		{
-			const string input = "{\"key\":\"value\"}";
+			const string input = @"{""key"":""value""}";
 			var expected = new List<Token<JsonTokenType>>
 			{
 				JsonGrammar.TokenObjectBegin,
 				JsonGrammar.TokenString("key"),
 				JsonGrammar.TokenPairDelim,
 				JsonGrammar.TokenString("value"),
+				JsonGrammar.TokenObjectEnd
+			};
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_ObjectNested_ReturnsNestedObjectTokens()
+		{
+			// input from pass3.json in test suite at http://www.json.org/JSON_checker/
+			const string input = @"{
+    ""JSON Test Pattern pass3"": {
+        ""The outermost value"": ""must be an object or array."",
+        ""In this test"": ""It is an object.""
+    }
+}
+";
+
+			var expected = new List<Token<JsonTokenType>>
+			{
+				JsonGrammar.TokenObjectBegin,
+				JsonGrammar.TokenString("JSON Test Pattern pass3"),
+				JsonGrammar.TokenPairDelim,
+				JsonGrammar.TokenObjectBegin,
+				JsonGrammar.TokenString("The outermost value"),
+				JsonGrammar.TokenPairDelim,
+				JsonGrammar.TokenString("must be an object or array."),
+				JsonGrammar.TokenValueDelim,
+				JsonGrammar.TokenString("In this test"),
+				JsonGrammar.TokenPairDelim,
+				JsonGrammar.TokenString("It is an object."),
+				JsonGrammar.TokenObjectEnd,
 				JsonGrammar.TokenObjectEnd
 			};
 
@@ -207,6 +242,23 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		public void GetTokens_StringSimple_ReturnsStringToken()
+		{
+			// input from fail1.json in test suite at http://www.json.org/JSON_checker/
+			const string input = @"""A JSON payload should be an object or array, not a string.""";
+			var expected = new List<Token<JsonTokenType>>
+			{
+				JsonGrammar.TokenString("A JSON payload should be an object or array, not a string.")
+			};
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+
+			// this is not allowed according to strict JSON, but we're following Postel's Law
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
 		public void GetTokens_StringUnrecognizedEscapeLetter_EscapesToSimpleChar()
 		{
 			// input from fail15.json in test suite at http://www.json.org/JSON_checker/
@@ -221,6 +273,7 @@ namespace JsonFx.Json
 			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
 			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
 
+			// this is not allowed according to strict JSON, but we're following Postel's Law
 			Assert.Equal(expected, actual);
 		}
 
@@ -239,6 +292,95 @@ namespace JsonFx.Json
 			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
 			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
 
+			// this is not allowed according to strict JSON, but we're following Postel's Law
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_StringSingleQuote_ReturnsStringToken()
+		{
+			// input from fail24.json in test suite at http://www.json.org/JSON_checker/
+			const string input = @"['single quote']";
+			var expected = new List<Token<JsonTokenType>>
+			{
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenString("single quote"),
+				JsonGrammar.TokenArrayEnd
+			};
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+
+			// this is not allowed according to strict JSON, but we're following Postel's Law
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_StringUnescapedSingleQuote_ReturnsStringToken()
+		{
+			const string input = @"""unescaped ' single quote""";
+			var expected = new List<Token<JsonTokenType>>
+			{
+				JsonGrammar.TokenString("unescaped ' single quote"),
+			};
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_StringUnescapedQuote_ReturnsStringToken()
+		{
+			const string input = @"'unescaped "" quote'";
+			var expected = new List<Token<JsonTokenType>>
+			{
+				JsonGrammar.TokenString("unescaped \" quote"),
+			};
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+
+			// this is not allowed according to strict JSON, but we're following Postel's Law
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_StringTabChar_ReturnsStringToken()
+		{
+			// input from fail25.json in test suite at http://www.json.org/JSON_checker/
+			const string input = @"[""	tab	character	in	string	""]";
+			var expected = new List<Token<JsonTokenType>>
+			{
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenString("\ttab\tcharacter\tin\tstring\t"),
+				JsonGrammar.TokenArrayEnd
+			};
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+
+			// this is not allowed according to strict JSON, but we're following Postel's Law
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_StringEscapedTabChar_ReturnsStringToken()
+		{
+			// input from fail26.json in test suite at http://www.json.org/JSON_checker/
+			const string input = @"[""\	tab\	character\	in\	string\	""]";
+			var expected = new List<Token<JsonTokenType>>
+			{
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenString("\ttab\tcharacter\tin\tstring\t"),
+				JsonGrammar.TokenArrayEnd
+			};
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+
+			// this is not allowed according to strict JSON, but we're following Postel's Law
 			Assert.Equal(expected, actual);
 		}
 
@@ -337,18 +479,23 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_NumberIntegerLeadingZero_ReturnsNumberToken()
+		public void GetTokens_NumberIntegerLeadingZero_ReturnsObjectTokensWithNumberValue()
 		{
-			// this is not allowed according to strict JSON, following Postel's Law
-			const string input = "013";
+			// input from fail13.json in test suite at http://www.json.org/JSON_checker/
+			const string input = @"{""Numbers cannot have leading zeroes"": 013}";
 			var expected = new List<Token<JsonTokenType>>
 			{
-				JsonGrammar.TokenNumber(13)
+				JsonGrammar.TokenObjectBegin,
+				JsonGrammar.TokenString("Numbers cannot have leading zeroes"),
+				JsonGrammar.TokenPairDelim,
+				JsonGrammar.TokenNumber(13),
+				JsonGrammar.TokenObjectEnd
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
 			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
 
+			// this is not allowed according to strict JSON, but we're following Postel's Law
 			Assert.Equal(expected, actual);
 		}
 
@@ -357,15 +504,16 @@ namespace JsonFx.Json
 		#region Simple Passing Literal Sequences
 
 		[Fact]
-		public void GetTokens_LiteralNonQuotedKey_NumberObjectWithLiteralKey()
+		public void GetTokens_LiteralNonQuotedKey_ReturnsObjectTokensWithLiteralKey()
 		{
-			const string input = @"{ key : null }";
+			// input from fail3.json in test suite at http://www.json.org/JSON_checker/
+			const string input = @"{unquoted_key: ""keys must be quoted""}";
 			var expected = new List<Token<JsonTokenType>>
 			{
 				JsonGrammar.TokenObjectBegin,
-				JsonGrammar.TokenLiteral("key"),
+				JsonGrammar.TokenLiteral("unquoted_key"),
 				JsonGrammar.TokenPairDelim,
-				JsonGrammar.TokenNull,
+				JsonGrammar.TokenString("keys must be quoted"),
 				JsonGrammar.TokenObjectEnd
 			};
 
@@ -376,7 +524,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_LiteralNonQuotedKeyDollarSign_NumberObjectWithLiteralKey()
+		public void GetTokens_LiteralNonQuotedKeyDollarSign_ReturnsObjectTokensWithLiteralKey()
 		{
 			const string input = @"{ $abcdefg0123456 : false }";
 			var expected = new List<Token<JsonTokenType>>
@@ -395,7 +543,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_LiteralNonQuotedKeyNumber_NumberObjectWithLiteralKey()
+		public void GetTokens_LiteralNonQuotedKeyNumber_ReturnsObjectTokensWithLiteralKey()
 		{
 			const string input = @"{ _123456 : true }";
 			var expected = new List<Token<JsonTokenType>>
@@ -880,6 +1028,83 @@ namespace JsonFx.Json
 		{
 			// input from fail16.json in test suite at http://www.json.org/JSON_checker/
 			const string input = @"[\naked]";
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+
+			Assert.Throws<DeserializationException>(
+				delegate
+				{
+					var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+				});
+		}
+
+		[Fact]
+		public void GetTokens_StringLineBreak_ThrowsDeserializationException()
+		{
+			// input from fail27.json in test suite at http://www.json.org/JSON_checker/
+			const string input = @"[""line
+break""]";
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+
+			Assert.Throws<DeserializationException>(
+				delegate
+				{
+					var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+				});
+		}
+
+		[Fact]
+		public void GetTokens_StringEscapedLineBreak_ThrowsDeserializationException()
+		{
+			// input from fail28.json in test suite at http://www.json.org/JSON_checker/
+			const string input = @"[""line\
+break""]";
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+
+			Assert.Throws<DeserializationException>(
+				delegate
+				{
+					var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+				});
+		}
+
+		[Fact]
+		public void GetTokens_NumberFloatMissingExp_ThrowsDeserializationException()
+		{
+			// input from fail29.json in test suite at http://www.json.org/JSON_checker/
+			const string input = @"[0e]";
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+
+			Assert.Throws<DeserializationException>(
+				delegate
+				{
+					var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+				});
+		}
+
+		[Fact]
+		public void GetTokens_NumberFloatMissingExpDigits_ThrowsDeserializationException()
+		{
+			// input from fail30.json in test suite at http://www.json.org/JSON_checker/
+			const string input = @"[0e+]";
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+
+			Assert.Throws<DeserializationException>(
+				delegate
+				{
+					var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+				});
+		}
+
+		[Fact]
+		public void GetTokens_NumberFloatExtraExpSign_ThrowsDeserializationException()
+		{
+			// input from fail31.json in test suite at http://www.json.org/JSON_checker/
+			const string input = @"[0e+-1]";
 
 			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
 
