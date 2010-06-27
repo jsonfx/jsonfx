@@ -85,7 +85,7 @@ namespace JsonFx.Serialization
 		#region MoveNext Tests
 
 		[Fact]
-		public void MoveNext_NullReader_ProducesEmptySequence()
+		public void MoveNext_NullReader_ReturnsEmptySequence()
 		{
 			var scanner = new TextReaderScanner(TextReader.Null);
 
@@ -99,7 +99,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
-		public void MoveNext_EmptySequence_ProducesEmptySequence()
+		public void MoveNext_EmptySequence_ReturnsEmptySequence()
 		{
 			const string input = "";
 
@@ -115,7 +115,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
-		public void MoveNext_OneCharSequence_ProducesSameSequence()
+		public void MoveNext_OneCharSequence_ReturnsSameSequence()
 		{
 			const string input = "_";
 
@@ -131,7 +131,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
-		public void MoveNext_LongSequence_ProducesSameSequence()
+		public void MoveNext_LongSequence_ReturnsSameSequence()
 		{
 			const string input = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -147,7 +147,23 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
-		public void MoveNext_UnicodeSequence_ProducesSameSequence()
+		public void MoveNext_EscapedSequence_ReturnsSameSequence()
+		{
+			const string input = @"""\\\b\f\n\r\t\u0123\u4567\u89AB\uCDEF\uabcd\uef4A\""""";
+
+			var scanner = new TextReaderScanner(new StringReader(input));
+
+			var buffer = new StringBuilder();
+			while (scanner.MoveNext())
+			{
+				buffer.Append(scanner.Current);
+			}
+
+			Assert.Equal(input, buffer.ToString());
+		}
+
+		[Fact]
+		public void MoveNext_UnicodeSequence_ReturnsSameSequence()
 		{
 			const string input = "私が日本語を話すことはありません。";
 
