@@ -264,9 +264,9 @@ namespace JsonFx.Json
         ""ALPHA"": ""ABCDEFGHIJKLMNOPQRSTUVWYZ"",
         ""digit"": ""0123456789"",
         ""0123456789"": ""digit"",
-        ""special"": ""`1~!@#$%^&*()_+-={':[,]}|;.</>?"","+
-		//""hex"": ""\u0123\u4567\u89AB\uCDEF\uabcd\uef4A"",
-@"        ""true"": true,
+        ""special"": ""`1~!@#$%^&*()_+-={':[,]}|;.</>?"",
+        ""hex"": ""\u0123\u4567\u89AB\uCDEF\uabcd\uef4A"",
+        ""true"": true,
         ""false"": false,
         ""null"": null,
         ""array"":[  ],
@@ -281,11 +281,10 @@ namespace JsonFx.Json
 
 4 , 5        ,          6           ,7        ],""compact"":[1,2,3,4,5,6,7],
         ""jsontext"": ""{\""object with 1 member\"":[\""array with 1 element\""]}"",
-        ""quotes"": ""&#34; \u0022 %22 0x22 034 &#x22;"""+
-//",
-//        ""\/\\\""\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?""
-//: ""A key can be any string""
-@"    },
+        ""quotes"": ""&#34; \u0022 %22 0x22 034 &#x22;"",
+        ""\/\\\""\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?""
+: ""A key can be any string""
+    },
     0.5 ,98.6
 ,
 99.44
@@ -394,10 +393,10 @@ namespace JsonFx.Json
 				JsonGrammar.TokenPairDelim,
 				JsonGrammar.TokenString("`1~!@#$%^&*()_+-={':[,]}|;.</>?"),
 				JsonGrammar.TokenValueDelim,
-				//JsonGrammar.TokenString("hex"),
-				//JsonGrammar.TokenPairDelim,
-				//JsonGrammar.TokenString("\u0123\u4567\u89AB\uCDEF\uabcd\uef4A"),
-				//JsonGrammar.TokenValueDelim,
+				JsonGrammar.TokenString("hex"),
+				JsonGrammar.TokenPairDelim,
+				JsonGrammar.TokenString("\u0123\u4567\u89AB\uCDEF\uabcd\uef4A"),
+				JsonGrammar.TokenValueDelim,
 				JsonGrammar.TokenString("true"),
 				JsonGrammar.TokenPairDelim,
 				JsonGrammar.TokenTrue,
@@ -479,10 +478,10 @@ namespace JsonFx.Json
 				JsonGrammar.TokenString("quotes"),
 				JsonGrammar.TokenPairDelim,
 				JsonGrammar.TokenString("&#34; \u0022 %22 0x22 034 &#x22;"),
-				//JsonGrammar.TokenValueDelim,
-				//JsonGrammar.TokenString(@"\/\\\""\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"),
-				//JsonGrammar.TokenPairDelim,
-				//JsonGrammar.TokenString("A key can be any string"),
+				JsonGrammar.TokenValueDelim,
+				JsonGrammar.TokenString("/\\\"\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"),
+				JsonGrammar.TokenPairDelim,
+				JsonGrammar.TokenString("A key can be any string"),
 				JsonGrammar.TokenObjectEnd,
 				JsonGrammar.TokenValueDelim,
 				JsonGrammar.TokenNumber(0.5),

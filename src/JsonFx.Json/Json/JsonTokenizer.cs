@@ -557,7 +557,7 @@ namespace JsonFx.Json
 							string escapeSeq = String.Empty;
 
 							this.scanner.MoveNext();
-							for (int i=0; Char.IsDigit(this.scanner.Current) && (i < UnicodeEscapeLength); i++)
+							for (int i=0; this.IsHexDigit(this.scanner.Current) && (i < UnicodeEscapeLength); i++)
 							{
 								escapeSeq += this.scanner.Current;
 								this.scanner.MoveNext();
@@ -761,6 +761,23 @@ namespace JsonFx.Json
 			}
 
 			#endregion ITokenizer<JsonTokenType> Members
+
+			#region Utility Methods
+
+			/// <summary>
+			/// Checks if character matches [0-9A-fa-f]
+			/// </summary>
+			/// <param name="ch"></param>
+			/// <returns></returns>
+			private bool IsHexDigit(char ch)
+			{
+				return
+					(ch >= '0' && ch <= '9') ||
+					(ch >= 'A' && ch <= 'F') ||
+					(ch >= 'a' && ch <= 'f');
+			}
+
+			#endregion Utility Methods
 		}
 	}
 }
