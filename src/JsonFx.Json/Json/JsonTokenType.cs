@@ -101,7 +101,7 @@ namespace JsonFx.Json
 		ValueDelim,
 
 		/// <summary>
-		/// Identifiers, Literal text
+		/// Keywords, Identifiers, Literal text
 		/// </summary>
 		Literal
 	}
