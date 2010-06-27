@@ -108,7 +108,7 @@ namespace JsonFx.Json
 
 			#endregion Properties
 
-			#region Methods
+			#region Scanning Methods
 
 			/// <summary>
 			/// Returns the next JSON token in the sequence.

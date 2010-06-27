@@ -35,7 +35,7 @@ using JsonFx.Serialization;
 namespace JsonFx.Json
 {
 	/// <summary>
-	/// The formal language of tokens and symbols for JSON
+	/// Formal language of tokens and symbols for JSON
 	/// </summary>
 	internal class JsonGrammar
 	{
