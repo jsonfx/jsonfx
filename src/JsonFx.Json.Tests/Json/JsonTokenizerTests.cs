@@ -30,18 +30,63 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
+using JsonFx.Serialization;
 using Xunit;
 
 namespace JsonFx.Json
 {
 	public class JsonTokenizerTests
 	{
-		//[Fact]
-		public void MethodName_StateUnderTest_ExpectedBehavior()
+		#region Simple Passing Sequences
+
+		[Fact]
+		public void GetTokens_EmptyArray_EmptyArrayTokens()
 		{
+			const string value = "[]";
+			var expected = new List<Token<JsonTokenType>>
+			{
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayEnd
+			};
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(value));
+
+			Assert.Equal(expected, actual);
 		}
+
+		[Fact]
+		public void GetTokens_EmptyObject_EmptyObjectToken()
+		{
+			const string value = "{}";
+			var expected = new List<Token<JsonTokenType>>
+			{
+				JsonGrammar.TokenObjectBegin,
+				JsonGrammar.TokenObjectEnd
+			};
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(value));
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_Integer_NumberToken()
+		{
+			const string value = "123456";
+			var expected = new List<Token<JsonTokenType>>
+			{
+				new Token<JsonTokenType>(JsonTokenType.Number, 123456)
+			};
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(value));
+
+			Assert.Equal(expected, actual);
+		}
+
+		#endregion Simple Passing Sequences
 	}
 }

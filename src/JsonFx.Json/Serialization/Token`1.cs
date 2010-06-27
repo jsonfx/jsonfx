@@ -30,6 +30,7 @@
 
 using System;
 using System.Text;
+using System.Collections.Generic;
 
 namespace JsonFx.Serialization
 {
@@ -89,6 +90,30 @@ namespace JsonFx.Serialization
 			builder.Append(" }");
 
 			return builder.ToString();
+		}
+
+		public override bool Equals(object obj)
+		{
+			Token<T> that = obj as Token<T>;
+			if (that == null)
+			{
+				return base.Equals(obj);
+			}
+
+			return
+				EqualityComparer<T>.Default.Equals(this.TokenType, that.TokenType) &&
+				EqualityComparer<object>.Default.Equals(this.Value, that.Value);
+		}
+
+		public override int GetHashCode()
+		{
+			// TODO: find the correct starting values here by creating an anonymous object and viewing its implementation
+			const int ShiftValue = -1521134295;
+
+			int hashcode = 0x23f797e3;
+			hashcode = (ShiftValue * hashcode) + EqualityComparer<T>.Default.GetHashCode(this.TokenType);
+			hashcode = (ShiftValue * hashcode) + EqualityComparer<object>.Default.GetHashCode(this.Value);
+			return hashcode;
 		}
 
 		#endregion Object Overrides

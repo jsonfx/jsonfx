@@ -80,6 +80,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Json\JsonTokenizerTests.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Serialization\StringScannerTests.cs" />
     <Compile Include="Serialization\TextReaderScannerTests.cs" />
   </ItemGroup>
