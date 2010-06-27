@@ -94,6 +94,60 @@ namespace JsonFx.Json
 			Assert.Equal(expected, actual);
 		}
 
+		[Fact]
+		public void GetTokens_ArrayNested_ReturnsNestedArrayTokens()
+		{
+			// input from pass2.json in test suite at http://www.json.org/JSON_checker/
+			const string input = @"[[[[[[[[[[[[[[[[[[[""Not too deep""]]]]]]]]]]]]]]]]]]]";
+			var expected = new List<Token<JsonTokenType>>
+			{
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenString("Not too deep"),
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd
+			};
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+
+			Assert.Equal(expected, actual);
+		}
+
 		#endregion Simple Passing Array Sequences
 
 		#region Simple Passing Object Sequences
@@ -144,6 +198,42 @@ namespace JsonFx.Json
 			var expected = new List<Token<JsonTokenType>>
 			{
 				JsonGrammar.TokenString(String.Empty)
+			};
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_StringUnrecognizedEscapeLetter_EscapesToSimpleChar()
+		{
+			// input from fail15.json in test suite at http://www.json.org/JSON_checker/
+			const string input = @"[""Illegal backslash escape: \x15""]";
+			var expected = new List<Token<JsonTokenType>>
+			{
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenString("Illegal backslash escape: x15"),
+				JsonGrammar.TokenArrayEnd
+			};
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_StringUnrecognizedEscapeNull_CharIgnored()
+		{
+			// input from fail17.json in test suite at http://www.json.org/JSON_checker/
+			const string input = @"[""Illegal backslash escape: \017""]";
+			var expected = new List<Token<JsonTokenType>>
+			{
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenString("Illegal backslash escape: 17"),
+				JsonGrammar.TokenArrayEnd
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
@@ -238,6 +328,22 @@ namespace JsonFx.Json
 			var expected = new List<Token<JsonTokenType>>
 			{
 				JsonGrammar.TokenNumber(-.123456)
+			};
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_NumberIntegerLeadingZero_ReturnsNumberToken()
+		{
+			// this is not allowed according to strict JSON, following Postel's Law
+			const string input = "013";
+			var expected = new List<Token<JsonTokenType>>
+			{
+				JsonGrammar.TokenNumber(13)
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
@@ -438,6 +544,7 @@ namespace JsonFx.Json
 		[Fact]
 		public void GetTokens_GraphComplex_ReturnsGraphTokenStream()
 		{
+			// input from pass1.json in test suite at http://www.json.org/JSON_checker/
 			const string input = @"[
     ""JSON Test Pattern pass1"",
     {""object with 1 member"":[""array with 1 element""]},
@@ -715,5 +822,74 @@ namespace JsonFx.Json
 		}
 
 		#endregion Complex Passing Graph Sequences
+
+		#region Failing Sequences
+
+		[Fact]
+		public void GetTokens_ObjectIllegalExpression_ThrowsDeserializationException()
+		{
+			// input from fail11.json in test suite at http://www.json.org/JSON_checker/
+			const string input = @"{""Illegal expression"": 1 + 2}";
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+
+			Assert.Throws<DeserializationException>(
+				delegate
+				{
+					var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+				});
+		}
+
+		[Fact]
+		public void GetTokens_ObjectIllegalInvocation_ThrowsDeserializationException()
+		{
+			// input from fail12.json in test suite at http://www.json.org/JSON_checker/
+			const string input = @"{""Illegal invocation"": alert()}";
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+
+			Assert.Throws<DeserializationException>(
+				delegate
+				{
+					var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+				});
+		}
+
+		[Fact]
+		public void GetTokens_ObjectHexValue_NotSupported()
+		{
+			// input from fail14.json in test suite at http://www.json.org/JSON_checker/
+			const string input = @"{""Numbers cannot be hex"": 0x14}";
+			var expected = new List<Token<JsonTokenType>>
+			{
+				JsonGrammar.TokenObjectBegin,
+				JsonGrammar.TokenString("Numbers cannot be hex"),
+				JsonGrammar.TokenPairDelim,
+				JsonGrammar.TokenNumber(0x14),
+				JsonGrammar.TokenObjectEnd
+			};
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+
+			Assert.NotEqual(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_ArrayUnquotedString_ThrowsDeserializationException()
+		{
+			// input from fail16.json in test suite at http://www.json.org/JSON_checker/
+			const string input = @"[\naked]";
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+
+			Assert.Throws<DeserializationException>(
+				delegate
+				{
+					var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+				});
+		}
+
+		#endregion Failing Sequences
 	}
 }
