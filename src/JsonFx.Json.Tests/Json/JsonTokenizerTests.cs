@@ -1024,7 +1024,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ArrayUnquotedString_ThrowsDeserializationException()
+		public void GetTokens_StringUnquoted_ThrowsDeserializationException()
 		{
 			// input from fail16.json in test suite at http://www.json.org/JSON_checker/
 			const string input = @"[\naked]";
@@ -1105,6 +1105,20 @@ break""]";
 		{
 			// input from fail31.json in test suite at http://www.json.org/JSON_checker/
 			const string input = @"[0e+-1]";
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+
+			Assert.Throws<DeserializationException>(
+				delegate
+				{
+					var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+				});
+		}
+
+		[Fact]
+		public void GetTokens_NumberUnfinishedFloat_ThrowsDeserializationException()
+		{
+			const string input = @"123.";
 
 			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
 

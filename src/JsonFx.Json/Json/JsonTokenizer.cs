@@ -330,8 +330,6 @@ namespace JsonFx.Json
 
 				if (!this.scanner.IsEnd && (this.scanner.Current == JsonGrammar.OperatorDecimalPoint))
 				{
-					hasDecimal = true;
-
 					// consume decimal
 					buffer.Append(this.scanner.Current);
 					this.scanner.MoveNext();
@@ -342,6 +340,13 @@ namespace JsonFx.Json
 						// consume digit
 						buffer.Append(this.scanner.Current);
 						this.scanner.MoveNext();
+						hasDecimal = true;
+					}
+
+					if (!hasDecimal)
+					{
+						// fractional digits required when '.' present
+						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.scanner.Index, this.scanner.Line, this.scanner.Column);
 					}
 				}
 
@@ -358,6 +363,7 @@ namespace JsonFx.Json
 
 				if (precision < 1)
 				{
+					// missing digits all together
 					throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.scanner.Index, this.scanner.Line, this.scanner.Column);
 				}
 
@@ -366,19 +372,13 @@ namespace JsonFx.Json
 				// optional exponent part
 				if (!this.scanner.IsEnd && (this.scanner.Current == 'e' || this.scanner.Current == 'E'))
 				{
-					hasExponent = true;
-
 					// consume 'e'
 					buffer.Append(this.scanner.Current);
 					this.scanner.MoveNext();
 
-					if (this.scanner.IsEnd)
-					{
-						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.scanner.Index, this.scanner.Line, this.scanner.Column);
-					}
-
 					// optional minus/plus part
-					if (this.scanner.Current == JsonGrammar.OperatorUnaryMinus ||
+					if (!this.scanner.IsEnd &&
+						this.scanner.Current == JsonGrammar.OperatorUnaryMinus ||
 						this.scanner.Current == JsonGrammar.OperatorUnaryPlus)
 					{
 						// consume sign
@@ -386,21 +386,24 @@ namespace JsonFx.Json
 						this.scanner.MoveNext();
 					}
 
-					if (this.scanner.IsEnd || !IsDigit(this.scanner.Current))
-					{
-						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.scanner.Index, this.scanner.Line, this.scanner.Column);
-					}
-
 					// exp part
-					do
+					while (!this.scanner.IsEnd && IsDigit(this.scanner.Current))
 					{
 						// consume digit
 						buffer.Append(this.scanner.Current);
 						this.scanner.MoveNext();
-					} while (!this.scanner.IsEnd && IsDigit(this.scanner.Current));
+
+						hasExponent = true;
+					}
+
+					if (!hasExponent)
+					{
+						// exponent digits required when 'e' present
+						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.scanner.Index, this.scanner.Line, this.scanner.Column);
+					}
 				}
 
-				// at this point, we have the full number string and know its characteristics
+				// by this point, we have the full number string and know its characteristics
 
 				if (!hasDecimal && !hasExponent && precision < 19)
 				{
@@ -417,17 +420,17 @@ namespace JsonFx.Json
 
 					if (number >= Int32.MinValue && number <= Int32.MaxValue)
 					{
-						// most common
+						// int most common
 						return JsonGrammar.TokenNumber((int)number);
 					}
 
 					if (number >= Int64.MinValue && number <= Int64.MaxValue)
 					{
-						// more flexible
+						// long more flexible
 						return JsonGrammar.TokenNumber((long)number);
 					}
 
-					// most flexible
+					// decimal most flexible
 					return JsonGrammar.TokenNumber(number);
 				}
 				else
