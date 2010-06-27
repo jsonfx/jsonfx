@@ -315,7 +315,7 @@ namespace JsonFx.Json
 					isNeg = true;
 				}
 
-				if (!Char.IsDigit(this.scanner.Current) &&
+				if (!IsDigit(this.scanner.Current) &&
 					this.scanner.Current != JsonGrammar.OperatorDecimalPoint)
 				{
 					// possibly "-Infinity"
@@ -323,7 +323,7 @@ namespace JsonFx.Json
 				}
 
 				// integer part
-				while (!this.scanner.IsEnd && Char.IsDigit(this.scanner.Current))
+				while (!this.scanner.IsEnd && IsDigit(this.scanner.Current))
 				{
 					// consume digit
 					buffer.Append(this.scanner.Current);
@@ -341,7 +341,7 @@ namespace JsonFx.Json
 					this.scanner.MoveNext();
 
 					// fraction part
-					while (!this.scanner.IsEnd && Char.IsDigit(this.scanner.Current))
+					while (!this.scanner.IsEnd && IsDigit(this.scanner.Current))
 					{
 						// consume digit
 						buffer.Append(this.scanner.Current);
@@ -390,7 +390,7 @@ namespace JsonFx.Json
 						this.scanner.MoveNext();
 					}
 
-					if (this.scanner.IsEnd || !Char.IsDigit(this.scanner.Current))
+					if (this.scanner.IsEnd || !IsDigit(this.scanner.Current))
 					{
 						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.scanner.Index, this.scanner.Line, this.scanner.Column);
 					}
@@ -401,7 +401,7 @@ namespace JsonFx.Json
 						// consume digit
 						buffer.Append(this.scanner.Current);
 						this.scanner.MoveNext();
-					} while (!this.scanner.IsEnd && Char.IsDigit(this.scanner.Current));
+					} while (!this.scanner.IsEnd && IsDigit(this.scanner.Current));
 				}
 
 				// at this point, we have the full number string and know its characteristics
@@ -694,8 +694,8 @@ namespace JsonFx.Json
 
 					// digits are only allowed after first char
 					// rest can be in head or tail
-					if ((identPart && Char.IsDigit(ch)) ||
-						Char.IsLetter(ch) || ch == '_' || ch == '$')
+					if ((identPart && IsDigit(ch)) ||
+						IsLetter(ch) || (ch == '_') || (ch == '$'))
 					{
 						identPart = true;
 						buffer.Append(ch);
@@ -762,7 +762,29 @@ namespace JsonFx.Json
 			#region Utility Methods
 
 			/// <summary>
-			/// Checks if character matches [0-9A-fa-f]
+			/// Checks if character matches [A-Za-z]
+			/// </summary>
+			/// <param name="ch"></param>
+			/// <returns></returns>
+			private static bool IsLetter(char ch)
+			{
+				return
+					((ch >= 'a') && (ch <= 'z')) ||
+					((ch >= 'A') && (ch <= 'Z'));
+			}
+
+			/// <summary>
+			/// Checks if character matches [0-9]
+			/// </summary>
+			/// <param name="ch"></param>
+			/// <returns></returns>
+			private static bool IsDigit(char ch)
+			{
+				return (ch >= '0') && (ch <= '9');
+			}
+
+			/// <summary>
+			/// Checks if character matches [0-9A-Fa-f]
 			/// </summary>
 			/// <param name="ch"></param>
 			/// <returns></returns>
