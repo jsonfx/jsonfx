@@ -554,13 +554,10 @@ namespace JsonFx.Json
 							// e.g. (c) => "\u00A9"
 							const int UnicodeEscapeLength = 4;
 
-							string escapeSeq = String.Empty;
-
-							this.scanner.MoveNext();
-							for (int i=0; this.IsHexDigit(this.scanner.Current) && (i < UnicodeEscapeLength); i++)
+							string escapeSeq = null;
+							for (int i=UnicodeEscapeLength; this.scanner.MoveNext() && IsHexDigit(this.scanner.Current) && (i > 0); i--)
 							{
 								escapeSeq += this.scanner.Current;
-								this.scanner.MoveNext();
 							}
 
 							// unicode ordinal
@@ -576,7 +573,7 @@ namespace JsonFx.Json
 							}
 							else
 							{
-								// using FireFox style recovery, if not a valid hex
+								// using FireFox-style recovery, if not a valid hex
 								// escape sequence then treat as single escaped 'u'
 								// followed by rest of string
 								buffer.Append('u');
@@ -769,7 +766,7 @@ namespace JsonFx.Json
 			/// </summary>
 			/// <param name="ch"></param>
 			/// <returns></returns>
-			private bool IsHexDigit(char ch)
+			private static bool IsHexDigit(char ch)
 			{
 				return
 					(ch >= '0' && ch <= '9') ||
