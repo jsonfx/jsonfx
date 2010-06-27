@@ -179,12 +179,8 @@ namespace JsonFx.Json
 					return token;
 				}
 
-				// hold for Infinity
-				if (hasUnaryOp)
-				{
-					this.scanner.MoveNext();
-				}
-				else
+				// hold for Infinity, clear for others
+				if (!hasUnaryOp)
 				{
 					ch = '\0';
 				}

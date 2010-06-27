@@ -217,6 +217,21 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		public void GetTokens_PosNoLeadingDigitFloat_NumberToken()
+		{
+			const string input = "+.123456";
+			var expected = new List<Token<JsonTokenType>>
+			{
+				JsonGrammar.TokenNumber(.123456)
+			};
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
 		public void GetTokens_NegNoLeadingDigitFloat_NumberToken()
 		{
 			const string input = "-.123456";
@@ -293,6 +308,130 @@ namespace JsonFx.Json
 		}
 
 		#endregion Simple Passing Literal Sequences
+
+		#region Simple Passing Keyword Sequences
+
+		[Fact]
+		public void GetTokens_Null_NullToken()
+		{
+			const string input = @"null";
+			var expected = new List<Token<JsonTokenType>>
+			{
+				JsonGrammar.TokenNull
+			};
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_Undefined_UndefinedToken()
+		{
+			const string input = @"undefined";
+			var expected = new List<Token<JsonTokenType>>
+			{
+				JsonGrammar.TokenUndefined
+			};
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_False_FalseToken()
+		{
+			const string input = @"false";
+			var expected = new List<Token<JsonTokenType>>
+			{
+				JsonGrammar.TokenFalse
+			};
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_True_TrueToken()
+		{
+			const string input = @"true";
+			var expected = new List<Token<JsonTokenType>>
+			{
+				JsonGrammar.TokenTrue
+			};
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_Nan_NanToken()
+		{
+			const string input = @"NaN";
+			var expected = new List<Token<JsonTokenType>>
+			{
+				JsonGrammar.TokenNaN
+			};
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_Infinity_PositiveInfinityToken()
+		{
+			const string input = @"Infinity";
+			var expected = new List<Token<JsonTokenType>>
+			{
+				JsonGrammar.TokenPositiveInfinity
+			};
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_PosInfinity_PositiveInfinityToken()
+		{
+			const string input = @"+Infinity";
+			var expected = new List<Token<JsonTokenType>>
+			{
+				JsonGrammar.TokenPositiveInfinity
+			};
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_NegInfinity_NegativeInfinityToken()
+		{
+			const string input = @"-Infinity";
+			var expected = new List<Token<JsonTokenType>>
+			{
+				JsonGrammar.TokenNegativeInfinity
+			};
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+
+			Assert.Equal(expected, actual);
+		}
+
+		#endregion Simple Passing Keyword Sequences
 
 		#region Complex Passing Sequences
 
