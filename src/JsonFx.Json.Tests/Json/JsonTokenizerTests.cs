@@ -41,7 +41,7 @@ namespace JsonFx.Json
 		#region Simple Passing Array Sequences
 
 		[Fact]
-		public void GetTokens_EmptyArray_EmptyArrayTokens()
+		public void GetTokens_ArrayEmpty_ReturnsEmptyArrayTokens()
 		{
 			const string input = "[]";
 			var expected = new List<Token<JsonTokenType>>
@@ -57,7 +57,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_OneItemArray_ArrayTokens()
+		public void GetTokens_ArrayOneItem_ReturnsArrayTokens()
 		{
 			const string input = "[null]";
 			var expected = new List<Token<JsonTokenType>>
@@ -74,7 +74,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_MultiItemArrayWhitespace_SimpleArrayTokens()
+		public void GetTokens_ArrayMultiItemWhitespace_ReturnsSimpleArrayTokens()
 		{
 			const string input = "[ 0, null, false ]";
 			var expected = new List<Token<JsonTokenType>>
@@ -99,7 +99,7 @@ namespace JsonFx.Json
 		#region Simple Passing Object Sequences
 
 		[Fact]
-		public void GetTokens_EmptyObject_EmptyObjectTokens()
+		public void GetTokens_ObjectEmpty_ReturnsEmptyObjectTokens()
 		{
 			const string input = "{}";
 			var expected = new List<Token<JsonTokenType>>
@@ -115,7 +115,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_OnePropertyObject_SimpleObjectTokens()
+		public void GetTokens_ObjectOneProperty_ReturnsSimpleObjectTokens()
 		{
 			const string input = "{\"key\":\"value\"}";
 			var expected = new List<Token<JsonTokenType>>
@@ -138,7 +138,7 @@ namespace JsonFx.Json
 		#region Simple Passing String Sequences
 
 		[Fact]
-		public void GetTokens_EmptyString_StringToken()
+		public void GetTokens_StringEmpty_ReturnsStringToken()
 		{
 			const string input = "\"\"";
 			var expected = new List<Token<JsonTokenType>>
@@ -157,7 +157,7 @@ namespace JsonFx.Json
 		#region Simple Passing Number Sequences
 
 		[Fact]
-		public void GetTokens_Integer_NumberToken()
+		public void GetTokens_NumberInteger_ReturnsNumberToken()
 		{
 			const string input = "123456";
 			var expected = new List<Token<JsonTokenType>>
@@ -172,7 +172,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_Float_NumberToken()
+		public void GetTokens_NumberFloat_ReturnsNumberToken()
 		{
 			const string input = "1.23456";
 			var expected = new List<Token<JsonTokenType>>
@@ -187,7 +187,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_NegFloat_NumberToken()
+		public void GetTokens_NumberNegFloat_ReturnsNumberToken()
 		{
 			const string input = "-0.123456";
 			var expected = new List<Token<JsonTokenType>>
@@ -202,7 +202,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_NoLeadingDigitFloat_NumberToken()
+		public void GetTokens_NumberNoLeadingDigitFloat_ReturnsNumberToken()
 		{
 			const string input = ".123456";
 			var expected = new List<Token<JsonTokenType>>
@@ -217,7 +217,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_PosNoLeadingDigitFloat_NumberToken()
+		public void GetTokens_NumberPosNoLeadingDigitFloat_ReturnsNumberToken()
 		{
 			const string input = "+.123456";
 			var expected = new List<Token<JsonTokenType>>
@@ -232,7 +232,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_NegNoLeadingDigitFloat_NumberToken()
+		public void GetTokens_NumberNegNoLeadingDigitFloat_ReturnsNumberToken()
 		{
 			const string input = "-.123456";
 			var expected = new List<Token<JsonTokenType>>
@@ -251,7 +251,7 @@ namespace JsonFx.Json
 		#region Simple Passing Literal Sequences
 
 		[Fact]
-		public void GetTokens_NonQuotedKey_ObjectWithLiteralKey()
+		public void GetTokens_LiteralNonQuotedKey_NumberObjectWithLiteralKey()
 		{
 			const string input = @"{ key : null }";
 			var expected = new List<Token<JsonTokenType>>
@@ -270,7 +270,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_NonQuotedKeyDollarSign_ObjectWithLiteralKey()
+		public void GetTokens_LiteralNonQuotedKeyDollarSign_NumberObjectWithLiteralKey()
 		{
 			const string input = @"{ $abcdefg0123456 : false }";
 			var expected = new List<Token<JsonTokenType>>
@@ -289,7 +289,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_NonQuotedKeyNumber_ObjectWithLiteralKey()
+		public void GetTokens_LiteralNonQuotedKeyNumber_NumberObjectWithLiteralKey()
 		{
 			const string input = @"{ _123456 : true }";
 			var expected = new List<Token<JsonTokenType>>
@@ -312,7 +312,7 @@ namespace JsonFx.Json
 		#region Simple Passing Keyword Sequences
 
 		[Fact]
-		public void GetTokens_Null_NullToken()
+		public void GetTokens_KeywordNull_ReturnsNullToken()
 		{
 			const string input = @"null";
 			var expected = new List<Token<JsonTokenType>>
@@ -327,7 +327,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_Undefined_UndefinedToken()
+		public void GetTokens_KeywordUndefined_ReturnsUndefinedToken()
 		{
 			const string input = @"undefined";
 			var expected = new List<Token<JsonTokenType>>
@@ -342,7 +342,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_False_FalseToken()
+		public void GetTokens_KeywordFalse_ReturnsFalseToken()
 		{
 			const string input = @"false";
 			var expected = new List<Token<JsonTokenType>>
@@ -357,7 +357,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_True_TrueToken()
+		public void GetTokens_KeywordTrue_ReturnsTrueToken()
 		{
 			const string input = @"true";
 			var expected = new List<Token<JsonTokenType>>
@@ -372,7 +372,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_Nan_NanToken()
+		public void GetTokens_KeywordNan_ReturnsNanToken()
 		{
 			const string input = @"NaN";
 			var expected = new List<Token<JsonTokenType>>
@@ -387,7 +387,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_Infinity_PositiveInfinityToken()
+		public void GetTokens_KeywordInfinity_ReturnsPositiveInfinityToken()
 		{
 			const string input = @"Infinity";
 			var expected = new List<Token<JsonTokenType>>
@@ -402,7 +402,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_PosInfinity_PositiveInfinityToken()
+		public void GetTokens_KeywordPosInfinity_ReturnsPositiveInfinityToken()
 		{
 			const string input = @"+Infinity";
 			var expected = new List<Token<JsonTokenType>>
@@ -417,7 +417,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_NegInfinity_NegativeInfinityToken()
+		public void GetTokens_KeywordNegInfinity_ReturnsNegativeInfinityToken()
 		{
 			const string input = @"-Infinity";
 			var expected = new List<Token<JsonTokenType>>
@@ -433,10 +433,10 @@ namespace JsonFx.Json
 
 		#endregion Simple Passing Keyword Sequences
 
-		#region Complex Passing Sequences
+		#region Complex Passing Graph Sequences
 
 		[Fact]
-		public void GetTokens_ComplexGraph_TokenStream()
+		public void GetTokens_GraphComplex_ReturnsGraphTokenStream()
 		{
 			const string input = @"[
     ""JSON Test Pattern pass1"",
@@ -714,6 +714,6 @@ namespace JsonFx.Json
 			Assert.Equal(expected, actual);
 		}
 
-		#endregion Complex Passing Sequences
+		#endregion Complex Passing Graph Sequences
 	}
 }
