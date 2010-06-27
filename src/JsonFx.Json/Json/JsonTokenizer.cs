@@ -715,29 +715,34 @@ namespace JsonFx.Json
 
 			#region ITokenizer<JsonTokenType> Members
 
+			/// <summary>
+			/// Gets a token sequence from the TextReader
+			/// </summary>
+			/// <param name="reader"></param>
+			/// <returns></returns>
 			public IEnumerable<Token<JsonTokenType>> GetTokens(TextReader reader)
 			{
-				this.scanner = new TextReaderScanner(reader);
-
-				// initialize
-				this.scanner.MoveNext();
-
-				while (true)
-				{
-					Token<JsonTokenType> token = this.NextToken();
-					if (token.TokenType == JsonTokenType.None)
-					{
-						this.scanner.Dispose();
-						this.scanner = TextReaderScanner.Null;
-						yield break;
-					}
-					yield return token;
-				};
+				return this.GetTokens(new TextReaderScanner(reader));
 			}
 
+			/// <summary>
+			/// Gets a token sequence from the string
+			/// </summary>
+			/// <param name="text"></param>
+			/// <returns></returns>
 			public IEnumerable<Token<JsonTokenType>> GetTokens(string text)
 			{
-				this.scanner = new StringScanner(text);
+				return this.GetTokens(new StringScanner(text));
+			}
+
+			/// <summary>
+			/// Gets a token sequence from the scanner
+			/// </summary>
+			/// <param name="scanner"></param>
+			/// <returns></returns>
+			protected IEnumerable<Token<JsonTokenType>> GetTokens(ITextScanner scanner)
+			{
+				this.scanner = scanner;
 
 				// initialize
 				this.scanner.MoveNext();
