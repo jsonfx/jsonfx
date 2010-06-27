@@ -233,6 +233,67 @@ namespace JsonFx.Json
 
 		#endregion Simple Passing Number Sequences
 
+		#region Simple Passing Literal Sequences
+
+		[Fact]
+		public void GetTokens_NonQuotedKey_ObjectWithLiteralKey()
+		{
+			const string input = @"{ key : null }";
+			var expected = new List<Token<JsonTokenType>>
+			{
+				JsonGrammar.TokenObjectBegin,
+				JsonGrammar.TokenLiteral("key"),
+				JsonGrammar.TokenPairDelim,
+				JsonGrammar.TokenNull,
+				JsonGrammar.TokenObjectEnd
+			};
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_NonQuotedKeyDollarSign_ObjectWithLiteralKey()
+		{
+			const string input = @"{ $abcdefg0123456 : false }";
+			var expected = new List<Token<JsonTokenType>>
+			{
+				JsonGrammar.TokenObjectBegin,
+				JsonGrammar.TokenLiteral("$abcdefg0123456"),
+				JsonGrammar.TokenPairDelim,
+				JsonGrammar.TokenFalse,
+				JsonGrammar.TokenObjectEnd
+			};
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_NonQuotedKeyNumber_ObjectWithLiteralKey()
+		{
+			const string input = @"{ _123456 : true }";
+			var expected = new List<Token<JsonTokenType>>
+			{
+				JsonGrammar.TokenObjectBegin,
+				JsonGrammar.TokenLiteral("_123456"),
+				JsonGrammar.TokenPairDelim,
+				JsonGrammar.TokenTrue,
+				JsonGrammar.TokenObjectEnd
+			};
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+
+			Assert.Equal(expected, actual);
+		}
+
+		#endregion Simple Passing Literal Sequences
+
 		#region Complex Passing Sequences
 
 		[Fact]
