@@ -556,7 +556,7 @@ namespace JsonFx.Json
 							// e.g. (c) => "\u00A9"
 							const int UnicodeEscapeLength = 4;
 
-							string escapeSeq = null;
+							string escapeSeq = String.Empty;
 							for (int i=UnicodeEscapeLength; this.scanner.MoveNext() && IsHexDigit(this.scanner.Current) && (i > 0); i--)
 							{
 								escapeSeq += this.scanner.Current;

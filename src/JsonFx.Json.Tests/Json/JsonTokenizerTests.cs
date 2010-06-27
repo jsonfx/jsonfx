@@ -259,6 +259,36 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		public void GetTokens_StringEscapedChars_ReturnsStringToken()
+		{
+			const string input = @"""\\\b\f\n\r\t\u0123\u4567\u89AB\uCDEF\uabcd\uef4A\""""";
+			var expected = new List<Token<JsonTokenType>>
+			{
+				JsonGrammar.TokenString("\\\b\f\n\r\t\u0123\u4567\u89AB\uCDEF\uabcd\uef4A\"")
+			};
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_StringImproperlyEscapedChars_ReturnsStringTokenWithSimpleChars()
+		{
+			const string input = @"""\u\u1\u12\u123\u12345""";
+			var expected = new List<Token<JsonTokenType>>
+			{
+				JsonGrammar.TokenString("uu1u12u123\u12345")
+			};
+
+			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var actual = new List<Token<JsonTokenType>>(tokenizer.GetTokens(input));
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
 		public void GetTokens_StringUnrecognizedEscapeLetter_EscapesToSimpleChar()
 		{
 			// input from fail15.json in test suite at http://www.json.org/JSON_checker/
