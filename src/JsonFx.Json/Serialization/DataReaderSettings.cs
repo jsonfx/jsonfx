@@ -60,10 +60,30 @@ namespace JsonFx.Serialization
 		#region Fields
 
 		private bool allowNullValueTypes = true;
-		private IDataNameResolver resolver;
-		private MemberCache cache;
+		private readonly MemberCache Cache;
 
 		#endregion Fields
+
+		#region Init
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		public DataReaderSettings()
+			: this(new DataNameResolver())
+		{
+		}
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="resolver"></param>
+		public DataReaderSettings(IDataNameResolver resolver)
+		{
+			this.Cache = new MemberCache(resolver);
+		}
+
+		#endregion Init
 
 		#region Properties
 
@@ -80,46 +100,6 @@ namespace JsonFx.Serialization
 		{
 			get { return this.allowNullValueTypes; }
 			set { this.allowNullValueTypes = value; }
-		}
-
-		/// <summary>
-		/// Gets and sets the serialized name resolver
-		/// </summary>
-		public IDataNameResolver Resolver
-		{
-			get
-			{
-				if (this.resolver == null)
-				{
-					this.resolver = new DataNameResolver();
-				}
-				return this.resolver;
-			}
-			set
-			{
-				if (this.resolver == value)
-				{
-					return;
-				}
-
-				this.resolver = value;
-				this.cache = null;
-			}
-		}
-
-		/// <summary>
-		/// Gets the member map cache
-		/// </summary>
-		private MemberCache Cache
-		{
-			get
-			{
-				if (this.cache == null)
-				{
-					this.cache = new MemberCache(this.Resolver);
-				}
-				return this.cache;
-			}
 		}
 
 		/// <summary>
