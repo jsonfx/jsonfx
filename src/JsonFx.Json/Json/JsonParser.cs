@@ -90,7 +90,28 @@ namespace JsonFx.Json
 			/// <summary>
 			/// Parses the token stream coercing the result targetType
 			/// </summary>
-			/// <param name="tokenizer"></param>
+			/// <param name="tokens"></param>
+			/// <returns></returns>
+			public object Parse(IEnumerable<Token<JsonTokenType>> tokens)
+			{
+				return this.Parse(tokens, null);
+			}
+
+			/// <summary>
+			/// Parses the token stream coercing the result to TResult
+			/// </summary>
+			/// <typeparam name="TResult">the result target type</typeparam>
+			/// <param name="tokens"></param>
+			/// <returns></returns>
+			public TResult Parse<TResult>(IEnumerable<Token<JsonTokenType>> tokens)
+			{
+				return (TResult)this.Parse(tokens, typeof(TResult));
+			}
+
+			/// <summary>
+			/// Parses the token stream coercing the result targetType
+			/// </summary>
+			/// <param name="tokens"></param>
 			/// <param name="targetType"></param>
 			/// <returns></returns>
 			public object Parse(IEnumerable<Token<JsonTokenType>> tokens, Type targetType)

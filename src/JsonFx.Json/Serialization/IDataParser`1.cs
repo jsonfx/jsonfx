@@ -42,12 +42,27 @@ namespace JsonFx.Serialization
 		#region Methods
 
 		/// <summary>
-		/// Parses the token sequence, coercing the result to Type targetType
+		/// Parses the token sequence
+		/// </summary>
+		/// <param name="tokens"></param>
+		/// <returns></returns>
+		object Parse(IEnumerable<Token<T>> tokens);
+
+		/// <summary>
+		/// Parses the token sequence, optionally coercing the result to Type targetType
 		/// </summary>
 		/// <param name="tokens"></param>
 		/// <param name="targetType">optional type for coercion (null if not specified)</param>
 		/// <returns></returns>
 		object Parse(IEnumerable<Token<T>> tokens, Type targetType);
+
+		/// <summary>
+		/// Parses the token sequence, coercing the result to Type TResult
+		/// </summary>
+		/// <typeparam name="TResult">optional type for coercion (null if not specified)</typeparam>
+		/// <param name="tokens"></param>
+		/// <returns></returns>
+		TResult Parse<TResult>(IEnumerable<Token<T>> tokens);
 
 		#endregion Methods
 	}
