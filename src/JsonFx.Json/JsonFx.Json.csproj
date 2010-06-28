@@ -91,12 +91,14 @@
     <Compile Include="Serialization\Exceptions.cs" />
     <Compile Include="Serialization\IDataFormatter`1.cs" />
     <Compile Include="Serialization\IDataGenerator`1.cs" />
+    <Compile Include="Serialization\IDataNameResolver.cs" />
     <Compile Include="Serialization\IDataParser`1.cs" />
     <Compile Include="Serialization\IDataReader.cs" />
     <Compile Include="Serialization\IDataTokenizer`1.cs" />
     <Compile Include="Serialization\IDataWriter.cs" />
     <Compile Include="Serialization\ISerializable`1.cs" />
     <Compile Include="Serialization\ITextScanner.cs" />
+    <Compile Include="Serialization\MemberCache.cs" />
     <Compile Include="Serialization\StringScanner.cs" />
     <Compile Include="Serialization\TextReaderScanner.cs" />
     <Compile Include="Serialization\Token`1.cs" />

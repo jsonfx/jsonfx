@@ -60,7 +60,8 @@ namespace JsonFx.Serialization
 		#region Fields
 
 		private bool allowNullValueTypes = true;
-		private DataNameResolver resolver;
+		private IDataNameResolver resolver;
+		private MemberCache cache;
 
 		#endregion Fields
 
@@ -84,7 +85,7 @@ namespace JsonFx.Serialization
 		/// <summary>
 		/// Gets and sets the serialized name resolver
 		/// </summary>
-		public DataNameResolver Resolver
+		public IDataNameResolver Resolver
 		{
 			get
 			{
@@ -94,7 +95,31 @@ namespace JsonFx.Serialization
 				}
 				return this.resolver;
 			}
-			set { this.resolver = value; }
+			set
+			{
+				if (this.resolver == value)
+				{
+					return;
+				}
+
+				this.resolver = value;
+				this.cache = null;
+			}
+		}
+
+		/// <summary>
+		/// Gets the member map cache
+		/// </summary>
+		private MemberCache Cache
+		{
+			get
+			{
+				if (this.cache == null)
+				{
+					this.cache = new MemberCache(this.Resolver);
+				}
+				return this.cache;
+			}
 		}
 
 		/// <summary>
@@ -107,7 +132,7 @@ namespace JsonFx.Serialization
 		{
 			get
 			{
-				IDictionary<MemberInfo, string> map = this.Resolver.GetWriteMap(type);
+				IDictionary<MemberInfo, string> map = this.Cache.GetWriteMap(type);
 				if (map == null || !map.ContainsKey(info))
 				{
 					return null;
@@ -126,7 +151,7 @@ namespace JsonFx.Serialization
 		{
 			get
 			{
-				IDictionary<string, MemberInfo> map = this.Resolver.GetReadMap(type);
+				IDictionary<string, MemberInfo> map = this.Cache.GetReadMap(type);
 				if (map == null || !map.ContainsKey(name))
 				{
 					return null;
@@ -386,15 +411,10 @@ namespace JsonFx.Serialization
 				{
 					if (!Enum.IsDefined(targetType, value))
 					{
-						// if isn't a defined value perhaps it is the JsonName
-						foreach (FieldInfo field in targetType.GetFields())
+						IDictionary<string, MemberInfo> map = this.Cache.GetReadMap(targetType);
+						if (map.ContainsKey((string)value))
 						{
-							string name = this.Resolver.GetName(field);
-							if (StringComparer.Ordinal.Equals((string)value, name))
-							{
-								value = field.Name;
-								break;
-							}
+							value = map[(string)value].Name;
 						}
 					}
 
@@ -501,7 +521,7 @@ namespace JsonFx.Serialization
 		{
 			object newValue = this.InstantiateObject(targetType);
 
-			IDictionary<string, MemberInfo> memberMap = this.Resolver.GetReadMap(targetType);
+			IDictionary<string, MemberInfo> memberMap = this.Cache.GetReadMap(targetType);
 			if (memberMap != null)
 			{
 				// copy any values into new object

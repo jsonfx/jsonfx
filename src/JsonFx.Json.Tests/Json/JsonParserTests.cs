@@ -39,6 +39,25 @@ namespace JsonFx.Json
 {
 	public class JsonParserTests
 	{
+		#region Test Types
+
+		private enum ExampleEnum
+		{
+			[DataName("zero")]
+			Zero = 0,
+
+			[DataName("one")]
+			One = 1,
+
+			[DataName("two")]
+			Two = 2,
+
+			[DataName("three")]
+			Three = 3
+		}
+
+		#endregion Test Types
+
 		#region Array Tests
 
 		[Fact]
@@ -78,5 +97,57 @@ namespace JsonFx.Json
 		}
 
 		#endregion Array Tests
+
+		#region Enum Tests
+
+		[Fact]
+		public void GetTokens_EnumFromString_ReturnsEnum()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenString("Two")
+			};
+
+			var expected = ExampleEnum.Two;
+
+			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+			var actual = parser.Parse((input), typeof(ExampleEnum));
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_EnumFromJsonName_ReturnsEnum()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenString("two")
+			};
+
+			var expected = ExampleEnum.Two;
+
+			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+			var actual = parser.Parse((input), typeof(ExampleEnum));
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_EnumFromNumber_ReturnsEnum()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenNumber(3)
+			};
+
+			var expected = ExampleEnum.Three;
+
+			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+			var actual = parser.Parse((input), typeof(ExampleEnum));
+
+			Assert.Equal(expected, actual);
+		}
+
+		#endregion Enum Tests
 	}
 }

@@ -29,8 +29,6 @@
 #endregion License
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
 
@@ -39,55 +37,46 @@ namespace JsonFx.Serialization
 	/// <summary>
 	/// Controls name resolution for IDataReader / IDataWriter
 	/// </summary>
-	public class DataNameResolver
+	/// <remarks>
+	/// Provides an extensibility point to control member naming at a very granular level.
+	/// </remarks>
+	public class DataNameResolver :
+		IDataNameResolver
 	{
-		#region Constants
-
-		private const string AnonymousTypePrefix = "<>f__AnonymousType";
-
-		#endregion Constants
-
-		#region Fields
-
-		private readonly object SyncLock = new object();
-		private readonly IDictionary<Type, IDictionary<string, MemberInfo>> ReadMapCache = new Dictionary<Type, IDictionary<string, MemberInfo>>();
-		private readonly IDictionary<Type, IDictionary<MemberInfo, string>> WriteMapCache = new Dictionary<Type, IDictionary<MemberInfo, string>>();
-
-		#endregion Fields
-
 		#region Name Resolution Methods
 
 		/// <summary>
 		/// Gets a value indicating if the property is to be serialized.
 		/// </summary>
-		/// <param name="info"></param>
+		/// <param name="member"></param>
+		/// <param name="isAnonymousType"></param>
 		/// <returns></returns>
 		/// <remarks>default implementation is must be read/write properties, or read-only anonymous</remarks>
-		protected virtual bool IsPropertyIgnored(PropertyInfo info, bool isAnonymousType)
+		public virtual bool IsPropertyIgnored(PropertyInfo member, bool isAnonymousType)
 		{
-			return (!info.CanRead || (!info.CanWrite && !isAnonymousType));
+			return (!member.CanRead || (!member.CanWrite && !isAnonymousType));
 		}
 
 		/// <summary>
 		/// Gets a value indicating if the field is to be serialized.
 		/// </summary>
-		/// <param name="info"></param>
+		/// <param name="member"></param>
 		/// <returns></returns>
 		/// <remarks>default implementation is must be public, non-readonly field</remarks>
-		protected virtual bool IsFieldIgnored(FieldInfo info)
+		public virtual bool IsFieldIgnored(FieldInfo member)
 		{
-			return (!info.IsPublic || info.IsStatic || info.IsInitOnly);
+			return (!member.IsPublic || (member.IsStatic != member.DeclaringType.IsEnum) || member.IsInitOnly);
 		}
 
 		/// <summary>
 		/// Gets a value indicating if the member is to be serialized.
 		/// </summary>
-		/// <param name="value"></param>
+		/// <param name="member"></param>
 		/// <returns></returns>
 		/// <remarks>default implementation checks for JsonIgnoreAttribute</remarks>
-		protected virtual bool IsIgnored(MemberInfo info)
+		public virtual bool IsIgnored(MemberInfo member)
 		{
-			if (DataNameResolver.GetAttribute<DataIgnoreAttribute>(info) != null)
+			if (DataNameResolver.GetAttribute<DataIgnoreAttribute>(member) != null)
 			{
 				return true;
 			}
@@ -104,21 +93,21 @@ namespace JsonFx.Serialization
 		/// <summary>
 		/// Determines if the property or field should not be serialized.
 		/// </summary>
-		/// <param name="objType"></param>
 		/// <param name="member"></param>
+		/// <param name="target"></param>
 		/// <param name="value"></param>
 		/// <returns></returns>
-		protected internal virtual bool IsValueIgnored(MemberInfo info, object target, out object value)
+		public virtual bool IsValueIgnored(MemberInfo member, object target, out object value)
 		{
-			value = DataNameResolver.GetMemberValue(target, info);
-			if (this.IsDefaultValue(info, value))
+			value = DataNameResolver.GetMemberValue(target, member);
+			if (this.IsDefaultValue(member, value))
 			{
 				return true;
 			}
 
-			Type objType = info.ReflectedType ?? info.DeclaringType;
+			Type objType = member.ReflectedType ?? member.DeclaringType;
 
-			DataSpecifiedPropertyAttribute specifiedProperty = DataNameResolver.GetAttribute<DataSpecifiedPropertyAttribute>(info);
+			DataSpecifiedPropertyAttribute specifiedProperty = DataNameResolver.GetAttribute<DataSpecifiedPropertyAttribute>(member);
 			if (!String.IsNullOrEmpty(specifiedProperty.SpecifiedProperty))
 			{
 				PropertyInfo specProp = objType.GetProperty(specifiedProperty.SpecifiedProperty);
@@ -151,8 +140,10 @@ namespace JsonFx.Serialization
 		/// <summary>
 		/// Determines if the member value matches the DefaultValue attribute
 		/// </summary>
+		/// <param name="member"></param>
+		/// <param name="value"></param>
 		/// <returns>if has a value equivalent to the DefaultValueAttribute</returns>
-		protected bool IsDefaultValue(MemberInfo member, object value)
+		public virtual bool IsDefaultValue(MemberInfo member, object value)
 		{
 			DefaultValueAttribute attribute = DataNameResolver.GetAttribute<DefaultValueAttribute>(member);
 			if (attribute == null)
@@ -166,11 +157,11 @@ namespace JsonFx.Serialization
 		/// <summary>
 		/// Gets the serialized name for the member.
 		/// </summary>
-		/// <param name="value"></param>
+		/// <param name="member"></param>
 		/// <returns></returns>
-		protected internal virtual string GetName(MemberInfo value)
+		public virtual string GetName(MemberInfo member)
 		{
-			DataNameAttribute attribute = DataNameResolver.GetAttribute<DataNameAttribute>(value);
+			DataNameAttribute attribute = DataNameResolver.GetAttribute<DataNameAttribute>(member);
 
 			// TODO: extend here for XmlNameAttribute, DataContractAttribute
 			return (attribute != null) ? attribute.Name : null;
@@ -181,123 +172,12 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="value"></param>
 		/// <returns></returns>
-		internal string GetName(Enum value)
+		public string GetName(Enum value)
 		{
 			return this.GetName(DataNameResolver.GetMemberInfo(value));
 		}
 
 		#endregion Name Resolution Methods
-
-		#region Map Methods
-
-		internal IDictionary<string, MemberInfo> GetReadMap(Type objectType)
-		{
-			lock (this.SyncLock)
-			{
-				if (!this.ReadMapCache.ContainsKey(objectType))
-				{
-					this.CreateMaps(objectType);
-				}
-
-				// map was stored in cache
-				return this.ReadMapCache[objectType];
-			}
-		}
-
-		internal IDictionary<MemberInfo, string> GetWriteMap(Type objectType)
-		{
-			lock (this.SyncLock)
-			{
-				if (!this.WriteMapCache.ContainsKey(objectType))
-				{
-					this.CreateMaps(objectType);
-				}
-
-				// map was stored in cache
-				return this.WriteMapCache[objectType];
-			}
-		}
-
-		/// <summary>
-		/// Removes any cached member mappings.
-		/// </summary>
-		public void Clear()
-		{
-			lock (this.SyncLock)
-			{
-				this.ReadMapCache.Clear();
-				this.WriteMapCache.Clear();
-			}
-		}
-
-		/// <summary>
-		/// Builds a mapping of member name to field/property
-		/// </summary>
-		/// <param name="objectType"></param>
-		private void CreateMaps(Type objectType)
-		{
-			lock (this.SyncLock)
-			{
-				// do not incurr the cost of member map for dictionaries
-				if (typeof(IDictionary).IsAssignableFrom(objectType))
-				{
-					// store in cache for future usage
-					this.ReadMapCache[objectType] = null;
-					this.WriteMapCache[objectType] = null;
-					return;
-				}
-
-				// create new maps
-				IDictionary<string, MemberInfo> readMap = new Dictionary<string, MemberInfo>();
-				IDictionary<MemberInfo, string> writeMap = new Dictionary<MemberInfo, string>();
-
-				bool isAnonymousType = objectType.IsGenericType && objectType.Name.StartsWith(DataNameResolver.AnonymousTypePrefix);
-
-				// load properties into property map
-				foreach (PropertyInfo info in objectType.GetProperties())
-				{
-					if (this.IsPropertyIgnored(info, isAnonymousType) ||
-						this.IsIgnored(info))
-					{
-						continue;
-					}
-
-					string name = this.GetName(info);
-					if (String.IsNullOrEmpty(name))
-					{
-						name = info.Name;
-					}
-
-					readMap[info.Name] = info;
-					writeMap[info] = name;
-				}
-
-				// load fields into property map
-				foreach (FieldInfo info in objectType.GetFields())
-				{
-					if (this.IsFieldIgnored(info) ||
-						this.IsIgnored(info))
-					{
-						continue;
-					}
-
-					string name = this.GetName(info);
-					if (String.IsNullOrEmpty(name))
-					{
-						name = info.Name;
-					}
-
-					readMap[name] = info;
-					writeMap[info] = name;
-				}
-
-				// store in cache for future usage
-				this.ReadMapCache[objectType] = readMap;
-				this.WriteMapCache[objectType] = writeMap;
-			}
-		}
-
-		#endregion Map Methods
 
 		#region Reflection Methods
 
