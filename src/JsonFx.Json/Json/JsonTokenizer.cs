@@ -57,28 +57,9 @@ namespace JsonFx.Json
 
 			#region Fields
 
-			private readonly DataReaderSettings Settings;
 			private ITextScanner scanner = TextReaderScanner.Null;
 
 			#endregion Fields
-
-			#region Init
-
-			/// <summary>
-			/// Ctor
-			/// </summary>
-			/// <param name="settings"></param>
-			public JsonTokenizer(DataReaderSettings settings)
-			{
-				if (settings == null)
-				{
-					throw new ArgumentNullException("settings");
-				}
-
-				this.Settings = settings;
-			}
-
-			#endregion Init
 
 			#region Properties
 

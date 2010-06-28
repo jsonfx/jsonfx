@@ -69,7 +69,7 @@ namespace JsonFx.Json
 
 		protected override IDataTokenizer<JsonTokenType> GetTokenizer(DataReaderSettings settings)
 		{
-			return new JsonReader.JsonTokenizer(settings);
+			return new JsonReader.JsonTokenizer();
 		}
 
 		protected override IDataParser<JsonTokenType> GetParser(DataReaderSettings settings)

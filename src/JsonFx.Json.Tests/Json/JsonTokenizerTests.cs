@@ -51,7 +51,7 @@ namespace JsonFx.Json
 				JsonGrammar.TokenArrayEnd
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -68,7 +68,7 @@ namespace JsonFx.Json
 				JsonGrammar.TokenArrayEnd
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -89,7 +89,7 @@ namespace JsonFx.Json
 				JsonGrammar.TokenArrayEnd
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -143,7 +143,7 @@ namespace JsonFx.Json
 				JsonGrammar.TokenArrayEnd
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -163,7 +163,7 @@ namespace JsonFx.Json
 				JsonGrammar.TokenObjectEnd
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -182,7 +182,7 @@ namespace JsonFx.Json
 				JsonGrammar.TokenObjectEnd
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -217,7 +217,7 @@ namespace JsonFx.Json
 				JsonGrammar.TokenObjectEnd
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -236,7 +236,7 @@ namespace JsonFx.Json
 				JsonGrammar.TokenString(String.Empty)
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -252,7 +252,7 @@ namespace JsonFx.Json
 				JsonGrammar.TokenString("A JSON payload should be an object or array, not a string.")
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			// this is not allowed according to strict JSON, but we're following Postel's Law
@@ -268,7 +268,7 @@ namespace JsonFx.Json
 				JsonGrammar.TokenString("\\\b\f\n\r\t\u0123\u4567\u89AB\uCDEF\uabcd\uef4A\"")
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -283,7 +283,7 @@ namespace JsonFx.Json
 				JsonGrammar.TokenString("uu1u12u123\u12345")
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -301,7 +301,7 @@ namespace JsonFx.Json
 				JsonGrammar.TokenArrayEnd
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			// this is not allowed according to strict JSON, but we're following Postel's Law
@@ -320,7 +320,7 @@ namespace JsonFx.Json
 				JsonGrammar.TokenArrayEnd
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			// this is not allowed according to strict JSON, but we're following Postel's Law
@@ -339,7 +339,7 @@ namespace JsonFx.Json
 				JsonGrammar.TokenArrayEnd
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			// this is not allowed according to strict JSON, but we're following Postel's Law
@@ -355,7 +355,7 @@ namespace JsonFx.Json
 				JsonGrammar.TokenString("unescaped ' single quote"),
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -370,7 +370,7 @@ namespace JsonFx.Json
 				JsonGrammar.TokenString("unescaped \" quote"),
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			// this is not allowed according to strict JSON, but we're following Postel's Law
@@ -389,7 +389,7 @@ namespace JsonFx.Json
 				JsonGrammar.TokenArrayEnd
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			// this is not allowed according to strict JSON, but we're following Postel's Law
@@ -408,7 +408,7 @@ namespace JsonFx.Json
 				JsonGrammar.TokenArrayEnd
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			// this is not allowed according to strict JSON, but we're following Postel's Law
@@ -421,7 +421,7 @@ namespace JsonFx.Json
 			// input from fail16.json in test suite at http://www.json.org/JSON_checker/
 			const string input = @"[\naked]";
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 
 			Assert.Throws<DeserializationException>(
 				delegate
@@ -437,7 +437,7 @@ namespace JsonFx.Json
 			const string input = @"[""line
 break""]";
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 
 			Assert.Throws<DeserializationException>(
 				delegate
@@ -453,7 +453,7 @@ break""]";
 			const string input = @"[""line\
 break""]";
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 
 			Assert.Throws<DeserializationException>(
 				delegate
@@ -467,7 +467,7 @@ break""]";
 		{
 			const string input = @"""unterminated";
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 
 			Assert.Throws<DeserializationException>(
 				delegate
@@ -489,7 +489,7 @@ break""]";
 				JsonGrammar.TokenNumber(123456)
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -504,7 +504,7 @@ break""]";
 				JsonGrammar.TokenNumber(1.23456)
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -519,7 +519,7 @@ break""]";
 				JsonGrammar.TokenNumber(-0.123456)
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -534,7 +534,7 @@ break""]";
 				JsonGrammar.TokenNumber(.123456)
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -549,7 +549,7 @@ break""]";
 				JsonGrammar.TokenNumber(.123456)
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -564,7 +564,7 @@ break""]";
 				JsonGrammar.TokenNumber(-.123456)
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -584,7 +584,7 @@ break""]";
 				JsonGrammar.TokenObjectEnd
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			// this is not allowed according to strict JSON, but we're following Postel's Law
@@ -597,7 +597,7 @@ break""]";
 			// input from fail14.json in test suite at http://www.json.org/JSON_checker/
 			const string input = @"{""Numbers cannot be hex"": 0x14}";
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 
 			Assert.Throws<DeserializationException>(
 				delegate
@@ -612,7 +612,7 @@ break""]";
 			// input from fail29.json in test suite at http://www.json.org/JSON_checker/
 			const string input = @"[0e]";
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 
 			Assert.Throws<DeserializationException>(
 				delegate
@@ -627,7 +627,7 @@ break""]";
 			// input from fail30.json in test suite at http://www.json.org/JSON_checker/
 			const string input = @"[0e+]";
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 
 			Assert.Throws<DeserializationException>(
 				delegate
@@ -642,7 +642,7 @@ break""]";
 			// input from fail31.json in test suite at http://www.json.org/JSON_checker/
 			const string input = @"[0e+-1]";
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 
 			Assert.Throws<DeserializationException>(
 				delegate
@@ -656,7 +656,7 @@ break""]";
 		{
 			const string input = @"123.";
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 
 			Assert.Throws<DeserializationException>(
 				delegate
@@ -670,7 +670,7 @@ break""]";
 		{
 			const string input = @"123.e5";
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 
 			Assert.Throws<DeserializationException>(
 				delegate
@@ -697,7 +697,7 @@ break""]";
 				JsonGrammar.TokenObjectEnd
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -716,7 +716,7 @@ break""]";
 				JsonGrammar.TokenObjectEnd
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -735,7 +735,7 @@ break""]";
 				JsonGrammar.TokenObjectEnd
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -754,7 +754,7 @@ break""]";
 				JsonGrammar.TokenUndefined
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			// this is not allowed according to strict JSON, but we're following Postel's Law
@@ -770,7 +770,7 @@ break""]";
 				JsonGrammar.TokenNull
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -785,7 +785,7 @@ break""]";
 				JsonGrammar.TokenFalse
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -800,7 +800,7 @@ break""]";
 				JsonGrammar.TokenTrue
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -815,7 +815,7 @@ break""]";
 				JsonGrammar.TokenNaN
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			// this is not allowed according to strict JSON, but we're following Postel's Law
@@ -831,7 +831,7 @@ break""]";
 				JsonGrammar.TokenPositiveInfinity
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			// this is not allowed according to strict JSON, but we're following Postel's Law
@@ -847,7 +847,7 @@ break""]";
 				JsonGrammar.TokenPositiveInfinity
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			// this is not allowed according to strict JSON, but we're following Postel's Law
@@ -863,7 +863,7 @@ break""]";
 				JsonGrammar.TokenNegativeInfinity
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			// this is not allowed according to strict JSON, but we're following Postel's Law
@@ -901,7 +901,7 @@ break""]";
 				JsonGrammar.TokenObjectEnd
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -1181,7 +1181,7 @@ break""]";
 				JsonGrammar.TokenArrayEnd
 			};
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -1197,7 +1197,7 @@ break""]";
 			// input from fail11.json in test suite at http://www.json.org/JSON_checker/
 			const string input = @"{""Illegal expression"": 1 + 2}";
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 
 			Assert.Throws<DeserializationException>(
 				delegate
@@ -1212,7 +1212,7 @@ break""]";
 			// input from fail12.json in test suite at http://www.json.org/JSON_checker/
 			const string input = @"{""Illegal invocation"": alert()}";
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 
 			Assert.Throws<DeserializationException>(
 				delegate
@@ -1226,7 +1226,7 @@ break""]";
 		{
 			const string input = @"var foo = true;";
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 
 			Assert.Throws<DeserializationException>(
 				delegate
@@ -1240,7 +1240,7 @@ break""]";
 		{
 			const string input = @"new function() { }";
 
-			var tokenizer = new JsonReader.JsonTokenizer(new DataReaderSettings());
+			var tokenizer = new JsonReader.JsonTokenizer();
 
 			Assert.Throws<DeserializationException>(
 				delegate
