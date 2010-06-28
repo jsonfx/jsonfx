@@ -72,9 +72,169 @@ namespace JsonFx.Json
 			var expected = new object[0];
 
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
-			var actual = parser.Parse((input), null);
+			var actual = parser.Parse(input);
 
 			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_ArrayOneItem_ReturnsExpectedArray()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenNull,
+				JsonGrammar.TokenArrayEnd
+			};
+
+			var expected = new object[] { null };
+
+			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+			var actual = parser.Parse(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_ArrayMultiItem_ReturnsExpectedArray()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenNumber(0),
+				JsonGrammar.TokenValueDelim,
+				JsonGrammar.TokenNull,
+				JsonGrammar.TokenValueDelim,
+				JsonGrammar.TokenFalse,
+				JsonGrammar.TokenValueDelim,
+				JsonGrammar.TokenTrue,
+				JsonGrammar.TokenArrayEnd
+			};
+
+			var expected = new object[]
+			{
+				0,
+				null,
+				false,
+				true
+			};
+
+			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+			var actual = parser.Parse(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_ArrayNestedDeeply_ReturnsExpectedArray()
+		{
+			// input from pass2.json in test suite at http://www.json.org/JSON_checker/
+			var input = new[]
+			{
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenString("Not too deep"),
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd
+			};
+
+			var expected = new []
+			{
+				new []
+				{
+					new []
+					{
+						new []
+						{
+							new []
+							{
+								new []
+								{
+									new []
+									{
+										new []
+										{
+											new []
+											{
+												new []
+												{
+													new []
+													{
+														new []
+														{
+															new []
+															{
+																new []
+																{
+																	new []
+																	{
+																		new []
+																		{
+																			new []
+																			{
+																				new []
+																				{
+																					new []
+																					{
+																						"Not too deep"
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			};
+
+			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+			var actual = parser.Parse((input));
+
+			AssertPatched.Equal(expected, actual);
 		}
 
 		[Fact]
@@ -92,7 +252,7 @@ namespace JsonFx.Json
 			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
-					var actual = parser.Parse(input, null);
+					var actual = parser.Parse(input);
 				});
 
 			// verify exception is coming from expected token
@@ -116,7 +276,7 @@ namespace JsonFx.Json
 			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
-					var actual = parser.Parse(input, null);
+					var actual = parser.Parse(input);
 				});
 
 			// verify exception is coming from expected token
@@ -141,7 +301,7 @@ namespace JsonFx.Json
 			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
-					var actual = parser.Parse(input, null);
+					var actual = parser.Parse(input);
 				});
 
 			// verify exception is coming from expected token
@@ -165,7 +325,7 @@ namespace JsonFx.Json
 			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
-					var actual = parser.Parse(input, null);
+					var actual = parser.Parse(input);
 				});
 
 			// verify exception is coming from expected token
@@ -189,7 +349,7 @@ namespace JsonFx.Json
 			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
-					var actual = parser.Parse(input, null);
+					var actual = parser.Parse(input);
 				});
 
 			// verify exception is coming from expected token
@@ -213,67 +373,15 @@ namespace JsonFx.Json
 			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
-					var actual = parser.Parse(input, null);
+					var actual = parser.Parse(input);
 				});
 
 			// verify exception is coming from expected token
 			Assert.Equal(JsonGrammar.TokenArrayEnd, ex.Token);
 		}
 
-		[Fact]
-		public void GetTokens_ObjectExtraComma_ThrowsArgumentException()
-		{
-			// input from fail9.json in test suite at http://www.json.org/JSON_checker/
-			var input = new[]
-			{
-				JsonGrammar.TokenObjectBegin,
-				JsonGrammar.TokenString("Extra comma"),
-				JsonGrammar.TokenPairDelim,
-				JsonGrammar.TokenTrue,
-				JsonGrammar.TokenValueDelim,
-				JsonGrammar.TokenObjectEnd
-			};
-
-			var parser = new JsonReader.JsonParser(new DataReaderSettings());
-
-			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
-				delegate
-				{
-					var actual = parser.Parse(input, null);
-				});
-
-			// verify exception is coming from expected token
-			Assert.Equal(JsonGrammar.TokenObjectEnd, ex.Token);
-		}
-
-		[Fact(Skip="JsonParser doesn't currently check after stream")]
-		public void GetTokens_ObjectExtraValueAfterClose_ThrowsArgumentException()
-		{
-			// input from fail10.json in test suite at http://www.json.org/JSON_checker/
-			var input = new[]
-			{
-				JsonGrammar.TokenObjectBegin,
-				JsonGrammar.TokenString("Extra value after close"),
-				JsonGrammar.TokenPairDelim,
-				JsonGrammar.TokenTrue,
-				JsonGrammar.TokenObjectEnd,
-				JsonGrammar.TokenString("misplaced quoted value")
-			};
-
-			var parser = new JsonReader.JsonParser(new DataReaderSettings());
-
-			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
-				delegate
-				{
-					var actual = parser.Parse(input, null);
-				});
-
-			// verify exception is coming from expected token
-			Assert.Equal(JsonGrammar.TokenString("misplaced quoted value"), ex.Token);
-		}
-
 		[Fact(Skip="JsonParser doesn't currently check depth")]
-		public void GetTokens_ArraysNestedTooDep_ThrowsArgumentException()
+		public void GetTokens_ArrayNestedTooDeeply_ThrowsArgumentException()
 		{
 			// input from fail18.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -326,11 +434,140 @@ namespace JsonFx.Json
 			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
-					var actual = parser.Parse(input, null);
+					var actual = parser.Parse(input);
 				});
 
 			// verify exception is coming from expected token
 			Assert.Equal(JsonGrammar.TokenArrayBegin, ex.Token);
+		}
+
+		[Fact]
+		public void GetTokens_ArrayColonInsteadOfComma_ThrowsArgumentException()
+		{
+			// input from fail22.json in test suite at http://www.json.org/JSON_checker/
+			var input = new[]
+			{
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenString("Colon instead of comma"),
+				JsonGrammar.TokenPairDelim,
+				JsonGrammar.TokenFalse,
+				JsonGrammar.TokenArrayEnd
+			};
+
+			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+
+			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
+				delegate
+				{
+					var actual = parser.Parse(input);
+				});
+
+			// verify exception is coming from expected token
+			Assert.Equal(JsonGrammar.TokenPairDelim, ex.Token);
+		}
+
+		[Fact]
+		public void GetTokens_ArrayBadValue_ThrowsArgumentException()
+		{
+			// input from fail23.json in test suite at http://www.json.org/JSON_checker/
+			var input = new[]
+			{
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenString("Bad value"),
+				JsonGrammar.TokenValueDelim,
+				JsonGrammar.TokenLiteral("truth"),
+				JsonGrammar.TokenArrayEnd
+			};
+
+			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+
+			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
+				delegate
+				{
+					var actual = parser.Parse(input);
+				});
+
+			// verify exception is coming from expected token
+			Assert.Equal(JsonGrammar.TokenLiteral("truth"), ex.Token);
+		}
+
+		[Fact]
+		public void GetTokens_ArrayCloseMismatch_ThrowsArgumentException()
+		{
+			// input from fail33.json in test suite at http://www.json.org/JSON_checker/
+			var input = new[]
+			{
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenString("mismatch"),
+				JsonGrammar.TokenObjectEnd
+			};
+
+			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+
+			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
+				delegate
+				{
+					var actual = parser.Parse(input);
+				});
+
+			// verify exception is coming from expected token
+			Assert.Equal(JsonGrammar.TokenObjectEnd, ex.Token);
+		}
+
+		#endregion Array Tests
+
+		#region Object Tests
+
+		[Fact]
+		public void GetTokens_ObjectExtraComma_ThrowsArgumentException()
+		{
+			// input from fail9.json in test suite at http://www.json.org/JSON_checker/
+			var input = new[]
+			{
+				JsonGrammar.TokenObjectBegin,
+				JsonGrammar.TokenString("Extra comma"),
+				JsonGrammar.TokenPairDelim,
+				JsonGrammar.TokenTrue,
+				JsonGrammar.TokenValueDelim,
+				JsonGrammar.TokenObjectEnd
+			};
+
+			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+
+			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
+				delegate
+				{
+					var actual = parser.Parse(input);
+				});
+
+			// verify exception is coming from expected token
+			Assert.Equal(JsonGrammar.TokenObjectEnd, ex.Token);
+		}
+
+		[Fact(Skip="JsonParser doesn't currently check after stream")]
+		public void GetTokens_ObjectExtraValueAfterClose_ThrowsArgumentException()
+		{
+			// input from fail10.json in test suite at http://www.json.org/JSON_checker/
+			var input = new[]
+			{
+				JsonGrammar.TokenObjectBegin,
+				JsonGrammar.TokenString("Extra value after close"),
+				JsonGrammar.TokenPairDelim,
+				JsonGrammar.TokenTrue,
+				JsonGrammar.TokenObjectEnd,
+				JsonGrammar.TokenString("misplaced quoted value")
+			};
+
+			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+
+			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
+				delegate
+				{
+					var actual = parser.Parse(input);
+				});
+
+			// verify exception is coming from expected token
+			Assert.Equal(JsonGrammar.TokenString("misplaced quoted value"), ex.Token);
 		}
 
 		[Fact]
@@ -350,7 +587,7 @@ namespace JsonFx.Json
 			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
-					var actual = parser.Parse(input, null);
+					var actual = parser.Parse(input);
 				});
 
 			// verify exception is coming from expected token
@@ -376,7 +613,7 @@ namespace JsonFx.Json
 			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
-					var actual = parser.Parse(input, null);
+					var actual = parser.Parse(input);
 				});
 
 			// verify exception is coming from expected token
@@ -401,61 +638,11 @@ namespace JsonFx.Json
 			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
-					var actual = parser.Parse(input, null);
+					var actual = parser.Parse(input);
 				});
 
 			// verify exception is coming from expected token
 			Assert.Equal(JsonGrammar.TokenValueDelim, ex.Token);
-		}
-
-		[Fact]
-		public void GetTokens_ArrayColonInsteadOfComma_ThrowsArgumentException()
-		{
-			// input from fail22.json in test suite at http://www.json.org/JSON_checker/
-			var input = new[]
-			{
-				JsonGrammar.TokenArrayBegin,
-				JsonGrammar.TokenString("Colon instead of comma"),
-				JsonGrammar.TokenPairDelim,
-				JsonGrammar.TokenFalse,
-				JsonGrammar.TokenArrayEnd
-			};
-
-			var parser = new JsonReader.JsonParser(new DataReaderSettings());
-
-			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
-				delegate
-				{
-					var actual = parser.Parse(input, null);
-				});
-
-			// verify exception is coming from expected token
-			Assert.Equal(JsonGrammar.TokenPairDelim, ex.Token);
-		}
-
-		[Fact]
-		public void GetTokens_ArrayBadValue_ThrowsArgumentException()
-		{
-			// input from fail23.json in test suite at http://www.json.org/JSON_checker/
-			var input = new[]
-			{
-				JsonGrammar.TokenArrayBegin,
-				JsonGrammar.TokenString("Bad value"),
-				JsonGrammar.TokenValueDelim,
-				JsonGrammar.TokenLiteral("truth"),
-				JsonGrammar.TokenArrayEnd
-			};
-
-			var parser = new JsonReader.JsonParser(new DataReaderSettings());
-
-			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
-				delegate
-				{
-					var actual = parser.Parse(input, null);
-				});
-
-			// verify exception is coming from expected token
-			Assert.Equal(JsonGrammar.TokenLiteral("truth"), ex.Token);
 		}
 
 		[Fact]
@@ -476,39 +663,18 @@ namespace JsonFx.Json
 			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
-					var actual = parser.Parse(input, null);
+					var actual = parser.Parse(input);
 				});
 
 			// verify exception is coming from expected token
 			Assert.Equal(JsonGrammar.TokenNone, ex.Token);
 		}
 
-		[Fact]
-		public void GetTokens_ArrayCloseMismatch_ThrowsArgumentException()
-		{
-			// input from fail33.json in test suite at http://www.json.org/JSON_checker/
-			var input = new[]
-			{
-				JsonGrammar.TokenArrayBegin,
-				JsonGrammar.TokenString("mismatch"),
-				JsonGrammar.TokenObjectEnd
-			};
-
-			var parser = new JsonReader.JsonParser(new DataReaderSettings());
-
-			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
-				delegate
-				{
-					var actual = parser.Parse(input, null);
-				});
-
-			// verify exception is coming from expected token
-			Assert.Equal(JsonGrammar.TokenObjectEnd, ex.Token);
-		}
-
-		#endregion Array Tests
+		#endregion Object Tests
 
 		#region Enum Tests
+
+		// TODO: these are actually testing type coercion, need to isolate type coercion to improve testability
 
 		[Fact]
 		public void GetTokens_EnumFromString_ReturnsEnum()
@@ -521,7 +687,7 @@ namespace JsonFx.Json
 			var expected = ExampleEnum.Two;
 
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
-			var actual = parser.Parse((input), typeof(ExampleEnum));
+			var actual = parser.Parse<ExampleEnum>(input);
 
 			Assert.Equal(expected, actual);
 		}
@@ -537,7 +703,7 @@ namespace JsonFx.Json
 			var expected = ExampleEnum.Two;
 
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
-			var actual = parser.Parse((input), typeof(ExampleEnum));
+			var actual = parser.Parse<ExampleEnum>(input);
 
 			Assert.Equal(expected, actual);
 		}
@@ -553,7 +719,7 @@ namespace JsonFx.Json
 			var expected = ExampleEnum.Three;
 
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
-			var actual = parser.Parse((input), typeof(ExampleEnum));
+			var actual = parser.Parse<ExampleEnum>(input);
 
 			Assert.Equal(expected, actual);
 		}
