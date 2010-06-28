@@ -276,6 +276,11 @@ namespace JsonFx.Json
 
 			private Token<JsonTokenType> ScanNumber()
 			{
+				// store for error cases
+				long numPos = this.scanner.Index;
+				int numLine = this.scanner.Line;
+				int numCol = this.scanner.Column;
+
 				StringBuilder buffer = new StringBuilder();
 
 				bool isNeg = false;
@@ -327,7 +332,7 @@ namespace JsonFx.Json
 					if (!hasDecimal)
 					{
 						// fractional digits required when '.' present
-						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.scanner.Index, this.scanner.Line, this.scanner.Column);
+						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, numPos, numLine, numCol);
 					}
 				}
 
@@ -345,7 +350,7 @@ namespace JsonFx.Json
 				if (precision < 1)
 				{
 					// missing digits all together
-					throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.scanner.Index, this.scanner.Line, this.scanner.Column);
+					throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, numPos, numLine, numCol);
 				}
 
 				bool hasExponent = false;
@@ -380,14 +385,14 @@ namespace JsonFx.Json
 					if (!hasExponent)
 					{
 						// exponent digits required when 'e' present
-						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.scanner.Index, this.scanner.Line, this.scanner.Column);
+						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, numPos, numLine, numCol);
 					}
 				}
 
 				// check for 0x-style hex numbers
 				if (!this.scanner.IsEnd && IsLetter(this.scanner.Current))
 				{
-					throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.scanner.Index, this.scanner.Line, this.scanner.Column);
+					throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, numPos, numLine, numCol);
 				}
 
 				// by this point, we have the full number string and know its characteristics
@@ -402,7 +407,7 @@ namespace JsonFx.Json
 						NumberFormatInfo.InvariantInfo,
 						out number))
 					{
-						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.scanner.Index, this.scanner.Line, this.scanner.Column);
+						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, numPos, numLine, numCol);
 					}
 
 					if (number >= Int32.MinValue && number <= Int32.MaxValue)
@@ -430,7 +435,7 @@ namespace JsonFx.Json
 						 NumberFormatInfo.InvariantInfo,
 						 out number))
 					{
-						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, this.scanner.Index, this.scanner.Line, this.scanner.Column);
+						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, numPos, numLine, numCol);
 					}
 
 					// native EcmaScript number (IEEE-754)

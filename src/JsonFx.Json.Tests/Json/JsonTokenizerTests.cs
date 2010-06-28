@@ -423,11 +423,14 @@ namespace JsonFx.Json
 
 			var tokenizer = new JsonReader.JsonTokenizer();
 
-			Assert.Throws<DeserializationException>(
+			DeserializationException ex = Assert.Throws<DeserializationException>(
 				delegate
 				{
 					var actual = tokenizer.GetTokens(input).ToArray();
 				});
+
+			// verify exception is coming from expected index
+			Assert.Equal(1, ex.Index);
 		}
 
 		[Fact]
@@ -439,11 +442,14 @@ break""]";
 
 			var tokenizer = new JsonReader.JsonTokenizer();
 
-			Assert.Throws<DeserializationException>(
+			DeserializationException ex = Assert.Throws<DeserializationException>(
 				delegate
 				{
 					var actual = tokenizer.GetTokens(input).ToArray();
 				});
+
+			// verify exception is coming from expected index
+			Assert.Equal(1, ex.Index);
 		}
 
 		[Fact]
@@ -455,11 +461,14 @@ break""]";
 
 			var tokenizer = new JsonReader.JsonTokenizer();
 
-			Assert.Throws<DeserializationException>(
+			DeserializationException ex = Assert.Throws<DeserializationException>(
 				delegate
 				{
 					var actual = tokenizer.GetTokens(input).ToArray();
 				});
+
+			// verify exception is coming from expected index
+			Assert.Equal(1, ex.Index);
 		}
 
 		[Fact]
@@ -469,11 +478,14 @@ break""]";
 
 			var tokenizer = new JsonReader.JsonTokenizer();
 
-			Assert.Throws<DeserializationException>(
+			DeserializationException ex = Assert.Throws<DeserializationException>(
 				delegate
 				{
 					var actual = tokenizer.GetTokens(input).ToArray();
 				});
+
+			// verify exception is coming from expected index
+			Assert.Equal(0, ex.Index);
 		}
 
 		#endregion String Tests
@@ -599,11 +611,14 @@ break""]";
 
 			var tokenizer = new JsonReader.JsonTokenizer();
 
-			Assert.Throws<DeserializationException>(
+			DeserializationException ex = Assert.Throws<DeserializationException>(
 				delegate
 				{
 					var actual = tokenizer.GetTokens(input).ToArray();
 				});
+
+			// verify exception is coming from expected index
+			Assert.Equal(26, ex.Index);
 		}
 
 		[Fact]
@@ -614,11 +629,14 @@ break""]";
 
 			var tokenizer = new JsonReader.JsonTokenizer();
 
-			Assert.Throws<DeserializationException>(
+			DeserializationException ex = Assert.Throws<DeserializationException>(
 				delegate
 				{
 					var actual = tokenizer.GetTokens(input).ToArray();
 				});
+
+			// verify exception is coming from expected index
+			Assert.Equal(1, ex.Index);
 		}
 
 		[Fact]
@@ -629,11 +647,14 @@ break""]";
 
 			var tokenizer = new JsonReader.JsonTokenizer();
 
-			Assert.Throws<DeserializationException>(
+			DeserializationException ex = Assert.Throws<DeserializationException>(
 				delegate
 				{
 					var actual = tokenizer.GetTokens(input).ToArray();
 				});
+
+			// verify exception is coming from expected index
+			Assert.Equal(1, ex.Index);
 		}
 
 		[Fact]
@@ -644,11 +665,14 @@ break""]";
 
 			var tokenizer = new JsonReader.JsonTokenizer();
 
-			Assert.Throws<DeserializationException>(
+			DeserializationException ex = Assert.Throws<DeserializationException>(
 				delegate
 				{
 					var actual = tokenizer.GetTokens(input).ToArray();
 				});
+
+			// verify exception is coming from expected index
+			Assert.Equal(1, ex.Index);
 		}
 
 		[Fact]
@@ -658,11 +682,14 @@ break""]";
 
 			var tokenizer = new JsonReader.JsonTokenizer();
 
-			Assert.Throws<DeserializationException>(
+			DeserializationException ex = Assert.Throws<DeserializationException>(
 				delegate
 				{
 					var actual = tokenizer.GetTokens(input).ToArray();
 				});
+
+			// verify exception is coming from expected index
+			Assert.Equal(0, ex.Index);
 		}
 
 		[Fact]
@@ -672,11 +699,14 @@ break""]";
 
 			var tokenizer = new JsonReader.JsonTokenizer();
 
-			Assert.Throws<DeserializationException>(
+			DeserializationException ex = Assert.Throws<DeserializationException>(
 				delegate
 				{
 					var actual = tokenizer.GetTokens(input).ToArray();
 				});
+
+			// verify exception is coming from expected index
+			Assert.Equal(0, ex.Index);
 		}
 
 		#endregion Number Tests
@@ -1199,11 +1229,14 @@ break""]";
 
 			var tokenizer = new JsonReader.JsonTokenizer();
 
-			Assert.Throws<DeserializationException>(
+			DeserializationException ex = Assert.Throws<DeserializationException>(
 				delegate
 				{
 					var actual = tokenizer.GetTokens(input).ToArray();
 				});
+
+			// verify exception is coming from expected index
+			Assert.Equal(26, ex.Index);
 		}
 
 		[Fact]
@@ -1214,11 +1247,14 @@ break""]";
 
 			var tokenizer = new JsonReader.JsonTokenizer();
 
-			Assert.Throws<DeserializationException>(
+			DeserializationException ex = Assert.Throws<DeserializationException>(
 				delegate
 				{
 					var actual = tokenizer.GetTokens(input).ToArray();
 				});
+
+			// verify exception is coming from expected index
+			Assert.Equal(28, ex.Index);
 		}
 
 		[Fact]
@@ -1228,11 +1264,14 @@ break""]";
 
 			var tokenizer = new JsonReader.JsonTokenizer();
 
-			Assert.Throws<DeserializationException>(
+			DeserializationException ex = Assert.Throws<DeserializationException>(
 				delegate
 				{
 					var actual = tokenizer.GetTokens(input).ToArray();
 				});
+
+			// verify exception is coming from expected index
+			Assert.Equal(8, ex.Index);
 		}
 
 		[Fact]
@@ -1242,11 +1281,14 @@ break""]";
 
 			var tokenizer = new JsonReader.JsonTokenizer();
 
-			Assert.Throws<DeserializationException>(
+			DeserializationException ex = Assert.Throws<DeserializationException>(
 				delegate
 				{
 					var actual = tokenizer.GetTokens(input).ToArray();
 				});
+
+			// verify exception is coming from expected index
+			Assert.Equal(12, ex.Index);
 		}
 
 		#endregion Illegal Sequence Tests
