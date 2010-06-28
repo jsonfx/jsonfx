@@ -67,14 +67,14 @@ namespace JsonFx.Json
 
 		#region IDataReader Methods
 
-		protected override IDataTokenizer<JsonTokenType> GetTokenizer(DataReaderSettings settings)
+		protected override IDataTokenizer<JsonTokenType> GetTokenizer()
 		{
 			return new JsonReader.JsonTokenizer();
 		}
 
-		protected override IDataParser<JsonTokenType> GetParser(DataReaderSettings settings)
+		protected override IDataParser<JsonTokenType> GetParser()
 		{
-			return new JsonReader.JsonParser(settings);
+			return new JsonReader.JsonParser(this.Settings);
 		}
 
 		#endregion IDataReader Methods

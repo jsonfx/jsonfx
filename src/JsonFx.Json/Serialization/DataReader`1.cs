@@ -108,13 +108,13 @@ namespace JsonFx.Serialization
 		/// <param name="targetType">the expected type of the serialized data</param>
 		public virtual object Deserialize(TextReader input, Type targetType)
 		{
-			IDataTokenizer<T> tokenizer = this.GetTokenizer(this.Settings);
+			IDataTokenizer<T> tokenizer = this.GetTokenizer();
 			if (tokenizer == null)
 			{
 				throw new InvalidOperationException("Tokenizer is invalid");
 			}
 
-			IDataParser<T> parser = this.GetParser(this.Settings);
+			IDataParser<T> parser = this.GetParser();
 			if (parser == null)
 			{
 				throw new InvalidOperationException("Parser is invalid");
@@ -163,13 +163,13 @@ namespace JsonFx.Serialization
 		/// <param name="targetType">the expected type of the serialized data</param>
 		public virtual object Deserialize(string input, Type targetType)
 		{
-			IDataTokenizer<T> tokenizer = this.GetTokenizer(this.Settings);
+			IDataTokenizer<T> tokenizer = this.GetTokenizer();
 			if (tokenizer == null)
 			{
 				throw new InvalidOperationException("Tokenizer is invalid");
 			}
 
-			IDataParser<T> parser = this.GetParser(this.Settings);
+			IDataParser<T> parser = this.GetParser();
 			if (parser == null)
 			{
 				throw new InvalidOperationException("Parser is invalid");
@@ -190,9 +190,9 @@ namespace JsonFx.Serialization
 			}
 		}
 
-		protected abstract IDataTokenizer<T> GetTokenizer(DataReaderSettings settings);
+		protected abstract IDataTokenizer<T> GetTokenizer();
 
-		protected abstract IDataParser<T> GetParser(DataReaderSettings settings);
+		protected abstract IDataParser<T> GetParser();
 
 		#endregion Methods
 	}

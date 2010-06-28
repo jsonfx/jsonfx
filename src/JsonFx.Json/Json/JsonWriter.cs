@@ -89,9 +89,9 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <returns></returns>
-		protected override IDataGenerator<JsonTokenType> GetGenerator(DataWriterSettings settings)
+		protected override IDataGenerator<JsonTokenType> GetGenerator()
 		{
-			return new JsonWriter.JsonGenerator(settings);
+			return new JsonWriter.JsonGenerator(this.Settings);
 		}
 
 		/// <summary>
@@ -99,9 +99,9 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <returns></returns>
-		protected override IDataFormatter<JsonTokenType> GetFormatter(DataWriterSettings settings)
+		protected override IDataFormatter<JsonTokenType> GetFormatter()
 		{
-			return new JsonWriter.JsonFormatter(settings);
+			return new JsonWriter.JsonFormatter(this.Settings);
 		}
 
 		#endregion DataWriter<JsonTokenType> Methods

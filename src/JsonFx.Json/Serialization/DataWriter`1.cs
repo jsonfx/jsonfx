@@ -104,13 +104,13 @@ namespace JsonFx.Serialization
 		/// <param name="data">the data to be serialized</param>
 		public virtual void Serialize(TextWriter output, object data)
 		{
-			IDataGenerator<T> generator = this.GetGenerator(this.Settings);
+			IDataGenerator<T> generator = this.GetGenerator();
 			if (generator == null)
 			{
 				throw new InvalidOperationException("Generator is invalid");
 			}
 
-			IDataFormatter<T> formatter = this.GetFormatter(this.Settings);
+			IDataFormatter<T> formatter = this.GetFormatter();
 			if (formatter == null)
 			{
 				throw new InvalidOperationException("Formatter is invalid");
@@ -138,13 +138,13 @@ namespace JsonFx.Serialization
 		/// <returns>the serialized data</returns>
 		public virtual string Serialize(object data)
 		{
-			IDataGenerator<T> generator = this.GetGenerator(this.Settings);
+			IDataGenerator<T> generator = this.GetGenerator();
 			if (generator == null)
 			{
 				throw new InvalidOperationException("Generator is invalid");
 			}
 
-			IDataFormatter<T> formatter = this.GetFormatter(this.Settings);
+			IDataFormatter<T> formatter = this.GetFormatter();
 			if (formatter == null)
 			{
 				throw new InvalidOperationException("Formatter is invalid");
@@ -170,14 +170,14 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="dataWriterSettings"></param>
 		/// <returns></returns>
-		protected abstract IDataGenerator<T> GetGenerator(DataWriterSettings dataWriterSettings);
+		protected abstract IDataGenerator<T> GetGenerator();
 
 		/// <summary>
 		/// Gets the formatter for this DataWriter
 		/// </summary>
 		/// <param name="dataWriterSettings"></param>
 		/// <returns></returns>
-		protected abstract IDataFormatter<T> GetFormatter(DataWriterSettings dataWriterSettings);
+		protected abstract IDataFormatter<T> GetFormatter();
 
 		#endregion Methods
 	}

@@ -43,7 +43,8 @@ namespace JsonFx.Serialization
 		private string tab = "\t";
 		private int maxDepth = 100;
 		private string newLine = Environment.NewLine;
-		private DataNameResolver resolver;
+		private IDataNameResolver resolver;
+		private MemberCache cache;
 
 		#endregion Fields
 
@@ -89,9 +90,9 @@ namespace JsonFx.Serialization
 		}
 
 		/// <summary>
-		/// Gets and sets the serialized name resolver
+		/// Gets and sets extensibility point to control name resolution for IDataWriter
 		/// </summary>
-		public DataNameResolver Resolver
+		public IDataNameResolver Resolver
 		{
 			get
 			{
@@ -102,6 +103,22 @@ namespace JsonFx.Serialization
 				return this.resolver;
 			}
 			set { this.resolver = value; }
+		}
+
+		/// <summary>
+		/// Gets and sets extensibility point to control name resolution for IDataReader
+		/// </summary>
+		internal MemberCache Cache
+		{
+			get
+			{
+				if (this.cache == null)
+				{
+					this.cache = new MemberCache(this.Resolver);
+				}
+				return this.cache;
+			}
+			set { this.cache = value; }
 		}
 
 		#endregion Properties

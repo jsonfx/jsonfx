@@ -63,6 +63,10 @@ namespace JsonFx.Serialization
 		/// <param name="resolver"></param>
 		public MemberCache(IDataNameResolver resolver)
 		{
+			if (resolver == null)
+			{
+				throw new ArgumentNullException("resolver");
+			}
 			this.Resolver = resolver;
 		}
 

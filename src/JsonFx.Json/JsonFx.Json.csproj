@@ -102,6 +102,7 @@
     <Compile Include="Serialization\StringScanner.cs" />
     <Compile Include="Serialization\TextReaderScanner.cs" />
     <Compile Include="Serialization\Token`1.cs" />
+    <Compile Include="Serialization\TypeCoercionUtility.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Readme.txt" />

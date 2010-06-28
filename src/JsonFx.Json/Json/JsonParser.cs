@@ -68,7 +68,7 @@ namespace JsonFx.Json
 
 			#region Fields
 
-			private readonly DataReaderSettings Settings;
+			private readonly TypeCoercionUtility Coercion;
 
 			#endregion Fields
 
@@ -80,7 +80,7 @@ namespace JsonFx.Json
 			/// <param name="settings"></param>
 			public JsonParser(DataReaderSettings settings)
 			{
-				this.Settings = settings;
+				this.Coercion = new TypeCoercionUtility(settings.Cache, settings.AllowNullValueTypes);
 			}
 
 			#endregion Init
@@ -99,7 +99,7 @@ namespace JsonFx.Json
 				if (!tokenizer.MoveNext())
 				{
 					// end of input
-					return this.Settings.CoerceType(targetType, null);
+					return this.Coercion.CoerceType(targetType, null);
 				}
 
 				object value = this.ParseValue(tokenizer, targetType);
@@ -115,7 +115,7 @@ namespace JsonFx.Json
 			{
 				if (targetType != null && JsonParser.SerializableType.IsAssignableFrom(targetType))
 				{
-					ISerializable<JsonTokenType> serializable = this.Settings.InstantiateObject<ISerializable<JsonTokenType>>(targetType);
+					ISerializable<JsonTokenType> serializable = TypeCoercionUtility.InstantiateObject<ISerializable<JsonTokenType>>(targetType);
 					return serializable.Read(this.Enumerate(tokens));
 				}
 
@@ -139,7 +139,7 @@ namespace JsonFx.Json
 					case JsonTokenType.Undefined:
 					{
 						// found primitive
-						return this.Settings.CoerceType(targetType, token.Value);
+						return this.Coercion.CoerceType(targetType, token.Value);
 					}
 					case JsonTokenType.ArrayEnd:
 					case JsonTokenType.Literal:
@@ -161,7 +161,7 @@ namespace JsonFx.Json
 			{
 				if (targetType != null && JsonParser.SerializableType.IsAssignableFrom(targetType))
 				{
-					ISerializable<JsonTokenType> serializable = this.Settings.InstantiateObject<ISerializable<JsonTokenType>>(targetType);
+					ISerializable<JsonTokenType> serializable = TypeCoercionUtility.InstantiateObject<ISerializable<JsonTokenType>>(targetType);
 					return serializable.Read(this.Enumerate(tokens));
 				}
 
@@ -175,9 +175,9 @@ namespace JsonFx.Json
 						token.TokenType));
 				}
 
-				Type itemType = DataReaderSettings.GetDictionaryItemType(targetType);
+				Type itemType = TypeCoercionUtility.GetDictionaryItemType(targetType);
 				object objectValue = (itemType != null) ?
-					this.Settings.InstantiateObject(targetType) :
+					TypeCoercionUtility.InstantiateObject(targetType) :
 					new Dictionary<string, object>();
 
 				bool hasProperties = false;
@@ -196,7 +196,7 @@ namespace JsonFx.Json
 							case JsonTokenType.ObjectEnd:
 							{
 								// end of the object loop
-								return this.Settings.CoerceType(targetType, objectValue);
+								return this.Coercion.CoerceType(targetType, objectValue);
 							}
 
 							default:
@@ -237,7 +237,7 @@ namespace JsonFx.Json
 							}
 
 							// end of the object loop
-							return this.Settings.CoerceType(targetType, objectValue);
+							return this.Coercion.CoerceType(targetType, objectValue);
 						}
 						case JsonTokenType.ValueDelim:
 						{
@@ -287,13 +287,13 @@ namespace JsonFx.Json
 
 					// find the member type info
 					MemberInfo memberInfo;
-					Type memberType = this.Settings.GetMemberInfo(targetType, itemType, memberName, out memberInfo);
+					Type memberType = this.Coercion.GetMemberInfo(targetType, itemType, memberName, out memberInfo);
 
 					// parse the property value
 					object memberValue = this.ParseValue(tokens, memberType);
 
 					// set member to the result
-					this.Settings.SetMemberValue(objectValue, targetType, memberInfo, memberName, memberValue);
+					this.Coercion.SetMemberValue(objectValue, targetType, memberInfo, memberName, memberValue);
 
 					hasProperties = true;
 				}
@@ -306,7 +306,7 @@ namespace JsonFx.Json
 			{
 				if (arrayType != null && JsonParser.SerializableType.IsAssignableFrom(arrayType))
 				{
-					ISerializable<JsonTokenType> serializable = this.Settings.InstantiateObject<ISerializable<JsonTokenType>>(arrayType);
+					ISerializable<JsonTokenType> serializable = TypeCoercionUtility.InstantiateObject<ISerializable<JsonTokenType>>(arrayType);
 					return serializable.Read(this.Enumerate(tokens));
 				}
 
@@ -320,7 +320,7 @@ namespace JsonFx.Json
 						token.TokenType));
 				}
 
-				Type itemType = DataReaderSettings.GetArrayItemType(arrayType);
+				Type itemType = TypeCoercionUtility.GetArrayItemType(arrayType);
 
 				// if itemType was specified by caller, then isn't just a hint
 				bool isItemTypeHint = (itemType == null);
@@ -343,7 +343,7 @@ namespace JsonFx.Json
 							case JsonTokenType.ArrayEnd:
 							{
 								// end of array loop
-								return this.Settings.CoerceArrayList(arrayType, itemType, array);
+								return this.Coercion.CoerceArrayList(arrayType, itemType, array);
 							}
 							default:
 							{
@@ -375,7 +375,7 @@ namespace JsonFx.Json
 							}
 
 							// end of array loop
-							return this.Settings.CoerceArrayList(arrayType, itemType, array);
+							return this.Coercion.CoerceArrayList(arrayType, itemType, array);
 						}
 						case JsonTokenType.ArrayBegin:
 						{
@@ -397,7 +397,7 @@ namespace JsonFx.Json
 						{
 							if (itemType != null && JsonParser.SerializableType.IsAssignableFrom(itemType))
 							{
-								ISerializable<JsonTokenType> serializable = this.Settings.InstantiateObject<ISerializable<JsonTokenType>>(itemType);
+								ISerializable<JsonTokenType> serializable = TypeCoercionUtility.InstantiateObject<ISerializable<JsonTokenType>>(itemType);
 								item = serializable.Read(this.Enumerate(tokens));
 							}
 							else
@@ -409,7 +409,7 @@ namespace JsonFx.Json
 								}
 								else
 								{
-									item = this.Settings.CoerceType(itemType, token.Value);
+									item = this.Coercion.CoerceType(itemType, token.Value);
 								}
 							}
 							break;
@@ -433,7 +433,7 @@ namespace JsonFx.Json
 					}
 
 					// establish common type
-					itemType = DataReaderSettings.FindCommonType(itemType, item);
+					itemType = TypeCoercionUtility.FindCommonType(itemType, item);
 
 					// add item to the array
 					array.Add(item);
