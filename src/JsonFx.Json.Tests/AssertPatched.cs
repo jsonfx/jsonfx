@@ -67,7 +67,31 @@ namespace JsonFx
 
 	internal class AssertPatched : Assert
 	{
-		#region Entry Methods
+		#region AssertEqualityComparer<T> Entry Points
+
+		/// <summary>
+		/// Verifies that a collection contains a given object.
+		/// </summary>
+		/// <typeparam name="T">The type of the object to be verified</typeparam>
+		/// <param name="expected">The object expected to be in the collection</param>
+		/// <param name="collection">The collection to be inspected</param>
+		/// <exception cref="ContainsException">Thrown when the object is not present in the collection</exception>
+		public new static void Contains<T>(T expected, IEnumerable<T> collection)
+		{
+			Contains(expected, collection, GetEqualityComparer<T>());
+		}
+
+		/// <summary>
+		/// Verifies that a collection does not contain a given object.
+		/// </summary>
+		/// <typeparam name="T">The type of the object to be compared</typeparam>
+		/// <param name="expected">The object that is expected not to be in the collection</param>
+		/// <param name="collection">The collection to be inspected</param>
+		/// <exception cref="DoesNotContainException">Thrown when the object is present inside the container</exception>
+		public new static void DoesNotContain<T>(T expected, IEnumerable<T> collection)
+		{
+			DoesNotContain(expected, collection, GetEqualityComparer<T>());
+		}
 
 		/// <summary>
 		/// Verifies that two objects are equal, using a default comparer.
@@ -78,15 +102,66 @@ namespace JsonFx
 		/// <exception cref="EqualException">Thrown when the objects are not equal</exception>
 		public new static void Equal<T>(T expected, T actual)
 		{
-			Assert.Equal(expected, actual, GetEqualityComparer<T>());
+			Equal(expected, actual, GetEqualityComparer<T>());
 		}
+
+		/// <summary>
+		/// Verifies that two objects are not equal, using a default comparer.
+		/// </summary>
+		/// <typeparam name="T">The type of the objects to be compared</typeparam>
+		/// <param name="expected">The expected object</param>
+		/// <param name="actual">The actual object</param>
+		/// <exception cref="NotEqualException">Thrown when the objects are equal</exception>
+		public new static void NotEqual<T>(T expected, T actual)
+		{
+			NotEqual(expected, actual, GetEqualityComparer<T>());
+		}
+
+		#endregion AssertEqualityComparer<T> Entry Points
+
+		#region AssertComparer<T> Entry Points
+
+		/// <summary>
+		/// Verifies that a value is within a given range.
+		/// </summary>
+		/// <typeparam name="T">The type of the value to be compared</typeparam>
+		/// <param name="actual">The actual value to be evaluated</param>
+		/// <param name="low">The (inclusive) low value of the range</param>
+		/// <param name="high">The (inclusive) high value of the range</param>
+		/// <exception cref="InRangeException">Thrown when the value is not in the given range</exception>
+		public new static void InRange<T>(T actual, T low, T high)
+		{
+			InRange(actual, low, high, GetComparer<T>());
+		}
+
+		/// <summary>
+		/// Verifies that a value is not within a given range, using the default comparer.
+		/// </summary>
+		/// <typeparam name="T">The type of the value to be compared</typeparam>
+		/// <param name="actual">The actual value to be evaluated</param>
+		/// <param name="low">The (inclusive) low value of the range</param>
+		/// <param name="high">The (inclusive) high value of the range</param>
+		/// <exception cref="NotInRangeException">Thrown when the value is in the given range</exception>
+		public new static void NotInRange<T>(T actual, T low, T high)
+		{
+			NotInRange(actual, low, high, GetComparer<T>());
+		}
+
+		#endregion AssertComparer<T> Entry Points
+
+		#region Factory Methods
 
 		static IEqualityComparer<T> GetEqualityComparer<T>()
 		{
 			return new AssertEqualityComparer<T>();
 		}
 
-		#endregion Entry Methods
+		static IComparer<T> GetComparer<T>()
+		{
+			return new AssertComparer<T>();
+		}
+
+		#endregion Factory Methods
 
 		#region AssertEqualityComparer
 

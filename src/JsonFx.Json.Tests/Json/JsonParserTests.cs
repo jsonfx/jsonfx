@@ -29,11 +29,12 @@
 #endregion License
 
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 
 using JsonFx.Serialization;
 using Xunit;
+using Assert=JsonFx.AssertPatched;
 
 namespace JsonFx.Json
 {
@@ -234,7 +235,7 @@ namespace JsonFx.Json
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
 			var actual = parser.Parse((input));
 
-			AssertPatched.Equal(expected, actual);
+			Assert.Equal(expected, actual);
 		}
 
 		[Fact]
