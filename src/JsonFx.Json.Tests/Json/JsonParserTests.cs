@@ -89,11 +89,14 @@ namespace JsonFx.Json
 
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
 
-			Assert.Throws<ArgumentException>(
+			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
 					var actual = parser.Parse(input, null);
 				});
+
+			// verify exception is coming from expected token
+			Assert.Equal(JsonGrammar.TokenNone, ex.Token);
 		}
 
 		[Fact]
@@ -110,11 +113,14 @@ namespace JsonFx.Json
 
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
 
-			Assert.Throws<ArgumentException>(
+			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
 					var actual = parser.Parse(input, null);
 				});
+
+			// verify exception is coming from expected token
+			Assert.Equal(JsonGrammar.TokenArrayEnd, ex.Token);
 		}
 
 		[Fact]
@@ -132,11 +138,14 @@ namespace JsonFx.Json
 
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
 
-			Assert.Throws<ArgumentException>(
+			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
 					var actual = parser.Parse(input, null);
 				});
+
+			// verify exception is coming from expected token
+			Assert.Equal(JsonGrammar.TokenValueDelim, ex.Token);
 		}
 
 		[Fact]
@@ -153,11 +162,14 @@ namespace JsonFx.Json
 
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
 
-			Assert.Throws<ArgumentException>(
+			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
 					var actual = parser.Parse(input, null);
 				});
+
+			// verify exception is coming from expected token
+			Assert.Equal(JsonGrammar.TokenValueDelim, ex.Token);
 		}
 
 		[Fact(Skip="JsonParser doesn't currently check after stream")]
@@ -174,11 +186,14 @@ namespace JsonFx.Json
 
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
 
-			Assert.Throws<ArgumentException>(
+			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
 					var actual = parser.Parse(input, null);
 				});
+
+			// verify exception is coming from expected token
+			Assert.Equal(JsonGrammar.TokenValueDelim, ex.Token);
 		}
 
 		[Fact(Skip="JsonParser doesn't currently check after stream")]
@@ -195,11 +210,14 @@ namespace JsonFx.Json
 
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
 
-			Assert.Throws<ArgumentException>(
+			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
 					var actual = parser.Parse(input, null);
 				});
+
+			// verify exception is coming from expected token
+			Assert.Equal(JsonGrammar.TokenArrayEnd, ex.Token);
 		}
 
 		[Fact]
@@ -218,11 +236,14 @@ namespace JsonFx.Json
 
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
 
-			Assert.Throws<ArgumentException>(
+			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
 					var actual = parser.Parse(input, null);
 				});
+
+			// verify exception is coming from expected token
+			Assert.Equal(JsonGrammar.TokenObjectEnd, ex.Token);
 		}
 
 		[Fact(Skip="JsonParser doesn't currently check after stream")]
@@ -241,11 +262,14 @@ namespace JsonFx.Json
 
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
 
-			Assert.Throws<ArgumentException>(
+			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
 					var actual = parser.Parse(input, null);
 				});
+
+			// verify exception is coming from expected token
+			Assert.Equal(JsonGrammar.TokenString("misplaced quoted value"), ex.Token);
 		}
 
 		[Fact(Skip="JsonParser doesn't currently check depth")]
@@ -299,11 +323,14 @@ namespace JsonFx.Json
 
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
 
-			Assert.Throws<ArgumentException>(
+			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
 					var actual = parser.Parse(input, null);
 				});
+
+			// verify exception is coming from expected token
+			Assert.Equal(JsonGrammar.TokenArrayBegin, ex.Token);
 		}
 
 		[Fact]
@@ -320,11 +347,14 @@ namespace JsonFx.Json
 
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
 
-			Assert.Throws<ArgumentException>(
+			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
 					var actual = parser.Parse(input, null);
 				});
+
+			// verify exception is coming from expected token
+			Assert.Equal(JsonGrammar.TokenNull, ex.Token);
 		}
 
 		[Fact]
@@ -343,11 +373,14 @@ namespace JsonFx.Json
 
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
 
-			Assert.Throws<ArgumentException>(
+			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
 					var actual = parser.Parse(input, null);
 				});
+
+			// verify exception is coming from expected token
+			Assert.Equal(JsonGrammar.TokenPairDelim, ex.Token);
 		}
 
 		[Fact]
@@ -365,11 +398,14 @@ namespace JsonFx.Json
 
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
 
-			Assert.Throws<ArgumentException>(
+			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
 					var actual = parser.Parse(input, null);
 				});
+
+			// verify exception is coming from expected token
+			Assert.Equal(JsonGrammar.TokenValueDelim, ex.Token);
 		}
 
 		[Fact]
@@ -387,11 +423,14 @@ namespace JsonFx.Json
 
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
 
-			Assert.Throws<ArgumentException>(
+			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
 					var actual = parser.Parse(input, null);
 				});
+
+			// verify exception is coming from expected token
+			Assert.Equal(JsonGrammar.TokenPairDelim, ex.Token);
 		}
 
 		[Fact]
@@ -409,11 +448,14 @@ namespace JsonFx.Json
 
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
 
-			Assert.Throws<ArgumentException>(
+			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
 					var actual = parser.Parse(input, null);
 				});
+
+			// verify exception is coming from expected token
+			Assert.Equal(JsonGrammar.TokenLiteral("truth"), ex.Token);
 		}
 
 		[Fact]
@@ -431,11 +473,14 @@ namespace JsonFx.Json
 
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
 
-			Assert.Throws<ArgumentException>(
+			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
 					var actual = parser.Parse(input, null);
 				});
+
+			// verify exception is coming from expected token
+			Assert.Equal(JsonGrammar.TokenNone, ex.Token);
 		}
 
 		[Fact]
@@ -451,11 +496,14 @@ namespace JsonFx.Json
 
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
 
-			Assert.Throws<ArgumentException>(
+			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
 					var actual = parser.Parse(input, null);
 				});
+
+			// verify exception is coming from expected token
+			Assert.Equal(JsonGrammar.TokenObjectEnd, ex.Token);
 		}
 
 		#endregion Array Tests

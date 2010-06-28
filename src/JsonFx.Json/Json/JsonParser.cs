@@ -150,9 +150,9 @@ namespace JsonFx.Json
 					default:
 					{
 						// these are invalid here
-						throw new ArgumentException(String.Format(
-							JsonParser.ErrorUnexpectedToken,
-							token.TokenType));
+						throw new ParseException<JsonTokenType>(
+							token,
+							String.Format(JsonParser.ErrorUnexpectedToken, token.TokenType));
 					}
 				}
 			}
@@ -170,9 +170,9 @@ namespace JsonFx.Json
 				// verify correct starting state
 				if (token.TokenType != JsonTokenType.ObjectBegin)
 				{
-					throw new ArgumentException(String.Format(
-						JsonParser.ErrorExpectedObject,
-						token.TokenType));
+					throw new ParseException<JsonTokenType>(
+						token,
+						String.Format(JsonParser.ErrorExpectedObject, token.TokenType));
 				}
 
 				Type itemType = TypeCoercionUtility.GetDictionaryItemType(targetType);
@@ -202,9 +202,9 @@ namespace JsonFx.Json
 							default:
 							{
 								// these are invalid here
-								throw new ArgumentException(String.Format(
-									JsonParser.ErrorExpectedObjectValueDelim,
-									token.TokenType));
+								throw new ParseException<JsonTokenType>(
+									token,
+									String.Format(JsonParser.ErrorExpectedObjectValueDelim, token.TokenType));
 							}
 						}
 
@@ -242,14 +242,16 @@ namespace JsonFx.Json
 						case JsonTokenType.ValueDelim:
 						{
 							// extraneous item delimiter
-							throw new ArgumentException(JsonParser.ErrorMissingObjectProperty);
+							throw new ParseException<JsonTokenType>(
+								token,
+								JsonParser.ErrorMissingObjectProperty);
 						}
 						default:
 						{
 							// these are invalid here
-							throw new ArgumentException(String.Format(
-								JsonParser.ErrorExpectedPropertyName,
-								token.TokenType));
+							throw new ParseException<JsonTokenType>(
+								token,
+								String.Format(JsonParser.ErrorExpectedPropertyName, token.TokenType));
 						}
 					}
 
@@ -271,9 +273,9 @@ namespace JsonFx.Json
 						default:
 						{
 							// these are invalid here
-							throw new ArgumentException(String.Format(
-								JsonParser.ErrorExpectedPropertyPairDelim,
-								token.TokenType));
+							throw new ParseException<JsonTokenType>(
+								token,
+								String.Format(JsonParser.ErrorExpectedPropertyPairDelim, token.TokenType));
 						}
 					}
 
@@ -299,7 +301,9 @@ namespace JsonFx.Json
 				}
 
 				// end of input
-				throw new ArgumentException(JsonParser.ErrorUnterminatedObject);
+				throw new ParseException<JsonTokenType>(
+					JsonGrammar.TokenNone,
+					JsonParser.ErrorUnterminatedObject);
 			}
 
 			private object ParseArray(IEnumerator<Token<JsonTokenType>> tokens, Type arrayType)
@@ -315,9 +319,9 @@ namespace JsonFx.Json
 				// verify correct starting state
 				if (token.TokenType != JsonTokenType.ArrayBegin)
 				{
-					throw new ArgumentException(String.Format(
-						JsonParser.ErrorExpectedArray,
-						token.TokenType));
+					throw new ParseException<JsonTokenType>(
+						token,
+						String.Format(JsonParser.ErrorExpectedArray, token.TokenType));
 				}
 
 				Type itemType = TypeCoercionUtility.GetArrayItemType(arrayType);
@@ -348,9 +352,9 @@ namespace JsonFx.Json
 							default:
 							{
 								// these are invalid here
-								throw new ArgumentException(String.Format(
-									JsonParser.ErrorExpectedArrayItemDelim,
-									token.TokenType));
+								throw new ParseException<JsonTokenType>(
+									token,
+									String.Format(JsonParser.ErrorExpectedArrayItemDelim, token.TokenType));
 							}
 						}
 
@@ -417,7 +421,9 @@ namespace JsonFx.Json
 						case JsonTokenType.ValueDelim:
 						{
 							// extraneous item delimiter
-							throw new ArgumentException(JsonParser.ErrorMissingArrayItem);
+							throw new ParseException<JsonTokenType>(
+								token,
+								JsonParser.ErrorMissingArrayItem);
 						}
 						case JsonTokenType.Literal:
 						case JsonTokenType.None:
@@ -426,9 +432,9 @@ namespace JsonFx.Json
 						default:
 						{
 							// these are invalid here
-							throw new ArgumentException(String.Format(
-								JsonParser.ErrorExpectedArrayItem,
-								token.TokenType));
+							throw new ParseException<JsonTokenType>(
+								token,
+								String.Format(JsonParser.ErrorExpectedArrayItem, token.TokenType));
 						}
 					}
 
@@ -440,7 +446,9 @@ namespace JsonFx.Json
 				}
 
 				// end of input
-				throw new ArgumentException(JsonParser.ErrorUnterminatedArray);
+				throw new ParseException<JsonTokenType>(
+					JsonGrammar.TokenNone,
+					JsonParser.ErrorUnterminatedArray);
 			}
 
 			#endregion Parsing Methods

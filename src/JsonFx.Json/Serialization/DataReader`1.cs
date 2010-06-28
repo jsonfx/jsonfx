@@ -131,6 +131,7 @@ namespace JsonFx.Serialization
 			}
 			catch (Exception ex)
 			{
+				// parser has no concept of index, line, col so we wrap here with more info
 				throw new DeserializationException(ex.Message, tokenizer.Index, tokenizer.Line, tokenizer.Column, ex);
 			}
 		}

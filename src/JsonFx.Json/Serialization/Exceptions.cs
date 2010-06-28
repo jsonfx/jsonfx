@@ -73,9 +73,9 @@ namespace JsonFx.Serialization
 	{
 		#region Fields
 
-		private int column = -1;
-		private int line = -1;
-		private long index = -1L;
+		private readonly int column = -1;
+		private readonly int line = -1;
+		private readonly long index = -1L;
 
 		#endregion Fields
 
@@ -208,6 +208,73 @@ namespace JsonFx.Serialization
 		}
 
 		#endregion Methods
+	}
+
+	public class ParseException<T> : SerializationException
+	{
+		#region Fields
+
+		private readonly Token<T> token;
+
+		#endregion Fields
+
+		#region Init
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		public ParseException(Token<T> token)
+			: base()
+		{
+			this.token = token;
+		}
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="message"></param>
+		public ParseException(Token<T> token, string message)
+			: base(message)
+		{
+			this.token = token;
+		}
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="message"></param>
+		/// <param name="innerException"></param>
+		public ParseException(Token<T> token, string message, Exception innerException)
+			: base(message, innerException)
+		{
+			this.token = token;
+		}
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="info"></param>
+		/// <param name="context"></param>
+		public ParseException(
+			System.Runtime.Serialization.SerializationInfo info,
+			System.Runtime.Serialization.StreamingContext context)
+			: base(info, context)
+		{
+		}
+
+		#endregion Init
+
+		#region Properties
+
+		/// <summary>
+		/// Gets the token in the sequence where the error occurred
+		/// </summary>
+		public Token<T> Token
+		{
+			get { return this.token; }
+		}
+
+		#endregion Properties
 	}
 
 	public class TypeCoercionException : ArgumentException
