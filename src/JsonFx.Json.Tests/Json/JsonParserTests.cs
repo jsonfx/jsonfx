@@ -80,11 +80,373 @@ namespace JsonFx.Json
 		[Fact]
 		public void GetTokens_ArrayUnclosed_ThrowsArgumentException()
 		{
-			// input from fail1.json in test suite at http://www.json.org/JSON_checker/
+			// input from fail2.json in test suite at http://www.json.org/JSON_checker/
 			var input = new []
 			{
 				JsonGrammar.TokenArrayBegin,
 				JsonGrammar.TokenString("Unclosed array")
+			};
+
+			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+
+			Assert.Throws<ArgumentException>(
+				delegate
+				{
+					var actual = parser.Parse(input, null);
+				});
+		}
+
+		[Fact]
+		public void GetTokens_ArrayExtraComma_ThrowsArgumentException()
+		{
+			// input from fail4.json in test suite at http://www.json.org/JSON_checker/
+			var input = new[]
+			{
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenString("extra comma"),
+				JsonGrammar.TokenValueDelim,
+				JsonGrammar.TokenArrayEnd
+			};
+
+			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+
+			Assert.Throws<ArgumentException>(
+				delegate
+				{
+					var actual = parser.Parse(input, null);
+				});
+		}
+
+		[Fact]
+		public void GetTokens_ArrayDoubleExtraComma_ThrowsArgumentException()
+		{
+			// input from fail5.json in test suite at http://www.json.org/JSON_checker/
+			var input = new[]
+			{
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenString("double extra comma"),
+				JsonGrammar.TokenValueDelim,
+				JsonGrammar.TokenValueDelim,
+				JsonGrammar.TokenArrayEnd
+			};
+
+			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+
+			Assert.Throws<ArgumentException>(
+				delegate
+				{
+					var actual = parser.Parse(input, null);
+				});
+		}
+
+		[Fact]
+		public void GetTokens_ArrayMissingValue_ThrowsArgumentException()
+		{
+			// input from fail6.json in test suite at http://www.json.org/JSON_checker/
+			var input = new[]
+			{
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenValueDelim,
+				JsonGrammar.TokenString("<-- missing value"),
+				JsonGrammar.TokenArrayEnd
+			};
+
+			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+
+			Assert.Throws<ArgumentException>(
+				delegate
+				{
+					var actual = parser.Parse(input, null);
+				});
+		}
+
+		[Fact(Skip="JsonParser doesn't currently check after stream")]
+		public void GetTokens_ArrayCommaAfterClose_ThrowsArgumentException()
+		{
+			// input from fail7.json in test suite at http://www.json.org/JSON_checker/
+			var input = new[]
+			{
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenString("Comma after the close"),
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenValueDelim
+			};
+
+			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+
+			Assert.Throws<ArgumentException>(
+				delegate
+				{
+					var actual = parser.Parse(input, null);
+				});
+		}
+
+		[Fact(Skip="JsonParser doesn't currently check after stream")]
+		public void GetTokens_ArrayExtraClose_ThrowsArgumentException()
+		{
+			// input from fail8.json in test suite at http://www.json.org/JSON_checker/
+			var input = new[]
+			{
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenString("Extra close"),
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd
+			};
+
+			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+
+			Assert.Throws<ArgumentException>(
+				delegate
+				{
+					var actual = parser.Parse(input, null);
+				});
+		}
+
+		[Fact]
+		public void GetTokens_ObjectExtraComma_ThrowsArgumentException()
+		{
+			// input from fail9.json in test suite at http://www.json.org/JSON_checker/
+			var input = new[]
+			{
+				JsonGrammar.TokenObjectBegin,
+				JsonGrammar.TokenString("Extra comma"),
+				JsonGrammar.TokenPairDelim,
+				JsonGrammar.TokenTrue,
+				JsonGrammar.TokenValueDelim,
+				JsonGrammar.TokenObjectEnd
+			};
+
+			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+
+			Assert.Throws<ArgumentException>(
+				delegate
+				{
+					var actual = parser.Parse(input, null);
+				});
+		}
+
+		[Fact(Skip="JsonParser doesn't currently check after stream")]
+		public void GetTokens_ObjectExtraValueAfterClose_ThrowsArgumentException()
+		{
+			// input from fail10.json in test suite at http://www.json.org/JSON_checker/
+			var input = new[]
+			{
+				JsonGrammar.TokenObjectBegin,
+				JsonGrammar.TokenString("Extra value after close"),
+				JsonGrammar.TokenPairDelim,
+				JsonGrammar.TokenTrue,
+				JsonGrammar.TokenObjectEnd,
+				JsonGrammar.TokenString("misplaced quoted value")
+			};
+
+			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+
+			Assert.Throws<ArgumentException>(
+				delegate
+				{
+					var actual = parser.Parse(input, null);
+				});
+		}
+
+		[Fact(Skip="JsonParser doesn't currently check depth")]
+		public void GetTokens_ArraysNestedTooDep_ThrowsArgumentException()
+		{
+			// input from fail18.json in test suite at http://www.json.org/JSON_checker/
+			var input = new[]
+			{
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenString("Too deep"),
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd
+			};
+
+			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+
+			Assert.Throws<ArgumentException>(
+				delegate
+				{
+					var actual = parser.Parse(input, null);
+				});
+		}
+
+		[Fact]
+		public void GetTokens_ObjectMissingColon_ThrowsArgumentException()
+		{
+			// input from fail19.json in test suite at http://www.json.org/JSON_checker/
+			var input = new[]
+			{
+				JsonGrammar.TokenObjectBegin,
+				JsonGrammar.TokenString("Missing colon"),
+				JsonGrammar.TokenNull,
+				JsonGrammar.TokenObjectEnd
+			};
+
+			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+
+			Assert.Throws<ArgumentException>(
+				delegate
+				{
+					var actual = parser.Parse(input, null);
+				});
+		}
+
+		[Fact]
+		public void GetTokens_ObjectDoubleColon_ThrowsArgumentException()
+		{
+			// input from fail20.json in test suite at http://www.json.org/JSON_checker/
+			var input = new[]
+			{
+				JsonGrammar.TokenObjectBegin,
+				JsonGrammar.TokenString("Double colon"),
+				JsonGrammar.TokenPairDelim,
+				JsonGrammar.TokenPairDelim,
+				JsonGrammar.TokenNull,
+				JsonGrammar.TokenObjectEnd
+			};
+
+			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+
+			Assert.Throws<ArgumentException>(
+				delegate
+				{
+					var actual = parser.Parse(input, null);
+				});
+		}
+
+		[Fact]
+		public void GetTokens_ObjectCommaInsteadOfColon_ThrowsArgumentException()
+		{
+			// input from fail21.json in test suite at http://www.json.org/JSON_checker/
+			var input = new[]
+			{
+				JsonGrammar.TokenObjectBegin,
+				JsonGrammar.TokenString("Comma instead of colon"),
+				JsonGrammar.TokenValueDelim,
+				JsonGrammar.TokenNull,
+				JsonGrammar.TokenObjectEnd
+			};
+
+			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+
+			Assert.Throws<ArgumentException>(
+				delegate
+				{
+					var actual = parser.Parse(input, null);
+				});
+		}
+
+		[Fact]
+		public void GetTokens_ArrayColonInsteadOfComma_ThrowsArgumentException()
+		{
+			// input from fail22.json in test suite at http://www.json.org/JSON_checker/
+			var input = new[]
+			{
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenString("Colon instead of comma"),
+				JsonGrammar.TokenPairDelim,
+				JsonGrammar.TokenFalse,
+				JsonGrammar.TokenArrayEnd
+			};
+
+			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+
+			Assert.Throws<ArgumentException>(
+				delegate
+				{
+					var actual = parser.Parse(input, null);
+				});
+		}
+
+		[Fact]
+		public void GetTokens_ArrayBadValue_ThrowsArgumentException()
+		{
+			// input from fail23.json in test suite at http://www.json.org/JSON_checker/
+			var input = new[]
+			{
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenString("Bad value"),
+				JsonGrammar.TokenValueDelim,
+				JsonGrammar.TokenLiteral("truth"),
+				JsonGrammar.TokenArrayEnd
+			};
+
+			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+
+			Assert.Throws<ArgumentException>(
+				delegate
+				{
+					var actual = parser.Parse(input, null);
+				});
+		}
+
+		[Fact]
+		public void GetTokens_ObjectCommaInsteadOfClose_ThrowsArgumentException()
+		{
+			// input from fail32.json in test suite at http://www.json.org/JSON_checker/
+			var input = new[]
+			{
+				JsonGrammar.TokenObjectBegin,
+				JsonGrammar.TokenString("Comma instead if closing brace"),
+				JsonGrammar.TokenPairDelim,
+				JsonGrammar.TokenTrue,
+				JsonGrammar.TokenValueDelim
+			};
+
+			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+
+			Assert.Throws<ArgumentException>(
+				delegate
+				{
+					var actual = parser.Parse(input, null);
+				});
+		}
+
+		[Fact]
+		public void GetTokens_ArrayCloseMismatch_ThrowsArgumentException()
+		{
+			// input from fail33.json in test suite at http://www.json.org/JSON_checker/
+			var input = new[]
+			{
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenString("mismatch"),
+				JsonGrammar.TokenObjectEnd
 			};
 
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
