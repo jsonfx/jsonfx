@@ -77,7 +77,7 @@ namespace JsonFx.Json
 		[Fact]
 		public void GetTokens_ArrayMultiItemWhitespace_ReturnsSimpleArrayTokens()
 		{
-			const string input = "[ 0, null, false ]";
+			const string input = "[ 0, null,  false,true ]";
 			var expected = new []
 			{
 				JsonGrammar.TokenArrayBegin,
@@ -86,6 +86,8 @@ namespace JsonFx.Json
 				JsonGrammar.TokenNull,
 				JsonGrammar.TokenValueDelim,
 				JsonGrammar.TokenFalse,
+				JsonGrammar.TokenValueDelim,
+				JsonGrammar.TokenTrue,
 				JsonGrammar.TokenArrayEnd
 			};
 
@@ -96,7 +98,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ArrayNested_ReturnsNestedArrayTokens()
+		public void GetTokens_ArrayNestedDeeply_ReturnsNestedArrayTokens()
 		{
 			// input from pass2.json in test suite at http://www.json.org/JSON_checker/
 			const string input = @"[[[[[[[[[[[[[[[[[[[""Not too deep""]]]]]]]]]]]]]]]]]]]";
