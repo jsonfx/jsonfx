@@ -75,7 +75,11 @@ namespace JsonFx.Serialization
 				}
 				return this.resolver;
 			}
-			set { this.resolver = value; }
+			set
+			{
+				this.resolver = value;
+				this.cache = null;
+			}
 		}
 
 		/// <summary>

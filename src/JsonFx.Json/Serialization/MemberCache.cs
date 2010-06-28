@@ -36,7 +36,7 @@ using System.Reflection;
 namespace JsonFx.Serialization
 {
 	/// <summary>
-	/// Controls name resolution for IDataReader / IDataWriter
+	/// Caches name resolution mappings for IDataReader / IDataWriter
 	/// </summary>
 	internal class MemberCache
 	{
@@ -125,7 +125,7 @@ namespace JsonFx.Serialization
 				// do not incurr the cost of member map for dictionaries
 				if (typeof(IDictionary).IsAssignableFrom(objectType))
 				{
-					// store in cache for future usage
+					// store marker in cache for future lookups
 					this.ReadMapCache[objectType] = null;
 					this.WriteMapCache[objectType] = null;
 					return;
