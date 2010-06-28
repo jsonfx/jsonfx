@@ -80,7 +80,7 @@ namespace JsonFx.Json
 			/// <param name="settings"></param>
 			public JsonParser(DataReaderSettings settings)
 			{
-				this.Coercion = new TypeCoercionUtility(settings.Cache, settings.AllowNullValueTypes);
+				this.Coercion = new TypeCoercionUtility(((IMemberCacheContainer)settings).MemberCache, settings.AllowNullValueTypes);
 			}
 
 			#endregion Init

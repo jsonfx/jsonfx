@@ -38,7 +38,7 @@ namespace JsonFx.Serialization
 	/// <summary>
 	/// Caches name resolution mappings for IDataReader / IDataWriter
 	/// </summary>
-	internal class MemberCache
+	public class MemberCache
 	{
 		#region Constants
 
@@ -51,7 +51,7 @@ namespace JsonFx.Serialization
 		private readonly object SyncLock = new object();
 		private readonly IDictionary<Type, IDictionary<string, MemberInfo>> ReadMapCache = new Dictionary<Type, IDictionary<string, MemberInfo>>();
 		private readonly IDictionary<Type, IDictionary<MemberInfo, string>> WriteMapCache = new Dictionary<Type, IDictionary<MemberInfo, string>>();
-		private readonly IDataNameResolver Resolver;
+		internal readonly IDataNameResolver Resolver;
 
 		#endregion Fields
 

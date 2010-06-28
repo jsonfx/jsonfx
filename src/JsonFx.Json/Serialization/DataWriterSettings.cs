@@ -36,6 +36,7 @@ namespace JsonFx.Serialization
 	/// Controls the serialization settings for IDataWriter
 	/// </summary>
 	public class DataWriterSettings
+		: IMemberCacheContainer
 	{
 		#region Fields
 
@@ -44,7 +45,7 @@ namespace JsonFx.Serialization
 		private int maxDepth = 100;
 		private string newLine = Environment.NewLine;
 		private IDataNameResolver resolver;
-		private MemberCache cache;
+		private MemberCache memberCache;
 
 		#endregion Fields
 
@@ -105,26 +106,35 @@ namespace JsonFx.Serialization
 			set
 			{
 				this.resolver = value;
-				this.cache = null;
+				this.memberCache = null;
 			}
 		}
 
 		/// <summary>
 		/// Gets and sets extensibility point to control name resolution for IDataReader
 		/// </summary>
-		internal MemberCache Cache
+		MemberCache IMemberCacheContainer.MemberCache
 		{
 			get
 			{
-				if (this.cache == null)
+				if (this.memberCache == null)
 				{
-					this.cache = new MemberCache(this.Resolver);
+					this.memberCache = new MemberCache(this.Resolver);
 				}
-				return this.cache;
+				return this.memberCache;
 			}
-			set { this.cache = value; }
 		}
 
 		#endregion Properties
+
+		#region IMemberCacheContainer Members
+
+		public void CopyCacheFrom(IMemberCacheContainer container)
+		{
+			this.Resolver = container.MemberCache.Resolver;
+			this.memberCache = container.MemberCache;
+		}
+
+		#endregion IMemberCacheContainer Members
 	}
 }
