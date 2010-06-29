@@ -230,7 +230,7 @@ namespace JsonFx.Json
 		#region String Tests
 
 		[Fact]
-		public void GetTokens_StringEmpty_ReturnsStringToken()
+		public void GetTokens_StringEmpty_ReturnsEmptyStringToken()
 		{
 			const string input = "\"\"";
 			var expected = new []
@@ -364,7 +364,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_StringUnescapedQuote_ReturnsStringToken()
+		public void GetTokens_StringUnescapedDoubleQuote_ReturnsStringToken()
 		{
 			const string input = @"'unescaped "" quote'";
 			var expected = new []

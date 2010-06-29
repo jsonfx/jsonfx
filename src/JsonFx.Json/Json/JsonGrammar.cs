@@ -50,8 +50,8 @@ namespace JsonFx.Json
 		public static readonly Token<JsonTokenType> TokenPairDelim = new Token<JsonTokenType>(JsonTokenType.PairDelim);
 		public static readonly Token<JsonTokenType> TokenValueDelim = new Token<JsonTokenType>(JsonTokenType.ValueDelim);
 
-		public static readonly Token<JsonTokenType> TokenUndefined = new Token<JsonTokenType>(JsonTokenType.Undefined);
-		public static readonly Token<JsonTokenType> TokenNull = new Token<JsonTokenType>(JsonTokenType.Null);
+		public static readonly Token<JsonTokenType> TokenUndefined = new Token<JsonTokenType>(JsonTokenType.Undefined, null);
+		public static readonly Token<JsonTokenType> TokenNull = new Token<JsonTokenType>(JsonTokenType.Null, null);
 		public static readonly Token<JsonTokenType> TokenFalse = new Token<JsonTokenType>(JsonTokenType.Boolean, false);
 		public static readonly Token<JsonTokenType> TokenTrue = new Token<JsonTokenType>(JsonTokenType.Boolean, true);
 		public static readonly Token<JsonTokenType> TokenNaN = new Token<JsonTokenType>(JsonTokenType.Number, Double.NaN);
