@@ -1220,6 +1220,34 @@ break""]";
 
 		#endregion Complex Graph Tests
 
+		#region Input Edge Case Tests
+
+		[Fact]
+		public void GetTokens_NullInput_ReturnsEmptySequence()
+		{
+			const string input = null;
+			var expected = new Token<JsonTokenType>[0];
+
+			var tokenizer = new JsonReader.JsonTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_EmptyInput_ReturnsEmptySequence()
+		{
+			const string input = "";
+			var expected = new Token<JsonTokenType>[0];
+
+			var tokenizer = new JsonReader.JsonTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		#endregion Input Edge Case Tests
+
 		#region Illegal Sequence Tests
 
 		[Fact]

@@ -30,6 +30,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using JsonFx.Serialization;
 using Xunit;
@@ -238,7 +239,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ArrayUnclosed_ThrowsArgumentException()
+		public void GetTokens_ArrayUnclosed_ThrowsParseException()
 		{
 			// input from fail2.json in test suite at http://www.json.org/JSON_checker/
 			var input = new []
@@ -260,7 +261,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ArrayExtraComma_ThrowsArgumentException()
+		public void GetTokens_ArrayExtraComma_ThrowsParseException()
 		{
 			// input from fail4.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -284,7 +285,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ArrayDoubleExtraComma_ThrowsArgumentException()
+		public void GetTokens_ArrayDoubleExtraComma_ThrowsParseException()
 		{
 			// input from fail5.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -309,7 +310,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ArrayMissingValue_ThrowsArgumentException()
+		public void GetTokens_ArrayMissingValue_ThrowsParseException()
 		{
 			// input from fail6.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -333,7 +334,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact(Skip="JsonParser doesn't currently check after stream")]
-		public void GetTokens_ArrayCommaAfterClose_ThrowsArgumentException()
+		public void GetTokens_ArrayCommaAfterClose_ThrowsParseException()
 		{
 			// input from fail7.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -357,7 +358,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact(Skip="JsonParser doesn't currently check after stream")]
-		public void GetTokens_ArrayExtraClose_ThrowsArgumentException()
+		public void GetTokens_ArrayExtraClose_ThrowsParseException()
 		{
 			// input from fail8.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -381,7 +382,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact(Skip="JsonParser doesn't currently check depth")]
-		public void GetTokens_ArrayNestedTooDeeply_ThrowsArgumentException()
+		public void GetTokens_ArrayNestedTooDeeply_ThrowsParseException()
 		{
 			// input from fail18.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -442,7 +443,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ArrayColonInsteadOfComma_ThrowsArgumentException()
+		public void GetTokens_ArrayColonInsteadOfComma_ThrowsParseException()
 		{
 			// input from fail22.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -467,7 +468,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ArrayBadValue_ThrowsArgumentException()
+		public void GetTokens_ArrayBadValue_ThrowsParseException()
 		{
 			// input from fail23.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -492,7 +493,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ArrayCloseMismatch_ThrowsArgumentException()
+		public void GetTokens_ArrayCloseMismatch_ThrowsParseException()
 		{
 			// input from fail33.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -598,7 +599,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ObjectExtraComma_ThrowsArgumentException()
+		public void GetTokens_ObjectExtraComma_ThrowsParseException()
 		{
 			// input from fail9.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -624,7 +625,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact(Skip="JsonParser doesn't currently check after stream")]
-		public void GetTokens_ObjectExtraValueAfterClose_ThrowsArgumentException()
+		public void GetTokens_ObjectExtraValueAfterClose_ThrowsParseException()
 		{
 			// input from fail10.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -650,7 +651,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ObjectMissingColon_ThrowsArgumentException()
+		public void GetTokens_ObjectMissingColon_ThrowsParseException()
 		{
 			// input from fail19.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -674,7 +675,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ObjectDoubleColon_ThrowsArgumentException()
+		public void GetTokens_ObjectDoubleColon_ThrowsParseException()
 		{
 			// input from fail20.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -700,7 +701,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ObjectCommaInsteadOfColon_ThrowsArgumentException()
+		public void GetTokens_ObjectCommaInsteadOfColon_ThrowsParseException()
 		{
 			// input from fail21.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -725,7 +726,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ObjectCommaInsteadOfClose_ThrowsArgumentException()
+		public void GetTokens_ObjectCommaInsteadOfClose_ThrowsParseException()
 		{
 			// input from fail32.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -1033,6 +1034,48 @@ namespace JsonFx.Json
 		}
 
 		#endregion Complex Graph Tests
+
+		#region Input Edge Case Tests
+
+		[Fact]
+		public void GetTokens_EmptyInput_ReturnsNull()
+		{
+			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+
+			var actual = parser.Parse(Enumerable.Empty<Token<JsonTokenType>>());
+
+			Assert.Equal(null, actual);
+		}
+
+		[Fact]
+		public void GetTokens_NullInput_ThrowsArgumentNullException()
+		{
+			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+
+			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
+				delegate
+				{
+					var actual = parser.Parse(null);
+				});
+
+			// verify exception is coming from expected param
+			Assert.Equal("tokens", ex.ParamName);
+		}
+
+		[Fact]
+		public void GetTokens_NullSettings_ThrowsArgumentNullException()
+		{
+			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
+				delegate
+				{
+					var parser = new JsonReader.JsonParser(null);
+				});
+
+			// verify exception is coming from expected param
+			Assert.Equal("settings", ex.ParamName);
+		}
+
+		#endregion Input Edge Case Tests
 
 		#region Enum Tests
 
