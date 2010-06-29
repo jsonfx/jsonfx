@@ -520,6 +520,85 @@ namespace JsonFx.Json
 		#region Object Tests
 
 		[Fact]
+		public void GetTokens_ObjectEmpty_ReturnsEmptyObject()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenObjectBegin,
+				JsonGrammar.TokenObjectEnd
+			};
+
+			var expected = new Dictionary<string, object>();
+
+			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+			var actual = parser.Parse(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_ObjectOneProperty_ReturnsSimpleObject()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenObjectBegin,
+				JsonGrammar.TokenString("key"),
+				JsonGrammar.TokenPairDelim,
+				JsonGrammar.TokenString("value"),
+				JsonGrammar.TokenObjectEnd
+			};
+
+			var expected = new Dictionary<string, object>
+				{
+					{ "key", "value" }
+				};
+
+			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+			var actual = parser.Parse(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_ObjectNested_ReturnsNestedObject()
+		{
+			// input from pass3.json in test suite at http://www.json.org/JSON_checker/
+			var input = new[]
+			{
+				JsonGrammar.TokenObjectBegin,
+				JsonGrammar.TokenString("JSON Test Pattern pass3"),
+				JsonGrammar.TokenPairDelim,
+				JsonGrammar.TokenObjectBegin,
+				JsonGrammar.TokenString("The outermost value"),
+				JsonGrammar.TokenPairDelim,
+				JsonGrammar.TokenString("must be an object or array."),
+				JsonGrammar.TokenValueDelim,
+				JsonGrammar.TokenString("In this test"),
+				JsonGrammar.TokenPairDelim,
+				JsonGrammar.TokenString("It is an object."),
+				JsonGrammar.TokenObjectEnd,
+				JsonGrammar.TokenObjectEnd
+			};
+
+			var expected = new Dictionary<string, object>
+				{
+					{
+						"JSON Test Pattern pass3",
+						new Dictionary<string, object>
+						{
+							{ "The outermost value", "must be an object or array." },
+							{ "In this test", "It is an object." }
+						}
+					}
+				};
+
+			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+			var actual = parser.Parse(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
 		public void GetTokens_ObjectExtraComma_ThrowsArgumentException()
 		{
 			// input from fail9.json in test suite at http://www.json.org/JSON_checker/
