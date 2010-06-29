@@ -33,6 +33,7 @@ using System.Linq;
 
 using JsonFx.Serialization;
 using Xunit;
+using Assert=JsonFx.AssertPatched;
 
 namespace JsonFx.Json
 {

@@ -1042,9 +1042,11 @@ namespace JsonFx.Json
 		{
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
 
+			var expected = (object)null;
+
 			var actual = parser.Parse(Enumerable.Empty<Token<JsonTokenType>>());
 
-			Assert.Equal(null, actual);
+			Assert.Equal(expected, actual);
 		}
 
 		[Fact]
