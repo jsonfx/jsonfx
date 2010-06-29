@@ -40,7 +40,7 @@ namespace JsonFx
 {
 	public class AssertPatchedTests
 	{
-		#region Self Tests
+		#region AssertPatched Tests
 
 		[Fact]
 		public void Assert_EqualNestedArrays_ThrowsEqualException()
@@ -62,7 +62,7 @@ namespace JsonFx
 				new[] { new[] { "Foo" }, new[] { "Bar" } });
 		}
 
-		#endregion Self Tests
+		#endregion AssertPatched Tests
 	}
 
 	internal class AssertPatched : Assert
@@ -247,29 +247,35 @@ namespace JsonFx
 					object currentX = enumeratorX.Current;
 					object currentY = enumeratorY.Current;
 
-					if (currentX is T && currentY is T)
-						return Equals((T)currentX, (T)currentY);
-
-					if (!ObjectEquals(currentX, currentY))
+					if (!this.ObjectEquals(currentX, currentY))
 						return false;
 				}
 			}
 
 			private bool ObjectEquals(object x, object y)
 			{
+				if (typeof(T) != typeof(object) && x is T && y is T)
+					return this.Equals((T)x, (T)y);
+
 				if (x == null)
 					return (y == null);
 
 				if (y == null)
 					return false;
 
-				Type itemType = x.GetType();
+				// TODO: find a way to generalize these types of exceptional situations
+				if (x is KeyValuePair<string, object>)
+				{
+					KeyValuePair<string, object> pairX = (KeyValuePair<string, object>)x;
+					KeyValuePair<string, object> pairy = (KeyValuePair<string, object>)y;
 
+					return this.ObjectEquals(pairX.Key, pairX.Key) &&
+						this.ObjectEquals(pairX.Value, pairX.Value);
+				}
+
+				Type itemType = x.GetType();
 				if (y.GetType() != itemType)
 					return false;
-
-				if (typeof(T) == itemType)
-					return Equals((T)x, (T)y);
 
 				if (comparerCache == null)
 				{
