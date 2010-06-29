@@ -30,7 +30,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using JsonFx.Serialization;
 using Xunit;
