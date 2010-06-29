@@ -757,6 +757,7 @@ namespace JsonFx.Json
 		[Fact]
 		public void GetTokens_GraphComplex_ReturnsGraph()
 		{
+			// input from pass1.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
 				JsonGrammar.TokenArrayBegin,
@@ -1040,11 +1041,12 @@ namespace JsonFx.Json
 		[Fact]
 		public void GetTokens_EmptyInput_ReturnsNull()
 		{
-			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+			var input = Enumerable.Empty<Token<JsonTokenType>>();
 
 			var expected = (object)null;
 
-			var actual = parser.Parse(Enumerable.Empty<Token<JsonTokenType>>());
+			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+			var actual = parser.Parse(input);
 
 			Assert.Equal(expected, actual);
 		}
@@ -1052,12 +1054,14 @@ namespace JsonFx.Json
 		[Fact]
 		public void GetTokens_NullInput_ThrowsArgumentNullException()
 		{
+			var input = (IEnumerable<Token<JsonTokenType>>)null;
+
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
 
 			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
 				delegate
 				{
-					var actual = parser.Parse(null);
+					var actual = parser.Parse(input);
 				});
 
 			// verify exception is coming from expected param
