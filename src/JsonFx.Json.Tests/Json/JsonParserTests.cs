@@ -62,7 +62,7 @@ namespace JsonFx.Json
 		#region Array Tests
 
 		[Fact]
-		public void GetTokens_ArrayEmpty_ReturnsEmptyArray()
+		public void Parse_ArrayEmpty_ReturnsEmptyArray()
 		{
 			var input = new []
 			{
@@ -79,7 +79,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ArrayOneItem_ReturnsExpectedArray()
+		public void Parse_ArrayOneItem_ReturnsExpectedArray()
 		{
 			var input = new[]
 			{
@@ -97,7 +97,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ArrayMultiItem_ReturnsExpectedArray()
+		public void Parse_ArrayMultiItem_ReturnsExpectedArray()
 		{
 			var input = new[]
 			{
@@ -127,7 +127,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ArrayNestedDeeply_ReturnsExpectedArray()
+		public void Parse_ArrayNestedDeeply_ReturnsExpectedArray()
 		{
 			// input from pass2.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -239,7 +239,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ArrayUnclosed_ThrowsParseException()
+		public void Parse_ArrayUnclosed_ThrowsParseException()
 		{
 			// input from fail2.json in test suite at http://www.json.org/JSON_checker/
 			var input = new []
@@ -261,7 +261,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ArrayExtraComma_ThrowsParseException()
+		public void Parse_ArrayExtraComma_ThrowsParseException()
 		{
 			// input from fail4.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -285,7 +285,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ArrayDoubleExtraComma_ThrowsParseException()
+		public void Parse_ArrayDoubleExtraComma_ThrowsParseException()
 		{
 			// input from fail5.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -310,7 +310,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ArrayMissingValue_ThrowsParseException()
+		public void Parse_ArrayMissingValue_ThrowsParseException()
 		{
 			// input from fail6.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -334,7 +334,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact(Skip="JsonParser doesn't currently check after stream")]
-		public void GetTokens_ArrayCommaAfterClose_ThrowsParseException()
+		public void Parse_ArrayCommaAfterClose_ThrowsParseException()
 		{
 			// input from fail7.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -358,7 +358,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact(Skip="JsonParser doesn't currently check after stream")]
-		public void GetTokens_ArrayExtraClose_ThrowsParseException()
+		public void Parse_ArrayExtraClose_ThrowsParseException()
 		{
 			// input from fail8.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -382,7 +382,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact(Skip="JsonParser doesn't currently check depth")]
-		public void GetTokens_ArrayNestedTooDeeply_ThrowsParseException()
+		public void Parse_ArrayNestedTooDeeply_ThrowsParseException()
 		{
 			// input from fail18.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -443,7 +443,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ArrayColonInsteadOfComma_ThrowsParseException()
+		public void Parse_ArrayColonInsteadOfComma_ThrowsParseException()
 		{
 			// input from fail22.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -468,7 +468,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ArrayBadValue_ThrowsParseException()
+		public void Parse_ArrayBadValue_ThrowsParseException()
 		{
 			// input from fail23.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -493,7 +493,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ArrayCloseMismatch_ThrowsParseException()
+		public void Parse_ArrayCloseMismatch_ThrowsParseException()
 		{
 			// input from fail33.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -520,7 +520,7 @@ namespace JsonFx.Json
 		#region Object Tests
 
 		[Fact]
-		public void GetTokens_ObjectEmpty_ReturnsEmptyObject()
+		public void Parse_ObjectEmpty_ReturnsEmptyObject()
 		{
 			var input = new[]
 			{
@@ -537,7 +537,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ObjectOneProperty_ReturnsSimpleObject()
+		public void Parse_ObjectOneProperty_ReturnsSimpleObject()
 		{
 			var input = new[]
 			{
@@ -560,7 +560,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ObjectNested_ReturnsNestedObject()
+		public void Parse_ObjectNested_ReturnsNestedObject()
 		{
 			// input from pass3.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -599,7 +599,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ObjectExtraComma_ThrowsParseException()
+		public void Parse_ObjectExtraComma_ThrowsParseException()
 		{
 			// input from fail9.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -625,7 +625,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact(Skip="JsonParser doesn't currently check after stream")]
-		public void GetTokens_ObjectExtraValueAfterClose_ThrowsParseException()
+		public void Parse_ObjectExtraValueAfterClose_ThrowsParseException()
 		{
 			// input from fail10.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -651,7 +651,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ObjectMissingColon_ThrowsParseException()
+		public void Parse_ObjectMissingColon_ThrowsParseException()
 		{
 			// input from fail19.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -675,7 +675,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ObjectDoubleColon_ThrowsParseException()
+		public void Parse_ObjectDoubleColon_ThrowsParseException()
 		{
 			// input from fail20.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -701,7 +701,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ObjectCommaInsteadOfColon_ThrowsParseException()
+		public void Parse_ObjectCommaInsteadOfColon_ThrowsParseException()
 		{
 			// input from fail21.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -726,7 +726,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ObjectCommaInsteadOfClose_ThrowsParseException()
+		public void Parse_ObjectCommaInsteadOfClose_ThrowsParseException()
 		{
 			// input from fail32.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -755,7 +755,7 @@ namespace JsonFx.Json
 		#region Complex Graph Tests
 
 		[Fact]
-		public void GetTokens_GraphComplex_ReturnsGraph()
+		public void Parse_GraphComplex_ReturnsGraph()
 		{
 			// input from pass1.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -1039,7 +1039,7 @@ namespace JsonFx.Json
 		#region Input Edge Case Tests
 
 		[Fact]
-		public void GetTokens_EmptyInput_ReturnsNull()
+		public void Parse_EmptyInput_ReturnsNull()
 		{
 			var input = Enumerable.Empty<Token<JsonTokenType>>();
 
@@ -1052,7 +1052,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_NullInput_ThrowsArgumentNullException()
+		public void Parse_NullInput_ThrowsArgumentNullException()
 		{
 			var input = (IEnumerable<Token<JsonTokenType>>)null;
 
@@ -1069,7 +1069,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_NullSettings_ThrowsArgumentNullException()
+		public void Parse_NullSettings_ThrowsArgumentNullException()
 		{
 			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
 				delegate
@@ -1088,7 +1088,7 @@ namespace JsonFx.Json
 		// TODO: these are actually testing type coercion, need to isolate type coercion to improve testability
 
 		[Fact]
-		public void GetTokens_EnumFromString_ReturnsEnum()
+		public void Parse_EnumFromString_ReturnsEnum()
 		{
 			var input = new[]
 			{
@@ -1104,7 +1104,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_EnumFromJsonName_ReturnsEnum()
+		public void Parse_EnumFromJsonName_ReturnsEnum()
 		{
 			var input = new[]
 			{
@@ -1120,7 +1120,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_EnumFromNumber_ReturnsEnum()
+		public void Parse_EnumFromNumber_ReturnsEnum()
 		{
 			var input = new[]
 			{
