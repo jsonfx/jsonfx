@@ -1293,7 +1293,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void Format_NullSettings_ThrowsArgumentNullException()
+		public void Ctor_NullSettings_ThrowsArgumentNullException()
 		{
 			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
 				delegate
