@@ -59,6 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssertPatched.cs" />
+    <Compile Include="Json\JsonFormatterTests.cs" />
     <Compile Include="Json\JsonParserTests.cs" />
     <Compile Include="Json\JsonTokenizerTests.cs" />
     <Compile Include="Serialization\StringScannerTests.cs" />
