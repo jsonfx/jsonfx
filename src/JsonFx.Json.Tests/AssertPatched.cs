@@ -48,7 +48,7 @@ namespace JsonFx
 			Assert.Throws<EqualException>(
 				delegate()
 				{
-					Assert.Equal<IEnumerable>(
+					Assert.Equal(
 						new[] { new[] { "Foo" }, new[] { "Bar" } },
 						new[] { new[] { "Foo" }, new[] { "Bar" } });
 				});
@@ -57,7 +57,7 @@ namespace JsonFx
 		[Fact]
 		public void AssertPatched_EqualNestedArrays_Passes()
 		{
-			AssertPatched.Equal<IEnumerable>(
+			AssertPatched.Equal(
 				new[] { new[] { "Foo" }, new[] { "Bar" } },
 				new[] { new[] { "Foo" }, new[] { "Bar" } });
 		}
@@ -158,15 +158,35 @@ namespace JsonFx
 
 		static IComparer<T> GetComparer<T>()
 		{
-			return new AssertComparer<T>();
+			return new AssertEqualityComparer<T>();
 		}
 
 		#endregion Factory Methods
 
-		#region AssertEqualityComparer
+		#region AssertEqualityComparer<T>
 
-		class AssertEqualityComparer<T> : IEqualityComparer<T>
+		class AssertEqualityComparer<T> :
+			IEqualityComparer<T>,
+			IComparer<T>
 		{
+			#region Fields
+
+			IDictionary<Type, object> comparerCache;
+			IDictionary<Type, MethodInfo> methodCache;
+
+			#endregion Fields
+
+			#region IComparer<T> Members
+
+			public int Compare(T x, T y)
+			{
+				return Equals(x, y) ? 0 : 1;
+			}
+
+			#endregion IComparer<T> Members
+
+			#region IEqualityComparer<T> Members
+
 			public bool Equals(T x, T y)
 			{
 				Type type = typeof(T);
@@ -205,175 +225,87 @@ namespace JsonFx
 				IEnumerable enumerableY = y as IEnumerable;
 
 				if (enumerableX != null && enumerableY != null)
+					return EnumerableEquals(enumerableX, enumerableY);
+
+				// Last case, rely on default comparers
+				return EqualityComparer<T>.Default.Equals(x, y);
+			}
+
+			private bool EnumerableEquals(IEnumerable x, IEnumerable y)
+			{
+				IEnumerator enumeratorX = x.GetEnumerator();
+				IEnumerator enumeratorY = y.GetEnumerator();
+
+				while (true)
 				{
-					IDictionary<Type, object> comparerCache = new Dictionary<Type, object>();
-					IDictionary<Type, MethodInfo> methodCache = new Dictionary<Type, MethodInfo>();
+					bool hasNextX = enumeratorX.MoveNext();
+					bool hasNextY = enumeratorY.MoveNext();
 
-					IEnumerator enumeratorX = enumerableX.GetEnumerator();
-					IEnumerator enumeratorY = enumerableY.GetEnumerator();
+					if (!hasNextX || !hasNextY)
+						return (hasNextX == hasNextY);
 
-					while (true)
-					{
-						bool hasNextX = enumeratorX.MoveNext();
-						bool hasNextY = enumeratorY.MoveNext();
+					object currentX = enumeratorX.Current;
+					object currentY = enumeratorY.Current;
 
-						if (!hasNextX || !hasNextY)
-							return (hasNextX == hasNextY);
+					if (currentX is T && currentY is T)
+						return Equals((T)currentX, (T)currentY);
 
-						if (enumeratorX.Current == null)
-						{
-							if (enumeratorY.Current == null)
-								continue;
-							else
-								return false;
-						}
+					if (!ObjectEquals(currentX, currentY))
+						return false;
+				}
+			}
 
-						if (enumeratorY.Current == null)
-							return false;
+			private bool ObjectEquals(object x, object y)
+			{
+				if (x == null)
+					return (y == null);
 
-						Type itemType = enumeratorX.Current.GetType();
+				if (y == null)
+					return false;
 
-						if (enumeratorY.Current.GetType() != itemType)
-							return false;
+				Type itemType = x.GetType();
 
-						object comparer;
-						MethodInfo equalsMethod;
-						if (comparerCache.ContainsKey(itemType))
-						{
-							comparer = comparerCache[itemType];
-							equalsMethod = methodCache[itemType];
-						}
-						else
-						{
-							Type comparerType = typeof(AssertEqualityComparer<>).MakeGenericType(itemType);
-							ConstructorInfo ctor = comparerType.GetConstructor(Type.EmptyTypes);
-							comparerCache[itemType] = comparer = ctor.Invoke(Type.EmptyTypes);
-							methodCache[itemType] = equalsMethod = comparerType.GetMethod("Equals", new Type[] { itemType, itemType });
-						}
+				if (y.GetType() != itemType)
+					return false;
 
-						bool areEqual = (bool)equalsMethod.Invoke(comparer, new object[] { enumeratorX.Current, enumeratorY.Current });
+				if (typeof(T) == itemType)
+					return Equals((T)x, (T)y);
 
-						if (!areEqual)
-							return false;
-					}
+				if (comparerCache == null)
+				{
+					comparerCache = new Dictionary<Type, object>();
+					methodCache = new Dictionary<Type, MethodInfo>();
 				}
 
-				// Last case, rely on Object.Equals
-				return EqualityComparer<T>.Default.Equals(x, y);
+				object comparer;
+				MethodInfo equalsMethod;
+				if (comparerCache.ContainsKey(itemType))
+				{
+					comparer = comparerCache[itemType];
+					equalsMethod = methodCache[itemType];
+				}
+				else
+				{
+					// get comparer type
+					Type comparerType = typeof(AssertEqualityComparer<>).MakeGenericType(itemType);
+					ConstructorInfo ctor = comparerType.GetConstructor(Type.EmptyTypes);
+
+					// store comparer
+					comparerCache[itemType] = comparer = ctor.Invoke(Type.EmptyTypes);
+					methodCache[itemType] = equalsMethod = comparerType.GetMethod("Equals", new Type[] { itemType, itemType });
+				}
+
+				return (bool)equalsMethod.Invoke(comparer, new object[] { x, y });
 			}
 
 			public int GetHashCode(T obj)
 			{
-				throw new NotImplementedException();
+				return EqualityComparer<T>.Default.GetHashCode(obj);
 			}
+
+			#endregion IEqualityComparer<T> Members
 		}
 
-		#endregion AssertEqualityComparer
-
-		#region AssertComparer
-
-		class AssertComparer<T> : IComparer<T>
-		{
-			public int Compare(T x, T y)
-			{
-				Type type = typeof(T);
-
-				// Null?
-				if (!type.IsValueType || (type.IsGenericType && type.GetGenericTypeDefinition().IsAssignableFrom(typeof(Nullable<>))))
-				{
-					if (Equals(x, default(T)))
-					{
-						if (Equals(y, default(T)))
-							return 0;
-						return -1;
-					}
-
-					if (Equals(y, default(T)))
-						return -1;
-				}
-
-				// Same type?
-				if (x.GetType() != y.GetType())
-					return -1;
-
-				// Implements IComparable<T>?
-				IComparable<T> comparable1 = x as IComparable<T>;
-				if (comparable1 != null)
-					return comparable1.CompareTo(y);
-
-				// Implements IComparable?
-				IComparable comparable2 = x as IComparable;
-				if (comparable2 != null)
-					return comparable2.CompareTo(y);
-
-				// Implements IEquatable<T>?
-				IEquatable<T> equatable = x as IEquatable<T>;
-				if (equatable != null)
-					return equatable.Equals(y) ? 0 : -1;
-
-				// Enumerable?
-				IEnumerable enumerableX = x as IEnumerable;
-				IEnumerable enumerableY = y as IEnumerable;
-
-				if (enumerableX != null && enumerableY != null)
-				{
-					IDictionary<Type, object> comparerCache = new Dictionary<Type, object>();
-					IDictionary<Type, MethodInfo> methodCache = new Dictionary<Type, MethodInfo>();
-
-					IEnumerator enumeratorX = enumerableX.GetEnumerator();
-					IEnumerator enumeratorY = enumerableY.GetEnumerator();
-
-					while (true)
-					{
-						bool hasNextX = enumeratorX.MoveNext();
-						bool hasNextY = enumeratorY.MoveNext();
-
-						if (!hasNextX || !hasNextY)
-							return (hasNextX == hasNextY) ? 0 : -1;
-
-						if (enumeratorX.Current == null)
-						{
-							if (enumeratorY.Current == null)
-								continue;
-							else
-								return -1;
-						}
-
-						if (enumeratorY.Current == null)
-							return -1;
-
-						Type itemType = enumeratorX.Current.GetType();
-
-						if (enumeratorY.Current.GetType() != itemType)
-							return -1;
-
-						object comparer;
-						MethodInfo equalsMethod;
-						if (comparerCache.ContainsKey(itemType))
-						{
-							comparer = comparerCache[itemType];
-							equalsMethod = methodCache[itemType];
-						}
-						else
-						{
-							Type comparerType = typeof(AssertEqualityComparer<>).MakeGenericType(itemType);
-							ConstructorInfo ctor = comparerType.GetConstructor(Type.EmptyTypes);
-							comparerCache[itemType] = comparer = ctor.Invoke(Type.EmptyTypes);
-							methodCache[itemType] = equalsMethod = comparerType.GetMethod("Equals", new Type[] { itemType, itemType });
-						}
-
-						bool areEqual = (bool)equalsMethod.Invoke(comparer, new object[] { enumeratorX.Current, enumeratorY.Current });
-
-						if (!areEqual)
-							return -1;
-					}
-				}
-
-				// Last case, rely on Object.Equals
-				return EqualityComparer<T>.Default.Equals(x, y) ? 0 : -1;
-			}
-		}
-
-		#endregion AssertComparer
+		#endregion AssertEqualityComparer<T>
 	}
 }
