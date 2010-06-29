@@ -43,7 +43,7 @@ namespace JsonFx.Json
 		#region Array Tests
 
 		[Fact]
-		public void GetTokens_ArrayEmpty_ReturnsEmptyArray()
+		public void Format_ArrayEmpty_ReturnsEmptyArray()
 		{
 			var input = new[]
 			{
@@ -60,7 +60,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ArrayEmptyPrettyPrint_ReturnsPrettyPrintedEmptyArray()
+		public void Format_ArrayEmptyPrettyPrint_ReturnsPrettyPrintedEmptyArray()
 		{
 			var input = new[]
 			{
@@ -77,7 +77,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ArrayOneItem_ReturnsExpectedArray()
+		public void Format_ArrayOneItem_ReturnsExpectedArray()
 		{
 			var input = new[]
 			{
@@ -95,7 +95,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ArrayOneItemPrettyPrint_ReturnsExpectedPrettyPrintedArray()
+		public void Format_ArrayOneItemPrettyPrint_ReturnsExpectedPrettyPrintedArray()
 		{
 			var input = new[]
 			{
@@ -116,7 +116,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ArrayMultiItem_ReturnsExpectedArray()
+		public void Format_ArrayMultiItem_ReturnsExpectedArray()
 		{
 			var input = new[]
 			{
@@ -140,7 +140,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ArrayMultiItemPrettyPrint_ReturnsExpectedPrettyPrintedArray()
+		public void Format_ArrayMultiItemPrettyPrint_ReturnsExpectedPrettyPrintedArray()
 		{
 			var input = new[]
 			{
@@ -170,7 +170,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ArrayNestedDeeply_ReturnsExpectedArray()
+		public void Format_ArrayNestedDeeply_ReturnsExpectedArray()
 		{
 			// input from pass2.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -225,7 +225,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ArrayNestedDeeplyPrettyPrint_ReturnsExpectedPrettyPrintedArray()
+		public void Format_ArrayNestedDeeplyPrettyPrint_ReturnsExpectedPrettyPrintedArray()
 		{
 			// input from pass2.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -320,10 +320,155 @@ namespace JsonFx.Json
 
 		#endregion Array Tests
 
+		#region Object Tests
+
+		[Fact]
+		public void Format_ObjectEmpty_ReturnsEmptyObject()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenObjectBegin,
+				JsonGrammar.TokenObjectEnd
+			};
+
+			const string expected = @"{}";
+
+			var tokenizer = new JsonWriter.JsonFormatter(new DataWriterSettings());
+			var actual = tokenizer.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void Format_ObjectEmptyPrettyPrint_ReturnsPrettyPrintedEmptyObject()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenObjectBegin,
+				JsonGrammar.TokenObjectEnd
+			};
+
+			const string expected = @"{}";
+
+			var tokenizer = new JsonWriter.JsonFormatter(new DataWriterSettings { PrettyPrint = true });
+			var actual = tokenizer.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void Format_ObjectOneProperty_ReturnsSimpleObject()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenObjectBegin,
+				JsonGrammar.TokenString("key"),
+				JsonGrammar.TokenPairDelim,
+				JsonGrammar.TokenString("value"),
+				JsonGrammar.TokenObjectEnd
+			};
+
+			const string expected = @"{""key"":""value""}";
+
+			var tokenizer = new JsonWriter.JsonFormatter(new DataWriterSettings());
+			var actual = tokenizer.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void Format_ObjectOnePropertyPrettyPrint_ReturnsPrettyPrintedSimpleObject()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenObjectBegin,
+				JsonGrammar.TokenString("key"),
+				JsonGrammar.TokenPairDelim,
+				JsonGrammar.TokenString("value"),
+				JsonGrammar.TokenObjectEnd
+			};
+
+			const string expected =
+@"{
+	""key"" : ""value""
+}";
+
+			var tokenizer = new JsonWriter.JsonFormatter(new DataWriterSettings { PrettyPrint = true });
+			var actual = tokenizer.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void Format_ObjectNested_ReturnsNestedObject()
+		{
+			// input from pass3.json in test suite at http://www.json.org/JSON_checker/
+			var input = new[]
+			{
+				JsonGrammar.TokenObjectBegin,
+				JsonGrammar.TokenString("JSON Test Pattern pass3"),
+				JsonGrammar.TokenPairDelim,
+				JsonGrammar.TokenObjectBegin,
+				JsonGrammar.TokenString("The outermost value"),
+				JsonGrammar.TokenPairDelim,
+				JsonGrammar.TokenString("must be an object or array."),
+				JsonGrammar.TokenValueDelim,
+				JsonGrammar.TokenString("In this test"),
+				JsonGrammar.TokenPairDelim,
+				JsonGrammar.TokenString("It is an object."),
+				JsonGrammar.TokenObjectEnd,
+				JsonGrammar.TokenObjectEnd
+			};
+
+			const string expected = @"{""JSON Test Pattern pass3"":{""The outermost value"":""must be an object or array."",""In this test"":""It is an object.""}}";
+
+			var tokenizer = new JsonWriter.JsonFormatter(new DataWriterSettings());
+			var actual = tokenizer.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void Format_ObjectNestedPrettyPrint_ReturnsPrettyPrintedNestedObject()
+		{
+			// input from pass3.json in test suite at http://www.json.org/JSON_checker/
+			var input = new[]
+			{
+				JsonGrammar.TokenObjectBegin,
+				JsonGrammar.TokenString("JSON Test Pattern pass3"),
+				JsonGrammar.TokenPairDelim,
+				JsonGrammar.TokenObjectBegin,
+				JsonGrammar.TokenString("The outermost value"),
+				JsonGrammar.TokenPairDelim,
+				JsonGrammar.TokenString("must be an object or array."),
+				JsonGrammar.TokenValueDelim,
+				JsonGrammar.TokenString("In this test"),
+				JsonGrammar.TokenPairDelim,
+				JsonGrammar.TokenString("It is an object."),
+				JsonGrammar.TokenObjectEnd,
+				JsonGrammar.TokenObjectEnd
+			};
+
+			const string expected =
+@"{
+	""JSON Test Pattern pass3"" : {
+		""The outermost value"" : ""must be an object or array."",
+		""In this test"" : ""It is an object.""
+	}
+}";
+
+			var tokenizer = new JsonWriter.JsonFormatter(new DataWriterSettings { PrettyPrint = true });
+			var actual = tokenizer.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		#endregion Object Tests
+
 		#region Complex Graph Tests
 
 		[Fact]
-		public void GetTokens_GraphComplex_ReturnsGraph()
+		public void Format_GraphComplex_ReturnsGraph()
 		{
 			// input from pass1.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -546,7 +691,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_GraphComplexPrettyPrint_ReturnsPrettyPrintedGraph()
+		public void Format_GraphComplexPrettyPrint_ReturnsPrettyPrintedGraph()
 		{
 			// input from pass1.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -878,7 +1023,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_NullSettings_ThrowsArgumentNullException()
+		public void Format_NullSettings_ThrowsArgumentNullException()
 		{
 			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
 				delegate
@@ -891,7 +1036,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_MissingArrayOpen_ThrowsSerializationException()
+		public void Format_MissingArrayOpen_ThrowsSerializationException()
 		{
 			var input = new[]
 			{
@@ -910,7 +1055,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ExtraArrayClose_ThrowsSerializationException()
+		public void Format_ExtraArrayClose_ThrowsSerializationException()
 		{
 			var input = new[]
 			{
@@ -931,7 +1076,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_MissingObjectOpen_ThrowsSerializationException()
+		public void Format_MissingObjectOpen_ThrowsSerializationException()
 		{
 			var input = new[]
 			{
@@ -950,7 +1095,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_ExtraObjectClose_ThrowsSerializationException()
+		public void Format_ExtraObjectClose_ThrowsSerializationException()
 		{
 			var input = new[]
 			{
@@ -971,7 +1116,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_MaxDepthExceeded_ThrowsSerializationException()
+		public void Format_MaxDepthExceeded_ThrowsSerializationException()
 		{
 			var input = new[]
 			{
