@@ -73,7 +73,7 @@ namespace JsonFx.Json
 			var expected = new object[0];
 
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
-			var actual = parser.Parse(input);
+			var actual = (object[])parser.Parse(input);
 
 			Assert.Equal(expected, actual);
 		}
@@ -91,7 +91,7 @@ namespace JsonFx.Json
 			var expected = new object[] { null };
 
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
-			var actual = parser.Parse(input);
+			var actual = (object[])parser.Parse(input);
 
 			Assert.Equal(expected, actual);
 		}
@@ -121,7 +121,7 @@ namespace JsonFx.Json
 			};
 
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
-			var actual = parser.Parse(input);
+			var actual = (object[])parser.Parse(input);
 
 			Assert.Equal(expected, actual);
 		}
@@ -233,7 +233,7 @@ namespace JsonFx.Json
 			};
 
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
-			var actual = parser.Parse((input));
+			var actual = (string[][][][][][][][][][][][][][][][][][][])parser.Parse((input));
 
 			Assert.Equal(expected, actual);
 		}
@@ -531,7 +531,7 @@ namespace JsonFx.Json
 			var expected = new Dictionary<string, object>();
 
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
-			var actual = parser.Parse(input);
+			var actual = (Dictionary<string, object>)parser.Parse(input);
 
 			Assert.Equal(expected, actual);
 		}
@@ -554,7 +554,7 @@ namespace JsonFx.Json
 				};
 
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
-			var actual = parser.Parse(input);
+			var actual = (Dictionary<string, object>)parser.Parse(input);
 
 			Assert.Equal(expected, actual);
 		}
@@ -593,7 +593,7 @@ namespace JsonFx.Json
 				};
 
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
-			var actual = parser.Parse(input);
+			var actual = (Dictionary<string, object>)parser.Parse(input);
 
 			Assert.Equal(expected, actual);
 		}
@@ -968,7 +968,7 @@ namespace JsonFx.Json
 				JsonGrammar.TokenArrayEnd
 			};
 
-			var expected = new object [] {
+			var expected = new object[] {
 				"JSON Test Pattern pass1",
 				new Dictionary<string, object>
 				{
@@ -1028,7 +1028,7 @@ namespace JsonFx.Json
 			};
 
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
-			var actual = parser.Parse(input);
+			var actual = (object[])parser.Parse(input);
 
 			Assert.Equal(expected, actual);
 		}
