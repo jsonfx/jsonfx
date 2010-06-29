@@ -333,8 +333,8 @@ namespace JsonFx.Json
 
 			const string expected = @"{}";
 
-			var tokenizer = new JsonWriter.JsonFormatter(new DataWriterSettings());
-			var actual = tokenizer.Format(input);
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
 
 			Assert.Equal(expected, actual);
 		}
@@ -350,8 +350,8 @@ namespace JsonFx.Json
 
 			const string expected = @"{}";
 
-			var tokenizer = new JsonWriter.JsonFormatter(new DataWriterSettings { PrettyPrint = true });
-			var actual = tokenizer.Format(input);
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings { PrettyPrint = true });
+			var actual = formatter.Format(input);
 
 			Assert.Equal(expected, actual);
 		}
@@ -370,8 +370,8 @@ namespace JsonFx.Json
 
 			const string expected = @"{""key"":""value""}";
 
-			var tokenizer = new JsonWriter.JsonFormatter(new DataWriterSettings());
-			var actual = tokenizer.Format(input);
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
 
 			Assert.Equal(expected, actual);
 		}
@@ -393,8 +393,8 @@ namespace JsonFx.Json
 	""key"" : ""value""
 }";
 
-			var tokenizer = new JsonWriter.JsonFormatter(new DataWriterSettings { PrettyPrint = true });
-			var actual = tokenizer.Format(input);
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings { PrettyPrint = true });
+			var actual = formatter.Format(input);
 
 			Assert.Equal(expected, actual);
 		}
@@ -422,8 +422,8 @@ namespace JsonFx.Json
 
 			const string expected = @"{""JSON Test Pattern pass3"":{""The outermost value"":""must be an object or array."",""In this test"":""It is an object.""}}";
 
-			var tokenizer = new JsonWriter.JsonFormatter(new DataWriterSettings());
-			var actual = tokenizer.Format(input);
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
 
 			Assert.Equal(expected, actual);
 		}
@@ -457,13 +457,283 @@ namespace JsonFx.Json
 	}
 }";
 
-			var tokenizer = new JsonWriter.JsonFormatter(new DataWriterSettings { PrettyPrint = true });
-			var actual = tokenizer.Format(input);
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings { PrettyPrint = true });
+			var actual = formatter.Format(input);
 
 			Assert.Equal(expected, actual);
 		}
 
 		#endregion Object Tests
+
+		#region String Tests
+
+		[Fact]
+		public void Format_StringTokenEmpty_ReturnsEmptyString()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenString(String.Empty)
+			};
+
+			const string expected = "\"\"";
+
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void Format_StringTokenSimple_ReturnsString()
+		{
+			// input from fail1.json in test suite at http://www.json.org/JSON_checker/
+			var input = new[]
+			{
+				JsonGrammar.TokenString("A JSON payload should be an object or array, not a string.")
+			};
+
+			const string expected = @"""A JSON payload should be an object or array, not a string.""";
+
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
+
+			// this is not allowed according to strict JSON, but we're following Postel's Law
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void Format_StringTokenEscapedChars_ReturnsString()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenString("\\\b\f\n\r\t\u0123\u4567\u89AB\uCDEF\uabcd\uef4A\"")
+			};
+
+			const string expected = @"""\\\b\f\n\r\t\u0123\u4567\u89AB\uCDEF\uABCD\uEF4A\""""";
+
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void Format_StringTokenUnescapedSingleQuote_ReturnsString()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenString("unescaped ' single quote"),
+			};
+
+			const string expected = @"""unescaped ' single quote""";
+
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void Format_StringTokenTabChar_ReturnsString()
+		{
+			// input from fail25.json in test suite at http://www.json.org/JSON_checker/
+			var input = new[]
+			{
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenString("\ttab\tcharacter\tin\tstring\t"),
+				JsonGrammar.TokenArrayEnd
+			};
+
+			const string expected = @"[""\ttab\tcharacter\tin\tstring\t""]";
+
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
+
+			// this is not allowed according to strict JSON, but we're following Postel's Law
+			Assert.Equal(expected, actual);
+		}
+
+		#endregion String Tests
+
+		#region Number Tests
+
+		[Fact]
+		public void Format_NumberTokenInteger_ReturnsNumber()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenNumber(123456)
+			};
+
+			const string expected = "123456";
+
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void Format_NumberTokenDouble_ReturnsNumber()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenNumber(1.23456)
+			};
+
+			const string expected = "1.23456";
+
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void Format_NumberTokenNegDouble_ReturnsNumber()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenNumber(-0.123456)
+			};
+
+			const string expected = "-0.123456";
+
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void Format_NumberTokenNoLeadingDigitDouble_ReturnsNumber()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenNumber(.123456)
+			};
+
+			const string expected = "0.123456";
+
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void Format_NumberTokenPosNoLeadingDigitDouble_ReturnsNumber()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenNumber(.123456)
+			};
+
+			const string expected = "0.123456";
+
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void Format_NumberTokenNegNoLeadingDigitDouble_ReturnsNumber()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenNumber(-.123456)
+			};
+
+			const string expected = "-0.123456";
+
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void Format_NumberTokenNegDecimal_ReturnsNumber()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenNumber(-123.456m)
+			};
+
+			const string expected = "-123.456";
+
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void Format_NumberTokenNegFloat_ReturnsNumber()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenNumber(-123.456f)
+			};
+
+			const string expected = "-123.456";
+
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void Format_NumberTokenNegLong_ReturnsNumber()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenNumber(-34L)
+			};
+
+			const string expected = "-34";
+
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void Format_NumberTokenOverflowLong_ReturnsString()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenNumber(Int64.MinValue)
+			};
+
+			const string expected = @"""-9223372036854775808""";
+
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void Format_NumberTokenOverflowDecimal_ReturnsString()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenNumber(Decimal.MaxValue)
+			};
+
+			const string expected = @"""79228162514264337593543950335""";
+
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		#endregion Number Tests
 
 		#region Complex Graph Tests
 

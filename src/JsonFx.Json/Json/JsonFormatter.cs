@@ -142,7 +142,9 @@ namespace JsonFx.Json
 								this.WriteLine(writer, +1);
 								pendingNewLine = false;
 							}
-							writer.Write(token.Value);
+
+							// emit without further introspection as this is an extension point
+							writer.Write(token.StringValue);
 							continue;
 						}
 						case JsonTokenType.Null:
@@ -162,7 +164,7 @@ namespace JsonFx.Json
 								this.WriteLine(writer, +1);
 								pendingNewLine = false;
 							}
-							writer.Write(token.Value);
+							this.FormatNumber(writer, token);
 							continue;
 						}
 						case JsonTokenType.ObjectBegin:
@@ -212,7 +214,7 @@ namespace JsonFx.Json
 								this.WriteLine(writer, +1);
 								pendingNewLine = false;
 							}
-							this.FormatString(writer, (string)token.Value);
+							this.FormatString(writer, token.StringValue);
 							continue;
 						}
 						case JsonTokenType.Undefined:
@@ -236,6 +238,56 @@ namespace JsonFx.Json
 						{
 							throw new NotSupportedException("Unexpected JSON token: "+token);
 						}
+					}
+				}
+			}
+
+			protected virtual void FormatNumber(TextWriter writer, Token<JsonTokenType> token)
+			{
+				if (token.TokenType != JsonTokenType.Number || token.Value == null)
+				{
+					throw new SerializationException("Invalid Number token: "+token);
+				}
+
+				switch (Type.GetTypeCode(token.Value.GetType()))
+				{
+					case TypeCode.Boolean:
+					{
+						writer.Write(true.Equals(token.Value) ? "1" : "0");
+						break;
+					}
+					case TypeCode.Byte:
+					case TypeCode.Double:
+					case TypeCode.Int16:
+					case TypeCode.Int32:
+					case TypeCode.SByte:
+					case TypeCode.Single:
+					case TypeCode.UInt16:
+					{
+						// fits within an IEEE-754 floating point so emit directly
+						writer.Write(token.StringValue);
+						break;
+					}
+					case TypeCode.Decimal:
+					case TypeCode.Int64:
+					case TypeCode.UInt32:
+					case TypeCode.UInt64:
+					{
+						// checks for IEEE-754 overflow and emit as strings
+						if (this.InvalidIeee754(Convert.ToDecimal(token.Value)))
+						{
+							this.FormatString(writer, token.StringValue);
+						}
+						else
+						{
+							// fits within an IEEE-754 floating point so emit directly
+							writer.Write(token.StringValue);
+						}
+						break;
+					}
+					default:
+					{
+						throw new SerializationException("Invalid Number token: "+token);
 					}
 				}
 			}
@@ -349,6 +401,29 @@ namespace JsonFx.Json
 			}
 
 			#endregion PrettyPrint Methods
+
+			#region Utility Methods
+
+			/// <summary>
+			/// Determines if a numberic value cannot be represented as IEEE-754.
+			/// </summary>
+			/// <param name="value"></param>
+			/// <returns></returns>
+			protected virtual bool InvalidIeee754(decimal value)
+			{
+				// http://stackoverflow.com/questions/1601646
+
+				try
+				{
+					return (decimal)(Decimal.ToDouble(value)) != value;
+				}
+				catch
+				{
+					return true;
+				}
+			}
+
+			#endregion Utility Methods
 		}
 	}
 }
