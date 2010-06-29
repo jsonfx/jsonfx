@@ -80,6 +80,11 @@ namespace JsonFx.Json
 			/// <param name="settings"></param>
 			public JsonParser(DataReaderSettings settings)
 			{
+				if (settings == null)
+				{
+					throw new ArgumentNullException("settings");
+				}
+
 				this.Coercion = new TypeCoercionUtility(((IMemberCacheContainer)settings).MemberCache, settings.AllowNullValueTypes);
 			}
 
@@ -116,6 +121,11 @@ namespace JsonFx.Json
 			/// <returns></returns>
 			public object Parse(IEnumerable<Token<JsonTokenType>> tokens, Type targetType)
 			{
+				if (tokens == null)
+				{
+					throw new ArgumentNullException("tokens");
+				}
+
 				IEnumerator<Token<JsonTokenType>> tokenizer = tokens.GetEnumerator();
 				if (!tokenizer.MoveNext())
 				{

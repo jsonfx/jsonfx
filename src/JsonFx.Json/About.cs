@@ -61,6 +61,11 @@ namespace JsonFx
 		/// <param name="assembly"></param>
 		public About(Assembly assembly)
 		{
+			if (assembly == null)
+			{
+				throw new ArgumentNullException("assembly");
+			}
+
 			AssemblyName name = assembly.GetName();
 
 			this.FullName = assembly.FullName;

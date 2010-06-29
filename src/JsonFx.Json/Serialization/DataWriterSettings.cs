@@ -35,7 +35,7 @@ namespace JsonFx.Serialization
 	/// <summary>
 	/// Controls the serialization settings for IDataWriter
 	/// </summary>
-	public class DataWriterSettings
+	public sealed class DataWriterSettings
 		: IMemberCacheContainer
 	{
 		#region Fields

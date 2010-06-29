@@ -26,7 +26,7 @@
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <NoWarn>1570,1571,1572,1573,1591,1592</NoWarn>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebugType>pdbonly</DebugType>
@@ -36,7 +36,7 @@
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <NoWarn>1570,1571,1572,1573,1591,1592</NoWarn>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Signed' ">
     <DefineConstants>TRACE;STRONG</DefineConstants>
@@ -48,7 +48,7 @@
     <DelaySign>false</DelaySign>
     <AssemblyOriginatorKeyFile>$(SolutionDir)keys\JsonFx_Key.pfx</AssemblyOriginatorKeyFile>
     <NoWarn>1570,1571,1572,1573,1591,1592</NoWarn>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFrameworkVersion)' == 'v4.0' ">
     <DefineConstants>$(DefineConstants);NET40</DefineConstants>

@@ -72,11 +72,12 @@ namespace JsonFx.Json
 			/// <param name="tokens"></param>
 			public string Format(IEnumerable<Token<JsonTokenType>> tokens)
 			{
-				StringWriter writer = new StringWriter();
+				using (StringWriter writer = new StringWriter())
+				{
+					this.Write(writer, tokens);
 
-				this.Write(writer, tokens);
-
-				return writer.GetStringBuilder().ToString();
+					return writer.GetStringBuilder().ToString();
+				}
 			}
 
 			/// <summary>

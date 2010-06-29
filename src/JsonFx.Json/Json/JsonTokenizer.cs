@@ -723,6 +723,11 @@ namespace JsonFx.Json
 			/// <returns></returns>
 			protected IEnumerable<Token<JsonTokenType>> GetTokens(ITextScanner scanner)
 			{
+				if (scanner == null)
+				{
+					throw new ArgumentNullException("scanner");
+				}
+
 				this.scanner = scanner;
 
 				// initialize
@@ -781,6 +786,24 @@ namespace JsonFx.Json
 			}
 
 			#endregion Utility Methods
+
+			#region IDisposable Members
+
+			public void Dispose()
+			{
+				this.Dispose(true);
+				GC.SuppressFinalize(this);
+			}
+
+			protected virtual void Dispose(bool disposing)
+			{
+				if (disposing)
+				{
+					this.scanner.Dispose();
+				}
+			}
+
+			#endregion IDisposable Members
 		}
 	}
 }

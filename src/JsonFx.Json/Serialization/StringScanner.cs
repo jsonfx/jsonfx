@@ -119,9 +119,18 @@ namespace JsonFx.Serialization
 
 		#region IDisposable Members
 
-		void IDisposable.Dispose()
+		public void Dispose()
 		{
-			((IDisposable)this.enumerator).Dispose();
+			this.Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (disposing)
+			{
+				((IDisposable)this.enumerator).Dispose();
+			}
 		}
 
 		#endregion IDisposable Members

@@ -35,7 +35,7 @@ namespace JsonFx.Serialization
 	/// <summary>
 	/// Controls deserialization settings for IDataReader
 	/// </summary>
-	public class DataReaderSettings
+	public sealed class DataReaderSettings
 		: IMemberCacheContainer
 	{
 		#region Fields

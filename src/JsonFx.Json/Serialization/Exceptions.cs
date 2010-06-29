@@ -29,9 +29,11 @@
 #endregion License
 
 using System;
+using System.Runtime.Serialization;
 
 namespace JsonFx.Serialization
 {
+	[Serializable]
 	public class SerializationException : InvalidOperationException
 	{
 		#region Init
@@ -69,6 +71,7 @@ namespace JsonFx.Serialization
 		#endregion Init
 	}
 
+	[Serializable]
 	public class DeserializationException : SerializationException
 	{
 		#region Fields
@@ -210,6 +213,7 @@ namespace JsonFx.Serialization
 		#endregion Methods
 	}
 
+	[Serializable]
 	public class ParseException<T> : SerializationException
 	{
 		#region Fields
@@ -277,6 +281,7 @@ namespace JsonFx.Serialization
 		#endregion Properties
 	}
 
+	[Serializable]
 	public class TypeCoercionException : ArgumentException
 	{
 		#region Init
