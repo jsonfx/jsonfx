@@ -119,7 +119,7 @@ namespace JsonFx.Serialization
 			try
 			{
 				// objects => tokens => characters
-				formatter.Write(output, generator.GetTokens(data));
+				formatter.Format(output, generator.GetTokens(data));
 			}
 			catch (SerializationException)
 			{

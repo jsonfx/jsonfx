@@ -59,6 +59,11 @@ namespace JsonFx.Json
 			/// <param name="settings"></param>
 			public JsonFormatter(DataWriterSettings settings)
 			{
+				if (settings == null)
+				{
+					throw new ArgumentNullException("settings");
+				}
+
 				this.Settings = settings;
 			}
 
@@ -74,7 +79,7 @@ namespace JsonFx.Json
 			{
 				using (StringWriter writer = new StringWriter())
 				{
-					this.Write(writer, tokens);
+					this.Format(writer, tokens);
 
 					return writer.GetStringBuilder().ToString();
 				}
@@ -85,8 +90,13 @@ namespace JsonFx.Json
 			/// </summary>
 			/// <param name="writer"></param>
 			/// <param name="tokens"></param>
-			public void Write(TextWriter writer, IEnumerable<Token<JsonTokenType>> tokens)
+			public void Format(TextWriter writer, IEnumerable<Token<JsonTokenType>> tokens)
 			{
+				if (tokens == null)
+				{
+					throw new ArgumentNullException("tokens");
+				}
+
 				foreach (Token<JsonTokenType> token in tokens)
 				{
 					switch (token.TokenType)
