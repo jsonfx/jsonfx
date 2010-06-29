@@ -259,7 +259,7 @@ namespace JsonFx
 				}
 
 				// Last case, rely on Object.Equals
-				return Object.Equals(x, y);
+				return EqualityComparer<T>.Default.Equals(x, y);
 			}
 
 			public int GetHashCode(T obj)
@@ -370,7 +370,7 @@ namespace JsonFx
 				}
 
 				// Last case, rely on Object.Equals
-				return Equals(x, y) ? 0 : -1;
+				return EqualityComparer<T>.Default.Equals(x, y) ? 0 : -1;
 			}
 		}
 
