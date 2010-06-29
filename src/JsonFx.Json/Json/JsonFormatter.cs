@@ -97,55 +97,107 @@ namespace JsonFx.Json
 					throw new ArgumentNullException("tokens");
 				}
 
+				// allows us to keep basic context without resorting to a push-down automata
+				bool pendingNewLine = false;
+
 				foreach (Token<JsonTokenType> token in tokens)
 				{
 					switch (token.TokenType)
 					{
 						case JsonTokenType.ArrayBegin:
 						{
+							if (pendingNewLine)
+							{
+								this.WriteLine(writer, +1);
+								pendingNewLine = false;
+							}
 							writer.Write(JsonGrammar.OperatorArrayBegin);
-							this.WriteLine(writer);
+							pendingNewLine = true;
 							continue;
 						}
 						case JsonTokenType.ArrayEnd:
 						{
+							if (!pendingNewLine)
+							{
+								this.WriteLine(writer, -1);
+							}
+							pendingNewLine = false;
 							writer.Write(JsonGrammar.OperatorArrayEnd);
 							continue;
 						}
 						case JsonTokenType.Boolean:
 						{
+							if (pendingNewLine)
+							{
+								this.WriteLine(writer, +1);
+								pendingNewLine = false;
+							}
 							writer.Write(true.Equals(token.Value) ? JsonGrammar.KeywordTrue : JsonGrammar.KeywordFalse);
 							continue;
 						}
 						case JsonTokenType.Literal:
 						{
+							if (pendingNewLine)
+							{
+								this.WriteLine(writer, +1);
+								pendingNewLine = false;
+							}
 							writer.Write(token.Value);
 							continue;
 						}
 						case JsonTokenType.Null:
 						{
+							if (pendingNewLine)
+							{
+								this.WriteLine(writer, +1);
+								pendingNewLine = false;
+							}
 							writer.Write(JsonGrammar.KeywordNull);
 							continue;
 						}
 						case JsonTokenType.Number:
 						{
+							if (pendingNewLine)
+							{
+								this.WriteLine(writer, +1);
+								pendingNewLine = false;
+							}
 							writer.Write(token.Value);
 							continue;
 						}
 						case JsonTokenType.ObjectBegin:
 						{
+							if (pendingNewLine)
+							{
+								this.WriteLine(writer, +1);
+								pendingNewLine = false;
+							}
 							writer.Write(JsonGrammar.OperatorObjectBegin);
+							pendingNewLine = true;
 							continue;
 						}
 						case JsonTokenType.ObjectEnd:
 						{
-							this.WriteLine(writer);
+							if (!pendingNewLine)
+							{
+								this.WriteLine(writer, -1);
+							}
+							pendingNewLine = false;
 							writer.Write(JsonGrammar.OperatorObjectEnd);
 							continue;
 						}
 						case JsonTokenType.PairDelim:
 						{
-							writer.Write(JsonGrammar.OperatorPairDelim);
+							if (this.Settings.PrettyPrint)
+							{
+								writer.Write(" ");
+								writer.Write(JsonGrammar.OperatorPairDelim);
+								writer.Write(" ");
+							}
+							else
+							{
+								writer.Write(JsonGrammar.OperatorPairDelim);
+							}
 							continue;
 						}
 						case JsonTokenType.String:
@@ -155,18 +207,28 @@ namespace JsonFx.Json
 								goto case JsonTokenType.Null;
 							}
 
-							this.WriteString(writer, (string)token.Value);
+							if (pendingNewLine)
+							{
+								this.WriteLine(writer, +1);
+								pendingNewLine = false;
+							}
+							this.FormatString(writer, (string)token.Value);
 							continue;
 						}
 						case JsonTokenType.Undefined:
 						{
+							if (pendingNewLine)
+							{
+								this.WriteLine(writer, +1);
+								pendingNewLine = false;
+							}
 							writer.Write(JsonGrammar.KeywordUndefined);
 							continue;
 						}
 						case JsonTokenType.ValueDelim:
 						{
 							writer.Write(JsonGrammar.OperatorValueDelim);
-							this.WriteLine(writer);
+							this.WriteLine(writer, 0);
 							continue;
 						}
 						case JsonTokenType.None:
@@ -178,7 +240,7 @@ namespace JsonFx.Json
 				}
 			}
 
-			protected virtual void WriteString(TextWriter writer, string value)
+			protected virtual void FormatString(TextWriter writer, string value)
 			{
 				int start = 0,
 					length = value.Length;
@@ -253,19 +315,40 @@ namespace JsonFx.Json
 				writer.Write(JsonGrammar.OperatorStringDelim);
 			}
 
-			private void WriteLine(TextWriter writer)
+			#endregion Format Methods
+
+			#region PrettyPrint Methods
+
+			private void WriteLine(TextWriter writer, int depthChange)
 			{
+				if (depthChange != 0)
+				{
+					this.depth += depthChange;
+					if (this.depth < 0)
+					{
+						// depth should never be negative
+						throw new SerializationException("Formatter depth cannot be negative");
+					}
+					else if (this.depth >= this.Settings.MaxDepth)
+					{
+						// TODO: should this move to generator along with an option to check for cycles rather than depth?
+						throw new SerializationException("Maximum depth exceeded: potential graph cycle detected.");
+					}
+				}
+
 				if (this.Settings.PrettyPrint)
 				{
+					// emit CRLF
 					writer.Write(this.Settings.NewLine);
 					for (int i=0; i<this.depth; i++)
 					{
+						// indent next line accordingly
 						writer.Write(this.Settings.Tab);
 					}
 				}
 			}
 
-			#endregion Methods
+			#endregion PrettyPrint Methods
 		}
 	}
 }
