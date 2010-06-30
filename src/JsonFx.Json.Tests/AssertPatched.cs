@@ -171,8 +171,7 @@ namespace JsonFx
 		{
 			#region Fields
 
-			IDictionary<Type, object> comparerCache;
-			IDictionary<Type, MethodInfo> methodCache;
+			IDictionary<Type, Delegate> methodCache;
 
 			#endregion Fields
 
@@ -277,31 +276,31 @@ namespace JsonFx
 				if (y.GetType() != itemType)
 					return false;
 
-				if (comparerCache == null)
-				{
-					comparerCache = new Dictionary<Type, object>();
-					methodCache = new Dictionary<Type, MethodInfo>();
-				}
+				if (methodCache == null)
+					methodCache = new Dictionary<Type, Delegate>();
 
-				object comparer;
-				MethodInfo equalsMethod;
-				if (comparerCache.ContainsKey(itemType))
+				Delegate equalsMethod;
+				if (methodCache.ContainsKey(itemType))
 				{
-					comparer = comparerCache[itemType];
 					equalsMethod = methodCache[itemType];
 				}
 				else
 				{
-					// get comparer type
+					// get comparer type and instantiate
 					Type comparerType = typeof(AssertEqualityComparer<>).MakeGenericType(itemType);
-					ConstructorInfo ctor = comparerType.GetConstructor(Type.EmptyTypes);
+					object comparer = comparerType.GetConstructor(Type.EmptyTypes).Invoke(null);
 
-					// store comparer
-					comparerCache[itemType] = comparer = ctor.Invoke(Type.EmptyTypes);
-					methodCache[itemType] = equalsMethod = comparerType.GetMethod("Equals", new Type[] { itemType, itemType });
+					MethodInfo methodInfo = comparerType.GetMethod("Equals", new Type[] { itemType, itemType });
+
+					// leveraging delegate contravariance to store in generalized form
+					methodCache[itemType] = equalsMethod = Delegate.CreateDelegate(
+						typeof(Func<,,>).MakeGenericType(itemType, itemType, typeof(bool)),
+						comparer,
+						methodInfo,
+						true);
 				}
 
-				return (bool)equalsMethod.Invoke(comparer, new object[] { x, y });
+				return (bool)equalsMethod.Method.Invoke(equalsMethod.Target, new object[] { x, y });
 			}
 
 			public int GetHashCode(T obj)
