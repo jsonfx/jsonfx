@@ -32,6 +32,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Xml;
 
 using JsonFx.Serialization;
 
@@ -70,7 +71,7 @@ namespace JsonFx.Json
 
 			#endregion Init
 
-			#region Methods
+			#region Format Methods
 
 			/// <summary>
 			/// Formats the token sequence as a string
@@ -150,7 +151,7 @@ namespace JsonFx.Json
 							}
 
 							// emit without further introspection as this is a raw extension point
-							writer.Write(this.FormatAsString(token.Value));
+							writer.Write(this.FormatString(token.Value));
 							continue;
 						}
 						case JsonTokenType.Null:
@@ -221,7 +222,7 @@ namespace JsonFx.Json
 								pendingNewLine = false;
 							}
 
-							this.WriteString(writer, this.FormatAsString(token.Value));
+							this.WriteString(writer, this.FormatString(token.Value));
 							continue;
 						}
 						case JsonTokenType.Undefined:
@@ -247,77 +248,6 @@ namespace JsonFx.Json
 						}
 					}
 				}
-			}
-
-			/// <summary>
-			/// Converts an object to its string representation
-			/// </summary>
-			/// <param name="value"></param>
-			/// <returns></returns>
-			private string FormatAsString(object value)
-			{
-				if (value is string)
-				{
-					return (string)value;
-				}
-
-				if (value is Enum)
-				{
-					return this.FormatAsString((Enum)value);
-				}
-
-				if (value is Guid)
-				{
-					return ((Guid)value).ToString("D");
-				}
-
-				if (value is Uri || value is Version)
-				{
-					return value.ToString();
-				}
-
-				if (value is char)
-				{
-					return new String((char)value, 1);
-				}
-
-				return Convert.ToString(value, CultureInfo.InvariantCulture);
-			}
-
-			/// <summary>
-			/// Converts an enum to its string representation
-			/// </summary>
-			/// <param name="value"></param>
-			/// <returns></returns>
-			private string FormatAsString(Enum value)
-			{
-				Type type = value.GetType();
-
-				string enumName;
-				if (type.IsDefined(typeof(FlagsAttribute), true) && !Enum.IsDefined(type, value))
-				{
-					Enum[] flags = JsonFormatter.GetFlagList(type, value);
-					string[] flagNames = new string[flags.Length];
-					for (int i=0; i<flags.Length; i++)
-					{
-						flagNames[i] = this.Settings.Resolver.GetName(flags[i]);
-						if (String.IsNullOrEmpty(flagNames[i]))
-						{
-							flagNames[i] = flags[i].ToString("f");
-						}
-					}
-					enumName = String.Join(", ", flagNames);
-				}
-				else
-				{
-					enumName = this.Settings.Resolver.GetName(value);
-					if (String.IsNullOrEmpty(enumName))
-					{
-						enumName = value.ToString("f");
-					}
-				}
-
-				return enumName;
 			}
 
 			protected virtual void WriteNumber(TextWriter writer, Token<JsonTokenType> token)
@@ -530,6 +460,124 @@ namespace JsonFx.Json
 			}
 
 			#endregion PrettyPrint Methods
+
+			#region String Formatting Methods
+
+			/// <summary>
+			/// Converts an object to its string representation
+			/// </summary>
+			/// <param name="value"></param>
+			/// <returns></returns>
+			private string FormatString(object value)
+			{
+				if (value is string)
+				{
+					return (string)value;
+				}
+
+				if (value is DateTime)
+				{
+					// TODO: extensibility point
+
+					return this.FormatISO8601((DateTime)value);
+				}
+
+				if (value is Enum)
+				{
+					// TODO: extensibility point
+
+					return this.FormatFlags((Enum)value);
+				}
+
+				if (value is Guid)
+				{
+					// TODO: extensibility point
+
+					return ((Guid)value).ToString("D");
+				}
+
+				if (value is Uri || value is Version)
+				{
+					return value.ToString();
+				}
+
+				if (value is XmlNode)
+				{
+					return ((XmlNode)value).OuterXml;
+				}
+
+				if (value is char)
+				{
+					return new String((char)value, 1);
+				}
+
+				return Convert.ToString(value, CultureInfo.InvariantCulture);
+			}
+
+			/// <summary>
+			/// Converts an enum to its string representation
+			/// </summary>
+			/// <param name="value"></param>
+			/// <returns></returns>
+			private string FormatISO8601(DateTime value)
+			{
+				switch (value.Kind)
+				{
+					case DateTimeKind.Local:
+					{
+						value = value.ToUniversalTime();
+						goto case DateTimeKind.Utc;
+					}
+					case DateTimeKind.Utc:
+					{
+						// UTC DateTime in ISO-8601
+						return String.Format("{0:s}Z", value);
+					}
+					default:
+					{
+						// DateTime in ISO-8601
+						return String.Format("{0:s}", value);
+					}
+				}
+			}
+
+			/// <summary>
+			/// Converts an enum to its string representation
+			/// </summary>
+			/// <param name="value"></param>
+			/// <returns></returns>
+			private string FormatFlags(Enum value)
+			{
+				Type type = value.GetType();
+
+				string enumName;
+				if (type.IsDefined(typeof(FlagsAttribute), true) && !Enum.IsDefined(type, value))
+				{
+					Enum[] flags = JsonFormatter.GetFlagList(type, value);
+					string[] flagNames = new string[flags.Length];
+					for (int i=0; i<flags.Length; i++)
+					{
+						flagNames[i] = this.Settings.Resolver.GetName(flags[i]);
+						if (String.IsNullOrEmpty(flagNames[i]))
+						{
+							flagNames[i] = flags[i].ToString("f");
+						}
+					}
+					enumName = String.Join(", ", flagNames);
+				}
+				else
+				{
+					enumName = this.Settings.Resolver.GetName(value);
+					if (String.IsNullOrEmpty(enumName))
+					{
+						enumName = value.ToString("f");
+					}
+				}
+
+				return enumName;
+			}
+
+			#endregion String Formatting Methods
 
 			#region Utility Methods
 
