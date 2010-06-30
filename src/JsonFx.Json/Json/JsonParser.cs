@@ -85,7 +85,7 @@ namespace JsonFx.Json
 					throw new ArgumentNullException("settings");
 				}
 
-				this.Coercion = new TypeCoercionUtility(((IMemberCacheContainer)settings).MemberCache, settings.AllowNullValueTypes);
+				this.Coercion = new TypeCoercionUtility(settings, settings.AllowNullValueTypes);
 			}
 
 			#endregion Init

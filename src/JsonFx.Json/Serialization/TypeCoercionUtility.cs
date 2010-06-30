@@ -69,6 +69,16 @@ namespace JsonFx.Serialization
 		/// <summary>
 		/// Ctor
 		/// </summary>
+		/// <param name="cacheContainer"></param>
+		/// <param name="allowNullValueTypes"></param>
+		public TypeCoercionUtility(IMemberCacheContainer cacheContainer, bool allowNullValueTypes)
+			: this(cacheContainer.MemberCache, allowNullValueTypes)
+		{
+		}
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
 		/// <param name="cache"></param>
 		/// <param name="allowNullValueTypes"></param>
 		public TypeCoercionUtility(MemberCache cache, bool allowNullValueTypes)
