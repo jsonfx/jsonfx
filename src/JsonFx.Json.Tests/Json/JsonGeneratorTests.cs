@@ -49,8 +49,8 @@ namespace JsonFx.Json
 
 			var expected = new[]
 				{
-					JsonGrammar.TokenObjectBegin,
-					JsonGrammar.TokenObjectEnd
+					JsonGrammar.TokenArrayBegin,
+					JsonGrammar.TokenArrayEnd
 				};
 
 			var generator = new JsonWriter.JsonGenerator(new DataWriterSettings());
@@ -66,8 +66,8 @@ namespace JsonFx.Json
 
 			var expected = new[]
 				{
-					JsonGrammar.TokenObjectBegin,
-					JsonGrammar.TokenObjectEnd
+					JsonGrammar.TokenArrayBegin,
+					JsonGrammar.TokenArrayEnd
 				};
 
 			var generator = new JsonWriter.JsonGenerator(new DataWriterSettings());
