@@ -44,12 +44,6 @@ namespace JsonFx.Json
 		/// </summary>
 		public class JsonGenerator : IDataGenerator<JsonTokenType>
 		{
-			#region Constants
-
-			private static readonly string TypeGenericIDictionary = typeof(IDictionary<,>).FullName;
-
-			#endregion Constants
-
 			#region Fields
 
 			private readonly DataWriterSettings Settings;
@@ -188,22 +182,11 @@ namespace JsonFx.Json
 					}
 				}
 
-				if (value is IDictionary ||
-					type.GetInterface(JsonGenerator.TypeGenericIDictionary) != null)
-				{
-					foreach (Token<JsonTokenType> token in this.GetObjectTokens((IEnumerable)value))
-					{
-						yield return token;
-					}
-					yield break;
-				}
-
-				// NOTE: IDictionary test must happen BEFORE IEnumerable test since IDictionary implements IEnumerable
 				if (value is IEnumerable)
 				{
 					if (value is XmlNode)
 					{
-						foreach (Token<JsonTokenType> token in this.Walk((XmlNode)value))
+						foreach (Token<JsonTokenType> token in this.GetXmlTokens((XmlNode)value))
 						{
 							yield return token;
 						}
@@ -230,31 +213,94 @@ namespace JsonFx.Json
 				}
 
 				// all other structs and classes
-				foreach (Token<JsonTokenType> token in this.GetTokens(value, type))
+				foreach (Token<JsonTokenType> token in this.GetObjectTokens(value, type))
 				{
 					yield return token;
 				}
 			}
 
-			private IEnumerable<Token<JsonTokenType>> GetTokens(object value, Type type)
+			private IEnumerable<Token<JsonTokenType>> GetArrayTokens(IEnumerable value)
 			{
-				yield return JsonGrammar.TokenObjectBegin;
-				yield return JsonGrammar.TokenObjectEnd;
-			}
+				IEnumerator enumerator = value.GetEnumerator();
 
-			private IEnumerable<Token<JsonTokenType>> GetObjectTokens(IEnumerable dictionary)
-			{
-				yield return JsonGrammar.TokenObjectBegin;
-				yield return JsonGrammar.TokenObjectEnd;
-			}
+				if (enumerator is IDictionaryEnumerator)
+				{
+					foreach (Token<JsonTokenType> token in this.GetObjectTokens((IDictionaryEnumerator)enumerator))
+					{
+						yield return token;
+					}
+					yield break;
+				}
 
-			private IEnumerable<Token<JsonTokenType>> GetArrayTokens(IEnumerable array)
-			{
 				yield return JsonGrammar.TokenArrayBegin;
+
+				bool appendDelim = false;
+				while (enumerator.MoveNext())
+				{
+					if (appendDelim)
+					{
+						yield return JsonGrammar.TokenValueDelim;
+					}
+					else
+					{
+						appendDelim = true;
+					}
+
+					foreach (Token<JsonTokenType> token in this.GetTokens(enumerator.Current))
+					{
+						yield return token;
+					}
+				}
+
 				yield return JsonGrammar.TokenArrayEnd;
 			}
 
-			private IEnumerable<Token<JsonTokenType>> Walk(XmlNode value)
+			private IEnumerable<Token<JsonTokenType>> GetObjectTokens(IDictionaryEnumerator enumerator)
+			{
+				bool appendDelim = false;
+
+				yield return JsonGrammar.TokenObjectBegin;
+
+				while (enumerator.MoveNext())
+				{
+					DictionaryEntry entry = enumerator.Entry;
+
+					if (appendDelim)
+					{
+						yield return JsonGrammar.TokenValueDelim;
+					}
+					else
+					{
+						appendDelim = true;
+					}
+
+					foreach (Token<JsonTokenType> token in this.GetPropertyTokens(entry.Key, entry.Value))
+					{
+						yield return token;
+					}
+				}
+
+				yield return JsonGrammar.TokenObjectEnd;
+			}
+
+			private IEnumerable<Token<JsonTokenType>> GetPropertyTokens(object key, object value)
+			{
+				yield return JsonGrammar.TokenString(key);
+				yield return JsonGrammar.TokenPairDelim;
+
+				foreach (Token<JsonTokenType> token in this.GetTokens(value))
+				{
+					yield return token;
+				}
+			}
+
+			private IEnumerable<Token<JsonTokenType>> GetObjectTokens(object value, Type type)
+			{
+				yield return JsonGrammar.TokenObjectBegin;
+				yield return JsonGrammar.TokenObjectEnd;
+			}
+
+			private IEnumerable<Token<JsonTokenType>> GetXmlTokens(XmlNode value)
 			{
 				// TODO: translate XML to JsonML?
 				yield return JsonGrammar.TokenString(value.OuterXml);
