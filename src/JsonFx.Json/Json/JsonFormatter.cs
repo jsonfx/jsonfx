@@ -138,6 +138,11 @@ namespace JsonFx.Json
 						}
 						case JsonTokenType.Literal:
 						{
+							if (token.Value == null)
+							{
+								goto case JsonTokenType.Null;
+							}
+
 							if (pendingNewLine)
 							{
 								this.WriteLine(writer, +1);
@@ -145,7 +150,7 @@ namespace JsonFx.Json
 							}
 
 							// emit without further introspection as this is an extension point
-							writer.Write(token.StringValue);
+							writer.Write(Convert.ToString(token.Value, CultureInfo.InvariantCulture));
 							continue;
 						}
 						case JsonTokenType.Null:
@@ -215,7 +220,7 @@ namespace JsonFx.Json
 								this.WriteLine(writer, +1);
 								pendingNewLine = false;
 							}
-							this.FormatString(writer, token.StringValue);
+							this.FormatString(writer, Convert.ToString(token.Value, CultureInfo.InvariantCulture));
 							continue;
 						}
 						case JsonTokenType.Undefined:

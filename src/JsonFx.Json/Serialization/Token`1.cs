@@ -30,7 +30,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Text;
 
 namespace JsonFx.Serialization
@@ -70,18 +69,6 @@ namespace JsonFx.Serialization
 		}
 
 		#endregion Init
-
-		#region Properties
-
-		/// <summary>
-		/// Gets a simple string version of the Value field
-		/// </summary>
-		public string StringValue
-		{
-			get { return Convert.ToString(this.Value, CultureInfo.InvariantCulture); }
-		}
-
-		#endregion Properties
 
 		#region Object Overrides
 
