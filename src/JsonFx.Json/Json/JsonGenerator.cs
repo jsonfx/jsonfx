@@ -31,6 +31,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Xml;
 
 using JsonFx.Serialization;
@@ -47,6 +48,7 @@ namespace JsonFx.Json
 			#region Fields
 
 			private readonly DataWriterSettings Settings;
+			private readonly MemberCache MemberCache;
 
 			#endregion Fields
 
@@ -64,6 +66,7 @@ namespace JsonFx.Json
 				}
 
 				this.Settings = settings;
+				this.MemberCache = ((IMemberCacheContainer)settings).MemberCache;
 			}
 
 			#endregion Init
@@ -257,10 +260,9 @@ namespace JsonFx.Json
 
 			private IEnumerable<Token<JsonTokenType>> GetObjectTokens(IDictionaryEnumerator enumerator)
 			{
-				bool appendDelim = false;
-
 				yield return JsonGrammar.TokenObjectBegin;
 
+				bool appendDelim = false;
 				while (enumerator.MoveNext())
 				{
 					DictionaryEntry entry = enumerator.Entry;
@@ -297,6 +299,41 @@ namespace JsonFx.Json
 			private IEnumerable<Token<JsonTokenType>> GetObjectTokens(object value, Type type)
 			{
 				yield return JsonGrammar.TokenObjectBegin;
+
+				IDictionary<string, MemberInfo> map = this.MemberCache.GetReadMap(type);
+
+				object[] NoIndices = new object[0];
+
+				bool appendDelim = false;
+				foreach (var property in map)
+				{
+					if (appendDelim)
+					{
+						yield return JsonGrammar.TokenValueDelim;
+					}
+					else
+					{
+						appendDelim = true;
+					}
+
+					object propertyValue;
+
+					PropertyInfo propertyInfo = property.Value as PropertyInfo;
+					if (propertyInfo != null)
+					{
+						propertyValue = propertyInfo.GetValue(value, NoIndices);
+					}
+					else
+					{
+						propertyValue = ((FieldInfo)property.Value).GetValue(value);
+					}
+
+					foreach (Token<JsonTokenType> token in this.GetPropertyTokens(property.Key, propertyValue))
+					{
+						yield return token;
+					}
+				}
+
 				yield return JsonGrammar.TokenObjectEnd;
 			}
 

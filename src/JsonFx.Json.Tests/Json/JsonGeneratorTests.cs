@@ -235,6 +235,72 @@ namespace JsonFx.Json
 			Assert.Equal(expected, actual);
 		}
 
+		[Fact]
+		public void GetTokens_ObjectAnonymous_ReturnsObjectTokens()
+		{
+			var input = new
+			{
+				One = 1,
+				Two = 2,
+				Three = 3
+			};
+
+			var expected = new[]
+				{
+					JsonGrammar.TokenObjectBegin,
+					JsonGrammar.TokenString("One"),
+					JsonGrammar.TokenPairDelim,
+					JsonGrammar.TokenNumber(1),
+					JsonGrammar.TokenValueDelim,
+					JsonGrammar.TokenString("Two"),
+					JsonGrammar.TokenPairDelim,
+					JsonGrammar.TokenNumber(2),
+					JsonGrammar.TokenValueDelim,
+					JsonGrammar.TokenString("Three"),
+					JsonGrammar.TokenPairDelim,
+					JsonGrammar.TokenNumber(3),
+					JsonGrammar.TokenObjectEnd
+				};
+
+			var generator = new JsonWriter.JsonGenerator(new DataWriterSettings());
+			var actual = generator.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_ObjectDictionary_ReturnsObjectTokens()
+		{
+			var input = new Dictionary<string, object>
+			{
+				{ "One", 1 },
+				{ "Two", 2 },
+				{ "Three", 3 }
+			};
+
+			var expected = new[]
+				{
+					JsonGrammar.TokenObjectBegin,
+					JsonGrammar.TokenString("One"),
+					JsonGrammar.TokenPairDelim,
+					JsonGrammar.TokenNumber(1),
+					JsonGrammar.TokenValueDelim,
+					JsonGrammar.TokenString("Two"),
+					JsonGrammar.TokenPairDelim,
+					JsonGrammar.TokenNumber(2),
+					JsonGrammar.TokenValueDelim,
+					JsonGrammar.TokenString("Three"),
+					JsonGrammar.TokenPairDelim,
+					JsonGrammar.TokenNumber(3),
+					JsonGrammar.TokenObjectEnd
+				};
+
+			var generator = new JsonWriter.JsonGenerator(new DataWriterSettings());
+			var actual = generator.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
 		#endregion Object Tests
 
 		#region Boolean Tests
