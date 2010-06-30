@@ -58,12 +58,12 @@ namespace JsonFx.Json
 		public static readonly Token<JsonTokenType> TokenPositiveInfinity = new Token<JsonTokenType>(JsonTokenType.Number, Double.PositiveInfinity);
 		public static readonly Token<JsonTokenType> TokenNegativeInfinity = new Token<JsonTokenType>(JsonTokenType.Number, Double.NegativeInfinity);
 
-		public static Token<JsonTokenType> TokenLiteral(string value)
+		public static Token<JsonTokenType> TokenLiteral(object value)
 		{
 			return new Token<JsonTokenType>(JsonTokenType.Literal, value);
 		}
 
-		public static Token<JsonTokenType> TokenString(string value)
+		public static Token<JsonTokenType> TokenString(object value)
 		{
 			return new Token<JsonTokenType>(JsonTokenType.String, value);
 		}

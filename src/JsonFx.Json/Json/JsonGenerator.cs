@@ -31,6 +31,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml;
 
 using JsonFx.Serialization;
 
@@ -43,6 +44,12 @@ namespace JsonFx.Json
 		/// </summary>
 		public class JsonGenerator : IDataGenerator<JsonTokenType>
 		{
+			#region Constants
+
+			private static readonly string TypeGenericIDictionary = typeof(IDictionary<,>).FullName;
+
+			#endregion Constants
+
 			#region Fields
 
 			private readonly DataWriterSettings Settings;
@@ -57,12 +64,17 @@ namespace JsonFx.Json
 			/// <param name="settings"></param>
 			public JsonGenerator(DataWriterSettings settings)
 			{
+				if (settings == null)
+				{
+					throw new ArgumentNullException("settings");
+				}
+
 				this.Settings = settings;
 			}
 
 			#endregion Init
 
-			#region IGenerator<JsonTokenType> Members
+			#region Generator Methods
 
 			/// <summary>
 			/// Generates a sequence of tokens representing the value
@@ -71,6 +83,12 @@ namespace JsonFx.Json
 			/// <returns></returns>
 			public IEnumerable<Token<JsonTokenType>> GetTokens(object value)
 			{
+				if (value == null)
+				{
+					yield return JsonGrammar.TokenNull;
+					yield break;
+				}
+
 				ISerializable<JsonTokenType> serializable = value as ISerializable<JsonTokenType>;
 				if (serializable != null)
 				{
@@ -81,11 +99,168 @@ namespace JsonFx.Json
 					yield break;
 				}
 
-				// TODO: walk the object graph
-				yield break;
+				Type type = value.GetType();
+
+				// must test enumerations before other value types
+				if (type.IsEnum)
+				{
+					yield return JsonGrammar.TokenString((Enum)value);
+					yield break;
+				}
+
+				// Type.GetTypeCode() allows us to more efficiently switch type
+				switch (Type.GetTypeCode(type))
+				{
+					case TypeCode.Boolean:
+					{
+						yield return true.Equals(value) ? JsonGrammar.TokenTrue : JsonGrammar.TokenFalse;
+						yield break;
+					}
+					case TypeCode.Byte:
+					case TypeCode.Decimal:
+					case TypeCode.Int16:
+					case TypeCode.Int32:
+					case TypeCode.Int64:
+					case TypeCode.SByte:
+					case TypeCode.UInt16:
+					case TypeCode.UInt32:
+					case TypeCode.UInt64:
+					{
+						yield return JsonGrammar.TokenNumber((ValueType)value);
+						yield break;
+					}
+					case TypeCode.Double:
+					{
+						double doubleVal = (double)value;
+
+						if (Double.IsNaN(doubleVal))
+						{
+							yield return JsonGrammar.TokenNaN;
+						}
+						else if (Double.IsPositiveInfinity(doubleVal))
+						{
+							yield return JsonGrammar.TokenPositiveInfinity;
+						}
+						else if (Double.IsNegativeInfinity(doubleVal))
+						{
+							yield return JsonGrammar.TokenNegativeInfinity;
+						}
+						else
+						{
+							yield return JsonGrammar.TokenNumber(doubleVal);
+						}
+						yield break;
+					}
+					case TypeCode.Single:
+					{
+						float floatVal = (float)value;
+
+						if (Single.IsNaN(floatVal))
+						{
+							yield return JsonGrammar.TokenNaN;
+						}
+						else if (Single.IsPositiveInfinity(floatVal))
+						{
+							yield return JsonGrammar.TokenPositiveInfinity;
+						}
+						else if (Single.IsNegativeInfinity(floatVal))
+						{
+							yield return JsonGrammar.TokenNegativeInfinity;
+						}
+						else
+						{
+							yield return JsonGrammar.TokenNumber(floatVal);
+						}
+						yield break;
+					}
+					case TypeCode.Char:
+					case TypeCode.DateTime:
+					case TypeCode.String:
+					{
+						yield return JsonGrammar.TokenString(value);
+						yield break;
+					}
+					case TypeCode.DBNull:
+					case TypeCode.Empty:
+					{
+						yield return JsonGrammar.TokenNull;
+						yield break;
+					}
+				}
+
+				if (value is IDictionary ||
+					type.GetInterface(JsonGenerator.TypeGenericIDictionary) != null)
+				{
+					foreach (Token<JsonTokenType> token in this.GetObjectTokens((IEnumerable)value))
+					{
+						yield return token;
+					}
+					yield break;
+				}
+
+				// NOTE: IDictionary test must happen BEFORE IEnumerable test since IDictionary implements IEnumerable
+				if (value is IEnumerable)
+				{
+					if (value is XmlNode)
+					{
+						foreach (Token<JsonTokenType> token in this.Walk((XmlNode)value))
+						{
+							yield return token;
+						}
+						yield break;
+					}
+
+					foreach (Token<JsonTokenType> token in this.GetArrayTokens((IEnumerable)value))
+					{
+						yield return token;
+					}
+					yield break;
+				}
+
+				if (value is Guid || value is Uri || value is Version)
+				{
+					yield return JsonGrammar.TokenString(value);
+					yield break;
+				}
+
+				if (value is TimeSpan)
+				{
+					yield return JsonGrammar.TokenNumber((TimeSpan)value);
+					yield break;
+				}
+
+				// all other structs and classes
+				foreach (Token<JsonTokenType> token in this.GetTokens(value, type))
+				{
+					yield return token;
+				}
 			}
 
-			#endregion IGenerator<JsonTokenType> Members
+			private IEnumerable<Token<JsonTokenType>> GetTokens(object value, Type type)
+			{
+				yield return JsonGrammar.TokenObjectBegin;
+				yield return JsonGrammar.TokenObjectEnd;
+			}
+
+			private IEnumerable<Token<JsonTokenType>> GetObjectTokens(IEnumerable dictionary)
+			{
+				yield return JsonGrammar.TokenObjectBegin;
+				yield return JsonGrammar.TokenObjectEnd;
+			}
+
+			private IEnumerable<Token<JsonTokenType>> GetArrayTokens(IEnumerable array)
+			{
+				yield return JsonGrammar.TokenArrayBegin;
+				yield return JsonGrammar.TokenArrayEnd;
+			}
+
+			private IEnumerable<Token<JsonTokenType>> Walk(XmlNode value)
+			{
+				// TODO: translate XML to JsonML?
+				yield return JsonGrammar.TokenString(value.OuterXml);
+			}
+
+			#endregion Generator Methods
 		}
 	}
 }

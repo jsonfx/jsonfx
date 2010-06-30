@@ -89,6 +89,13 @@ namespace JsonFx.Serialization
 		/// <returns></returns>
 		string GetName(MemberInfo member);
 
+		/// <summary>
+		/// Gets the serialized name for the Enum value.
+		/// </summary>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		string GetName(Enum value);
+
 		#endregion Methods
 	}
 }

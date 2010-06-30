@@ -149,8 +149,8 @@ namespace JsonFx.Json
 								pendingNewLine = false;
 							}
 
-							// emit without further introspection as this is an extension point
-							writer.Write(Convert.ToString(token.Value, CultureInfo.InvariantCulture));
+							// emit without further introspection as this is a raw extension point
+							writer.Write(this.FormatAsString(token.Value));
 							continue;
 						}
 						case JsonTokenType.Null:
@@ -170,7 +170,7 @@ namespace JsonFx.Json
 								this.WriteLine(writer, +1);
 								pendingNewLine = false;
 							}
-							this.FormatNumber(writer, token);
+							this.WriteNumber(writer, token);
 							continue;
 						}
 						case JsonTokenType.ObjectBegin:
@@ -220,7 +220,8 @@ namespace JsonFx.Json
 								this.WriteLine(writer, +1);
 								pendingNewLine = false;
 							}
-							this.FormatString(writer, Convert.ToString(token.Value, CultureInfo.InvariantCulture));
+
+							this.WriteString(writer, this.FormatAsString(token.Value));
 							continue;
 						}
 						case JsonTokenType.Undefined:
@@ -248,7 +249,78 @@ namespace JsonFx.Json
 				}
 			}
 
-			protected virtual void FormatNumber(TextWriter writer, Token<JsonTokenType> token)
+			/// <summary>
+			/// Converts an object to its string representation
+			/// </summary>
+			/// <param name="value"></param>
+			/// <returns></returns>
+			private string FormatAsString(object value)
+			{
+				if (value is string)
+				{
+					return (string)value;
+				}
+
+				if (value is Enum)
+				{
+					return this.FormatAsString((Enum)value);
+				}
+
+				if (value is Guid)
+				{
+					return ((Guid)value).ToString("D");
+				}
+
+				if (value is Uri || value is Version)
+				{
+					return value.ToString();
+				}
+
+				if (value is char)
+				{
+					return new String((char)value, 1);
+				}
+
+				return Convert.ToString(value, CultureInfo.InvariantCulture);
+			}
+
+			/// <summary>
+			/// Converts an enum to its string representation
+			/// </summary>
+			/// <param name="value"></param>
+			/// <returns></returns>
+			private string FormatAsString(Enum value)
+			{
+				Type type = value.GetType();
+
+				string enumName;
+				if (type.IsDefined(typeof(FlagsAttribute), true) && !Enum.IsDefined(type, value))
+				{
+					Enum[] flags = JsonFormatter.GetFlagList(type, value);
+					string[] flagNames = new string[flags.Length];
+					for (int i=0; i<flags.Length; i++)
+					{
+						flagNames[i] = this.Settings.Resolver.GetName(flags[i]);
+						if (String.IsNullOrEmpty(flagNames[i]))
+						{
+							flagNames[i] = flags[i].ToString("f");
+						}
+					}
+					enumName = String.Join(", ", flagNames);
+				}
+				else
+				{
+					enumName = this.Settings.Resolver.GetName(value);
+					if (String.IsNullOrEmpty(enumName))
+					{
+						enumName = value.ToString("f");
+					}
+				}
+
+				return enumName;
+			}
+
+			protected virtual void WriteNumber(TextWriter writer, Token<JsonTokenType> token)
 			{
 				if (token.TokenType != JsonTokenType.Number || token.Value == null)
 				{
@@ -326,6 +398,13 @@ namespace JsonFx.Json
 					}
 					default:
 					{
+						if (token.Value is TimeSpan)
+						{
+							overflowsIEEE754 = true;
+							number = ((TimeSpan)token.Value).Ticks.ToString("g", CultureInfo.InvariantCulture);
+							break;
+						}
+
 						throw new SerializationException("Invalid Number token: "+token);
 					}
 				}
@@ -333,7 +412,7 @@ namespace JsonFx.Json
 				if (overflowsIEEE754 && this.InvalidIEEE754(Convert.ToDecimal(token.Value)))
 				{
 					// checks for IEEE-754 overflow and emit as strings
-					this.FormatString(writer, number);
+					this.WriteString(writer, number);
 				}
 				else
 				{
@@ -342,7 +421,7 @@ namespace JsonFx.Json
 				}
 			}
 
-			protected virtual void FormatString(TextWriter writer, string value)
+			protected virtual void WriteString(TextWriter writer, string value)
 			{
 				int start = 0,
 					length = value.Length;
@@ -453,6 +532,58 @@ namespace JsonFx.Json
 			#endregion PrettyPrint Methods
 
 			#region Utility Methods
+
+			/// <summary>
+			/// Splits a bitwise-OR'd set of enums into a list.
+			/// </summary>
+			/// <param name="enumType">the enum type</param>
+			/// <param name="value">the combined value</param>
+			/// <returns>list of flag enums</returns>
+			/// <remarks>
+			/// from PseudoCode.EnumHelper
+			/// </remarks>
+			private static Enum[] GetFlagList(Type enumType, object value)
+			{
+				ulong longVal = Convert.ToUInt64(value);
+				Array enumValues = Enum.GetValues(enumType);
+
+				List<Enum> enums = new List<Enum>(enumValues.Length);
+
+				// check for empty
+				if (longVal == 0L)
+				{
+					// Return the value of empty, or zero if none exists
+					enums.Add((Enum)Convert.ChangeType(value, enumType));
+					return enums.ToArray();
+				}
+
+				for (int i = enumValues.Length-1; i >= 0; i--)
+				{
+					ulong enumValue = Convert.ToUInt64(enumValues.GetValue(i));
+
+					if ((i == 0) && (enumValue == 0L))
+					{
+						continue;
+					}
+
+					// matches a value in enumeration
+					if ((longVal & enumValue) == enumValue)
+					{
+						// remove from val
+						longVal -= enumValue;
+
+						// add enum to list
+						enums.Add(enumValues.GetValue(i) as Enum);
+					}
+				}
+
+				if (longVal != 0x0L)
+				{
+					enums.Add(Enum.ToObject(enumType, longVal) as Enum);
+				}
+
+				return enums.ToArray();
+			}
 
 			/// <summary>
 			/// Determines if a numberic value cannot be represented as IEEE-754.
