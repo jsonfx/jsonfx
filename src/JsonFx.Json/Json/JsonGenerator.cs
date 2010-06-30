@@ -300,7 +300,7 @@ namespace JsonFx.Json
 			{
 				yield return JsonGrammar.TokenObjectBegin;
 
-				IDictionary<string, MemberInfo> map = this.MemberCache.GetReadMap(type);
+				IDictionary<string, MemberInfo> map = this.MemberCache.GetMap(type);
 
 				object[] NoIndices = new object[0];
 

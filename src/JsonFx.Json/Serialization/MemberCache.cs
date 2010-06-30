@@ -48,9 +48,7 @@ namespace JsonFx.Serialization
 
 		#region Fields
 
-		private readonly object SyncLock = new object();
-		private readonly IDictionary<Type, IDictionary<string, MemberInfo>> ReadMapCache = new Dictionary<Type, IDictionary<string, MemberInfo>>();
-		private readonly IDictionary<Type, IDictionary<MemberInfo, string>> WriteMapCache = new Dictionary<Type, IDictionary<MemberInfo, string>>();
+		private readonly Dictionary<Type, IDictionary<string, MemberInfo>> MapCache = new Dictionary<Type, IDictionary<string, MemberInfo>>();
 		internal readonly IDataNameResolver Resolver;
 
 		#endregion Fields
@@ -74,43 +72,28 @@ namespace JsonFx.Serialization
 
 		#region Map Methods
 
-		public IDictionary<string, MemberInfo> GetReadMap(Type objectType)
+		public IDictionary<string, MemberInfo> GetMap(Type objectType)
 		{
-			lock (this.SyncLock)
+			lock (this.MapCache)
 			{
-				if (!this.ReadMapCache.ContainsKey(objectType))
+				if (!this.MapCache.ContainsKey(objectType))
 				{
-					this.CreateMaps(objectType);
+					this.BuildMap(objectType);
 				}
 
 				// map was stored in cache
-				return this.ReadMapCache[objectType];
-			}
-		}
-
-		public IDictionary<MemberInfo, string> GetWriteMap(Type objectType)
-		{
-			lock (this.SyncLock)
-			{
-				if (!this.WriteMapCache.ContainsKey(objectType))
-				{
-					this.CreateMaps(objectType);
-				}
-
-				// map was stored in cache
-				return this.WriteMapCache[objectType];
+				return this.MapCache[objectType];
 			}
 		}
 
 		/// <summary>
 		/// Removes any cached member mappings.
 		/// </summary>
-		public void ClearCache()
+		public void Clear()
 		{
-			lock (this.SyncLock)
+			lock (this.MapCache)
 			{
-				this.ReadMapCache.Clear();
-				this.WriteMapCache.Clear();
+				this.MapCache.Clear();
 			}
 		}
 
@@ -118,22 +101,20 @@ namespace JsonFx.Serialization
 		/// Builds a mapping of member name to field/property
 		/// </summary>
 		/// <param name="objectType"></param>
-		private void CreateMaps(Type objectType)
+		private void BuildMap(Type objectType)
 		{
-			lock (this.SyncLock)
+			lock (this.MapCache)
 			{
 				// do not incurr the cost of member map for dictionaries
 				if (typeof(IDictionary).IsAssignableFrom(objectType))
 				{
 					// store marker in cache for future lookups
-					this.ReadMapCache[objectType] = null;
-					this.WriteMapCache[objectType] = null;
+					this.MapCache[objectType] = null;
 					return;
 				}
 
 				// create new maps
-				IDictionary<string, MemberInfo> readMap = new Dictionary<string, MemberInfo>();
-				IDictionary<MemberInfo, string> writeMap = new Dictionary<MemberInfo, string>();
+				IDictionary<string, MemberInfo> map = new Dictionary<string, MemberInfo>();
 
 				if (!objectType.IsEnum)
 				{
@@ -154,8 +135,7 @@ namespace JsonFx.Serialization
 							name = info.Name;
 						}
 
-						readMap[info.Name] = info;
-						writeMap[info] = name;
+						map[info.Name] = info;
 					}
 				}
 
@@ -174,13 +154,11 @@ namespace JsonFx.Serialization
 						name = info.Name;
 					}
 
-					readMap[name] = info;
-					writeMap[info] = name;
+					map[name] = info;
 				}
 
 				// store in cache for future usage
-				this.ReadMapCache[objectType] = readMap;
-				this.WriteMapCache[objectType] = writeMap;
+				this.MapCache[objectType] = map;
 			}
 		}
 

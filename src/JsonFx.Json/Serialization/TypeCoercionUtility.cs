@@ -40,7 +40,7 @@ namespace JsonFx.Serialization
 	/// <summary>
 	/// Performs type coercion
 	/// </summary>
-	internal class TypeCoercionUtility
+	internal sealed class TypeCoercionUtility
 	{
 		#region Constants
 
@@ -96,35 +96,16 @@ namespace JsonFx.Serialization
 		#region Properties
 
 		/// <summary>
-		/// Gets the serialized name for a member of a given type
-		/// </summary>
-		/// <param name="type"></param>
-		/// <param name="info">PropertyInfo or FieldInfo</param>
-		/// <returns>serialized name</returns>
-		public string this[Type type, MemberInfo info]
-		{
-			get
-			{
-				IDictionary<MemberInfo, string> map = this.Cache.GetWriteMap(type);
-				if (map == null || !map.ContainsKey(info))
-				{
-					return null;
-				}
-				return map[info];
-			}
-		}
-
-		/// <summary>
 		/// Gets the member info for a serialized name of a given type.
 		/// </summary>
 		/// <param name="type"></param>
 		/// <param name="name"></param>
 		/// <returns>PropertyInfo or FieldInfo</returns>
-		public MemberInfo this[Type type, string name]
+		private MemberInfo this[Type type, string name]
 		{
 			get
 			{
-				IDictionary<string, MemberInfo> map = this.Cache.GetReadMap(type);
+				IDictionary<string, MemberInfo> map = this.Cache.GetMap(type);
 				if (map == null || !map.ContainsKey(name))
 				{
 					return null;
@@ -384,7 +365,7 @@ namespace JsonFx.Serialization
 				{
 					if (!Enum.IsDefined(targetType, value))
 					{
-						IDictionary<string, MemberInfo> map = this.Cache.GetReadMap(targetType);
+						IDictionary<string, MemberInfo> map = this.Cache.GetMap(targetType);
 						if (map.ContainsKey((string)value))
 						{
 							value = map[(string)value].Name;
@@ -494,19 +475,19 @@ namespace JsonFx.Serialization
 		{
 			object newValue = TypeCoercionUtility.InstantiateObject(targetType);
 
-			IDictionary<string, MemberInfo> memberMap = this.Cache.GetReadMap(targetType);
-			if (memberMap != null)
+			IDictionary<string, MemberInfo> map = this.Cache.GetMap(targetType);
+			if (map != null)
 			{
 				// copy any values into new object
 				foreach (object key in value.Keys)
 				{
 					string memberName = (key as String);
-					if (String.IsNullOrEmpty(memberName) || !memberMap.ContainsKey(memberName))
+					if (String.IsNullOrEmpty(memberName) || !map.ContainsKey(memberName))
 					{
 						continue;
 					}
 
-					this.SetMemberValue(newValue, memberMap[memberName], value[key]);
+					this.SetMemberValue(newValue, map[memberName], value[key]);
 				}
 			}
 
