@@ -30,6 +30,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 
 using JsonFx.Serialization;
@@ -249,46 +250,90 @@ namespace JsonFx.Json
 					throw new SerializationException("Invalid Number token: "+token);
 				}
 
+				bool overflowsIEEE754 = false;
+
+				string number;
 				switch (Type.GetTypeCode(token.Value.GetType()))
 				{
 					case TypeCode.Boolean:
 					{
-						writer.Write(true.Equals(token.Value) ? "1" : "0");
+						number = true.Equals(token.Value) ? "1" : "0";
 						break;
 					}
 					case TypeCode.Byte:
+					{
+						number = ((byte)token.Value).ToString("g", CultureInfo.InvariantCulture);
+						break;
+					}
 					case TypeCode.Double:
+					{
+						number = ((double)token.Value).ToString("g", CultureInfo.InvariantCulture);
+						break;
+					}
 					case TypeCode.Int16:
+					{
+						number = ((short)token.Value).ToString("g", CultureInfo.InvariantCulture);
+						break;
+					}
 					case TypeCode.Int32:
+					{
+						number = ((int)token.Value).ToString("g", CultureInfo.InvariantCulture);
+						break;
+					}
 					case TypeCode.SByte:
+					{
+						number = ((sbyte)token.Value).ToString("g", CultureInfo.InvariantCulture);
+						break;
+					}
 					case TypeCode.Single:
+					{
+						number = ((float)token.Value).ToString("g", CultureInfo.InvariantCulture);
+						break;
+					}
 					case TypeCode.UInt16:
 					{
-						// fits within an IEEE-754 floating point so emit directly
-						writer.Write(token.StringValue);
+						number = ((ushort)token.Value).ToString("g", CultureInfo.InvariantCulture);
 						break;
 					}
 					case TypeCode.Decimal:
+					{
+						overflowsIEEE754 = true;
+						number = ((decimal)token.Value).ToString("g", CultureInfo.InvariantCulture);
+						break;
+					}
 					case TypeCode.Int64:
+					{
+						overflowsIEEE754 = true;
+						number = ((long)token.Value).ToString("g", CultureInfo.InvariantCulture);
+						break;
+					}
 					case TypeCode.UInt32:
+					{
+						overflowsIEEE754 = true;
+						number = ((uint)token.Value).ToString("g", CultureInfo.InvariantCulture);
+						break;
+					}
 					case TypeCode.UInt64:
 					{
-						// checks for IEEE-754 overflow and emit as strings
-						if (this.InvalidIeee754(Convert.ToDecimal(token.Value)))
-						{
-							this.FormatString(writer, token.StringValue);
-						}
-						else
-						{
-							// fits within an IEEE-754 floating point so emit directly
-							writer.Write(token.StringValue);
-						}
+						overflowsIEEE754 = true;
+						number = ((ulong)token.Value).ToString("g", CultureInfo.InvariantCulture);
 						break;
 					}
 					default:
 					{
 						throw new SerializationException("Invalid Number token: "+token);
 					}
+				}
+
+				if (overflowsIEEE754 && this.InvalidIEEE754(Convert.ToDecimal(token.Value)))
+				{
+					// checks for IEEE-754 overflow and emit as strings
+					this.FormatString(writer, number);
+				}
+				else
+				{
+					// fits within an IEEE-754 floating point so emit directly
+					writer.Write(number);
 				}
 			}
 
@@ -409,7 +454,7 @@ namespace JsonFx.Json
 			/// </summary>
 			/// <param name="value"></param>
 			/// <returns></returns>
-			protected virtual bool InvalidIeee754(decimal value)
+			protected virtual bool InvalidIEEE754(decimal value)
 			{
 				// http://stackoverflow.com/questions/1601646
 
