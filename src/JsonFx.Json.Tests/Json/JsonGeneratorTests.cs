@@ -43,7 +43,7 @@ namespace JsonFx.Json
 		#region Array Tests
 
 		[Fact]
-		public void GetTokens_EmptyArray_ReturnsEmptyArrayTokens()
+		public void GetTokens_ArrayEmpty_ReturnsEmptyArrayTokens()
 		{
 			var input = new object[0];
 
@@ -60,13 +60,134 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void GetTokens_EmptyList_ReturnsEmptyArrayTokens()
+		public void GetTokens_ListEmpty_ReturnsEmptyArrayTokens()
 		{
 			var input = new List<object>(0);
 
 			var expected = new[]
 				{
 					JsonGrammar.TokenArrayBegin,
+					JsonGrammar.TokenArrayEnd
+				};
+
+			var generator = new JsonWriter.JsonGenerator(new DataWriterSettings());
+			var actual = generator.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_ArraySingleItem_ReturnsSingleItemArrayTokens()
+		{
+			var input = new object[]
+				{
+					null
+				};
+
+			var expected = new[]
+				{
+					JsonGrammar.TokenArrayBegin,
+					JsonGrammar.TokenNull,
+					JsonGrammar.TokenArrayEnd
+				};
+
+			var generator = new JsonWriter.JsonGenerator(new DataWriterSettings());
+			var actual = generator.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_ArrayMultiItem_ReturnsArrayTokens()
+		{
+			var input = new object[]
+				{
+					false,
+					true,
+					null,
+					'a',
+					'b',
+					'c',
+					1,
+					2,
+					3
+				};
+
+			var expected = new[]
+				{
+					JsonGrammar.TokenArrayBegin,
+					JsonGrammar.TokenFalse,
+					JsonGrammar.TokenValueDelim,
+					JsonGrammar.TokenTrue,
+					JsonGrammar.TokenValueDelim,
+					JsonGrammar.TokenNull,
+					JsonGrammar.TokenValueDelim,
+					JsonGrammar.TokenString('a'),
+					JsonGrammar.TokenValueDelim,
+					JsonGrammar.TokenString('b'),
+					JsonGrammar.TokenValueDelim,
+					JsonGrammar.TokenString('c'),
+					JsonGrammar.TokenValueDelim,
+					JsonGrammar.TokenNumber(1),
+					JsonGrammar.TokenValueDelim,
+					JsonGrammar.TokenNumber(2),
+					JsonGrammar.TokenValueDelim,
+					JsonGrammar.TokenNumber(3),
+					JsonGrammar.TokenArrayEnd
+				};
+
+			var generator = new JsonWriter.JsonGenerator(new DataWriterSettings());
+			var actual = generator.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_ArrayNested_ReturnsNestedArrayTokens()
+		{
+			var input = new object[]
+				{
+					false,
+					true,
+					null,
+					new []
+					{
+						'a',
+						'b',
+						'c'
+					},
+					new []
+					{
+						1,
+						2,
+						3
+					}
+				};
+
+			var expected = new[]
+				{
+					JsonGrammar.TokenArrayBegin,
+					JsonGrammar.TokenFalse,
+					JsonGrammar.TokenValueDelim,
+					JsonGrammar.TokenTrue,
+					JsonGrammar.TokenValueDelim,
+					JsonGrammar.TokenNull,
+					JsonGrammar.TokenValueDelim,
+					JsonGrammar.TokenArrayBegin,
+					JsonGrammar.TokenString('a'),
+					JsonGrammar.TokenValueDelim,
+					JsonGrammar.TokenString('b'),
+					JsonGrammar.TokenValueDelim,
+					JsonGrammar.TokenString('c'),
+					JsonGrammar.TokenArrayEnd,
+					JsonGrammar.TokenValueDelim,
+					JsonGrammar.TokenArrayBegin,
+					JsonGrammar.TokenNumber(1),
+					JsonGrammar.TokenValueDelim,
+					JsonGrammar.TokenNumber(2),
+					JsonGrammar.TokenValueDelim,
+					JsonGrammar.TokenNumber(3),
+					JsonGrammar.TokenArrayEnd,
 					JsonGrammar.TokenArrayEnd
 				};
 
