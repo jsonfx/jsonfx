@@ -214,6 +214,11 @@ namespace JsonFx.CodeGen
 				// unbox the argument as a value type
 				il.Emit(OpCodes.Unbox_Any, propertyInfo.PropertyType);
 			}
+			else
+			{
+				// cast the argument as the corresponding type
+				il.Emit(OpCodes.Castclass, propertyInfo.PropertyType);
+			}
 			// Call the method that returns void
 			il.Emit(methodInfo.IsVirtual ? OpCodes.Callvirt :  OpCodes.Call, methodInfo);
 			// return (void) from the method
@@ -361,6 +366,11 @@ namespace JsonFx.CodeGen
 				// unbox the argument as a value type
 				il.Emit(OpCodes.Unbox_Any, fieldInfo.FieldType);
 			}
+			else
+			{
+				// cast the argument as the corresponding type
+				il.Emit(OpCodes.Castclass, fieldInfo.FieldType);
+			}
 			// Set the field
 			il.Emit(OpCodes.Stfld, fieldInfo);
 			// return (void) from the method
@@ -406,6 +416,22 @@ namespace JsonFx.CodeGen
 			// using a stream size larger than the IL that will be emitted.
 			ILGenerator il = dynamicMethod.GetILGenerator(64 * (args.Length+5));
 
+			//// define a label for the if statement
+			//Label jump = il.DefineLabel();
+
+			//// add a check for missing arguments
+			//il.Emit(OpCodes.Ldarg_0);
+			//il.Emit(OpCodes.Ldlen);
+			//il.Emit(OpCodes.Conv_I4);
+			//il.Emit(OpCodes.Ldc_I4, args.Length);
+			//il.Emit(OpCodes.Blt, jump);
+			//il.Emit(OpCodes.Ldstr, "Missing constructor arguments");
+			//il.Emit(OpCodes.Newobj, typeof(ArgumentOutOfRangeException));
+			//il.Emit(OpCodes.Throw);
+
+			//// set this as the destination of the jump
+			//il.MarkLabel(jump);
+
 			for (int i=0; i<args.Length; i++)
 			{
 				// Load the argument from params array onto the evaluation stack
@@ -414,10 +440,12 @@ namespace JsonFx.CodeGen
 				il.Emit(OpCodes.Ldelem_Ref);
 				if (args[i].IsValueType)
 				{
+					// unbox the argument as a value type
 					il.Emit(OpCodes.Unbox_Any, args[i]);
 				}
 				else
 				{
+					// cast the argument as the corresponding type
 					il.Emit(OpCodes.Castclass, args[i]);
 				}
 			}
