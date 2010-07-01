@@ -39,7 +39,7 @@ namespace JsonFx.CodeGen
 	/// </summary>
 	/// <param name="args"></param>
 	/// <returns></returns>
-	public delegate object CtorDelegate(params object[] args);
+	public delegate object FactoryDelegate(params object[] args);
 
 	/// <summary>
 	/// Generalized delegate for getting a field or property value
@@ -60,7 +60,7 @@ namespace JsonFx.CodeGen
 	/// </summary>
 	internal static class DynamicMethodGenerator
 	{
-		#region Dynamic Method Generators
+		#region Getter / Setter Generators
 
 		/// <summary>
 		/// Creates a field getter delegate for the specified property or field
@@ -370,20 +370,24 @@ namespace JsonFx.CodeGen
 			return (SetterDelegate)dynamicMethod.CreateDelegate(typeof(SetterDelegate));
 		}
 
+		#endregion Getter / Setter Generators
+
+		#region Type Factory Generators
+
 		/// <summary>
 		/// Creates a constructor delegate accepting specified arguments
 		/// </summary>
 		/// <param name="type"></param>
 		/// <param name="argsCount"></param>
-		/// <returns>CtorDelegate or null if constructor not found</returns>
-		public static CtorDelegate GetTypeFactory(Type type, params Type[] args)
+		/// <returns>FactoryDelegate or null if constructor not found</returns>
+		public static FactoryDelegate GetTypeFactory(Type type, params Type[] args)
 		{
 			if (type == null)
 			{
 				throw new ArgumentNullException("type");
 			}
 
-			ConstructorInfo ctor = type.GetConstructor(args);
+			ConstructorInfo ctor = type.GetConstructor(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic, null, args, null);
 			if (ctor == null)
 			{
 				return null;
@@ -408,6 +412,14 @@ namespace JsonFx.CodeGen
 				il.Emit(OpCodes.Ldarg_0);
 				il.Emit(OpCodes.Ldc_I4, i);
 				il.Emit(OpCodes.Ldelem_Ref);
+				if (args[i].IsValueType)
+				{
+					il.Emit(OpCodes.Unbox_Any, args[i]);
+				}
+				else
+				{
+					il.Emit(OpCodes.Castclass, args[i]);
+				}
 			}
 
 			// Call the ctor, passing in the stack of args, result is put back on stack
@@ -421,9 +433,9 @@ namespace JsonFx.CodeGen
 			il.Emit(OpCodes.Ret);
 
 			// produce a delegate that we can then call
-			return (CtorDelegate)dynamicMethod.CreateDelegate(typeof(CtorDelegate));
+			return (FactoryDelegate)dynamicMethod.CreateDelegate(typeof(FactoryDelegate));
 		}
 
-		#endregion Dynamic Method Generators
+		#endregion Type Factory Generators
 	}
 }

@@ -29,6 +29,7 @@
 #endregion License
 
 using System;
+using System.Linq;
 using System.Reflection;
 
 using Xunit;
@@ -43,9 +44,9 @@ namespace JsonFx.CodeGen
 		{
 			#region Fields
 
-			public string a = "aye";
-			private string b = "bee";
-			protected string c = "sea";
+			public string a;
+			private string b;
+			protected string c;
 			public int one = 1;
 			private int two = 2;
 			private int three = 3;
@@ -58,10 +59,33 @@ namespace JsonFx.CodeGen
 			/// Ctor
 			/// </summary>
 			public Example()
+				: this("aye", "bee", "sea", 1, 2, 3, "doe", "ray", "me")
 			{
-				this.Do = "doe";
-				this.Re = "ray";
-				this.Mi = "me";
+			}
+
+			/// <summary>
+			/// Ctor
+			/// </summary>
+			/// <param name="a"></param>
+			/// <param name="b"></param>
+			/// <param name="c"></param>
+			/// <param name="one"></param>
+			/// <param name="two"></param>
+			/// <param name="three"></param>
+			/// <param name="do"></param>
+			/// <param name="re"></param>
+			/// <param name="mi"></param>
+			public Example(string a, string b, string c, int one, int two, int three, string @do, string re, string mi)
+			{
+				this.a = a;
+				this.b = b;
+				this.c = c;
+				this.one = one;
+				this.two = two;
+				this.three = three;
+				this.Do = @do;
+				this.Re = re;
+				this.Mi = mi;
 			}
 
 			#endregion Init
@@ -305,11 +329,13 @@ namespace JsonFx.CodeGen
 		[Fact]
 		public void GetPropertyGetter_NullInput_ThrowsArgumentNullException()
 		{
-			Assert.Throws<ArgumentNullException>(
+			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
 				delegate()
 				{
 					GetterDelegate getter = DynamicMethodGenerator.GetPropertyGetter(null);
 				});
+
+			Assert.Equal("propertyInfo", ex.ParamName);
 		}
 
 		#endregion GetPropertyGetter Tests
@@ -508,11 +534,13 @@ namespace JsonFx.CodeGen
 		[Fact]
 		public void GetPropertySetter_NullInput_ThrowsArgumentNullException()
 		{
-			Assert.Throws<ArgumentNullException>(
+			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
 				delegate()
 				{
 					SetterDelegate setter = DynamicMethodGenerator.GetPropertySetter(null);
 				});
+
+			Assert.Equal("propertyInfo", ex.ParamName);
 		}
 
 		#endregion GetPropertySetter Tests
@@ -578,11 +606,13 @@ namespace JsonFx.CodeGen
 		[Fact]
 		public void GetFieldGetter_NullInput_ThrowsArgumentNullException()
 		{
-			Assert.Throws<ArgumentNullException>(
+			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
 				delegate()
 				{
 					GetterDelegate getter = DynamicMethodGenerator.GetFieldGetter(null);
 				});
+
+			Assert.Equal("fieldInfo", ex.ParamName);
 		}
 
 		#endregion GetFieldGetter Tests
@@ -657,13 +687,140 @@ namespace JsonFx.CodeGen
 		[Fact]
 		public void GetFieldSetter_NullInput_ThrowsArgumentNullException()
 		{
-			Assert.Throws<ArgumentNullException>(
+			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
 				delegate()
 				{
 					SetterDelegate setter = DynamicMethodGenerator.GetFieldSetter(null);
 				});
+
+			Assert.Equal("fieldInfo", ex.ParamName);
 		}
 
 		#endregion GetFieldSetter Tests
+
+		#region GetTypeFactory Tests
+
+		[Fact]
+		public void GetTypeFactory_CtorNoArgs_ReturnsCorrectlyInstantiatedObject()
+		{
+			var expected = new Example();
+
+			FactoryDelegate factory = DynamicMethodGenerator.GetTypeFactory(typeof(Example));
+			Assert.NotNull(factory);
+			var actual = (Example)factory();
+
+			var getters =
+				from m in typeof(Example).GetMembers(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic)
+				let g = DynamicMethodGenerator.GetGetter(m)
+				where (g != null)
+				select g;
+
+			foreach (GetterDelegate getter in getters)
+			{
+				// assert all of the fields and properties are equal
+				Assert.Equal(getter(expected), getter(actual));
+			}
+		}
+
+		[Fact]
+		public void GetTypeFactory_CtorAssortedArgs_ReturnsCorrectlyInstantiatedObject()
+		{
+			var expected = new Example("alpha", "bravo", "charlie", -1, -2, -3, "deer", "sun", "myself");
+
+			FactoryDelegate factory = DynamicMethodGenerator.GetTypeFactory(
+				typeof(Example),
+				typeof(string), typeof(string), typeof(string), typeof(int), typeof(int), typeof(int), typeof(string), typeof(string), typeof(string));
+			Assert.NotNull(factory);
+			var actual = (Example)factory("alpha", "bravo", "charlie", -1, -2, -3, "deer", "sun", "myself");
+
+			var getters =
+				from m in typeof(Example).GetMembers(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic)
+				let g = DynamicMethodGenerator.GetGetter(m)
+				where (g != null)
+				select g;
+
+			foreach (GetterDelegate getter in getters)
+			{
+				// assert all of the fields and properties are equal
+				Assert.Equal(getter(expected), getter(actual));
+			}
+		}
+
+		[Fact]
+		public void GetTypeFactory_CtorExtraArgs_IgnoresAndReturnsCorrectlyInstantiatedObject()
+		{
+			var expected = new Example("alpha", "bravo", "charlie", -1, -2, -3, "deer", "sun", "myself");
+
+			FactoryDelegate factory = DynamicMethodGenerator.GetTypeFactory(
+				typeof(Example),
+				typeof(string), typeof(string), typeof(string), typeof(int), typeof(int), typeof(int), typeof(string), typeof(string), typeof(string));
+			Assert.NotNull(factory);
+			var actual = (Example)factory("alpha", "bravo", "charlie", -1, -2, -3, "deer", "sun", "myself", 4, 5, 6, "extra", false);
+
+			var getters =
+				from m in typeof(Example).GetMembers(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic)
+				let g = DynamicMethodGenerator.GetGetter(m)
+				where (g != null)
+				select g;
+
+			foreach (GetterDelegate getter in getters)
+			{
+				// assert all of the fields and properties are equal
+				Assert.Equal(getter(expected), getter(actual));
+			}
+		}
+
+		[Fact]
+		public void GetTypeFactory_ArgsMismatchInBuilding_ReturnsNull()
+		{
+			FactoryDelegate factory = DynamicMethodGenerator.GetTypeFactory(
+				typeof(Example),
+				typeof(string), typeof(string), typeof(string));
+			Assert.Null(factory);
+		}
+
+		[Fact]
+		public void GetTypeFactory_ArgsMissingInCalling_ThrowsArgumentNullException()
+		{
+			FactoryDelegate factory = DynamicMethodGenerator.GetTypeFactory(
+				typeof(Example),
+				typeof(string), typeof(string), typeof(string), typeof(int), typeof(int), typeof(int), typeof(string), typeof(string), typeof(string));
+			Assert.NotNull(factory);
+
+			IndexOutOfRangeException ex = Assert.Throws<IndexOutOfRangeException>(
+				delegate()
+				{
+					var actual = (Example)factory("alpha", "bravo", "charlie", -1, -2, -3);
+				});
+		}
+
+		[Fact]
+		public void GetTypeFactory_ArgsTypeMismatchInCalling_ThrowsArgumentNullException()
+		{
+			FactoryDelegate factory = DynamicMethodGenerator.GetTypeFactory(
+				typeof(Example),
+				typeof(string), typeof(string), typeof(string), typeof(int), typeof(int), typeof(int), typeof(string), typeof(string), typeof(string));
+			Assert.NotNull(factory);
+
+			InvalidCastException ex = Assert.Throws<InvalidCastException>(
+				delegate()
+				{
+					var actual = (Example)factory(1, 2, 3, 4, 5, 6);
+				});
+		}
+
+		[Fact]
+		public void GetTypeFactory_NullInput_ThrowsArgumentNullException()
+		{
+			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
+				delegate()
+				{
+					FactoryDelegate setter = DynamicMethodGenerator.GetTypeFactory(null);
+				});
+
+			Assert.Equal("type", ex.ParamName);
+		}
+
+		#endregion GetTypeFactory Tests
 	}
 }
