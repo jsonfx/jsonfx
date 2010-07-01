@@ -586,5 +586,84 @@ namespace JsonFx.CodeGen
 		}
 
 		#endregion GetFieldGetter Tests
+
+		#region GetFieldSetter Tests
+
+		[Fact]
+		public void GetFieldSetter_PublicReferenceTypeField_ReturnsFieldValue()
+		{
+			var input = new Example();
+			var expected = "alpha";
+
+			var fieldInfo = input.GetType().GetField("a");
+			Assert.NotNull(fieldInfo);
+
+			SetterDelegate setter = DynamicMethodGenerator.GetFieldSetter(fieldInfo);
+
+			Assert.NotNull(setter);
+			setter(input, expected);
+
+			Assert.Equal(expected, input.A);
+		}
+
+		[Fact]
+		public void GetFieldSetter_ProtectedField_ReturnsFieldValue()
+		{
+			var input = new Example();
+			var expected = "charlie";
+
+			var fieldInfo = input.GetType().GetField("c", BindingFlags.NonPublic|BindingFlags.Instance);
+			Assert.NotNull(fieldInfo);
+
+			SetterDelegate setter = DynamicMethodGenerator.GetFieldSetter(fieldInfo);
+			Assert.NotNull(setter);
+			setter(input, expected);
+
+			Assert.Equal(expected, fieldInfo.GetValue(input));
+		}
+
+		[Fact]
+		public void GetFieldSetter_ValueTypeField_ReturnsFieldValue()
+		{
+			var input = new Example();
+			var expected = -1;
+
+			var fieldInfo = input.GetType().GetField("one");
+			Assert.NotNull(fieldInfo);
+
+			SetterDelegate setter = DynamicMethodGenerator.GetFieldSetter(fieldInfo);
+			Assert.NotNull(setter);
+			setter(input, expected);
+
+			Assert.Equal(expected, input.One);
+		}
+
+		[Fact]
+		public void GetFieldSetter_PrivateField_ReturnsFieldValue()
+		{
+			var input = new Example();
+			var expected = -2;
+
+			var fieldInfo = input.GetType().GetField("two", BindingFlags.NonPublic|BindingFlags.Instance);
+			Assert.NotNull(fieldInfo);
+
+			SetterDelegate setter = DynamicMethodGenerator.GetFieldSetter(fieldInfo);
+			Assert.NotNull(setter);
+			setter(input, expected);
+
+			Assert.Equal(expected, fieldInfo.GetValue(input));
+		}
+
+		[Fact]
+		public void GetFieldSetter_NullInput_ThrowsArgumentNullException()
+		{
+			Assert.Throws<ArgumentNullException>(
+				delegate()
+				{
+					SetterDelegate setter = DynamicMethodGenerator.GetFieldSetter(null);
+				});
+		}
+
+		#endregion GetFieldSetter Tests
 	}
 }
