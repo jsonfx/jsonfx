@@ -157,6 +157,33 @@ namespace JsonFx.CodeGen
 			}
 
 			#endregion Properties
+
+			#region Methods
+
+			public void Reset(string a, string b, string c, int one, int two, int three, string @do, string re, string mi)
+			{
+				this.a = a;
+				this.b = b;
+				this.c = c;
+				this.one = one;
+				this.two = two;
+				this.three = three;
+				this.Do = @do;
+				this.Re = re;
+				this.Mi = mi;
+			}
+
+			public string GetMi()
+			{
+				return this.Mi;
+			}
+
+			public string Swap(string a)
+			{
+				return System.Threading.Interlocked.Exchange(ref this.a, a);
+			}
+
+			#endregion Methods
 		}
 
 		#endregion Test Types
@@ -697,6 +724,119 @@ namespace JsonFx.CodeGen
 		}
 
 		#endregion GetFieldSetter Tests
+
+		#region GetMethodProxy Tests
+
+		[Fact]
+		public void GetMethodProxy_MethodNoArgsOneReturn_BuildsProxyAndInvokes()
+		{
+			var input = new Example();
+
+			ProxyDelegate proxy = DynamicMethodGenerator.GetMethodProxy(typeof(Example).GetMethod("GetMi"));
+			Assert.NotNull(proxy);
+			var actual = (string)proxy(input);
+
+			Assert.Equal("me", actual);
+		}
+
+		[Fact]
+		public void GetMethodProxy_MethodOneArgOneReturn_BuildsProxyAndInvokes()
+		{
+			var input = new Example();
+
+			ProxyDelegate proxy = DynamicMethodGenerator.GetMethodProxy(typeof(Example).GetMethod("Swap"));
+			Assert.NotNull(proxy);
+			var actual = (string)proxy(input, "foo");
+
+			Assert.Equal("aye", actual);
+			Assert.Equal("foo", input.A);
+		}
+
+		[Fact]
+		public void GetMethodProxy_MethodAssortedArgsVoidReturn_BuildsProxyAndInvokes()
+		{
+			var input = new Example();
+			var expected = new Example("alpha", "bravo", "charlie", -1, -2, -3, "deer", "sun", "myself");
+
+			ProxyDelegate proxy = DynamicMethodGenerator.GetMethodProxy(typeof(Example).GetMethod("Reset"));
+			Assert.NotNull(proxy);
+			proxy(input, "alpha", "bravo", "charlie", -1, -2, -3, "deer", "sun", "myself");
+
+			var getters =
+				from m in typeof(Example).GetMembers(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic)
+				let g = DynamicMethodGenerator.GetGetter(m)
+				where (g != null)
+				select g;
+
+			foreach (GetterDelegate getter in getters)
+			{
+				// assert all of the fields and properties are equal
+				Assert.Equal(getter(expected), getter(input));
+			}
+		}
+
+		[Fact]
+		public void GetMethodProxy_MethodExtraArgs_IgnoresExtraBuildsProxyAndInvokes()
+		{
+			var input = new Example();
+			var expected = new Example("alpha", "bravo", "charlie", -1, -2, -3, "deer", "sun", "myself");
+
+			ProxyDelegate proxy = DynamicMethodGenerator.GetMethodProxy(typeof(Example).GetMethod("Reset"));
+			Assert.NotNull(proxy);
+			proxy(input, "alpha", "bravo", "charlie", -1, -2, -3, "deer", "sun", "myself", 4, 5, 6, "extra", false);
+
+			var getters =
+				from m in typeof(Example).GetMembers(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic)
+				let g = DynamicMethodGenerator.GetGetter(m)
+				where (g != null)
+				select g;
+
+			foreach (GetterDelegate getter in getters)
+			{
+				// assert all of the fields and properties are equal
+				Assert.Equal(getter(expected), getter(input));
+			}
+		}
+
+		[Fact]
+		public void GetMethodProxy_ArgsMissingWhenCalling_ThrowsArgumentNullException()
+		{
+			ProxyDelegate proxy = DynamicMethodGenerator.GetMethodProxy(typeof(Example).GetMethod("Reset"));
+			Assert.NotNull(proxy);
+
+			ArgumentException ex = Assert.Throws<ArgumentException>(
+				delegate()
+				{
+					var actual = proxy(new Example(), "alpha", "bravo", "charlie", -1, -2, -3);
+				});
+		}
+
+		[Fact]
+		public void GetMethodProxy_ArgsTypeMismatchWhenCalling_ThrowsArgumentNullException()
+		{
+			ProxyDelegate proxy = DynamicMethodGenerator.GetMethodProxy(typeof(Example).GetMethod("Reset"));
+			Assert.NotNull(proxy);
+
+			InvalidCastException ex = Assert.Throws<InvalidCastException>(
+				delegate()
+				{
+					proxy(new Example(), 1, 2, 3, 4, 5, 6, 7, 8, 9);
+				});
+		}
+
+		[Fact]
+		public void GetMethodProxy_NullInput_ThrowsArgumentNullException()
+		{
+			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
+				delegate()
+				{
+					ProxyDelegate setter = DynamicMethodGenerator.GetMethodProxy(null);
+				});
+
+			Assert.Equal("methodInfo", ex.ParamName);
+		}
+
+		#endregion GetMethodProxy Tests
 
 		#region GetTypeFactory Tests
 

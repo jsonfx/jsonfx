@@ -42,6 +42,14 @@ namespace JsonFx.CodeGen
 	public delegate object FactoryDelegate(params object[] args);
 
 	/// <summary>
+	/// Generalized delegate for invoking a method
+	/// </summary>
+	/// <param name="target">the instance object</param>
+	/// <param name="args">the method parameters</param>
+	/// <returns></returns>
+	public delegate object ProxyDelegate(object target, params object[] args);
+
+	/// <summary>
 	/// Generalized delegate for getting a field or property value
 	/// </summary>
 	/// <param name="target"></param>
@@ -397,6 +405,124 @@ namespace JsonFx.CodeGen
 
 		#endregion Getter / Setter Generators
 
+		#region Method Generators
+
+		/// <summary>
+		/// Creates a proxy delegate accepting a target instance and corresponding arguments
+		/// </summary>
+		/// <param name="methodInfo">method to proxy</param>
+		/// <returns>ProxyDelegate or null if cannot be invoked</returns>
+		/// <remarks>
+		/// Note: use with caution this method will expose private and protected methods without safety checks.
+		/// </remarks>
+		public static ProxyDelegate GetMethodProxy(MethodInfo methodInfo)
+		{
+			if (methodInfo == null)
+			{
+				throw new ArgumentNullException("methodInfo");
+			}
+
+			if (methodInfo.IsAbstract)
+			{
+				return null;
+			}
+
+			// Create a dynamic method with a return type of object and one parameter for each argument.
+			// Create the method in the module that owns the instance type
+			DynamicMethod dynamicMethod = new DynamicMethod(
+				"",//methodInfo.DeclaringType.FullName+"."+methodInfo.Name,,
+				typeof(object),
+				new Type[] { typeof(object), typeof(object[]) },
+				methodInfo.DeclaringType.Module,
+				true);
+
+			ParameterInfo[] args = methodInfo.GetParameters();
+
+			// Get an ILGenerator and emit a body for the dynamic method,
+			// using a stream size larger than the IL that will be emitted.
+			ILGenerator il = dynamicMethod.GetILGenerator(64 * (args.Length+15));
+
+			// define a label for the if statement
+			Label jump = il.DefineLabel();
+
+			// add a check for missing arguments
+			// if (params.Length >= N) goto label;
+			il.Emit(OpCodes.Ldarg_1);
+			il.Emit(OpCodes.Ldlen);
+			il.Emit(OpCodes.Conv_I4);
+			il.Emit(OpCodes.Ldc_I4, args.Length);
+			il.Emit(OpCodes.Bge_S, jump);
+
+			// throw new ArgumentException("Missing method arguments");
+			il.Emit(OpCodes.Ldstr, "Missing method arguments");
+			il.Emit(OpCodes.Newobj, typeof(ArgumentException).GetConstructor(new Type[] { typeof(string) }));
+			il.Emit(OpCodes.Throw);
+
+			// set this as the destination of the jump
+			il.MarkLabel(jump);
+
+			if (methodInfo.IsStatic)
+			{
+				// TODO: what goes here?
+			}
+			else
+			{
+				// Load the target instance onto the evaluation stack
+				il.Emit(OpCodes.Ldarg_0);
+			}
+
+			for (int i=0; i<args.Length; i++)
+			{
+				ParameterInfo arg = args[i];
+				Type argType = arg.ParameterType;
+
+				if (arg.IsOut)
+				{
+					throw new NotSupportedException("GetProxyMethod does not support out parameters.");
+				}
+
+				// Load the argument from params array onto the evaluation stack
+				il.Emit(OpCodes.Ldarg_1);
+				il.Emit(OpCodes.Ldc_I4, arg.Position);
+				il.Emit(OpCodes.Ldelem_Ref);
+				if (argType.IsValueType)
+				{
+					// unbox the argument as a value type
+					il.Emit(OpCodes.Unbox_Any, argType);
+				}
+				else
+				{
+					// cast the argument as the corresponding type
+					il.Emit(OpCodes.Castclass, argType);
+				}
+			}
+
+			// Call the ctor, passing in the stack of args, result is put back on stack
+			// Call the method and return result
+			il.Emit(methodInfo.IsVirtual ? OpCodes.Callvirt :  OpCodes.Call, methodInfo);
+
+			if (methodInfo.ReturnType == typeof(void))
+			{
+				// no return type so load null to return
+				il.Emit(OpCodes.Ldnull);
+			}
+			else
+			{
+				if (methodInfo.ReturnType.IsValueType)
+				{
+					// box the return value as a reference type
+					il.Emit(OpCodes.Box, methodInfo.ReturnType);
+				}
+			}
+			// return any result from the method
+			il.Emit(OpCodes.Ret);
+
+			// produce a delegate that we can then call
+			return (ProxyDelegate)dynamicMethod.CreateDelegate(typeof(ProxyDelegate));
+		}
+
+		#endregion Method Generators
+
 		#region Type Factory Generators
 
 		/// <summary>
@@ -432,7 +558,7 @@ namespace JsonFx.CodeGen
 
 			// Get an ILGenerator and emit a body for the dynamic method,
 			// using a stream size larger than the IL that will be emitted.
-			ILGenerator il = dynamicMethod.GetILGenerator(64 * (args.Length+5));
+			ILGenerator il = dynamicMethod.GetILGenerator(64 * (args.Length+15));
 
 			// define a label for the if statement
 			Label jump = il.DefineLabel();
