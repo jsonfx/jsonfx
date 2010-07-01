@@ -89,6 +89,7 @@
     <Compile Include="Serialization\DataSpecifiedPropertyAttribute.cs" />
     <Compile Include="Serialization\DataWriterSettings.cs" />
     <Compile Include="Serialization\DataWriter`1.cs" />
+    <Compile Include="CodeGen\DynamicMethodGenerator.cs" />
     <Compile Include="Serialization\Exceptions.cs" />
     <Compile Include="Serialization\IDataFormatter`1.cs" />
     <Compile Include="Serialization\IDataGenerator`1.cs" />
