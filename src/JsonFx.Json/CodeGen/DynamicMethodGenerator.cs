@@ -63,6 +63,46 @@ namespace JsonFx.CodeGen
 		#region Dynamic Method Generators
 
 		/// <summary>
+		/// Creates a field getter delegate for the specified property or field
+		/// </summary>
+		/// <param name="memberInfo">PropertyInfo or FieldInfo</param>
+		/// <returns>GetterDelegate for property or field, null otherwise</returns>
+		public static GetterDelegate GetGetter(MemberInfo memberInfo)
+		{
+			if (memberInfo is PropertyInfo)
+			{
+				return DynamicMethodGenerator.GetPropertyGetter((PropertyInfo)memberInfo);
+			}
+
+			if (memberInfo is FieldInfo)
+			{
+				return DynamicMethodGenerator.GetFieldGetter((FieldInfo)memberInfo);
+			}
+
+			return null;
+		}
+
+		/// <summary>
+		/// Creates a field setter delegate for the specified property or field
+		/// </summary>
+		/// <param name="memberInfo">PropertyInfo or FieldInfo</param>
+		/// <returns>SetterDelegate for property or field, null otherwise</returns>
+		public static SetterDelegate GetSetter(MemberInfo memberInfo)
+		{
+			if (memberInfo is PropertyInfo)
+			{
+				return DynamicMethodGenerator.GetPropertySetter((PropertyInfo)memberInfo);
+			}
+
+			if (memberInfo is FieldInfo)
+			{
+				return DynamicMethodGenerator.GetFieldSetter((FieldInfo)memberInfo);
+			}
+
+			return null;
+		}
+
+		/// <summary>
 		/// Creates a property getter delegate for the specified property
 		/// </summary>
 		/// <param name="propertyInfo"></param>
