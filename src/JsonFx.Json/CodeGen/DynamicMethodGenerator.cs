@@ -483,7 +483,7 @@ namespace JsonFx.CodeGen
 
 				// Load the argument from params array onto the evaluation stack
 				il.Emit(OpCodes.Ldarg_1);
-				il.Emit(OpCodes.Ldc_I4, arg.Position);
+				il.Emit(OpCodes.Ldc_I4, i);
 				il.Emit(OpCodes.Ldelem_Ref);
 				if (argType.IsValueType)
 				{
@@ -547,6 +547,28 @@ namespace JsonFx.CodeGen
 				return null;
 			}
 
+			return DynamicMethodGenerator.GetTypeFactory(ctor);
+		}
+
+		/// <summary>
+		/// Creates a constructor delegate accepting specified arguments
+		/// </summary>
+		/// <param name="type">type to be created</param>
+		/// <param name="args">constructor arguments type list</param>
+		/// <returns>FactoryDelegate or null if constructor not found</returns>
+		/// <remarks>
+		/// Note: use with caution this method will expose private and protected constructors without safety checks.
+		/// </remarks>
+		public static FactoryDelegate GetTypeFactory(ConstructorInfo ctor)
+		{
+			if (ctor == null)
+			{
+				throw new ArgumentNullException("ctor");
+			}
+
+			Type type = ctor.DeclaringType;
+			ParameterInfo[] args = ctor.GetParameters();
+
 			// Create a dynamic method with a return type of object and one parameter for each argument.
 			// Create the method in the module that owns the instance type
 			DynamicMethod dynamicMethod = new DynamicMethod(
@@ -581,19 +603,21 @@ namespace JsonFx.CodeGen
 
 			for (int i=0; i<args.Length; i++)
 			{
+				Type argType = args[i].ParameterType;
+
 				// Load the argument from params array onto the evaluation stack
 				il.Emit(OpCodes.Ldarg_0);
 				il.Emit(OpCodes.Ldc_I4, i);
 				il.Emit(OpCodes.Ldelem_Ref);
-				if (args[i].IsValueType)
+				if (argType.IsValueType)
 				{
 					// unbox the argument as a value type
-					il.Emit(OpCodes.Unbox_Any, args[i]);
+					il.Emit(OpCodes.Unbox_Any, argType);
 				}
 				else
 				{
 					// cast the argument as the corresponding type
-					il.Emit(OpCodes.Castclass, args[i]);
+					il.Emit(OpCodes.Castclass, argType);
 				}
 			}
 

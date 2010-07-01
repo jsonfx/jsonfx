@@ -950,15 +950,27 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
-		public void GetTypeFactory_NullInput_ThrowsArgumentNullException()
+		public void GetTypeFactory_NullTypeInput_ThrowsArgumentNullException()
 		{
 			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
 				delegate()
 				{
-					FactoryDelegate setter = DynamicMethodGenerator.GetTypeFactory(null);
+					FactoryDelegate setter = DynamicMethodGenerator.GetTypeFactory((Type)null);
 				});
 
 			Assert.Equal("type", ex.ParamName);
+		}
+
+		[Fact]
+		public void GetTypeFactory_NullCtorInput_ThrowsArgumentNullException()
+		{
+			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
+				delegate()
+				{
+					FactoryDelegate setter = DynamicMethodGenerator.GetTypeFactory((ConstructorInfo)null);
+				});
+
+			Assert.Equal("ctor", ex.ParamName);
 		}
 
 		#endregion GetTypeFactory Tests
