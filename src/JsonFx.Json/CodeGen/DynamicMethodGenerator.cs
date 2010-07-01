@@ -89,10 +89,10 @@ namespace JsonFx.CodeGen
 			}
 			// Call the method that returns void
 			il.Emit(methodInfo.IsVirtual ? OpCodes.Callvirt :  OpCodes.Call, methodInfo);
-			if (methodInfo.ReturnType.IsValueType)
+			if (propertyInfo.PropertyType.IsValueType)
 			{
 				// Load the return value as a reference type
-				il.Emit(OpCodes.Box, methodInfo.ReturnType);
+				il.Emit(OpCodes.Box, propertyInfo.PropertyType);
 			}
 			// return property value from the method
 			il.Emit(OpCodes.Ret);
@@ -149,6 +149,11 @@ namespace JsonFx.CodeGen
 			}
 			// Load the argument onto the evaluation stack
 			il.Emit(OpCodes.Ldarg_1);
+			if (propertyInfo.PropertyType.IsValueType)
+			{
+				// unbox the argument as a value type
+				il.Emit(OpCodes.Unbox_Any, propertyInfo.PropertyType);
+			}
 			// Call the method that returns void
 			il.Emit(methodInfo.IsVirtual ? OpCodes.Callvirt :  OpCodes.Call, methodInfo);
 			// return (void) from the method
@@ -243,7 +248,7 @@ namespace JsonFx.CodeGen
 				il.Emit(OpCodes.Ldarg_0);
 				// Load the field
 				il.Emit(OpCodes.Ldfld, fieldInfo);
-				if (fieldInfo.DeclaringType.IsValueType)
+				if (fieldInfo.FieldType.IsValueType)
 				{
 					// box the field value as a reference type
 					il.Emit(OpCodes.Box, fieldInfo.DeclaringType);
@@ -291,6 +296,11 @@ namespace JsonFx.CodeGen
 			il.Emit(OpCodes.Ldarg_0);
 			// Load the argument onto the evaluation stack
 			il.Emit(OpCodes.Ldarg_1);
+			if (fieldInfo.FieldType.IsValueType)
+			{
+				// unbox the argument as a value type
+				il.Emit(OpCodes.Unbox_Any, fieldInfo.FieldType);
+			}
 			// Set the field
 			il.Emit(OpCodes.Stfld, fieldInfo);
 			// return (void) from the method
