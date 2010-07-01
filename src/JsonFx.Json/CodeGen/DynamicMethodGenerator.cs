@@ -59,7 +59,7 @@ namespace JsonFx.CodeGen
 				return null;
 			}
 
-			MethodInfo methodInfo = propertyInfo.GetGetMethod();
+			MethodInfo methodInfo = propertyInfo.GetGetMethod(true);
 			if (methodInfo == null ||
 				methodInfo.IsAbstract)
 			{
@@ -118,7 +118,7 @@ namespace JsonFx.CodeGen
 				return null;
 			}
 
-			MethodInfo methodInfo = propertyInfo.GetSetMethod();
+			MethodInfo methodInfo = propertyInfo.GetSetMethod(true);
 			if (methodInfo == null ||
 				methodInfo.IsAbstract)
 			{

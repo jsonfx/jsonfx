@@ -29,12 +29,9 @@
 #endregion License
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Reflection;
 
 using Xunit;
-using Xunit.Sdk;
 
 namespace JsonFx.CodeGen
 {
@@ -42,35 +39,94 @@ namespace JsonFx.CodeGen
 	{
 		#region Test Types
 
-		public class Example
+		private class Example
 		{
-			public Example(
-				string a, string b, string c, string d, string e,
-				int one, int two, int three, int four, int five)
+			#region Fields
+
+			private string a = "aye";
+			private string b = "bee";
+			private string c = "sea";
+			private int one = 1;
+			private int two = 2;
+			private int three = 3;
+
+			#endregion Fields
+
+			#region Init
+
+			/// <summary>
+			/// Ctor
+			/// </summary>
+			public Example()
 			{
-				this.A = a;
-				this.B = b;
-				this.C = c;
-				this.D = d;
-				this.E = e;
-				this.One = one;
-				this.Two = two;
-				this.Three = three;
-				this.Four = four;
-				this.Five = five;
+				this.Do = "doe";
+				this.Re = "ray";
+				this.Mi = "me";
 			}
 
-			public string A { get; set; }
-			public virtual string B { get; set; }
-			protected string C { get; set; }
-			protected virtual string D { get; set; }
-			private string E { get; set; }
+			#endregion Init
 
-			public int One { get; set; }
-			public virtual int Two { get; set; }
-			protected int Three { get; set; }
-			protected virtual int Four { get; set; }
-			private int Five { get; set; }
+			#region Properties
+
+			public string A
+			{
+				get { return this.a; }
+				set { this.a = value; }
+			}
+
+			public virtual string B
+			{
+				get { return this.b; }
+				set { this.b = value; }
+			}
+
+			protected string C
+			{
+				get { return this.c; }
+				set { this.c = value; }
+			}
+
+			public int One
+			{
+				get { return this.one; }
+				set { this.one = value; }
+			}
+
+			private int Two
+			{
+				get { return this.two; }
+				set { this.two = value; }
+			}
+
+			public int Three_Getter
+			{
+				get { return this.three; }
+			}
+
+			public int Three_Setter
+			{
+				set { this.three = value; }
+			}
+
+			public string Do
+			{
+				get;
+				set;
+			}
+
+			public string Re
+			{
+				get;
+				private set;
+			}
+
+			public string Mi
+			{
+				private get;
+				set;
+			}
+
+			#endregion Properties
 		}
 
 		#endregion Test Types
@@ -78,67 +134,167 @@ namespace JsonFx.CodeGen
 		#region GetPropertyGetter Tests
 
 		[Fact]
-		public void GetPropertyGetter_AnonymousObjectWithPublicValueTypeProperty_ReturnsValueType()
+		public void GetPropertyGetter_PublicReferenceTypeProperty_ReturnsPropertyValue()
 		{
-			var input = new
-			{
-				A = "aye",
-				B = "bee",
-				C = "sea",
-				One = 1,
-				Two = 2,
-				Three = 3
-			};
+			var input = new Example();
 
-			var propertyInfo = input.GetType().GetProperty("Two");
+			var propertyInfo = input.GetType().GetProperty("A");
+			Assert.NotNull(propertyInfo);
 
 			GetterDelegate getter = DynamicMethodGenerator.GetPropertyGetter(propertyInfo);
 
-			Assert.Equal(2, getter(input));
+			Assert.NotNull(getter);
+			Assert.Equal("aye", getter(input));
 		}
 
 		[Fact]
-		public void GetPropertyGetter_AnonymousObjectWithPublicReferenceTypeProperty_ReturnsReferenceType()
+		public void GetPropertyGetter_VirtualProperty_ReturnsPropertyValue()
 		{
-			var input = new
-			{
-				A = "aye",
-				B = "bee",
-				C = "sea",
-				One = 1,
-				Two = 2,
-				Three = 3
-			};
+			var input = new Example();
 
-			var propertyInfo = input.GetType().GetProperty("C");
+			var propertyInfo = input.GetType().GetProperty("B");
+			Assert.NotNull(propertyInfo);
 
 			GetterDelegate getter = DynamicMethodGenerator.GetPropertyGetter(propertyInfo);
 
+			Assert.NotNull(getter);
+			Assert.Equal("bee", getter(input));
+		}
+
+		[Fact]
+		public void GetPropertyGetter_ProtectedProperty_ReturnsPropertyValue()
+		{
+			var input = new Example();
+
+			var propertyInfo = input.GetType().GetProperty("C", BindingFlags.NonPublic|BindingFlags.Instance);
+			Assert.NotNull(propertyInfo);
+
+			GetterDelegate getter = DynamicMethodGenerator.GetPropertyGetter(propertyInfo);
+
+			Assert.NotNull(getter);
 			Assert.Equal("sea", getter(input));
 		}
 
 		[Fact]
-		public void GetPropertyGetter_ClassWithPublicValueTypeProperty_ReturnsValueType()
+		public void GetPropertyGetter_ValueTypeProperty_ReturnsPropertyValue()
 		{
-			var input = new Example("aye", "bee", "sea", "dee", "yi", 1, 2, 3, 4, 5);
+			var input = new Example();
 
 			var propertyInfo = input.GetType().GetProperty("One");
+			Assert.NotNull(propertyInfo);
 
 			GetterDelegate getter = DynamicMethodGenerator.GetPropertyGetter(propertyInfo);
 
+			Assert.NotNull(getter);
 			Assert.Equal(1, getter(input));
 		}
 
 		[Fact]
-		public void GetPropertyGetter_ClassWithPublicReferenceTypeProperty_ReturnsReferenceType()
+		public void GetPropertyGetter_PrivateProperty_ReturnsPropertyValue()
 		{
-			var input = new Example("aye", "bee", "sea", "dee", "yi", 1, 2, 3, 4, 5);
+			var input = new Example();
 
-			var propertyInfo = input.GetType().GetProperty("A");
+			var propertyInfo = input.GetType().GetProperty("Two", BindingFlags.NonPublic|BindingFlags.Instance);
+			Assert.NotNull(propertyInfo);
 
 			GetterDelegate getter = DynamicMethodGenerator.GetPropertyGetter(propertyInfo);
 
-			Assert.Equal("aye", getter(input));
+			Assert.NotNull(getter);
+			Assert.Equal(2, getter(input));
+		}
+
+		[Fact]
+		public void GetPropertyGetter_GetterOnlyProperty_ReturnsPropertyValue()
+		{
+			var input = new Example();
+
+			var propertyInfo = input.GetType().GetProperty("Three_Getter");
+			Assert.NotNull(propertyInfo);
+
+			GetterDelegate getter = DynamicMethodGenerator.GetPropertyGetter(propertyInfo);
+
+			Assert.NotNull(getter);
+			Assert.Equal(3, getter(input));
+		}
+
+		[Fact]
+		public void GetPropertyGetter_SetterOnlyProperty_ReturnsPropertyValue()
+		{
+			var input = new Example();
+
+			var propertyInfo = input.GetType().GetProperty("Three_Setter");
+			Assert.NotNull(propertyInfo);
+
+			GetterDelegate getter = DynamicMethodGenerator.GetPropertyGetter(propertyInfo);
+
+			Assert.Null(getter);
+		}
+
+		[Fact]
+		public void GetPropertyGetter_AutoImplementedProperty_ReturnsPropertyValue()
+		{
+			var input = new Example();
+
+			var propertyInfo = input.GetType().GetProperty("Do");
+			Assert.NotNull(propertyInfo);
+
+			GetterDelegate getter = DynamicMethodGenerator.GetPropertyGetter(propertyInfo);
+
+			Assert.NotNull(getter);
+			Assert.Equal("doe", getter(input));
+		}
+
+		[Fact]
+		public void GetPropertyGetter_PrivateSetterProperty_ReturnsPropertyValue()
+		{
+			var input = new Example();
+
+			var propertyInfo = input.GetType().GetProperty("Re");
+			Assert.NotNull(propertyInfo);
+
+			GetterDelegate getter = DynamicMethodGenerator.GetPropertyGetter(propertyInfo);
+
+			Assert.NotNull(getter);
+			Assert.Equal("ray", getter(input));
+		}
+
+		[Fact]
+		public void GetPropertyGetter_PrivateGetterProperty_ReturnsPropertyValue()
+		{
+			var input = new Example();
+
+			var propertyInfo = input.GetType().GetProperty("Mi");
+			Assert.NotNull(propertyInfo);
+
+			GetterDelegate getter = DynamicMethodGenerator.GetPropertyGetter(propertyInfo);
+
+			Assert.NotNull(getter);
+			Assert.Equal("me", getter(input));
+		}
+
+		[Fact]
+		public void GetPropertyGetter_AnonymousObjectProperty_ReturnsPropertyValue()
+		{
+			var input = new
+			{
+				A = "aye",
+				B = "bee",
+				C = "sea",
+				One = 1,
+				Two = 2,
+				Three = 3,
+				Do = "doe",
+				Re = "ray",
+				Mi = "me"
+			};
+
+			var propertyInfo = input.GetType().GetProperty("Two");
+			Assert.NotNull(propertyInfo);
+
+			GetterDelegate getter = DynamicMethodGenerator.GetPropertyGetter(propertyInfo);
+
+			Assert.NotNull(getter);
+			Assert.Equal(2, getter(input));
 		}
 
 		[Fact]
