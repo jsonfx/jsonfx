@@ -8,7 +8,7 @@ namespace JsonFx.CodeGen
 	public delegate object GetterDelegate(object target);
 	public delegate void SetterDelegate(object target, object value);
 
-	internal class DynamicMethodGenerator
+	internal static class DynamicMethodGenerator
 	{
 		#region Dynamic Method Generators
 
@@ -26,7 +26,7 @@ namespace JsonFx.CodeGen
 
 			MethodInfo methodInfo = propertyInfo.GetGetMethod();
 
-			// Create a dynamic method with a return type of object, and one parameter taking the instance
+			// Create a dynamic method with a return type of object, and one parameter taking the instance.
 			// Create the method in the module that owns the instance type
 			DynamicMethod dynamicMethod = new DynamicMethod(
 				propertyInfo.DeclaringType.FullName+".get_"+propertyInfo.Name,
@@ -100,7 +100,7 @@ namespace JsonFx.CodeGen
 				throw new ArgumentNullException("fieldInfo");
 			}
 
-			// Create a dynamic method with a return type of void, one parameter taking the instance and the other taking the new value.
+			// Create a dynamic method with a return type of object, one parameter taking the instance.
 			// Create the method in the module that owns the instance type
 			DynamicMethod dynamicMethod = new DynamicMethod(
 				fieldInfo.DeclaringType.FullName+".get_"+fieldInfo.Name,
@@ -179,7 +179,7 @@ namespace JsonFx.CodeGen
 				return null;
 			}
 
-			// Create a dynamic method with a return type of void, one parameter taking the instance and the other taking the new value.
+			// Create a dynamic method with a return type of object and one parameter for each argument.
 			// Create the method in the module that owns the instance type
 			DynamicMethod dynamicMethod = new DynamicMethod(
 				type.FullName+".ctor_"+args.Length,
