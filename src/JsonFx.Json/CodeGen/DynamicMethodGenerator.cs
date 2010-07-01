@@ -60,7 +60,8 @@ namespace JsonFx.CodeGen
 			}
 
 			MethodInfo methodInfo = propertyInfo.GetGetMethod();
-			if (methodInfo.IsAbstract)
+			if (methodInfo == null ||
+				methodInfo.IsAbstract)
 			{
 				return null;
 			}
@@ -68,7 +69,7 @@ namespace JsonFx.CodeGen
 			// Create a dynamic method with a return type of object, and one parameter taking the instance.
 			// Create the method in the module that owns the instance type
 			DynamicMethod dynamicMethod = new DynamicMethod(
-				propertyInfo.DeclaringType.FullName+".get_"+propertyInfo.Name,
+				"",//propertyInfo.DeclaringType.FullName+".get_"+propertyInfo.Name,
 				typeof(object),
 				new Type[] { typeof(object) },
 				propertyInfo.DeclaringType.Module,
@@ -77,11 +78,23 @@ namespace JsonFx.CodeGen
 			// Get an ILGenerator and emit a body for the dynamic method,
 			// using a stream size larger than the IL that will be emitted.
 			ILGenerator il = dynamicMethod.GetILGenerator(64 * 5);
-			// Load the target instance onto the evaluation stack
-			il.Emit(OpCodes.Ldarg_0);
+			if (methodInfo.IsStatic)
+			{
+				// TODO: what goes here?
+			}
+			else
+			{
+				// Load the target instance onto the evaluation stack
+				il.Emit(OpCodes.Ldarg_0);
+			}
 			// Call the method that returns void
 			il.Emit(methodInfo.IsVirtual ? OpCodes.Callvirt :  OpCodes.Call, methodInfo);
-			// return from the method
+			if (methodInfo.ReturnType.IsValueType)
+			{
+				// Load the return value as a reference type
+				il.Emit(OpCodes.Box, methodInfo.ReturnType);
+			}
+			// return property value from the method
 			il.Emit(OpCodes.Ret);
 
 			// produce a delegate that we can then call
@@ -106,7 +119,8 @@ namespace JsonFx.CodeGen
 			}
 
 			MethodInfo methodInfo = propertyInfo.GetSetMethod();
-			if (methodInfo.IsAbstract)
+			if (methodInfo == null ||
+				methodInfo.IsAbstract)
 			{
 				return null;
 			}
@@ -114,7 +128,7 @@ namespace JsonFx.CodeGen
 			// Create a dynamic method with a return type of void, one parameter taking the instance and the other taking the new value.
 			// Create the method in the module that owns the instance type
 			DynamicMethod dynamicMethod = new DynamicMethod(
-				propertyInfo.DeclaringType.FullName+".set_"+propertyInfo.Name,
+				"",//propertyInfo.DeclaringType.FullName+".set_"+propertyInfo.Name,
 				null,
 				new Type[] { typeof(object), typeof(object) },
 				propertyInfo.DeclaringType.Module,
@@ -124,13 +138,20 @@ namespace JsonFx.CodeGen
 			// using a stream size larger than the IL that will be emitted.
 			ILGenerator il = dynamicMethod.GetILGenerator(64 * 5);
 
-			// Load the target instance onto the evaluation stack
-			il.Emit(OpCodes.Ldarg_0);
+			if (methodInfo.IsStatic)
+			{
+				// TODO: what goes here?
+			}
+			else
+			{
+				// Load the target instance onto the evaluation stack
+				il.Emit(OpCodes.Ldarg_0);
+			}
 			// Load the argument onto the evaluation stack
 			il.Emit(OpCodes.Ldarg_1);
 			// Call the method that returns void
 			il.Emit(methodInfo.IsVirtual ? OpCodes.Callvirt :  OpCodes.Call, methodInfo);
-			// return from the method
+			// return (void) from the method
 			il.Emit(OpCodes.Ret);
 
 			// produce a delegate that we can then call
@@ -152,7 +173,7 @@ namespace JsonFx.CodeGen
 			// Create a dynamic method with a return type of object, one parameter taking the instance.
 			// Create the method in the module that owns the instance type
 			DynamicMethod dynamicMethod = new DynamicMethod(
-				fieldInfo.DeclaringType.FullName+".get_"+fieldInfo.Name,
+				"",//fieldInfo.DeclaringType.FullName+".get_"+fieldInfo.Name,
 				typeof(object),
 				new Type[] { typeof(object) },
 				fieldInfo.DeclaringType.Module,
@@ -213,7 +234,7 @@ namespace JsonFx.CodeGen
 					}
 				}
 
-				// Load the field value
+				// Load the field value as a reference type
 				il.Emit(OpCodes.Box, fieldInfo.DeclaringType);
 			}
 			else
@@ -222,8 +243,13 @@ namespace JsonFx.CodeGen
 				il.Emit(OpCodes.Ldarg_0);
 				// Load the field
 				il.Emit(OpCodes.Ldfld, fieldInfo);
+				if (fieldInfo.DeclaringType.IsValueType)
+				{
+					// box the field value as a reference type
+					il.Emit(OpCodes.Box, fieldInfo.DeclaringType);
+				}
 			}
-			// return from the method
+			// return field value from the method
 			il.Emit(OpCodes.Ret);
 
 			// produce a delegate that we can then call
@@ -242,7 +268,8 @@ namespace JsonFx.CodeGen
 				throw new ArgumentNullException("fieldInfo");
 			}
 
-			if (fieldInfo.IsInitOnly)
+			if (fieldInfo.IsInitOnly ||
+				fieldInfo.IsLiteral)
 			{
 				return null;
 			}
@@ -250,7 +277,7 @@ namespace JsonFx.CodeGen
 			// Create a dynamic method with a return type of void, one parameter taking the instance and the other taking the new value.
 			// Create the method in the module that owns the instance type
 			DynamicMethod dynamicMethod = new DynamicMethod(
-				fieldInfo.DeclaringType.FullName+".set_"+fieldInfo.Name,
+				"",//fieldInfo.DeclaringType.FullName+".set_"+fieldInfo.Name,
 				null,
 				new Type[] { typeof(object), typeof(object) },
 				fieldInfo.DeclaringType.Module,
@@ -266,7 +293,7 @@ namespace JsonFx.CodeGen
 			il.Emit(OpCodes.Ldarg_1);
 			// Set the field
 			il.Emit(OpCodes.Stfld, fieldInfo);
-			// return from the method
+			// return (void) from the method
 			il.Emit(OpCodes.Ret);
 
 			// produce a delegate that we can then call
@@ -295,7 +322,7 @@ namespace JsonFx.CodeGen
 			// Create a dynamic method with a return type of object and one parameter for each argument.
 			// Create the method in the module that owns the instance type
 			DynamicMethod dynamicMethod = new DynamicMethod(
-				type.FullName+".ctor_"+args.Length,
+				"",//type.FullName+".ctor_"+args.Length,
 				typeof(object),
 				new Type[] { typeof(object[]) },
 				type.Module,
@@ -315,6 +342,11 @@ namespace JsonFx.CodeGen
 
 			// Call the ctor, passing in the stack of args, result is put back on stack
 			il.Emit(OpCodes.Newobj, ctor);
+			if (type.IsValueType)
+			{
+				// box the return value as a reference type
+				il.Emit(OpCodes.Box, type);
+			}
 			// return result from the method
 			il.Emit(OpCodes.Ret);
 
