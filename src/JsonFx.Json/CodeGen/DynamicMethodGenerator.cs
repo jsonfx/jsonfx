@@ -67,6 +67,9 @@ namespace JsonFx.CodeGen
 		/// </summary>
 		/// <param name="memberInfo">PropertyInfo or FieldInfo</param>
 		/// <returns>GetterDelegate for property or field, null otherwise</returns>
+		/// <remarks>
+		/// Note: use with caution this method will expose private and protected constructors without safety checks.
+		/// </remarks>
 		public static GetterDelegate GetGetter(MemberInfo memberInfo)
 		{
 			if (memberInfo is PropertyInfo)
@@ -107,6 +110,9 @@ namespace JsonFx.CodeGen
 		/// </summary>
 		/// <param name="propertyInfo"></param>
 		/// <returns>GetterDelegate if property CanRead, otherwise null</returns>
+		/// <remarks>
+		/// Note: use with caution this method will expose private and protected constructors without safety checks.
+		/// </remarks>
 		public static GetterDelegate GetPropertyGetter(PropertyInfo propertyInfo)
 		{
 			if (propertyInfo == null)
@@ -166,6 +172,9 @@ namespace JsonFx.CodeGen
 		/// </summary>
 		/// <param name="propertyInfo"></param>
 		/// <returns>GetterDelegate if property CanWrite, otherwise null</returns>
+		/// <remarks>
+		/// Note: use with caution this method will expose private and protected constructors without safety checks.
+		/// </remarks>
 		public static SetterDelegate GetPropertySetter(PropertyInfo propertyInfo)
 		{
 			if (propertyInfo == null)
@@ -232,7 +241,10 @@ namespace JsonFx.CodeGen
 		/// Creates a field getter delegate for the specified field
 		/// </summary>
 		/// <param name="fieldInfo"></param>
-		/// <returns></returns>
+		/// <returns>GetterDelegate which returns field unless is enum in which will return enum value</returns>
+		/// <remarks>
+		/// Note: use with caution this method will expose private and protected constructors without safety checks.
+		/// </remarks>
 		public static GetterDelegate GetFieldGetter(FieldInfo fieldInfo)
 		{
 			if (fieldInfo == null)
@@ -331,6 +343,9 @@ namespace JsonFx.CodeGen
 		/// </summary>
 		/// <param name="fieldInfo"></param>
 		/// <returns>SetterDelegate unless field IsInitOnly then returns null</returns>
+		/// <remarks>
+		/// Note: use with caution this method will expose private and protected constructors without safety checks.
+		/// </remarks>
 		public static SetterDelegate GetFieldSetter(FieldInfo fieldInfo)
 		{
 			if (fieldInfo == null)
@@ -387,9 +402,12 @@ namespace JsonFx.CodeGen
 		/// <summary>
 		/// Creates a constructor delegate accepting specified arguments
 		/// </summary>
-		/// <param name="type"></param>
-		/// <param name="argsCount"></param>
+		/// <param name="type">type to be created</param>
+		/// <param name="args">constructor arguments type list</param>
 		/// <returns>FactoryDelegate or null if constructor not found</returns>
+		/// <remarks>
+		/// Note: use with caution this method will expose private and protected constructors without safety checks.
+		/// </remarks>
 		public static FactoryDelegate GetTypeFactory(Type type, params Type[] args)
 		{
 			if (type == null)
@@ -416,21 +434,24 @@ namespace JsonFx.CodeGen
 			// using a stream size larger than the IL that will be emitted.
 			ILGenerator il = dynamicMethod.GetILGenerator(64 * (args.Length+5));
 
-			//// define a label for the if statement
-			//Label jump = il.DefineLabel();
+			// define a label for the if statement
+			Label jump = il.DefineLabel();
 
-			//// add a check for missing arguments
-			//il.Emit(OpCodes.Ldarg_0);
-			//il.Emit(OpCodes.Ldlen);
-			//il.Emit(OpCodes.Conv_I4);
-			//il.Emit(OpCodes.Ldc_I4, args.Length);
-			//il.Emit(OpCodes.Blt, jump);
-			//il.Emit(OpCodes.Ldstr, "Missing constructor arguments");
-			//il.Emit(OpCodes.Newobj, typeof(ArgumentOutOfRangeException));
-			//il.Emit(OpCodes.Throw);
+			// add a check for missing arguments
+			// if (params.Length >= N) goto label;
+			il.Emit(OpCodes.Ldarg_0);
+			il.Emit(OpCodes.Ldlen);
+			il.Emit(OpCodes.Conv_I4);
+			il.Emit(OpCodes.Ldc_I4, args.Length);
+			il.Emit(OpCodes.Bge_S, jump);
 
-			//// set this as the destination of the jump
-			//il.MarkLabel(jump);
+			// throw new TypeLoadException("Missing constructor arguments");
+			il.Emit(OpCodes.Ldstr, "Missing constructor arguments");
+			il.Emit(OpCodes.Newobj, typeof(TypeLoadException).GetConstructor(new Type[] { typeof(string) }));
+			il.Emit(OpCodes.Throw);
+
+			// set this as the destination of the jump
+			il.MarkLabel(jump);
 
 			for (int i=0; i<args.Length; i++)
 			{

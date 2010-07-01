@@ -780,14 +780,14 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
-		public void GetTypeFactory_ArgsMissingInCalling_ThrowsArgumentNullException()
+		public void GetTypeFactory_ArgsMissingWhenCalling_ThrowsArgumentNullException()
 		{
 			FactoryDelegate factory = DynamicMethodGenerator.GetTypeFactory(
 				typeof(Example),
 				typeof(string), typeof(string), typeof(string), typeof(int), typeof(int), typeof(int), typeof(string), typeof(string), typeof(string));
 			Assert.NotNull(factory);
 
-			IndexOutOfRangeException ex = Assert.Throws<IndexOutOfRangeException>(
+			TypeLoadException ex = Assert.Throws<TypeLoadException>(
 				delegate()
 				{
 					var actual = (Example)factory("alpha", "bravo", "charlie", -1, -2, -3);
@@ -795,7 +795,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
-		public void GetTypeFactory_ArgsTypeMismatchInCalling_ThrowsArgumentNullException()
+		public void GetTypeFactory_ArgsTypeMismatchWhenCalling_ThrowsArgumentNullException()
 		{
 			FactoryDelegate factory = DynamicMethodGenerator.GetTypeFactory(
 				typeof(Example),
@@ -805,7 +805,7 @@ namespace JsonFx.CodeGen
 			InvalidCastException ex = Assert.Throws<InvalidCastException>(
 				delegate()
 				{
-					var actual = (Example)factory(1, 2, 3, 4, 5, 6);
+					var actual = (Example)factory(1, 2, 3, 4, 5, 6, 7, 8, 9);
 				});
 		}
 
