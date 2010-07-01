@@ -271,7 +271,7 @@ namespace JsonFx.CodeGen
 				if (fieldInfo.FieldType.IsValueType)
 				{
 					// box the field value as a reference type
-					il.Emit(OpCodes.Box, fieldInfo.DeclaringType);
+					il.Emit(OpCodes.Box, fieldInfo.FieldType);
 				}
 			}
 			// return field value from the method

@@ -43,10 +43,10 @@ namespace JsonFx.CodeGen
 		{
 			#region Fields
 
-			private string a = "aye";
+			public string a = "aye";
 			private string b = "bee";
-			private string c = "sea";
-			private int one = 1;
+			protected string c = "sea";
+			public int one = 1;
 			private int two = 2;
 			private int three = 3;
 
@@ -516,5 +516,75 @@ namespace JsonFx.CodeGen
 		}
 
 		#endregion GetPropertySetter Tests
+
+		#region GetFieldGetter Tests
+
+		[Fact]
+		public void GetFieldGetter_PublicReferenceTypeField_ReturnsFieldValue()
+		{
+			var input = new Example();
+
+			var fieldInfo = input.GetType().GetField("a");
+			Assert.NotNull(fieldInfo);
+
+			GetterDelegate getter = DynamicMethodGenerator.GetFieldGetter(fieldInfo);
+			Assert.NotNull(getter);
+
+			Assert.Equal("aye", getter(input));
+		}
+
+		[Fact]
+		public void GetFieldGetter_ProtectedField_ReturnsFieldValue()
+		{
+			var input = new Example();
+
+			var fieldInfo = input.GetType().GetField("c", BindingFlags.NonPublic|BindingFlags.Instance);
+			Assert.NotNull(fieldInfo);
+
+			GetterDelegate getter = DynamicMethodGenerator.GetFieldGetter(fieldInfo);
+			Assert.NotNull(getter);
+
+			Assert.Equal("sea", getter(input));
+		}
+
+		[Fact]
+		public void GetFieldGetter_ValueTypeField_ReturnsFieldValue()
+		{
+			var input = new Example();
+
+			var fieldInfo = input.GetType().GetField("one");
+			Assert.NotNull(fieldInfo);
+
+			GetterDelegate getter = DynamicMethodGenerator.GetFieldGetter(fieldInfo);
+			Assert.NotNull(getter);
+
+			Assert.Equal(1, getter(input));
+		}
+
+		[Fact]
+		public void GetFieldGetter_PrivateField_ReturnsFieldValue()
+		{
+			var input = new Example();
+
+			var fieldInfo = input.GetType().GetField("two", BindingFlags.NonPublic|BindingFlags.Instance);
+			Assert.NotNull(fieldInfo);
+
+			GetterDelegate getter = DynamicMethodGenerator.GetFieldGetter(fieldInfo);
+			Assert.NotNull(getter);
+
+			Assert.Equal(2, getter(input));
+		}
+
+		[Fact]
+		public void GetFieldGetter_NullInput_ThrowsArgumentNullException()
+		{
+			Assert.Throws<ArgumentNullException>(
+				delegate()
+				{
+					GetterDelegate getter = DynamicMethodGenerator.GetFieldGetter(null);
+				});
+		}
+
+		#endregion GetFieldGetter Tests
 	}
 }
