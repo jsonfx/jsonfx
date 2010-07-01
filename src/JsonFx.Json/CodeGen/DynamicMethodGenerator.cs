@@ -16,12 +16,17 @@ namespace JsonFx.CodeGen
 		/// Creates a property getter delegate for the specified property
 		/// </summary>
 		/// <param name="propertyInfo"></param>
-		/// <returns></returns>
+		/// <returns>GetterDelegate if property CanRead, otherwise null</returns>
 		public static GetterDelegate GetPropertyGetter(PropertyInfo propertyInfo)
 		{
 			if (propertyInfo == null)
 			{
 				throw new ArgumentNullException("propertyInfo");
+			}
+
+			if (!propertyInfo.CanRead)
+			{
+				return null;
 			}
 
 			MethodInfo methodInfo = propertyInfo.GetGetMethod();
@@ -53,12 +58,17 @@ namespace JsonFx.CodeGen
 		/// Creates a property setter delegate for the specified property
 		/// </summary>
 		/// <param name="propertyInfo"></param>
-		/// <returns></returns>
+		/// <returns>GetterDelegate if property CanWrite, otherwise null</returns>
 		public static SetterDelegate GetPropertySetter(PropertyInfo propertyInfo)
 		{
 			if (propertyInfo == null)
 			{
 				throw new ArgumentNullException("propertyInfo");
+			}
+
+			if (!propertyInfo.CanWrite)
+			{
+				return null;
 			}
 
 			MethodInfo methodInfo = propertyInfo.GetSetMethod();
@@ -75,6 +85,7 @@ namespace JsonFx.CodeGen
 			// Get an ILGenerator and emit a body for the dynamic method,
 			// using a stream size larger than the IL that will be emitted.
 			ILGenerator il = dynamicMethod.GetILGenerator(64 * 5);
+
 			// Load the target instance onto the evaluation stack
 			il.Emit(OpCodes.Ldarg_0);
 			// Load the argument onto the evaluation stack
@@ -112,8 +123,13 @@ namespace JsonFx.CodeGen
 			// Get an ILGenerator and emit a body for the dynamic method,
 			// using a stream size larger than the IL that will be emitted.
 			ILGenerator il = dynamicMethod.GetILGenerator(64 * 5);
-			// Load the target instance onto the evaluation stack
-			il.Emit(OpCodes.Ldarg_0);
+
+			if (!fieldInfo.IsStatic)
+			{
+				// Load the target instance onto the evaluation stack
+				il.Emit(OpCodes.Ldarg_0);
+			}
+
 			// Load the field
 			il.Emit(OpCodes.Ldfld, fieldInfo);
 			// return from the method
@@ -127,12 +143,17 @@ namespace JsonFx.CodeGen
 		/// Creates a field setter delegate for the specified field
 		/// </summary>
 		/// <param name="fieldInfo"></param>
-		/// <returns></returns>
+		/// <returns>SetterDelegate unless field IsInitOnly then returns null</returns>
 		public static SetterDelegate GetFieldSetter(FieldInfo fieldInfo)
 		{
 			if (fieldInfo == null)
 			{
 				throw new ArgumentNullException("fieldInfo");
+			}
+
+			if (!fieldInfo.IsInitOnly)
+			{
+				return null;
 			}
 
 			// Create a dynamic method with a return type of void, one parameter taking the instance and the other taking the new value.
@@ -147,8 +168,13 @@ namespace JsonFx.CodeGen
 			// Get an ILGenerator and emit a body for the dynamic method,
 			// using a stream size larger than the IL that will be emitted.
 			ILGenerator il = dynamicMethod.GetILGenerator(64 * 5);
-			// Load the target instance onto the evaluation stack
-			il.Emit(OpCodes.Ldarg_0);
+
+			if (!fieldInfo.IsStatic)
+			{
+				// Load the target instance onto the evaluation stack
+				il.Emit(OpCodes.Ldarg_0);
+			}
+
 			// Load the argument onto the evaluation stack
 			il.Emit(OpCodes.Ldarg_1);
 			// Set the field
