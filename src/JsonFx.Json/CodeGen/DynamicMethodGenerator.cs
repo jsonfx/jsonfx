@@ -1,4 +1,34 @@
-﻿using System;
+﻿#region License
+/*---------------------------------------------------------------------------------*\
+
+	Distributed under the terms of an MIT-style license:
+
+	The MIT License
+
+	Copyright (c) 2006-2010 Stephen M. McKamey
+
+	Permission is hereby granted, free of charge, to any person obtaining a copy
+	of this software and associated documentation files (the "Software"), to deal
+	in the Software without restriction, including without limitation the rights
+	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	copies of the Software, and to permit persons to whom the Software is
+	furnished to do so, subject to the following conditions:
+
+	The above copyright notice and this permission notice shall be included in
+	all copies or substantial portions of the Software.
+
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	THE SOFTWARE.
+
+\*---------------------------------------------------------------------------------*/
+#endregion License
+
+using System;
 using System.Reflection;
 using System.Reflection.Emit;
 
@@ -30,6 +60,10 @@ namespace JsonFx.CodeGen
 			}
 
 			MethodInfo methodInfo = propertyInfo.GetGetMethod();
+			if (methodInfo.IsAbstract)
+			{
+				return null;
+			}
 
 			// Create a dynamic method with a return type of object, and one parameter taking the instance.
 			// Create the method in the module that owns the instance type
@@ -72,6 +106,10 @@ namespace JsonFx.CodeGen
 			}
 
 			MethodInfo methodInfo = propertyInfo.GetSetMethod();
+			if (methodInfo.IsAbstract)
+			{
+				return null;
+			}
 
 			// Create a dynamic method with a return type of void, one parameter taking the instance and the other taking the new value.
 			// Create the method in the module that owns the instance type
@@ -124,14 +162,67 @@ namespace JsonFx.CodeGen
 			// using a stream size larger than the IL that will be emitted.
 			ILGenerator il = dynamicMethod.GetILGenerator(64 * 5);
 
-			if (!fieldInfo.IsStatic)
+			if (fieldInfo.IsStatic && fieldInfo.DeclaringType.IsEnum)
+			{
+				object value = fieldInfo.GetValue(null);
+				switch (Type.GetTypeCode(fieldInfo.FieldType))
+				{
+					case TypeCode.Byte:
+					{
+						il.Emit(OpCodes.Ldc_I4_S, (byte)value);
+						break;
+					}
+					case TypeCode.SByte:
+					{
+						il.Emit(OpCodes.Ldc_I4_S, (sbyte)value);
+						break;
+					}
+					case TypeCode.Int16:
+					{
+						il.Emit(OpCodes.Ldc_I4_S, (short)value);
+						break;
+					}
+					case TypeCode.UInt16:
+					{
+						il.Emit(OpCodes.Ldc_I4_S, (ushort)value);
+						break;
+					}
+					case TypeCode.Int32:
+					{
+						il.Emit(OpCodes.Ldc_I4, (int)value);
+						break;
+					}
+					case TypeCode.UInt32:
+					{
+						il.Emit(OpCodes.Ldc_I4, (uint)value);
+						break;
+					}
+					case TypeCode.Int64:
+					{
+						il.Emit(OpCodes.Ldc_I8, (long)value);
+						break;
+					}
+					case TypeCode.UInt64:
+					{
+						il.Emit(OpCodes.Ldc_I8, (ulong)value);
+						break;
+					}
+					default:
+					{
+						return null;
+					}
+				}
+
+				// Load the field value
+				il.Emit(OpCodes.Box, fieldInfo.DeclaringType);
+			}
+			else
 			{
 				// Load the target instance onto the evaluation stack
 				il.Emit(OpCodes.Ldarg_0);
+				// Load the field
+				il.Emit(OpCodes.Ldfld, fieldInfo);
 			}
-
-			// Load the field
-			il.Emit(OpCodes.Ldfld, fieldInfo);
 			// return from the method
 			il.Emit(OpCodes.Ret);
 
@@ -151,7 +242,7 @@ namespace JsonFx.CodeGen
 				throw new ArgumentNullException("fieldInfo");
 			}
 
-			if (!fieldInfo.IsInitOnly)
+			if (fieldInfo.IsInitOnly)
 			{
 				return null;
 			}
@@ -169,12 +260,8 @@ namespace JsonFx.CodeGen
 			// using a stream size larger than the IL that will be emitted.
 			ILGenerator il = dynamicMethod.GetILGenerator(64 * 5);
 
-			if (!fieldInfo.IsStatic)
-			{
-				// Load the target instance onto the evaluation stack
-				il.Emit(OpCodes.Ldarg_0);
-			}
-
+			// Load the target instance onto the evaluation stack
+			il.Emit(OpCodes.Ldarg_0);
 			// Load the argument onto the evaluation stack
 			il.Emit(OpCodes.Ldarg_1);
 			// Set the field
@@ -192,7 +279,7 @@ namespace JsonFx.CodeGen
 		/// <param name="type"></param>
 		/// <param name="argsCount"></param>
 		/// <returns>CtorDelegate or null if constructor not found</returns>
-		public static CtorDelegate GetCtorDelegate(Type type, params Type[] args)
+		public static CtorDelegate GetTypeFactory(Type type, params Type[] args)
 		{
 			if (type == null)
 			{
