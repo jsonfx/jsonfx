@@ -34,10 +34,30 @@ using System.Reflection.Emit;
 
 namespace JsonFx.CodeGen
 {
+	/// <summary>
+	/// Generalized delegate for invoking a constructor
+	/// </summary>
+	/// <param name="args"></param>
+	/// <returns></returns>
 	public delegate object CtorDelegate(params object[] args);
+
+	/// <summary>
+	/// Generalized delegate for getting a field or property value
+	/// </summary>
+	/// <param name="target"></param>
+	/// <returns></returns>
 	public delegate object GetterDelegate(object target);
+
+	/// <summary>
+	/// Generalized delegate for setting a field or property value
+	/// </summary>
+	/// <param name="target"></param>
+	/// <param name="value"></param>
 	public delegate void SetterDelegate(object target, object value);
 
+	/// <summary>
+	/// Generates delegates for getting/setting properties and field and invoking constructors
+	/// </summary>
 	internal static class DynamicMethodGenerator
 	{
 		#region Dynamic Method Generators
