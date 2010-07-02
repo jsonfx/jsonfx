@@ -75,13 +75,13 @@ namespace JsonFx.Serialization
 		/// <remarks>default implementation checks for JsonIgnoreAttribute</remarks>
 		public virtual bool IsIgnored(MemberInfo member)
 		{
-			if (DataNameResolver.GetAttribute<DataIgnoreAttribute>(member) != null)
+			if (TypeCoercionUtility.GetAttribute<DataIgnoreAttribute>(member) != null)
 			{
 				return true;
 			}
 
 			// TODO: extend here for JsonIgnoreAttribute, XmlIgnoreAttribute, DataContractAttribute, JsonSpecifiedPropertyAttribute
-			//if (DataReaderSettings.GetAttribute<XmlIgnoreAttribute>(info) != null)
+			//if (TypeCoercionUtility.GetAttribute<XmlIgnoreAttribute>(info) != null)
 			//{
 			//    return true;
 			//}
@@ -103,7 +103,7 @@ namespace JsonFx.Serialization
 		{
 			Type objType = member.ReflectedType ?? member.DeclaringType;
 
-			DataSpecifiedPropertyAttribute specifiedProperty = DataNameResolver.GetAttribute<DataSpecifiedPropertyAttribute>(member);
+			DataSpecifiedPropertyAttribute specifiedProperty = TypeCoercionUtility.GetAttribute<DataSpecifiedPropertyAttribute>(member);
 			if (specifiedProperty != null && !String.IsNullOrEmpty(specifiedProperty.SpecifiedProperty))
 			{
 				PropertyInfo specProp = objType.GetProperty(specifiedProperty.SpecifiedProperty, BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic);
@@ -143,7 +143,7 @@ namespace JsonFx.Serialization
 		/// <returns>if has a value equivalent to the DefaultValueAttribute</returns>
 		public virtual bool IsDefaultValue(MemberInfo member, object value)
 		{
-			DefaultValueAttribute attribute = DataNameResolver.GetAttribute<DefaultValueAttribute>(member);
+			DefaultValueAttribute attribute = TypeCoercionUtility.GetAttribute<DefaultValueAttribute>(member);
 			if (attribute == null)
 			{
 				return false;
@@ -159,7 +159,7 @@ namespace JsonFx.Serialization
 		/// <returns></returns>
 		public virtual string GetName(MemberInfo member)
 		{
-			DataNameAttribute attribute = DataNameResolver.GetAttribute<DataNameAttribute>(member);
+			DataNameAttribute attribute = TypeCoercionUtility.GetAttribute<DataNameAttribute>(member);
 
 			// TODO: extend here for XmlNameAttribute, DataContractAttribute
 			return (attribute != null) ? attribute.Name : null;
@@ -185,25 +185,5 @@ namespace JsonFx.Serialization
 		}
 
 		#endregion Name Resolution Methods
-
-		#region Attribute Methods
-
-		/// <summary>
-		/// Gets the attribute T for the given value.
-		/// </summary>
-		/// <param name="value"></param>
-		/// <typeparam name="T">Attribute Type</typeparam>
-		/// <returns>attribte</returns>
-		public static T GetAttribute<T>(MemberInfo info)
-			where T : Attribute
-		{
-			if (info == null || !Attribute.IsDefined(info, typeof(T)))
-			{
-				return default(T);
-			}
-			return (T)Attribute.GetCustomAttribute(info, typeof(T));
-		}
-
-		#endregion Attribute Methods
 	}
 }

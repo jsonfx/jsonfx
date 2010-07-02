@@ -751,5 +751,25 @@ namespace JsonFx.Serialization
 		}
 
 		#endregion Type Methods
+
+		#region Attribute Methods
+
+		/// <summary>
+		/// Gets the attribute T for the given value.
+		/// </summary>
+		/// <param name="value"></param>
+		/// <typeparam name="T">Attribute Type</typeparam>
+		/// <returns>attribte</returns>
+		public static T GetAttribute<T>(MemberInfo info)
+			where T : Attribute
+		{
+			if (info == null || !Attribute.IsDefined(info, typeof(T)))
+			{
+				return default(T);
+			}
+			return (T)Attribute.GetCustomAttribute(info, typeof(T));
+		}
+
+		#endregion Attribute Methods
 	}
 }
