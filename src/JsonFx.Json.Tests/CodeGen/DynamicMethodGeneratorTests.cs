@@ -188,6 +188,12 @@ namespace JsonFx.CodeGen
 
 		#endregion Test Types
 
+		#region Constants
+
+		private const long MaxCount = 1000000;
+
+		#endregion Constants
+
 		#region GetPropertyGetter Tests
 
 		[Fact]
@@ -363,6 +369,21 @@ namespace JsonFx.CodeGen
 				});
 
 			Assert.Equal("propertyInfo", ex.ParamName);
+		}
+
+		[Fact(Timeout=15)]
+		public void GetPropertyGetter_1MillionPropertyGets_PerformsInAround10ms()
+		{
+			Example instance = new Example();
+			PropertyInfo propertyInfo = typeof(Example).GetProperty("A", BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic);
+
+			GetterDelegate getter = DynamicMethodGenerator.GetPropertyGetter(propertyInfo);
+
+			string value = null;
+			for (long i=0; i<MaxCount; i++)
+			{
+				value = (string)getter(instance);
+			}
 		}
 
 		#endregion GetPropertyGetter Tests
@@ -570,6 +591,20 @@ namespace JsonFx.CodeGen
 			Assert.Equal("propertyInfo", ex.ParamName);
 		}
 
+		[Fact(Timeout=15)]
+		public void GetPropertySetter_1MillionPropertySets_PerformsInAround10ms()
+		{
+			Example instance = new Example();
+			PropertyInfo propertyInfo = typeof(Example).GetProperty("A", BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic);
+
+			SetterDelegate setter = DynamicMethodGenerator.GetPropertySetter(propertyInfo);
+
+			for (long i=0; i<MaxCount; i++)
+			{
+				setter(instance, "alpha");
+			}
+		}
+
 		#endregion GetPropertySetter Tests
 
 		#region GetFieldGetter Tests
@@ -640,6 +675,21 @@ namespace JsonFx.CodeGen
 				});
 
 			Assert.Equal("fieldInfo", ex.ParamName);
+		}
+
+		[Fact(Timeout=15)]
+		public void GetFieldGetter_1MillionFieldGets_PerformsInAround10ms()
+		{
+			Example instance = new Example();
+			FieldInfo fieldInfo = typeof(Example).GetField("a", BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic);
+
+			GetterDelegate getter = DynamicMethodGenerator.GetFieldGetter(fieldInfo);
+
+			string value = null;
+			for (long i=0; i<MaxCount; i++)
+			{
+				value = (string)getter(instance);
+			}
 		}
 
 		#endregion GetFieldGetter Tests
@@ -721,6 +771,20 @@ namespace JsonFx.CodeGen
 				});
 
 			Assert.Equal("fieldInfo", ex.ParamName);
+		}
+
+		[Fact(Timeout=15)]
+		public void GetFieldSetter_1MillionFieldSets_PerformsInAround10ms()
+		{
+			Example instance = new Example();
+			FieldInfo fieldInfo = typeof(Example).GetField("a", BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic);
+
+			SetterDelegate setter = DynamicMethodGenerator.GetFieldSetter(fieldInfo);
+
+			for (long i=0; i<MaxCount; i++)
+			{
+				setter(instance, "alpha");
+			}
 		}
 
 		#endregion GetFieldSetter Tests
@@ -834,6 +898,21 @@ namespace JsonFx.CodeGen
 				});
 
 			Assert.Equal("methodInfo", ex.ParamName);
+		}
+
+		[Fact(Timeout=75)]
+		public void GetMethodProxy_1MillionMethodCalls_PerformsInAround50ms()
+		{
+			Example instance = new Example();
+			MethodInfo methodInfo = typeof(Example).GetMethod("GetMi", BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic);
+
+			ProxyDelegate proxy = DynamicMethodGenerator.GetMethodProxy(methodInfo);
+
+			string value = null;
+			for (long i=0; i<MaxCount; i++)
+			{
+				value = (string)proxy(instance);
+			}
 		}
 
 		#endregion GetMethodProxy Tests
@@ -971,6 +1050,17 @@ namespace JsonFx.CodeGen
 				});
 
 			Assert.Equal("ctor", ex.ParamName);
+		}
+
+		[Fact(Timeout=100)]
+		public void GetTypeFactory_1MillionInstantiations_PerformsInAround50ms()
+		{
+			FactoryDelegate factory = DynamicMethodGenerator.GetTypeFactory(typeof(Example));
+
+			for (long i=0; i<MaxCount; i++)
+			{
+				Example instance = (Example)factory();
+			}
 		}
 
 		#endregion GetTypeFactory Tests
