@@ -70,6 +70,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="About.cs" />
+    <Compile Include="IO\ITextScanner.cs" />
+    <Compile Include="IO\StringScanner.cs" />
+    <Compile Include="IO\TextReaderScanner.cs" />
     <Compile Include="Json\IJsonSerializable.cs" />
     <Compile Include="Json\JsonFormatter.cs" />
     <Compile Include="Json\JsonGenerator.cs" />
@@ -100,10 +103,7 @@
     <Compile Include="Serialization\IDataWriter.cs" />
     <Compile Include="Serialization\IMemberCacheContainer.cs" />
     <Compile Include="Serialization\ISerializable`1.cs" />
-    <Compile Include="Serialization\ITextScanner.cs" />
     <Compile Include="Serialization\MemberCache.cs" />
-    <Compile Include="Serialization\StringScanner.cs" />
-    <Compile Include="Serialization\TextReaderScanner.cs" />
     <Compile Include="Serialization\Token`1.cs" />
     <Compile Include="Serialization\TypeCoercionUtility.cs" />
   </ItemGroup>

@@ -32,7 +32,7 @@ using System;
 using System.Collections;
 using System.IO;
 
-namespace JsonFx.Serialization
+namespace JsonFx.IO
 {
 	/// <summary>
 	/// Supports a simple iteration over a TextReader tracking line/column/position

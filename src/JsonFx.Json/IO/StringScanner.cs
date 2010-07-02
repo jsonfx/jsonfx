@@ -31,7 +31,7 @@
 using System;
 using System.Collections;
 
-namespace JsonFx.Serialization
+namespace JsonFx.IO
 {
 	/// <summary>
 	/// Supports a simple iteration over a string tracking line/column/position

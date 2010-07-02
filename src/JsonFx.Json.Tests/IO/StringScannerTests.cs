@@ -29,21 +29,20 @@
 #endregion License
 
 using System;
-using System.IO;
 using System.Text;
 
 using Xunit;
 
-namespace JsonFx.Serialization
+namespace JsonFx.IO
 {
-	public class TextReaderScannerTests
+	public class StringScannerTests
 	{
 		#region Start State Tests
 
 		[Fact]
 		public void Current_MoveNextNotCalled_ReturnsNullChar()
 		{
-			var scanner = new TextReaderScanner(TextReader.Null);
+			var scanner = new StringScanner(null);
 
 			Assert.Equal('\0', scanner.Current);
 		}
@@ -51,7 +50,7 @@ namespace JsonFx.Serialization
 		[Fact]
 		public void Index_MoveNextNotCalled_ReturnsNegOne()
 		{
-			var scanner = new TextReaderScanner(TextReader.Null);
+			var scanner = new StringScanner(null);
 
 			Assert.Equal(-1, scanner.Index);
 		}
@@ -59,7 +58,7 @@ namespace JsonFx.Serialization
 		[Fact]
 		public void Line_MoveNextNotCalled_ReturnsNegOne()
 		{
-			var scanner = new TextReaderScanner(TextReader.Null);
+			var scanner = new StringScanner(null);
 
 			Assert.Equal(0, scanner.Line);
 		}
@@ -67,7 +66,7 @@ namespace JsonFx.Serialization
 		[Fact]
 		public void Column_MoveNextNotCalled_ReturnsNegOne()
 		{
-			var scanner = new TextReaderScanner(TextReader.Null);
+			var scanner = new StringScanner(null);
 
 			Assert.Equal(0, scanner.Column);
 		}
@@ -75,7 +74,7 @@ namespace JsonFx.Serialization
 		[Fact]
 		public void IsEnd_MoveNextNotCalled_ReturnsFalse()
 		{
-			var scanner = new TextReaderScanner(TextReader.Null);
+			var scanner = new StringScanner(null);
 
 			Assert.Equal(false, scanner.IsEnd);
 		}
@@ -85,9 +84,9 @@ namespace JsonFx.Serialization
 		#region MoveNext Tests
 
 		[Fact]
-		public void MoveNext_NullReader_ReturnsEmptySequence()
+		public void MoveNext_NullString_ReturnsEmptySequence()
 		{
-			var scanner = new TextReaderScanner(TextReader.Null);
+			var scanner = new StringScanner(null);
 
 			var buffer = new StringBuilder();
 			while (scanner.MoveNext())
@@ -99,11 +98,11 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
-		public void MoveNext_EmptySequence_ReturnsEmptySequence()
+		public void MoveNext_EmptyString_ReturnsEmptySequence()
 		{
 			const string input = "";
 
-			var scanner = new TextReaderScanner(new StringReader(input));
+			var scanner = new StringScanner(input);
 
 			var buffer = new StringBuilder();
 			while (scanner.MoveNext())
@@ -115,11 +114,11 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
-		public void MoveNext_OneCharSequence_ReturnsSameSequence()
+		public void MoveNext_OneCharString_ReturnsSameSequence()
 		{
 			const string input = "_";
 
-			var scanner = new TextReaderScanner(new StringReader(input));
+			var scanner = new StringScanner(input);
 
 			var buffer = new StringBuilder();
 			while (scanner.MoveNext())
@@ -131,11 +130,11 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
-		public void MoveNext_LongSequence_ReturnsSameSequence()
+		public void MoveNext_LongString_ReturnsSameSequence()
 		{
 			const string input = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-			var scanner = new TextReaderScanner(new StringReader(input));
+			var scanner = new StringScanner(input);
 
 			var buffer = new StringBuilder();
 			while (scanner.MoveNext())
@@ -151,7 +150,7 @@ namespace JsonFx.Serialization
 		{
 			const string input = @"""\\\b\f\n\r\t\u0123\u4567\u89AB\uCDEF\uabcd\uef4A\""""";
 
-			var scanner = new TextReaderScanner(new StringReader(input));
+			var scanner = new StringScanner(input);
 
 			var buffer = new StringBuilder();
 			while (scanner.MoveNext())
@@ -163,11 +162,11 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
-		public void MoveNext_UnicodeSequence_ReturnsSameSequence()
+		public void MoveNext_UnicodeString_ReturnsSameSequence()
 		{
 			const string input = "私が日本語を話すことはありません。";
 
-			var scanner = new TextReaderScanner(new StringReader(input));
+			var scanner = new StringScanner(input);
 
 			var buffer = new StringBuilder();
 			while (scanner.MoveNext())
@@ -187,7 +186,7 @@ namespace JsonFx.Serialization
 		{
 			const string input = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-			var scanner = new TextReaderScanner(new StringReader(input));
+			var scanner = new StringScanner(input);
 
 			while (scanner.MoveNext())
 			{
@@ -209,7 +208,7 @@ Line two
 Line three
 Line Four";
 
-			var scanner = new TextReaderScanner(new StringReader(input));
+			var scanner = new StringScanner(input);
 
 			while (scanner.MoveNext());
 
@@ -224,7 +223,7 @@ Line two
 Line three
 Line Four";
 
-			var scanner = new TextReaderScanner(new StringReader(input));
+			var scanner = new StringScanner(input);
 
 			while (scanner.MoveNext());
 
@@ -239,7 +238,7 @@ Line two
 Line three
 Line Four";
 
-			var scanner = new TextReaderScanner(new StringReader(input));
+			var scanner = new StringScanner(input);
 
 			long i;
 			for (i=0; scanner.MoveNext(); i++)
