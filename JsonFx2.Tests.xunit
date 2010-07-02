@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xunit>
+  <assemblies>
+    <assembly filename=".\build\Tests\Debug_v4.0\JsonFx.Json.Tests.dll" shadow-copy="true" />
+  </assemblies>
+</xunit>
