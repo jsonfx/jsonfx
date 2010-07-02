@@ -140,6 +140,7 @@ namespace JsonFx.Serialization
 			try
 			{
 				// always try-catch Invoke() to expose real exception
+				// TODO :build FactoryDelegate, cache under targetType and execute
 				result = ctor.Invoke(null);
 			}
 			catch (TargetInvocationException ex)
@@ -248,7 +249,6 @@ namespace JsonFx.Serialization
 				{
 					if (!Enum.IsDefined(targetType, value))
 					{
-						// TODO: can this be done with MemberCache?
 						IDictionary<string, MemberMap> map = this.MapCache.LoadMaps(targetType);
 						if (map != null && map.ContainsKey((string)value))
 						{
@@ -414,6 +414,7 @@ namespace JsonFx.Serialization
 					try
 					{
 						// invoke first constructor that can take this value as an argument
+						// TODO :build FactoryDelegate, cache under targetType and execute
 						return ctor.Invoke(
 								new object[] { value }
 							);
@@ -436,6 +437,7 @@ namespace JsonFx.Serialization
 			try
 			{
 				// always try-catch Invoke() to expose real exception
+				// TODO :build FactoryDelegate, cache under targetType and execute
 				collection = defaultCtor.Invoke(null);
 			}
 			catch (TargetInvocationException ex)
@@ -462,6 +464,7 @@ namespace JsonFx.Serialization
 				{
 					// always try-catch Invoke() to expose real exception
 					// add all members in one method
+					// TODO :build FactoryDelegate, cache under targetType and execute
 					method.Invoke(
 						collection,
 						new object[] { value });
@@ -494,6 +497,7 @@ namespace JsonFx.Serialization
 						try
 						{
 							// always try-catch Invoke() to expose real exception
+							// TODO :build FactoryDelegate, cache under targetType and execute
 							method.Invoke(
 								collection,
 								new object[] {
@@ -647,7 +651,8 @@ namespace JsonFx.Serialization
 			}
 
 			Type[] genericArgs = dictionaryType.GetGenericArguments();
-			if (genericArgs.Length != 2 || genericArgs[0] != typeof(String))
+			if (genericArgs.Length != 2 ||
+				(genericArgs[0] != typeof(string) && genericArgs[0] != typeof(object)))
 			{
 				// only supports IDictionary<string, TVal>
 				throw new ArgumentException(String.Format(

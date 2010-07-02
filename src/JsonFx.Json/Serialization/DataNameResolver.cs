@@ -106,9 +106,10 @@ namespace JsonFx.Serialization
 			DataSpecifiedPropertyAttribute specifiedProperty = DataNameResolver.GetAttribute<DataSpecifiedPropertyAttribute>(member);
 			if (specifiedProperty != null && !String.IsNullOrEmpty(specifiedProperty.SpecifiedProperty))
 			{
-				PropertyInfo specProp = objType.GetProperty(specifiedProperty.SpecifiedProperty);
+				PropertyInfo specProp = objType.GetProperty(specifiedProperty.SpecifiedProperty, BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic);
 				if (specProp != null)
 				{
+					// TODO: build GetterDelegate, cache under original member, execute
 					object isSpecified = specProp.GetValue(target, null);
 					if (isSpecified is Boolean && !Convert.ToBoolean(isSpecified))
 					{
@@ -122,6 +123,7 @@ namespace JsonFx.Serialization
 			//    PropertyInfo specProp = objType.GetProperty(info.Name+"Specified");
 			//    if (specProp != null)
 			//    {
+			// TODO: build GetterDelegate, cache under original member, execute
 			//        object isSpecified = specProp.GetValue(obj, null);
 			//        if (isSpecified is Boolean && !Convert.ToBoolean(isSpecified))
 			//        {

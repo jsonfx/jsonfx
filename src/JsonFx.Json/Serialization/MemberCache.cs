@@ -119,6 +119,8 @@ namespace JsonFx.Serialization
 	/// </summary>
 	public class MemberCache
 	{
+		// TODO: replace lock with ReaderWriterLockSlim and ReaderWriterLock for NET20
+
 		#region Constants
 
 		private const string AnonymousTypePrefix = "<>f__AnonymousType";
