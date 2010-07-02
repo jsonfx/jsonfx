@@ -371,7 +371,7 @@ namespace JsonFx.CodeGen
 			Assert.Equal("propertyInfo", ex.ParamName);
 		}
 
-		[Fact(Timeout=15)]
+		[Fact(Timeout=20)]
 		public void GetPropertyGetter_1MillionPropertyGets_PerformsInAround10ms()
 		{
 			Example instance = new Example();
@@ -591,7 +591,7 @@ namespace JsonFx.CodeGen
 			Assert.Equal("propertyInfo", ex.ParamName);
 		}
 
-		[Fact(Timeout=15)]
+		[Fact(Timeout=20)]
 		public void GetPropertySetter_1MillionPropertySets_PerformsInAround10ms()
 		{
 			Example instance = new Example();
@@ -677,7 +677,7 @@ namespace JsonFx.CodeGen
 			Assert.Equal("fieldInfo", ex.ParamName);
 		}
 
-		[Fact(Timeout=15)]
+		[Fact(Timeout=20)]
 		public void GetFieldGetter_1MillionFieldGets_PerformsInAround10ms()
 		{
 			Example instance = new Example();
@@ -773,7 +773,7 @@ namespace JsonFx.CodeGen
 			Assert.Equal("fieldInfo", ex.ParamName);
 		}
 
-		[Fact(Timeout=15)]
+		[Fact(Timeout=20)]
 		public void GetFieldSetter_1MillionFieldSets_PerformsInAround10ms()
 		{
 			Example instance = new Example();
@@ -900,7 +900,7 @@ namespace JsonFx.CodeGen
 			Assert.Equal("methodInfo", ex.ParamName);
 		}
 
-		[Fact(Timeout=75)]
+		[Fact(Timeout=100)]
 		public void GetMethodProxy_1MillionMethodCalls_PerformsInAround50ms()
 		{
 			Example instance = new Example();
