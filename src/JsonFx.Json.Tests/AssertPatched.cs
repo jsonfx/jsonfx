@@ -43,7 +43,7 @@ namespace JsonFx
 		#region AssertPatched Tests
 
 		[Fact]
-		public void Assert_EqualNestedArrays_ThrowsEqualException()
+		public void Assert_ExactlyEqualNestedArrays_ThrowsEqualException()
 		{
 			Assert.Throws<EqualException>(
 				delegate()
@@ -55,11 +55,77 @@ namespace JsonFx
 		}
 
 		[Fact]
-		public void AssertPatched_EqualNestedArrays_Passes()
+		public void AssertPatched_ExactlyEqualNestedArrays_Passes()
 		{
 			AssertPatched.Equal(
 				new[] { new[] { "Foo" }, new[] { "Bar" } },
 				new[] { new[] { "Foo" }, new[] { "Bar" } });
+		}
+
+		[Fact]
+		public void Assert_EquivalentNestedArrays_ThrowsEqualException()
+		{
+			Assert.Throws<EqualException>(
+				delegate()
+				{
+					Assert.Equal(
+						new[] { new string[] { "Foo" }, new string[] { "Bar" } },
+						new[] { new object[] { "Foo" }, new object[] { "Bar" } });
+				});
+		}
+
+		[Fact]
+		public void AssertPatched_EquivalentStrictNestedArrays_ThrowsEqualException()
+		{
+			Assert.Throws<EqualException>(
+				delegate()
+				{
+					AssertPatched.Equal(
+						new[] { new string[] { "Foo" }, new string[] { "Bar" } },
+						new[] { new object[] { "Foo" }, new object[] { "Bar" } },
+						true);
+				});
+		}
+
+		[Fact]
+		public void AssertPatched_EquivalentNotStrictNestedArrays_Passes()
+		{
+			AssertPatched.Equal(
+				new[] { new string[] { "Foo" }, new string[] { "Bar" } },
+				new[] { new object[] { "Foo" }, new object[] { "Bar" } },
+				false);
+		}
+
+		[Fact]
+		public void AssertPatched_EquivalentStrictDictionaries_ThrowsEqualException()
+		{
+			var x = new Dictionary<string, object>
+			{
+				{ "Key", "Value" }
+			};
+
+			dynamic y = new System.Dynamic.ExpandoObject();
+			y.Key = "Value";
+
+			Assert.Throws<EqualException>(
+				delegate()
+				{
+					AssertPatched.Equal<IDictionary<string, object>>(x, y, true);
+				});
+		}
+
+		[Fact]
+		public void AssertPatched_EquivalentNotStrictDictionaries_Passes()
+		{
+			var x = new Dictionary<string, object>
+			{
+				{ "Key", "Value" }
+			};
+
+			dynamic y = new System.Dynamic.ExpandoObject();
+			y.Key = "Value";
+
+			AssertPatched.Equal<IDictionary<string, object>>(x, y, false);
 		}
 
 		#endregion AssertPatched Tests
@@ -106,6 +172,18 @@ namespace JsonFx
 		}
 
 		/// <summary>
+		/// Verifies that two objects are equal, using a default comparer. Allows less strict comparison.
+		/// </summary>
+		/// <typeparam name="T">The type of the objects to be compared</typeparam>
+		/// <param name="expected">The expected value</param>
+		/// <param name="actual">The value to be compared against</param>
+		/// <exception cref="EqualException">Thrown when the objects are not equal</exception>
+		public static void Equal<T>(T expected, T actual, bool strict)
+		{
+			Equal(expected, actual, GetEqualityComparer<T>(strict));
+		}
+
+		/// <summary>
 		/// Verifies that two objects are not equal, using a default comparer.
 		/// </summary>
 		/// <typeparam name="T">The type of the objects to be compared</typeparam>
@@ -115,6 +193,18 @@ namespace JsonFx
 		public new static void NotEqual<T>(T expected, T actual)
 		{
 			NotEqual(expected, actual, GetEqualityComparer<T>());
+		}
+
+		/// <summary>
+		/// Verifies that two objects are not equal, using a default comparer.
+		/// </summary>
+		/// <typeparam name="T">The type of the objects to be compared</typeparam>
+		/// <param name="expected">The expected object</param>
+		/// <param name="actual">The actual object</param>
+		/// <exception cref="NotEqualException">Thrown when the objects are equal</exception>
+		public static void NotEqual<T>(T expected, T actual, bool strict)
+		{
+			NotEqual(expected, actual, GetEqualityComparer<T>(strict));
 		}
 
 		#endregion AssertEqualityComparer<T> Entry Points
@@ -153,12 +243,22 @@ namespace JsonFx
 
 		static IEqualityComparer<T> GetEqualityComparer<T>()
 		{
-			return new AssertEqualityComparer<T>();
+			return GetEqualityComparer<T>(true);
+		}
+
+		static IEqualityComparer<T> GetEqualityComparer<T>(bool strict)
+		{
+			return new AssertEqualityComparer<T>(strict);
 		}
 
 		static IComparer<T> GetComparer<T>()
 		{
-			return new AssertEqualityComparer<T>();
+			return GetComparer<T>(true);
+		}
+
+		static IComparer<T> GetComparer<T>(bool strict)
+		{
+			return new AssertEqualityComparer<T>(strict);
 		}
 
 		#endregion Factory Methods
@@ -171,9 +271,23 @@ namespace JsonFx
 		{
 			#region Fields
 
+			readonly bool StrictTyping;
 			IDictionary<Type, Delegate> methodCache;
 
 			#endregion Fields
+
+			#region Init
+
+			/// <summary>
+			/// Ctor
+			/// </summary>
+			/// <param name="strictTyping">Forces types to match exactly</param>
+			public AssertEqualityComparer(bool strictTyping)
+			{
+				this.StrictTyping = strictTyping;
+			}
+
+			#endregion Init
 
 			#region IComparer<T> Members
 
@@ -201,8 +315,11 @@ namespace JsonFx
 				}
 
 				// Same type?
-				if (x.GetType() != y.GetType())
+				if (this.StrictTyping &&
+					x.GetType() != y.GetType())
+				{
 					return false;
+				}
 
 				// Implements IEquatable<T>?
 				IEquatable<T> equatable = x as IEquatable<T>;
@@ -273,8 +390,16 @@ namespace JsonFx
 				}
 
 				Type itemType = x.GetType();
-				if (y.GetType() != itemType)
+				if (this.StrictTyping &&
+					y.GetType() != itemType)
 					return false;
+
+				// Enumerable?
+				IEnumerable enumerableX = x as IEnumerable;
+				IEnumerable enumerableY = y as IEnumerable;
+
+				if (enumerableX != null && enumerableY != null)
+					return EnumerableEquals(enumerableX, enumerableY);
 
 				if (methodCache == null)
 					methodCache = new Dictionary<Type, Delegate>();
@@ -288,7 +413,7 @@ namespace JsonFx
 				{
 					// get comparer type and instantiate
 					Type comparerType = typeof(AssertEqualityComparer<>).MakeGenericType(itemType);
-					object comparer = comparerType.GetConstructor(Type.EmptyTypes).Invoke(null);
+					object comparer = comparerType.GetConstructor(new Type[] { typeof(bool) }).Invoke(new object[] { this.StrictTyping });
 
 					MethodInfo methodInfo = comparerType.GetMethod("Equals", new Type[] { itemType, itemType });
 
