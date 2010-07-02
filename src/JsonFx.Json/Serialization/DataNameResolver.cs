@@ -40,8 +40,7 @@ namespace JsonFx.Serialization
 	/// <remarks>
 	/// Provides an extensibility point to control member naming at a very granular level.
 	/// </remarks>
-	public class DataNameResolver :
-		IDataNameResolver
+	public class DataNameResolver : IDataNameResolver
 	{
 		#region Name Resolution Methods
 
@@ -91,24 +90,21 @@ namespace JsonFx.Serialization
 		}
 
 		/// <summary>
-		/// Determines if the property or field should not be serialized.
+		/// Determines if the property or field should not be serialized based upon its value.
 		/// </summary>
 		/// <param name="member"></param>
 		/// <param name="target"></param>
 		/// <param name="value"></param>
-		/// <returns></returns>
-		public virtual bool IsValueIgnored(MemberInfo member, object target, out object value)
+		/// <returns>if has a value equivalent to the DefaultValueAttribute</returns>
+		/// <remarks>
+		/// This is useful when default values need not be serialized.
+		/// </remarks>
+		public virtual bool IsValueIgnored(MemberInfo member, object target, object value)
 		{
-			value = DataNameResolver.GetMemberValue(target, member);
-			if (this.IsDefaultValue(member, value))
-			{
-				return true;
-			}
-
 			Type objType = member.ReflectedType ?? member.DeclaringType;
 
 			DataSpecifiedPropertyAttribute specifiedProperty = DataNameResolver.GetAttribute<DataSpecifiedPropertyAttribute>(member);
-			if (!String.IsNullOrEmpty(specifiedProperty.SpecifiedProperty))
+			if (specifiedProperty != null && !String.IsNullOrEmpty(specifiedProperty.SpecifiedProperty))
 			{
 				PropertyInfo specProp = objType.GetProperty(specifiedProperty.SpecifiedProperty);
 				if (specProp != null)
@@ -174,12 +170,21 @@ namespace JsonFx.Serialization
 		/// <returns></returns>
 		public string GetName(Enum value)
 		{
-			return this.GetName(DataNameResolver.GetMemberInfo(value));
+			Type type = value.GetType();
+
+			string name = Enum.GetName(type, value);
+			if (String.IsNullOrEmpty(name))
+			{
+				return null;
+			}
+
+			MemberInfo member = type.GetField(name);
+			return this.GetName(member);
 		}
 
 		#endregion Name Resolution Methods
 
-		#region Reflection Methods
+		#region Attribute Methods
 
 		/// <summary>
 		/// Gets the attribute T for the given value.
@@ -187,7 +192,7 @@ namespace JsonFx.Serialization
 		/// <param name="value"></param>
 		/// <typeparam name="T">Attribute Type</typeparam>
 		/// <returns>attribte</returns>
-		protected static T GetAttribute<T>(MemberInfo info)
+		public static T GetAttribute<T>(MemberInfo info)
 			where T : Attribute
 		{
 			if (info == null || !Attribute.IsDefined(info, typeof(T)))
@@ -197,41 +202,6 @@ namespace JsonFx.Serialization
 			return (T)Attribute.GetCustomAttribute(info, typeof(T));
 		}
 
-		private static object GetMemberValue(object target, MemberInfo info)
-		{
-			PropertyInfo propertyInfo = info as PropertyInfo;
-			if (propertyInfo != null && propertyInfo.CanRead)
-			{
-				return propertyInfo.GetValue(target, null);
-			}
-
-			FieldInfo fieldInfo = info as FieldInfo;
-			if (fieldInfo != null)
-			{
-				return fieldInfo.GetValue(target);
-			}
-
-			return null;
-		}
-
-		/// <summary>
-		/// Gets the Enum field for the given value.
-		/// </summary>
-		/// <param name="value"></param>
-		/// <returns></returns>
-		private static MemberInfo GetMemberInfo(Enum value)
-		{
-			Type type = value.GetType();
-
-			string name = Enum.GetName(type, value);
-			if (String.IsNullOrEmpty(name))
-			{
-				return null;
-			}
-
-			return type.GetField(name);
-		}
-
-		#endregion Reflection Methods
+		#endregion Attribute Methods
 	}
 }

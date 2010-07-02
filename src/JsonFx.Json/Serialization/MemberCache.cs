@@ -33,8 +33,87 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
+using JsonFx.CodeGen;
+
 namespace JsonFx.Serialization
 {
+	public class MemberMap
+	{
+		#region Init
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="propertyInfo"></param>
+		public MemberMap(PropertyInfo propertyInfo)
+		{
+			if (propertyInfo == null)
+			{
+				throw new ArgumentNullException("propertyInfo");
+			}
+
+			this.MemberInfo = propertyInfo;
+			this.Name = propertyInfo.Name;
+			this.Type = propertyInfo.PropertyType;
+			this.Getter = DynamicMethodGenerator.GetPropertyGetter(propertyInfo);
+			this.Setter = DynamicMethodGenerator.GetPropertySetter(propertyInfo);
+		}
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="fieldInfo"></param>
+		public MemberMap(FieldInfo fieldInfo)
+		{
+			if (fieldInfo == null)
+			{
+				throw new ArgumentNullException("fieldInfo");
+			}
+
+			this.MemberInfo = fieldInfo;
+			this.Name = fieldInfo.Name;
+			this.Type = fieldInfo.FieldType;
+			this.Getter = DynamicMethodGenerator.GetFieldGetter(fieldInfo);
+			this.Setter = DynamicMethodGenerator.GetFieldSetter(fieldInfo);
+		}
+
+		#endregion Init
+
+		#region Properties
+
+		public MemberInfo MemberInfo
+		{
+			get;
+			private set;
+		}
+
+		public string Name
+		{
+			get;
+			private set;
+		}
+
+		public Type Type
+		{
+			get;
+			private set;
+		}
+
+		public GetterDelegate Getter
+		{
+			get;
+			private set;
+		}
+
+		public SetterDelegate Setter
+		{
+			get;
+			private set;
+		}
+
+		#endregion Properties
+	}
+
 	/// <summary>
 	/// Caches name resolution mappings for IDataReader / IDataWriter
 	/// </summary>
@@ -48,7 +127,7 @@ namespace JsonFx.Serialization
 
 		#region Fields
 
-		private readonly Dictionary<Type, IDictionary<string, MemberInfo>> MapCache = new Dictionary<Type, IDictionary<string, MemberInfo>>();
+		private readonly Dictionary<Type, IDictionary<string, MemberMap>> MapCache = new Dictionary<Type, IDictionary<string, MemberMap>>();
 		internal readonly IDataNameResolver Resolver;
 
 		#endregion Fields
@@ -72,17 +151,16 @@ namespace JsonFx.Serialization
 
 		#region Map Methods
 
-		public IDictionary<string, MemberInfo> GetMap(Type objectType)
+		public IDictionary<string, MemberMap> LoadMaps(Type type)
 		{
+			if (type == null || type == typeof(object))
+			{
+				return null;
+			}
+
 			lock (this.MapCache)
 			{
-				if (!this.MapCache.ContainsKey(objectType))
-				{
-					this.BuildMap(objectType);
-				}
-
-				// map was stored in cache
-				return this.MapCache[objectType];
+				return this.MapCache.ContainsKey(type) ? this.MapCache[type] : this.BuildMap(type);
 			}
 		}
 
@@ -101,7 +179,7 @@ namespace JsonFx.Serialization
 		/// Builds a mapping of member name to field/property
 		/// </summary>
 		/// <param name="objectType"></param>
-		private void BuildMap(Type objectType)
+		private IDictionary<string, MemberMap> BuildMap(Type objectType)
 		{
 			lock (this.MapCache)
 			{
@@ -109,19 +187,18 @@ namespace JsonFx.Serialization
 				if (typeof(IDictionary).IsAssignableFrom(objectType))
 				{
 					// store marker in cache for future lookups
-					this.MapCache[objectType] = null;
-					return;
+					return (this.MapCache[objectType] = null);
 				}
 
-				// create new maps
-				IDictionary<string, MemberInfo> map = new Dictionary<string, MemberInfo>();
+				// create new map
+				IDictionary<string, MemberMap> map = new Dictionary<string, MemberMap>();
 
 				if (!objectType.IsEnum)
 				{
 					bool isAnonymousType = objectType.IsGenericType && objectType.Name.StartsWith(MemberCache.AnonymousTypePrefix);
 
 					// load properties into property map
-					foreach (PropertyInfo info in objectType.GetProperties())
+					foreach (PropertyInfo info in objectType.GetProperties(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic))
 					{
 						if (this.Resolver.IsPropertyIgnored(info, isAnonymousType) ||
 							this.Resolver.IsIgnored(info))
@@ -135,12 +212,12 @@ namespace JsonFx.Serialization
 							name = info.Name;
 						}
 
-						map[info.Name] = info;
+						map[name] = new MemberMap(info);
 					}
 				}
 
 				// load fields into property map
-				foreach (FieldInfo info in objectType.GetFields())
+				foreach (FieldInfo info in objectType.GetFields(objectType.IsEnum ? BindingFlags.Static|BindingFlags.Public : BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic))
 				{
 					if (this.Resolver.IsFieldIgnored(info) ||
 						this.Resolver.IsIgnored(info))
@@ -154,11 +231,11 @@ namespace JsonFx.Serialization
 						name = info.Name;
 					}
 
-					map[name] = info;
+					map[name] = new MemberMap(info);
 				}
 
 				// store in cache for future usage
-				this.MapCache[objectType] = map;
+				return (this.MapCache[objectType] = map);
 			}
 		}
 

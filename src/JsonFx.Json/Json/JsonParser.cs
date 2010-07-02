@@ -31,7 +31,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
+using System.Globalization;
 
 using JsonFx.Serialization;
 
@@ -206,6 +206,8 @@ namespace JsonFx.Json
 						String.Format(JsonParser.ErrorExpectedObject, token.TokenType));
 				}
 
+				IDictionary<string, MemberMap> memberMap = this.Coercion.LoadMaps(targetType);
+
 				Type itemType = TypeCoercionUtility.GetDictionaryItemType(targetType);
 				object objectValue = (itemType != null) ?
 					TypeCoercionUtility.InstantiateObject(targetType) :
@@ -249,14 +251,14 @@ namespace JsonFx.Json
 					}
 
 					// parse the property key
-					string memberName;
+					string propertyName;
 					switch (token.TokenType)
 					{
 						case JsonTokenType.Literal:
 						case JsonTokenType.String:
 						case JsonTokenType.Number:
 						{
-							memberName = Convert.ToString(token.Value);
+							propertyName = Convert.ToString(token.Value, CultureInfo.InvariantCulture);
 							break;
 						}
 						case JsonTokenType.ObjectEnd:
@@ -318,16 +320,32 @@ namespace JsonFx.Json
 					}
 					token = tokens.Current;
 
-					// find the member type info
-					MemberInfo memberInfo;
-					Type memberType = this.Coercion.GetMemberInfo(targetType, itemType, memberName, out memberInfo);
+					MemberMap propertyMap;
+					Type propertyType;
+					if (itemType != null)
+					{
+						// properties all of the same type
+						propertyMap = null;
+						propertyType = itemType;
+					}
+					else if ((memberMap != null) && memberMap.ContainsKey(propertyName))
+					{
+						propertyMap = memberMap[propertyName];
+						propertyType = (propertyMap != null) ? propertyMap.Type : null;
+					}
+					else
+					{
+						propertyMap = null;
+						propertyType = null;
+					}
 
 					// parse the property value
-					object memberValue = this.ParseValue(tokens, memberType);
+					object propertyValue = this.ParseValue(tokens, propertyType);
 
 					// set member to the result
-					this.Coercion.SetMemberValue(objectValue, targetType, memberInfo, memberName, memberValue);
+					this.Coercion.SetMemberValue(objectValue, targetType, propertyMap, propertyName, propertyValue);
 
+					// flag to ensure delimiter
 					hasProperties = true;
 				}
 

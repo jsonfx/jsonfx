@@ -31,7 +31,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Xml;
 
 using JsonFx.Serialization;
@@ -300,13 +299,28 @@ namespace JsonFx.Json
 			{
 				yield return JsonGrammar.TokenObjectBegin;
 
-				IDictionary<string, MemberInfo> map = this.MemberCache.GetMap(type);
-
-				object[] NoIndices = new object[0];
+				IDictionary<string, MemberMap> propertyMaps = this.MemberCache.LoadMaps(type);
+				if (propertyMaps == null)
+				{
+					// 
+					yield return JsonGrammar.TokenObjectEnd;
+					yield break;
+				}
 
 				bool appendDelim = false;
-				foreach (var property in map)
+				foreach (var propertyMap in propertyMaps)
 				{
+					if (propertyMap.Value.Getter == null)
+					{
+						continue;
+					}
+
+					object propertyValue = propertyMap.Value.Getter(value);
+					if (this.MemberCache.Resolver.IsValueIgnored(propertyMap.Value.MemberInfo, value, value))
+					{
+						continue;
+					}
+
 					if (appendDelim)
 					{
 						yield return JsonGrammar.TokenValueDelim;
@@ -316,19 +330,7 @@ namespace JsonFx.Json
 						appendDelim = true;
 					}
 
-					object propertyValue;
-
-					PropertyInfo propertyInfo = property.Value as PropertyInfo;
-					if (propertyInfo != null)
-					{
-						propertyValue = propertyInfo.GetValue(value, NoIndices);
-					}
-					else
-					{
-						propertyValue = ((FieldInfo)property.Value).GetValue(value);
-					}
-
-					foreach (Token<JsonTokenType> token in this.GetPropertyTokens(property.Key, propertyValue))
+					foreach (Token<JsonTokenType> token in this.GetPropertyTokens(propertyMap.Key, propertyValue))
 					{
 						yield return token;
 					}

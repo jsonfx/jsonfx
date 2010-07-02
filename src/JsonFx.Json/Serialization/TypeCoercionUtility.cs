@@ -60,7 +60,7 @@ namespace JsonFx.Serialization
 		#region Fields
 
 		private readonly bool AllowNullValueTypes;
-		private readonly MemberCache Cache;
+		private readonly MemberCache MapCache;
 
 		#endregion Fields
 
@@ -87,34 +87,11 @@ namespace JsonFx.Serialization
 			{
 				throw new ArgumentNullException("cache");
 			}
-			this.Cache = cache;
+			this.MapCache = cache;
 			this.AllowNullValueTypes = allowNullValueTypes;
 		}
 
 		#endregion Init
-
-		#region Properties
-
-		/// <summary>
-		/// Gets the member info for a serialized name of a given type.
-		/// </summary>
-		/// <param name="type"></param>
-		/// <param name="name"></param>
-		/// <returns>PropertyInfo or FieldInfo</returns>
-		private MemberInfo this[Type type, string name]
-		{
-			get
-			{
-				IDictionary<string, MemberInfo> map = this.Cache.GetMap(type);
-				if (map == null || !map.ContainsKey(name))
-				{
-					return null;
-				}
-				return map[name];
-			}
-		}
-
-		#endregion Properties
 
 		#region Object Manipulation Methods
 
@@ -152,7 +129,7 @@ namespace JsonFx.Serialization
 					targetType.FullName));
 			}
 
-			ConstructorInfo ctor = targetType.GetConstructor(Type.EmptyTypes);
+			ConstructorInfo ctor = targetType.GetConstructor(null);
 			if (ctor == null)
 			{
 				throw new TypeCoercionException(String.Format(
@@ -181,74 +158,12 @@ namespace JsonFx.Serialization
 		/// <summary>
 		/// Helper method to set value of a member.
 		/// </summary>
-		/// <param name="target">the object which owns the member</param>
-		/// <param name="memberType">the type of the meme</param>
-		/// <param name="value">the member value</param>
-		public void SetMemberValue(object target, string memberName, object memberValue)
-		{
-			if (target == null)
-			{
-				return;
-			}
-
-			Type targetType = target.GetType();
-			MemberInfo memberInfo = this[targetType, memberName];
-
-			this.SetMemberValue(target, targetType, memberInfo, memberName, memberValue);
-		}
-
-		/// <summary>
-		/// Helper method to set value of a member.
-		/// </summary>
-		/// <param name="target">the object which owns the member</param>
-		/// <param name="memberType">the type of the meme</param>
-		/// <param name="value">the member value</param>
-		public void SetMemberValue(object target, MemberInfo memberInfo, object value)
-		{
-			if (target == null || memberInfo == null)
-			{
-				return;
-			}
-
-			PropertyInfo propertyInfo = memberInfo as PropertyInfo;
-			if (propertyInfo != null)
-			{
-				if (propertyInfo.CanWrite)
-				{
-					// set value of public property
-					propertyInfo.SetValue(
-						target,
-						this.CoerceType(propertyInfo.PropertyType, value),
-						null);
-				}
-				return;
-			}
-
-			FieldInfo fieldInfo = memberInfo as FieldInfo;
-			if (fieldInfo != null)
-			{
-				if (!fieldInfo.IsInitOnly)
-				{
-					// set value of public field
-					fieldInfo.SetValue(
-						target,
-						this.CoerceType(fieldInfo.FieldType, value));
-				}
-				return;
-			}
-
-			// all other values are ignored
-		}
-
-		/// <summary>
-		/// Helper method to set value of a member.
-		/// </summary>
 		/// <param name="target"></param>
 		/// <param name="targetType"></param>
-		/// <param name="memberInfo"></param>
+		/// <param name="memberMap"></param>
 		/// <param name="memberName"></param>
 		/// <param name="memberValue"></param>
-		internal void SetMemberValue(object target, Type targetType, MemberInfo memberInfo, string memberName, object memberValue)
+		internal void SetMemberValue(object target, Type targetType, MemberMap memberMap, string memberName, object memberValue)
 		{
 			if (target == null)
 			{
@@ -265,49 +180,17 @@ namespace JsonFx.Serialization
 					TypeCoercionUtility.ErrorGenericIDictionary,
 					targetType));
 			}
-			else if (memberInfo != null)
+			else if (memberMap != null && memberMap.Setter != null)
 			{
-				this.SetMemberValue(target, memberInfo, memberValue);
+				memberMap.Setter(target, this.CoerceType(memberMap.Type, memberValue));
 			}
 
 			// ignore non-applicable members
 		}
 
-		/// <summary>
-		/// Helper method to find the MemberInfo and Type of a member.
-		/// </summary>
-		/// <param name="objectType"></param>
-		/// <param name="commonItemType"></param>
-		/// <param name="memberName"></param>
-		/// <param name="memberInfo"></param>
-		/// <returns></returns>
-		internal Type GetMemberInfo(Type objectType, Type commonItemType, string memberName, out MemberInfo memberInfo)
+		internal IDictionary<string, MemberMap> LoadMaps(Type type)
 		{
-			if (commonItemType != null)
-			{
-				memberInfo = null;
-				return commonItemType;
-			}
-
-			if (objectType == null || objectType == typeof(object) || String.IsNullOrEmpty(memberName))
-			{
-				memberInfo = null;
-				return null;
-			}
-
-			memberInfo = this[objectType, memberName];
-
-			if (memberInfo is PropertyInfo)
-			{
-				return ((PropertyInfo)memberInfo).PropertyType;
-			}
-
-			if (memberInfo is FieldInfo)
-			{
-				return ((FieldInfo)memberInfo).FieldType;
-			}
-
-			return null;
+			return this.MapCache.LoadMaps(type);
 		}
 
 		#endregion Object Manipulation Methods
@@ -365,8 +248,9 @@ namespace JsonFx.Serialization
 				{
 					if (!Enum.IsDefined(targetType, value))
 					{
-						IDictionary<string, MemberInfo> map = this.Cache.GetMap(targetType);
-						if (map.ContainsKey((string)value))
+						// TODO: can this be done with MemberCache?
+						IDictionary<string, MemberMap> map = this.MapCache.LoadMaps(targetType);
+						if (map != null && map.ContainsKey((string)value))
 						{
 							value = map[(string)value].Name;
 						}
@@ -475,19 +359,20 @@ namespace JsonFx.Serialization
 		{
 			object newValue = TypeCoercionUtility.InstantiateObject(targetType);
 
-			IDictionary<string, MemberInfo> map = this.Cache.GetMap(targetType);
+			IDictionary<string, MemberMap> map = this.MapCache.LoadMaps(targetType);
 			if (map != null)
 			{
 				// copy any values into new object
 				foreach (object key in value.Keys)
 				{
-					string memberName = (key as String);
-					if (String.IsNullOrEmpty(memberName) || !map.ContainsKey(memberName))
+					string memberName = Convert.ToString(key, CultureInfo.InvariantCulture);
+					MemberMap memberMap = map.ContainsKey(memberName) ? map[memberName] : null;
+					if (memberMap == null || memberMap.Setter == null)
 					{
 						continue;
 					}
 
-					this.SetMemberValue(newValue, map[memberName], value[key]);
+					memberMap.Setter(newValue, value[key]);
 				}
 			}
 
@@ -670,6 +555,8 @@ namespace JsonFx.Serialization
 		/// <returns></returns>
 		private Array CoerceArray(Type itemType, IEnumerable value)
 		{
+			// TODO: if not NET20, optimize this with LINQ
+
 			ArrayList target = value as ArrayList;
 
 			if (target == null)
@@ -700,8 +587,15 @@ namespace JsonFx.Serialization
 
 		#region Type Methods
 
+		/// <summary>
+		/// Finds a suitable concrete class for common collection interface types
+		/// </summary>
+		/// <param name="targetType"></param>
+		/// <returns></returns>
 		private static Type ResolveInterfaceType(Type targetType)
 		{
+			// TODO: if NET40, replace Dictionary<,> with ExpandoObject
+
 			if (targetType.IsInterface)
 			{
 				if (targetType.IsGenericType)
@@ -727,7 +621,7 @@ namespace JsonFx.Serialization
 				}
 				else if (targetType == typeof(IDictionary))
 				{
-					targetType = typeof(Dictionary<object, object>);
+					targetType = typeof(Dictionary<string, object>);
 				}
 			}
 			return targetType;
@@ -745,11 +639,7 @@ namespace JsonFx.Serialization
 				return null;
 			}
 
-			Type dictionaryType =
-				(targetType.IsGenericType && targetType.GetGenericTypeDefinition() == typeof(IDictionary<,>)) ?
-				targetType :
-				targetType.GetInterface(TypeCoercionUtility.TypeGenericIDictionary);
-
+			Type dictionaryType = targetType.GetInterface(TypeCoercionUtility.TypeGenericIDictionary);
 			if (dictionaryType == null)
 			{
 				// not an IDictionary<TKey, TVal>
@@ -783,25 +673,16 @@ namespace JsonFx.Serialization
 				return targetType.GetElementType();
 			}
 
-			Type arrayType =
-				(targetType.IsGenericType && targetType.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ?
-				targetType :
-				targetType.GetInterface(TypeCoercionUtility.TypeGenericIEnumerable);
-
+			Type arrayType = targetType.GetInterface(TypeCoercionUtility.TypeGenericIEnumerable);
 			if (arrayType == null)
 			{
 				// not an IEnumerable<T>
 				return null;
 			}
 
+			// found list or enumerable type
 			Type[] genericArgs = arrayType.GetGenericArguments();
-			if (genericArgs.Length == 1)
-			{
-				// list or enumerable type
-				return genericArgs[0];
-			}
-
-			return null;
+			return (genericArgs.Length == 1) ? genericArgs[0] : null;
 		}
 
 		/// <summary>
@@ -827,18 +708,22 @@ namespace JsonFx.Serialization
 				// if hasn't been set before
 				itemType = value.GetType();
 			}
-			else if (!itemType.IsAssignableFrom(value.GetType()))
+			else
 			{
-				if (value.GetType().IsAssignableFrom(itemType))
+				Type valueType = value.GetType();
+				if (!itemType.IsAssignableFrom(valueType))
 				{
-					// attempt to use the more general type
-					itemType = value.GetType();
-				}
-				else
-				{
-					// use plain object to hold value
-					// TODO: find a common ancestor?
-					itemType = typeof(object);
+					if (valueType.IsAssignableFrom(itemType))
+					{
+						// attempt to use the more general type
+						itemType = valueType;
+					}
+					else
+					{
+						// use plain object to hold value
+						// TODO: find a common ancestor?
+						itemType = typeof(object);
+					}
 				}
 			}
 

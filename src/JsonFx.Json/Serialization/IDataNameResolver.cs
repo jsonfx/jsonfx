@@ -72,14 +72,19 @@ namespace JsonFx.Serialization
 		/// <param name="target"></param>
 		/// <param name="value"></param>
 		/// <returns></returns>
-		bool IsValueIgnored(MemberInfo member, object target, out object value);
+		bool IsValueIgnored(MemberInfo member, object target, object value);
 
 		/// <summary>
-		/// Determines if the member value matches the DefaultValue attribute
+		/// Determines if the property or field should not be serialized based upon its value.
 		/// </summary>
 		/// <param name="member"></param>
+		/// <param name="target"></param>
 		/// <param name="value"></param>
-		/// <returns>if has a value equivalent to the DefaultValueAttribute</returns>
+		/// <returns></returns>
+		/// <remarks>
+		/// This is useful when default values need not be serialized.
+		/// Can check from within IsValueIgnored.
+		/// </remarks>
 		bool IsDefaultValue(MemberInfo member, object value);
 
 		/// <summary>
