@@ -186,7 +186,8 @@ namespace JsonFx.Serialization
 			lock (this.MapCache)
 			{
 				// do not incurr the cost of member map for dictionaries
-				if (typeof(IDictionary).IsAssignableFrom(objectType))
+				if (typeof(IDictionary<string, object>).IsAssignableFrom(objectType) ||
+					typeof(IDictionary).IsAssignableFrom(objectType))
 				{
 					// store marker in cache for future lookups
 					return (this.MapCache[objectType] = null);

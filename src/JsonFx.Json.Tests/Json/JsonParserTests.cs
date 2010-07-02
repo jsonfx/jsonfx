@@ -531,9 +531,9 @@ namespace JsonFx.Json
 			var expected = new Dictionary<string, object>();
 
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
-			var actual = (Dictionary<string, object>)parser.Parse(input);
+			var actual = (IDictionary<string, object>)parser.Parse(input);
 
-			Assert.Equal(expected, actual);
+			Assert.Equal(expected, actual, false);
 		}
 
 		[Fact]
@@ -554,9 +554,9 @@ namespace JsonFx.Json
 				};
 
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
-			var actual = (Dictionary<string, object>)parser.Parse(input);
+			var actual = (IDictionary<string, object>)parser.Parse(input);
 
-			Assert.Equal(expected, actual);
+			Assert.Equal(expected, actual, false);
 		}
 
 		[Fact]
@@ -593,9 +593,9 @@ namespace JsonFx.Json
 				};
 
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
-			var actual = (Dictionary<string, object>)parser.Parse(input);
+			var actual = (IDictionary<string, object>)parser.Parse(input);
 
-			Assert.Equal(expected, actual);
+			Assert.Equal(expected, actual, false);
 		}
 
 		[Fact]
@@ -1031,7 +1031,7 @@ namespace JsonFx.Json
 			var parser = new JsonReader.JsonParser(new DataReaderSettings());
 			var actual = (object[])parser.Parse(input);
 
-			Assert.Equal(expected, actual);
+			Assert.Equal(expected, actual, false);
 		}
 
 		#endregion Complex Graph Tests

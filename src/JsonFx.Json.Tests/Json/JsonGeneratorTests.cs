@@ -269,6 +269,37 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		public void GetTokens_ObjectDynamic_ReturnsObjectTokens()
+		{
+			dynamic input = new System.Dynamic.ExpandoObject();
+			input.One = 1;
+			input.Two = 2;
+			input.Three = 3;
+
+			var expected = new[]
+				{
+					JsonGrammar.TokenObjectBegin,
+					JsonGrammar.TokenString("One"),
+					JsonGrammar.TokenPairDelim,
+					JsonGrammar.TokenNumber(1),
+					JsonGrammar.TokenValueDelim,
+					JsonGrammar.TokenString("Two"),
+					JsonGrammar.TokenPairDelim,
+					JsonGrammar.TokenNumber(2),
+					JsonGrammar.TokenValueDelim,
+					JsonGrammar.TokenString("Three"),
+					JsonGrammar.TokenPairDelim,
+					JsonGrammar.TokenNumber(3),
+					JsonGrammar.TokenObjectEnd
+				};
+
+			var generator = new JsonWriter.JsonGenerator(new DataWriterSettings());
+			var actual = generator.GetTokens((object)input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
 		public void GetTokens_ObjectDictionary_ReturnsObjectTokens()
 		{
 			var input = new Dictionary<string, object>

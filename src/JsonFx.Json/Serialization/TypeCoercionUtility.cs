@@ -171,7 +171,12 @@ namespace JsonFx.Serialization
 				return;
 			}
 
-			if (target is IDictionary)
+			if (target is IDictionary<string, object>)
+			{
+				// needed for ExpandoObject which unfortunately does not implement IDictionary
+				((IDictionary<string, object>)target)[memberName] = memberValue;
+			}
+			else if (target is IDictionary)
 			{
 				((IDictionary)target)[memberName] = memberValue;
 			}

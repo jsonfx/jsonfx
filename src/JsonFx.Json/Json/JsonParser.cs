@@ -35,6 +35,12 @@ using System.Globalization;
 
 using JsonFx.Serialization;
 
+#if NET40
+using JsonObject=System.Dynamic.ExpandoObject;
+#else
+using JsonObject=System.Collections.Generic.Dictionary<string, object>;
+#endif
+
 namespace JsonFx.Json
 {
 	public partial class JsonReader
@@ -211,7 +217,7 @@ namespace JsonFx.Json
 				Type itemType = TypeCoercionUtility.GetDictionaryItemType(targetType);
 				object objectValue = (itemType != null) ?
 					TypeCoercionUtility.InstantiateObject(targetType) :
-					new Dictionary<string, object>();
+					new JsonObject();
 
 				bool hasProperties = false;
 				while (tokens.MoveNext())

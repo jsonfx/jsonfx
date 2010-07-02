@@ -225,9 +225,10 @@ namespace JsonFx.Json
 			{
 				IEnumerator enumerator = value.GetEnumerator();
 
-				if (enumerator is IDictionaryEnumerator)
+				if (enumerator is IEnumerator<KeyValuePair<string, object>> ||
+					enumerator is IDictionaryEnumerator)
 				{
-					foreach (Token<JsonTokenType> token in this.GetObjectTokens((IDictionaryEnumerator)enumerator))
+					foreach (Token<JsonTokenType> token in this.GetObjectTokens(enumerator))
 					{
 						yield return token;
 					}
@@ -257,28 +258,57 @@ namespace JsonFx.Json
 				yield return JsonGrammar.TokenArrayEnd;
 			}
 
-			private IEnumerable<Token<JsonTokenType>> GetObjectTokens(IDictionaryEnumerator enumerator)
+			private IEnumerable<Token<JsonTokenType>> GetObjectTokens(IEnumerator enumerator)
 			{
 				yield return JsonGrammar.TokenObjectBegin;
 
+				IEnumerator<KeyValuePair<string, object>> keyValueEnumerator = enumerator as IEnumerator<KeyValuePair<string, object>>;
+				IDictionaryEnumerator dictionaryEnumerator = enumerator as IDictionaryEnumerator;
+
 				bool appendDelim = false;
-				while (enumerator.MoveNext())
+
+				if (keyValueEnumerator != null)
 				{
-					DictionaryEntry entry = enumerator.Entry;
+					while (enumerator.MoveNext())
+					{
+						if (appendDelim)
+						{
+							yield return JsonGrammar.TokenValueDelim;
+						}
+						else
+						{
+							appendDelim = true;
+						}
 
-					if (appendDelim)
-					{
-						yield return JsonGrammar.TokenValueDelim;
+						KeyValuePair<string, object> pair = keyValueEnumerator.Current;
+						foreach (Token<JsonTokenType> token in this.GetPropertyTokens(pair.Key, pair.Value))
+						{
+							yield return token;
+						}
 					}
-					else
+				}
+				else if (dictionaryEnumerator != null)
+				{
+					while (enumerator.MoveNext())
 					{
-						appendDelim = true;
-					}
+						if (appendDelim)
+						{
+							yield return JsonGrammar.TokenValueDelim;
+						}
+						else
+						{
+							appendDelim = true;
+						}
 
-					foreach (Token<JsonTokenType> token in this.GetPropertyTokens(entry.Key, entry.Value))
-					{
-						yield return token;
+						foreach (Token<JsonTokenType> token in this.GetPropertyTokens(dictionaryEnumerator.Key, dictionaryEnumerator.Value))
+						{
+							yield return token;
+						}
 					}
+				}
+				else
+				{
+					throw new ArgumentException("enumerator", "Expected IDictionaryEnumerator or IEnumerator<KeyValuePair<string, object>>");
 				}
 
 				yield return JsonGrammar.TokenObjectEnd;
