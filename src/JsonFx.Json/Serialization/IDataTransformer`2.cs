@@ -38,7 +38,7 @@ namespace JsonFx.Serialization
 	/// </summary>
 	/// <typeparam name="TIn">input token type</typeparam>
 	/// <typeparam name="TOut">output token type</typeparam>
-	public interface IDataTansformer<TIn, TOut>
+	public interface IDataTransformer<TIn, TOut>
 	{
 		#region Methods
 

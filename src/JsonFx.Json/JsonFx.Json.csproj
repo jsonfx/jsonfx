@@ -84,7 +84,6 @@
     <Compile Include="Json\JsonWriter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\AssemblyVersion.cs" />
-    <Compile Include="Serialization\IDataTansformer`2.cs" />
     <Compile Include="Serialization\DataIgnoreAttribute.cs" />
     <Compile Include="Serialization\DataNameAttribute.cs" />
     <Compile Include="Serialization\DataNameResolverStrategy.cs" />
@@ -100,6 +99,7 @@
     <Compile Include="Serialization\IDataParser`1.cs" />
     <Compile Include="Serialization\IDataReader.cs" />
     <Compile Include="Serialization\IDataTokenizer`1.cs" />
+    <Compile Include="Serialization\IDataTransformer`2.cs" />
     <Compile Include="Serialization\IDataWriter.cs" />
     <Compile Include="Serialization\IResolverCacheContainer.cs" />
     <Compile Include="Serialization\IResolverStrategy.cs" />
