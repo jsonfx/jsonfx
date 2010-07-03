@@ -32,6 +32,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading;
 
 using JsonFx.CodeGen;
 
@@ -120,15 +121,20 @@ namespace JsonFx.Serialization
 	public sealed class ResolverCache :
 		IResolverStrategy
 	{
-		// TODO: replace lock with ReaderWriterLockSlim and ReaderWriterLock for NET20
-
 		#region Constants
 
 		private const string AnonymousTypePrefix = "<>f__AnonymousType";
+		private const int LockTimeout = 250;
 
 		#endregion Constants
 
 		#region Fields
+
+#if NET20 || NET30
+		private readonly ReaderWriterLock Lock = new ReaderWriterLock();
+#else
+		private readonly ReaderWriterLockSlim Lock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+#endif
 
 		private readonly IDictionary<Type, IDictionary<string, MemberMap>> Cache = new Dictionary<Type, IDictionary<string, MemberMap>>();
 		private readonly IResolverStrategy Strategy;
@@ -161,10 +167,28 @@ namespace JsonFx.Serialization
 				return null;
 			}
 
-			lock (this.Cache)
+#if NET20 || NET30
+			this.Lock.AcquireReaderLock(ResolverCache.LockTimeout);
+#else
+			this.Lock.EnterReadLock();
+#endif
+			try
 			{
-				return this.Cache.ContainsKey(type) ? this.Cache[type] : this.BuildMap(type);
+				if (this.Cache.ContainsKey(type))
+				{
+					return this.Cache[type];
+				}
 			}
+			finally
+			{
+#if NET20 || NET30
+				this.Lock.ReleaseReaderLock();
+#else
+				this.Lock.ExitReadLock();
+#endif
+			}
+
+			return this.BuildMap(type);
 		}
 
 		/// <summary>
@@ -172,9 +196,22 @@ namespace JsonFx.Serialization
 		/// </summary>
 		public void Clear()
 		{
-			lock (this.Cache)
+#if NET20 || NET30
+			this.Lock.AcquireWriterLock(ResolverCache.LockTimeout);
+#else
+			this.Lock.EnterWriteLock();
+#endif
+			try
 			{
 				this.Cache.Clear();
+			}
+			finally
+			{
+#if NET20 || NET30
+				this.Lock.ReleaseWriterLock();
+#else
+				this.Lock.ExitWriteLock();
+#endif
 			}
 		}
 
@@ -184,47 +221,42 @@ namespace JsonFx.Serialization
 		/// <param name="objectType"></param>
 		private IDictionary<string, MemberMap> BuildMap(Type objectType)
 		{
-			lock (this.Cache)
+			// do not incurr the cost of member map for dictionaries
+			if (typeof(IDictionary<string, object>).IsAssignableFrom(objectType) ||
+				typeof(IDictionary).IsAssignableFrom(objectType))
 			{
-				// do not incurr the cost of member map for dictionaries
-				if (typeof(IDictionary<string, object>).IsAssignableFrom(objectType) ||
-					typeof(IDictionary).IsAssignableFrom(objectType))
+#if NET20 || NET30
+			this.Lock.AcquireWriterLock(ResolverCache.LockTimeout);
+#else
+				this.Lock.EnterWriteLock();
+#endif
+				try
 				{
 					// store marker in cache for future lookups
 					return (this.Cache[objectType] = null);
 				}
-
-				// create new map
-				IDictionary<string, MemberMap> map = new Dictionary<string, MemberMap>();
-
-				if (!objectType.IsEnum)
+				finally
 				{
-					bool isAnonymousType = objectType.IsGenericType && objectType.Name.StartsWith(ResolverCache.AnonymousTypePrefix);
-
-					// load properties into property map
-					foreach (PropertyInfo info in objectType.GetProperties(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic))
-					{
-						if (this.Strategy.IsPropertyIgnored(info, isAnonymousType) ||
-							this.Strategy.IsIgnored(info))
-						{
-							continue;
-						}
-
-						string name = this.Strategy.GetName(info);
-						if (String.IsNullOrEmpty(name))
-						{
-							name = info.Name;
-						}
-
-						map[name] = new MemberMap(info);
-					}
+#if NET20 || NET30
+					this.Lock.ReleaseWriterLock();
+#else
+					this.Lock.ExitWriteLock();
+#endif
 				}
+			}
 
-				// load fields into property map
-				foreach (FieldInfo info in objectType.GetFields(objectType.IsEnum ? BindingFlags.Static|BindingFlags.Public : BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic))
+			// create new map
+			IDictionary<string, MemberMap> map = new Dictionary<string, MemberMap>();
+
+			if (!objectType.IsEnum)
+			{
+				bool isAnonymousType = objectType.IsGenericType && objectType.Name.StartsWith(ResolverCache.AnonymousTypePrefix);
+
+				// load properties into property map
+				foreach (PropertyInfo info in objectType.GetProperties(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic))
 				{
-					if (this.Strategy.IsFieldIgnored(info) ||
-						this.Strategy.IsIgnored(info))
+					if (this.Strategy.IsPropertyIgnored(info, isAnonymousType) ||
+							this.Strategy.IsIgnored(info))
 					{
 						continue;
 					}
@@ -237,9 +269,43 @@ namespace JsonFx.Serialization
 
 					map[name] = new MemberMap(info);
 				}
+			}
 
+			// load fields into property map
+			foreach (FieldInfo info in objectType.GetFields(objectType.IsEnum ? BindingFlags.Static|BindingFlags.Public : BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic))
+			{
+				if (this.Strategy.IsFieldIgnored(info) ||
+						this.Strategy.IsIgnored(info))
+				{
+					continue;
+				}
+
+				string name = this.Strategy.GetName(info);
+				if (String.IsNullOrEmpty(name))
+				{
+					name = info.Name;
+				}
+
+				map[name] = new MemberMap(info);
+			}
+
+#if NET20 || NET30
+			this.Lock.AcquireWriterLock(ResolverCache.LockTimeout);
+#else
+			this.Lock.EnterWriteLock();
+#endif
+			try
+			{
 				// store in cache for future usage
 				return (this.Cache[objectType] = map);
+			}
+			finally
+			{
+#if NET20 || NET30
+				this.Lock.ReleaseWriterLock();
+#else
+				this.Lock.ExitWriteLock();
+#endif
 			}
 		}
 
