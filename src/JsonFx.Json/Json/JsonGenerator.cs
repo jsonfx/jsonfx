@@ -47,7 +47,6 @@ namespace JsonFx.Json
 			#region Fields
 
 			private readonly DataWriterSettings Settings;
-			private readonly MemberCache MemberCache;
 
 			#endregion Fields
 
@@ -65,7 +64,6 @@ namespace JsonFx.Json
 				}
 
 				this.Settings = settings;
-				this.MemberCache = ((IMemberCacheContainer)settings).MemberCache;
 			}
 
 			#endregion Init
@@ -329,7 +327,7 @@ namespace JsonFx.Json
 			{
 				yield return JsonGrammar.TokenObjectBegin;
 
-				IDictionary<string, MemberMap> propertyMaps = this.MemberCache.LoadMaps(type);
+				IDictionary<string, MemberMap> propertyMaps = this.Settings.Resolver.LoadMaps(type);
 				if (propertyMaps == null)
 				{
 					// 
@@ -346,7 +344,7 @@ namespace JsonFx.Json
 					}
 
 					object propertyValue = propertyMap.Value.Getter(value);
-					if (this.MemberCache.Resolver.IsValueIgnored(propertyMap.Value.MemberInfo, value, value))
+					if (this.Settings.Resolver.IsValueIgnored(propertyMap.Value.MemberInfo, value, value))
 					{
 						continue;
 					}

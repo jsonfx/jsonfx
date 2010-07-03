@@ -32,10 +32,8 @@ using System;
 
 namespace JsonFx.Serialization
 {
-	public interface IMemberCacheContainer
+	public interface IResolverCacheContainer
 	{
-		MemberCache MemberCache { get; }
-
-		void CopyCacheFrom(IMemberCacheContainer container);
+		ResolverCache ResolverCache { get; }
 	}
 }

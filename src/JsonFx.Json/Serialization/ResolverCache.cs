@@ -117,7 +117,8 @@ namespace JsonFx.Serialization
 	/// <summary>
 	/// Caches name resolution mappings for IDataReader / IDataWriter
 	/// </summary>
-	public class MemberCache
+	public sealed class ResolverCache :
+		IResolverStrategy
 	{
 		// TODO: replace lock with ReaderWriterLockSlim and ReaderWriterLock for NET20
 
@@ -129,8 +130,8 @@ namespace JsonFx.Serialization
 
 		#region Fields
 
-		private readonly Dictionary<Type, IDictionary<string, MemberMap>> MapCache = new Dictionary<Type, IDictionary<string, MemberMap>>();
-		internal readonly IDataNameResolver Resolver;
+		private readonly IDictionary<Type, IDictionary<string, MemberMap>> Cache = new Dictionary<Type, IDictionary<string, MemberMap>>();
+		private readonly IResolverStrategy Strategy;
 
 		#endregion Fields
 
@@ -139,14 +140,14 @@ namespace JsonFx.Serialization
 		/// <summary>
 		/// Ctor
 		/// </summary>
-		/// <param name="resolver"></param>
-		public MemberCache(IDataNameResolver resolver)
+		/// <param name="strategy"></param>
+		public ResolverCache(IResolverStrategy strategy)
 		{
-			if (resolver == null)
+			if (strategy == null)
 			{
-				throw new ArgumentNullException("resolver");
+				throw new ArgumentNullException("strategy");
 			}
-			this.Resolver = resolver;
+			this.Strategy = strategy;
 		}
 
 		#endregion Init
@@ -160,9 +161,9 @@ namespace JsonFx.Serialization
 				return null;
 			}
 
-			lock (this.MapCache)
+			lock (this.Cache)
 			{
-				return this.MapCache.ContainsKey(type) ? this.MapCache[type] : this.BuildMap(type);
+				return this.Cache.ContainsKey(type) ? this.Cache[type] : this.BuildMap(type);
 			}
 		}
 
@@ -171,9 +172,9 @@ namespace JsonFx.Serialization
 		/// </summary>
 		public void Clear()
 		{
-			lock (this.MapCache)
+			lock (this.Cache)
 			{
-				this.MapCache.Clear();
+				this.Cache.Clear();
 			}
 		}
 
@@ -183,14 +184,14 @@ namespace JsonFx.Serialization
 		/// <param name="objectType"></param>
 		private IDictionary<string, MemberMap> BuildMap(Type objectType)
 		{
-			lock (this.MapCache)
+			lock (this.Cache)
 			{
 				// do not incurr the cost of member map for dictionaries
 				if (typeof(IDictionary<string, object>).IsAssignableFrom(objectType) ||
 					typeof(IDictionary).IsAssignableFrom(objectType))
 				{
 					// store marker in cache for future lookups
-					return (this.MapCache[objectType] = null);
+					return (this.Cache[objectType] = null);
 				}
 
 				// create new map
@@ -198,18 +199,18 @@ namespace JsonFx.Serialization
 
 				if (!objectType.IsEnum)
 				{
-					bool isAnonymousType = objectType.IsGenericType && objectType.Name.StartsWith(MemberCache.AnonymousTypePrefix);
+					bool isAnonymousType = objectType.IsGenericType && objectType.Name.StartsWith(ResolverCache.AnonymousTypePrefix);
 
 					// load properties into property map
 					foreach (PropertyInfo info in objectType.GetProperties(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic))
 					{
-						if (this.Resolver.IsPropertyIgnored(info, isAnonymousType) ||
-							this.Resolver.IsIgnored(info))
+						if (this.Strategy.IsPropertyIgnored(info, isAnonymousType) ||
+							this.Strategy.IsIgnored(info))
 						{
 							continue;
 						}
 
-						string name = this.Resolver.GetName(info);
+						string name = this.Strategy.GetName(info);
 						if (String.IsNullOrEmpty(name))
 						{
 							name = info.Name;
@@ -222,13 +223,13 @@ namespace JsonFx.Serialization
 				// load fields into property map
 				foreach (FieldInfo info in objectType.GetFields(objectType.IsEnum ? BindingFlags.Static|BindingFlags.Public : BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic))
 				{
-					if (this.Resolver.IsFieldIgnored(info) ||
-						this.Resolver.IsIgnored(info))
+					if (this.Strategy.IsFieldIgnored(info) ||
+						this.Strategy.IsIgnored(info))
 					{
 						continue;
 					}
 
-					string name = this.Resolver.GetName(info);
+					string name = this.Strategy.GetName(info);
 					if (String.IsNullOrEmpty(name))
 					{
 						name = info.Name;
@@ -238,10 +239,49 @@ namespace JsonFx.Serialization
 				}
 
 				// store in cache for future usage
-				return (this.MapCache[objectType] = map);
+				return (this.Cache[objectType] = map);
 			}
 		}
 
 		#endregion Map Methods
+
+		#region IResolverStrategy Members
+
+		public bool IsPropertyIgnored(PropertyInfo member, bool isAnonymousType)
+		{
+			return this.Strategy.IsPropertyIgnored(member, isAnonymousType);
+		}
+
+		public bool IsFieldIgnored(FieldInfo member)
+		{
+			return this.Strategy.IsFieldIgnored(member);
+		}
+
+		public bool IsIgnored(MemberInfo member)
+		{
+			return this.Strategy.IsIgnored(member);
+		}
+
+		public bool IsValueIgnored(MemberInfo member, object target, object value)
+		{
+			return this.Strategy.IsValueIgnored(member, target, value);
+		}
+
+		public bool IsDefaultValue(MemberInfo member, object value)
+		{
+			return this.Strategy.IsDefaultValue(member, value);
+		}
+
+		public string GetName(MemberInfo member)
+		{
+			return this.Strategy.GetName(member);
+		}
+
+		public string GetName(Enum value)
+		{
+			return this.Strategy.GetName(value);
+		}
+
+		#endregion IResolverStrategy Members
 	}
 }

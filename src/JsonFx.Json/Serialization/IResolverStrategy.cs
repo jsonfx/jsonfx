@@ -39,7 +39,7 @@ namespace JsonFx.Serialization
 	/// <remarks>
 	/// Provides an extensibility point to control member naming at a very granular level.
 	/// </remarks>
-	public interface IDataNameResolver
+	public interface IResolverStrategy
 	{
 		#region Methods
 

@@ -35,16 +35,46 @@ namespace JsonFx.Serialization
 	/// <summary>
 	/// Controls deserialization settings for IDataReader
 	/// </summary>
-	public sealed class DataReaderSettings
-		: IMemberCacheContainer
+	public sealed class DataReaderSettings :
+		IResolverCacheContainer
 	{
 		#region Fields
 
 		private bool allowNullValueTypes = true;
-		private IDataNameResolver resolver;
-		private MemberCache memberCache;
+		private readonly ResolverCache ResolverCache;
 
 		#endregion Fields
+
+		#region Init
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="strategy"></param>
+		public DataReaderSettings()
+			: this(new DataNameResolverStrategy())
+		{
+		}
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		public DataReaderSettings(IResolverStrategy strategy)
+			: this(new ResolverCache(strategy))
+		{
+		}
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="resolver"></param>
+		/// <param name="resolverCache"></param>
+		public DataReaderSettings(ResolverCache resolverCache)
+		{
+			this.ResolverCache = resolverCache;
+		}
+
+		#endregion Init
 
 		#region Properties
 
@@ -64,50 +94,22 @@ namespace JsonFx.Serialization
 		}
 
 		/// <summary>
-		/// Gets and sets extensibility point to control name resolution for IDataReader
+		/// Gets manager of name resolution for IDataReader
 		/// </summary>
-		public IDataNameResolver Resolver
+		public ResolverCache Resolver
 		{
-			get
-			{
-				if (this.resolver == null)
-				{
-					this.resolver = new DataNameResolver();
-				}
-				return this.resolver;
-			}
-			set
-			{
-				this.resolver = value;
-				this.memberCache = null;
-			}
-		}
-
-		/// <summary>
-		/// Gets and sets extensibility point to control name resolution for IDataReader
-		/// </summary>
-		MemberCache IMemberCacheContainer.MemberCache
-		{
-			get
-			{
-				if (this.memberCache == null)
-				{
-					this.memberCache = new MemberCache(this.Resolver);
-				}
-				return this.memberCache;
-			}
+			get { return this.ResolverCache; }
 		}
 
 		#endregion Properties
 
-		#region IMemberCacheContainer Members
+		#region IResolverCacheContainer Members
 
-		public void CopyCacheFrom(IMemberCacheContainer container)
+		ResolverCache IResolverCacheContainer.ResolverCache
 		{
-			this.Resolver = container.MemberCache.Resolver;
-			this.memberCache = container.MemberCache;
+			get { return this.ResolverCache; }
 		}
 
-		#endregion IMemberCacheContainer Members
+		#endregion IResolverCacheContainer Members
 	}
 }

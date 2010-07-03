@@ -40,7 +40,8 @@ namespace JsonFx.Serialization
 	/// <summary>
 	/// Performs type coercion
 	/// </summary>
-	internal sealed class TypeCoercionUtility
+	internal sealed class TypeCoercionUtility :
+		IResolverCacheContainer
 	{
 		#region Constants
 
@@ -60,7 +61,7 @@ namespace JsonFx.Serialization
 		#region Fields
 
 		private readonly bool AllowNullValueTypes;
-		private readonly MemberCache MapCache;
+		private readonly ResolverCache ResolverCache;
 
 		#endregion Fields
 
@@ -71,23 +72,23 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="cacheContainer"></param>
 		/// <param name="allowNullValueTypes"></param>
-		public TypeCoercionUtility(IMemberCacheContainer cacheContainer, bool allowNullValueTypes)
-			: this(cacheContainer.MemberCache, allowNullValueTypes)
+		public TypeCoercionUtility(IResolverCacheContainer cacheContainer, bool allowNullValueTypes)
+			: this(cacheContainer.ResolverCache, allowNullValueTypes)
 		{
 		}
 
 		/// <summary>
 		/// Ctor
 		/// </summary>
-		/// <param name="cache"></param>
+		/// <param name="resolverCache"></param>
 		/// <param name="allowNullValueTypes"></param>
-		public TypeCoercionUtility(MemberCache cache, bool allowNullValueTypes)
+		public TypeCoercionUtility(ResolverCache resolverCache, bool allowNullValueTypes)
 		{
-			if (cache == null)
+			if (resolverCache == null)
 			{
-				throw new ArgumentNullException("cache");
+				throw new ArgumentNullException("resolverCache");
 			}
-			this.MapCache = cache;
+			this.ResolverCache = resolverCache;
 			this.AllowNullValueTypes = allowNullValueTypes;
 		}
 
@@ -196,7 +197,7 @@ namespace JsonFx.Serialization
 
 		internal IDictionary<string, MemberMap> LoadMaps(Type type)
 		{
-			return this.MapCache.LoadMaps(type);
+			return this.ResolverCache.LoadMaps(type);
 		}
 
 		#endregion Object Manipulation Methods
@@ -254,7 +255,7 @@ namespace JsonFx.Serialization
 				{
 					if (!Enum.IsDefined(targetType, value))
 					{
-						IDictionary<string, MemberMap> map = this.MapCache.LoadMaps(targetType);
+						IDictionary<string, MemberMap> map = this.ResolverCache.LoadMaps(targetType);
 						if (map != null && map.ContainsKey((string)value))
 						{
 							value = map[(string)value].Name;
@@ -364,7 +365,7 @@ namespace JsonFx.Serialization
 		{
 			object newValue = TypeCoercionUtility.InstantiateObject(targetType);
 
-			IDictionary<string, MemberMap> map = this.MapCache.LoadMaps(targetType);
+			IDictionary<string, MemberMap> map = this.ResolverCache.LoadMaps(targetType);
 			if (map != null)
 			{
 				// copy any values into new object
@@ -771,5 +772,14 @@ namespace JsonFx.Serialization
 		}
 
 		#endregion Attribute Methods
+
+		#region IResolverCacheContainer Members
+
+		ResolverCache IResolverCacheContainer.ResolverCache
+		{
+			get { return this.ResolverCache; }
+		}
+
+		#endregion IResolverCacheContainer Members
 	}
 }

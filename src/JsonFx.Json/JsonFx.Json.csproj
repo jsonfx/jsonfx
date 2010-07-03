@@ -86,7 +86,7 @@
     <Compile Include="Properties\AssemblyVersion.cs" />
     <Compile Include="Serialization\DataIgnoreAttribute.cs" />
     <Compile Include="Serialization\DataNameAttribute.cs" />
-    <Compile Include="Serialization\DataNameResolver.cs" />
+    <Compile Include="Serialization\DataNameResolverStrategy.cs" />
     <Compile Include="Serialization\DataReaderSettings.cs" />
     <Compile Include="Serialization\DataReader`1.cs" />
     <Compile Include="Serialization\DataSpecifiedPropertyAttribute.cs" />
@@ -96,14 +96,14 @@
     <Compile Include="Serialization\Exceptions.cs" />
     <Compile Include="Serialization\IDataFormatter`1.cs" />
     <Compile Include="Serialization\IDataGenerator`1.cs" />
-    <Compile Include="Serialization\IDataNameResolver.cs" />
     <Compile Include="Serialization\IDataParser`1.cs" />
     <Compile Include="Serialization\IDataReader.cs" />
     <Compile Include="Serialization\IDataTokenizer`1.cs" />
     <Compile Include="Serialization\IDataWriter.cs" />
-    <Compile Include="Serialization\IMemberCacheContainer.cs" />
+    <Compile Include="Serialization\IResolverCacheContainer.cs" />
+    <Compile Include="Serialization\IResolverStrategy.cs" />
     <Compile Include="Serialization\ISerializable`1.cs" />
-    <Compile Include="Serialization\MemberCache.cs" />
+    <Compile Include="Serialization\ResolverCache.cs" />
     <Compile Include="Serialization\Token`1.cs" />
     <Compile Include="Serialization\TypeCoercionUtility.cs" />
   </ItemGroup>
