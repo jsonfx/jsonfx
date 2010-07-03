@@ -333,55 +333,7 @@ namespace JsonFx.Json
 			Assert.Equal(JsonGrammar.TokenValueDelim, ex.Token);
 		}
 
-		[Fact(Skip="JsonParser doesn't currently check after stream")]
-		public void Parse_ArrayCommaAfterClose_ThrowsParseException()
-		{
-			// input from fail7.json in test suite at http://www.json.org/JSON_checker/
-			var input = new[]
-			{
-				JsonGrammar.TokenArrayBegin,
-				JsonGrammar.TokenString("Comma after the close"),
-				JsonGrammar.TokenArrayEnd,
-				JsonGrammar.TokenValueDelim
-			};
-
-			var parser = new JsonReader.JsonParser(new DataReaderSettings());
-
-			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
-				delegate
-				{
-					var actual = parser.Parse(input);
-				});
-
-			// verify exception is coming from expected token
-			Assert.Equal(JsonGrammar.TokenValueDelim, ex.Token);
-		}
-
-		[Fact(Skip="JsonParser doesn't currently check after stream")]
-		public void Parse_ArrayExtraClose_ThrowsParseException()
-		{
-			// input from fail8.json in test suite at http://www.json.org/JSON_checker/
-			var input = new[]
-			{
-				JsonGrammar.TokenArrayBegin,
-				JsonGrammar.TokenString("Extra close"),
-				JsonGrammar.TokenArrayEnd,
-				JsonGrammar.TokenArrayEnd
-			};
-
-			var parser = new JsonReader.JsonParser(new DataReaderSettings());
-
-			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
-				delegate
-				{
-					var actual = parser.Parse(input);
-				});
-
-			// verify exception is coming from expected token
-			Assert.Equal(JsonGrammar.TokenArrayEnd, ex.Token);
-		}
-
-		[Fact(Skip="JsonParser doesn't currently check depth")]
+		[Fact(Skip="JsonParser doesn't check depth since cannot have cycles on reads")]
 		public void Parse_ArrayNestedTooDeeply_ThrowsParseException()
 		{
 			// input from fail18.json in test suite at http://www.json.org/JSON_checker/
@@ -622,32 +574,6 @@ namespace JsonFx.Json
 
 			// verify exception is coming from expected token
 			Assert.Equal(JsonGrammar.TokenObjectEnd, ex.Token);
-		}
-
-		[Fact(Skip="JsonParser doesn't currently check after stream")]
-		public void Parse_ObjectExtraValueAfterClose_ThrowsParseException()
-		{
-			// input from fail10.json in test suite at http://www.json.org/JSON_checker/
-			var input = new[]
-			{
-				JsonGrammar.TokenObjectBegin,
-				JsonGrammar.TokenString("Extra value after close"),
-				JsonGrammar.TokenPairDelim,
-				JsonGrammar.TokenTrue,
-				JsonGrammar.TokenObjectEnd,
-				JsonGrammar.TokenString("misplaced quoted value")
-			};
-
-			var parser = new JsonReader.JsonParser(new DataReaderSettings());
-
-			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
-				delegate
-				{
-					var actual = parser.Parse(input);
-				});
-
-			// verify exception is coming from expected token
-			Assert.Equal(JsonGrammar.TokenString("misplaced quoted value"), ex.Token);
 		}
 
 		[Fact]
