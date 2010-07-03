@@ -124,7 +124,9 @@ namespace JsonFx.Serialization
 		#region Constants
 
 		private const string AnonymousTypePrefix = "<>f__AnonymousType";
+#if NET20 || NET30
 		private const int LockTimeout = 250;
+#endif
 
 		#endregion Constants
 
