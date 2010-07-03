@@ -87,7 +87,8 @@
     <Compile Include="Json\JsonWriter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\AssemblyVersion.cs" />
-    <Compile Include="Serialization\CustomResolverStrategy.cs" />
+    <Compile Include="Serialization\CallbackResolverStrategy.cs" />
+    <Compile Include="Serialization\CombinedResolverStrategy.cs" />
     <Compile Include="Serialization\PocoResolverStrategy.cs" />
     <Compile Include="Serialization\DataReaderSettings.cs" />
     <Compile Include="Serialization\DataReader`1.cs" />

@@ -31,20 +31,21 @@
 using System;
 using System.ComponentModel;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace JsonFx.Serialization
 {
 	/// <summary>
-	/// Controls name resolution for IDataReader / IDataWriter by using a decorator pattern around any other strategy
+	/// Controls name resolution for IDataReader / IDataWriter by combining an ordered sequence of any other strategies
 	/// </summary>
 	/// <remarks>
-	/// Provides an extensibility point to control member naming and visibility at a very granular level.
+	/// Each strategy is invoked in order, the first to respond wins.
 	/// </remarks>
-	public sealed class CustomResolverStrategy : IResolverStrategy
+	public sealed class CombinedResolverStrategy : IResolverStrategy
 	{
 		#region Fields
 
-		private readonly IResolverStrategy InnerStrategy;
+		private readonly IEnumerable<IResolverStrategy> InnerStrategies;
 
 		#endregion Fields
 
@@ -53,49 +54,35 @@ namespace JsonFx.Serialization
 		/// <summary>
 		/// Ctor
 		/// </summary>
-		/// <param name="strategy"></param>
-		public CustomResolverStrategy(IResolverStrategy strategy)
+		/// <param name="strategies">ordered sequence of strategies</param>
+		public CombinedResolverStrategy(params IResolverStrategy[] strategies)
+			: this((IEnumerable<IResolverStrategy>)strategies)
 		{
-			this.InnerStrategy = strategy;
+		}
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="strategies">ordered sequence of strategies</param>
+		public CombinedResolverStrategy(IEnumerable<IResolverStrategy> strategies)
+		{
+			if (strategies == null)
+			{
+				throw new ArgumentNullException("strategies");
+			}
+
+			foreach (IResolverStrategy strategy in strategies)
+			{
+				if (strategies == null)
+				{
+					throw new ArgumentNullException("strategies");
+				}
+			}
+
+			this.InnerStrategies = strategies;
 		}
 
 		#endregion Init
-
-		#region Properties
-
-		public delegate bool PropertyIgnoredDelegate(PropertyInfo propertyInfo, bool isAnonymous);
-
-		public PropertyIgnoredDelegate IsPropertyIgnoredCustom
-		{
-			get;
-			set;
-		}
-
-		public delegate bool FieldIgnoredDelegate(FieldInfo fieldInfo);
-
-		public FieldIgnoredDelegate IsFieldIgnoredCustom
-		{
-			get;
-			set;
-		}
-
-		public delegate bool ValueIgnoredDelegate(MemberInfo memberInfo, object target, object value);
-
-		public ValueIgnoredDelegate IsValueIgnoredCustom
-		{
-			get;
-			set;
-		}
-
-		public delegate string GetNameDelegate(MemberInfo memberInfo);
-
-		public GetNameDelegate GetNameCustom
-		{
-			get;
-			set;
-		}
-
-		#endregion Properties
 
 		#region Name Resolution Methods
 
@@ -104,30 +91,36 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="member"></param>
 		/// <param name="isAnonymousType"></param>
-		/// <returns></returns>
+		/// <returns>true if any strategy specifies this should be ignored</returns>
 		public bool IsPropertyIgnored(PropertyInfo member, bool isAnonymousType)
 		{
-			if (this.IsPropertyIgnoredCustom != null)
+			foreach (IResolverStrategy strategy in this.InnerStrategies)
 			{
-				return this.IsPropertyIgnoredCustom(member, isAnonymousType);
+				if (strategy.IsPropertyIgnored(member, isAnonymousType))
+				{
+					return true;
+				}
 			}
 
-			return this.InnerStrategy.IsPropertyIgnored(member, isAnonymousType);
+			return false;
 		}
 
 		/// <summary>
 		/// Gets a value indicating if the field is to be serialized.
 		/// </summary>
 		/// <param name="member"></param>
-		/// <returns></returns>
+		/// <returns>true if any strategy specifies this should be ignored</returns>
 		public bool IsFieldIgnored(FieldInfo member)
 		{
-			if (this.IsFieldIgnoredCustom != null)
+			foreach (IResolverStrategy strategy in this.InnerStrategies)
 			{
-				return this.IsFieldIgnoredCustom(member);
+				if (strategy.IsFieldIgnored(member))
+				{
+					return true;
+				}
 			}
 
-			return this.InnerStrategy.IsFieldIgnored(member);
+			return false;
 		}
 
 		/// <summary>
@@ -136,15 +129,18 @@ namespace JsonFx.Serialization
 		/// <param name="member"></param>
 		/// <param name="target"></param>
 		/// <param name="value"></param>
-		/// <returns>if has a value equivalent to the DefaultValueAttribute</returns>
+		/// <returns>true if any strategy specifies this should be ignored</returns>
 		public bool IsValueIgnored(MemberInfo member, object target, object value)
 		{
-			if (this.IsValueIgnoredCustom != null)
+			foreach (IResolverStrategy strategy in this.InnerStrategies)
 			{
-				return this.IsValueIgnoredCustom(member, target, value);
+				if (strategy.IsValueIgnored(member, target, value))
+				{
+					return true;
+				}
 			}
 
-			return this.InnerStrategy.IsValueIgnored(member, target, value);
+			return false;
 		}
 
 		/// <summary>
@@ -152,14 +148,19 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="member"></param>
 		/// <returns></returns>
+		/// <returns>custom name if any strategy specifies one, otherwise null</returns>
 		public string GetName(MemberInfo member)
 		{
-			if (this.GetNameCustom != null)
+			foreach (IResolverStrategy strategy in this.InnerStrategies)
 			{
-				return this.GetNameCustom(member);
+				string name = strategy.GetName(member);
+				if (!String.IsNullOrEmpty(name))
+				{
+					return name;
+				}
 			}
 
-			return this.InnerStrategy.GetName(member);
+			return null;
 		}
 
 		#endregion Name Resolution Methods
