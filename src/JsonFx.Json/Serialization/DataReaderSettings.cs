@@ -50,7 +50,6 @@ namespace JsonFx.Serialization
 		/// <summary>
 		/// Ctor
 		/// </summary>
-		/// <param name="strategy"></param>
 		public DataReaderSettings()
 			: this(new DataNameResolverStrategy())
 		{
@@ -59,6 +58,7 @@ namespace JsonFx.Serialization
 		/// <summary>
 		/// Ctor
 		/// </summary>
+		/// <param name="strategy"></param>
 		public DataReaderSettings(IResolverStrategy strategy)
 			: this(new ResolverCache(strategy))
 		{
@@ -67,7 +67,6 @@ namespace JsonFx.Serialization
 		/// <summary>
 		/// Ctor
 		/// </summary>
-		/// <param name="resolver"></param>
 		/// <param name="resolverCache"></param>
 		public DataReaderSettings(ResolverCache resolverCache)
 		{
