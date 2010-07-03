@@ -76,8 +76,12 @@
     <Compile Include="Json\JsonFormatter.cs" />
     <Compile Include="Json\JsonGenerator.cs" />
     <Compile Include="Json\JsonGrammar.cs" />
+    <Compile Include="Json\JsonIgnoreAttribute.cs" />
+    <Compile Include="Json\JsonNameAttribute.cs" />
     <Compile Include="Json\JsonParser.cs" />
     <Compile Include="Json\JsonReader.cs" />
+    <Compile Include="Json\JsonResolverStrategy.cs" />
+    <Compile Include="Json\JsonSpecifiedPropertyAttribute.cs" />
     <Compile Include="Json\JsonTokenizer.cs" />
     <Compile Include="Json\JsonTokenType.cs" />
     <Compile Include="Json\JsonWriter.cs" />
@@ -85,12 +89,8 @@
     <Compile Include="Properties\AssemblyVersion.cs" />
     <Compile Include="Serialization\CustomResolverStrategy.cs" />
     <Compile Include="Serialization\PocoResolverStrategy.cs" />
-    <Compile Include="Serialization\DataIgnoreAttribute.cs" />
-    <Compile Include="Serialization\DataNameAttribute.cs" />
-    <Compile Include="Serialization\DataNameResolverStrategy.cs" />
     <Compile Include="Serialization\DataReaderSettings.cs" />
     <Compile Include="Serialization\DataReader`1.cs" />
-    <Compile Include="Serialization\DataSpecifiedPropertyAttribute.cs" />
     <Compile Include="Serialization\DataWriterSettings.cs" />
     <Compile Include="Serialization\DataWriter`1.cs" />
     <Compile Include="CodeGen\DynamicMethodGenerator.cs" />

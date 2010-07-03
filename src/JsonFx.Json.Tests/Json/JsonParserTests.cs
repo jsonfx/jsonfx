@@ -44,16 +44,16 @@ namespace JsonFx.Json
 
 		private enum ExampleEnum
 		{
-			[DataName("zero")]
+			[JsonName("zero")]
 			Zero = 0,
 
-			[DataName("one")]
+			[JsonName("one")]
 			One = 1,
 
-			[DataName("two")]
+			[JsonName("two")]
 			Two = 2,
 
-			[DataName("three")]
+			[JsonName("three")]
 			Three = 3
 		}
 
@@ -1011,7 +1011,7 @@ namespace JsonFx.Json
 
 		#region Enum Tests
 
-		// TODO: these are actually testing type coercion, need to isolate type coercion to improve testability
+		// TODO: these are actually testing type coercion and resolver strategy, need to isolate to improve testability
 
 		[Fact]
 		public void Parse_EnumFromString_ReturnsEnum()
@@ -1039,7 +1039,7 @@ namespace JsonFx.Json
 
 			var expected = ExampleEnum.Two;
 
-			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+			var parser = new JsonReader.JsonParser(new DataReaderSettings(new JsonResolverStrategy()));
 			var actual = parser.Parse<ExampleEnum>(input);
 
 			Assert.Equal(expected, actual);

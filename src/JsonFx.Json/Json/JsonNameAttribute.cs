@@ -30,13 +30,51 @@
 
 using System;
 
-namespace JsonFx.Serialization
+namespace JsonFx.Json
 {
 	/// <summary>
-	/// Designates a property or field to not be serialized.
+	/// Specifies the naming to use for a property or field when serializing
 	/// </summary>
 	[AttributeUsage(AttributeTargets.All, AllowMultiple=false)]
-	public sealed class DataIgnoreAttribute : Attribute
+	public class JsonNameAttribute : Attribute
 	{
+		#region Fields
+
+		private string name;
+
+		#endregion Fields
+
+		#region Init
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		public JsonNameAttribute()
+		{
+		}
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="name"></param>
+		public JsonNameAttribute(string name)
+		{
+			this.Name = name;
+		}
+
+		#endregion Init
+
+		#region Properties
+
+		/// <summary>
+		/// Gets and sets the name to be used in serialization
+		/// </summary>
+		public string Name
+		{
+			get { return this.name; }
+			set { this.name = value; }
+		}
+
+		#endregion Properties
 	}
 }

@@ -32,15 +32,17 @@ using System;
 using System.ComponentModel;
 using System.Reflection;
 
-namespace JsonFx.Serialization
+using JsonFx.Serialization;
+
+namespace JsonFx.Json
 {
 	/// <summary>
-	/// Controls name resolution for IDataReader / IDataWriter
+	/// Controls name resolution for IDataReader / IDataWriter using JsonNameAttribute / JsonIgnoreAttribute / JsonPropertySpecifiedAttribute
 	/// </summary>
 	/// <remarks>
-	/// Provides an extensibility point to control member naming at a very granular level.
+	/// This is the default strategy from JsonFx v1.0
 	/// </remarks>
-	public class DataNameResolverStrategy : IResolverStrategy
+	public class JsonResolverStrategy : IResolverStrategy
 	{
 		#region Name Resolution Methods
 
@@ -58,7 +60,7 @@ namespace JsonFx.Serialization
 				return true;
 			}
 
-			return (TypeCoercionUtility.GetAttribute<DataIgnoreAttribute>(member) != null);
+			return (TypeCoercionUtility.GetAttribute<JsonIgnoreAttribute>(member) != null);
 		}
 
 		/// <summary>
@@ -74,7 +76,7 @@ namespace JsonFx.Serialization
 				return true;
 			}
 
-			return (TypeCoercionUtility.GetAttribute<DataIgnoreAttribute>(member) != null);
+			return (TypeCoercionUtility.GetAttribute<JsonIgnoreAttribute>(member) != null);
 		}
 
 		/// <summary>
@@ -85,7 +87,7 @@ namespace JsonFx.Serialization
 		/// <param name="value"></param>
 		/// <returns>if has a value equivalent to the DefaultValueAttribute</returns>
 		/// <remarks>
-		/// This is useful when default values need not be serialized.
+		/// This is useful for excluding serialization of default values.
 		/// </remarks>
 		public virtual bool IsValueIgnored(MemberInfo member, object target, object value)
 		{
@@ -97,7 +99,7 @@ namespace JsonFx.Serialization
 
 			Type objType = member.ReflectedType ?? member.DeclaringType;
 
-			DataSpecifiedPropertyAttribute specifiedProperty = TypeCoercionUtility.GetAttribute<DataSpecifiedPropertyAttribute>(member);
+			JsonSpecifiedPropertyAttribute specifiedProperty = TypeCoercionUtility.GetAttribute<JsonSpecifiedPropertyAttribute>(member);
 			if (specifiedProperty != null && !String.IsNullOrEmpty(specifiedProperty.SpecifiedProperty))
 			{
 				PropertyInfo specProp = objType.GetProperty(specifiedProperty.SpecifiedProperty, BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic);
@@ -122,7 +124,7 @@ namespace JsonFx.Serialization
 		/// <returns></returns>
 		public virtual string GetName(MemberInfo member)
 		{
-			DataNameAttribute attribute = TypeCoercionUtility.GetAttribute<DataNameAttribute>(member);
+			JsonNameAttribute attribute = TypeCoercionUtility.GetAttribute<JsonNameAttribute>(member);
 
 			return (attribute != null) ? attribute.Name : null;
 		}

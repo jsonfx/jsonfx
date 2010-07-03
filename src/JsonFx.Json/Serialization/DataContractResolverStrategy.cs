@@ -29,7 +29,6 @@
 #endregion License
 
 using System;
-using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.Serialization;
 
@@ -56,7 +55,8 @@ namespace JsonFx.Serialization
 				return true;
 			}
 
-			return (TypeCoercionUtility.GetAttribute<DataIgnoreAttribute>(member) != null);
+			return //(TypeCoercionUtility.GetAttribute<DataMemberAttribute>(member) == null) ||
+				(TypeCoercionUtility.GetAttribute<IgnoreDataMemberAttribute>(member) != null);
 		}
 
 		/// <summary>
@@ -72,7 +72,8 @@ namespace JsonFx.Serialization
 				return true;
 			}
 
-			return (TypeCoercionUtility.GetAttribute<IgnoreDataMemberAttribute>(member) != null);
+			return //(TypeCoercionUtility.GetAttribute<DataMemberAttribute>(member) == null) ||
+				(TypeCoercionUtility.GetAttribute<IgnoreDataMemberAttribute>(member) != null);
 		}
 
 		/// <summary>
@@ -83,7 +84,7 @@ namespace JsonFx.Serialization
 		/// <param name="value"></param>
 		/// <returns>if has a value equivalent to the DefaultValueAttribute</returns>
 		/// <remarks>
-		/// This is useful when default values need not be serialized.
+		/// This is useful for excluding serialization of default values.
 		/// </remarks>
 		public virtual bool IsValueIgnored(MemberInfo member, object target, object value)
 		{
@@ -97,7 +98,7 @@ namespace JsonFx.Serialization
 		/// <returns></returns>
 		public virtual string GetName(MemberInfo member)
 		{
-			DataNameAttribute attribute = TypeCoercionUtility.GetAttribute<DataNameAttribute>(member);
+			DataMemberAttribute attribute = TypeCoercionUtility.GetAttribute<DataMemberAttribute>(member);
 
 			return (attribute != null) ? attribute.Name : null;
 		}

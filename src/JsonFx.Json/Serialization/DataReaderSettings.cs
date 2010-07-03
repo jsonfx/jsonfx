@@ -51,7 +51,7 @@ namespace JsonFx.Serialization
 		/// Ctor
 		/// </summary>
 		public DataReaderSettings()
-			: this(new DataNameResolverStrategy())
+			: this(new PocoResolverStrategy())
 		{
 		}
 

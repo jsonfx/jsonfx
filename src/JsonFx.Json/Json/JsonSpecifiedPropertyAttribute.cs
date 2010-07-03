@@ -30,13 +30,13 @@
 
 using System;
 
-namespace JsonFx.Serialization
+namespace JsonFx.Json
 {
 	/// <summary>
 	/// Specifies the name of the property which specifies if member should be serialized.
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Property|AttributeTargets.Field, AllowMultiple=false)]
-	public class DataSpecifiedPropertyAttribute : Attribute
+	public class JsonSpecifiedPropertyAttribute : Attribute
 	{
 		#region Fields
 
@@ -50,7 +50,7 @@ namespace JsonFx.Serialization
 		/// Ctor
 		/// </summary>
 		/// <param name="propertyName">the name of the property which controls serialization for this member</param>
-		public DataSpecifiedPropertyAttribute()
+		public JsonSpecifiedPropertyAttribute()
 		{
 		}
 
@@ -58,7 +58,7 @@ namespace JsonFx.Serialization
 		/// Ctor
 		/// </summary>
 		/// <param name="propertyName">the name of the property which controls serialization for this member</param>
-		public DataSpecifiedPropertyAttribute(string propertyName)
+		public JsonSpecifiedPropertyAttribute(string propertyName)
 		{
 			this.specifiedProperty = propertyName;
 		}
