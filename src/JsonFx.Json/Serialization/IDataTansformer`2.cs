@@ -36,8 +36,8 @@ namespace JsonFx.Serialization
 	/// <summary>
 	/// Consumes a SAX-like sequence of tokens and produces a token sequence of a different type
 	/// </summary>
-	/// <typeparam name="T">input token type</typeparam>
-	/// <typeparam name="T">output token type</typeparam>
+	/// <typeparam name="TIn">input token type</typeparam>
+	/// <typeparam name="TOut">output token type</typeparam>
 	public interface IDataTansformer<TIn, TOut>
 	{
 		#region Methods
