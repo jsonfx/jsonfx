@@ -327,8 +327,8 @@ namespace JsonFx.Json
 			{
 				yield return JsonGrammar.TokenObjectBegin;
 
-				IDictionary<string, MemberMap> propertyMaps = this.Settings.Resolver.LoadMaps(type);
-				if (propertyMaps == null)
+				IDictionary<string, MemberMap> maps = this.Settings.Resolver.LoadMaps(type);
+				if (maps == null)
 				{
 					// 
 					yield return JsonGrammar.TokenObjectEnd;
@@ -336,15 +336,16 @@ namespace JsonFx.Json
 				}
 
 				bool appendDelim = false;
-				foreach (var propertyMap in propertyMaps)
+				foreach (var map in maps)
 				{
-					if (propertyMap.Value.Getter == null)
+					if (map.Value.Getter == null)
 					{
 						continue;
 					}
 
-					object propertyValue = propertyMap.Value.Getter(value);
-					if (this.Settings.Resolver.IsValueIgnored(propertyMap.Value.MemberInfo, value, value))
+					object propertyValue = map.Value.Getter(value);
+					if (map.Value.IsIgnored != null &&
+						map.Value.IsIgnored(value, propertyValue))
 					{
 						continue;
 					}
@@ -358,7 +359,7 @@ namespace JsonFx.Json
 						appendDelim = true;
 					}
 
-					foreach (Token<JsonTokenType> token in this.GetPropertyTokens(propertyMap.Key, propertyValue))
+					foreach (Token<JsonTokenType> token in this.GetPropertyTokens(map.Key, propertyValue))
 					{
 						yield return token;
 					}

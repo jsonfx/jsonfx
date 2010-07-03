@@ -114,14 +114,19 @@ namespace JsonFx.Serialization
 			private set;
 		}
 
+		public ValueIgnoredDelegate IsIgnored
+		{
+			get;
+			private set;
+		}
+
 		#endregion Properties
 	}
 
 	/// <summary>
 	/// Caches name resolution mappings for IDataReader / IDataWriter
 	/// </summary>
-	public sealed class ResolverCache :
-		IResolverStrategy
+	public sealed class ResolverCache
 	{
 		#region Constants
 
@@ -313,35 +318,17 @@ namespace JsonFx.Serialization
 
 		#endregion Map Methods
 
-		#region IResolverStrategy Members
-
-		public bool IsPropertyIgnored(PropertyInfo member, bool isAnonymousType)
-		{
-			return this.Strategy.IsPropertyIgnored(member, isAnonymousType);
-		}
-
-		public bool IsFieldIgnored(FieldInfo member)
-		{
-			return this.Strategy.IsFieldIgnored(member);
-		}
-
-		public bool IsValueIgnored(MemberInfo member, object target, object value)
-		{
-			return this.Strategy.IsValueIgnored(member, target, value);
-		}
-
-		public string GetName(MemberInfo member)
-		{
-			return this.Strategy.GetName(member);
-		}
+		#region Utility Methods
 
 		/// <summary>
-		/// Gets the serialized name for the Enum value.
+		/// Gets the serialized name for the Enum value
 		/// </summary>
 		/// <param name="value"></param>
 		/// <returns></returns>
-		public string GetName(Enum value)
+		internal string GetName(Enum value)
 		{
+			// TODO: generate map and cache values
+
 			Type type = value.GetType();
 
 			string name = Enum.GetName(type, value);
@@ -354,6 +341,6 @@ namespace JsonFx.Serialization
 			return this.Strategy.GetName(member);
 		}
 
-		#endregion IResolverStrategy Members
+		#endregion Utility Methods
 	}
 }

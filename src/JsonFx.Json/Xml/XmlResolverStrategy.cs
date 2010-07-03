@@ -33,6 +33,7 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Xml.Serialization;
 
+using JsonFx.CodeGen;
 using JsonFx.Serialization;
 
 namespace JsonFx.Xml
@@ -73,37 +74,63 @@ namespace JsonFx.Xml
 		}
 
 		/// <summary>
-		/// Determines if the property or field should not be serialized based upon its value.
+		/// Gets a delegate which determines if the property or field should not be serialized based upon its value.
 		/// </summary>
 		/// <param name="member"></param>
-		/// <param name="target"></param>
-		/// <param name="value"></param>
-		/// <returns>if has a value equivalent to the DefaultValueAttribute</returns>
+		/// <returns>if has a value equivalent to the DefaultValueAttribute or has a property named XXXSpecified which determines visibility</returns>
 		/// <remarks>
 		/// This is useful when default values need not be serialized.
 		/// </remarks>
-		public virtual bool IsValueIgnored(MemberInfo member, object target, object value)
+		public virtual ValueIgnoredDelegate GetValueIgnored(MemberInfo member)
 		{
-			DefaultValueAttribute attribute = TypeCoercionUtility.GetAttribute<DefaultValueAttribute>(member);
-			if (attribute != null && (attribute.Value == value))
-			{
-				return true;
-			}
-
 			Type objType = member.ReflectedType ?? member.DeclaringType;
 
-			PropertyInfo specProp = objType.GetProperty(member.Name+"Specified");
-			if (specProp != null)
+			// look up specified property to see if exists
+			GetterDelegate specifiedPropertyGetter = null;
+
+			PropertyInfo specProp = objType.GetProperty(member.Name+"Specified", BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic);
+
+			// ensure is correct return type
+			if (specProp != null && specProp.PropertyType == typeof(bool))
 			{
-				//TODO: build GetterDelegate, cache under original member, execute
-			    object isSpecified = specProp.GetValue(target, null);
-				if (Object.Equals(isSpecified, false))
-			    {
-			        return true;
-			    }
+				specifiedPropertyGetter = DynamicMethodGenerator.GetPropertyGetter(specProp);
 			}
 
-			return false;
+			DefaultValueAttribute attribute = TypeCoercionUtility.GetAttribute<DefaultValueAttribute>(member);
+			if (attribute == null)
+			{
+				if (specifiedPropertyGetter == null)
+				{
+					// no need to even create a delegate
+					return null;
+				}
+
+				// create a delegate which simply calls the specified property
+				return delegate(object target, object value)
+				{
+					return Object.Equals(false, specifiedPropertyGetter(target));
+				};
+			}
+
+			// extract default value since cannot change (is constant in attribute)
+			object defaultValue = attribute.Value;
+
+			if (specifiedPropertyGetter == null)
+			{
+				// create a specific delegate which only has to compare the default value to the current value
+				return delegate(object target, object value)
+				{
+					return Object.Equals(defaultValue, value);
+				};
+			}
+
+			// create a combined delegate which checks both states
+			return delegate(object target, object value)
+			{
+				return
+					Object.Equals(defaultValue, value) ||
+					Object.Equals(false, specifiedPropertyGetter(target));
+			};
 		}
 
 		/// <summary>

@@ -35,6 +35,9 @@ namespace JsonFx.Json
 	/// <summary>
 	/// Specifies the name of the property which specifies if member should be serialized.
 	/// </summary>
+	/// <remarks>
+	/// These properties can be marked private/protected/internal and it will still be recognized
+	/// </remarks>
 	[AttributeUsage(AttributeTargets.Property|AttributeTargets.Field, AllowMultiple=false)]
 	public class JsonSpecifiedPropertyAttribute : Attribute
 	{

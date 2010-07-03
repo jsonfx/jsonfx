@@ -124,23 +124,45 @@ namespace JsonFx.Serialization
 		}
 
 		/// <summary>
-		/// Determines if the property or field should not be serialized based upon its value.
+		/// Gets a delegate which determines if the property or field should not be serialized based upon its value.
 		/// </summary>
 		/// <param name="member"></param>
-		/// <param name="target"></param>
-		/// <param name="value"></param>
 		/// <returns>true if any strategy specifies this should be ignored</returns>
-		public bool IsValueIgnored(MemberInfo member, object target, object value)
+		public ValueIgnoredDelegate GetValueIgnored(MemberInfo member)
 		{
+			List<ValueIgnoredDelegate> ignoredDelegates = new List<ValueIgnoredDelegate>();
+
 			foreach (IResolverStrategy strategy in this.InnerStrategies)
 			{
-				if (strategy.IsValueIgnored(member, target, value))
+				ValueIgnoredDelegate ignoredDelegate = strategy.GetValueIgnored(member);
+				if (ignoredDelegate != null)
 				{
-					return true;
+					ignoredDelegates.Add(ignoredDelegate);
 				}
 			}
 
-			return false;
+			if (ignoredDelegates.Count < 1)
+			{
+				return null;
+			}
+
+			if (ignoredDelegates.Count == 1)
+			{
+				return ignoredDelegates[0];
+			}
+
+			return delegate(object instance, object memberValue)
+			{
+				foreach (ValueIgnoredDelegate ignoredDelegate in ignoredDelegates)
+				{
+					if (ignoredDelegate(instance, memberValue))
+					{
+						return true;
+					}
+				}
+
+				return false;
+			};
 		}
 
 		/// <summary>

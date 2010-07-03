@@ -85,15 +85,13 @@ namespace JsonFx.Serialization
 		}
 
 		/// <summary>
-		/// Determines if the property or field should not be serialized based upon its value.
+		/// Gets a delegate which determines if the property or field should not be serialized based upon its value.
 		/// </summary>
 		/// <param name="member"></param>
-		/// <param name="target"></param>
-		/// <param name="value"></param>
 		/// <returns></returns>
-		public virtual bool IsValueIgnored(MemberInfo member, object target, object value)
+		public virtual ValueIgnoredDelegate GetValueIgnored(MemberInfo member)
 		{
-			return false;
+			return null;
 		}
 
 		/// <summary>

@@ -62,12 +62,12 @@ namespace JsonFx.Serialization
 			set;
 		}
 
-		public delegate bool ValueIgnoredDelegate(MemberInfo memberInfo, object target, object value);
+		public delegate ValueIgnoredDelegate GetValueIgnoredDelegate(MemberInfo memberInfo);
 
 		/// <summary>
 		/// Gets and sets the implementation for ignoring properties by value
 		/// </summary>
-		public ValueIgnoredDelegate IsValueIgnored
+		public GetValueIgnoredDelegate GetValueIgnored
 		{
 			get;
 			set;
@@ -108,14 +108,14 @@ namespace JsonFx.Serialization
 			return this.IsFieldIgnored(member);
 		}
 
-		bool IResolverStrategy.IsValueIgnored(MemberInfo member, object target, object value)
+		ValueIgnoredDelegate IResolverStrategy.GetValueIgnored(MemberInfo member)
 		{
-			if (this.IsValueIgnored == null)
+			if (this.GetValueIgnored == null)
 			{
-				return false;
+				return null;
 			}
 
-			return this.IsValueIgnored(member, target, value);
+			return this.GetValueIgnored(member);
 		}
 
 		string IResolverStrategy.GetName(MemberInfo member)

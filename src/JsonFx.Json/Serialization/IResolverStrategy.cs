@@ -34,6 +34,13 @@ using System.Reflection;
 namespace JsonFx.Serialization
 {
 	/// <summary>
+	/// Gets a delegate which determines if the property or field should not be serialized based upon its value.
+	/// </summary>
+	/// <param name="value"></param>
+	/// <returns></returns>
+	public delegate bool ValueIgnoredDelegate(object instance, object memberValue);
+
+	/// <summary>
 	/// Controls name resolution for IDataReader / IDataWriter
 	/// </summary>
 	/// <remarks>
@@ -65,7 +72,7 @@ namespace JsonFx.Serialization
 		/// <param name="target"></param>
 		/// <param name="value"></param>
 		/// <returns></returns>
-		bool IsValueIgnored(MemberInfo member, object target, object value);
+		ValueIgnoredDelegate GetValueIgnored(MemberInfo member);
 
 		/// <summary>
 		/// Gets the serialized name for the member.
