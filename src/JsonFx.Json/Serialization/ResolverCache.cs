@@ -38,8 +38,6 @@ using JsonFx.CodeGen;
 
 namespace JsonFx.Serialization
 {
-	// TODO: should this be expanded so it contains all of the members but stores if they are ignored or not
-	// then when serializing, use a where clause style filter to only return those that are serialized?
 	public class MemberMap
 	{
 		#region Init
@@ -235,7 +233,7 @@ namespace JsonFx.Serialization
 				typeof(IDictionary).IsAssignableFrom(objectType))
 			{
 #if NET20 || NET30
-			this.Lock.AcquireWriterLock(ResolverCache.LockTimeout);
+				this.Lock.AcquireWriterLock(ResolverCache.LockTimeout);
 #else
 				this.Lock.EnterWriteLock();
 #endif
