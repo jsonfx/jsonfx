@@ -49,7 +49,13 @@ namespace JsonFx.Serialization
 		/// <remarks>default implementation is must be read/write properties, or read-only anonymous</remarks>
 		public virtual bool IsPropertyIgnored(PropertyInfo member, bool isAnonymousType)
 		{
-			return (!member.CanRead || (!member.CanWrite && !isAnonymousType));
+			// must be public read/write (or anonymous object)
+			MethodInfo getter = member.CanRead ? member.GetGetMethod() : null;
+			MethodInfo setter = member.CanWrite ? member.GetSetMethod() : null;
+
+			return
+				(getter == null || !getter.IsPublic) ||
+				(!isAnonymousType && (setter == null || !setter.IsPublic));
 		}
 
 		/// <summary>
@@ -60,7 +66,8 @@ namespace JsonFx.Serialization
 		/// <remarks>default implementation is must be public, non-readonly field</remarks>
 		public virtual bool IsFieldIgnored(FieldInfo member)
 		{
-			return (!member.IsPublic || (member.IsStatic != member.DeclaringType.IsEnum) || member.IsInitOnly);
+			// must be public read/write
+			return (!member.IsPublic || member.IsInitOnly);
 		}
 
 		/// <summary>

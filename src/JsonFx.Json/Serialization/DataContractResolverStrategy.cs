@@ -37,7 +37,10 @@ namespace JsonFx.Serialization
 	/// <summary>
 	/// Controls name resolution for IDataReader / IDataWriter using DataContract attributes
 	/// </summary>
-	public class DataContractResolverStrategy : IResolverStrategy
+	/// <remarks>
+	/// http://msdn.microsoft.com/en-us/library/kd1dc9w5.aspx
+	/// </remarks>
+	public class DataContractResolverStrategy : PocoResolverStrategy
 	{
 		#region Name Resolution Methods
 
@@ -47,20 +50,20 @@ namespace JsonFx.Serialization
 		/// <param name="member"></param>
 		/// <param name="isAnonymousType"></param>
 		/// <returns></returns>
-		public virtual bool IsPropertyIgnored(PropertyInfo member, bool isAnonymousType)
+		public override bool IsPropertyIgnored(PropertyInfo member, bool isAnonymousType)
 		{
-			if ((TypeCoercionUtility.GetAttribute<DataContractAttribute>(member.DeclaringType) == null) &&
-				(TypeCoercionUtility.GetAttribute<DataMemberAttribute>(member) == null))
+			Type objType = member.ReflectedType ?? member.DeclaringType;
+
+			if (TypeCoercionUtility.HasAttribute<DataContractAttribute>(objType))
 			{
-				return true;
+				// use DataContract rules: member must be marked and not ignored
+				return
+					!TypeCoercionUtility.HasAttribute<DataMemberAttribute>(member) ||
+					TypeCoercionUtility.HasAttribute<IgnoreDataMemberAttribute>(member);
 			}
 
-			if (!member.CanRead || (!member.CanWrite && !isAnonymousType))
-			{
-				return true;
-			}
-
-			return TypeCoercionUtility.HasAttribute<IgnoreDataMemberAttribute>(member);
+			// use POCO rules: must be public read/write (or anonymous object)
+			return base.IsPropertyIgnored(member, isAnonymousType);
 		}
 
 		/// <summary>
@@ -68,20 +71,20 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="member"></param>
 		/// <returns></returns>
-		public virtual bool IsFieldIgnored(FieldInfo member)
+		public override bool IsFieldIgnored(FieldInfo member)
 		{
-			if ((TypeCoercionUtility.GetAttribute<DataContractAttribute>(member.DeclaringType) == null) &&
-				(TypeCoercionUtility.GetAttribute<DataMemberAttribute>(member) == null))
+			Type objType = member.ReflectedType ?? member.DeclaringType;
+
+			if (TypeCoercionUtility.HasAttribute<DataContractAttribute>(objType))
 			{
-				return true;
+				// use DataContract rules: member must be marked and not ignored
+				return
+					!TypeCoercionUtility.HasAttribute<DataMemberAttribute>(member) ||
+					TypeCoercionUtility.HasAttribute<IgnoreDataMemberAttribute>(member);
 			}
 
-			if (!member.IsPublic || (member.IsStatic != member.DeclaringType.IsEnum) || member.IsInitOnly)
-			{
-				return true;
-			}
-
-			return TypeCoercionUtility.HasAttribute<IgnoreDataMemberAttribute>(member);
+			// use POCO rules: must be public read/write
+			return base.IsFieldIgnored(member);
 		}
 
 		/// <summary>
@@ -89,7 +92,7 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="member"></param>
 		/// <returns></returns>
-		public virtual ValueIgnoredDelegate GetValueIgnoredCallback(MemberInfo member)
+		public override ValueIgnoredDelegate GetValueIgnoredCallback(MemberInfo member)
 		{
 			return null;
 		}
@@ -99,7 +102,7 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="member"></param>
 		/// <returns></returns>
-		public virtual string GetName(MemberInfo member)
+		public override string GetName(MemberInfo member)
 		{
 			DataMemberAttribute attribute = TypeCoercionUtility.GetAttribute<DataMemberAttribute>(member);
 

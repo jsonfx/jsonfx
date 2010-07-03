@@ -43,7 +43,7 @@ namespace JsonFx.Json
 	/// <remarks>
 	/// This is the default strategy from JsonFx v1.0
 	/// </remarks>
-	public class JsonResolverStrategy : IResolverStrategy
+	public class JsonResolverStrategy : PocoResolverStrategy
 	{
 		#region Name Resolution Methods
 
@@ -54,14 +54,12 @@ namespace JsonFx.Json
 		/// <param name="isAnonymousType"></param>
 		/// <returns></returns>
 		/// <remarks>default implementation is must be read/write properties, or read-only anonymous</remarks>
-		public virtual bool IsPropertyIgnored(PropertyInfo member, bool isAnonymousType)
+		public override bool IsPropertyIgnored(PropertyInfo member, bool isAnonymousType)
 		{
-			if (!member.CanRead || (!member.CanWrite && !isAnonymousType))
-			{
-				return true;
-			}
-
-			return TypeCoercionUtility.HasAttribute<JsonIgnoreAttribute>(member);
+			// must satisfy POCO rules and not be ignored
+			return
+				base.IsPropertyIgnored(member, isAnonymousType) ||
+				TypeCoercionUtility.HasAttribute<JsonIgnoreAttribute>(member);
 		}
 
 		/// <summary>
@@ -70,14 +68,12 @@ namespace JsonFx.Json
 		/// <param name="member"></param>
 		/// <returns></returns>
 		/// <remarks>default implementation is must be public, non-readonly field</remarks>
-		public virtual bool IsFieldIgnored(FieldInfo member)
+		public override bool IsFieldIgnored(FieldInfo member)
 		{
-			if (!member.IsPublic || (member.IsStatic != member.DeclaringType.IsEnum) || member.IsInitOnly)
-			{
-				return true;
-			}
-
-			return TypeCoercionUtility.HasAttribute<JsonIgnoreAttribute>(member);
+			// must satisfy POCO rules and not be ignored
+			return
+				base.IsFieldIgnored(member) ||
+				TypeCoercionUtility.HasAttribute<JsonIgnoreAttribute>(member);
 		}
 
 		/// <summary>
@@ -88,16 +84,16 @@ namespace JsonFx.Json
 		/// <remarks>
 		/// This is useful for excluding serialization of default values.
 		/// </remarks>
-		public virtual ValueIgnoredDelegate GetValueIgnoredCallback(MemberInfo member)
+		public override ValueIgnoredDelegate GetValueIgnoredCallback(MemberInfo member)
 		{
 			Type objType = member.ReflectedType ?? member.DeclaringType;
-			JsonSpecifiedPropertyAttribute specifiedProperty = TypeCoercionUtility.GetAttribute<JsonSpecifiedPropertyAttribute>(member);
+			JsonSpecifiedPropertyAttribute specifiedPropertyAttr = TypeCoercionUtility.GetAttribute<JsonSpecifiedPropertyAttribute>(member);
 
 			// look up specified property to see if exists
 			GetterDelegate specifiedPropertyGetter = null;
-			if (specifiedProperty != null && !String.IsNullOrEmpty(specifiedProperty.SpecifiedProperty))
+			if (specifiedPropertyAttr != null && !String.IsNullOrEmpty(specifiedPropertyAttr.SpecifiedProperty))
 			{
-				PropertyInfo specProp = objType.GetProperty(specifiedProperty.SpecifiedProperty, BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic);
+				PropertyInfo specProp = objType.GetProperty(specifiedPropertyAttr.SpecifiedProperty, BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic);
 
 				// ensure is correct return type
 				if (specProp != null && specProp.PropertyType == typeof(bool))
@@ -106,8 +102,8 @@ namespace JsonFx.Json
 				}
 			}
 
-			DefaultValueAttribute attribute = TypeCoercionUtility.GetAttribute<DefaultValueAttribute>(member);
-			if (attribute == null)
+			DefaultValueAttribute defaultAttr = TypeCoercionUtility.GetAttribute<DefaultValueAttribute>(member);
+			if (defaultAttr == null)
 			{
 				if (specifiedPropertyGetter == null)
 				{
@@ -123,7 +119,7 @@ namespace JsonFx.Json
 			}
 
 			// extract default value since cannot change (is constant in attribute)
-			object defaultValue = attribute.Value;
+			object defaultValue = defaultAttr.Value;
 
 			if (specifiedPropertyGetter == null)
 			{
@@ -148,7 +144,7 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="member"></param>
 		/// <returns></returns>
-		public virtual string GetName(MemberInfo member)
+		public override string GetName(MemberInfo member)
 		{
 			JsonNameAttribute attribute = TypeCoercionUtility.GetAttribute<JsonNameAttribute>(member);
 

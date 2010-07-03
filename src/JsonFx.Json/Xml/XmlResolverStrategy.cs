@@ -41,7 +41,7 @@ namespace JsonFx.Xml
 	/// <summary>
 	/// Controls name resolution for IDataReader / IDataWriter using XmlSerializer attributes
 	/// </summary>
-	public class XmlResolverStrategy : IResolverStrategy
+	public class XmlResolverStrategy : PocoResolverStrategy
 	{
 		#region Name Resolution Methods
 
@@ -52,9 +52,12 @@ namespace JsonFx.Xml
 		/// <param name="isAnonymousType"></param>
 		/// <returns></returns>
 		/// <remarks>default implementation is must be read/write properties, or read-only anonymous</remarks>
-		public virtual bool IsPropertyIgnored(PropertyInfo member, bool isAnonymousType)
+		public override bool IsPropertyIgnored(PropertyInfo member, bool isAnonymousType)
 		{
-			return (!member.CanRead || !member.CanWrite);
+			// must satisfy POCO rules and not be ignored
+			return
+				base.IsPropertyIgnored(member, isAnonymousType) ||
+				TypeCoercionUtility.HasAttribute<XmlIgnoreAttribute>(member);
 		}
 
 		/// <summary>
@@ -63,14 +66,12 @@ namespace JsonFx.Xml
 		/// <param name="member"></param>
 		/// <returns></returns>
 		/// <remarks>default implementation is must be public, non-readonly field</remarks>
-		public virtual bool IsFieldIgnored(FieldInfo member)
+		public override bool IsFieldIgnored(FieldInfo member)
 		{
-			if (!member.IsPublic || (member.IsStatic != member.DeclaringType.IsEnum) || member.IsInitOnly)
-			{
-				return true;
-			}
-
-			return (TypeCoercionUtility.GetAttribute<XmlIgnoreAttribute>(member) != null);
+			// must satisfy POCO rules and not be ignored
+			return
+				base.IsFieldIgnored(member) ||
+				TypeCoercionUtility.HasAttribute<XmlIgnoreAttribute>(member);
 		}
 
 		/// <summary>
@@ -81,7 +82,7 @@ namespace JsonFx.Xml
 		/// <remarks>
 		/// This is useful when default values need not be serialized.
 		/// </remarks>
-		public virtual ValueIgnoredDelegate GetValueIgnoredCallback(MemberInfo member)
+		public override ValueIgnoredDelegate GetValueIgnoredCallback(MemberInfo member)
 		{
 			Type objType = member.ReflectedType ?? member.DeclaringType;
 
@@ -96,8 +97,8 @@ namespace JsonFx.Xml
 				specifiedPropertyGetter = DynamicMethodGenerator.GetPropertyGetter(specProp);
 			}
 
-			DefaultValueAttribute attribute = TypeCoercionUtility.GetAttribute<DefaultValueAttribute>(member);
-			if (attribute == null)
+			DefaultValueAttribute defaultAttr = TypeCoercionUtility.GetAttribute<DefaultValueAttribute>(member);
+			if (defaultAttr == null)
 			{
 				if (specifiedPropertyGetter == null)
 				{
@@ -113,7 +114,7 @@ namespace JsonFx.Xml
 			}
 
 			// extract default value since cannot change (is constant in attribute)
-			object defaultValue = attribute.Value;
+			object defaultValue = defaultAttr.Value;
 
 			if (specifiedPropertyGetter == null)
 			{
@@ -138,7 +139,7 @@ namespace JsonFx.Xml
 		/// </summary>
 		/// <param name="member"></param>
 		/// <returns></returns>
-		public virtual string GetName(MemberInfo member)
+		public override string GetName(MemberInfo member)
 		{
 			XmlElementAttribute attribute = TypeCoercionUtility.GetAttribute<XmlElementAttribute>(member);
 
