@@ -89,7 +89,7 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="member"></param>
 		/// <returns></returns>
-		public virtual ValueIgnoredDelegate GetValueIgnored(MemberInfo member)
+		public virtual ValueIgnoredDelegate GetValueIgnoredCallback(MemberInfo member)
 		{
 			return null;
 		}

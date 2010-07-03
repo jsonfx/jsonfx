@@ -108,7 +108,7 @@ namespace JsonFx.Serialization
 			return this.IsFieldIgnored(member);
 		}
 
-		ValueIgnoredDelegate IResolverStrategy.GetValueIgnored(MemberInfo member)
+		ValueIgnoredDelegate IResolverStrategy.GetValueIgnoredCallback(MemberInfo member)
 		{
 			if (this.GetValueIgnored == null)
 			{

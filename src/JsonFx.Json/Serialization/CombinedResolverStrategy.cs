@@ -128,13 +128,13 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="member"></param>
 		/// <returns>true if any strategy specifies this should be ignored</returns>
-		public ValueIgnoredDelegate GetValueIgnored(MemberInfo member)
+		public ValueIgnoredDelegate GetValueIgnoredCallback(MemberInfo member)
 		{
 			List<ValueIgnoredDelegate> ignoredDelegates = new List<ValueIgnoredDelegate>();
 
 			foreach (IResolverStrategy strategy in this.InnerStrategies)
 			{
-				ValueIgnoredDelegate ignoredDelegate = strategy.GetValueIgnored(member);
+				ValueIgnoredDelegate ignoredDelegate = strategy.GetValueIgnoredCallback(member);
 				if (ignoredDelegate != null)
 				{
 					ignoredDelegates.Add(ignoredDelegate);

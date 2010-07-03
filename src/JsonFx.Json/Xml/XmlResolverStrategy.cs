@@ -81,7 +81,7 @@ namespace JsonFx.Xml
 		/// <remarks>
 		/// This is useful when default values need not be serialized.
 		/// </remarks>
-		public virtual ValueIgnoredDelegate GetValueIgnored(MemberInfo member)
+		public virtual ValueIgnoredDelegate GetValueIgnoredCallback(MemberInfo member)
 		{
 			Type objType = member.ReflectedType ?? member.DeclaringType;
 

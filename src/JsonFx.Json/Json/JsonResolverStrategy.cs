@@ -88,7 +88,7 @@ namespace JsonFx.Json
 		/// <remarks>
 		/// This is useful for excluding serialization of default values.
 		/// </remarks>
-		public virtual ValueIgnoredDelegate GetValueIgnored(MemberInfo member)
+		public virtual ValueIgnoredDelegate GetValueIgnoredCallback(MemberInfo member)
 		{
 			Type objType = member.ReflectedType ?? member.DeclaringType;
 			JsonSpecifiedPropertyAttribute specifiedProperty = TypeCoercionUtility.GetAttribute<JsonSpecifiedPropertyAttribute>(member);

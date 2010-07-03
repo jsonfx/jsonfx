@@ -71,7 +71,7 @@ namespace JsonFx.Serialization
 		/// <remarks>
 		/// This is useful when default values need not be serialized.
 		/// </remarks>
-		public virtual ValueIgnoredDelegate GetValueIgnored(MemberInfo member)
+		public virtual ValueIgnoredDelegate GetValueIgnoredCallback(MemberInfo member)
 		{
 			return null;
 		}

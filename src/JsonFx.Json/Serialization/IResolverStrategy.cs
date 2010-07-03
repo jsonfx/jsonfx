@@ -72,7 +72,7 @@ namespace JsonFx.Serialization
 		/// <param name="target"></param>
 		/// <param name="value"></param>
 		/// <returns></returns>
-		ValueIgnoredDelegate GetValueIgnored(MemberInfo member);
+		ValueIgnoredDelegate GetValueIgnoredCallback(MemberInfo member);
 
 		/// <summary>
 		/// Gets the serialized name for the member.
