@@ -61,7 +61,7 @@ namespace JsonFx.Json
 				return true;
 			}
 
-			return (TypeCoercionUtility.GetAttribute<JsonIgnoreAttribute>(member) != null);
+			return TypeCoercionUtility.HasAttribute<JsonIgnoreAttribute>(member);
 		}
 
 		/// <summary>
@@ -77,7 +77,7 @@ namespace JsonFx.Json
 				return true;
 			}
 
-			return (TypeCoercionUtility.GetAttribute<JsonIgnoreAttribute>(member) != null);
+			return TypeCoercionUtility.HasAttribute<JsonIgnoreAttribute>(member);
 		}
 
 		/// <summary>

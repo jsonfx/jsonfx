@@ -60,7 +60,7 @@ namespace JsonFx.Serialization
 				return true;
 			}
 
-			return (TypeCoercionUtility.GetAttribute<IgnoreDataMemberAttribute>(member) != null);
+			return TypeCoercionUtility.HasAttribute<IgnoreDataMemberAttribute>(member);
 		}
 
 		/// <summary>
@@ -81,7 +81,7 @@ namespace JsonFx.Serialization
 				return true;
 			}
 
-			return (TypeCoercionUtility.GetAttribute<IgnoreDataMemberAttribute>(member) != null);
+			return TypeCoercionUtility.HasAttribute<IgnoreDataMemberAttribute>(member);
 		}
 
 		/// <summary>

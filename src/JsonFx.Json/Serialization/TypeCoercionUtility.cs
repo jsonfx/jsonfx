@@ -760,7 +760,19 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="value"></param>
 		/// <typeparam name="T">Attribute Type</typeparam>
-		/// <returns>attribte</returns>
+		/// <returns>true if defined</returns>
+		public static bool HasAttribute<T>(MemberInfo info)
+			where T : Attribute
+		{
+			return (info != null && Attribute.IsDefined(info, typeof(T)));
+		}
+
+		/// <summary>
+		/// Gets the attribute T for the given value.
+		/// </summary>
+		/// <param name="value"></param>
+		/// <typeparam name="T">Attribute Type</typeparam>
+		/// <returns>requested attribute or not if not defined</returns>
 		public static T GetAttribute<T>(MemberInfo info)
 			where T : Attribute
 		{
