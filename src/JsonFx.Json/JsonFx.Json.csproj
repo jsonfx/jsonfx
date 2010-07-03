@@ -58,6 +58,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFrameworkVersion)' == 'v2.0' Or '$(TargetFrameworkVersion)' == 'v3.0' ">
     <DefineConstants>$(DefineConstants);NET20</DefineConstants>
+    <TargetFrameworkProfile></TargetFrameworkProfile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
