@@ -47,16 +47,20 @@ namespace JsonFx.Serialization
 		/// <param name="member"></param>
 		/// <param name="isAnonymousType"></param>
 		/// <returns></returns>
-		/// <remarks>default implementation is must be read/write properties, or read-only anonymous</remarks>
 		public virtual bool IsPropertyIgnored(PropertyInfo member, bool isAnonymousType)
 		{
+			if ((TypeCoercionUtility.GetAttribute<DataContractAttribute>(member.DeclaringType) == null) &&
+				(TypeCoercionUtility.GetAttribute<DataMemberAttribute>(member) == null))
+			{
+				return true;
+			}
+
 			if (!member.CanRead || (!member.CanWrite && !isAnonymousType))
 			{
 				return true;
 			}
 
-			return //(TypeCoercionUtility.GetAttribute<DataMemberAttribute>(member) == null) ||
-				(TypeCoercionUtility.GetAttribute<IgnoreDataMemberAttribute>(member) != null);
+			return (TypeCoercionUtility.GetAttribute<IgnoreDataMemberAttribute>(member) != null);
 		}
 
 		/// <summary>
@@ -64,16 +68,20 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="member"></param>
 		/// <returns></returns>
-		/// <remarks>default implementation is must be public, non-readonly field</remarks>
 		public virtual bool IsFieldIgnored(FieldInfo member)
 		{
+			if ((TypeCoercionUtility.GetAttribute<DataContractAttribute>(member.DeclaringType) == null) &&
+				(TypeCoercionUtility.GetAttribute<DataMemberAttribute>(member) == null))
+			{
+				return true;
+			}
+
 			if (!member.IsPublic || (member.IsStatic != member.DeclaringType.IsEnum) || member.IsInitOnly)
 			{
 				return true;
 			}
 
-			return //(TypeCoercionUtility.GetAttribute<DataMemberAttribute>(member) == null) ||
-				(TypeCoercionUtility.GetAttribute<IgnoreDataMemberAttribute>(member) != null);
+			return (TypeCoercionUtility.GetAttribute<IgnoreDataMemberAttribute>(member) != null);
 		}
 
 		/// <summary>
@@ -82,10 +90,7 @@ namespace JsonFx.Serialization
 		/// <param name="member"></param>
 		/// <param name="target"></param>
 		/// <param name="value"></param>
-		/// <returns>if has a value equivalent to the DefaultValueAttribute</returns>
-		/// <remarks>
-		/// This is useful for excluding serialization of default values.
-		/// </remarks>
+		/// <returns></returns>
 		public virtual bool IsValueIgnored(MemberInfo member, object target, object value)
 		{
 			return false;
