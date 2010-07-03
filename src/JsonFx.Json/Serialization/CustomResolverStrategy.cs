@@ -35,13 +35,68 @@ using System.Reflection;
 namespace JsonFx.Serialization
 {
 	/// <summary>
-	/// Controls name resolution for IDataReader / IDataWriter
+	/// Controls name resolution for IDataReader / IDataWriter by using a decorator pattern around any other strategy
 	/// </summary>
 	/// <remarks>
-	/// Provides an extensibility point to control member naming at a very granular level.
+	/// Provides an extensibility point to control member naming and visibility at a very granular level.
 	/// </remarks>
-	public class DataNameResolverStrategy : IResolverStrategy
+	public sealed class CustomResolverStrategy : IResolverStrategy
 	{
+		#region Fields
+
+		private readonly IResolverStrategy InnerStrategy;
+
+		#endregion Fields
+
+		#region Init
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="strategy"></param>
+		public CustomResolverStrategy(IResolverStrategy strategy)
+		{
+			this.InnerStrategy = strategy;
+		}
+
+		#endregion Init
+
+		#region Properties
+
+		public delegate bool PropertyIgnoredDelegate(PropertyInfo propertyInfo, bool isAnonymous);
+
+		public PropertyIgnoredDelegate IsPropertyIgnoredCustom
+		{
+			get;
+			set;
+		}
+
+		public delegate bool FieldIgnoredDelegate(FieldInfo fieldInfo);
+
+		public FieldIgnoredDelegate IsFieldIgnoredCustom
+		{
+			get;
+			set;
+		}
+
+		public delegate bool ValueIgnoredDelegate(MemberInfo memberInfo, object target, object value);
+
+		public ValueIgnoredDelegate IsValueIgnoredCustom
+		{
+			get;
+			set;
+		}
+
+		public delegate string GetNameDelegate(MemberInfo memberInfo);
+
+		public GetNameDelegate GetNameCustom
+		{
+			get;
+			set;
+		}
+
+		#endregion Properties
+
 		#region Name Resolution Methods
 
 		/// <summary>
@@ -50,15 +105,14 @@ namespace JsonFx.Serialization
 		/// <param name="member"></param>
 		/// <param name="isAnonymousType"></param>
 		/// <returns></returns>
-		/// <remarks>default implementation is must be read/write properties, or read-only anonymous</remarks>
-		public virtual bool IsPropertyIgnored(PropertyInfo member, bool isAnonymousType)
+		public bool IsPropertyIgnored(PropertyInfo member, bool isAnonymousType)
 		{
-			if (!member.CanRead || (!member.CanWrite && !isAnonymousType))
+			if (this.IsPropertyIgnoredCustom != null)
 			{
-				return true;
+				return this.IsPropertyIgnoredCustom(member, isAnonymousType);
 			}
 
-			return (TypeCoercionUtility.GetAttribute<DataIgnoreAttribute>(member) != null);
+			return this.InnerStrategy.IsPropertyIgnored(member, isAnonymousType);
 		}
 
 		/// <summary>
@@ -66,15 +120,14 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="member"></param>
 		/// <returns></returns>
-		/// <remarks>default implementation is must be public, non-readonly field</remarks>
-		public virtual bool IsFieldIgnored(FieldInfo member)
+		public bool IsFieldIgnored(FieldInfo member)
 		{
-			if (!member.IsPublic || (member.IsStatic != member.DeclaringType.IsEnum) || member.IsInitOnly)
+			if (this.IsFieldIgnoredCustom != null)
 			{
-				return true;
+				return this.IsFieldIgnoredCustom(member);
 			}
 
-			return (TypeCoercionUtility.GetAttribute<DataIgnoreAttribute>(member) != null);
+			return this.InnerStrategy.IsFieldIgnored(member);
 		}
 
 		/// <summary>
@@ -84,35 +137,14 @@ namespace JsonFx.Serialization
 		/// <param name="target"></param>
 		/// <param name="value"></param>
 		/// <returns>if has a value equivalent to the DefaultValueAttribute</returns>
-		/// <remarks>
-		/// This is useful when default values need not be serialized.
-		/// </remarks>
-		public virtual bool IsValueIgnored(MemberInfo member, object target, object value)
+		public bool IsValueIgnored(MemberInfo member, object target, object value)
 		{
-			DefaultValueAttribute attribute = TypeCoercionUtility.GetAttribute<DefaultValueAttribute>(member);
-			if (attribute != null && (attribute.Value == value))
+			if (this.IsValueIgnoredCustom != null)
 			{
-				return true;
+				return this.IsValueIgnoredCustom(member, target, value);
 			}
 
-			Type objType = member.ReflectedType ?? member.DeclaringType;
-
-			DataSpecifiedPropertyAttribute specifiedProperty = TypeCoercionUtility.GetAttribute<DataSpecifiedPropertyAttribute>(member);
-			if (specifiedProperty != null && !String.IsNullOrEmpty(specifiedProperty.SpecifiedProperty))
-			{
-				PropertyInfo specProp = objType.GetProperty(specifiedProperty.SpecifiedProperty, BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic);
-				if (specProp != null)
-				{
-					// TODO: build GetterDelegate, cache under original member, execute
-					object isSpecified = specProp.GetValue(target, null);
-					if (isSpecified is Boolean && !Convert.ToBoolean(isSpecified))
-					{
-						return true;
-					}
-				}
-			}
-
-			return false;
+			return this.InnerStrategy.IsValueIgnored(member, target, value);
 		}
 
 		/// <summary>
@@ -120,11 +152,14 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="member"></param>
 		/// <returns></returns>
-		public virtual string GetName(MemberInfo member)
+		public string GetName(MemberInfo member)
 		{
-			DataNameAttribute attribute = TypeCoercionUtility.GetAttribute<DataNameAttribute>(member);
+			if (this.GetNameCustom != null)
+			{
+				return this.GetNameCustom(member);
+			}
 
-			return (attribute != null) ? attribute.Name : null;
+			return this.InnerStrategy.GetName(member);
 		}
 
 		#endregion Name Resolution Methods

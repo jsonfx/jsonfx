@@ -38,6 +38,8 @@ using JsonFx.CodeGen;
 
 namespace JsonFx.Serialization
 {
+	// TODO: should this be expanded so it contains all of the members but stores if they are ignored or not
+	// then when serializing, use a where clause style filter to only return those that are serialized?
 	public class MemberMap
 	{
 		#region Init
@@ -257,8 +259,7 @@ namespace JsonFx.Serialization
 				// load properties into property map
 				foreach (PropertyInfo info in objectType.GetProperties(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic))
 				{
-					if (this.Strategy.IsPropertyIgnored(info, isAnonymousType) ||
-							this.Strategy.IsIgnored(info))
+					if (this.Strategy.IsPropertyIgnored(info, isAnonymousType))
 					{
 						continue;
 					}
@@ -276,8 +277,7 @@ namespace JsonFx.Serialization
 			// load fields into property map
 			foreach (FieldInfo info in objectType.GetFields(objectType.IsEnum ? BindingFlags.Static|BindingFlags.Public : BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic))
 			{
-				if (this.Strategy.IsFieldIgnored(info) ||
-						this.Strategy.IsIgnored(info))
+				if (this.Strategy.IsFieldIgnored(info))
 				{
 					continue;
 				}
@@ -325,19 +325,9 @@ namespace JsonFx.Serialization
 			return this.Strategy.IsFieldIgnored(member);
 		}
 
-		public bool IsIgnored(MemberInfo member)
-		{
-			return this.Strategy.IsIgnored(member);
-		}
-
 		public bool IsValueIgnored(MemberInfo member, object target, object value)
 		{
 			return this.Strategy.IsValueIgnored(member, target, value);
-		}
-
-		public bool IsDefaultValue(MemberInfo member, object value)
-		{
-			return this.Strategy.IsDefaultValue(member, value);
 		}
 
 		public string GetName(MemberInfo member)
@@ -345,9 +335,23 @@ namespace JsonFx.Serialization
 			return this.Strategy.GetName(member);
 		}
 
+		/// <summary>
+		/// Gets the serialized name for the Enum value.
+		/// </summary>
+		/// <param name="value"></param>
+		/// <returns></returns>
 		public string GetName(Enum value)
 		{
-			return this.Strategy.GetName(value);
+			Type type = value.GetType();
+
+			string name = Enum.GetName(type, value);
+			if (String.IsNullOrEmpty(name))
+			{
+				return null;
+			}
+
+			MemberInfo member = type.GetField(name);
+			return this.Strategy.GetName(member);
 		}
 
 		#endregion IResolverStrategy Members

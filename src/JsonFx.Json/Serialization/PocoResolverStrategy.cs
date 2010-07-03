@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -34,14 +34,11 @@ using System.Reflection;
 namespace JsonFx.Serialization
 {
 	/// <summary>
-	/// Controls name resolution for IDataReader / IDataWriter
+	/// Controls name resolution for IDataReader / IDataWriter using plain old CLR object (POCO) names
 	/// </summary>
-	/// <remarks>
-	/// Provides an extensibility point to control member naming and visibility at a very granular level.
-	/// </remarks>
-	public interface IResolverStrategy
+	public class PocoResolverStrategy : IResolverStrategy
 	{
-		#region Methods
+		#region Name Resolution Methods
 
 		/// <summary>
 		/// Gets a value indicating if the property is to be serialized.
@@ -49,31 +46,48 @@ namespace JsonFx.Serialization
 		/// <param name="member"></param>
 		/// <param name="isAnonymousType"></param>
 		/// <returns></returns>
-		bool IsPropertyIgnored(PropertyInfo member, bool isAnonymousType);
+		/// <remarks>default implementation is must be read/write properties, or read-only anonymous</remarks>
+		public virtual bool IsPropertyIgnored(PropertyInfo member, bool isAnonymousType)
+		{
+			return (!member.CanRead || (!member.CanWrite && !isAnonymousType));
+		}
 
 		/// <summary>
 		/// Gets a value indicating if the field is to be serialized.
 		/// </summary>
 		/// <param name="member"></param>
 		/// <returns></returns>
-		bool IsFieldIgnored(FieldInfo member);
+		/// <remarks>default implementation is must be public, non-readonly field</remarks>
+		public virtual bool IsFieldIgnored(FieldInfo member)
+		{
+			return (!member.IsPublic || (member.IsStatic != member.DeclaringType.IsEnum) || member.IsInitOnly);
+		}
 
 		/// <summary>
-		/// Determines if the property or field should not be serialized.
+		/// Determines if the property or field should not be serialized based upon its value.
 		/// </summary>
 		/// <param name="member"></param>
 		/// <param name="target"></param>
 		/// <param name="value"></param>
-		/// <returns></returns>
-		bool IsValueIgnored(MemberInfo member, object target, object value);
+		/// <returns>if has a value equivalent to the DefaultValueAttribute</returns>
+		/// <remarks>
+		/// This is useful when default values need not be serialized.
+		/// </remarks>
+		public virtual bool IsValueIgnored(MemberInfo member, object target, object value)
+		{
+			return false;
+		}
 
 		/// <summary>
 		/// Gets the serialized name for the member.
 		/// </summary>
-		/// <param name="value"></param>
+		/// <param name="member"></param>
 		/// <returns></returns>
-		string GetName(MemberInfo member);
+		public virtual string GetName(MemberInfo member)
+		{
+			return null;
+		}
 
-		#endregion Methods
+		#endregion Name Resolution Methods
 	}
 }

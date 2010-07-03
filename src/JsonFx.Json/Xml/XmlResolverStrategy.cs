@@ -31,16 +31,16 @@
 using System;
 using System.ComponentModel;
 using System.Reflection;
+using System.Xml.Serialization;
 
-namespace JsonFx.Serialization
+using JsonFx.Serialization;
+
+namespace JsonFx.Xml
 {
 	/// <summary>
-	/// Controls name resolution for IDataReader / IDataWriter
+	/// Controls name resolution for IDataReader / IDataWriter using XmlSerializer attributes
 	/// </summary>
-	/// <remarks>
-	/// Provides an extensibility point to control member naming at a very granular level.
-	/// </remarks>
-	public class DataNameResolverStrategy : IResolverStrategy
+	public class XmlResolverStrategy : IResolverStrategy
 	{
 		#region Name Resolution Methods
 
@@ -53,12 +53,7 @@ namespace JsonFx.Serialization
 		/// <remarks>default implementation is must be read/write properties, or read-only anonymous</remarks>
 		public virtual bool IsPropertyIgnored(PropertyInfo member, bool isAnonymousType)
 		{
-			if (!member.CanRead || (!member.CanWrite && !isAnonymousType))
-			{
-				return true;
-			}
-
-			return (TypeCoercionUtility.GetAttribute<DataIgnoreAttribute>(member) != null);
+			return (!member.CanRead || !member.CanWrite);
 		}
 
 		/// <summary>
@@ -74,7 +69,7 @@ namespace JsonFx.Serialization
 				return true;
 			}
 
-			return (TypeCoercionUtility.GetAttribute<DataIgnoreAttribute>(member) != null);
+			return (TypeCoercionUtility.GetAttribute<XmlIgnoreAttribute>(member) != null);
 		}
 
 		/// <summary>
@@ -97,19 +92,15 @@ namespace JsonFx.Serialization
 
 			Type objType = member.ReflectedType ?? member.DeclaringType;
 
-			DataSpecifiedPropertyAttribute specifiedProperty = TypeCoercionUtility.GetAttribute<DataSpecifiedPropertyAttribute>(member);
-			if (specifiedProperty != null && !String.IsNullOrEmpty(specifiedProperty.SpecifiedProperty))
+			PropertyInfo specProp = objType.GetProperty(member.Name+"Specified");
+			if (specProp != null)
 			{
-				PropertyInfo specProp = objType.GetProperty(specifiedProperty.SpecifiedProperty, BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic);
-				if (specProp != null)
-				{
-					// TODO: build GetterDelegate, cache under original member, execute
-					object isSpecified = specProp.GetValue(target, null);
-					if (isSpecified is Boolean && !Convert.ToBoolean(isSpecified))
-					{
-						return true;
-					}
-				}
+				//TODO: build GetterDelegate, cache under original member, execute
+			    object isSpecified = specProp.GetValue(target, null);
+				if (Object.Equals(isSpecified, false))
+			    {
+			        return true;
+			    }
 			}
 
 			return false;
@@ -122,9 +113,9 @@ namespace JsonFx.Serialization
 		/// <returns></returns>
 		public virtual string GetName(MemberInfo member)
 		{
-			DataNameAttribute attribute = TypeCoercionUtility.GetAttribute<DataNameAttribute>(member);
+			XmlElementAttribute attribute = TypeCoercionUtility.GetAttribute<XmlElementAttribute>(member);
 
-			return (attribute != null) ? attribute.Name : null;
+			return (attribute != null) ? attribute.ElementName : null;
 		}
 
 		#endregion Name Resolution Methods
