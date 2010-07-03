@@ -10,11 +10,17 @@ IF NOT EXIST "%MSBuild%" (
 	GOTO END
 )
 
-ECHO Building for unit test pass...
-"%MSBuild%" JsonFx2.Json.sln /target:rebuild /property:TargetFrameworkVersion=v4.0;Configuration=Release;RunTests=True
+IF NOT EXIST "keys\JsonFx_Key.pfx" (
+	SET Configuration=Release
+) ELSE (
+	SET Configuration=Signed
+)
 
-ECHO Building singed builds for v2.0, v3.5, v4.0...
-FOR %%i IN (v2.0 v3.5 v4.0) DO "%MSBuild%" JsonFx2.Json.sln /target:rebuild /property:TargetFrameworkVersion=%%i;Configuration=Signed
+ECHO Building unit test pass...
+"%MSBuild%" JsonFx2.sln /target:rebuild /property:TargetFrameworkVersion=v4.0;Configuration=Release;RunTests=True
+
+ECHO Building specific builds for v2.0, v3.5, v4.0...
+FOR %%i IN (v2.0 v3.5 v4.0) DO "%MSBuild%" src/JsonFx.Json/JsonFx.Json.csproj /target:rebuild /property:TargetFrameworkVersion=%%i;Configuration=%Configuration%
 
 :END
 POPD
