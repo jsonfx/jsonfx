@@ -40,25 +40,6 @@ namespace JsonFx.Json
 {
 	public class JsonAnalyzerTests
 	{
-		#region Test Types
-
-		private enum ExampleEnum
-		{
-			[JsonName("zero")]
-			Zero = 0,
-
-			[JsonName("one")]
-			One = 1,
-
-			[JsonName("two")]
-			Two = 2,
-
-			[JsonName("three")]
-			Three = 3
-		}
-
-		#endregion Test Types
-
 		#region Array Tests
 
 		[Fact]
@@ -943,59 +924,5 @@ namespace JsonFx.Json
 		}
 
 		#endregion Input Edge Case Tests
-
-		#region Enum Tests
-
-		// TODO: these are actually testing type coercion and resolver strategy, need to isolate to improve testability
-
-		[Fact]
-		public void Parse_EnumFromString_ReturnsEnum()
-		{
-			var input = new[]
-			{
-				JsonGrammar.TokenString("Two")
-			};
-
-			var expected = ExampleEnum.Two;
-
-			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings(new JsonResolverStrategy()));
-			var actual = analyzer.Analyze<ExampleEnum>(input).Single();
-
-			Assert.Equal(expected, actual);
-		}
-
-		[Fact]
-		public void Parse_EnumFromJsonName_ReturnsEnum()
-		{
-			var input = new[]
-			{
-				JsonGrammar.TokenString("two")
-			};
-
-			var expected = ExampleEnum.Two;
-
-			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings(new JsonResolverStrategy()));
-			var actual = analyzer.Analyze<ExampleEnum>(input).Single();
-
-			Assert.Equal(expected, actual);
-		}
-
-		[Fact]
-		public void Parse_EnumFromNumber_ReturnsEnum()
-		{
-			var input = new[]
-			{
-				JsonGrammar.TokenNumber(3)
-			};
-
-			var expected = ExampleEnum.Three;
-
-			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings(new JsonResolverStrategy()));
-			var actual = analyzer.Analyze<ExampleEnum>(input).Single();
-
-			Assert.Equal(expected, actual);
-		}
-
-		#endregion Enum Tests
 	}
 }

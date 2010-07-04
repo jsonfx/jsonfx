@@ -32,14 +32,35 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Linq;
 
+using JsonFx.Json;
 using Xunit;
+
 using Assert=JsonFx.AssertPatched;
 
 namespace JsonFx.Serialization
 {
 	public class TypeCoercionUtilityTests
 	{
+		#region Test Types
+
+		private enum ExampleEnum
+		{
+			Zero = 0,
+
+			[JsonName("")]
+			One = 1,
+
+			[JsonName("yellow")]
+			Two = 2,
+
+			[JsonName(null)]
+			Three = 3
+		}
+
+		#endregion Test Types
+
 		#region List Tests
 
 		[Fact]
@@ -129,5 +150,145 @@ namespace JsonFx.Serialization
 		}
 
 		#endregion Array Tests
+
+		#region Enum Tests
+
+		// TODO: these are actually testing type coercion and resolver strategy, need to isolate and improve testability
+
+		[Fact]
+		public void JsonAnalyzerParse_EnumFromString_ReturnsEnum()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenString("Two")
+			};
+
+			var expected = ExampleEnum.Two;
+
+			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings(new JsonResolverStrategy()));
+			var actual = analyzer.Analyze<ExampleEnum>(input).Single();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void JsonAnalyzerParse_EnumFromJsonName_ReturnsEnum()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenString("yellow")
+			};
+
+			var expected = ExampleEnum.Two;
+
+			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings(new JsonResolverStrategy()));
+			var actual = analyzer.Analyze<ExampleEnum>(input).Single();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void JsonAnalyzerParse_EnumFromNumber_ReturnsEnum()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenNumber(3)
+			};
+
+			var expected = ExampleEnum.Three;
+
+			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings(new JsonResolverStrategy()));
+			var actual = analyzer.Analyze<ExampleEnum>(input).Single();
+
+			Assert.Equal(expected, actual);
+		}
+
+		#endregion Enum Tests
+
+		#region Enum Tests
+
+		// TODO: these are actually testing type coercion and resolver strategy, need to isolate and improve testability
+
+		[Fact]
+		public void JsonFormatterFormat_EnumPocoToString_ReturnsEnum()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenString(ExampleEnum.Zero)
+			};
+
+			var expected = @"""Zero""";
+
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings(new JsonResolverStrategy()));
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void JsonFormatterFormat_EnumEmptyStringJsonNameToString_ReturnsEnum()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenString(ExampleEnum.One)
+			};
+
+			var expected = @"""One""";
+
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings(new JsonResolverStrategy()));
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void JsonFormatterFormat_EnumWithJsonName_ReturnsEnum()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenString(ExampleEnum.Two)
+			};
+
+			var expected = @"""yellow""";
+
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings(new JsonResolverStrategy()));
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void JsonFormatterFormat_EnumNullJsonNameToString_ReturnsEnum()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenString(ExampleEnum.Three)
+			};
+
+			var expected = @"""Three""";
+
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings(new JsonResolverStrategy()));
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void JsonFormatterFormat_EnumFromNumber_ReturnsEnum()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenNumber(ExampleEnum.Three)
+			};
+
+			var expected = "3";
+
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings(new JsonResolverStrategy()));
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		#endregion Enum Tests
 	}
 }
