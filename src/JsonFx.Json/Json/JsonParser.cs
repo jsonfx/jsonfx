@@ -334,9 +334,9 @@ namespace JsonFx.Json
 						propertyMap = null;
 						propertyType = itemType;
 					}
-					else if ((memberMap != null) && memberMap.ContainsKey(propertyName))
+					else if ((memberMap != null) &&
+						memberMap.TryGetValue(propertyName, out propertyMap))
 					{
-						propertyMap = memberMap[propertyName];
 						propertyType = (propertyMap != null) ? propertyMap.Type : null;
 					}
 					else

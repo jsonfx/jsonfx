@@ -365,20 +365,21 @@ namespace JsonFx.Serialization
 		{
 			object newValue = TypeCoercionUtility.InstantiateObject(targetType);
 
-			IDictionary<string, MemberMap> map = this.ResolverCache.LoadMaps(targetType);
-			if (map != null)
+			IDictionary<string, MemberMap> maps = this.ResolverCache.LoadMaps(targetType);
+			if (maps != null)
 			{
 				// copy any values into new object
 				foreach (object key in value.Keys)
 				{
 					string memberName = Convert.ToString(key, CultureInfo.InvariantCulture);
-					MemberMap memberMap = map.ContainsKey(memberName) ? map[memberName] : null;
-					if (memberMap == null || memberMap.Setter == null)
-					{
-						continue;
-					}
 
-					memberMap.Setter(newValue, value[key]);
+					MemberMap map;
+
+					if (maps.TryGetValue(memberName, out map) &&
+						map != null && map.Setter != null)
+					{
+						map.Setter(newValue, value[key]);
+					}
 				}
 			}
 

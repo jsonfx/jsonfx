@@ -40,6 +40,24 @@ namespace JsonFx.Json
 {
 	public class JsonFormatterTests
 	{
+		#region Test Types
+
+		private enum ExampleEnum
+		{
+			Zero = 0,
+
+			[JsonName("")]
+			One = 1,
+
+			[JsonName("yellow")]
+			Two = 2,
+
+			[JsonName(null)]
+			Three = 3
+		}
+
+		#endregion Test Types
+
 		#region Array Tests
 
 		[Fact]
@@ -734,6 +752,92 @@ namespace JsonFx.Json
 		}
 
 		#endregion Number Tests
+
+		#region Enum Tests
+
+		// TODO: these are actually testing type coercion and resolver strategy, need to isolate and improve testability
+
+		[Fact]
+		public void Format_EnumPocoToString_ReturnsEnum()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenString(ExampleEnum.Zero)
+			};
+
+			var expected = @"""Zero""";
+
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings(new JsonResolverStrategy()));
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void Format_EnumEmptyStringJsonNameToString_ReturnsEnum()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenString(ExampleEnum.One)
+			};
+
+			var expected = @"""One""";
+
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings(new JsonResolverStrategy()));
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void Format_EnumWithJsonName_ReturnsEnum()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenString(ExampleEnum.Two)
+			};
+
+			var expected = @"""yellow""";
+
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings(new JsonResolverStrategy()));
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void Format_EnumNullJsonNameToString_ReturnsEnum()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenString(ExampleEnum.Three)
+			};
+
+			var expected = @"""Three""";
+
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings(new JsonResolverStrategy()));
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void Format_EnumFromNumber_ReturnsEnum()
+		{
+			var input = new[]
+			{
+				JsonGrammar.TokenNumber(ExampleEnum.Three)
+			};
+
+			var expected = "3";
+
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings(new JsonResolverStrategy()));
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		#endregion Enum Tests
 
 		#region Complex Graph Tests
 

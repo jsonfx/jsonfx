@@ -1023,7 +1023,7 @@ namespace JsonFx.Json
 
 			var expected = ExampleEnum.Two;
 
-			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+			var parser = new JsonReader.JsonParser(new DataReaderSettings(new JsonResolverStrategy()));
 			var actual = parser.Parse<ExampleEnum>(input);
 
 			Assert.Equal(expected, actual);
@@ -1055,7 +1055,7 @@ namespace JsonFx.Json
 
 			var expected = ExampleEnum.Three;
 
-			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+			var parser = new JsonReader.JsonParser(new DataReaderSettings(new JsonResolverStrategy()));
 			var actual = parser.Parse<ExampleEnum>(input);
 
 			Assert.Equal(expected, actual);

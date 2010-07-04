@@ -549,6 +549,7 @@ namespace JsonFx.Json
 			private string FormatFlags(Enum value)
 			{
 				Type type = value.GetType();
+				IDictionary<Enum, string> map = this.Settings.Resolver.LoadEnumMaps(type);
 
 				string enumName;
 				if (type.IsDefined(typeof(FlagsAttribute), true) && !Enum.IsDefined(type, value))
@@ -557,8 +558,8 @@ namespace JsonFx.Json
 					string[] flagNames = new string[flags.Length];
 					for (int i=0; i<flags.Length; i++)
 					{
-						flagNames[i] = this.Settings.Resolver.GetName(flags[i]);
-						if (String.IsNullOrEmpty(flagNames[i]))
+						if (!map.TryGetValue(flags[i], out flagNames[i]) ||
+							String.IsNullOrEmpty(flagNames[i]))
 						{
 							flagNames[i] = flags[i].ToString("f");
 						}
@@ -567,8 +568,8 @@ namespace JsonFx.Json
 				}
 				else
 				{
-					enumName = this.Settings.Resolver.GetName(value);
-					if (String.IsNullOrEmpty(enumName))
+					if (!map.TryGetValue(value, out enumName) ||
+						String.IsNullOrEmpty(enumName))
 					{
 						enumName = value.ToString("f");
 					}
