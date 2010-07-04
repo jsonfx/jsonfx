@@ -86,6 +86,7 @@
     <Compile Include="Json\JsonFormatterTests.cs" />
     <Compile Include="Json\JsonTokenizerTests.cs" />
     <Compile Include="Json\JsonWalkerTests.cs" />
+    <Compile Include="Serialization\TypeCoercionUtilityTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\JsonFx.Json\JsonFx.Json.csproj">

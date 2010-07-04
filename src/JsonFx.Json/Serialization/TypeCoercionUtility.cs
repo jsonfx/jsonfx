@@ -35,6 +35,12 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 
+#if NET40
+using JsonObject=System.Dynamic.ExpandoObject;
+#else
+using JsonObject=System.Collections.Generic.Dictionary<string, object>;
+#endif
+
 namespace JsonFx.Serialization
 {
 	/// <summary>
@@ -130,7 +136,11 @@ namespace JsonFx.Serialization
 					targetType.FullName));
 			}
 
-			ConstructorInfo ctor = targetType.GetConstructor(null);
+			ConstructorInfo ctor = targetType.GetConstructor(
+				BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic,
+				null,
+				Type.EmptyTypes,
+				null);
 			if (ctor == null)
 			{
 				throw new TypeCoercionException(String.Format(
@@ -141,7 +151,7 @@ namespace JsonFx.Serialization
 			try
 			{
 				// always try-catch Invoke() to expose real exception
-				// TODO :build FactoryDelegate, cache under targetType and execute
+				// TODO: build FactoryDelegate, cache under targetType and execute
 				result = ctor.Invoke(null);
 			}
 			catch (TargetInvocationException ex)
@@ -271,7 +281,11 @@ namespace JsonFx.Serialization
 				}
 			}
 
-			if (value is IDictionary)
+			if (value is IDictionary<string, object>)
+			{
+				return this.CoerceType(targetType, (IDictionary<string, object>)value);
+			}
+			else if (value is IDictionary)
 			{
 				return this.CoerceType(targetType, (IDictionary)value);
 			}
@@ -361,12 +375,90 @@ namespace JsonFx.Serialization
 		/// <param name="targetType"></param>
 		/// <param name="value"></param>
 		/// <returns></returns>
+		private object CoerceType(Type targetType, IDictionary<string, object> value)
+		{
+			object newValue = TypeCoercionUtility.InstantiateObject(targetType);
+
+			IDictionary<string, MemberMap> maps = this.ResolverCache.LoadMaps(targetType);
+			if (maps == null)
+			{
+				IDictionary<string, object> genericDictionary = newValue as IDictionary<string, object>;
+				if (genericDictionary != null)
+				{
+					// copy all values into new object
+					foreach (string memberName in value.Keys)
+					{
+						genericDictionary[memberName] = value[memberName];
+					}
+				}
+				else
+				{
+					IDictionary dictionary = newValue as IDictionary;
+					if (dictionary != null)
+					{
+						// copy all values into new object
+						foreach (string memberName in value.Keys)
+						{
+							dictionary[memberName] = value[memberName];
+						}
+					}
+				}
+			}
+			else
+			{
+				// copy any values into new object
+				foreach (string memberName in value.Keys)
+				{
+					MemberMap map;
+
+					if (maps.TryGetValue(memberName, out map) &&
+						map != null && map.Setter != null)
+					{
+						map.Setter(newValue, value[memberName]);
+					}
+				}
+			}
+
+			return newValue;
+		}
+
+		/// <summary>
+		/// Populates the properties of an object with the dictionary values.
+		/// </summary>
+		/// <param name="targetType"></param>
+		/// <param name="value"></param>
+		/// <returns></returns>
 		private object CoerceType(Type targetType, IDictionary value)
 		{
 			object newValue = TypeCoercionUtility.InstantiateObject(targetType);
 
 			IDictionary<string, MemberMap> maps = this.ResolverCache.LoadMaps(targetType);
-			if (maps != null)
+			if (maps == null)
+			{
+				IDictionary<string, object> genericDictionary = newValue as IDictionary<string, object>;
+				if (genericDictionary != null)
+				{
+					// copy all values into new object
+					foreach (object key in value.Keys)
+					{
+						string memberName = Convert.ToString(key, CultureInfo.InvariantCulture);
+						genericDictionary[memberName] = value[memberName];
+					}
+				}
+				else
+				{
+					IDictionary dictionary = newValue as IDictionary;
+					if (dictionary != null)
+					{
+						// copy all values into new object
+						foreach (object memberName in value.Keys)
+						{
+							dictionary[memberName] = value[memberName];
+						}
+					}
+				}
+			}
+			else
 			{
 				// copy any values into new object
 				foreach (object key in value.Keys)
@@ -421,7 +513,7 @@ namespace JsonFx.Serialization
 					try
 					{
 						// invoke first constructor that can take this value as an argument
-						// TODO :build FactoryDelegate, cache under targetType and execute
+						// TODO: build FactoryDelegate, cache under targetType and execute
 						return ctor.Invoke(
 								new object[] { value }
 							);
@@ -444,7 +536,7 @@ namespace JsonFx.Serialization
 			try
 			{
 				// always try-catch Invoke() to expose real exception
-				// TODO :build FactoryDelegate, cache under targetType and execute
+				// TODO: build FactoryDelegate, cache under targetType and execute
 				collection = defaultCtor.Invoke(null);
 			}
 			catch (TargetInvocationException ex)
@@ -471,7 +563,7 @@ namespace JsonFx.Serialization
 				{
 					// always try-catch Invoke() to expose real exception
 					// add all members in one method
-					// TODO :build FactoryDelegate, cache under targetType and execute
+					// TODO: build FactoryDelegate, cache under targetType and execute
 					method.Invoke(
 						collection,
 						new object[] { value });
@@ -488,9 +580,18 @@ namespace JsonFx.Serialization
 			}
 			else
 			{
-				// many ICollection types have an Add method
+				Type collectionType = targetType.GetInterface(typeof(ICollection<>).FullName);
+
+				// many collection types have an Add method
 				// which adds items one at a time
-				method = targetType.GetMethod("Add");
+				if (collectionType != null)
+				{
+					method = collectionType.GetMethod("Add");
+				}
+				else
+				{
+					method = targetType.GetMethod("Add");
+				}
 				parameters = (method == null) ?
 						null : method.GetParameters();
 				paramType = (parameters == null || parameters.Length != 1) ?
@@ -504,7 +605,7 @@ namespace JsonFx.Serialization
 						try
 						{
 							// always try-catch Invoke() to expose real exception
-							// TODO :build FactoryDelegate, cache under targetType and execute
+							// TODO: build FactoryDelegate, cache under targetType and execute
 							method.Invoke(
 								collection,
 								new object[] {
@@ -605,8 +706,6 @@ namespace JsonFx.Serialization
 		/// <returns></returns>
 		private static Type ResolveInterfaceType(Type targetType)
 		{
-			// TODO: if NET40, replace Dictionary<,> with ExpandoObject
-
 			if (targetType.IsInterface)
 			{
 				if (targetType.IsGenericType)
@@ -617,11 +716,23 @@ namespace JsonFx.Serialization
 						genericType == typeof(IEnumerable<>) ||
 						genericType == typeof(ICollection<>))
 					{
-						targetType = typeof(List<>).MakeGenericType(targetType.GetGenericArguments());
+						Type[] genericArgs = targetType.GetGenericArguments();
+						targetType = typeof(List<>).MakeGenericType(genericArgs);
 					}
 					else if (genericType == typeof(IDictionary<,>))
 					{
-						targetType = typeof(Dictionary<,>).MakeGenericType(targetType.GetGenericArguments());
+						Type[] genericArgs = targetType.GetGenericArguments();
+						if (genericArgs.Length == 2 &&
+							genericArgs[0] == typeof(string) &&
+							genericArgs[0] == typeof(object))
+						{
+							// allow ExpandoObject in NET40, otherwise Dictionary<string, object>
+							targetType = typeof(JsonObject);
+						}
+						else
+						{
+							targetType = typeof(Dictionary<,>).MakeGenericType(genericArgs);
+						}
 					}
 				}
 				else if (targetType == typeof(IList) ||
@@ -632,6 +743,7 @@ namespace JsonFx.Serialization
 				}
 				else if (targetType == typeof(IDictionary))
 				{
+					// <rant>cannot use ExpandoObject here because it does not implement IDictionary</rant>
 					targetType = typeof(Dictionary<string, object>);
 				}
 			}
@@ -659,14 +771,18 @@ namespace JsonFx.Serialization
 
 			Type[] genericArgs = dictionaryType.GetGenericArguments();
 			if (genericArgs.Length != 2 ||
-				(genericArgs[0] != typeof(string) && genericArgs[0] != typeof(object)))
+				!genericArgs[0].IsAssignableFrom(typeof(string)))
 			{
-				// only supports IDictionary<string, TVal>
+				if (typeof(IDictionary).IsAssignableFrom(targetType))
+				{
+					// can build from non-generic IDictionary
+					return null;
+				}
+
+				// only supports variants of IDictionary<string, TVal>
 				throw new ArgumentException(String.Format(
 					TypeCoercionUtility.ErrorGenericIDictionaryKeys,
 					targetType));
-
-				// TODO: support serialization as KeyValue<TKey, TVal>[]?
 			}
 
 			return genericArgs[1];
