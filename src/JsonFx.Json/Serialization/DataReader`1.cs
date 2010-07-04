@@ -149,7 +149,7 @@ namespace JsonFx.Serialization
 			IDataTokenizer<T> tokenizer = this.GetTokenizer();
 			if (tokenizer == null)
 			{
-				throw new InvalidOperationException("Tokenizer is invalid");
+				throw new ArgumentNullException("tokenizer");
 			}
 			return DeserializeInternal(tokenizer, tokenizer.GetTokens(input), targetType);
 		}
@@ -167,19 +167,19 @@ namespace JsonFx.Serialization
 			IDataTokenizer<T> tokenizer = this.GetTokenizer();
 			if (tokenizer == null)
 			{
-				throw new InvalidOperationException("Tokenizer is invalid");
+				throw new ArgumentNullException("tokenizer");
 			}
 
-			IDataParser<T> parser = this.GetParser();
-			if (parser == null)
+			IDataAnalyzer<T> analyzer = this.GetAnalyzer();
+			if (analyzer == null)
 			{
-				throw new InvalidOperationException("Parser is invalid");
+				throw new ArgumentNullException("analyzer");
 			}
 
 			try
 			{
 				// chars stream => token stream => object stream
-				return parser.Parse(tokenizer.GetTokens(input));
+				return analyzer.Analyze(tokenizer.GetTokens(input));
 			}
 			catch (DeserializationException)
 			{
@@ -193,15 +193,15 @@ namespace JsonFx.Serialization
 
 		private object DeserializeInternal(IDataTokenizer<T> tokenizer, IEnumerable<Token<T>> tokens, Type targetType)
 		{
-			IDataParser<T> parser = this.GetParser();
-			if (parser == null)
+			IDataAnalyzer<T> analyzer = this.GetAnalyzer();
+			if (analyzer == null)
 			{
-				throw new InvalidOperationException("Parser is invalid");
+				throw new ArgumentNullException("analyzer");
 			}
 
 			try
 			{
-				IEnumerator enumerator = parser.Parse(tokens, targetType).GetEnumerator();
+				IEnumerator enumerator = analyzer.Analyze(tokens, targetType).GetEnumerator();
 				if (!enumerator.MoveNext())
 				{
 					return null;
@@ -230,7 +230,7 @@ namespace JsonFx.Serialization
 
 		protected abstract IDataTokenizer<T> GetTokenizer();
 
-		protected abstract IDataParser<T> GetParser();
+		protected abstract IDataAnalyzer<T> GetAnalyzer();
 
 		#endregion Methods
 	}

@@ -42,7 +42,7 @@ namespace JsonFx.Json
 		/// <summary>
 		/// Generates a SAX-like sequence of JSON tokens from an object graph
 		/// </summary>
-		public class JsonGenerator : IDataGenerator<JsonTokenType>
+		public class JsonWalker : IDataWalker<JsonTokenType>
 		{
 			#region Fields
 
@@ -56,7 +56,7 @@ namespace JsonFx.Json
 			/// Ctor
 			/// </summary>
 			/// <param name="settings"></param>
-			public JsonGenerator(DataWriterSettings settings)
+			public JsonWalker(DataWriterSettings settings)
 			{
 				if (settings == null)
 				{
@@ -68,7 +68,7 @@ namespace JsonFx.Json
 
 			#endregion Init
 
-			#region Generator Methods
+			#region Walker Methods
 
 			/// <summary>
 			/// Generates a sequence of tokens representing the value
@@ -344,7 +344,7 @@ namespace JsonFx.Json
 				yield return JsonGrammar.TokenString(value.OuterXml);
 			}
 
-			#endregion Generator Methods
+			#endregion Walker Methods
 		}
 	}
 }

@@ -442,7 +442,7 @@ namespace JsonFx.Json
 					}
 					else if (this.depth >= this.Settings.MaxDepth)
 					{
-						// TODO: should this move to generator along with an option to check for cycles rather than depth?
+						// TODO: should this move to walker along with an option to check for cycles rather than depth?
 						throw new SerializationException("Maximum depth exceeded: potential graph cycle detected.");
 					}
 				}

@@ -104,22 +104,22 @@ namespace JsonFx.Serialization
 		/// <param name="data">the data to be serialized</param>
 		public virtual void Serialize(TextWriter output, object data)
 		{
-			IDataGenerator<T> generator = this.GetGenerator();
-			if (generator == null)
+			IDataWalker<T> walker = this.GetWalker();
+			if (walker == null)
 			{
-				throw new InvalidOperationException("Generator is invalid");
+				throw new ArgumentNullException("walker");
 			}
 
 			IDataFormatter<T> formatter = this.GetFormatter();
 			if (formatter == null)
 			{
-				throw new InvalidOperationException("Formatter is invalid");
+				throw new ArgumentNullException("formatter");
 			}
 
 			try
 			{
 				// objects => tokens => characters
-				formatter.Format(output, generator.GetTokens(data));
+				formatter.Format(output, walker.GetTokens(data));
 			}
 			catch (SerializationException)
 			{
@@ -138,22 +138,22 @@ namespace JsonFx.Serialization
 		/// <returns>the serialized data</returns>
 		public virtual string Serialize(object data)
 		{
-			IDataGenerator<T> generator = this.GetGenerator();
-			if (generator == null)
+			IDataWalker<T> walker = this.GetWalker();
+			if (walker == null)
 			{
-				throw new InvalidOperationException("Generator is invalid");
+				throw new ArgumentNullException("walker");
 			}
 
 			IDataFormatter<T> formatter = this.GetFormatter();
 			if (formatter == null)
 			{
-				throw new InvalidOperationException("Formatter is invalid");
+				throw new ArgumentNullException("formatter");
 			}
 
 			try
 			{
 				// objects => tokens => characters
-				return formatter.Format(generator.GetTokens(data));
+				return formatter.Format(walker.GetTokens(data));
 			}
 			catch (SerializationException)
 			{
@@ -166,11 +166,11 @@ namespace JsonFx.Serialization
 		}
 
 		/// <summary>
-		/// Gets the generator for this DataWriter
+		/// Gets the walker for this DataWriter
 		/// </summary>
 		/// <param name="dataWriterSettings"></param>
 		/// <returns></returns>
-		protected abstract IDataGenerator<T> GetGenerator();
+		protected abstract IDataWalker<T> GetWalker();
 
 		/// <summary>
 		/// Gets the formatter for this DataWriter

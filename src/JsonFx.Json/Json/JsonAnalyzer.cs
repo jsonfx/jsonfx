@@ -48,11 +48,11 @@ namespace JsonFx.Json
 		/// <summary>
 		/// Consumes a SAX-like sequence of JSON tokens to produce an object graph optionally coerced to a given type
 		/// </summary>
-		public class JsonParser : IDataParser<JsonTokenType>
+		public class JsonAnalyzer : IDataAnalyzer<JsonTokenType>
 		{
 			#region Constants
 
-			// parse errors
+			// errors
 			private const string ErrorUnexpectedToken = "Unexpected JSON token ({0})";
 
 			private const string ErrorExpectedArray = "Expected JSON array start ({0})";
@@ -84,7 +84,7 @@ namespace JsonFx.Json
 			/// Ctor
 			/// </summary>
 			/// <param name="settings"></param>
-			public JsonParser(DataReaderSettings settings)
+			public JsonAnalyzer(DataReaderSettings settings)
 			{
 				if (settings == null)
 				{
@@ -103,9 +103,9 @@ namespace JsonFx.Json
 			/// </summary>
 			/// <param name="tokens"></param>
 			/// <returns></returns>
-			public IEnumerable<object> Parse(IEnumerable<Token<JsonTokenType>> tokens)
+			public IEnumerable<object> Analyze(IEnumerable<Token<JsonTokenType>> tokens)
 			{
-				return this.Parse(tokens, null);
+				return this.Analyze(tokens, null);
 			}
 
 			/// <summary>
@@ -114,12 +114,9 @@ namespace JsonFx.Json
 			/// <typeparam name="TResult">the result target type</typeparam>
 			/// <param name="tokens"></param>
 			/// <returns></returns>
-			public IEnumerable<TResult> Parse<TResult>(IEnumerable<Token<JsonTokenType>> tokens)
+			public IEnumerable<TResult> Analyze<TResult>(IEnumerable<Token<JsonTokenType>> tokens)
 			{
-				foreach (object value in this.Parse(tokens, typeof(TResult)))
-				{
-					yield return (TResult)value;
-				}
+				foreach (object value in this.Analyze(tokens, typeof(TResult))) { yield return (TResult)value; }
 			}
 
 			/// <summary>
@@ -128,7 +125,7 @@ namespace JsonFx.Json
 			/// <param name="tokens"></param>
 			/// <param name="targetType"></param>
 			/// <returns></returns>
-			public IEnumerable<object> Parse(IEnumerable<Token<JsonTokenType>> tokens, Type targetType)
+			public IEnumerable<object> Analyze(IEnumerable<Token<JsonTokenType>> tokens, Type targetType)
 			{
 				if (tokens == null)
 				{
@@ -138,13 +135,13 @@ namespace JsonFx.Json
 				IEnumerator<Token<JsonTokenType>> tokenizer = tokens.GetEnumerator();
 				while (tokenizer.MoveNext())
 				{
-					yield return this.ParseValue(tokenizer, targetType);
+					yield return this.ConsumeValue(tokenizer, targetType);
 				}
 			}
 
-			private object ParseValue(IEnumerator<Token<JsonTokenType>> tokens, Type targetType)
+			private object ConsumeValue(IEnumerator<Token<JsonTokenType>> tokens, Type targetType)
 			{
-				if (targetType != null && JsonParser.SerializableType.IsAssignableFrom(targetType))
+				if (targetType != null && JsonAnalyzer.SerializableType.IsAssignableFrom(targetType))
 				{
 					ISerializable<JsonTokenType> serializable = TypeCoercionUtility.InstantiateObject<ISerializable<JsonTokenType>>(targetType);
 					return serializable.Read(this.Enumerate(tokens));
@@ -156,12 +153,12 @@ namespace JsonFx.Json
 					case JsonTokenType.ArrayBegin:
 					{
 						// found array
-						return this.ParseArray(tokens, targetType);
+						return this.ConsumeArray(tokens, targetType);
 					}
 					case JsonTokenType.ObjectBegin:
 					{
 						// found object
-						return this.ParseObject(tokens, targetType);
+						return this.ConsumeObject(tokens, targetType);
 					}
 					case JsonTokenType.Boolean:
 					case JsonTokenType.Number:
@@ -183,14 +180,14 @@ namespace JsonFx.Json
 						// these are invalid here
 						throw new ParseException<JsonTokenType>(
 							token,
-							String.Format(JsonParser.ErrorUnexpectedToken, token.TokenType));
+							String.Format(JsonAnalyzer.ErrorUnexpectedToken, token.TokenType));
 					}
 				}
 			}
 
-			private object ParseObject(IEnumerator<Token<JsonTokenType>> tokens, Type targetType)
+			private object ConsumeObject(IEnumerator<Token<JsonTokenType>> tokens, Type targetType)
 			{
-				if (targetType != null && JsonParser.SerializableType.IsAssignableFrom(targetType))
+				if (targetType != null && JsonAnalyzer.SerializableType.IsAssignableFrom(targetType))
 				{
 					ISerializable<JsonTokenType> serializable = TypeCoercionUtility.InstantiateObject<ISerializable<JsonTokenType>>(targetType);
 					return serializable.Read(this.Enumerate(tokens));
@@ -203,7 +200,7 @@ namespace JsonFx.Json
 				{
 					throw new ParseException<JsonTokenType>(
 						token,
-						String.Format(JsonParser.ErrorExpectedObject, token.TokenType));
+						String.Format(JsonAnalyzer.ErrorExpectedObject, token.TokenType));
 				}
 
 				IDictionary<string, MemberMap> memberMap = this.Coercion.LoadMaps(targetType);
@@ -219,7 +216,7 @@ namespace JsonFx.Json
 					token = tokens.Current;
 					if (hasProperties)
 					{
-						// parse value delimiter
+						// consume value delimiter
 						switch (token.TokenType)
 						{
 							case JsonTokenType.ValueDelim:
@@ -237,7 +234,7 @@ namespace JsonFx.Json
 								// these are invalid here
 								throw new ParseException<JsonTokenType>(
 									token,
-									String.Format(JsonParser.ErrorExpectedObjectValueDelim, token.TokenType));
+									String.Format(JsonAnalyzer.ErrorExpectedObjectValueDelim, token.TokenType));
 							}
 						}
 
@@ -250,7 +247,7 @@ namespace JsonFx.Json
 						token = tokens.Current;
 					}
 
-					// parse the property key
+					// consume the property key
 					string propertyName;
 					switch (token.TokenType)
 					{
@@ -277,14 +274,14 @@ namespace JsonFx.Json
 							// extraneous item delimiter
 							throw new ParseException<JsonTokenType>(
 								token,
-								JsonParser.ErrorMissingObjectProperty);
+								JsonAnalyzer.ErrorMissingObjectProperty);
 						}
 						default:
 						{
 							// these are invalid here
 							throw new ParseException<JsonTokenType>(
 								token,
-								String.Format(JsonParser.ErrorExpectedPropertyName, token.TokenType));
+								String.Format(JsonAnalyzer.ErrorExpectedPropertyName, token.TokenType));
 						}
 					}
 
@@ -296,7 +293,7 @@ namespace JsonFx.Json
 					}
 					token = tokens.Current;
 
-					// parse pair delimiter
+					// consume pair delimiter
 					switch (token.TokenType)
 					{
 						case JsonTokenType.PairDelim:
@@ -308,7 +305,7 @@ namespace JsonFx.Json
 							// these are invalid here
 							throw new ParseException<JsonTokenType>(
 								token,
-								String.Format(JsonParser.ErrorExpectedPropertyPairDelim, token.TokenType));
+								String.Format(JsonAnalyzer.ErrorExpectedPropertyPairDelim, token.TokenType));
 						}
 					}
 
@@ -339,8 +336,8 @@ namespace JsonFx.Json
 						propertyType = null;
 					}
 
-					// parse the property value
-					object propertyValue = this.ParseValue(tokens, propertyType);
+					// consume the property value
+					object propertyValue = this.ConsumeValue(tokens, propertyType);
 
 					// set member to the result
 					this.Coercion.SetMemberValue(objectValue, targetType, propertyMap, propertyName, propertyValue);
@@ -352,12 +349,12 @@ namespace JsonFx.Json
 				// end of input
 				throw new ParseException<JsonTokenType>(
 					JsonGrammar.TokenNone,
-					JsonParser.ErrorUnterminatedObject);
+					JsonAnalyzer.ErrorUnterminatedObject);
 			}
 
-			private object ParseArray(IEnumerator<Token<JsonTokenType>> tokens, Type arrayType)
+			private object ConsumeArray(IEnumerator<Token<JsonTokenType>> tokens, Type arrayType)
 			{
-				if (arrayType != null && JsonParser.SerializableType.IsAssignableFrom(arrayType))
+				if (arrayType != null && JsonAnalyzer.SerializableType.IsAssignableFrom(arrayType))
 				{
 					ISerializable<JsonTokenType> serializable = TypeCoercionUtility.InstantiateObject<ISerializable<JsonTokenType>>(arrayType);
 					return serializable.Read(this.Enumerate(tokens));
@@ -370,7 +367,7 @@ namespace JsonFx.Json
 				{
 					throw new ParseException<JsonTokenType>(
 						token,
-						String.Format(JsonParser.ErrorExpectedArray, token.TokenType));
+						String.Format(JsonAnalyzer.ErrorExpectedArray, token.TokenType));
 				}
 
 				Type itemType = TypeCoercionUtility.GetArrayItemType(arrayType);
@@ -386,7 +383,7 @@ namespace JsonFx.Json
 					token = tokens.Current;
 					if (array.Count > 0)
 					{
-						// parse item delimiter
+						// consume item delimiter
 						switch (token.TokenType)
 						{
 							case JsonTokenType.ValueDelim:
@@ -403,7 +400,7 @@ namespace JsonFx.Json
 								// these are invalid here
 								throw new ParseException<JsonTokenType>(
 									token,
-									String.Format(JsonParser.ErrorExpectedArrayItemDelim, token.TokenType));
+									String.Format(JsonAnalyzer.ErrorExpectedArrayItemDelim, token.TokenType));
 							}
 						}
 
@@ -415,7 +412,7 @@ namespace JsonFx.Json
 						token = tokens.Current;
 					}
 
-					// parse the next item
+					// consume the next item
 					object item;
 					switch (token.TokenType)
 					{
@@ -433,13 +430,13 @@ namespace JsonFx.Json
 						case JsonTokenType.ArrayBegin:
 						{
 							// array item
-							item = this.ParseArray(tokens, isItemTypeHint ? null : itemType);
+							item = this.ConsumeArray(tokens, isItemTypeHint ? null : itemType);
 							break;
 						}
 						case JsonTokenType.ObjectBegin:
 						{
 							// object item
-							item = this.ParseObject(tokens, isItemTypeHint ? null : itemType);
+							item = this.ConsumeObject(tokens, isItemTypeHint ? null : itemType);
 							break;
 						}
 						case JsonTokenType.Boolean:
@@ -448,7 +445,7 @@ namespace JsonFx.Json
 						case JsonTokenType.String:
 						case JsonTokenType.Undefined:
 						{
-							if (itemType != null && JsonParser.SerializableType.IsAssignableFrom(itemType))
+							if (itemType != null && JsonAnalyzer.SerializableType.IsAssignableFrom(itemType))
 							{
 								ISerializable<JsonTokenType> serializable = TypeCoercionUtility.InstantiateObject<ISerializable<JsonTokenType>>(itemType);
 								item = serializable.Read(this.Enumerate(tokens));
@@ -472,7 +469,7 @@ namespace JsonFx.Json
 							// extraneous item delimiter
 							throw new ParseException<JsonTokenType>(
 								token,
-								JsonParser.ErrorMissingArrayItem);
+								JsonAnalyzer.ErrorMissingArrayItem);
 						}
 						case JsonTokenType.Literal:
 						case JsonTokenType.None:
@@ -483,7 +480,7 @@ namespace JsonFx.Json
 							// these are invalid here
 							throw new ParseException<JsonTokenType>(
 								token,
-								String.Format(JsonParser.ErrorExpectedArrayItem, token.TokenType));
+								String.Format(JsonAnalyzer.ErrorExpectedArrayItem, token.TokenType));
 						}
 					}
 
@@ -497,7 +494,7 @@ namespace JsonFx.Json
 				// end of input
 				throw new ParseException<JsonTokenType>(
 					JsonGrammar.TokenNone,
-					JsonParser.ErrorUnterminatedArray);
+					JsonAnalyzer.ErrorUnterminatedArray);
 			}
 
 			#endregion Parsing Methods

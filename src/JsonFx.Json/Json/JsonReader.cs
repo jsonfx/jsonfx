@@ -72,9 +72,9 @@ namespace JsonFx.Json
 			return new JsonReader.JsonTokenizer();
 		}
 
-		protected override IDataParser<JsonTokenType> GetParser()
+		protected override IDataAnalyzer<JsonTokenType> GetAnalyzer()
 		{
-			return new JsonReader.JsonParser(this.Settings);
+			return new JsonReader.JsonAnalyzer(this.Settings);
 		}
 
 		#endregion IDataReader Methods

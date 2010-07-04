@@ -58,7 +58,8 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFrameworkVersion)' == 'v2.0' Or '$(TargetFrameworkVersion)' == 'v3.0' ">
     <DefineConstants>$(DefineConstants);NET20</DefineConstants>
-    <TargetFrameworkProfile></TargetFrameworkProfile>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -74,22 +75,24 @@
     <Compile Include="IO\StringScanner.cs" />
     <Compile Include="IO\TextReaderScanner.cs" />
     <Compile Include="Json\IJsonSerializable.cs" />
+    <Compile Include="Json\JsonAnalyzer.cs" />
     <Compile Include="Json\JsonFormatter.cs" />
-    <Compile Include="Json\JsonGenerator.cs" />
     <Compile Include="Json\JsonGrammar.cs" />
     <Compile Include="Json\JsonIgnoreAttribute.cs" />
     <Compile Include="Json\JsonNameAttribute.cs" />
-    <Compile Include="Json\JsonParser.cs" />
     <Compile Include="Json\JsonReader.cs" />
     <Compile Include="Json\JsonResolverStrategy.cs" />
     <Compile Include="Json\JsonSpecifiedPropertyAttribute.cs" />
     <Compile Include="Json\JsonTokenizer.cs" />
     <Compile Include="Json\JsonTokenType.cs" />
+    <Compile Include="Json\JsonWalker.cs" />
     <Compile Include="Json\JsonWriter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\AssemblyVersion.cs" />
     <Compile Include="Serialization\CallbackResolverStrategy.cs" />
     <Compile Include="Serialization\CombinedResolverStrategy.cs" />
+    <Compile Include="Serialization\IDataAnalyzer`1.cs" />
+    <Compile Include="Serialization\IDataWalker`1.cs" />
     <Compile Include="Serialization\PocoResolverStrategy.cs" />
     <Compile Include="Serialization\DataReaderSettings.cs" />
     <Compile Include="Serialization\DataReader`1.cs" />
@@ -98,8 +101,6 @@
     <Compile Include="CodeGen\DynamicMethodGenerator.cs" />
     <Compile Include="Serialization\Exceptions.cs" />
     <Compile Include="Serialization\IDataFormatter`1.cs" />
-    <Compile Include="Serialization\IDataGenerator`1.cs" />
-    <Compile Include="Serialization\IDataParser`1.cs" />
     <Compile Include="Serialization\IDataReader.cs" />
     <Compile Include="Serialization\IDataTokenizer`1.cs" />
     <Compile Include="Serialization\IDataTransformer`2.cs" />

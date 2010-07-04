@@ -85,13 +85,13 @@ namespace JsonFx.Json
 		#region DataWriter<JsonTokenType> Methods
 
 		/// <summary>
-		/// Gets the generator for JSON
+		/// Gets a walker for JSON
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <returns></returns>
-		protected override IDataGenerator<JsonTokenType> GetGenerator()
+		protected override IDataWalker<JsonTokenType> GetWalker()
 		{
-			return new JsonWriter.JsonGenerator(this.Settings);
+			return new JsonWriter.JsonWalker(this.Settings);
 		}
 
 		/// <summary>

@@ -38,7 +38,7 @@ using Assert=JsonFx.AssertPatched;
 
 namespace JsonFx.Json
 {
-	public class JsonParserTests
+	public class JsonAnalyzerTests
 	{
 		#region Test Types
 
@@ -72,8 +72,8 @@ namespace JsonFx.Json
 
 			var expected = new object[0];
 
-			var parser = new JsonReader.JsonParser(new DataReaderSettings());
-			var actual = parser.Parse(input).Cast<object[]>().Single();
+			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings());
+			var actual = analyzer.Analyze(input).Cast<object[]>().Single();
 
 			Assert.Equal(expected, actual);
 		}
@@ -90,8 +90,8 @@ namespace JsonFx.Json
 
 			var expected = new object[] { null };
 
-			var parser = new JsonReader.JsonParser(new DataReaderSettings());
-			var actual = parser.Parse(input).Cast<object[]>().Single();
+			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings());
+			var actual = analyzer.Analyze(input).Cast<object[]>().Single();
 
 			Assert.Equal(expected, actual);
 		}
@@ -120,8 +120,8 @@ namespace JsonFx.Json
 				true
 			};
 
-			var parser = new JsonReader.JsonParser(new DataReaderSettings());
-			var actual = parser.Parse(input).Cast<object[]>().Single();
+			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings());
+			var actual = analyzer.Analyze(input).Cast<object[]>().Single();
 
 			Assert.Equal(expected, actual);
 		}
@@ -232,8 +232,8 @@ namespace JsonFx.Json
 				}
 			};
 
-			var parser = new JsonReader.JsonParser(new DataReaderSettings());
-			var actual = parser.Parse((input)).Cast<string[][][][][][][][][][][][][][][][][][][]>().Single();
+			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings());
+			var actual = analyzer.Analyze((input)).Cast<string[][][][][][][][][][][][][][][][][][][]>().Single();
 
 			Assert.Equal(expected, actual);
 		}
@@ -248,12 +248,12 @@ namespace JsonFx.Json
 				JsonGrammar.TokenString("Unclosed array")
 			};
 
-			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings());
 
 			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
-					var actual = parser.Parse(input).Single();
+					var actual = analyzer.Analyze(input).Single();
 				});
 
 			// verify exception is coming from expected token
@@ -272,12 +272,12 @@ namespace JsonFx.Json
 				JsonGrammar.TokenArrayEnd
 			};
 
-			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings());
 
 			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
-					var actual = parser.Parse(input).Single();
+					var actual = analyzer.Analyze(input).Single();
 				});
 
 			// verify exception is coming from expected token
@@ -297,12 +297,12 @@ namespace JsonFx.Json
 				JsonGrammar.TokenArrayEnd
 			};
 
-			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings());
 
 			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
-					var actual = parser.Parse(input).Single();
+					var actual = analyzer.Analyze(input).Single();
 				});
 
 			// verify exception is coming from expected token
@@ -321,12 +321,12 @@ namespace JsonFx.Json
 				JsonGrammar.TokenArrayEnd
 			};
 
-			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings());
 
 			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
-					var actual = parser.Parse(input).Single();
+					var actual = analyzer.Analyze(input).Single();
 				});
 
 			// verify exception is coming from expected token
@@ -346,12 +346,12 @@ namespace JsonFx.Json
 				JsonGrammar.TokenArrayEnd
 			};
 
-			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings());
 
 			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
-					var actual = parser.Parse(input).Single();
+					var actual = analyzer.Analyze(input).Single();
 				});
 
 			// verify exception is coming from expected token
@@ -371,12 +371,12 @@ namespace JsonFx.Json
 				JsonGrammar.TokenArrayEnd
 			};
 
-			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings());
 
 			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
-					var actual = parser.Parse(input).Single();
+					var actual = analyzer.Analyze(input).Single();
 				});
 
 			// verify exception is coming from expected token
@@ -394,12 +394,12 @@ namespace JsonFx.Json
 				JsonGrammar.TokenObjectEnd
 			};
 
-			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings());
 
 			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
-					var actual = parser.Parse(input).Single();
+					var actual = analyzer.Analyze(input).Single();
 				});
 
 			// verify exception is coming from expected token
@@ -421,8 +421,8 @@ namespace JsonFx.Json
 
 			var expected = new Dictionary<string, object>();
 
-			var parser = new JsonReader.JsonParser(new DataReaderSettings());
-			var actual = parser.Parse(input).Cast<IDictionary<string, object>>().Single();
+			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings());
+			var actual = analyzer.Analyze(input).Cast<IDictionary<string, object>>().Single();
 
 			Assert.Equal(expected, actual, false);
 		}
@@ -444,8 +444,8 @@ namespace JsonFx.Json
 					{ "key", "value" }
 				};
 
-			var parser = new JsonReader.JsonParser(new DataReaderSettings());
-			var actual = parser.Parse(input).Cast<IDictionary<string, object>>().Single();
+			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings());
+			var actual = analyzer.Analyze(input).Cast<IDictionary<string, object>>().Single();
 
 			Assert.Equal(expected, actual, false);
 		}
@@ -483,8 +483,8 @@ namespace JsonFx.Json
 					}
 				};
 
-			var parser = new JsonReader.JsonParser(new DataReaderSettings());
-			var actual = parser.Parse(input).Cast<IDictionary<string, object>>().Single();
+			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings());
+			var actual = analyzer.Analyze(input).Cast<IDictionary<string, object>>().Single();
 
 			Assert.Equal(expected, actual, false);
 		}
@@ -503,12 +503,12 @@ namespace JsonFx.Json
 				JsonGrammar.TokenObjectEnd
 			};
 
-			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings());
 
 			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
-					var actual = parser.Parse(input).Single();
+					var actual = analyzer.Analyze(input).Single();
 				});
 
 			// verify exception is coming from expected token
@@ -527,12 +527,12 @@ namespace JsonFx.Json
 				JsonGrammar.TokenObjectEnd
 			};
 
-			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings());
 
 			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
-					var actual = parser.Parse(input).Single();
+					var actual = analyzer.Analyze(input).Single();
 				});
 
 			// verify exception is coming from expected token
@@ -553,12 +553,12 @@ namespace JsonFx.Json
 				JsonGrammar.TokenObjectEnd
 			};
 
-			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings());
 
 			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
-					var actual = parser.Parse(input).Single();
+					var actual = analyzer.Analyze(input).Single();
 				});
 
 			// verify exception is coming from expected token
@@ -578,12 +578,12 @@ namespace JsonFx.Json
 				JsonGrammar.TokenObjectEnd
 			};
 
-			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings());
 
 			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
-					var actual = parser.Parse(input).Single();
+					var actual = analyzer.Analyze(input).Single();
 				});
 
 			// verify exception is coming from expected token
@@ -603,12 +603,12 @@ namespace JsonFx.Json
 				JsonGrammar.TokenValueDelim
 			};
 
-			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings());
 
 			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
-					var actual = parser.Parse(input).Single();
+					var actual = analyzer.Analyze(input).Single();
 				});
 
 			// verify exception is coming from expected token
@@ -893,8 +893,8 @@ namespace JsonFx.Json
 				"rosebud"
 			};
 
-			var parser = new JsonReader.JsonParser(new DataReaderSettings());
-			var actual = parser.Parse(input).Cast<object[]>().Single();
+			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings());
+			var actual = analyzer.Analyze(input).Cast<object[]>().Single();
 
 			Assert.Equal(expected, actual, false);
 		}
@@ -908,8 +908,8 @@ namespace JsonFx.Json
 		{
 			var input = Enumerable.Empty<Token<JsonTokenType>>();
 
-			var parser = new JsonReader.JsonParser(new DataReaderSettings());
-			Assert.False(parser.Parse(input).Any());
+			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings());
+			Assert.False(analyzer.Analyze(input).Any());
 		}
 
 		[Fact]
@@ -917,12 +917,12 @@ namespace JsonFx.Json
 		{
 			var input = (IEnumerable<Token<JsonTokenType>>)null;
 
-			var parser = new JsonReader.JsonParser(new DataReaderSettings());
+			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings());
 
 			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
 				delegate
 				{
-					var actual = parser.Parse(input).Single();
+					var actual = analyzer.Analyze(input).Single();
 				});
 
 			// verify exception is coming from expected param
@@ -935,7 +935,7 @@ namespace JsonFx.Json
 			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
 				delegate
 				{
-					var parser = new JsonReader.JsonParser(null);
+					var analyzer = new JsonReader.JsonAnalyzer(null);
 				});
 
 			// verify exception is coming from expected param
@@ -958,8 +958,8 @@ namespace JsonFx.Json
 
 			var expected = ExampleEnum.Two;
 
-			var parser = new JsonReader.JsonParser(new DataReaderSettings(new JsonResolverStrategy()));
-			var actual = parser.Parse<ExampleEnum>(input).Single();
+			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings(new JsonResolverStrategy()));
+			var actual = analyzer.Analyze<ExampleEnum>(input).Single();
 
 			Assert.Equal(expected, actual);
 		}
@@ -974,8 +974,8 @@ namespace JsonFx.Json
 
 			var expected = ExampleEnum.Two;
 
-			var parser = new JsonReader.JsonParser(new DataReaderSettings(new JsonResolverStrategy()));
-			var actual = parser.Parse<ExampleEnum>(input).Single();
+			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings(new JsonResolverStrategy()));
+			var actual = analyzer.Analyze<ExampleEnum>(input).Single();
 
 			Assert.Equal(expected, actual);
 		}
@@ -990,8 +990,8 @@ namespace JsonFx.Json
 
 			var expected = ExampleEnum.Three;
 
-			var parser = new JsonReader.JsonParser(new DataReaderSettings(new JsonResolverStrategy()));
-			var actual = parser.Parse<ExampleEnum>(input).Single();
+			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings(new JsonResolverStrategy()));
+			var actual = analyzer.Analyze<ExampleEnum>(input).Single();
 
 			Assert.Equal(expected, actual);
 		}

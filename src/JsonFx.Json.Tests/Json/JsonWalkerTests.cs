@@ -38,7 +38,7 @@ using Assert=JsonFx.AssertPatched;
 
 namespace JsonFx.Json
 {
-	public class JsonGeneratorTests
+	public class JsonWalkerTests
 	{
 		#region Array Tests
 
@@ -53,8 +53,8 @@ namespace JsonFx.Json
 					JsonGrammar.TokenArrayEnd
 				};
 
-			var generator = new JsonWriter.JsonGenerator(new DataWriterSettings());
-			var actual = generator.GetTokens(input).ToArray();
+			var walker = new JsonWriter.JsonWalker(new DataWriterSettings());
+			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
 		}
@@ -70,8 +70,8 @@ namespace JsonFx.Json
 					JsonGrammar.TokenArrayEnd
 				};
 
-			var generator = new JsonWriter.JsonGenerator(new DataWriterSettings());
-			var actual = generator.GetTokens(input).ToArray();
+			var walker = new JsonWriter.JsonWalker(new DataWriterSettings());
+			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
 		}
@@ -91,8 +91,8 @@ namespace JsonFx.Json
 					JsonGrammar.TokenArrayEnd
 				};
 
-			var generator = new JsonWriter.JsonGenerator(new DataWriterSettings());
-			var actual = generator.GetTokens(input).ToArray();
+			var walker = new JsonWriter.JsonWalker(new DataWriterSettings());
+			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
 		}
@@ -136,8 +136,8 @@ namespace JsonFx.Json
 					JsonGrammar.TokenArrayEnd
 				};
 
-			var generator = new JsonWriter.JsonGenerator(new DataWriterSettings());
-			var actual = generator.GetTokens(input).ToArray();
+			var walker = new JsonWriter.JsonWalker(new DataWriterSettings());
+			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
 		}
@@ -191,8 +191,8 @@ namespace JsonFx.Json
 					JsonGrammar.TokenArrayEnd
 				};
 
-			var generator = new JsonWriter.JsonGenerator(new DataWriterSettings());
-			var actual = generator.GetTokens(input).ToArray();
+			var walker = new JsonWriter.JsonWalker(new DataWriterSettings());
+			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
 		}
@@ -212,8 +212,8 @@ namespace JsonFx.Json
 					JsonGrammar.TokenObjectEnd
 				};
 
-			var generator = new JsonWriter.JsonGenerator(new DataWriterSettings());
-			var actual = generator.GetTokens(input).ToArray();
+			var walker = new JsonWriter.JsonWalker(new DataWriterSettings());
+			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
 		}
@@ -229,8 +229,8 @@ namespace JsonFx.Json
 					JsonGrammar.TokenObjectEnd
 				};
 
-			var generator = new JsonWriter.JsonGenerator(new DataWriterSettings());
-			var actual = generator.GetTokens(input).ToArray();
+			var walker = new JsonWriter.JsonWalker(new DataWriterSettings());
+			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
 		}
@@ -262,8 +262,8 @@ namespace JsonFx.Json
 					JsonGrammar.TokenObjectEnd
 				};
 
-			var generator = new JsonWriter.JsonGenerator(new DataWriterSettings());
-			var actual = generator.GetTokens(input).ToArray();
+			var walker = new JsonWriter.JsonWalker(new DataWriterSettings());
+			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
 		}
@@ -293,8 +293,8 @@ namespace JsonFx.Json
 					JsonGrammar.TokenObjectEnd
 				};
 
-			var generator = new JsonWriter.JsonGenerator(new DataWriterSettings());
-			var actual = generator.GetTokens((object)input).ToArray();
+			var walker = new JsonWriter.JsonWalker(new DataWriterSettings());
+			var actual = walker.GetTokens((object)input).ToArray();
 
 			Assert.Equal(expected, actual);
 		}
@@ -326,8 +326,8 @@ namespace JsonFx.Json
 					JsonGrammar.TokenObjectEnd
 				};
 
-			var generator = new JsonWriter.JsonGenerator(new DataWriterSettings());
-			var actual = generator.GetTokens(input).ToArray();
+			var walker = new JsonWriter.JsonWalker(new DataWriterSettings());
+			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
 		}
@@ -346,8 +346,8 @@ namespace JsonFx.Json
 					JsonGrammar.TokenFalse
 				};
 
-			var generator = new JsonWriter.JsonGenerator(new DataWriterSettings());
-			var actual = generator.GetTokens(input).ToArray();
+			var walker = new JsonWriter.JsonWalker(new DataWriterSettings());
+			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
 		}
@@ -362,8 +362,8 @@ namespace JsonFx.Json
 					JsonGrammar.TokenTrue
 				};
 
-			var generator = new JsonWriter.JsonGenerator(new DataWriterSettings());
-			var actual = generator.GetTokens(input).ToArray();
+			var walker = new JsonWriter.JsonWalker(new DataWriterSettings());
+			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
 		}
@@ -382,8 +382,8 @@ namespace JsonFx.Json
 					JsonGrammar.TokenNaN
 				};
 
-			var generator = new JsonWriter.JsonGenerator(new DataWriterSettings());
-			var actual = generator.GetTokens(input).ToArray();
+			var walker = new JsonWriter.JsonWalker(new DataWriterSettings());
+			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
 		}
@@ -398,8 +398,8 @@ namespace JsonFx.Json
 					JsonGrammar.TokenPositiveInfinity
 				};
 
-			var generator = new JsonWriter.JsonGenerator(new DataWriterSettings());
-			var actual = generator.GetTokens(input).ToArray();
+			var walker = new JsonWriter.JsonWalker(new DataWriterSettings());
+			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
 		}
@@ -414,8 +414,8 @@ namespace JsonFx.Json
 					JsonGrammar.TokenNegativeInfinity
 				};
 
-			var generator = new JsonWriter.JsonGenerator(new DataWriterSettings());
-			var actual = generator.GetTokens(input).ToArray();
+			var walker = new JsonWriter.JsonWalker(new DataWriterSettings());
+			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
 		}
@@ -697,8 +697,8 @@ namespace JsonFx.Json
 				JsonGrammar.TokenArrayEnd
 			};
 
-			var generator = new JsonWriter.JsonGenerator(new DataWriterSettings());
-			var actual = generator.GetTokens(input).ToArray();
+			var walker = new JsonWriter.JsonWalker(new DataWriterSettings());
+			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
 		}
@@ -717,8 +717,8 @@ namespace JsonFx.Json
 					JsonGrammar.TokenNull
 				};
 
-			var generator = new JsonWriter.JsonGenerator(new DataWriterSettings());
-			var actual = generator.GetTokens(input).ToArray();
+			var walker = new JsonWriter.JsonWalker(new DataWriterSettings());
+			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
 		}
@@ -729,7 +729,7 @@ namespace JsonFx.Json
 			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
 				delegate
 				{
-					var generator = new JsonWriter.JsonGenerator(null);
+					var walker = new JsonWriter.JsonWalker(null);
 				});
 
 			// verify exception is coming from expected param

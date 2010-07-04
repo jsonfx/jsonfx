@@ -81,11 +81,11 @@
     <Compile Include="CodeGen\DynamicMethodGeneratorTests.cs" />
     <Compile Include="IO\StringScannerTests.cs" />
     <Compile Include="IO\TextReaderScannerTests.cs" />
+    <Compile Include="Json\JsonAnalyzerTests.cs" />
     <Compile Include="Json\JsonReaderTests.cs" />
-    <Compile Include="Json\JsonGeneratorTests.cs" />
     <Compile Include="Json\JsonFormatterTests.cs" />
-    <Compile Include="Json\JsonParserTests.cs" />
     <Compile Include="Json\JsonTokenizerTests.cs" />
+    <Compile Include="Json\JsonWalkerTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\JsonFx.Json\JsonFx.Json.csproj">
