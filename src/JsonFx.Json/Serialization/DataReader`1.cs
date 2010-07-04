@@ -29,6 +29,7 @@
 #endregion License
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 
@@ -84,12 +85,12 @@ namespace JsonFx.Serialization
 		/// Deserializes the data from the given input
 		/// </summary>
 		/// <param name="input">the input reader</param>
-		/// <typeparam name="TVal">the expected type of the serialized data</typeparam>
-		public virtual TVal Deserialize<TVal>(TextReader input)
+		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
+		public virtual TResult Deserialize<TResult>(TextReader input)
 		{
-			object value = this.Deserialize(input, typeof(TVal));
+			object value = this.Deserialize(input, typeof(TResult));
 
-			return (value is TVal) ? (TVal)value : default(TVal);
+			return (value is TResult) ? (TResult)value : default(TResult);
 		}
 
 		/// <summary>
@@ -114,38 +115,19 @@ namespace JsonFx.Serialization
 				throw new InvalidOperationException("Tokenizer is invalid");
 			}
 
-			IDataParser<T> parser = this.GetParser();
-			if (parser == null)
-			{
-				throw new InvalidOperationException("Parser is invalid");
-			}
-
-			try
-			{
-				// characters => tokens => objects
-				return parser.Parse(tokenizer.GetTokens(input), targetType);
-			}
-			catch (DeserializationException)
-			{
-				throw;
-			}
-			catch (Exception ex)
-			{
-				// parser has no concept of index, line, col so we wrap here with more info
-				throw new DeserializationException(ex.Message, tokenizer.Index, tokenizer.Line, tokenizer.Column, ex);
-			}
+			return this.DeserializeInternal(tokenizer, tokenizer.GetTokens(input), targetType);
 		}
 
 		/// <summary>
 		/// Deserializes the data from the given input
 		/// </summary>
 		/// <param name="input">the input text</param>
-		/// <typeparam name="TVal">the expected type of the serialized data</typeparam>
-		public virtual TVal Deserialize<TVal>(string input)
+		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
+		public virtual TResult Deserialize<TResult>(string input)
 		{
-			object value = this.Deserialize(input, typeof(TVal));
+			object value = this.Deserialize(input, typeof(TResult));
 
-			return (value is TVal) ? (TVal)value : default(TVal);
+			return (value is TResult) ? (TResult)value : default(TResult);
 		}
 
 		/// <summary>
@@ -169,6 +151,24 @@ namespace JsonFx.Serialization
 			{
 				throw new InvalidOperationException("Tokenizer is invalid");
 			}
+			return DeserializeInternal(tokenizer, tokenizer.GetTokens(input), targetType);
+		}
+
+		/// <summary>
+		/// Deserializes a potentially endless sequence of objects from a stream source
+		/// </summary>
+		/// <param name="input">a streamed source of objects</param>
+		/// <returns>a sequence of objects</returns>
+		/// <remarks>
+		/// character stream => token stream => object stream
+		/// </remarks>
+		public IEnumerable StreamedDeserialize(TextReader input)
+		{
+			IDataTokenizer<T> tokenizer = this.GetTokenizer();
+			if (tokenizer == null)
+			{
+				throw new InvalidOperationException("Tokenizer is invalid");
+			}
 
 			IDataParser<T> parser = this.GetParser();
 			if (parser == null)
@@ -178,8 +178,45 @@ namespace JsonFx.Serialization
 
 			try
 			{
-				// characters => tokens => objects
-				return parser.Parse(tokenizer.GetTokens(input), targetType);
+				// chars stream => token stream => object stream
+				return parser.Parse(tokenizer.GetTokens(input));
+			}
+			catch (DeserializationException)
+			{
+				throw;
+			}
+			catch (Exception ex)
+			{
+				throw new DeserializationException(ex.Message, tokenizer.Index, tokenizer.Line, tokenizer.Column, ex);
+			}
+		}
+
+		private object DeserializeInternal(IDataTokenizer<T> tokenizer, IEnumerable<Token<T>> tokens, Type targetType)
+		{
+			IDataParser<T> parser = this.GetParser();
+			if (parser == null)
+			{
+				throw new InvalidOperationException("Parser is invalid");
+			}
+
+			try
+			{
+				IEnumerator enumerator = parser.Parse(tokens, targetType).GetEnumerator();
+				if (!enumerator.MoveNext())
+				{
+					return null;
+				}
+
+				// character stream => token stream => object stream
+				object value = enumerator.Current;
+
+				// enforce only one object in stream
+				if (enumerator.MoveNext())
+				{
+					throw new DeserializationException("Invalid trailing content", tokenizer.Index, tokenizer.Line, tokenizer.Column);
+				}
+
+				return value;
 			}
 			catch (DeserializationException)
 			{

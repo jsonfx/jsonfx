@@ -1492,23 +1492,53 @@ namespace JsonFx.Json
 		[Fact]
 		public void Format_MaxDepthExceeded_ThrowsSerializationException()
 		{
+			// input from fail18.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				JsonGrammar.TokenObjectBegin,
-				JsonGrammar.TokenObjectBegin,
-				JsonGrammar.TokenObjectBegin,
-				JsonGrammar.TokenObjectBegin,
-				JsonGrammar.TokenObjectBegin,
-				JsonGrammar.TokenObjectBegin,
-				JsonGrammar.TokenObjectEnd,
-				JsonGrammar.TokenObjectEnd,
-				JsonGrammar.TokenObjectEnd,
-				JsonGrammar.TokenObjectEnd,
-				JsonGrammar.TokenObjectEnd,
-				JsonGrammar.TokenObjectEnd
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenArrayBegin,
+				JsonGrammar.TokenString("Too deep"),
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd,
+				JsonGrammar.TokenArrayEnd
 			};
 
-			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings { MaxDepth = 5 });
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings { MaxDepth = 20 });
 
 			SerializationException ex = Assert.Throws<SerializationException>(
 				delegate

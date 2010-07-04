@@ -103,7 +103,7 @@ namespace JsonFx.Json
 			/// </summary>
 			/// <param name="tokens"></param>
 			/// <returns></returns>
-			public object Parse(IEnumerable<Token<JsonTokenType>> tokens)
+			public IEnumerable<object> Parse(IEnumerable<Token<JsonTokenType>> tokens)
 			{
 				return this.Parse(tokens, null);
 			}
@@ -114,9 +114,12 @@ namespace JsonFx.Json
 			/// <typeparam name="TResult">the result target type</typeparam>
 			/// <param name="tokens"></param>
 			/// <returns></returns>
-			public TResult Parse<TResult>(IEnumerable<Token<JsonTokenType>> tokens)
+			public IEnumerable<TResult> Parse<TResult>(IEnumerable<Token<JsonTokenType>> tokens)
 			{
-				return (TResult)this.Parse(tokens, typeof(TResult));
+				foreach (object value in this.Parse(tokens, typeof(TResult)))
+				{
+					yield return (TResult)value;
+				}
 			}
 
 			/// <summary>
@@ -125,7 +128,7 @@ namespace JsonFx.Json
 			/// <param name="tokens"></param>
 			/// <param name="targetType"></param>
 			/// <returns></returns>
-			public object Parse(IEnumerable<Token<JsonTokenType>> tokens, Type targetType)
+			public IEnumerable<object> Parse(IEnumerable<Token<JsonTokenType>> tokens, Type targetType)
 			{
 				if (tokens == null)
 				{
@@ -133,19 +136,10 @@ namespace JsonFx.Json
 				}
 
 				IEnumerator<Token<JsonTokenType>> tokenizer = tokens.GetEnumerator();
-				if (!tokenizer.MoveNext())
+				while (tokenizer.MoveNext())
 				{
-					// end of input
-					return this.Coercion.CoerceType(targetType, null);
+					yield return this.ParseValue(tokenizer, targetType);
 				}
-
-				object value = this.ParseValue(tokenizer, targetType);
-
-				// not checking for trailing tokens allows this
-				// JSON stream to be parsed inside of another structure
-				// for example inside <[CDATA[ ... ]]>
-
-				return value;
 			}
 
 			private object ParseValue(IEnumerator<Token<JsonTokenType>> tokens, Type targetType)

@@ -34,7 +34,7 @@ using System.Collections.Generic;
 namespace JsonFx.Serialization
 {
 	/// <summary>
-	/// Consumes a SAX-like sequence of tokens to produce an object graph, optionally coerced to a given type
+	/// Consumes a SAX-like sequence of tokens to produce a sequence of objects, optionally coerced to a given type
 	/// </summary>
 	/// <typeparam name="T">token type</typeparam>
 	public interface IDataParser<T>
@@ -46,7 +46,7 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="tokens"></param>
 		/// <returns></returns>
-		object Parse(IEnumerable<Token<T>> tokens);
+		IEnumerable<object> Parse(IEnumerable<Token<T>> tokens);
 
 		/// <summary>
 		/// Parses the token sequence, optionally coercing the result to Type targetType
@@ -54,7 +54,7 @@ namespace JsonFx.Serialization
 		/// <param name="tokens"></param>
 		/// <param name="targetType">optional type for coercion (null if not specified)</param>
 		/// <returns></returns>
-		object Parse(IEnumerable<Token<T>> tokens, Type targetType);
+		IEnumerable<object> Parse(IEnumerable<Token<T>> tokens, Type targetType);
 
 		/// <summary>
 		/// Parses the token sequence, coercing the result to Type TResult
@@ -62,7 +62,7 @@ namespace JsonFx.Serialization
 		/// <typeparam name="TResult">optional type for coercion (null if not specified)</typeparam>
 		/// <param name="tokens"></param>
 		/// <returns></returns>
-		TResult Parse<TResult>(IEnumerable<Token<T>> tokens);
+		IEnumerable<TResult> Parse<TResult>(IEnumerable<Token<T>> tokens);
 
 		#endregion Methods
 	}

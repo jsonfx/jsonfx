@@ -29,6 +29,8 @@
 #endregion License
 
 using System;
+using System.Collections.Generic;
+using System.IO;
 
 using JsonFx.Serialization;
 using Xunit;
@@ -40,7 +42,7 @@ namespace JsonFx.Json
 	{
 		#region Array Tests
 
-		[Fact(Skip="JsonReader doesn't check stream after parsing")]
+		[Fact]
 		public void Deserialize_ArrayCommaAfterClose_ThrowsDeserializationException()
 		{
 			// input from fail7.json in test suite at http://www.json.org/JSON_checker/
@@ -55,10 +57,10 @@ namespace JsonFx.Json
 				});
 
 			// verify exception is coming from expected position
-			Assert.Equal(35L, ex.Index);
+			Assert.Equal(25L, ex.Index);
 		}
 
-		[Fact(Skip="JsonReader doesn't check stream after parsing")]
+		[Fact]
 		public void Deserialize_ArrayExtraClose_ThrowsDeserializationException()
 		{
 			// input from fail8.json in test suite at http://www.json.org/JSON_checker/
@@ -80,8 +82,8 @@ namespace JsonFx.Json
 
 		#region Object Tests
 
-		[Fact(Skip="JsonReader doesn't check stream after parsing")]
-		public void Deserialize_ObjectExtraValueAfterClose_ThrowsParseException()
+		[Fact]
+		public void Deserialize_ObjectExtraValueAfterClose_ThrowsDeserializationException()
 		{
 			// input from fail10.json in test suite at http://www.json.org/JSON_checker/
 			var input = @"{""Extra value after close"": true} ""misplaced quoted value""";
@@ -95,7 +97,35 @@ namespace JsonFx.Json
 				});
 
 			// verify exception is coming from expected position
-			Assert.Equal(34L, ex.Index);
+			// note the reader doesn't see the 2nd object until it is read
+			// so the index is after the trailing value
+			Assert.Equal(57L, ex.Index);
+		}
+
+		[Fact]
+		public void StreamedDeserialize_ObjectExtraValueAfterClose_DeserializesStreamOfObject()
+		{
+			// input from fail10.json in test suite at http://www.json.org/JSON_checker/
+			var input = new StringReader(@"{""Extra value after close"": true} ""misplaced quoted value""");
+
+			var reader = new JsonReader(new DataReaderSettings());
+
+			var enumerator = reader.StreamedDeserialize(input).GetEnumerator();
+
+			Assert.True(enumerator.MoveNext());
+			Assert.Equal(new Dictionary<string, object>
+				{
+					{ "Extra value after close", true }
+				},
+				enumerator.Current,
+				false);
+
+			Assert.True(enumerator.MoveNext());
+			Assert.Equal(
+				"misplaced quoted value",
+				enumerator.Current);
+
+			Assert.False(enumerator.MoveNext());
 		}
 
 		#endregion Object Tests
