@@ -62,7 +62,7 @@ namespace JsonFx.Serialization
 		#region Methods
 
 		/// <summary>
-		/// Serializes the data to the given output
+		/// Deserializes a single object from the given input
 		/// </summary>
 		/// <param name="input">the input reader</param>
 		/// <typeparam name="T">the expected type of the serialized data</typeparam>
@@ -75,31 +75,41 @@ namespace JsonFx.Serialization
 		object Deserialize(TextReader input);
 
 		/// <summary>
-		/// Serializes the data to the given output
+		/// Deserializes a single object from the given input
 		/// </summary>
 		/// <param name="input">the input reader</param>
 		/// <param name="targetType">the expected type of the serialized data</param>
 		object Deserialize(TextReader input, Type targetType);
 
 		/// <summary>
-		/// Serializes the data to the given output
+		/// Deserializes a single object from the given input
 		/// </summary>
 		/// <param name="input">the input text</param>
 		/// <typeparam name="T">the expected type of the serialized data</typeparam>
 		T Deserialize<T>(string input);
 
 		/// <summary>
-		/// Serializes the data to the given output
+		/// Deserializes a single object from the given input
 		/// </summary>
 		/// <param name="input">the input text</param>
 		object Deserialize(string input);
 
 		/// <summary>
-		/// Serializes the data to the given output
+		/// Deserializes a single object from the given input
 		/// </summary>
 		/// <param name="input">the input text</param>
 		/// <param name="targetType">the expected type of the serialized data</param>
 		object Deserialize(string input, Type targetType);
+
+		/// <summary>
+		/// Deserializes a potentially endless sequence of objects from a stream source
+		/// </summary>
+		/// <param name="input"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// character stream => token stream => object stream
+		/// </remarks>
+		IEnumerable<object> StreamedDeserialize(TextReader input);
 
 		#endregion Methods
 	}

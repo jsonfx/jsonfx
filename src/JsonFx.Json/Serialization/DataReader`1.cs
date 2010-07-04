@@ -162,7 +162,7 @@ namespace JsonFx.Serialization
 		/// <remarks>
 		/// character stream => token stream => object stream
 		/// </remarks>
-		public IEnumerable StreamedDeserialize(TextReader input)
+		public IEnumerable<object> StreamedDeserialize(TextReader input)
 		{
 			IDataTokenizer<T> tokenizer = this.GetTokenizer();
 			if (tokenizer == null)
