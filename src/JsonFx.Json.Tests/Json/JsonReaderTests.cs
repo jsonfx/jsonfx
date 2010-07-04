@@ -43,6 +43,28 @@ namespace JsonFx.Json
 		#region Array Tests
 
 		[Fact]
+		public void Deserialize_AllowTrailingContent_IgnoresTrailingContent()
+		{
+			var input = new StringReader(@"[""Content embedded inside other structure"", true,null, 42]</xml>");
+			var expected = new object[]
+				{
+					"Content embedded inside other structure",
+					true,
+					null,
+					42
+				};
+
+			var reader = new JsonReader(new DataReaderSettings { AllowTrailingContent = true });
+
+			var actual = reader.Deserialize(input);
+
+			Assert.Equal(expected, actual);
+
+			// Didn't consume remaining content
+			Assert.Equal("</xml>", input.ReadToEnd());
+		}
+
+		[Fact]
 		public void Deserialize_ArrayCommaAfterClose_ThrowsDeserializationException()
 		{
 			// input from fail7.json in test suite at http://www.json.org/JSON_checker/

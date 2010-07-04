@@ -211,7 +211,7 @@ namespace JsonFx.Serialization
 				object value = enumerator.Current;
 
 				// enforce only one object in stream
-				if (enumerator.MoveNext())
+				if (!this.Settings.AllowTrailingContent && enumerator.MoveNext())
 				{
 					throw new DeserializationException("Invalid trailing content", tokenizer.Index, tokenizer.Line, tokenizer.Column);
 				}

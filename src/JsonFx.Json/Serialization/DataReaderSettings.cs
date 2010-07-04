@@ -41,6 +41,7 @@ namespace JsonFx.Serialization
 		#region Fields
 
 		private bool allowNullValueTypes = true;
+		private bool allowTrailingContent = false;
 		private readonly ResolverCache ResolverCache;
 
 		#endregion Fields
@@ -90,6 +91,18 @@ namespace JsonFx.Serialization
 		{
 			get { return this.allowNullValueTypes; }
 			set { this.allowNullValueTypes = value; }
+		}
+
+		/// <summary>
+		/// Gets and sets if should verify that stream is empty after deserialzing object
+		/// </summary>
+		/// <remarks>
+		/// Setting to true allows reading a JSON stream inside other structures (e.g. JavaScript)
+		/// </remarks>
+		public bool AllowTrailingContent
+		{
+			get { return this.allowTrailingContent; }
+			set { this.allowTrailingContent = value; }
 		}
 
 		/// <summary>
