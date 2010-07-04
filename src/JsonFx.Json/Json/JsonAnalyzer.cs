@@ -143,7 +143,7 @@ namespace JsonFx.Json
 			{
 				if (targetType != null && JsonAnalyzer.SerializableType.IsAssignableFrom(targetType))
 				{
-					ISerializable<JsonTokenType> serializable = TypeCoercionUtility.InstantiateObject<ISerializable<JsonTokenType>>(targetType);
+					ISerializable<JsonTokenType> serializable = this.Coercion.InstantiateObject<ISerializable<JsonTokenType>>(targetType);
 					return serializable.Read(this.Enumerate(tokens));
 				}
 
@@ -189,7 +189,7 @@ namespace JsonFx.Json
 			{
 				if (targetType != null && JsonAnalyzer.SerializableType.IsAssignableFrom(targetType))
 				{
-					ISerializable<JsonTokenType> serializable = TypeCoercionUtility.InstantiateObject<ISerializable<JsonTokenType>>(targetType);
+					ISerializable<JsonTokenType> serializable = this.Coercion.InstantiateObject<ISerializable<JsonTokenType>>(targetType);
 					return serializable.Read(this.Enumerate(tokens));
 				}
 
@@ -207,7 +207,7 @@ namespace JsonFx.Json
 
 				Type itemType = TypeCoercionUtility.GetDictionaryItemType(targetType);
 				object objectValue = (itemType != null) ?
-					TypeCoercionUtility.InstantiateObject(targetType) :
+					this.Coercion.InstantiateObject(targetType) :
 					new JsonObject();
 
 				bool hasProperties = false;
@@ -356,7 +356,7 @@ namespace JsonFx.Json
 			{
 				if (arrayType != null && JsonAnalyzer.SerializableType.IsAssignableFrom(arrayType))
 				{
-					ISerializable<JsonTokenType> serializable = TypeCoercionUtility.InstantiateObject<ISerializable<JsonTokenType>>(arrayType);
+					ISerializable<JsonTokenType> serializable = this.Coercion.InstantiateObject<ISerializable<JsonTokenType>>(arrayType);
 					return serializable.Read(this.Enumerate(tokens));
 				}
 
@@ -447,7 +447,7 @@ namespace JsonFx.Json
 						{
 							if (itemType != null && JsonAnalyzer.SerializableType.IsAssignableFrom(itemType))
 							{
-								ISerializable<JsonTokenType> serializable = TypeCoercionUtility.InstantiateObject<ISerializable<JsonTokenType>>(itemType);
+								ISerializable<JsonTokenType> serializable = this.Coercion.InstantiateObject<ISerializable<JsonTokenType>>(itemType);
 								item = serializable.Read(this.Enumerate(tokens));
 							}
 							else

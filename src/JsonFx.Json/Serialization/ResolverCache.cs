@@ -41,6 +41,22 @@ namespace JsonFx.Serialization
 {
 	public class MemberMap
 	{
+		#region Fields
+
+		public readonly MemberInfo MemberInfo;
+
+		public readonly string Name;
+
+		public readonly Type Type;
+
+		public readonly GetterDelegate Getter;
+
+		public readonly SetterDelegate Setter;
+
+		public readonly ValueIgnoredDelegate IsIgnored;
+
+		#endregion Fields
+
 		#region Init
 
 		/// <summary>
@@ -80,43 +96,167 @@ namespace JsonFx.Serialization
 		}
 
 		#endregion Init
+	}
+
+	public class FactoryMap
+	{
+		#region Constants
+
+		private const string ErrorCannotInstantiate = "Interfaces, Abstract classes, and unsupported ValueTypes cannot be instantiated. ({0})";
+
+		#endregion Constants
+
+		#region Fields
+
+		private readonly IDictionary<Type, FactoryDelegate> CollectionCtors;
+		public readonly FactoryDelegate DefaultCtor;
+		public readonly ProxyDelegate Add;
+		public readonly ProxyDelegate AddRange;
+		public readonly Type AddType;
+		public readonly Type AddRangeType;
+
+		#endregion Fields
+
+		#region Init
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		public FactoryMap(Type type)
+		{
+			if (type == null)
+			{
+				throw new ArgumentNullException("type");
+			}
+
+			if (type.IsInterface || type.IsAbstract || type.IsValueType)
+			{
+				throw new TypeLoadException(String.Format(
+					FactoryMap.ErrorCannotInstantiate,
+					type.FullName));
+			}
+
+			if (!typeof(IEnumerable).IsAssignableFrom(type))
+			{
+				this.DefaultCtor = DynamicMethodGenerator.GetTypeFactory(type);
+				return;
+			}
+
+			// many ICollection types take an IEnumerable or ICollection
+			// as a constructor argument.  look through constructors for
+			// a compatible match.
+			ConstructorInfo[] ctors = type.GetConstructors(BindingFlags.Instance|BindingFlags.Public);
+
+			this.CollectionCtors = new Dictionary<Type, FactoryDelegate>(ctors.Length);
+
+			foreach (ConstructorInfo ctor in ctors)
+			{
+				ParameterInfo[] paramList = ctor.GetParameters();
+				if (paramList.Length > 1)
+				{
+					continue;
+				}
+
+				if (paramList.Length == 0)
+				{
+					// save default in case cannot find closer match
+					this.DefaultCtor = DynamicMethodGenerator.GetTypeFactory(type);
+					continue;
+				}
+
+				Type argType = paramList[0].ParameterType;
+				if ((argType == typeof(string)) ||
+					((argType.GetInterface(typeof(IEnumerable<>).FullName) == null) &&
+					(argType.GetInterface(typeof(IEnumerable).FullName) == null)))
+				{
+					continue;
+				}
+
+				// save all constructors that can take an enumerable of objects
+				this.CollectionCtors[argType] = DynamicMethodGenerator.GetTypeFactory(ctor);
+			}
+
+			if (this.DefaultCtor == null)
+			{
+				// try to grab a private ctor if exists
+				this.DefaultCtor = DynamicMethodGenerator.GetTypeFactory(type);
+			}
+
+			// many collection types have an AddRange method
+			// which adds a collection of items at once
+			MethodInfo methodInfo = type.GetMethod("AddRange");
+			if (methodInfo != null)
+			{
+				ParameterInfo[] parameters = methodInfo.GetParameters();
+				if (parameters.Length == 1)
+				{
+					this.AddRange = DynamicMethodGenerator.GetMethodProxy(methodInfo);
+					this.AddRangeType = parameters[0].ParameterType;
+				}
+			}
+
+			// many collection types have an Add method
+			// which adds items one at a time
+			Type collectionType = type.GetInterface(typeof(ICollection<>).FullName);
+			if (collectionType != null)
+			{
+				methodInfo = collectionType.GetMethod("Add");
+			}
+			else
+			{
+				methodInfo = type.GetMethod("Add");
+			}
+
+			if (methodInfo != null)
+			{
+				ParameterInfo[] parameters = methodInfo.GetParameters();
+				if (parameters.Length == 1)
+				{
+					this.Add = DynamicMethodGenerator.GetMethodProxy(methodInfo);
+					this.AddType = parameters[0].ParameterType;
+				}
+			}
+		}
+
+		#endregion Init
 
 		#region Properties
 
-		public MemberInfo MemberInfo
+		/// <summary>
+		/// Gets a sequence of the available factory arguments
+		/// </summary>
+		public IEnumerable<Type> ArgTypes
 		{
-			get;
-			private set;
+			get
+			{
+				if (this.CollectionCtors == null)
+				{
+					return Type.EmptyTypes;
+				}
+
+				return this.CollectionCtors.Keys;
+			}
 		}
 
-		public string Name
+		/// <summary>
+		/// Gets the factory associated with the given argument type
+		/// </summary>
+		/// <param name="argType"></param>
+		/// <returns></returns>
+		public FactoryDelegate this[Type argType]
 		{
-			get;
-			private set;
-		}
+			get
+			{
+				FactoryDelegate factory;
 
-		public Type Type
-		{
-			get;
-			private set;
-		}
+				if (this.CollectionCtors == null ||
+					!this.CollectionCtors.TryGetValue(argType, out factory))
+				{
+					return null;
+				}
 
-		public GetterDelegate Getter
-		{
-			get;
-			private set;
-		}
-
-		public SetterDelegate Setter
-		{
-			get;
-			private set;
-		}
-
-		public ValueIgnoredDelegate IsIgnored
-		{
-			get;
-			private set;
+				return factory;
+			}
 		}
 
 		#endregion Properties
@@ -139,13 +279,20 @@ namespace JsonFx.Serialization
 		#region Fields
 
 #if NET20 || NET30
-		private readonly ReaderWriterLock Lock = new ReaderWriterLock();
+		private readonly ReaderWriterLock MapLock = new ReaderWriterLock();
 #else
-		private readonly ReaderWriterLockSlim Lock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+		private readonly ReaderWriterLockSlim MapLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+#endif
+
+#if NET20 || NET30
+		private readonly ReaderWriterLock FactoryLock = new ReaderWriterLock();
+#else
+		private readonly ReaderWriterLockSlim FactoryLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
 #endif
 
 		private readonly IDictionary<Type, IDictionary<string, MemberMap>> Cache = new Dictionary<Type, IDictionary<string, MemberMap>>();
 		private readonly IDictionary<Type, IDictionary<Enum, string>> EnumCache = new Dictionary<Type, IDictionary<Enum, string>>();
+		private readonly IDictionary<Type, FactoryMap> Factories = new Dictionary<Type, FactoryMap>();
 		private readonly IResolverStrategy Strategy;
 
 		#endregion Fields
@@ -179,9 +326,9 @@ namespace JsonFx.Serialization
 			IDictionary<string, MemberMap> map;
 
 #if NET20 || NET30
-			this.Lock.AcquireReaderLock(ResolverCache.LockTimeout);
+			this.MapLock.AcquireReaderLock(ResolverCache.LockTimeout);
 #else
-			this.Lock.EnterReadLock();
+			this.MapLock.EnterReadLock();
 #endif
 			try
 			{
@@ -193,9 +340,9 @@ namespace JsonFx.Serialization
 			finally
 			{
 #if NET20 || NET30
-				this.Lock.ReleaseReaderLock();
+				this.MapLock.ReleaseReaderLock();
 #else
-				this.Lock.ExitReadLock();
+				this.MapLock.ExitReadLock();
 #endif
 			}
 
@@ -212,9 +359,9 @@ namespace JsonFx.Serialization
 			IDictionary<Enum, string> map;
 
 #if NET20 || NET30
-			this.Lock.AcquireReaderLock(ResolverCache.LockTimeout);
+			this.MapLock.AcquireReaderLock(ResolverCache.LockTimeout);
 #else
-			this.Lock.EnterReadLock();
+			this.MapLock.EnterReadLock();
 #endif
 			try
 			{
@@ -226,9 +373,9 @@ namespace JsonFx.Serialization
 			finally
 			{
 #if NET20 || NET30
-				this.Lock.ReleaseReaderLock();
+				this.MapLock.ReleaseReaderLock();
 #else
-				this.Lock.ExitReadLock();
+				this.MapLock.ExitReadLock();
 #endif
 			}
 
@@ -241,20 +388,32 @@ namespace JsonFx.Serialization
 		public void Clear()
 		{
 #if NET20 || NET30
-			this.Lock.AcquireWriterLock(ResolverCache.LockTimeout);
+			this.MapLock.AcquireWriterLock(ResolverCache.LockTimeout);
 #else
-			this.Lock.EnterWriteLock();
+			this.MapLock.EnterWriteLock();
+#endif
+#if NET20 || NET30
+			this.FactoryLock.AcquireWriterLock(ResolverCache.LockTimeout);
+#else
+			this.FactoryLock.EnterWriteLock();
 #endif
 			try
 			{
 				this.Cache.Clear();
+				this.EnumCache.Clear();
+				this.Factories.Clear();
 			}
 			finally
 			{
 #if NET20 || NET30
-				this.Lock.ReleaseWriterLock();
+				this.FactoryLock.ReleaseWriterLock();
 #else
-				this.Lock.ExitWriteLock();
+				this.FactoryLock.ExitWriteLock();
+#endif
+#if NET20 || NET30
+				this.MapLock.ReleaseWriterLock();
+#else
+				this.MapLock.ExitWriteLock();
 #endif
 			}
 		}
@@ -270,9 +429,9 @@ namespace JsonFx.Serialization
 				typeof(IDictionary).IsAssignableFrom(objectType))
 			{
 #if NET20 || NET30
-				this.Lock.AcquireWriterLock(ResolverCache.LockTimeout);
+				this.MapLock.AcquireWriterLock(ResolverCache.LockTimeout);
 #else
-				this.Lock.EnterWriteLock();
+				this.MapLock.EnterWriteLock();
 #endif
 				try
 				{
@@ -282,9 +441,9 @@ namespace JsonFx.Serialization
 				finally
 				{
 #if NET20 || NET30
-					this.Lock.ReleaseWriterLock();
+					this.MapLock.ReleaseWriterLock();
 #else
-					this.Lock.ExitWriteLock();
+					this.MapLock.ExitWriteLock();
 #endif
 				}
 			}
@@ -337,21 +496,21 @@ namespace JsonFx.Serialization
 			}
 
 #if NET20 || NET30
-			this.Lock.AcquireWriterLock(ResolverCache.LockTimeout);
+			this.MapLock.AcquireWriterLock(ResolverCache.LockTimeout);
 #else
-			this.Lock.EnterWriteLock();
+			this.MapLock.EnterWriteLock();
 #endif
 			try
 			{
-				// store in cache for future usage
+				// store in cache for future requests
 				return (this.Cache[objectType] = maps);
 			}
 			finally
 			{
 #if NET20 || NET30
-				this.Lock.ReleaseWriterLock();
+				this.MapLock.ReleaseWriterLock();
 #else
-				this.Lock.ExitWriteLock();
+				this.MapLock.ExitWriteLock();
 #endif
 			}
 		}
@@ -382,26 +541,82 @@ namespace JsonFx.Serialization
 
 
 #if NET20 || NET30
-			this.Lock.AcquireWriterLock(ResolverCache.LockTimeout);
+			this.MapLock.AcquireWriterLock(ResolverCache.LockTimeout);
 #else
-			this.Lock.EnterWriteLock();
+			this.MapLock.EnterWriteLock();
 #endif
 			try
 			{
-				// store in caches for future usage
+				// store in caches for future requests
 				this.Cache[enumType] = maps;
 				return (this.EnumCache[enumType] = enumMaps);
 			}
 			finally
 			{
 #if NET20 || NET30
-				this.Lock.ReleaseWriterLock();
+				this.MapLock.ReleaseWriterLock();
 #else
-				this.Lock.ExitWriteLock();
+				this.MapLock.ExitWriteLock();
 #endif
 			}
 		}
 
 		#endregion Map Methods
+
+		#region Factory Methods
+
+		public FactoryMap LoadFactory(Type type)
+		{
+			if (type == null || type == typeof(object))
+			{
+				return null;
+			}
+
+			FactoryMap map;
+
+#if NET20 || NET30
+			this.FactoryLock.AcquireReaderLock(ResolverCache.LockTimeout);
+#else
+			this.FactoryLock.EnterReadLock();
+#endif
+			try
+			{
+				if (this.Factories.TryGetValue(type, out map))
+				{
+					return map;
+				}
+			}
+			finally
+			{
+#if NET20 || NET30
+				this.FactoryLock.ReleaseReaderLock();
+#else
+				this.FactoryLock.ExitReadLock();
+#endif
+			}
+
+			map = new FactoryMap(type);
+
+#if NET20 || NET30
+			this.FactoryLock.AcquireWriterLock(ResolverCache.LockTimeout);
+#else
+			this.FactoryLock.EnterWriteLock();
+#endif
+			try
+			{
+				// store in cache for future requests
+				return (this.Factories[type] = map);
+			}
+			finally
+			{
+#if NET20 || NET30
+				this.FactoryLock.ReleaseWriterLock();
+#else
+				this.FactoryLock.ExitWriteLock();
+#endif
+			}
+		}
+
+		#endregion Factory Methods
 	}
 }

@@ -56,7 +56,6 @@ namespace JsonFx.Serialization
 
 		private const string ErrorNullValueType = "{0} does not accept null as a value";
 		private const string ErrorDefaultCtor = "Only objects with default constructors can be deserialized. ({0})";
-		private const string ErrorCannotInstantiate = "Interfaces, Abstract classes, and unsupported ValueTypes cannot be deserialized. ({0})";
 		private const string ErrorCannotInstantiateAsT = "Type {0} is not of Type {1}";
 
 		private const string ErrorGenericIDictionary = "Types which implement Generic IDictionary<TKey, TValue> also need to implement IDictionary to be deserialized. ({0})";
@@ -107,7 +106,7 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="objectType"></param>
 		/// <returns>objectType instance</returns>
-		public static T InstantiateObject<T>(Type objectType)
+		public T InstantiateObject<T>(Type objectType)
 		{
 			if (!objectType.IsSubclassOf(typeof(T)))
 			{
@@ -117,7 +116,7 @@ namespace JsonFx.Serialization
 					typeof(T).FullName));
 			}
 
-			return (T)TypeCoercionUtility.InstantiateObject(objectType);
+			return (T)this.InstantiateObject(objectType);
 		}
 
 		/// <summary>
@@ -125,46 +124,19 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="objectType"></param>
 		/// <returns>objectType instance</returns>
-		public static object InstantiateObject(Type targetType)
+		public object InstantiateObject(Type targetType)
 		{
 			targetType = TypeCoercionUtility.ResolveInterfaceType(targetType);
 
-			if (targetType.IsInterface || targetType.IsAbstract || targetType.IsValueType)
-			{
-				throw new TypeCoercionException(String.Format(
-					TypeCoercionUtility.ErrorCannotInstantiate,
-					targetType.FullName));
-			}
-
-			ConstructorInfo ctor = targetType.GetConstructor(
-				BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic,
-				null,
-				Type.EmptyTypes,
-				null);
-			if (ctor == null)
+			FactoryMap factory = this.ResolverCache.LoadFactory(targetType);
+			if (factory == null || factory.DefaultCtor == null)
 			{
 				throw new TypeCoercionException(String.Format(
 					TypeCoercionUtility.ErrorDefaultCtor,
 					targetType.FullName));
 			}
-			object result;
-			try
-			{
-				// always try-catch Invoke() to expose real exception
-				// TODO: build FactoryDelegate, cache under targetType and execute
-				result = ctor.Invoke(null);
-			}
-			catch (TargetInvocationException ex)
-			{
-				if (ex.InnerException != null)
-				{
-					throw new TypeCoercionException(ex.InnerException.Message, ex.InnerException);
-				}
 
-				throw new TypeCoercionException("Error instantiating " + targetType.FullName, ex);
-			}
-
-			return result;
+			return factory.DefaultCtor();
 		}
 
 		/// <summary>
@@ -377,7 +349,7 @@ namespace JsonFx.Serialization
 		/// <returns></returns>
 		private object CoerceType(Type targetType, IDictionary<string, object> value)
 		{
-			object newValue = TypeCoercionUtility.InstantiateObject(targetType);
+			object newValue = this.InstantiateObject(targetType);
 
 			IDictionary<string, MemberMap> maps = this.ResolverCache.LoadMaps(targetType);
 			if (maps == null)
@@ -430,7 +402,7 @@ namespace JsonFx.Serialization
 		/// <returns></returns>
 		private object CoerceType(Type targetType, IDictionary value)
 		{
-			object newValue = TypeCoercionUtility.InstantiateObject(targetType);
+			object newValue = this.InstantiateObject(targetType);
 
 			IDictionary<string, MemberMap> maps = this.ResolverCache.LoadMaps(targetType);
 			if (maps == null)
@@ -492,31 +464,22 @@ namespace JsonFx.Serialization
 			// assume is an ICollection or IEnumerable with AddRange, Add,
 			// or custom Constructor with which we can populate it
 
-			// many ICollection types take an IEnumerable or ICollection
-			// as a constructor argument.  look through constructors for
-			// a compatible match.
-			ConstructorInfo[] ctors = targetType.GetConstructors();
-			ConstructorInfo defaultCtor = null;
-			foreach (ConstructorInfo ctor in ctors)
+			FactoryMap factory = this.ResolverCache.LoadFactory(targetType);
+			if (factory == null)
 			{
-				ParameterInfo[] paramList = ctor.GetParameters();
-				if (paramList.Length == 0)
-				{
-					// save for in case cannot find closer match
-					defaultCtor = ctor;
-					continue;
-				}
+				throw new TypeCoercionException(String.Format(
+					TypeCoercionUtility.ErrorDefaultCtor,
+					targetType.FullName));
+			}
 
-				if (paramList.Length == 1 &&
-					paramList[0].ParameterType.IsAssignableFrom(valueType))
+			foreach (Type argType in factory.ArgTypes)
+			{
+				if (argType.IsAssignableFrom(valueType))
 				{
 					try
 					{
 						// invoke first constructor that can take this value as an argument
-						// TODO: build FactoryDelegate, cache under targetType and execute
-						return ctor.Invoke(
-								new object[] { value }
-							);
+						return factory[argType](value);
 					}
 					catch
 					{
@@ -526,108 +489,39 @@ namespace JsonFx.Serialization
 				}
 			}
 
-			if (defaultCtor == null)
+			if (factory.DefaultCtor == null)
 			{
 				throw new TypeCoercionException(String.Format(
 					TypeCoercionUtility.ErrorDefaultCtor,
 					targetType.FullName));
 			}
-			object collection;
-			try
+
+			object collection = factory.DefaultCtor();
+
+			// attempt bulk insert first as is most efficient
+			if (factory.AddRange != null &&
+				factory.AddRangeType != null &&
+				factory.AddRangeType.IsAssignableFrom(valueType))
 			{
-				// always try-catch Invoke() to expose real exception
-				// TODO: build FactoryDelegate, cache under targetType and execute
-				collection = defaultCtor.Invoke(null);
-			}
-			catch (TargetInvocationException ex)
-			{
-				if (ex.InnerException != null)
-				{
-					throw new TypeCoercionException(ex.InnerException.Message, ex.InnerException);
-				}
-				throw new TypeCoercionException("Error instantiating " + targetType.FullName, ex);
+				factory.AddRange(collection, value);
 			}
 
-			// many ICollection types have an AddRange method
-			// which adds all items at once
-			MethodInfo method = targetType.GetMethod("AddRange");
-			ParameterInfo[] parameters = (method == null) ?
-					null : method.GetParameters();
-			Type paramType = (parameters == null || parameters.Length != 1) ?
-					null : parameters[0].ParameterType;
-
-			if (paramType != null &&
-				paramType.IsAssignableFrom(valueType))
+			// attempt sequence of single inserts next
+			if (factory.Add != null &&
+				factory.AddType != null)
 			{
-				try
-				{
-					// always try-catch Invoke() to expose real exception
-					// add all members in one method
-					// TODO: build FactoryDelegate, cache under targetType and execute
-					method.Invoke(
-						collection,
-						new object[] { value });
-				}
-				catch (TargetInvocationException ex)
-				{
-					if (ex.InnerException != null)
-					{
-						throw new TypeCoercionException(ex.InnerException.Message, ex.InnerException);
-					}
-					throw new TypeCoercionException("Error calling AddRange on " + targetType.FullName, ex);
-				}
-				return collection;
-			}
-			else
-			{
-				Type collectionType = targetType.GetInterface(typeof(ICollection<>).FullName);
+				Type addType = factory.AddType;
 
-				// many collection types have an Add method
-				// which adds items one at a time
-				if (collectionType != null)
+				// loop through adding items to collection
+				foreach (object item in value)
 				{
-					method = collectionType.GetMethod("Add");
-				}
-				else
-				{
-					method = targetType.GetMethod("Add");
-				}
-				parameters = (method == null) ?
-						null : method.GetParameters();
-				paramType = (parameters == null || parameters.Length != 1) ?
-						null : parameters[0].ParameterType;
-
-				if (paramType != null)
-				{
-					// loop through adding items to collection
-					foreach (object item in value)
-					{
-						try
-						{
-							// always try-catch Invoke() to expose real exception
-							// TODO: build FactoryDelegate, cache under targetType and execute
-							method.Invoke(
-								collection,
-								new object[] {
-								this.CoerceType(paramType, item)
-							});
-						}
-						catch (TargetInvocationException ex)
-						{
-							if (ex.InnerException != null)
-							{
-								throw new TypeCoercionException(ex.InnerException.Message, ex.InnerException);
-							}
-							throw new TypeCoercionException("Error calling Add on " + targetType.FullName, ex);
-						}
-					}
-					return collection;
+					factory.Add(collection, this.CoerceType(addType, item));
 				}
 			}
 
 			try
 			{
-				// fall back to basics
+				// finally fall back to basics
 				return Convert.ChangeType(value, targetType);
 			}
 			catch (Exception ex)
