@@ -561,8 +561,6 @@ namespace JsonFx.Serialization
 		/// <returns></returns>
 		private Array CoerceArray(Type itemType, IEnumerable value)
 		{
-			// TODO: if not NET20, optimize this with LINQ
-
 			ArrayList target = value as ArrayList;
 
 			if (target == null)

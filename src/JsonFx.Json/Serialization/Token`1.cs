@@ -107,10 +107,9 @@ namespace JsonFx.Serialization
 
 		public override int GetHashCode()
 		{
-			// TODO: find the correct starting values here by creating an anonymous object and viewing its implementation
 			const int ShiftValue = -1521134295;
 
-			int hashcode = 0x23f797e3;
+			int hashcode = -1321491941;
 			hashcode = (ShiftValue * hashcode) + EqualityComparer<T>.Default.GetHashCode(this.TokenType);
 			hashcode = (ShiftValue * hashcode) + EqualityComparer<object>.Default.GetHashCode(this.Value);
 			return hashcode;
