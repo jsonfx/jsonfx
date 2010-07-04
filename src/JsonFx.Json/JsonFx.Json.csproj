@@ -74,7 +74,8 @@
     <Compile Include="IO\ITextScanner.cs" />
     <Compile Include="IO\StringScanner.cs" />
     <Compile Include="IO\TextReaderScanner.cs" />
-    <Compile Include="Json\IJsonSerializable.cs" />
+    <Compile Include="Json\Filters\DateIso8601Filter.cs" />
+    <Compile Include="Json\IJsonFilter`1.cs" />
     <Compile Include="Json\JsonAnalyzer.cs" />
     <Compile Include="Json\JsonFormatter.cs" />
     <Compile Include="Json\JsonGrammar.cs" />
@@ -92,6 +93,7 @@
     <Compile Include="Serialization\CallbackResolverStrategy.cs" />
     <Compile Include="Serialization\CombinedResolverStrategy.cs" />
     <Compile Include="Serialization\IDataAnalyzer`1.cs" />
+    <Compile Include="Serialization\IDataFilter`2.cs" />
     <Compile Include="Serialization\IDataWalker`1.cs" />
     <Compile Include="Serialization\PocoResolverStrategy.cs" />
     <Compile Include="Serialization\DataReaderSettings.cs" />
@@ -107,7 +109,6 @@
     <Compile Include="Serialization\IDataWriter.cs" />
     <Compile Include="Serialization\IResolverCacheContainer.cs" />
     <Compile Include="Serialization\IResolverStrategy.cs" />
-    <Compile Include="Serialization\ISerializable`1.cs" />
     <Compile Include="Serialization\ResolverCache.cs" />
     <Compile Include="Serialization\Token`1.cs" />
     <Compile Include="Serialization\TypeCoercionUtility.cs" />
@@ -119,5 +120,6 @@
   <ItemGroup>
     <Content Include="Readme.txt" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

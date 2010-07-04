@@ -68,8 +68,6 @@ namespace JsonFx.Json
 			private const string ErrorMissingObjectProperty = "Missing JSON object property";
 			private const string ErrorUnterminatedObject = "Unterminated JSON object";
 
-			private static readonly Type SerializableType = typeof(ISerializable<JsonTokenType>);
-
 			#endregion Constants
 
 			#region Fields
@@ -141,12 +139,6 @@ namespace JsonFx.Json
 
 			private object ConsumeValue(IEnumerator<Token<JsonTokenType>> tokens, Type targetType)
 			{
-				if (targetType != null && JsonAnalyzer.SerializableType.IsAssignableFrom(targetType))
-				{
-					ISerializable<JsonTokenType> serializable = this.Coercion.InstantiateObject<ISerializable<JsonTokenType>>(targetType);
-					return serializable.Read(this.Enumerate(tokens));
-				}
-
 				Token<JsonTokenType> token = tokens.Current;
 				switch (token.TokenType)
 				{
@@ -187,12 +179,6 @@ namespace JsonFx.Json
 
 			private object ConsumeObject(IEnumerator<Token<JsonTokenType>> tokens, Type targetType)
 			{
-				if (targetType != null && JsonAnalyzer.SerializableType.IsAssignableFrom(targetType))
-				{
-					ISerializable<JsonTokenType> serializable = this.Coercion.InstantiateObject<ISerializable<JsonTokenType>>(targetType);
-					return serializable.Read(this.Enumerate(tokens));
-				}
-
 				Token<JsonTokenType> token = tokens.Current;
 
 				// verify correct starting state
@@ -354,12 +340,6 @@ namespace JsonFx.Json
 
 			private object ConsumeArray(IEnumerator<Token<JsonTokenType>> tokens, Type arrayType)
 			{
-				if (arrayType != null && JsonAnalyzer.SerializableType.IsAssignableFrom(arrayType))
-				{
-					ISerializable<JsonTokenType> serializable = this.Coercion.InstantiateObject<ISerializable<JsonTokenType>>(arrayType);
-					return serializable.Read(this.Enumerate(tokens));
-				}
-
 				Token<JsonTokenType> token = tokens.Current;
 
 				// verify correct starting state
@@ -445,22 +425,14 @@ namespace JsonFx.Json
 						case JsonTokenType.String:
 						case JsonTokenType.Undefined:
 						{
-							if (itemType != null && JsonAnalyzer.SerializableType.IsAssignableFrom(itemType))
+							// primitive item
+							if (isItemTypeHint)
 							{
-								ISerializable<JsonTokenType> serializable = this.Coercion.InstantiateObject<ISerializable<JsonTokenType>>(itemType);
-								item = serializable.Read(this.Enumerate(tokens));
+								item = token.Value;
 							}
 							else
 							{
-								// primitive item
-								if (isItemTypeHint)
-								{
-									item = token.Value;
-								}
-								else
-								{
-									item = this.Coercion.CoerceType(itemType, token.Value);
-								}
+								item = this.Coercion.CoerceType(itemType, token.Value);
 							}
 							break;
 						}

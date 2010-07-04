@@ -83,13 +83,6 @@ namespace JsonFx.Json
 					yield break;
 				}
 
-				ISerializable<JsonTokenType> serializable = value as ISerializable<JsonTokenType>;
-				if (serializable != null)
-				{
-					foreach (Token<JsonTokenType> token in serializable.Write()) { yield return token; }
-					yield break;
-				}
-
 				Type type = value.GetType();
 
 				// must test enumerations before other value types
