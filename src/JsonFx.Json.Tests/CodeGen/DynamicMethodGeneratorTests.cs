@@ -51,9 +51,19 @@ namespace JsonFx.CodeGen
 			private int two = 2;
 			private int three = 3;
 
+			public static int MyStatic = 42;
+
 			#endregion Fields
 
 			#region Init
+
+			/// <summary>
+			/// Ctor
+			/// </summary>
+			static Example()
+			{
+				Example.Solo = "Single";
+			}
 
 			/// <summary>
 			/// Ctor
@@ -153,6 +163,12 @@ namespace JsonFx.CodeGen
 			public string Mi
 			{
 				private get;
+				set;
+			}
+
+			public static string Solo
+			{
+				get;
 				set;
 			}
 
@@ -369,6 +385,19 @@ namespace JsonFx.CodeGen
 				});
 
 			Assert.Equal("propertyInfo", ex.ParamName);
+		}
+
+		[Fact]
+		public void GetPropertyGetter_StaticProperty_ChangesFieldValue()
+		{
+			var propertyInfo = typeof(Example).GetProperty("Solo");
+			Assert.NotNull(propertyInfo);
+
+			GetterDelegate getter = DynamicMethodGenerator.GetPropertyGetter(propertyInfo);
+			Assert.NotNull(getter);
+
+			var actual = getter(null);
+			Assert.Equal("Single", Example.Solo);
 		}
 
 		[Fact(Timeout=1000)]
@@ -591,6 +620,27 @@ namespace JsonFx.CodeGen
 			Assert.Equal("propertyInfo", ex.ParamName);
 		}
 
+		[Fact]
+		public void GetPropertySetter_StaticProperty_ChangesFieldValue()
+		{
+			var propertyInfo = typeof(Example).GetProperty("Solo");
+			Assert.NotNull(propertyInfo);
+
+			SetterDelegate setter = DynamicMethodGenerator.GetPropertySetter(propertyInfo);
+			Assert.NotNull(setter);
+
+			var prev = Example.Solo;
+			try
+			{
+				setter(null, "Duet");
+				Assert.Equal("Duet", Example.Solo);
+			}
+			finally
+			{
+				Example.Solo = prev;
+			}
+		}
+
 		[Fact(Timeout=1000)]
 		public void GetPropertySetter_1MillionPropertySets_PerformsInAround10ms()
 		{
@@ -675,6 +725,42 @@ namespace JsonFx.CodeGen
 				});
 
 			Assert.Equal("fieldInfo", ex.ParamName);
+		}
+
+		[Fact]
+		public void GetFieldGetter_StaticField_ReturnsFieldValue()
+		{
+			var fieldInfo = typeof(Example).GetField("MyStatic");
+			Assert.NotNull(fieldInfo);
+
+			GetterDelegate getter = DynamicMethodGenerator.GetFieldGetter(fieldInfo);
+			Assert.NotNull(getter);
+
+			Assert.Equal(42, getter(null));
+		}
+
+		[Fact]
+		public void GetFieldGetter_StaticReadonlyField_ReturnsFieldValue()
+		{
+			var fieldInfo = typeof(Guid).GetField("Empty");
+			Assert.NotNull(fieldInfo);
+
+			GetterDelegate getter = DynamicMethodGenerator.GetFieldGetter(fieldInfo);
+			Assert.NotNull(getter);
+
+			Assert.Equal(Guid.Empty, getter(null));
+		}
+
+		[Fact]
+		public void GetFieldGetter_ConstField_ReturnsFieldValue()
+		{
+			var fieldInfo = typeof(Int32).GetField("MaxValue");
+			Assert.NotNull(fieldInfo);
+
+			GetterDelegate getter = DynamicMethodGenerator.GetFieldGetter(fieldInfo);
+			Assert.NotNull(getter);
+
+			Assert.Equal(Int32.MaxValue, getter(null));
 		}
 
 		[Fact(Timeout=1000)]
@@ -771,6 +857,47 @@ namespace JsonFx.CodeGen
 				});
 
 			Assert.Equal("fieldInfo", ex.ParamName);
+		}
+
+		[Fact]
+		public void GetFieldSetter_StaticField_ChangesFieldValue()
+		{
+			var fieldInfo = typeof(Example).GetField("MyStatic");
+			Assert.NotNull(fieldInfo);
+
+			SetterDelegate setter = DynamicMethodGenerator.GetFieldSetter(fieldInfo);
+			Assert.NotNull(setter);
+
+			var prev = Example.MyStatic;
+			try
+			{
+				setter(null, 2010);
+				Assert.Equal(2010, Example.MyStatic);
+			}
+			finally
+			{
+				Example.MyStatic = prev;
+			}
+		}
+
+		[Fact]
+		public void GetFieldSetter_StaticReadonlyField_ReturnsNull()
+		{
+			var fieldInfo = typeof(Guid).GetField("Empty");
+			Assert.NotNull(fieldInfo);
+
+			SetterDelegate setter = DynamicMethodGenerator.GetFieldSetter(fieldInfo);
+			Assert.Null(setter);
+		}
+
+		[Fact]
+		public void GetFieldSetter_ConstField_ReturnsNull()
+		{
+			var fieldInfo = typeof(Int32).GetField("MaxValue");
+			Assert.NotNull(fieldInfo);
+
+			SetterDelegate setter = DynamicMethodGenerator.GetFieldSetter(fieldInfo);
+			Assert.Null(setter);
 		}
 
 		[Fact(Timeout=1000)]

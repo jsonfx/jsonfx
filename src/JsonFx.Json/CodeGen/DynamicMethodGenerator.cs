@@ -152,17 +152,13 @@ namespace JsonFx.CodeGen
 			// Get an ILGenerator and emit a body for the dynamic method,
 			// using a stream size larger than the IL that will be emitted.
 			ILGenerator il = dynamicMethod.GetILGenerator(64 * 5);
-			if (methodInfo.IsStatic)
-			{
-				// TODO: what goes here?
-			}
-			else
+			if (!methodInfo.IsStatic)
 			{
 				// Load the target instance onto the evaluation stack
 				il.Emit(OpCodes.Ldarg_0);
 			}
 			// Call the method that returns void
-			il.Emit(methodInfo.IsVirtual ? OpCodes.Callvirt :  OpCodes.Call, methodInfo);
+			il.Emit(methodInfo.IsVirtual ? OpCodes.Callvirt : OpCodes.Call, methodInfo);
 			if (propertyInfo.PropertyType.IsValueType)
 			{
 				// Load the return value as a reference type
@@ -215,11 +211,7 @@ namespace JsonFx.CodeGen
 			// using a stream size larger than the IL that will be emitted.
 			ILGenerator il = dynamicMethod.GetILGenerator(64 * 5);
 
-			if (methodInfo.IsStatic)
-			{
-				// TODO: what goes here?
-			}
-			else
+			if (!methodInfo.IsStatic)
 			{
 				// Load the target instance onto the evaluation stack
 				il.Emit(OpCodes.Ldarg_0);
@@ -237,7 +229,7 @@ namespace JsonFx.CodeGen
 				il.Emit(OpCodes.Castclass, propertyInfo.PropertyType);
 			}
 			// Call the method that returns void
-			il.Emit(methodInfo.IsVirtual ? OpCodes.Callvirt :  OpCodes.Call, methodInfo);
+			il.Emit(methodInfo.IsVirtual ? OpCodes.Callvirt : OpCodes.Call, methodInfo);
 			// return (void) from the method
 			il.Emit(OpCodes.Ret);
 
@@ -273,59 +265,80 @@ namespace JsonFx.CodeGen
 			// using a stream size larger than the IL that will be emitted.
 			ILGenerator il = dynamicMethod.GetILGenerator(64 * 5);
 
-			if (fieldInfo.IsStatic && fieldInfo.DeclaringType.IsEnum)
+			if (fieldInfo.IsStatic)
 			{
-				object value = fieldInfo.GetValue(null);
-				switch (Type.GetTypeCode(fieldInfo.FieldType))
+				if (fieldInfo.IsLiteral)
 				{
-					case TypeCode.Byte:
+					object value = fieldInfo.GetValue(null);
+					switch (Type.GetTypeCode(fieldInfo.FieldType))
 					{
-						il.Emit(OpCodes.Ldc_I4_S, (byte)value);
-						break;
-					}
-					case TypeCode.SByte:
-					{
-						il.Emit(OpCodes.Ldc_I4_S, (sbyte)value);
-						break;
-					}
-					case TypeCode.Int16:
-					{
-						il.Emit(OpCodes.Ldc_I4_S, (short)value);
-						break;
-					}
-					case TypeCode.UInt16:
-					{
-						il.Emit(OpCodes.Ldc_I4_S, (ushort)value);
-						break;
-					}
-					case TypeCode.Int32:
-					{
-						il.Emit(OpCodes.Ldc_I4, (int)value);
-						break;
-					}
-					case TypeCode.UInt32:
-					{
-						il.Emit(OpCodes.Ldc_I4, (uint)value);
-						break;
-					}
-					case TypeCode.Int64:
-					{
-						il.Emit(OpCodes.Ldc_I8, (long)value);
-						break;
-					}
-					case TypeCode.UInt64:
-					{
-						il.Emit(OpCodes.Ldc_I8, (ulong)value);
-						break;
-					}
-					default:
-					{
-						return null;
+						case TypeCode.Boolean:
+						{
+							il.Emit(OpCodes.Ldc_I4, Object.Equals(true, value) ? 1 : 0);
+							break;
+						}
+						case TypeCode.Byte:
+						{
+							il.Emit(OpCodes.Ldc_I4_S, (byte)value);
+							break;
+						}
+						case TypeCode.Char:
+						{
+							il.Emit(OpCodes.Ldc_I4_S, (char)value);
+							break;
+						}
+						case TypeCode.Int16:
+						{
+							il.Emit(OpCodes.Ldc_I4_S, (short)value);
+							break;
+						}
+						case TypeCode.Int32:
+						{
+							il.Emit(OpCodes.Ldc_I4, (int)value);
+							break;
+						}
+						case TypeCode.Int64:
+						{
+							il.Emit(OpCodes.Ldc_I8, (long)value);
+							break;
+						}
+						case TypeCode.SByte:
+						{
+							il.Emit(OpCodes.Ldc_I4_S, (sbyte)value);
+							break;
+						}
+						case TypeCode.String:
+						{
+							il.Emit(OpCodes.Ldstr, (string)value);
+							break;
+						}
+						case TypeCode.UInt16:
+						{
+							il.Emit(OpCodes.Ldc_I4_S, (ushort)value);
+							break;
+						}
+						case TypeCode.UInt32:
+						{
+							il.Emit(OpCodes.Ldc_I4, (uint)value);
+							break;
+						}
+						case TypeCode.UInt64:
+						{
+							il.Emit(OpCodes.Ldc_I8, (ulong)value);
+							break;
+						}
+						default:
+						{
+							// not sure how to load these
+							return null;
+						}
 					}
 				}
-
-				// Load the field value as a reference type
-				il.Emit(OpCodes.Box, fieldInfo.DeclaringType);
+				else
+				{
+					// Load the static field
+					il.Emit(OpCodes.Ldsfld, fieldInfo);
+				}
 			}
 			else
 			{
@@ -333,11 +346,11 @@ namespace JsonFx.CodeGen
 				il.Emit(OpCodes.Ldarg_0);
 				// Load the field
 				il.Emit(OpCodes.Ldfld, fieldInfo);
-				if (fieldInfo.FieldType.IsValueType)
-				{
-					// box the field value as a reference type
-					il.Emit(OpCodes.Box, fieldInfo.FieldType);
-				}
+			}
+			if (fieldInfo.FieldType.IsValueType)
+			{
+				// box the field value as a reference type
+				il.Emit(OpCodes.Box, fieldInfo.FieldType);
 			}
 			// return field value from the method
 			il.Emit(OpCodes.Ret);
@@ -380,8 +393,11 @@ namespace JsonFx.CodeGen
 			// using a stream size larger than the IL that will be emitted.
 			ILGenerator il = dynamicMethod.GetILGenerator(64 * 5);
 
-			// Load the target instance onto the evaluation stack
-			il.Emit(OpCodes.Ldarg_0);
+			if (!fieldInfo.IsStatic)
+			{
+				// Load the target instance onto the evaluation stack
+				il.Emit(OpCodes.Ldarg_0);
+			}
 			// Load the argument onto the evaluation stack
 			il.Emit(OpCodes.Ldarg_1);
 			if (fieldInfo.FieldType.IsValueType)
@@ -394,8 +410,16 @@ namespace JsonFx.CodeGen
 				// cast the argument as the corresponding type
 				il.Emit(OpCodes.Castclass, fieldInfo.FieldType);
 			}
-			// Set the field
-			il.Emit(OpCodes.Stfld, fieldInfo);
+			if (fieldInfo.IsStatic)
+			{
+				// Set the static field
+				il.Emit(OpCodes.Stsfld, fieldInfo);
+			}
+			else
+			{
+				// Set the field
+				il.Emit(OpCodes.Stfld, fieldInfo);
+			}
 			// return (void) from the method
 			il.Emit(OpCodes.Ret);
 
@@ -461,11 +485,7 @@ namespace JsonFx.CodeGen
 			// set this as the destination of the jump
 			il.MarkLabel(jump);
 
-			if (methodInfo.IsStatic)
-			{
-				// TODO: what goes here?
-			}
-			else
+			if (!methodInfo.IsStatic)
 			{
 				// Load the target instance onto the evaluation stack
 				il.Emit(OpCodes.Ldarg_0);
@@ -499,7 +519,7 @@ namespace JsonFx.CodeGen
 
 			// Call the ctor, passing in the stack of args, result is put back on stack
 			// Call the method and return result
-			il.Emit(methodInfo.IsVirtual ? OpCodes.Callvirt :  OpCodes.Call, methodInfo);
+			il.Emit(methodInfo.IsVirtual ? OpCodes.Callvirt : OpCodes.Call, methodInfo);
 
 			if (methodInfo.ReturnType == typeof(void))
 			{
