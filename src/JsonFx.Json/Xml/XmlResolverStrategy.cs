@@ -39,10 +39,17 @@ using JsonFx.Serialization;
 namespace JsonFx.Xml
 {
 	/// <summary>
-	/// Controls name resolution for IDataReader / IDataWriter using XmlSerializer attributes
+	/// Controls name resolution for IDataReader / IDataWriter using attributes and conventions similar to XmlSerializer semantics
 	/// </summary>
 	public class XmlResolverStrategy : PocoResolverStrategy
 	{
+		#region Constants
+
+		private const string SpecifiedSuffix = "Specified";
+		private const string ShouldSerializePrefix = "ShouldSerialize";
+
+		#endregion Constants
+
 		#region Name Resolution Methods
 
 		/// <summary>
@@ -81,6 +88,10 @@ namespace JsonFx.Xml
 		/// <returns>if has a value equivalent to the DefaultValueAttribute or has a property named XXXSpecified which determines visibility</returns>
 		/// <remarks>
 		/// This is useful when default values need not be serialized.
+		/// Under these situations XmlSerializer ignores properties based upon value:
+		/// - DefaultValue: http://msdn.microsoft.com/en-us/library/system.componentmodel.defaultvalueattribute.aspx
+		/// - Specified Properies: http://msdn.microsoft.com/en-us/library/bb402199.aspx
+		/// - ShouldSerialize Methods: http://msdn.microsoft.com/en-us/library/53b8022e.aspx
 		/// </remarks>
 		public override ValueIgnoredDelegate GetValueIgnoredCallback(MemberInfo member)
 		{
@@ -88,8 +99,7 @@ namespace JsonFx.Xml
 
 			// look up specified property to see if exists
 			GetterDelegate specifiedPropertyGetter = null;
-
-			PropertyInfo specProp = objType.GetProperty(member.Name+"Specified", BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic);
+			PropertyInfo specProp = objType.GetProperty(member.Name+SpecifiedSuffix, BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic);
 
 			// ensure is correct return type
 			if (specProp != null && specProp.PropertyType == typeof(bool))
@@ -97,19 +107,51 @@ namespace JsonFx.Xml
 				specifiedPropertyGetter = DynamicMethodGenerator.GetPropertyGetter(specProp);
 			}
 
+			// look up specified property to see if exists
+			ProxyDelegate shouldSerializeProxy = null;
+			MethodInfo shouldSerialize = objType.GetMethod(ShouldSerializePrefix+member.Name, BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic);
+
+			// ensure is correct return type
+			if (shouldSerialize != null && shouldSerialize.ReturnType == typeof(bool) && shouldSerialize.GetParameters().Length == 0)
+			{
+				shouldSerializeProxy = DynamicMethodGenerator.GetMethodProxy(shouldSerialize);
+			}
+
+			// to be most efficient must create a different delegate for each of 8 combinations so not performing extra work
+
 			DefaultValueAttribute defaultAttr = TypeCoercionUtility.GetAttribute<DefaultValueAttribute>(member);
 			if (defaultAttr == null)
 			{
 				if (specifiedPropertyGetter == null)
 				{
-					// no need to even create a delegate
-					return null;
+					if (shouldSerializeProxy == null)
+					{
+						// situation 1: no need to even create a delegate
+						return null;
+					}
+
+					// situation 2: create a delegate which simply calls the should serialize method
+					return delegate(object target, object value)
+					{
+						return Object.Equals(false, shouldSerializeProxy(target));
+					};
 				}
 
-				// create a delegate which simply calls the specified property
+				if (shouldSerializeProxy == null)
+				{
+					// situation 3: create a delegate which simply calls the specified property
+					return delegate(object target, object value)
+					{
+						return Object.Equals(false, specifiedPropertyGetter(target));
+					};
+				}
+
+				// situation 4: create a delegate which calls both the specified property and the should serialize method
 				return delegate(object target, object value)
 				{
-					return Object.Equals(false, specifiedPropertyGetter(target));
+					return
+						Object.Equals(false, shouldSerializeProxy(target)) ||
+						Object.Equals(false, specifiedPropertyGetter(target));
 				};
 			}
 
@@ -118,18 +160,41 @@ namespace JsonFx.Xml
 
 			if (specifiedPropertyGetter == null)
 			{
-				// create a specific delegate which only has to compare the default value to the current value
+				if (shouldSerializeProxy == null)
+				{
+					// situation 5: create a specific delegate which only has to compare the default value to the current value
+					return delegate(object target, object value)
+					{
+						return Object.Equals(defaultValue, value);
+					};
+				}
+
+				// situation 6: create a specific delegate which both compares to default value and calls should serialize method
 				return delegate(object target, object value)
 				{
-					return Object.Equals(defaultValue, value);
+					return
+						Object.Equals(defaultValue, value) ||
+						Object.Equals(false, shouldSerializeProxy(target));
 				};
 			}
 
-			// create a combined delegate which checks both states
+			if (shouldSerializeProxy == null)
+			{
+				// situation 7: create a specific delegate which both compares to default value and checks specified property
+				return delegate(object target, object value)
+				{
+					return
+						Object.Equals(defaultValue, value) ||
+						Object.Equals(false, specifiedPropertyGetter(target));
+				};
+			}
+
+			// situation 8: create a combined delegate which checks all three states
 			return delegate(object target, object value)
 			{
 				return
 					Object.Equals(defaultValue, value) ||
+					Object.Equals(false, shouldSerializeProxy(target)) ||
 					Object.Equals(false, specifiedPropertyGetter(target));
 			};
 		}
