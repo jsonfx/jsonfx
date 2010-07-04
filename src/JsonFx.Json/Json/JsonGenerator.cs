@@ -86,10 +86,7 @@ namespace JsonFx.Json
 				ISerializable<JsonTokenType> serializable = value as ISerializable<JsonTokenType>;
 				if (serializable != null)
 				{
-					foreach (Token<JsonTokenType> token in serializable.Write())
-					{
-						yield return token;
-					}
+					foreach (Token<JsonTokenType> token in serializable.Write()) { yield return token; }
 					yield break;
 				}
 
@@ -186,17 +183,11 @@ namespace JsonFx.Json
 				{
 					if (value is XmlNode)
 					{
-						foreach (Token<JsonTokenType> token in this.GetXmlTokens((XmlNode)value))
-						{
-							yield return token;
-						}
+						foreach (Token<JsonTokenType> token in this.GetXmlTokens((XmlNode)value)) { yield return token; }
 						yield break;
 					}
 
-					foreach (Token<JsonTokenType> token in this.GetArrayTokens((IEnumerable)value))
-					{
-						yield return token;
-					}
+					foreach (Token<JsonTokenType> token in this.GetArrayTokens((IEnumerable)value)) { yield return token; }
 					yield break;
 				}
 
@@ -213,10 +204,7 @@ namespace JsonFx.Json
 				}
 
 				// all other structs and classes
-				foreach (Token<JsonTokenType> token in this.GetObjectTokens(value, type))
-				{
-					yield return token;
-				}
+				foreach (Token<JsonTokenType> token in this.GetObjectTokens(value, type)) { yield return token; }
 			}
 
 			private IEnumerable<Token<JsonTokenType>> GetArrayTokens(IEnumerable value)
@@ -226,10 +214,7 @@ namespace JsonFx.Json
 				if (enumerator is IEnumerator<KeyValuePair<string, object>> ||
 					enumerator is IDictionaryEnumerator)
 				{
-					foreach (Token<JsonTokenType> token in this.GetObjectTokens(enumerator))
-					{
-						yield return token;
-					}
+					foreach (Token<JsonTokenType> token in this.GetObjectTokens(enumerator)) { yield return token; }
 					yield break;
 				}
 
@@ -247,10 +232,7 @@ namespace JsonFx.Json
 						appendDelim = true;
 					}
 
-					foreach (Token<JsonTokenType> token in this.GetTokens(enumerator.Current))
-					{
-						yield return token;
-					}
+					foreach (Token<JsonTokenType> token in this.GetTokens(enumerator.Current)) { yield return token; }
 				}
 
 				yield return JsonGrammar.TokenArrayEnd;
@@ -279,10 +261,7 @@ namespace JsonFx.Json
 						}
 
 						KeyValuePair<string, object> pair = keyValueEnumerator.Current;
-						foreach (Token<JsonTokenType> token in this.GetPropertyTokens(pair.Key, pair.Value))
-						{
-							yield return token;
-						}
+						foreach (Token<JsonTokenType> token in this.GetPropertyTokens(pair.Key, pair.Value)) { yield return token; }
 					}
 				}
 				else if (dictionaryEnumerator != null)
@@ -298,10 +277,7 @@ namespace JsonFx.Json
 							appendDelim = true;
 						}
 
-						foreach (Token<JsonTokenType> token in this.GetPropertyTokens(dictionaryEnumerator.Key, dictionaryEnumerator.Value))
-						{
-							yield return token;
-						}
+						foreach (Token<JsonTokenType> token in this.GetPropertyTokens(dictionaryEnumerator.Key, dictionaryEnumerator.Value)) { yield return token; }
 					}
 				}
 				else
@@ -317,10 +293,7 @@ namespace JsonFx.Json
 				yield return JsonGrammar.TokenString(key);
 				yield return JsonGrammar.TokenPairDelim;
 
-				foreach (Token<JsonTokenType> token in this.GetTokens(value))
-				{
-					yield return token;
-				}
+				foreach (Token<JsonTokenType> token in this.GetTokens(value)) { yield return token; }
 			}
 
 			private IEnumerable<Token<JsonTokenType>> GetObjectTokens(object value, Type type)
@@ -359,10 +332,7 @@ namespace JsonFx.Json
 						appendDelim = true;
 					}
 
-					foreach (Token<JsonTokenType> token in this.GetPropertyTokens(map.Key, propertyValue))
-					{
-						yield return token;
-					}
+					foreach (Token<JsonTokenType> token in this.GetPropertyTokens(map.Key, propertyValue)) { yield return token; }
 				}
 
 				yield return JsonGrammar.TokenObjectEnd;
