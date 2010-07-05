@@ -32,7 +32,7 @@ using System;
 
 using JsonFx.Serialization;
 
-namespace JsonFx.Json
+namespace JsonFx.Json.Filters
 {
 	/// <summary>
 	/// Allows a mechanism for manipulating JSON serialization

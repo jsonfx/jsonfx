@@ -40,34 +40,28 @@ namespace JsonFx.Serialization
 	{
 		#region IDataFilter<TTokenType,TResult> Members
 
-		public abstract bool TryRead(IEnumerable<Token<TTokenType>> tokens, out TResult value);
+		public abstract bool TryRead(DataReaderSettings settings, IEnumerable<Token<TTokenType>> tokens, out TResult value);
 
-		public abstract bool TryWrite(TResult value, out IEnumerable<Token<TTokenType>> tokens);
+		public abstract bool TryWrite(DataWriterSettings settings, TResult value, out IEnumerable<Token<TTokenType>> tokens);
 
 		#endregion IDataFilter<TTokenType,TResult> Members
 
 		#region IDataFilter<TTokenType> Members
 
-		bool IDataFilter<TTokenType>.TryRead(IEnumerable<Token<TTokenType>> tokens, out object value)
+		bool IDataFilter<TTokenType>.TryRead(DataReaderSettings settings, IEnumerable<Token<TTokenType>> tokens, out object value)
 		{
 			TResult result;
-			if (this.TryRead(tokens, out result))
-			{
-				value = result;
-				return true;
-			}
-			else
-			{
-				value = result;
-				return false;
-			}
+			bool success = this.TryRead(settings, tokens, out result);
+
+			value = result;
+			return success;
 		}
 
-		bool IDataFilter<TTokenType>.TryWrite(object value, out IEnumerable<Token<TTokenType>> tokens)
+		bool IDataFilter<TTokenType>.TryWrite(DataWriterSettings settings, object value, out IEnumerable<Token<TTokenType>> tokens)
 		{
 			tokens = null;
 
-			return (value is TResult) && (this.TryWrite((TResult)value, out tokens));
+			return (value is TResult) && (this.TryWrite(settings, (TResult)value, out tokens));
 		}
 
 		#endregion IDataFilter<TTokenType> Members

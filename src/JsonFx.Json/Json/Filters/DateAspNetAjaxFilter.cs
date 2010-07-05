@@ -35,13 +35,13 @@ using System.Text.RegularExpressions;
 
 using JsonFx.Serialization;
 
-namespace JsonFx.Json
+namespace JsonFx.Json.Filters
 {
 	/// <summary>
 	/// Defines a filter for JSON serialization of DateTime into an ASP.NET Ajax Date string.
 	/// </summary>
 	/// <remarks>
-	/// This is the format used by Microsoft in ASP.NET Ajax:
+	/// This is the format used by Microsoft ASP.NET Ajax:
 	/// http://weblogs.asp.net/bleroy/archive/2008/01/18/dates-and-json.aspx
 	/// </remarks>
 	public class DateAspNetAjaxFilter : JsonFilter<DateTime>
@@ -60,7 +60,7 @@ namespace JsonFx.Json
 
 		#region IDataFilter<JsonTokenType,DateTime> Members
 
-		public override bool TryRead(IEnumerable<Token<JsonTokenType>> tokens, out DateTime value)
+		public override bool TryRead(DataReaderSettings settings, IEnumerable<Token<JsonTokenType>> tokens, out DateTime value)
 		{
 			// TODO: determine MoveNext or not?
 			Token<JsonTokenType> token = tokens.GetEnumerator().Current;
@@ -69,7 +69,7 @@ namespace JsonFx.Json
 			return this.TryParseAspNetAjaxDate(date, out value);
 		}
 
-		public override bool TryWrite(DateTime value, out IEnumerable<Token<JsonTokenType>> tokens)
+		public override bool TryWrite(DataWriterSettings settings, DateTime value, out IEnumerable<Token<JsonTokenType>> tokens)
 		{
 			tokens = new Token<JsonTokenType>[]
 				{
@@ -134,7 +134,7 @@ namespace JsonFx.Json
 			// get the total milliseconds
 			long ticks = (long)duration.TotalMilliseconds;
 
-			// write out as a Date constructor
+			// write out as a pseudo Date constructor
 			return String.Concat(
 				DateAspNetAjaxFilter.DateCtorPrefix,
 				ticks,

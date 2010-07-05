@@ -76,8 +76,8 @@
     <Compile Include="IO\TextReaderScanner.cs" />
     <Compile Include="Json\Filters\DateAspNetAjaxFilter.cs" />
     <Compile Include="Json\Filters\DateIso8601Filter.cs" />
+    <Compile Include="Json\Filters\JsonFilter`1.cs" />
     <Compile Include="Json\JsonAnalyzer.cs" />
-    <Compile Include="Json\JsonFilter`1.cs" />
     <Compile Include="Json\JsonFormatter.cs" />
     <Compile Include="Json\JsonGrammar.cs" />
     <Compile Include="Json\JsonIgnoreAttribute.cs" />

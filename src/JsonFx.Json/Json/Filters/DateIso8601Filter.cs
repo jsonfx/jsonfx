@@ -34,29 +34,51 @@ using System.Globalization;
 
 using JsonFx.Serialization;
 
-namespace JsonFx.Json
+namespace JsonFx.Json.Filters
 {
 	/// <summary>
 	/// Defines a filter for JSON serialization of DateTime into ISO-8601
 	/// </summary>
 	/// <remarks>
+	/// This is the format used by EcmaScript JSON.stringify(...):
+	/// http://json.org/json.js
 	/// http://www.w3.org/TR/NOTE-datetime
 	/// http://en.wikipedia.org/wiki/ISO_8601
 	/// </remarks>
 	public class DateIso8601Filter : JsonFilter<DateTime>
 	{
+		#region Constants
+
+		private const string Iso8601Format = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff";
+		private const string UtcIso8601Format = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'";
+
+		#endregion Constants
+
 		#region IDataFilter<JsonTokenType,DateTime> Members
 
-		public override bool TryRead(IEnumerable<Token<JsonTokenType>> tokens, out DateTime value)
+		public override bool TryRead(DataReaderSettings settings, IEnumerable<Token<JsonTokenType>> tokens, out DateTime value)
 		{
-			// TODO: determine MoveNext or not?
-			Token<JsonTokenType> token = tokens.GetEnumerator().Current;
+			IEnumerator<Token<JsonTokenType>> enumerator = tokens.GetEnumerator();
+			if (!enumerator.MoveNext())
+			{
+				value = default(DateTime);
+				return false;
+			}
 
-			string date = Convert.ToString(token.Value, CultureInfo.InvariantCulture);
-			return this.TryParseISO8601(date, out value);
+			Token<JsonTokenType> token = enumerator.Current;
+			if (enumerator.Current == null ||
+				enumerator.Current.TokenType != JsonTokenType.String)
+			{
+				value = default(DateTime);
+				return false;
+			}
+
+			return this.TryParseISO8601(
+				Convert.ToString(token.Value, CultureInfo.InvariantCulture),
+				out value);
 		}
 
-		public override bool TryWrite(DateTime value, out IEnumerable<Token<JsonTokenType>> tokens)
+		public override bool TryWrite(DataWriterSettings settings, DateTime value, out IEnumerable<Token<JsonTokenType>> tokens)
 		{
 			tokens = new Token<JsonTokenType>[]
 				{
@@ -74,15 +96,26 @@ namespace JsonFx.Json
 		/// Converts a ISO-8601 string to the corresponding DateTime representation
 		/// </summary>
 		/// <param name="date">ISO-8601 conformant date</param>
-		/// <param name="value"></param>
+		/// <param name="value">UTC or Unspecified DateTime</param>
 		/// <returns>true if parsing was successful</returns>
 		private bool TryParseISO8601(string date, out DateTime value)
 		{
-			return DateTime.TryParse(
+			if (!DateTime.TryParse(
 				date,
 				CultureInfo.InvariantCulture,
-				DateTimeStyles.RoundtripKind | DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.NoCurrentDateDefault,
-				out value);
+				DateTimeStyles.RoundtripKind|DateTimeStyles.AllowWhiteSpaces|DateTimeStyles.NoCurrentDateDefault,
+				out value))
+			{
+				value = default(DateTime);
+				return false;
+			}
+
+			if (value.Kind == DateTimeKind.Local)
+			{
+				value = value.ToUniversalTime();
+			}
+
+			return true;
 		}
 
 		/// <summary>
@@ -102,12 +135,12 @@ namespace JsonFx.Json
 				case DateTimeKind.Utc:
 				{
 					// UTC DateTime in ISO-8601
-					return value.ToString("s")+"Z";
+					return value.ToString(DateIso8601Filter.UtcIso8601Format);
 				}
 				default:
 				{
 					// DateTime in ISO-8601
-					return value.ToString("s");
+					return value.ToString(DateIso8601Filter.Iso8601Format);
 				}
 			}
 		}

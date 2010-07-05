@@ -45,7 +45,7 @@ namespace JsonFx.Serialization
 		/// <param name="tokens">input tokens</param>
 		/// <param name="value"></param>
 		/// <returns>true if value was generated</returns>
-		bool TryRead(IEnumerable<Token<TTokenType>> tokens, out object value);
+		bool TryRead(DataReaderSettings settings, IEnumerable<Token<TTokenType>> tokens, out object value);
 
 		/// <summary>
 		/// Allows a class to serialize a type as Token&lt;T&gt; sequence
@@ -53,7 +53,7 @@ namespace JsonFx.Serialization
 		/// <param name="value"></param>
 		/// <param name="tokens"></param>
 		/// <returns>true if value was consumed</returns>
-		bool TryWrite(object value, out IEnumerable<Token<TTokenType>> tokens);
+		bool TryWrite(DataWriterSettings settings, object value, out IEnumerable<Token<TTokenType>> tokens);
 	}
 
 	/// <summary>
@@ -69,7 +69,7 @@ namespace JsonFx.Serialization
 		/// <param name="tokens">input tokens</param>
 		/// <param name="value"></param>
 		/// <returns>true if value was generated</returns>
-		bool TryRead(IEnumerable<Token<TTokenType>> tokens, out TResult value);
+		bool TryRead(DataReaderSettings settings, IEnumerable<Token<TTokenType>> tokens, out TResult value);
 
 		/// <summary>
 		/// Allows a class to serialize a type as Token&lt;T&gt; sequence
@@ -77,6 +77,6 @@ namespace JsonFx.Serialization
 		/// <param name="value"></param>
 		/// <param name="tokens"></param>
 		/// <returns>true if value was consumed</returns>
-		bool TryWrite(TResult value, out IEnumerable<Token<TTokenType>> tokens);
+		bool TryWrite(DataWriterSettings settings, TResult value, out IEnumerable<Token<TTokenType>> tokens);
 	}
 }
