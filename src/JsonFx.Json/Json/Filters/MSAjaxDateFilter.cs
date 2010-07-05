@@ -49,12 +49,14 @@ namespace JsonFx.Json.Filters
 		#region Constant
 
 		private static readonly DateTime EcmaScriptEpoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+		private static readonly long MinValueMilliseconds = -62135596800000L;
+		private static readonly long MaxValueMilliseconds = 253402300800000L;
 
-		private const string DateCtorPattern = @"^\\/Date\((\d+?)\)\\/$";
-		private static readonly Regex DateCtorRegex = new Regex(DateCtorPattern, RegexOptions.Compiled|RegexOptions.CultureInvariant|RegexOptions.ECMAScript);
+		private const string MSAjaxDatePattern = @"^\\/Date\(([+\-]?\d+?)\)\\/$";
+		private static readonly Regex MSAjaxDateRegex = new Regex(MSAjaxDatePattern, RegexOptions.Compiled|RegexOptions.CultureInvariant|RegexOptions.ECMAScript);
 
-		private const string DateCtorPrefix = @"\/Date(";
-		private const string DateCtorSuffix = @")\/";
+		private const string MSAjaxDatePrefix = @"\/Date(";
+		private const string MSAjaxDateSuffix = @")\/";
 
 		#endregion Constant
 
@@ -62,11 +64,24 @@ namespace JsonFx.Json.Filters
 
 		public override bool TryRead(DataReaderSettings settings, IEnumerable<Token<JsonTokenType>> tokens, out DateTime value)
 		{
-			// TODO: determine MoveNext or not?
-			Token<JsonTokenType> token = tokens.GetEnumerator().Current;
+			IEnumerator<Token<JsonTokenType>> enumerator = tokens.GetEnumerator();
+			if (!enumerator.MoveNext())
+			{
+				value = default(DateTime);
+				return false;
+			}
 
-			string date = Convert.ToString(token.Value, CultureInfo.InvariantCulture);
-			return this.TryParseMSAjaxDate(date, out value);
+			Token<JsonTokenType> token = enumerator.Current;
+			if (enumerator.Current == null ||
+				enumerator.Current.TokenType != JsonTokenType.String)
+			{
+				value = default(DateTime);
+				return false;
+			}
+
+			return this.TryParseMSAjaxDate(
+				Convert.ToString(token.Value, CultureInfo.InvariantCulture),
+				out value);
 		}
 
 		public override bool TryWrite(DataWriterSettings settings, DateTime value, out IEnumerable<Token<JsonTokenType>> tokens)
@@ -86,7 +101,7 @@ namespace JsonFx.Json.Filters
 		/// <summary>
 		/// Converts an ASP.NET Ajax date string to the corresponding DateTime representation
 		/// </summary>
-		/// <param name="date">Date constructor string</param>
+		/// <param name="date">ASP.NET Ajax date string</param>
 		/// <param name="value"></param>
 		/// <returns>true if parsing was successful</returns>
 		private bool TryParseMSAjaxDate(string date, out DateTime value)
@@ -97,12 +112,12 @@ namespace JsonFx.Json.Filters
 				return false;
 			}
 
-			Match match = MSAjaxDateFilter.DateCtorRegex.Match(date);
+			Match match = MSAjaxDateFilter.MSAjaxDateRegex.Match(date);
 
 			long ticks;
 			if (!match.Success ||
 				!Int64.TryParse(
-					match.Value,
+					match.Groups[1].Value,
 					NumberStyles.Integer,
 					CultureInfo.InvariantCulture,
 					out ticks))
@@ -111,7 +126,18 @@ namespace JsonFx.Json.Filters
 				return false;
 			}
 
-			value = MSAjaxDateFilter.EcmaScriptEpoch.AddMilliseconds(ticks);
+			if (ticks <= MSAjaxDateFilter.MinValueMilliseconds)
+			{
+				value = DateTime.MinValue;
+			}
+			else if (ticks >= MSAjaxDateFilter.MaxValueMilliseconds)
+			{
+				value = DateTime.MaxValue;
+			}
+			else
+			{
+				value = MSAjaxDateFilter.EcmaScriptEpoch.AddMilliseconds(ticks);
+			}
 			return true;
 		}
 
@@ -128,7 +154,7 @@ namespace JsonFx.Json.Filters
 				value = value.ToUniversalTime();
 			}
 
-			// find the time since Jan 1, 1970
+			// find the duration since Jan 1, 1970
 			TimeSpan duration = value.Subtract(MSAjaxDateFilter.EcmaScriptEpoch);
 
 			// get the total milliseconds
@@ -136,9 +162,9 @@ namespace JsonFx.Json.Filters
 
 			// write out as a pseudo Date constructor
 			return String.Concat(
-				MSAjaxDateFilter.DateCtorPrefix,
+				MSAjaxDateFilter.MSAjaxDatePrefix,
 				ticks,
-				MSAjaxDateFilter.DateCtorSuffix);
+				MSAjaxDateFilter.MSAjaxDateSuffix);
 		}
 
 		#endregion Utility Methods
