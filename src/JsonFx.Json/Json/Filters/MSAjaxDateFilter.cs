@@ -42,7 +42,9 @@ namespace JsonFx.Json.Filters
 	/// </summary>
 	/// <remarks>
 	/// This is the format used by Microsoft ASP.NET Ajax:
-	/// http://weblogs.asp.net/bleroy/archive/2008/01/18/dates-and-json.aspx
+	///		http://weblogs.asp.net/bleroy/archive/2008/01/18/dates-and-json.aspx
+	///	
+	/// NOTE: This format is limited to expressing DateTime at the millisecond level as UTC only.
 	/// </remarks>
 	public class MSAjaxDateFilter : JsonFilter<DateTime>
 	{

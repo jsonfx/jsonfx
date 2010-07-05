@@ -306,7 +306,7 @@ namespace JsonFx.Json.Filters
 		}
 
 		[Fact]
-		public void TryWrite_UnspecifiedStandardTimeZone_DirectlyWritesAsClientLocal()
+		public void TryWrite_UnspecifiedStandardTimeZone_DirectlyWritesAsUnspecified()
 		{
 			var input = new DateTime(2008, 2, 29, 23, 59, 59, 999, DateTimeKind.Unspecified);
 
@@ -363,7 +363,7 @@ namespace JsonFx.Json.Filters
 		}
 
 		[Fact]
-		public void TryWrite_UnspecifiedDaylightSavingsTimeZone_DirectlyWritesAsClientLocal()
+		public void TryWrite_UnspecifiedDaylightSavingsTimeZone_DirectlyWritesAsUnspecified()
 		{
 			var input = new DateTime(2010, 7, 5, 10, 51, 17, 768, DateTimeKind.Unspecified);
 
@@ -420,7 +420,7 @@ namespace JsonFx.Json.Filters
 		}
 
 		[Fact]
-		public void TryWrite_FutureUnspecifiedTimeZone_DirectlyWritesAsClientLocal()
+		public void TryWrite_FutureUnspecifiedTimeZone_DirectlyWritesAsUnspecified()
 		{
 			var input = new DateTime(2099, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified);
 
@@ -439,7 +439,7 @@ namespace JsonFx.Json.Filters
 		}
 
 		[Fact]
-		public void TryWrite_DateTimeMinValue_DirectlyWritesAsClientLocal()
+		public void TryWrite_DateTimeMinValue_DirectlyWritesAsUnspecified()
 		{
 			var input = DateTime.MinValue;
 
@@ -458,7 +458,7 @@ namespace JsonFx.Json.Filters
 		}
 
 		[Fact]
-		public void TryWrite_DateTimeMaxValue_DirectlyWritesAsClientLocal()
+		public void TryWrite_DateTimeMaxValue_DirectlyWritesAsUnspecified()
 		{
 			var input = DateTime.MaxValue;
 

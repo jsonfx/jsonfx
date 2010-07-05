@@ -41,9 +41,11 @@ namespace JsonFx.Json.Filters
 	/// </summary>
 	/// <remarks>
 	/// This is the format used by EcmaScript JSON.stringify(...):
-	/// http://json.org/json.js
-	/// http://www.w3.org/TR/NOTE-datetime
-	/// http://en.wikipedia.org/wiki/ISO_8601
+	///		http://json.org/json.js
+	///		http://www.w3.org/TR/NOTE-datetime
+	///		http://en.wikipedia.org/wiki/ISO_8601
+	///	
+	/// NOTE: This format is limited to expressing DateTime at the millisecond level as either UTC or Unspecified.
 	/// </remarks>
 	public class Iso8601DateFilter : JsonFilter<DateTime>
 	{
