@@ -37,7 +37,6 @@ namespace JsonFx.Serialization
 	/// Allows a mechanism for manipulating serialization
 	/// </summary>
 	/// <typeparam name="TTokenType">Defines the type of token stream this filter understands</typeparam>
-	/// <typeparam name="TResult">Defines the type this filter reads/writes</typeparam>
 	public interface IDataFilter<TTokenType>
 	{
 		/// <summary>

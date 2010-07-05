@@ -31,20 +31,33 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 using JsonFx.Serialization;
 
 namespace JsonFx.Json
 {
 	/// <summary>
-	/// Defines a filter for JSON serialization of DateTime into ISO-8601
+	/// Defines a filter for JSON serialization of DateTime into an ASP.NET Ajax Date string.
 	/// </summary>
 	/// <remarks>
-	/// http://www.w3.org/TR/NOTE-datetime
-	/// http://en.wikipedia.org/wiki/ISO_8601
+	/// This is the format used by Microsoft in ASP.NET Ajax:
+	/// http://weblogs.asp.net/bleroy/archive/2008/01/18/dates-and-json.aspx
 	/// </remarks>
-	public class DateIso8601Filter : JsonFilter<DateTime>
+	public class DateAspNetAjaxFilter : JsonFilter<DateTime>
 	{
+		#region Constant
+
+		private static readonly DateTime EcmaScriptEpoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+
+		private const string DateCtorPattern = @"^\\/Date\((\d+?)\)\\/$";
+		private static readonly Regex DateCtorRegex = new Regex(DateCtorPattern, RegexOptions.Compiled|RegexOptions.CultureInvariant|RegexOptions.ECMAScript);
+
+		private const string DateCtorPrefix = @"\/Date(";
+		private const string DateCtorSuffix = @")\/";
+
+		#endregion Constant
+
 		#region IDataFilter<JsonTokenType,DateTime> Members
 
 		public override bool TryRead(IEnumerable<Token<JsonTokenType>> tokens, out DateTime value)
@@ -53,14 +66,14 @@ namespace JsonFx.Json
 			Token<JsonTokenType> token = tokens.GetEnumerator().Current;
 
 			string date = Convert.ToString(token.Value, CultureInfo.InvariantCulture);
-			return this.TryParseISO8601(date, out value);
+			return this.TryParseAspNetAjaxDate(date, out value);
 		}
 
 		public override bool TryWrite(DateTime value, out IEnumerable<Token<JsonTokenType>> tokens)
 		{
 			tokens = new Token<JsonTokenType>[]
 				{
-					JsonGrammar.TokenString(this.FormatISO8601(value))
+					JsonGrammar.TokenString(this.FormatAspNetAjaxDate(value))
 				};
 
 			return true;
@@ -71,45 +84,61 @@ namespace JsonFx.Json
 		#region Utility Methods
 
 		/// <summary>
-		/// Converts a ISO-8601 string to the corresponding DateTime representation
+		/// Converts an ASP.NET Ajax date string to the corresponding DateTime representation
 		/// </summary>
-		/// <param name="date">ISO-8601 conformant date</param>
+		/// <param name="date">Date constructor string</param>
 		/// <param name="value"></param>
 		/// <returns>true if parsing was successful</returns>
-		private bool TryParseISO8601(string date, out DateTime value)
+		private bool TryParseAspNetAjaxDate(string date, out DateTime value)
 		{
-			return DateTime.TryParse(
-				date,
-				CultureInfo.InvariantCulture,
-				DateTimeStyles.RoundtripKind | DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.NoCurrentDateDefault,
-				out value);
+			if (String.IsNullOrEmpty(date))
+			{
+				value = default(DateTime);
+				return false;
+			}
+
+			Match match = DateAspNetAjaxFilter.DateCtorRegex.Match(date);
+
+			long ticks;
+			if (!match.Success ||
+				!Int64.TryParse(
+					match.Value,
+					NumberStyles.Integer,
+					CultureInfo.InvariantCulture,
+					out ticks))
+			{
+				value = default(DateTime);
+				return false;
+			}
+
+			value = DateAspNetAjaxFilter.EcmaScriptEpoch.AddMilliseconds(ticks);
+			return true;
 		}
 
 		/// <summary>
-		/// Converts a DateTime to the corresponding ISO-8601 string representation
+		/// Converts a DateTime to the corresponding ASP.NET Ajax date string representation
 		/// </summary>
 		/// <param name="value"></param>
-		/// <returns>ISO-8601 conformant date</returns>
-		private string FormatISO8601(DateTime value)
+		/// <returns>ASP.NET Ajax date string</returns>
+		private string FormatAspNetAjaxDate(DateTime value)
 		{
-			switch (value.Kind)
+			if (value.Kind == DateTimeKind.Local)
 			{
-				case DateTimeKind.Local:
-				{
-					value = value.ToUniversalTime();
-					goto case DateTimeKind.Utc;
-				}
-				case DateTimeKind.Utc:
-				{
-					// UTC DateTime in ISO-8601
-					return value.ToString("s")+"Z";
-				}
-				default:
-				{
-					// DateTime in ISO-8601
-					return value.ToString("s");
-				}
+				// convert server-local to UTC
+				value = value.ToUniversalTime();
 			}
+
+			// find the time since Jan 1, 1970
+			TimeSpan duration = value.Subtract(DateAspNetAjaxFilter.EcmaScriptEpoch);
+
+			// get the total milliseconds
+			long ticks = (long)duration.TotalMilliseconds;
+
+			// write out as a Date constructor
+			return String.Concat(
+				DateAspNetAjaxFilter.DateCtorPrefix,
+				ticks,
+				DateAspNetAjaxFilter.DateCtorSuffix);
 		}
 
 		#endregion Utility Methods

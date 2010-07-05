@@ -74,9 +74,10 @@
     <Compile Include="IO\ITextScanner.cs" />
     <Compile Include="IO\StringScanner.cs" />
     <Compile Include="IO\TextReaderScanner.cs" />
+    <Compile Include="Json\Filters\DateAspNetAjaxFilter.cs" />
     <Compile Include="Json\Filters\DateIso8601Filter.cs" />
-    <Compile Include="Json\IJsonFilter`1.cs" />
     <Compile Include="Json\JsonAnalyzer.cs" />
+    <Compile Include="Json\JsonFilter`1.cs" />
     <Compile Include="Json\JsonFormatter.cs" />
     <Compile Include="Json\JsonGrammar.cs" />
     <Compile Include="Json\JsonIgnoreAttribute.cs" />
@@ -92,6 +93,7 @@
     <Compile Include="Properties\AssemblyVersion.cs" />
     <Compile Include="Serialization\CallbackResolverStrategy.cs" />
     <Compile Include="Serialization\CombinedResolverStrategy.cs" />
+    <Compile Include="Serialization\DataFilter`2.cs" />
     <Compile Include="Serialization\IDataAnalyzer`1.cs" />
     <Compile Include="Serialization\IDataFilter`2.cs" />
     <Compile Include="Serialization\IDataWalker`1.cs" />

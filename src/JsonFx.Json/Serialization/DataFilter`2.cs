@@ -29,16 +29,47 @@
 #endregion License
 
 using System;
+using System.Collections.Generic;
 
-using JsonFx.Serialization;
-
-namespace JsonFx.Json
+namespace JsonFx.Serialization
 {
 	/// <summary>
-	/// Allows a mechanism for manipulating JSON serialization
+	/// Partially implements an IDataFilter
 	/// </summary>
-	/// <typeparam name="T">Defines the type this filter reads/writes</typeparam>
-	public interface IJsonFilter<T> : IDataFilter<JsonTokenType, T>
+	public abstract class DataFilter<TTokenType, TResult> : IDataFilter<TTokenType, TResult>
 	{
+		#region IDataFilter<TTokenType,TResult> Members
+
+		public abstract bool TryRead(IEnumerable<Token<TTokenType>> tokens, out TResult value);
+
+		public abstract bool TryWrite(TResult value, out IEnumerable<Token<TTokenType>> tokens);
+
+		#endregion IDataFilter<TTokenType,TResult> Members
+
+		#region IDataFilter<TTokenType> Members
+
+		bool IDataFilter<TTokenType>.TryRead(IEnumerable<Token<TTokenType>> tokens, out object value)
+		{
+			TResult result;
+			if (this.TryRead(tokens, out result))
+			{
+				value = result;
+				return true;
+			}
+			else
+			{
+				value = result;
+				return false;
+			}
+		}
+
+		bool IDataFilter<TTokenType>.TryWrite(object value, out IEnumerable<Token<TTokenType>> tokens)
+		{
+			tokens = null;
+
+			return (value is TResult) && (this.TryWrite((TResult)value, out tokens));
+		}
+
+		#endregion IDataFilter<TTokenType> Members
 	}
 }
