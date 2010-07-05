@@ -44,7 +44,7 @@ namespace JsonFx.Json.Filters
 	/// This is the format used by Microsoft ASP.NET Ajax:
 	/// http://weblogs.asp.net/bleroy/archive/2008/01/18/dates-and-json.aspx
 	/// </remarks>
-	public class DateAspNetAjaxFilter : JsonFilter<DateTime>
+	public class MSAjaxDateFilter : JsonFilter<DateTime>
 	{
 		#region Constant
 
@@ -66,14 +66,14 @@ namespace JsonFx.Json.Filters
 			Token<JsonTokenType> token = tokens.GetEnumerator().Current;
 
 			string date = Convert.ToString(token.Value, CultureInfo.InvariantCulture);
-			return this.TryParseAspNetAjaxDate(date, out value);
+			return this.TryParseMSAjaxDate(date, out value);
 		}
 
 		public override bool TryWrite(DataWriterSettings settings, DateTime value, out IEnumerable<Token<JsonTokenType>> tokens)
 		{
 			tokens = new Token<JsonTokenType>[]
 				{
-					JsonGrammar.TokenString(this.FormatAspNetAjaxDate(value))
+					JsonGrammar.TokenString(this.FormatMSAjaxDate(value))
 				};
 
 			return true;
@@ -89,7 +89,7 @@ namespace JsonFx.Json.Filters
 		/// <param name="date">Date constructor string</param>
 		/// <param name="value"></param>
 		/// <returns>true if parsing was successful</returns>
-		private bool TryParseAspNetAjaxDate(string date, out DateTime value)
+		private bool TryParseMSAjaxDate(string date, out DateTime value)
 		{
 			if (String.IsNullOrEmpty(date))
 			{
@@ -97,7 +97,7 @@ namespace JsonFx.Json.Filters
 				return false;
 			}
 
-			Match match = DateAspNetAjaxFilter.DateCtorRegex.Match(date);
+			Match match = MSAjaxDateFilter.DateCtorRegex.Match(date);
 
 			long ticks;
 			if (!match.Success ||
@@ -111,7 +111,7 @@ namespace JsonFx.Json.Filters
 				return false;
 			}
 
-			value = DateAspNetAjaxFilter.EcmaScriptEpoch.AddMilliseconds(ticks);
+			value = MSAjaxDateFilter.EcmaScriptEpoch.AddMilliseconds(ticks);
 			return true;
 		}
 
@@ -120,7 +120,7 @@ namespace JsonFx.Json.Filters
 		/// </summary>
 		/// <param name="value"></param>
 		/// <returns>ASP.NET Ajax date string</returns>
-		private string FormatAspNetAjaxDate(DateTime value)
+		private string FormatMSAjaxDate(DateTime value)
 		{
 			if (value.Kind == DateTimeKind.Local)
 			{
@@ -129,16 +129,16 @@ namespace JsonFx.Json.Filters
 			}
 
 			// find the time since Jan 1, 1970
-			TimeSpan duration = value.Subtract(DateAspNetAjaxFilter.EcmaScriptEpoch);
+			TimeSpan duration = value.Subtract(MSAjaxDateFilter.EcmaScriptEpoch);
 
 			// get the total milliseconds
 			long ticks = (long)duration.TotalMilliseconds;
 
 			// write out as a pseudo Date constructor
 			return String.Concat(
-				DateAspNetAjaxFilter.DateCtorPrefix,
+				MSAjaxDateFilter.DateCtorPrefix,
 				ticks,
-				DateAspNetAjaxFilter.DateCtorSuffix);
+				MSAjaxDateFilter.DateCtorSuffix);
 		}
 
 		#endregion Utility Methods

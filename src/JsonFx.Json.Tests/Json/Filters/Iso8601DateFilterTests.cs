@@ -38,7 +38,7 @@ using Assert=JsonFx.AssertPatched;
 
 namespace JsonFx.Json.Filters
 {
-	public class DateIso8601FilterTests
+	public class Iso8601DateFilterTests
 	{
 		#region TryRead Tests
 
@@ -53,7 +53,7 @@ namespace JsonFx.Json.Filters
 				};
 
 			DateTime actual;
-			Assert.True(new DateIso8601Filter().TryRead(new DataReaderSettings(), input, out actual));
+			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), input, out actual));
 
 			Assert.Equal(expected.Kind, actual.Kind);
 			Assert.Equal(expected.Ticks, actual.Ticks);
@@ -70,7 +70,7 @@ namespace JsonFx.Json.Filters
 			var expected = new DateTime(2008, 2, 29, 23, 59, 59, 999, DateTimeKind.Unspecified);
 
 			DateTime actual;
-			Assert.True(new DateIso8601Filter().TryRead(new DataReaderSettings(), input, out actual));
+			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), input, out actual));
 
 			Assert.Equal(expected.Kind, actual.Kind);
 			Assert.Equal(expected.Ticks, actual.Ticks);
@@ -87,7 +87,7 @@ namespace JsonFx.Json.Filters
 			var expected = new DateTime(2008, 3, 01, 05, 59, 59, 999, DateTimeKind.Utc);
 
 			DateTime actual;
-			Assert.True(new DateIso8601Filter().TryRead(new DataReaderSettings(), input, out actual));
+			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), input, out actual));
 
 			Assert.Equal(expected.Kind, actual.Kind);
 			Assert.Equal(expected.Ticks, actual.Ticks);
@@ -104,7 +104,7 @@ namespace JsonFx.Json.Filters
 				};
 
 			DateTime actual;
-			Assert.True(new DateIso8601Filter().TryRead(new DataReaderSettings(), input, out actual));
+			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), input, out actual));
 
 			Assert.Equal(expected.Kind, actual.Kind);
 			Assert.Equal(expected.Ticks, actual.Ticks);
@@ -121,7 +121,7 @@ namespace JsonFx.Json.Filters
 			var expected = new DateTime(2010, 7, 5, 10, 51, 17, 768, DateTimeKind.Unspecified);
 
 			DateTime actual;
-			Assert.True(new DateIso8601Filter().TryRead(new DataReaderSettings(), input, out actual));
+			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), input, out actual));
 
 			Assert.Equal(expected.Kind, actual.Kind);
 			Assert.Equal(expected.Ticks, actual.Ticks);
@@ -138,7 +138,7 @@ namespace JsonFx.Json.Filters
 			var expected = new DateTime(2010, 7, 5, 15, 51, 17, 768, DateTimeKind.Utc);
 
 			DateTime actual;
-			Assert.True(new DateIso8601Filter().TryRead(new DataReaderSettings(), input, out actual));
+			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), input, out actual));
 
 			Assert.Equal(expected.Kind, actual.Kind);
 			Assert.Equal(expected.Ticks, actual.Ticks);
@@ -155,7 +155,7 @@ namespace JsonFx.Json.Filters
 				};
 
 			DateTime actual;
-			Assert.True(new DateIso8601Filter().TryRead(new DataReaderSettings(), input, out actual));
+			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), input, out actual));
 
 			Assert.Equal(expected.Kind, actual.Kind);
 			Assert.Equal(expected.Ticks, actual.Ticks);
@@ -172,7 +172,7 @@ namespace JsonFx.Json.Filters
 			var expected = new DateTime(2099, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified);
 
 			DateTime actual;
-			Assert.True(new DateIso8601Filter().TryRead(new DataReaderSettings(), input, out actual));
+			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), input, out actual));
 
 			Assert.Equal(expected.Kind, actual.Kind);
 			Assert.Equal(expected.Ticks, actual.Ticks);
@@ -189,7 +189,7 @@ namespace JsonFx.Json.Filters
 			var expected = new DateTime(2100, 1, 1, 4, 59, 59, 999, DateTimeKind.Utc);
 
 			DateTime actual;
-			Assert.True(new DateIso8601Filter().TryRead(new DataReaderSettings(), input, out actual));
+			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), input, out actual));
 
 			Assert.Equal(expected.Kind, actual.Kind);
 			Assert.Equal(expected.Ticks, actual.Ticks);
@@ -206,7 +206,7 @@ namespace JsonFx.Json.Filters
 			var expected = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified);
 
 			DateTime actual;
-			Assert.True(new DateIso8601Filter().TryRead(new DataReaderSettings(), input, out actual));
+			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), input, out actual));
 
 			Assert.Equal(expected.Kind, actual.Kind);
 			Assert.Equal(expected.Ticks, actual.Ticks);
@@ -223,7 +223,7 @@ namespace JsonFx.Json.Filters
 			var expected = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
 
 			DateTime actual;
-			Assert.True(new DateIso8601Filter().TryRead(new DataReaderSettings(), input, out actual));
+			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), input, out actual));
 
 			Assert.Equal(expected.Kind, actual.Kind);
 			Assert.Equal(expected.Ticks, actual.Ticks);
@@ -240,7 +240,7 @@ namespace JsonFx.Json.Filters
 			var expected = new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified);
 
 			DateTime actual;
-			Assert.True(new DateIso8601Filter().TryRead(new DataReaderSettings(), input, out actual));
+			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), input, out actual));
 
 			Assert.Equal(expected.Kind, actual.Kind);
 			Assert.Equal(expected.Ticks, actual.Ticks);
@@ -257,7 +257,7 @@ namespace JsonFx.Json.Filters
 			var expected = new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Utc);
 
 			DateTime actual;
-			Assert.True(new DateIso8601Filter().TryRead(new DataReaderSettings(), input, out actual));
+			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), input, out actual));
 
 			Assert.Equal(expected.Kind, actual.Kind);
 			Assert.Equal(expected.Ticks, actual.Ticks);
@@ -278,7 +278,7 @@ namespace JsonFx.Json.Filters
 				};
 
 			IEnumerable<Token<JsonTokenType>> actual;
-			Assert.True(new DateIso8601Filter().TryWrite(new DataWriterSettings(), input, out actual));
+			Assert.True(new Iso8601DateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
 			Assert.Equal(expected.Count(), actual.Count());
@@ -297,7 +297,7 @@ namespace JsonFx.Json.Filters
 				};
 
 			IEnumerable<Token<JsonTokenType>> actual;
-			Assert.True(new DateIso8601Filter().TryWrite(new DataWriterSettings(), input, out actual));
+			Assert.True(new Iso8601DateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
 			Assert.Equal(expected.Count(), actual.Count());
@@ -316,7 +316,7 @@ namespace JsonFx.Json.Filters
 				};
 
 			IEnumerable<Token<JsonTokenType>> actual;
-			Assert.True(new DateIso8601Filter().TryWrite(new DataWriterSettings(), input, out actual));
+			Assert.True(new Iso8601DateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
 			Assert.Equal(expected.Count(), actual.Count());
@@ -335,7 +335,7 @@ namespace JsonFx.Json.Filters
 				};
 
 			IEnumerable<Token<JsonTokenType>> actual;
-			Assert.True(new DateIso8601Filter().TryWrite(new DataWriterSettings(), input, out actual));
+			Assert.True(new Iso8601DateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
 			Assert.Equal(expected.Count(), actual.Count());
@@ -354,7 +354,7 @@ namespace JsonFx.Json.Filters
 				};
 
 			IEnumerable<Token<JsonTokenType>> actual;
-			Assert.True(new DateIso8601Filter().TryWrite(new DataWriterSettings(), input, out actual));
+			Assert.True(new Iso8601DateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
 			Assert.Equal(expected.Count(), actual.Count());
@@ -373,7 +373,7 @@ namespace JsonFx.Json.Filters
 				};
 
 			IEnumerable<Token<JsonTokenType>> actual;
-			Assert.True(new DateIso8601Filter().TryWrite(new DataWriterSettings(), input, out actual));
+			Assert.True(new Iso8601DateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
 			Assert.Equal(expected.Count(), actual.Count());
@@ -392,7 +392,7 @@ namespace JsonFx.Json.Filters
 				};
 
 			IEnumerable<Token<JsonTokenType>> actual;
-			Assert.True(new DateIso8601Filter().TryWrite(new DataWriterSettings(), input, out actual));
+			Assert.True(new Iso8601DateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
 			Assert.Equal(expected.Count(), actual.Count());
@@ -411,7 +411,7 @@ namespace JsonFx.Json.Filters
 				};
 
 			IEnumerable<Token<JsonTokenType>> actual;
-			Assert.True(new DateIso8601Filter().TryWrite(new DataWriterSettings(), input, out actual));
+			Assert.True(new Iso8601DateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
 			Assert.Equal(expected.Count(), actual.Count());
@@ -430,7 +430,7 @@ namespace JsonFx.Json.Filters
 				};
 
 			IEnumerable<Token<JsonTokenType>> actual;
-			Assert.True(new DateIso8601Filter().TryWrite(new DataWriterSettings(), input, out actual));
+			Assert.True(new Iso8601DateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
 			Assert.Equal(expected.Count(), actual.Count());
@@ -449,7 +449,7 @@ namespace JsonFx.Json.Filters
 				};
 
 			IEnumerable<Token<JsonTokenType>> actual;
-			Assert.True(new DateIso8601Filter().TryWrite(new DataWriterSettings(), input, out actual));
+			Assert.True(new Iso8601DateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
 			Assert.Equal(expected.Count(), actual.Count());
@@ -468,7 +468,7 @@ namespace JsonFx.Json.Filters
 				};
 
 			IEnumerable<Token<JsonTokenType>> actual;
-			Assert.True(new DateIso8601Filter().TryWrite(new DataWriterSettings(), input, out actual));
+			Assert.True(new Iso8601DateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
 			Assert.Equal(expected.Count(), actual.Count());

@@ -45,7 +45,7 @@ namespace JsonFx.Json.Filters
 	/// http://www.w3.org/TR/NOTE-datetime
 	/// http://en.wikipedia.org/wiki/ISO_8601
 	/// </remarks>
-	public class DateIso8601Filter : JsonFilter<DateTime>
+	public class Iso8601DateFilter : JsonFilter<DateTime>
 	{
 		#region Constants
 
@@ -73,7 +73,7 @@ namespace JsonFx.Json.Filters
 				return false;
 			}
 
-			return this.TryParseISO8601(
+			return this.TryParseIso8601(
 				Convert.ToString(token.Value, CultureInfo.InvariantCulture),
 				out value);
 		}
@@ -82,7 +82,7 @@ namespace JsonFx.Json.Filters
 		{
 			tokens = new Token<JsonTokenType>[]
 				{
-					JsonGrammar.TokenString(this.FormatISO8601(value))
+					JsonGrammar.TokenString(this.FormatIso8601(value))
 				};
 
 			return true;
@@ -98,7 +98,7 @@ namespace JsonFx.Json.Filters
 		/// <param name="date">ISO-8601 conformant date</param>
 		/// <param name="value">UTC or Unspecified DateTime</param>
 		/// <returns>true if parsing was successful</returns>
-		private bool TryParseISO8601(string date, out DateTime value)
+		private bool TryParseIso8601(string date, out DateTime value)
 		{
 			if (!DateTime.TryParse(
 				date,
@@ -123,7 +123,7 @@ namespace JsonFx.Json.Filters
 		/// </summary>
 		/// <param name="value"></param>
 		/// <returns>ISO-8601 conformant date</returns>
-		private string FormatISO8601(DateTime value)
+		private string FormatIso8601(DateTime value)
 		{
 			switch (value.Kind)
 			{
@@ -135,12 +135,12 @@ namespace JsonFx.Json.Filters
 				case DateTimeKind.Utc:
 				{
 					// UTC DateTime in ISO-8601
-					return value.ToString(DateIso8601Filter.UtcIso8601Format);
+					return value.ToString(Iso8601DateFilter.UtcIso8601Format);
 				}
 				default:
 				{
 					// DateTime in ISO-8601
-					return value.ToString(DateIso8601Filter.Iso8601Format);
+					return value.ToString(Iso8601DateFilter.Iso8601Format);
 				}
 			}
 		}
