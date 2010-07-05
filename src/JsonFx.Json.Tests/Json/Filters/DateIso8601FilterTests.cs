@@ -144,6 +144,125 @@ namespace JsonFx.Json.Filters
 			Assert.Equal(expected.Ticks, actual.Ticks);
 		}
 
+		[Fact]
+		public void TryRead_FutureUtcTimeZone_ReadsAsUtc()
+		{
+			var expected = new DateTime(2099, 12, 31, 23, 59, 59, 999, DateTimeKind.Utc);
+
+			var input = new[]
+				{
+					JsonGrammar.TokenString("2099-12-31T23:59:59.999Z")
+				};
+
+			DateTime actual;
+			Assert.True(new DateIso8601Filter().TryRead(new DataReaderSettings(), input, out actual));
+
+			Assert.Equal(expected.Kind, actual.Kind);
+			Assert.Equal(expected.Ticks, actual.Ticks);
+		}
+
+		[Fact]
+		public void TryRead_FutureUnspecifiedTimeZone_ReadsAsUnspecified()
+		{
+			var input = new[]
+				{
+					JsonGrammar.TokenString("2099-12-31T23:59:59.999")
+				};
+
+			var expected = new DateTime(2099, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified);
+
+			DateTime actual;
+			Assert.True(new DateIso8601Filter().TryRead(new DataReaderSettings(), input, out actual));
+
+			Assert.Equal(expected.Kind, actual.Kind);
+			Assert.Equal(expected.Ticks, actual.Ticks);
+		}
+
+		[Fact]
+		public void TryRead_FutureEasternTimeZone_ReadsAsUtc()
+		{
+			var input = new[]
+				{
+					JsonGrammar.TokenString("2099-12-31T23:59:59.999-05:00")
+				};
+
+			var expected = new DateTime(2100, 1, 1, 4, 59, 59, 999, DateTimeKind.Utc);
+
+			DateTime actual;
+			Assert.True(new DateIso8601Filter().TryRead(new DataReaderSettings(), input, out actual));
+
+			Assert.Equal(expected.Kind, actual.Kind);
+			Assert.Equal(expected.Ticks, actual.Ticks);
+		}
+
+		[Fact]
+		public void TryRead_DateTimeMinValueUnspecified_ReadsAsUnspecified()
+		{
+			var input = new[]
+				{
+					JsonGrammar.TokenString("0001-01-01T00:00:00.000")
+				};
+
+			var expected = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified);
+
+			DateTime actual;
+			Assert.True(new DateIso8601Filter().TryRead(new DataReaderSettings(), input, out actual));
+
+			Assert.Equal(expected.Kind, actual.Kind);
+			Assert.Equal(expected.Ticks, actual.Ticks);
+		}
+
+		[Fact]
+		public void TryRead_DateTimeMinValueUtc_ReadsAsUtc()
+		{
+			var input = new[]
+				{
+					JsonGrammar.TokenString("0001-01-01T00:00:00.000Z")
+				};
+
+			var expected = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+
+			DateTime actual;
+			Assert.True(new DateIso8601Filter().TryRead(new DataReaderSettings(), input, out actual));
+
+			Assert.Equal(expected.Kind, actual.Kind);
+			Assert.Equal(expected.Ticks, actual.Ticks);
+		}
+
+		[Fact]
+		public void TryRead_DateTimeMaxValueUnspecified_ReadsAsUnspecified()
+		{
+			var input = new[]
+				{
+					JsonGrammar.TokenString("9999-12-31T23:59:59.999")
+				};
+
+			var expected = new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified);
+
+			DateTime actual;
+			Assert.True(new DateIso8601Filter().TryRead(new DataReaderSettings(), input, out actual));
+
+			Assert.Equal(expected.Kind, actual.Kind);
+			Assert.Equal(expected.Ticks, actual.Ticks);
+		}
+
+		[Fact]
+		public void TryRead_DateTimeMaxValueUtc_ReadsAsUtc()
+		{
+			var input = new[]
+				{
+					JsonGrammar.TokenString("9999-12-31T23:59:59.999Z")
+				};
+
+			var expected = new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Utc);
+
+			DateTime actual;
+			Assert.True(new DateIso8601Filter().TryRead(new DataReaderSettings(), input, out actual));
+
+			Assert.Equal(expected.Kind, actual.Kind);
+			Assert.Equal(expected.Ticks, actual.Ticks);
+		}
+
 		#endregion TryRead Tests
 
 		#region TryWrite Tests
@@ -251,6 +370,63 @@ namespace JsonFx.Json.Filters
 			var expected = new[]
 				{
 					JsonGrammar.TokenString("2010-07-05T10:51:17.768")
+				};
+
+			IEnumerable<Token<JsonTokenType>> actual;
+			Assert.True(new DateIso8601Filter().TryWrite(new DataWriterSettings(), input, out actual));
+
+			Assert.NotNull(actual);
+			Assert.Equal(expected.Count(), actual.Count());
+			Assert.Equal(expected[0].TokenType, actual.First().TokenType);
+			Assert.Equal(expected[0].Value, actual.First().Value);
+		}
+
+		[Fact]
+		public void TryWrite_FutureUtcTimeZone_DirectlyWritesAsUtc()
+		{
+			var input = new DateTime(2099, 12, 31, 23, 59, 59, 999, DateTimeKind.Utc);
+
+			var expected = new[]
+				{
+					JsonGrammar.TokenString("2099-12-31T23:59:59.999Z")
+				};
+
+			IEnumerable<Token<JsonTokenType>> actual;
+			Assert.True(new DateIso8601Filter().TryWrite(new DataWriterSettings(), input, out actual));
+
+			Assert.NotNull(actual);
+			Assert.Equal(expected.Count(), actual.Count());
+			Assert.Equal(expected[0].TokenType, actual.First().TokenType);
+			Assert.Equal(expected[0].Value, actual.First().Value);
+		}
+
+		[Fact]
+		public void TryWrite_FutureLocalTimeZone_ConvertsToUtcAndWritesAsUtc()
+		{
+			var input = new DateTime(2099, 12, 31, 23, 59, 59, 999, DateTimeKind.Local);
+
+			var expected = new[]
+				{
+					JsonGrammar.TokenString("2100-01-01T07:59:59.999Z")
+				};
+
+			IEnumerable<Token<JsonTokenType>> actual;
+			Assert.True(new DateIso8601Filter().TryWrite(new DataWriterSettings(), input, out actual));
+
+			Assert.NotNull(actual);
+			Assert.Equal(expected.Count(), actual.Count());
+			Assert.Equal(expected[0].TokenType, actual.First().TokenType);
+			Assert.Equal(expected[0].Value, actual.First().Value);
+		}
+
+		[Fact]
+		public void TryWrite_FutureUnspecifiedTimeZone_DirectlyWritesAsClientLocal()
+		{
+			var input = new DateTime(2099, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified);
+
+			var expected = new[]
+				{
+					JsonGrammar.TokenString("2099-12-31T23:59:59.999")
 				};
 
 			IEnumerable<Token<JsonTokenType>> actual;
