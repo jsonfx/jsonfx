@@ -101,21 +101,33 @@ namespace JsonFx.Json
 			/// <returns></returns>
 			public IEnumerable<Token<JsonTokenType>> GetTokens(object value)
 			{
+				Queue<Token<JsonTokenType>> tokens = new Queue<Token<JsonTokenType>>();
+
+				this.GetTokens(tokens, value);
+
+				return tokens;
+			}
+
+			private void GetTokens(Queue<Token<JsonTokenType>> tokens, object value)
+			{
 				foreach (var filter in this.Filters)
 				{
-					IEnumerable<Token<JsonTokenType>> tokens;
-					if (filter.TryWrite(this.Settings, value, out tokens))
+					IEnumerable<Token<JsonTokenType>> filterTokens;
+					if (filter.TryWrite(this.Settings, value, out filterTokens))
 					{
 						// found a successful match
-						foreach (Token<JsonTokenType> token in tokens) { yield return token; }
-						yield break;
+						foreach (Token<JsonTokenType> token in filterTokens)
+						{
+							tokens.Enqueue(token);
+						}
+						return;
 					}
 				}
 
 				if (value == null)
 				{
-					yield return JsonGrammar.TokenNull;
-					yield break;
+					tokens.Enqueue(JsonGrammar.TokenNull);
+					return;
 				}
 
 				Type type = value.GetType();
@@ -123,8 +135,8 @@ namespace JsonFx.Json
 				// must test enumerations before other value types
 				if (type.IsEnum)
 				{
-					yield return JsonGrammar.TokenString((Enum)value);
-					yield break;
+					tokens.Enqueue(JsonGrammar.TokenString((Enum)value));
+					return;
 				}
 
 				// Type.GetTypeCode() allows us to more efficiently switch type
@@ -132,8 +144,8 @@ namespace JsonFx.Json
 				{
 					case TypeCode.Boolean:
 					{
-						yield return true.Equals(value) ? JsonGrammar.TokenTrue : JsonGrammar.TokenFalse;
-						yield break;
+						tokens.Enqueue(true.Equals(value) ? JsonGrammar.TokenTrue : JsonGrammar.TokenFalse);
+						return;
 					}
 					case TypeCode.Byte:
 					case TypeCode.Decimal:
@@ -145,8 +157,8 @@ namespace JsonFx.Json
 					case TypeCode.UInt32:
 					case TypeCode.UInt64:
 					{
-						yield return JsonGrammar.TokenNumber((ValueType)value);
-						yield break;
+						tokens.Enqueue(JsonGrammar.TokenNumber((ValueType)value));
+						return;
 					}
 					case TypeCode.Double:
 					{
@@ -154,21 +166,21 @@ namespace JsonFx.Json
 
 						if (Double.IsNaN(doubleVal))
 						{
-							yield return JsonGrammar.TokenNaN;
+							tokens.Enqueue(JsonGrammar.TokenNaN);
 						}
 						else if (Double.IsPositiveInfinity(doubleVal))
 						{
-							yield return JsonGrammar.TokenPositiveInfinity;
+							tokens.Enqueue(JsonGrammar.TokenPositiveInfinity);
 						}
 						else if (Double.IsNegativeInfinity(doubleVal))
 						{
-							yield return JsonGrammar.TokenNegativeInfinity;
+							tokens.Enqueue(JsonGrammar.TokenNegativeInfinity);
 						}
 						else
 						{
-							yield return JsonGrammar.TokenNumber(doubleVal);
+							tokens.Enqueue(JsonGrammar.TokenNumber(doubleVal));
 						}
-						yield break;
+						return;
 					}
 					case TypeCode.Single:
 					{
@@ -176,93 +188,93 @@ namespace JsonFx.Json
 
 						if (Single.IsNaN(floatVal))
 						{
-							yield return JsonGrammar.TokenNaN;
+							tokens.Enqueue(JsonGrammar.TokenNaN);
 						}
 						else if (Single.IsPositiveInfinity(floatVal))
 						{
-							yield return JsonGrammar.TokenPositiveInfinity;
+							tokens.Enqueue(JsonGrammar.TokenPositiveInfinity);
 						}
 						else if (Single.IsNegativeInfinity(floatVal))
 						{
-							yield return JsonGrammar.TokenNegativeInfinity;
+							tokens.Enqueue(JsonGrammar.TokenNegativeInfinity);
 						}
 						else
 						{
-							yield return JsonGrammar.TokenNumber(floatVal);
+							tokens.Enqueue(JsonGrammar.TokenNumber(floatVal));
 						}
-						yield break;
+						return;
 					}
 					case TypeCode.Char:
 					case TypeCode.DateTime:
 					case TypeCode.String:
 					{
-						yield return JsonGrammar.TokenString(value);
-						yield break;
+						tokens.Enqueue(JsonGrammar.TokenString(value));
+						return;
 					}
 					case TypeCode.DBNull:
 					case TypeCode.Empty:
 					{
-						yield return JsonGrammar.TokenNull;
-						yield break;
+						tokens.Enqueue(JsonGrammar.TokenNull);
+						return;
 					}
 				}
 
 				if (value is IEnumerable)
 				{
-					foreach (Token<JsonTokenType> token in this.GetArrayTokens((IEnumerable)value)) { yield return token; }
-					yield break;
+					this.GetArrayTokens(tokens, (IEnumerable)value);
+					return;
 				}
 
 				if (value is Guid || value is Uri || value is Version)
 				{
-					yield return JsonGrammar.TokenString(value);
-					yield break;
+					tokens.Enqueue(JsonGrammar.TokenString(value));
+					return;
 				}
 
 				if (value is TimeSpan)
 				{
-					yield return JsonGrammar.TokenNumber((TimeSpan)value);
-					yield break;
+					tokens.Enqueue(JsonGrammar.TokenNumber((TimeSpan)value));
+					return;
 				}
 
 				// all other structs and classes
-				foreach (Token<JsonTokenType> token in this.GetObjectTokens(value, type)) { yield return token; }
+				this.GetObjectTokens(tokens, value, type);
 			}
 
-			private IEnumerable<Token<JsonTokenType>> GetArrayTokens(IEnumerable value)
+			private void GetArrayTokens(Queue<Token<JsonTokenType>> tokens, IEnumerable value)
 			{
 				IEnumerator enumerator = value.GetEnumerator();
 
 				if (enumerator is IEnumerator<KeyValuePair<string, object>> ||
 					enumerator is IDictionaryEnumerator)
 				{
-					foreach (Token<JsonTokenType> token in this.GetObjectTokens(enumerator)) { yield return token; }
-					yield break;
+					this.GetObjectTokens(tokens, enumerator);
+					return;
 				}
 
-				yield return JsonGrammar.TokenArrayBegin;
+				tokens.Enqueue(JsonGrammar.TokenArrayBegin);
 
 				bool appendDelim = false;
 				while (enumerator.MoveNext())
 				{
 					if (appendDelim)
 					{
-						yield return JsonGrammar.TokenValueDelim;
+						tokens.Enqueue(JsonGrammar.TokenValueDelim);
 					}
 					else
 					{
 						appendDelim = true;
 					}
 
-					foreach (Token<JsonTokenType> token in this.GetTokens(enumerator.Current)) { yield return token; }
+					this.GetTokens(tokens, enumerator.Current);
 				}
 
-				yield return JsonGrammar.TokenArrayEnd;
+				tokens.Enqueue(JsonGrammar.TokenArrayEnd);
 			}
 
-			private IEnumerable<Token<JsonTokenType>> GetObjectTokens(IEnumerator enumerator)
+			private void GetObjectTokens(Queue<Token<JsonTokenType>> tokens, IEnumerator enumerator)
 			{
-				yield return JsonGrammar.TokenObjectBegin;
+				tokens.Enqueue(JsonGrammar.TokenObjectBegin);
 
 				IEnumerator<KeyValuePair<string, object>> keyValueEnumerator = enumerator as IEnumerator<KeyValuePair<string, object>>;
 				IDictionaryEnumerator dictionaryEnumerator = enumerator as IDictionaryEnumerator;
@@ -275,7 +287,7 @@ namespace JsonFx.Json
 					{
 						if (appendDelim)
 						{
-							yield return JsonGrammar.TokenValueDelim;
+							tokens.Enqueue(JsonGrammar.TokenValueDelim);
 						}
 						else
 						{
@@ -283,7 +295,7 @@ namespace JsonFx.Json
 						}
 
 						KeyValuePair<string, object> pair = keyValueEnumerator.Current;
-						foreach (Token<JsonTokenType> token in this.GetPropertyTokens(pair.Key, pair.Value)) { yield return token; }
+						this.GetPropertyTokens(tokens, pair.Key, pair.Value);
 					}
 				}
 				else if (dictionaryEnumerator != null)
@@ -292,14 +304,14 @@ namespace JsonFx.Json
 					{
 						if (appendDelim)
 						{
-							yield return JsonGrammar.TokenValueDelim;
+							tokens.Enqueue(JsonGrammar.TokenValueDelim);
 						}
 						else
 						{
 							appendDelim = true;
 						}
 
-						foreach (Token<JsonTokenType> token in this.GetPropertyTokens(dictionaryEnumerator.Key, dictionaryEnumerator.Value)) { yield return token; }
+						this.GetPropertyTokens(tokens, dictionaryEnumerator.Key, dictionaryEnumerator.Value);
 					}
 				}
 				else
@@ -307,19 +319,19 @@ namespace JsonFx.Json
 					throw new ArgumentException("enumerator", "Expected IDictionaryEnumerator or IEnumerator<KeyValuePair<string, object>>");
 				}
 
-				yield return JsonGrammar.TokenObjectEnd;
+				tokens.Enqueue(JsonGrammar.TokenObjectEnd);
 			}
 
-			private IEnumerable<Token<JsonTokenType>> GetObjectTokens(object value, Type type)
+			private void GetObjectTokens(Queue<Token<JsonTokenType>> tokens, object value, Type type)
 			{
-				yield return JsonGrammar.TokenObjectBegin;
+				tokens.Enqueue(JsonGrammar.TokenObjectBegin);
 
 				IDictionary<string, MemberMap> maps = this.Settings.Resolver.LoadMaps(type);
 				if (maps == null)
 				{
-					// 
-					yield return JsonGrammar.TokenObjectEnd;
-					yield break;
+					// TODO: verify no other valid situations here
+					tokens.Enqueue(JsonGrammar.TokenObjectEnd);
+					return;
 				}
 
 				bool appendDelim = false;
@@ -339,25 +351,25 @@ namespace JsonFx.Json
 
 					if (appendDelim)
 					{
-						yield return JsonGrammar.TokenValueDelim;
+						tokens.Enqueue(JsonGrammar.TokenValueDelim);
 					}
 					else
 					{
 						appendDelim = true;
 					}
 
-					foreach (Token<JsonTokenType> token in this.GetPropertyTokens(map.Key, propertyValue)) { yield return token; }
+					this.GetPropertyTokens(tokens, map.Key, propertyValue);
 				}
 
-				yield return JsonGrammar.TokenObjectEnd;
+				tokens.Enqueue(JsonGrammar.TokenObjectEnd);
 			}
 
-			private IEnumerable<Token<JsonTokenType>> GetPropertyTokens(object key, object value)
+			private void GetPropertyTokens(Queue<Token<JsonTokenType>> tokens, object key, object value)
 			{
-				yield return JsonGrammar.TokenString(key);
-				yield return JsonGrammar.TokenPairDelim;
+				tokens.Enqueue(JsonGrammar.TokenString(key));
+				tokens.Enqueue(JsonGrammar.TokenPairDelim);
 
-				foreach (Token<JsonTokenType> token in this.GetTokens(value)) { yield return token; }
+				this.GetTokens(tokens, value);
 			}
 
 			#endregion Walker Methods
