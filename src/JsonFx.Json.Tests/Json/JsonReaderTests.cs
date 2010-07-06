@@ -32,6 +32,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
+using JsonFx.Json.Filters;
 using JsonFx.Serialization;
 using Xunit;
 using Assert=JsonFx.AssertPatched;
@@ -41,6 +42,28 @@ namespace JsonFx.Json
 	public class JsonReaderTests
 	{
 		#region Array Tests
+
+		[Fact]
+		public void Deserialize_RecognizesFilters_DeserializesMultipleDateTimeFormats()
+		{
+			var input = new StringReader(@"[ ""Normal string before"", ""2008-02-29T23:59:59.999Z"", ""\\/Date(1278327077768)\\/"", ""Normal string after""]");
+			var expected = new object[]
+				{
+					"Normal string before",
+					new DateTime(2008, 2, 29, 23, 59, 59, 999, DateTimeKind.Utc),
+					new DateTime(2010, 7, 5, 10, 51, 17, 768, DateTimeKind.Utc),
+					"Normal string after"
+				};
+
+			var reader = new JsonReader(
+				new DataReaderSettings { AllowTrailingContent = true },
+				new Iso8601DateFilter { Format=Iso8601DateFilter.Precision.Seconds },
+				new MSAjaxDateFilter());
+
+			var actual = reader.Deserialize(input);
+
+			Assert.Equal(expected, actual);
+		}
 
 		[Fact]
 		public void Deserialize_AllowTrailingContent_IgnoresTrailingContent()

@@ -182,14 +182,10 @@ namespace JsonFx.Json
 
 			private object ConsumeValue(IEnumerator<Token<JsonTokenType>> tokens, Type targetType)
 			{
-				foreach (var filter in this.Filters)
+				object result;
+				if (this.TryReadFilters(tokens, out result))
 				{
-					object result;
-					if (filter.TryRead(this.Settings, tokens, out result))
-					{
-						// found a successful match
-						return result;
-					}
+					return result;
 				}
 
 				Token<JsonTokenType> token = tokens.Current;
@@ -479,13 +475,14 @@ namespace JsonFx.Json
 						case JsonTokenType.Undefined:
 						{
 							// primitive item
-							if (isItemTypeHint)
+							if (!this.TryReadFilters(tokens, out item))
 							{
-								item = token.Value;
+								item = tokens.Current.Value;
 							}
-							else
+
+							if (!isItemTypeHint)
 							{
-								item = this.Coercion.CoerceType(itemType, token.Value);
+								item = this.Coercion.CoerceType(itemType, item);
 							}
 							break;
 						}
@@ -520,6 +517,21 @@ namespace JsonFx.Json
 				throw new ParseException<JsonTokenType>(
 					JsonGrammar.TokenNone,
 					JsonAnalyzer.ErrorUnterminatedArray);
+			}
+
+			private bool TryReadFilters(IEnumerator<Token<JsonTokenType>> tokens, out object result)
+			{
+				foreach (var filter in this.Filters)
+				{
+					if (filter.TryRead(this.Settings, tokens, out result))
+					{
+						// found a successful match
+						return true;
+					}
+				}
+
+				result = null;
+				return false;
 			}
 
 			#endregion Consume Methods
