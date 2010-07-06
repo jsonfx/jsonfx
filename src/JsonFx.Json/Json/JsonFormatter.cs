@@ -47,8 +47,6 @@ namespace JsonFx.Json
 			#region Fields
 
 			private readonly DataWriterSettings Settings;
-			private TextWriter Writer = TextWriter.Null;
-			private int depth = 0;
 
 			#endregion Fields
 
@@ -100,6 +98,7 @@ namespace JsonFx.Json
 
 				// allows us to keep basic context without resorting to a push-down automata
 				bool pendingNewLine = false;
+				int depth = 0;
 
 				foreach (Token<JsonTokenType> token in tokens)
 				{
@@ -109,7 +108,7 @@ namespace JsonFx.Json
 						{
 							if (pendingNewLine)
 							{
-								this.WriteLine(writer, +1);
+								this.WriteLine(writer, ++depth);
 								pendingNewLine = false;
 							}
 							writer.Write(JsonGrammar.OperatorArrayBegin);
@@ -120,7 +119,7 @@ namespace JsonFx.Json
 						{
 							if (!pendingNewLine)
 							{
-								this.WriteLine(writer, -1);
+								this.WriteLine(writer, --depth);
 							}
 							pendingNewLine = false;
 							writer.Write(JsonGrammar.OperatorArrayEnd);
@@ -130,7 +129,7 @@ namespace JsonFx.Json
 						{
 							if (pendingNewLine)
 							{
-								this.WriteLine(writer, +1);
+								this.WriteLine(writer, ++depth);
 								pendingNewLine = false;
 							}
 							writer.Write(true.Equals(token.Value) ? JsonGrammar.KeywordTrue : JsonGrammar.KeywordFalse);
@@ -145,7 +144,7 @@ namespace JsonFx.Json
 
 							if (pendingNewLine)
 							{
-								this.WriteLine(writer, +1);
+								this.WriteLine(writer, ++depth);
 								pendingNewLine = false;
 							}
 
@@ -157,7 +156,7 @@ namespace JsonFx.Json
 						{
 							if (pendingNewLine)
 							{
-								this.WriteLine(writer, +1);
+								this.WriteLine(writer, ++depth);
 								pendingNewLine = false;
 							}
 							writer.Write(JsonGrammar.KeywordNull);
@@ -167,7 +166,7 @@ namespace JsonFx.Json
 						{
 							if (pendingNewLine)
 							{
-								this.WriteLine(writer, +1);
+								this.WriteLine(writer, ++depth);
 								pendingNewLine = false;
 							}
 							this.WriteNumber(writer, token);
@@ -177,7 +176,7 @@ namespace JsonFx.Json
 						{
 							if (pendingNewLine)
 							{
-								this.WriteLine(writer, +1);
+								this.WriteLine(writer, ++depth);
 								pendingNewLine = false;
 							}
 							writer.Write(JsonGrammar.OperatorObjectBegin);
@@ -188,7 +187,7 @@ namespace JsonFx.Json
 						{
 							if (!pendingNewLine)
 							{
-								this.WriteLine(writer, -1);
+								this.WriteLine(writer, --depth);
 							}
 							pendingNewLine = false;
 							writer.Write(JsonGrammar.OperatorObjectEnd);
@@ -217,7 +216,7 @@ namespace JsonFx.Json
 
 							if (pendingNewLine)
 							{
-								this.WriteLine(writer, +1);
+								this.WriteLine(writer, ++depth);
 								pendingNewLine = false;
 							}
 
@@ -228,7 +227,7 @@ namespace JsonFx.Json
 						{
 							if (pendingNewLine)
 							{
-								this.WriteLine(writer, +1);
+								this.WriteLine(writer, ++depth);
 								pendingNewLine = false;
 							}
 							writer.Write(JsonGrammar.KeywordUndefined);
@@ -237,7 +236,7 @@ namespace JsonFx.Json
 						case JsonTokenType.ValueDelim:
 						{
 							writer.Write(JsonGrammar.OperatorValueDelim);
-							this.WriteLine(writer, 0);
+							this.WriteLine(writer, depth);
 							continue;
 						}
 						case JsonTokenType.None:
@@ -429,28 +428,25 @@ namespace JsonFx.Json
 
 			#region PrettyPrint Methods
 
-			private void WriteLine(TextWriter writer, int depthChange)
+			private void WriteLine(TextWriter writer, int depth)
 			{
-				if (depthChange != 0)
+				if (depth < 0)
 				{
-					this.depth += depthChange;
-					if (this.depth < 0)
-					{
-						// depth should never be negative
-						throw new SerializationException("Formatter depth cannot be negative");
-					}
-					else if (this.depth >= this.Settings.MaxDepth)
-					{
-						// TODO: should this move to walker along with an option to check for cycles rather than depth?
-						throw new SerializationException("Maximum depth exceeded: potential graph cycle detected.");
-					}
+					// depth should never be negative
+					throw new SerializationException("Formatter depth cannot be negative");
+				}
+
+				if (depth >= this.Settings.MaxDepth)
+				{
+					// TODO: should this move to walker along with an option to check for cycles rather than depth?
+					throw new SerializationException("Maximum depth exceeded: potential graph cycle detected.");
 				}
 
 				if (this.Settings.PrettyPrint)
 				{
 					// emit CRLF
 					writer.Write(this.Settings.NewLine);
-					for (int i=0; i<this.depth; i++)
+					for (int i=0; i<depth; i++)
 					{
 						// indent next line accordingly
 						writer.Write(this.Settings.Tab);
