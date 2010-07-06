@@ -114,6 +114,7 @@ namespace JsonFx.Json
 			/// <returns></returns>
 			public IEnumerable<TResult> Analyze<TResult>(IEnumerable<Token<JsonTokenType>> tokens)
 			{
+				// cast each of the values accordingly
 				foreach (object value in this.Analyze(tokens, typeof(TResult))) { yield return (TResult)value; }
 			}
 
