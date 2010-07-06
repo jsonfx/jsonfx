@@ -234,7 +234,7 @@ namespace JsonFx.Json
 			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
-					var actual = analyzer.Analyze(input).Single();
+					var actual = analyzer.Analyze<object>(input).Single();
 				});
 
 			// verify exception is coming from expected token
@@ -258,7 +258,7 @@ namespace JsonFx.Json
 			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
-					var actual = analyzer.Analyze(input).Single();
+					var actual = analyzer.Analyze<object>(input).Single();
 				});
 
 			// verify exception is coming from expected token
@@ -283,7 +283,7 @@ namespace JsonFx.Json
 			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
-					var actual = analyzer.Analyze(input).Single();
+					var actual = analyzer.Analyze<object>(input).Single();
 				});
 
 			// verify exception is coming from expected token
@@ -307,7 +307,7 @@ namespace JsonFx.Json
 			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
-					var actual = analyzer.Analyze(input).Single();
+					var actual = analyzer.Analyze<object>(input).Single();
 				});
 
 			// verify exception is coming from expected token
@@ -332,7 +332,7 @@ namespace JsonFx.Json
 			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
-					var actual = analyzer.Analyze(input).Single();
+					var actual = analyzer.Analyze<object>(input).Single();
 				});
 
 			// verify exception is coming from expected token
@@ -357,7 +357,7 @@ namespace JsonFx.Json
 			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
-					var actual = analyzer.Analyze(input).Single();
+					var actual = analyzer.Analyze<object>(input).Single();
 				});
 
 			// verify exception is coming from expected token
@@ -380,7 +380,7 @@ namespace JsonFx.Json
 			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
-					var actual = analyzer.Analyze(input).Single();
+					var actual = analyzer.Analyze<object>(input).Single();
 				});
 
 			// verify exception is coming from expected token
@@ -489,7 +489,7 @@ namespace JsonFx.Json
 			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
-					var actual = analyzer.Analyze(input).Single();
+					var actual = analyzer.Analyze<object>(input).Single();
 				});
 
 			// verify exception is coming from expected token
@@ -513,7 +513,7 @@ namespace JsonFx.Json
 			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
-					var actual = analyzer.Analyze(input).Single();
+					var actual = analyzer.Analyze<object>(input).Single();
 				});
 
 			// verify exception is coming from expected token
@@ -539,7 +539,7 @@ namespace JsonFx.Json
 			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
-					var actual = analyzer.Analyze(input).Single();
+					var actual = analyzer.Analyze<object>(input).Single();
 				});
 
 			// verify exception is coming from expected token
@@ -564,7 +564,7 @@ namespace JsonFx.Json
 			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
-					var actual = analyzer.Analyze(input).Single();
+					var actual = analyzer.Analyze<object>(input).Single();
 				});
 
 			// verify exception is coming from expected token
@@ -589,7 +589,7 @@ namespace JsonFx.Json
 			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
 				delegate
 				{
-					var actual = analyzer.Analyze(input).Single();
+					var actual = analyzer.Analyze<object>(input).Single();
 				});
 
 			// verify exception is coming from expected token
@@ -890,7 +890,7 @@ namespace JsonFx.Json
 			var input = Enumerable.Empty<Token<JsonTokenType>>();
 
 			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings());
-			Assert.False(analyzer.Analyze(input).Any());
+			Assert.False(analyzer.Analyze<object>(input).Any());
 		}
 
 		[Fact]
@@ -903,7 +903,7 @@ namespace JsonFx.Json
 			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
 				delegate
 				{
-					var actual = analyzer.Analyze(input).Single();
+					var actual = analyzer.Analyze<object>(input).Single();
 				});
 
 			// verify exception is coming from expected param

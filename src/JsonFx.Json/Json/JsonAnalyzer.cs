@@ -126,21 +126,9 @@ namespace JsonFx.Json
 			/// </summary>
 			/// <param name="tokens"></param>
 			/// <returns></returns>
-			public IEnumerable<object> Analyze(IEnumerable<Token<JsonTokenType>> tokens)
+			public IEnumerable Analyze(IEnumerable<Token<JsonTokenType>> tokens)
 			{
 				return this.Analyze(tokens, null);
-			}
-
-			/// <summary>
-			/// Parses the token stream coercing the result to TResult
-			/// </summary>
-			/// <typeparam name="TResult">the result target type</typeparam>
-			/// <param name="tokens"></param>
-			/// <returns></returns>
-			public IEnumerable<TResult> Analyze<TResult>(IEnumerable<Token<JsonTokenType>> tokens)
-			{
-				// cast each of the values accordingly
-				foreach (object value in this.Analyze(tokens, typeof(TResult))) { yield return (TResult)value; }
 			}
 
 			/// <summary>
@@ -149,7 +137,7 @@ namespace JsonFx.Json
 			/// <param name="tokens"></param>
 			/// <param name="targetType"></param>
 			/// <returns></returns>
-			public IEnumerable<object> Analyze(IEnumerable<Token<JsonTokenType>> tokens, Type targetType)
+			public IEnumerable Analyze(IEnumerable<Token<JsonTokenType>> tokens, Type targetType)
 			{
 				if (tokens == null)
 				{
@@ -160,6 +148,27 @@ namespace JsonFx.Json
 				while (tokenizer.MoveNext())
 				{
 					yield return this.ConsumeValue(tokenizer, targetType);
+				}
+			}
+
+			/// <summary>
+			/// Parses the token stream coercing the result to TResult
+			/// </summary>
+			/// <typeparam name="TResult">the result target type</typeparam>
+			/// <param name="tokens"></param>
+			/// <returns></returns>
+			public IEnumerable<TResult> Analyze<TResult>(IEnumerable<Token<JsonTokenType>> tokens)
+			{
+				if (tokens == null)
+				{
+					throw new ArgumentNullException("tokens");
+				}
+
+				IEnumerator<Token<JsonTokenType>> tokenizer = tokens.GetEnumerator();
+				while (tokenizer.MoveNext())
+				{
+					// cast each of the values accordingly
+					yield return (TResult)this.ConsumeValue(tokenizer, typeof(TResult));
 				}
 			}
 
@@ -496,27 +505,6 @@ namespace JsonFx.Json
 			}
 
 			#endregion Parsing Methods
-
-			#region Utility Methods
-
-			/// <summary>
-			/// Allows an IEnumerator&lt;T&gt; to be continue to be used as an IEnumerable&lt;T&gt;.
-			/// </summary>
-			/// <param name="enumerator"></param>
-			/// <returns></returns>
-			/// <remarks>
-			/// Assumes that the Current value still needs to be consumed.
-			/// </remarks>
-			private IEnumerable<T> Enumerate<T>(IEnumerator<T> enumerator)
-			{
-				do
-				{
-					yield return enumerator.Current;
-
-				} while (enumerator.MoveNext());
-			}
-
-			#endregion Utility Methods
 		}
 	}
 }

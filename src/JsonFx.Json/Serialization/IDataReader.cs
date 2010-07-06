@@ -29,6 +29,7 @@
 #endregion License
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 
@@ -109,7 +110,7 @@ namespace JsonFx.Serialization
 		/// <remarks>
 		/// character stream => token stream => object stream
 		/// </remarks>
-		IEnumerable<object> StreamedDeserialize(TextReader input);
+		IEnumerable StreamedDeserialize(TextReader input);
 
 		#endregion Methods
 	}

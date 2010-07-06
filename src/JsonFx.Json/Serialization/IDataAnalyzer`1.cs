@@ -29,6 +29,7 @@
 #endregion License
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace JsonFx.Serialization
@@ -46,7 +47,7 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="tokens"></param>
 		/// <returns></returns>
-		IEnumerable<object> Analyze(IEnumerable<Token<T>> tokens);
+		IEnumerable Analyze(IEnumerable<Token<T>> tokens);
 
 		/// <summary>
 		/// Parses the token sequence, optionally coercing the result to Type targetType
@@ -54,7 +55,7 @@ namespace JsonFx.Serialization
 		/// <param name="tokens"></param>
 		/// <param name="targetType">optional type for coercion (null if not specified)</param>
 		/// <returns></returns>
-		IEnumerable<object> Analyze(IEnumerable<Token<T>> tokens, Type targetType);
+		IEnumerable Analyze(IEnumerable<Token<T>> tokens, Type targetType);
 
 		/// <summary>
 		/// Parses the token sequence, coercing the result to Type TResult
