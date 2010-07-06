@@ -64,18 +64,11 @@ namespace JsonFx.Json.Filters
 
 		#region IDataFilter<JsonTokenType,DateTime> Members
 
-		public override bool TryRead(DataReaderSettings settings, IEnumerable<Token<JsonTokenType>> tokens, out DateTime value)
+		public override bool TryRead(DataReaderSettings settings, IEnumerator<Token<JsonTokenType>> tokens, out DateTime value)
 		{
-			IEnumerator<Token<JsonTokenType>> enumerator = tokens.GetEnumerator();
-			if (!enumerator.MoveNext())
-			{
-				value = default(DateTime);
-				return false;
-			}
-
-			Token<JsonTokenType> token = enumerator.Current;
-			if (enumerator.Current == null ||
-				enumerator.Current.TokenType != JsonTokenType.String)
+			Token<JsonTokenType> token = tokens.Current;
+			if (token == null ||
+				token.TokenType != JsonTokenType.String)
 			{
 				value = default(DateTime);
 				return false;

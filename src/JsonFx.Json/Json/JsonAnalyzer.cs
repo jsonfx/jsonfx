@@ -72,6 +72,7 @@ namespace JsonFx.Json
 
 			#region Fields
 
+			private readonly DataReaderSettings Settings;
 			private readonly TypeCoercionUtility Coercion;
 			private readonly IEnumerable<IDataFilter<JsonTokenType>> Filters;
 
@@ -99,6 +100,7 @@ namespace JsonFx.Json
 				{
 					throw new ArgumentNullException("settings");
 				}
+				this.Settings = settings;
 
 				if (filters == null)
 				{
@@ -119,7 +121,7 @@ namespace JsonFx.Json
 
 			#endregion Init
 
-			#region Parsing Methods
+			#region Analyze Methods
 
 			/// <summary>
 			/// Parses the token stream coercing the result targetType
@@ -174,8 +176,22 @@ namespace JsonFx.Json
 				}
 			}
 
+			#endregion Analyze Methods
+
+			#region Consume Methods
+
 			private object ConsumeValue(IEnumerator<Token<JsonTokenType>> tokens, Type targetType)
 			{
+				foreach (var filter in this.Filters)
+				{
+					object result;
+					if (filter.TryRead(this.Settings, tokens, out result))
+					{
+						// found a successful match
+						return result;
+					}
+				}
+
 				Token<JsonTokenType> token = tokens.Current;
 				switch (token.TokenType)
 				{
@@ -506,7 +522,7 @@ namespace JsonFx.Json
 					JsonAnalyzer.ErrorUnterminatedArray);
 			}
 
-			#endregion Parsing Methods
+			#endregion Consume Methods
 		}
 	}
 }
