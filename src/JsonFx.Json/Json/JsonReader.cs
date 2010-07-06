@@ -46,8 +46,19 @@ namespace JsonFx.Json
 		/// Ctor
 		/// </summary>
 		/// <param name="settings"></param>
-		public JsonReader(DataReaderSettings settings)
-			: base(settings)
+		/// <param name="filters"></param>
+		public JsonReader(DataReaderSettings settings, params IDataFilter<JsonTokenType>[] filters)
+			: base(settings, (IEnumerable<IDataFilter<JsonTokenType>>)filters)
+		{
+		}
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="settings"></param>
+		/// <param name="filters"></param>
+		public JsonReader(DataReaderSettings settings, IEnumerable<IDataFilter<JsonTokenType>> filters)
+			: base(settings, filters)
 		{
 		}
 
@@ -74,7 +85,7 @@ namespace JsonFx.Json
 
 		protected override IDataAnalyzer<JsonTokenType> GetAnalyzer()
 		{
-			return new JsonReader.JsonAnalyzer(this.Settings);
+			return new JsonReader.JsonAnalyzer(this.Settings, this.Filters);
 		}
 
 		#endregion IDataReader Methods

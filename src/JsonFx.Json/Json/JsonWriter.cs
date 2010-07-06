@@ -47,8 +47,19 @@ namespace JsonFx.Json
 		/// Ctor
 		/// </summary>
 		/// <param name="settings"></param>
-		public JsonWriter(DataWriterSettings settings)
-			: base(settings)
+		/// <param name="filters"></param>
+		public JsonWriter(DataWriterSettings settings, params IDataFilter<JsonTokenType>[] filters)
+			: base(settings, (IEnumerable<IDataFilter<JsonTokenType>>)filters)
+		{
+		}
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="settings"></param>
+		/// <param name="filters"></param>
+		public JsonWriter(DataWriterSettings settings, IEnumerable<IDataFilter<JsonTokenType>> filters)
+			: base(settings, filters)
 		{
 		}
 
@@ -91,7 +102,7 @@ namespace JsonFx.Json
 		/// <returns></returns>
 		protected override IDataWalker<JsonTokenType> GetWalker()
 		{
-			return new JsonWriter.JsonWalker(this.Settings);
+			return new JsonWriter.JsonWalker(this.Settings, this.Filters);
 		}
 
 		/// <summary>

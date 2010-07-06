@@ -43,6 +43,7 @@ namespace JsonFx.Serialization
 		#region Fields
 
 		private readonly DataWriterSettings settings;
+		private readonly IEnumerable<IDataFilter<T>> filters;
 
 		#endregion Fields
 
@@ -52,9 +53,19 @@ namespace JsonFx.Serialization
 		/// Ctor
 		/// </summary>
 		/// <param name="settings"></param>
-		public DataWriter(DataWriterSettings settings)
+		public DataWriter(DataWriterSettings settings, params IDataFilter<T>[] filters)
+			: this(settings, (IEnumerable<IDataFilter<T>>)filters)
+		{
+		}
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="settings"></param>
+		public DataWriter(DataWriterSettings settings, IEnumerable<IDataFilter<T>> filters)
 		{
 			this.settings = settings;
+			this.filters = filters;
 		}
 
 		#endregion Init
@@ -91,6 +102,14 @@ namespace JsonFx.Serialization
 		public DataWriterSettings Settings
 		{
 			get { return this.settings; }
+		}
+
+		/// <summary>
+		/// Gets the filters used for serialization
+		/// </summary>
+		public IEnumerable<IDataFilter<T>> Filters
+		{
+			get { return this.filters; }
 		}
 
 		#endregion Properties
