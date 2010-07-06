@@ -81,6 +81,7 @@
     <Compile Include="CodeGen\DynamicMethodGeneratorTests.cs" />
     <Compile Include="IO\StringScannerTests.cs" />
     <Compile Include="IO\TextReaderScannerTests.cs" />
+    <Compile Include="Json\JsonWriterTests.cs" />
     <Compile Include="Json\Filters\MSAjaxDateFilterTests.cs" />
     <Compile Include="Json\Filters\Iso8601DateFilterTests.cs" />
     <Compile Include="Json\JsonAnalyzerTests.cs" />

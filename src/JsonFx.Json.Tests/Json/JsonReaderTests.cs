@@ -46,7 +46,7 @@ namespace JsonFx.Json
 		[Fact]
 		public void Deserialize_RecognizesFilters_DeserializesMultipleDateTimeFormats()
 		{
-			var input = new StringReader(@"[ ""Normal string before"", ""2008-02-29T23:59:59.999Z"", ""\\/Date(1278327077768)\\/"", ""Normal string after""]");
+			var input = @"[ ""Normal string before"", ""2008-02-29T23:59:59.999Z"", ""\\/Date(1278327077768)\\/"", ""Normal string after""]";
 			var expected = new object[]
 				{
 					"Normal string before",
