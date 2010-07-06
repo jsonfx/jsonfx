@@ -164,11 +164,13 @@ namespace JsonFx.Json
 					throw new ArgumentNullException("tokens");
 				}
 
+				Type resultType = typeof(TResult);
+
 				IEnumerator<Token<JsonTokenType>> tokenizer = tokens.GetEnumerator();
 				while (tokenizer.MoveNext())
 				{
 					// cast each of the values accordingly
-					yield return (TResult)this.ConsumeValue(tokenizer, typeof(TResult));
+					yield return (TResult)this.ConsumeValue(tokenizer, resultType);
 				}
 			}
 
