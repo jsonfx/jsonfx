@@ -289,6 +289,7 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryWrite_LocalStandardTimeZone_ConvertsToUtcAndWritesAsUtc()
 		{
+			// Note: test only valid in Pacific Standard/Daylight Savings Time
 			var input = new DateTime(2008, 2, 29, 23, 59, 59, 999, DateTimeKind.Local);
 
 			var expected = new[]
@@ -346,6 +347,7 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryWrite_LocalDaylightSavingsTimeZone_ConvertsToUtcAndWritesAsUtc()
 		{
+			// Note: test only valid in Pacific Standard/Daylight Savings Time
 			var input = new DateTime(2010, 7, 5, 10, 51, 17, 768, DateTimeKind.Local);
 
 			var expected = new[]
@@ -403,6 +405,7 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryWrite_FutureLocalTimeZone_ConvertsToUtcAndWritesAsUtc()
 		{
+			// Note: test only valid in Pacific Standard/Daylight Savings Time
 			var input = new DateTime(2099, 12, 31, 23, 59, 59, 999, DateTimeKind.Local);
 
 			var expected = new[]
@@ -439,6 +442,27 @@ namespace JsonFx.Json.Filters
 		}
 
 		[Fact]
+		public void TryWrite_DateTimeFullPrecision_DirectlyWritesAsUnspecified()
+		{
+			// Note: test only valid in Pacific Standard/Daylight Savings Time
+			var input = new DateTime(634139450143516165L, DateTimeKind.Local);
+
+			var expected = new[]
+				{
+					JsonGrammar.TokenString("2010-07-05T23:43:34.3516165Z")
+				};
+
+			IEnumerable<Token<JsonTokenType>> actual;
+			Assert.True(new Iso8601DateFilter { Format=Iso8601DateFilter.Precision.Ticks }
+				.TryWrite(new DataWriterSettings(), input, out actual));
+
+			Assert.NotNull(actual);
+			Assert.Equal(expected.Count(), actual.Count());
+			Assert.Equal(expected[0].TokenType, actual.First().TokenType);
+			Assert.Equal(expected[0].Value, actual.First().Value);
+		}
+
+		[Fact]
 		public void TryWrite_DateTimeMinValue_DirectlyWritesAsUnspecified()
 		{
 			var input = DateTime.MinValue;
@@ -458,6 +482,66 @@ namespace JsonFx.Json.Filters
 		}
 
 		[Fact]
+		public void TryWrite_DateTimeMinValueShortPrecision_DirectlyWritesAsUnspecified()
+		{
+			var input = DateTime.MinValue;
+
+			var expected = new[]
+				{
+					JsonGrammar.TokenString("0001-01-01T00:00:00")
+				};
+
+			IEnumerable<Token<JsonTokenType>> actual;
+			Assert.True(new Iso8601DateFilter { Format=Iso8601DateFilter.Precision.Seconds }
+				.TryWrite(new DataWriterSettings(), input, out actual));
+
+			Assert.NotNull(actual);
+			Assert.Equal(expected.Count(), actual.Count());
+			Assert.Equal(expected[0].TokenType, actual.First().TokenType);
+			Assert.Equal(expected[0].Value, actual.First().Value);
+		}
+
+		[Fact]
+		public void TryWrite_DateTimeMinValueEcmaScriptPrecision_DirectlyWritesAsUnspecified()
+		{
+			var input = DateTime.MinValue;
+
+			var expected = new[]
+				{
+					JsonGrammar.TokenString("0001-01-01T00:00:00.000")
+				};
+
+			IEnumerable<Token<JsonTokenType>> actual;
+			Assert.True(new Iso8601DateFilter { Format=Iso8601DateFilter.Precision.Milliseconds }
+				.TryWrite(new DataWriterSettings(), input, out actual));
+
+			Assert.NotNull(actual);
+			Assert.Equal(expected.Count(), actual.Count());
+			Assert.Equal(expected[0].TokenType, actual.First().TokenType);
+			Assert.Equal(expected[0].Value, actual.First().Value);
+		}
+
+		[Fact]
+		public void TryWrite_DateTimeMinValueFullPrecision_DirectlyWritesAsUnspecified()
+		{
+			var input = DateTime.MinValue;
+
+			var expected = new[]
+				{
+					JsonGrammar.TokenString("0001-01-01T00:00:00")
+				};
+
+			IEnumerable<Token<JsonTokenType>> actual;
+			Assert.True(new Iso8601DateFilter { Format=Iso8601DateFilter.Precision.Ticks }
+				.TryWrite(new DataWriterSettings(), input, out actual));
+
+			Assert.NotNull(actual);
+			Assert.Equal(expected.Count(), actual.Count());
+			Assert.Equal(expected[0].TokenType, actual.First().TokenType);
+			Assert.Equal(expected[0].Value, actual.First().Value);
+		}
+
+		[Fact]
 		public void TryWrite_DateTimeMaxValue_DirectlyWritesAsUnspecified()
 		{
 			var input = DateTime.MaxValue;
@@ -469,6 +553,66 @@ namespace JsonFx.Json.Filters
 
 			IEnumerable<Token<JsonTokenType>> actual;
 			Assert.True(new Iso8601DateFilter().TryWrite(new DataWriterSettings(), input, out actual));
+
+			Assert.NotNull(actual);
+			Assert.Equal(expected.Count(), actual.Count());
+			Assert.Equal(expected[0].TokenType, actual.First().TokenType);
+			Assert.Equal(expected[0].Value, actual.First().Value);
+		}
+
+		[Fact]
+		public void TryWrite_DateTimeMaxValueShortPrecision_DirectlyWritesAsUnspecified()
+		{
+			var input = DateTime.MaxValue;
+
+			var expected = new[]
+				{
+					JsonGrammar.TokenString("9999-12-31T23:59:59")
+				};
+
+			IEnumerable<Token<JsonTokenType>> actual;
+			Assert.True(new Iso8601DateFilter { Format=Iso8601DateFilter.Precision.Seconds }
+				.TryWrite(new DataWriterSettings(), input, out actual));
+
+			Assert.NotNull(actual);
+			Assert.Equal(expected.Count(), actual.Count());
+			Assert.Equal(expected[0].TokenType, actual.First().TokenType);
+			Assert.Equal(expected[0].Value, actual.First().Value);
+		}
+
+		[Fact]
+		public void TryWrite_DateTimeMaxValueFullPrecision_DirectlyWritesAsUnspecified()
+		{
+			var input = DateTime.MaxValue;
+
+			var expected = new[]
+				{
+					JsonGrammar.TokenString("9999-12-31T23:59:59.999")
+				};
+
+			IEnumerable<Token<JsonTokenType>> actual;
+			Assert.True(new Iso8601DateFilter { Format=Iso8601DateFilter.Precision.Milliseconds }
+				.TryWrite(new DataWriterSettings(), input, out actual));
+
+			Assert.NotNull(actual);
+			Assert.Equal(expected.Count(), actual.Count());
+			Assert.Equal(expected[0].TokenType, actual.First().TokenType);
+			Assert.Equal(expected[0].Value, actual.First().Value);
+		}
+
+		[Fact]
+		public void TryWrite_DateTimeMaxValueEcmaScriptPrecision_DirectlyWritesAsUnspecified()
+		{
+			var input = DateTime.MaxValue;
+
+			var expected = new[]
+				{
+					JsonGrammar.TokenString("9999-12-31T23:59:59.9999999")
+				};
+
+			IEnumerable<Token<JsonTokenType>> actual;
+			Assert.True(new Iso8601DateFilter { Format=Iso8601DateFilter.Precision.Ticks }
+				.TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
 			Assert.Equal(expected.Count(), actual.Count());

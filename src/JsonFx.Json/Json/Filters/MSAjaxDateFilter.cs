@@ -81,7 +81,7 @@ namespace JsonFx.Json.Filters
 				return false;
 			}
 
-			return this.TryParseMSAjaxDate(
+			return MSAjaxDateFilter.TryParseMSAjaxDate(
 				Convert.ToString(token.Value, CultureInfo.InvariantCulture),
 				out value);
 		}
@@ -106,7 +106,7 @@ namespace JsonFx.Json.Filters
 		/// <param name="date">ASP.NET Ajax date string</param>
 		/// <param name="value"></param>
 		/// <returns>true if parsing was successful</returns>
-		private bool TryParseMSAjaxDate(string date, out DateTime value)
+		internal static bool TryParseMSAjaxDate(string date, out DateTime value)
 		{
 			if (String.IsNullOrEmpty(date))
 			{

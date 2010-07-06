@@ -108,7 +108,7 @@ namespace JsonFx.Serialization
 		/// <returns>objectType instance</returns>
 		public T InstantiateObject<T>(Type objectType)
 		{
-			if (!objectType.IsSubclassOf(typeof(T)))
+			if (!typeof(T).IsAssignableFrom(objectType))
 			{
 				throw new TypeCoercionException(String.Format(
 					TypeCoercionUtility.ErrorCannotInstantiateAsT,
@@ -275,8 +275,19 @@ namespace JsonFx.Serialization
 					DateTime date;
 					if (DateTime.TryParse(
 						(string)value,
-						DateTimeFormatInfo.InvariantInfo,
-						DateTimeStyles.RoundtripKind | DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.NoCurrentDateDefault,
+						CultureInfo.InvariantCulture,
+						DateTimeStyles.RoundtripKind|DateTimeStyles.AllowWhiteSpaces|DateTimeStyles.NoCurrentDateDefault,
+						out date))
+					{
+						if (date.Kind == DateTimeKind.Local)
+						{
+							return date.ToUniversalTime();
+						}
+						return date;
+					}
+
+					if (JsonFx.Json.Filters.MSAjaxDateFilter.TryParseMSAjaxDate(
+						(string)value,
 						out date))
 					{
 						return date;

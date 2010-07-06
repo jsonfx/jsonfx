@@ -40,21 +40,95 @@ namespace JsonFx.Json.Filters
 	/// Defines a filter for JSON serialization of DateTime into ISO-8601
 	/// </summary>
 	/// <remarks>
-	/// This is the format used by EcmaScript JSON.stringify(...):
-	///		http://json.org/json.js
+	/// This is the format used by EcmaScript 5th edition Date.prototype.toJSON(...):
+	///		http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-262.pdf
 	///		http://www.w3.org/TR/NOTE-datetime
 	///		http://en.wikipedia.org/wiki/ISO_8601
 	///	
-	/// NOTE: This format is limited to expressing DateTime at the millisecond level as either UTC or Unspecified.
+	/// NOTE: This format limits expressing DateTime as either UTC or Unspecified. Local (i.e. Server Local) is converted to UTC.
 	/// </remarks>
 	public class Iso8601DateFilter : JsonFilter<DateTime>
 	{
+		#region Precision
+
+		/// <summary>
+		/// Defines the precision of fractional seconds in ISO-8601 dates
+		/// </summary>
+		public enum Precision
+		{
+			Seconds,
+			Milliseconds,
+			Ticks
+		}
+
+		#endregion Precision
+
 		#region Constants
 
-		private const string Iso8601Format = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff";
-		private const string UtcIso8601Format = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'";
+		private const string ShortFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ssK";
+		private const string LongFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fffK";
+		private const string FullFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'FFFFFFFK";
 
 		#endregion Constants
+
+		#region Fields
+
+		private string iso8601Format = Iso8601DateFilter.LongFormat;
+
+		#endregion Fields
+
+		#region Properties
+
+		/// <summary>
+		/// Determines the precision of fractional seconds.
+		/// Defaults to EcmaScript precision of milliseconds.
+		/// </summary>
+		public Precision Format
+		{
+			get
+			{
+				switch (this.iso8601Format)
+				{
+					case ShortFormat:
+					{
+						return Precision.Seconds;
+					}
+					case LongFormat:
+					{
+						return Precision.Milliseconds;
+					}
+					default:
+					case FullFormat:
+					{
+						return Precision.Ticks;
+					}
+				}
+			}
+			set
+			{
+				switch (value)
+				{
+					case Precision.Seconds:
+					{
+						this.iso8601Format = Iso8601DateFilter.ShortFormat;
+						break;
+					}
+					case Precision.Milliseconds:
+					{
+						this.iso8601Format = Iso8601DateFilter.LongFormat;
+						break;
+					}
+					default:
+					case Precision.Ticks:
+					{
+						this.iso8601Format = Iso8601DateFilter.FullFormat;
+						break;
+					}
+				}
+			}
+		}
+
+		#endregion Properties
 
 		#region IDataFilter<JsonTokenType,DateTime> Members
 
@@ -75,7 +149,7 @@ namespace JsonFx.Json.Filters
 				return false;
 			}
 
-			return this.TryParseIso8601(
+			return Iso8601DateFilter.TryParseIso8601(
 				Convert.ToString(token.Value, CultureInfo.InvariantCulture),
 				out value);
 		}
@@ -100,10 +174,11 @@ namespace JsonFx.Json.Filters
 		/// <param name="date">ISO-8601 conformant date</param>
 		/// <param name="value">UTC or Unspecified DateTime</param>
 		/// <returns>true if parsing was successful</returns>
-		private bool TryParseIso8601(string date, out DateTime value)
+		private static bool TryParseIso8601(string date, out DateTime value)
 		{
-			if (!DateTime.TryParse(
+			if (!DateTime.TryParseExact(
 				date,
+				Iso8601DateFilter.FullFormat,
 				CultureInfo.InvariantCulture,
 				DateTimeStyles.RoundtripKind|DateTimeStyles.AllowWhiteSpaces|DateTimeStyles.NoCurrentDateDefault,
 				out value))
@@ -127,24 +202,13 @@ namespace JsonFx.Json.Filters
 		/// <returns>ISO-8601 conformant date</returns>
 		private string FormatIso8601(DateTime value)
 		{
-			switch (value.Kind)
+			if (value.Kind == DateTimeKind.Local)
 			{
-				case DateTimeKind.Local:
-				{
-					value = value.ToUniversalTime();
-					goto case DateTimeKind.Utc;
-				}
-				case DateTimeKind.Utc:
-				{
-					// UTC DateTime in ISO-8601
-					return value.ToString(Iso8601DateFilter.UtcIso8601Format);
-				}
-				default:
-				{
-					// DateTime in ISO-8601
-					return value.ToString(Iso8601DateFilter.Iso8601Format);
-				}
+				value = value.ToUniversalTime();
 			}
+
+			// DateTime in ISO-8601
+			return value.ToString(this.iso8601Format);
 		}
 
 		#endregion Utility Methods

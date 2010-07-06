@@ -153,6 +153,7 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryWrite_LocalStandardTimeZone_ConvertsToUtcAndWritesAsUtc()
 		{
+			// Note: test only valid in Pacific Standard/Daylight Savings Time
 			var input = new DateTime(2008, 2, 29, 23, 59, 59, 999, DateTimeKind.Local);
 
 			var expected = new[]
@@ -210,6 +211,7 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryWrite_LocalDaylightSavingsTimeZone_ConvertsToUtcAndWritesAsUtc()
 		{
+			// Note: test only valid in Pacific Standard/Daylight Savings Time
 			var input = new DateTime(2010, 7, 5, 10, 51, 17, 768, DateTimeKind.Local);
 
 			var expected = new[]
@@ -267,6 +269,7 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryWrite_FutureLocalTimeZone_ConvertsToUtcAndWritesAsUtc()
 		{
+			// Note: test only valid in Pacific Standard/Daylight Savings Time
 			var input = new DateTime(2099, 12, 31, 23, 59, 59, 999, DateTimeKind.Local);
 
 			var expected = new[]
