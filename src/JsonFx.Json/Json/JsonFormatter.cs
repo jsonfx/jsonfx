@@ -32,7 +32,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Xml;
 
 using JsonFx.Serialization;
 
@@ -461,7 +460,7 @@ namespace JsonFx.Json
 
 			#endregion PrettyPrint Methods
 
-			#region String Formatting Methods
+			#region String Methods
 
 			/// <summary>
 			/// Converts an object to its string representation
@@ -475,78 +474,24 @@ namespace JsonFx.Json
 					return (string)value;
 				}
 
-				if (value is DateTime)
-				{
-					// TODO: extensibility point
-
-					return this.FormatISO8601((DateTime)value);
-				}
-
 				if (value is Enum)
 				{
-					// TODO: extensibility point
-
-					return this.FormatFlags((Enum)value);
-				}
-
-				if (value is Guid)
-				{
-					// TODO: extensibility point
-
-					return ((Guid)value).ToString("D");
-				}
-
-				if (value is Uri || value is Version)
-				{
-					return value.ToString();
-				}
-
-				if (value is XmlNode)
-				{
-					return ((XmlNode)value).OuterXml;
-				}
-
-				if (value is char)
-				{
-					return new String((char)value, 1);
+					return this.FormatEnum((Enum)value);
 				}
 
 				return Convert.ToString(value, CultureInfo.InvariantCulture);
 			}
 
-			/// <summary>
-			/// Converts an enum to its string representation
-			/// </summary>
-			/// <param name="value"></param>
-			/// <returns></returns>
-			private string FormatISO8601(DateTime value)
-			{
-				switch (value.Kind)
-				{
-					case DateTimeKind.Local:
-					{
-						value = value.ToUniversalTime();
-						goto case DateTimeKind.Utc;
-					}
-					case DateTimeKind.Utc:
-					{
-						// UTC DateTime in ISO-8601
-						return String.Format("{0:s}Z", value);
-					}
-					default:
-					{
-						// DateTime in ISO-8601
-						return String.Format("{0:s}", value);
-					}
-				}
-			}
+			#endregion String Methods
+
+			#region Enum Methods
 
 			/// <summary>
 			/// Converts an enum to its string representation
 			/// </summary>
 			/// <param name="value"></param>
 			/// <returns></returns>
-			private string FormatFlags(Enum value)
+			private string FormatEnum(Enum value)
 			{
 				Type type = value.GetType();
 				IDictionary<Enum, string> map = this.Settings.Resolver.LoadEnumMaps(type);
@@ -577,10 +522,6 @@ namespace JsonFx.Json
 
 				return enumName;
 			}
-
-			#endregion String Formatting Methods
-
-			#region Utility Methods
 
 			/// <summary>
 			/// Splits a bitwise-OR'd set of enums into a list.
@@ -634,15 +575,20 @@ namespace JsonFx.Json
 				return enums.ToArray();
 			}
 
+			#endregion Enum Methods
+
+			#region Number Methods
+
 			/// <summary>
 			/// Determines if a numberic value cannot be represented as IEEE-754.
 			/// </summary>
 			/// <param name="value"></param>
 			/// <returns></returns>
+			/// <remarks>
+			/// http://stackoverflow.com/questions/1601646
+			/// </remarks>
 			protected virtual bool InvalidIEEE754(decimal value)
 			{
-				// http://stackoverflow.com/questions/1601646
-
 				try
 				{
 					return (decimal)(Decimal.ToDouble(value)) != value;
@@ -653,7 +599,7 @@ namespace JsonFx.Json
 				}
 			}
 
-			#endregion Utility Methods
+			#endregion Number Methods
 		}
 	}
 }

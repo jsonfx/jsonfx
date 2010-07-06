@@ -31,7 +31,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Xml;
 
 using JsonFx.Serialization;
 
@@ -47,6 +46,7 @@ namespace JsonFx.Json
 			#region Fields
 
 			private readonly DataWriterSettings Settings;
+			private readonly IEnumerable<IDataFilter<JsonTokenType>> Filters;
 
 			#endregion Fields
 
@@ -56,14 +56,38 @@ namespace JsonFx.Json
 			/// Ctor
 			/// </summary>
 			/// <param name="settings"></param>
-			public JsonWalker(DataWriterSettings settings)
+			/// <param name="filters"></param>
+			public JsonWalker(DataWriterSettings settings, params IDataFilter<JsonTokenType>[] filters)
+				: this(settings, (IEnumerable<IDataFilter<JsonTokenType>>)filters)
+			{
+			}
+
+			/// <summary>
+			/// Ctor
+			/// </summary>
+			/// <param name="settings"></param>
+			/// <param name="filters"></param>
+			public JsonWalker(DataWriterSettings settings, IEnumerable<IDataFilter<JsonTokenType>> filters)
 			{
 				if (settings == null)
 				{
 					throw new ArgumentNullException("settings");
 				}
-
 				this.Settings = settings;
+
+				if (filters == null)
+				{
+					filters = new IDataFilter<JsonTokenType>[0];
+				}
+				this.Filters = filters;
+
+				foreach (var filter in this.Filters)
+				{
+					if (filter == null)
+					{
+						throw new ArgumentNullException("filters");
+					}
+				}
 			}
 
 			#endregion Init
@@ -77,6 +101,17 @@ namespace JsonFx.Json
 			/// <returns></returns>
 			public IEnumerable<Token<JsonTokenType>> GetTokens(object value)
 			{
+				foreach (var filter in this.Filters)
+				{
+					IEnumerable<Token<JsonTokenType>> tokens;
+					if (filter.TryWrite(this.Settings, value, out tokens))
+					{
+						// found a successful match
+						foreach (Token<JsonTokenType> token in tokens) { yield return token; }
+						yield break;
+					}
+				}
+
 				if (value == null)
 				{
 					yield return JsonGrammar.TokenNull;
@@ -174,12 +209,6 @@ namespace JsonFx.Json
 
 				if (value is IEnumerable)
 				{
-					if (value is XmlNode)
-					{
-						foreach (Token<JsonTokenType> token in this.GetXmlTokens((XmlNode)value)) { yield return token; }
-						yield break;
-					}
-
 					foreach (Token<JsonTokenType> token in this.GetArrayTokens((IEnumerable)value)) { yield return token; }
 					yield break;
 				}
@@ -281,14 +310,6 @@ namespace JsonFx.Json
 				yield return JsonGrammar.TokenObjectEnd;
 			}
 
-			private IEnumerable<Token<JsonTokenType>> GetPropertyTokens(object key, object value)
-			{
-				yield return JsonGrammar.TokenString(key);
-				yield return JsonGrammar.TokenPairDelim;
-
-				foreach (Token<JsonTokenType> token in this.GetTokens(value)) { yield return token; }
-			}
-
 			private IEnumerable<Token<JsonTokenType>> GetObjectTokens(object value, Type type)
 			{
 				yield return JsonGrammar.TokenObjectBegin;
@@ -331,10 +352,12 @@ namespace JsonFx.Json
 				yield return JsonGrammar.TokenObjectEnd;
 			}
 
-			private IEnumerable<Token<JsonTokenType>> GetXmlTokens(XmlNode value)
+			private IEnumerable<Token<JsonTokenType>> GetPropertyTokens(object key, object value)
 			{
-				// TODO: translate XML to JsonML?
-				yield return JsonGrammar.TokenString(value.OuterXml);
+				yield return JsonGrammar.TokenString(key);
+				yield return JsonGrammar.TokenPairDelim;
+
+				foreach (Token<JsonTokenType> token in this.GetTokens(value)) { yield return token; }
 			}
 
 			#endregion Walker Methods

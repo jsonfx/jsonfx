@@ -73,6 +73,7 @@ namespace JsonFx.Json
 			#region Fields
 
 			private readonly TypeCoercionUtility Coercion;
+			private readonly IEnumerable<IDataFilter<JsonTokenType>> Filters;
 
 			#endregion Fields
 
@@ -82,11 +83,35 @@ namespace JsonFx.Json
 			/// Ctor
 			/// </summary>
 			/// <param name="settings"></param>
-			public JsonAnalyzer(DataReaderSettings settings)
+			/// <param name="filters"></param>
+			public JsonAnalyzer(DataReaderSettings settings, params IDataFilter<JsonTokenType>[] filters)
+				: this(settings, (IEnumerable<IDataFilter<JsonTokenType>>)filters)
+			{
+			}
+
+			/// <summary>
+			/// Ctor
+			/// </summary>
+			/// <param name="settings"></param>
+			public JsonAnalyzer(DataReaderSettings settings, IEnumerable<IDataFilter<JsonTokenType>> filters)
 			{
 				if (settings == null)
 				{
 					throw new ArgumentNullException("settings");
+				}
+
+				if (filters == null)
+				{
+					filters = new IDataFilter<JsonTokenType>[0];
+				}
+				this.Filters = filters;
+
+				foreach (var filter in this.Filters)
+				{
+					if (filter == null)
+					{
+						throw new ArgumentNullException("filters");
+					}
 				}
 
 				this.Coercion = new TypeCoercionUtility(settings, settings.AllowNullValueTypes);
