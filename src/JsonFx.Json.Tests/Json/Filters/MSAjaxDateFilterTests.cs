@@ -32,8 +32,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using JsonFx.IO;
 using JsonFx.Serialization;
 using Xunit;
+
 using Assert=JsonFx.AssertPatched;
 
 namespace JsonFx.Json.Filters
@@ -45,17 +47,15 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_StandardTimeZone_ReadsAsUtc()
 		{
-			var expected = new DateTime(2008, 2, 29, 23, 59, 59, 999, DateTimeKind.Utc);
-
-			IEnumerable<Token<JsonTokenType>> input = new[]
+			Stream<Token<JsonTokenType>> input = new Stream<Token<JsonTokenType>>(new[]
 				{
 					JsonGrammar.TokenString(@"\/Date(1204329599999)\/")
-				};
-			var enumerator = input.GetEnumerator();
-			Assert.True(enumerator.MoveNext());
+				});
+
+			var expected = new DateTime(2008, 2, 29, 23, 59, 59, 999, DateTimeKind.Utc);
 
 			DateTime actual;
-			Assert.True(new MSAjaxDateFilter().TryRead(new DataReaderSettings(), enumerator, out actual));
+			Assert.True(new MSAjaxDateFilter().TryRead(new DataReaderSettings(), input, out actual));
 
 			Assert.Equal(expected.Kind, actual.Kind);
 			Assert.Equal(expected.Ticks, actual.Ticks);
@@ -64,17 +64,15 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_DaylightSavingsTimeZone_ReadsAsUtc()
 		{
-			var expected = new DateTime(2010, 7, 5, 10, 51, 17, 768, DateTimeKind.Utc);
-
-			IEnumerable<Token<JsonTokenType>> input = new[]
+			Stream<Token<JsonTokenType>> input = new Stream<Token<JsonTokenType>>(new[]
 				{
 					JsonGrammar.TokenString(@"\/Date(1278327077768)\/")
-				};
-			var enumerator = input.GetEnumerator();
-			Assert.True(enumerator.MoveNext());
+				});
+
+			var expected = new DateTime(2010, 7, 5, 10, 51, 17, 768, DateTimeKind.Utc);
 
 			DateTime actual;
-			Assert.True(new MSAjaxDateFilter().TryRead(new DataReaderSettings(), enumerator, out actual));
+			Assert.True(new MSAjaxDateFilter().TryRead(new DataReaderSettings(), input, out actual));
 
 			Assert.Equal(expected.Kind, actual.Kind);
 			Assert.Equal(expected.Ticks, actual.Ticks);
@@ -83,17 +81,15 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_FutureTimeZone_ReadsAsUtc()
 		{
-			var expected = new DateTime(2099, 12, 31, 23, 59, 59, 999, DateTimeKind.Utc);
-
-			IEnumerable<Token<JsonTokenType>> input = new[]
+			Stream<Token<JsonTokenType>> input = new Stream<Token<JsonTokenType>>(new[]
 				{
 					JsonGrammar.TokenString(@"\/Date(4102444799999)\/")
-				};
-			var enumerator = input.GetEnumerator();
-			Assert.True(enumerator.MoveNext());
+				});
+
+			var expected = new DateTime(2099, 12, 31, 23, 59, 59, 999, DateTimeKind.Utc);
 
 			DateTime actual;
-			Assert.True(new MSAjaxDateFilter().TryRead(new DataReaderSettings(), enumerator, out actual));
+			Assert.True(new MSAjaxDateFilter().TryRead(new DataReaderSettings(), input, out actual));
 
 			Assert.Equal(expected.Kind, actual.Kind);
 			Assert.Equal(expected.Ticks, actual.Ticks);
@@ -102,17 +98,15 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_DateTimeMinValueUtc_ReadsAsDateTimeMinValue()
 		{
-			IEnumerable<Token<JsonTokenType>> input = new[]
-				{
-					JsonGrammar.TokenString(@"\/Date(-62135596800000)\/")
-				};
-			var enumerator = input.GetEnumerator();
-			Assert.True(enumerator.MoveNext());
-
 			var expected = DateTime.MinValue;
 
+			Stream<Token<JsonTokenType>> input = new Stream<Token<JsonTokenType>>(new[]
+				{
+					JsonGrammar.TokenString(@"\/Date(-62135596800000)\/")
+				});
+
 			DateTime actual;
-			Assert.True(new MSAjaxDateFilter().TryRead(new DataReaderSettings(), enumerator, out actual));
+			Assert.True(new MSAjaxDateFilter().TryRead(new DataReaderSettings(), input, out actual));
 
 			Assert.Equal(expected.Kind, actual.Kind);
 			Assert.Equal(expected.Ticks, actual.Ticks);
@@ -121,17 +115,15 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_DateTimeMaxValueUtc_ReadsAsDateTimeMaxValue()
 		{
-			IEnumerable<Token<JsonTokenType>> input = new[]
+			Stream<Token<JsonTokenType>> input = new Stream<Token<JsonTokenType>>(new[]
 				{
 					JsonGrammar.TokenString(@"\/Date(253402300800000)\/")
-				};
-			var enumerator = input.GetEnumerator();
-			Assert.True(enumerator.MoveNext());
+				});
 
 			var expected = DateTime.MaxValue;
 
 			DateTime actual;
-			Assert.True(new MSAjaxDateFilter().TryRead(new DataReaderSettings(), enumerator, out actual));
+			Assert.True(new MSAjaxDateFilter().TryRead(new DataReaderSettings(), input, out actual));
 
 			Assert.Equal(expected.Kind, actual.Kind);
 			Assert.Equal(expected.Ticks, actual.Ticks);

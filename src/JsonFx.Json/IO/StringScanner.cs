@@ -46,7 +46,7 @@ namespace JsonFx.IO
 
 		#region Fields
 
-		private readonly CharEnumerator enumerator;
+		private readonly CharEnumerator Enumerator;
 		private bool isEnd;
 		private char current;
 		private int column;
@@ -63,7 +63,7 @@ namespace JsonFx.IO
 		/// <param name="value"></param>
 		public StringScanner(string value)
 		{
-			this.enumerator = (value ?? String.Empty).GetEnumerator();
+			this.Enumerator = (value ?? String.Empty).GetEnumerator();
 			this.index = -1L;
 		}
 
@@ -129,7 +129,7 @@ namespace JsonFx.IO
 		{
 			if (disposing)
 			{
-				((IDisposable)this.enumerator).Dispose();
+				((IDisposable)this.Enumerator).Dispose();
 			}
 		}
 
@@ -162,7 +162,7 @@ namespace JsonFx.IO
 
 			char prev = this.current;
 
-			if (!this.enumerator.MoveNext())
+			if (!this.Enumerator.MoveNext())
 			{
 				this.isEnd = true;
 				this.current = '\0';
@@ -171,14 +171,14 @@ namespace JsonFx.IO
 
 			if (this.index < 0)
 			{
-				this.current = this.enumerator.Current;
+				this.current = this.Enumerator.Current;
 				this.line = this.column = 1;
 				this.index = 0;
 			}
 			else
 			{
 				// check for line endings
-				switch (this.current = this.enumerator.Current)
+				switch (this.current = this.Enumerator.Current)
 				{
 					case '\n':
 					{
@@ -213,7 +213,7 @@ namespace JsonFx.IO
 		/// </summary>
 		public void Reset()
 		{
-			this.enumerator.Reset();
+			this.Enumerator.Reset();
 
 			this.current = '\0';
 			this.isEnd = false;

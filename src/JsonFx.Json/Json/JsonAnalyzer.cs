@@ -33,6 +33,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 
+using JsonFx.IO;
 using JsonFx.Serialization;
 
 #if NET40
@@ -146,10 +147,10 @@ namespace JsonFx.Json
 					throw new ArgumentNullException("tokens");
 				}
 
-				IEnumerator<Token<JsonTokenType>> tokenizer = tokens.GetEnumerator();
-				while (tokenizer.MoveNext())
+				Stream<Token<JsonTokenType>> stream = new Stream<Token<JsonTokenType>>(tokens);
+				while (!stream.IsComplete)
 				{
-					yield return this.ConsumeValue(tokenizer, targetType);
+					yield return this.ConsumeValue(stream, targetType);
 				}
 			}
 
@@ -168,11 +169,11 @@ namespace JsonFx.Json
 
 				Type resultType = typeof(TResult);
 
-				IEnumerator<Token<JsonTokenType>> tokenizer = tokens.GetEnumerator();
-				while (tokenizer.MoveNext())
+				Stream<Token<JsonTokenType>> stream = new Stream<Token<JsonTokenType>>(tokens);
+				while (!stream.IsComplete)
 				{
 					// cast each of the values accordingly
-					yield return (TResult)this.ConsumeValue(tokenizer, resultType);
+					yield return (TResult)this.ConsumeValue(stream, resultType);
 				}
 			}
 
@@ -180,7 +181,7 @@ namespace JsonFx.Json
 
 			#region Consume Methods
 
-			private object ConsumeValue(IEnumerator<Token<JsonTokenType>> tokens, Type targetType)
+			private object ConsumeValue(Stream<Token<JsonTokenType>> tokens, Type targetType)
 			{
 				object result;
 				if (this.TryReadFilters(tokens, out result))
@@ -188,7 +189,7 @@ namespace JsonFx.Json
 					return result;
 				}
 
-				Token<JsonTokenType> token = tokens.Current;
+				Token<JsonTokenType> token = tokens.Peek();
 				switch (token.TokenType)
 				{
 					case JsonTokenType.ArrayBegin:
@@ -208,6 +209,7 @@ namespace JsonFx.Json
 					case JsonTokenType.Undefined:
 					{
 						// found primitive
+						tokens.Pop();
 						return this.Coercion.CoerceType(targetType, token.Value);
 					}
 					case JsonTokenType.ArrayEnd:
@@ -219,6 +221,7 @@ namespace JsonFx.Json
 					default:
 					{
 						// these are invalid here
+						tokens.Pop();
 						throw new ParseException<JsonTokenType>(
 							token,
 							String.Format(JsonAnalyzer.ErrorUnexpectedToken, token.TokenType));
@@ -226,9 +229,9 @@ namespace JsonFx.Json
 				}
 			}
 
-			private object ConsumeObject(IEnumerator<Token<JsonTokenType>> tokens, Type targetType)
+			private object ConsumeObject(Stream<Token<JsonTokenType>> tokens, Type targetType)
 			{
-				Token<JsonTokenType> token = tokens.Current;
+				Token<JsonTokenType> token = tokens.Pop();
 
 				// verify correct starting state
 				if (token.TokenType != JsonTokenType.ObjectBegin)
@@ -246,9 +249,9 @@ namespace JsonFx.Json
 					new JsonObject();
 
 				bool hasProperties = false;
-				while (tokens.MoveNext())
+				while (!tokens.IsComplete)
 				{
-					token = tokens.Current;
+					token = tokens.Peek();
 					if (hasProperties)
 					{
 						// consume value delimiter
@@ -256,30 +259,33 @@ namespace JsonFx.Json
 						{
 							case JsonTokenType.ValueDelim:
 							{
+								// move past delim
+								tokens.Pop();
 								break;
 							}
 							case JsonTokenType.ObjectEnd:
 							{
 								// end of the object loop
+								tokens.Pop();
 								return this.Coercion.CoerceType(targetType, objectValue);
 							}
 
 							default:
 							{
 								// these are invalid here
+								tokens.Pop();
 								throw new ParseException<JsonTokenType>(
 									token,
 									String.Format(JsonAnalyzer.ErrorExpectedObjectValueDelim, token.TokenType));
 							}
 						}
 
-						// move past delim
-						if (!tokens.MoveNext())
+						if (tokens.IsComplete)
 						{
 							// end of input
 							break;
 						}
-						token = tokens.Current;
+						token = tokens.Peek();
 					}
 
 					// consume the property key
@@ -290,6 +296,7 @@ namespace JsonFx.Json
 						case JsonTokenType.String:
 						case JsonTokenType.Number:
 						{
+							tokens.Pop();
 							propertyName = Convert.ToString(token.Value, CultureInfo.InvariantCulture);
 							break;
 						}
@@ -302,11 +309,13 @@ namespace JsonFx.Json
 							}
 
 							// end of the object loop
+							tokens.Pop();
 							return this.Coercion.CoerceType(targetType, objectValue);
 						}
 						case JsonTokenType.ValueDelim:
 						{
 							// extraneous item delimiter
+							tokens.Pop();
 							throw new ParseException<JsonTokenType>(
 								token,
 								JsonAnalyzer.ErrorMissingObjectProperty);
@@ -314,6 +323,7 @@ namespace JsonFx.Json
 						default:
 						{
 							// these are invalid here
+							tokens.Pop();
 							throw new ParseException<JsonTokenType>(
 								token,
 								String.Format(JsonAnalyzer.ErrorExpectedPropertyName, token.TokenType));
@@ -321,14 +331,14 @@ namespace JsonFx.Json
 					}
 
 					// move past delim
-					if (!tokens.MoveNext())
+					if (tokens.IsComplete)
 					{
 						// end of input
 						break;
 					}
-					token = tokens.Current;
 
 					// consume pair delimiter
+					token = tokens.Pop();
 					switch (token.TokenType)
 					{
 						case JsonTokenType.PairDelim:
@@ -344,13 +354,12 @@ namespace JsonFx.Json
 						}
 					}
 
-					// move past delim
-					if (!tokens.MoveNext())
+					if (tokens.IsComplete)
 					{
 						// end of input
 						break;
 					}
-					token = tokens.Current;
+					token = tokens.Peek();
 
 					MemberMap propertyMap;
 					Type propertyType;
@@ -387,9 +396,9 @@ namespace JsonFx.Json
 					JsonAnalyzer.ErrorUnterminatedObject);
 			}
 
-			private object ConsumeArray(IEnumerator<Token<JsonTokenType>> tokens, Type arrayType)
+			private object ConsumeArray(Stream<Token<JsonTokenType>> tokens, Type arrayType)
 			{
-				Token<JsonTokenType> token = tokens.Current;
+				Token<JsonTokenType> token = tokens.Pop();
 
 				// verify correct starting state
 				if (token.TokenType != JsonTokenType.ArrayBegin)
@@ -407,9 +416,9 @@ namespace JsonFx.Json
 				// using ArrayList since has .ToArray(Type) method
 				// cannot create List<T> at runtime
 				ArrayList array = new ArrayList();
-				while (tokens.MoveNext())
+				while (!tokens.IsComplete)
 				{
-					token = tokens.Current;
+					token = tokens.Peek();
 					if (array.Count > 0)
 					{
 						// consume item delimiter
@@ -417,28 +426,31 @@ namespace JsonFx.Json
 						{
 							case JsonTokenType.ValueDelim:
 							{
+								tokens.Pop();
 								break;
 							}
 							case JsonTokenType.ArrayEnd:
 							{
 								// end of array loop
+								tokens.Pop();
 								return this.Coercion.CoerceArrayList(arrayType, itemType, array);
 							}
 							default:
 							{
 								// these are invalid here
+								tokens.Pop();
 								throw new ParseException<JsonTokenType>(
 									token,
 									String.Format(JsonAnalyzer.ErrorExpectedArrayItemDelim, token.TokenType));
 							}
 						}
 
-						if (!tokens.MoveNext())
+						if (tokens.IsComplete)
 						{
 							// end of input
 							break;
 						}
-						token = tokens.Current;
+						token = tokens.Peek();
 					}
 
 					// consume the next item
@@ -454,6 +466,7 @@ namespace JsonFx.Json
 							}
 
 							// end of array loop
+							tokens.Pop();
 							return this.Coercion.CoerceArrayList(arrayType, itemType, array);
 						}
 						case JsonTokenType.ArrayBegin:
@@ -477,7 +490,9 @@ namespace JsonFx.Json
 							// primitive item
 							if (!this.TryReadFilters(tokens, out item))
 							{
-								item = tokens.Current.Value;
+								// TODO: evaluate how to ensure that filters didn't take anything
+								token = tokens.Pop();
+								item = (token != null) ? token.Value : null;
 							}
 
 							if (!isItemTypeHint)
@@ -489,6 +504,7 @@ namespace JsonFx.Json
 						case JsonTokenType.ValueDelim:
 						{
 							// extraneous item delimiter
+							tokens.Pop();
 							throw new ParseException<JsonTokenType>(
 								token,
 								JsonAnalyzer.ErrorMissingArrayItem);
@@ -500,6 +516,7 @@ namespace JsonFx.Json
 						default:
 						{
 							// these are invalid here
+							tokens.Pop();
 							throw new ParseException<JsonTokenType>(
 								token,
 								String.Format(JsonAnalyzer.ErrorExpectedArrayItem, token.TokenType));
@@ -519,7 +536,7 @@ namespace JsonFx.Json
 					JsonAnalyzer.ErrorUnterminatedArray);
 			}
 
-			private bool TryReadFilters(IEnumerator<Token<JsonTokenType>> tokens, out object result)
+			private bool TryReadFilters(Stream<Token<JsonTokenType>> tokens, out object result)
 			{
 				foreach (var filter in this.Filters)
 				{

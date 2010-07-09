@@ -32,8 +32,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using JsonFx.IO;
 using JsonFx.Serialization;
 using Xunit;
+
 using Assert=JsonFx.AssertPatched;
 
 namespace JsonFx.Json.Filters
@@ -45,17 +47,15 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_UtcStandardTimeZone_ReadsAsUtc()
 		{
-			var expected = new DateTime(2008, 2, 29, 23, 59, 59, 999, DateTimeKind.Utc);
-
-			IEnumerable<Token<JsonTokenType>> input = new[]
+			Stream<Token<JsonTokenType>> input = new Stream<Token<JsonTokenType>>(new[]
 				{
 					JsonGrammar.TokenString("2008-02-29T23:59:59.999Z")
-				};
-			var enumerator = input.GetEnumerator();
-			Assert.True(enumerator.MoveNext());
+				});
+
+			var expected = new DateTime(2008, 2, 29, 23, 59, 59, 999, DateTimeKind.Utc);
 
 			DateTime actual;
-			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), enumerator, out actual));
+			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), input, out actual));
 
 			Assert.Equal(expected.Kind, actual.Kind);
 			Assert.Equal(expected.Ticks, actual.Ticks);
@@ -64,17 +64,15 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_UnspecifiedStandardTimeZone_ReadsAsUnspecified()
 		{
-			IEnumerable<Token<JsonTokenType>> input = new[]
+			Stream<Token<JsonTokenType>> input = new Stream<Token<JsonTokenType>>(new[]
 				{
 					JsonGrammar.TokenString("2008-02-29T23:59:59.999")
-				};
-			var enumerator = input.GetEnumerator();
-			Assert.True(enumerator.MoveNext());
+				});
 
 			var expected = new DateTime(2008, 2, 29, 23, 59, 59, 999, DateTimeKind.Unspecified);
 
 			DateTime actual;
-			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), enumerator, out actual));
+			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), input, out actual));
 
 			Assert.Equal(expected.Kind, actual.Kind);
 			Assert.Equal(expected.Ticks, actual.Ticks);
@@ -83,17 +81,15 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_EasternStandardTimeZone_ReadsAsUtc()
 		{
-			IEnumerable<Token<JsonTokenType>> input = new[]
+			Stream<Token<JsonTokenType>> input = new Stream<Token<JsonTokenType>>(new[]
 				{
 					JsonGrammar.TokenString("2008-02-29T23:59:59.999-06:00")
-				};
-			var enumerator = input.GetEnumerator();
-			Assert.True(enumerator.MoveNext());
+				});
 
 			var expected = new DateTime(2008, 3, 01, 05, 59, 59, 999, DateTimeKind.Utc);
 
 			DateTime actual;
-			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), enumerator, out actual));
+			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), input, out actual));
 
 			Assert.Equal(expected.Kind, actual.Kind);
 			Assert.Equal(expected.Ticks, actual.Ticks);
@@ -102,17 +98,15 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_UtcDaylightSavingsTimeZone_ReadsAsUtc()
 		{
-			var expected = new DateTime(2010, 7, 5, 10, 51, 17, 768, DateTimeKind.Utc);
-
-			IEnumerable<Token<JsonTokenType>> input = new[]
+			Stream<Token<JsonTokenType>> input = new Stream<Token<JsonTokenType>>(new[]
 				{
 					JsonGrammar.TokenString("2010-07-05T10:51:17.768Z")
-				};
-			var enumerator = input.GetEnumerator();
-			Assert.True(enumerator.MoveNext());
+				});
+
+			var expected = new DateTime(2010, 7, 5, 10, 51, 17, 768, DateTimeKind.Utc);
 
 			DateTime actual;
-			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), enumerator, out actual));
+			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), input, out actual));
 
 			Assert.Equal(expected.Kind, actual.Kind);
 			Assert.Equal(expected.Ticks, actual.Ticks);
@@ -121,17 +115,15 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_UnspecifiedDaylightSavingsTimeZone_ReadsAsUnspecified()
 		{
-			IEnumerable<Token<JsonTokenType>> input = new[]
+			Stream<Token<JsonTokenType>> input = new Stream<Token<JsonTokenType>>(new[]
 				{
 					JsonGrammar.TokenString("2010-07-05T10:51:17.768")
-				};
-			var enumerator = input.GetEnumerator();
-			Assert.True(enumerator.MoveNext());
+				});
 
 			var expected = new DateTime(2010, 7, 5, 10, 51, 17, 768, DateTimeKind.Unspecified);
 
 			DateTime actual;
-			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), enumerator, out actual));
+			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), input, out actual));
 
 			Assert.Equal(expected.Kind, actual.Kind);
 			Assert.Equal(expected.Ticks, actual.Ticks);
@@ -140,17 +132,15 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_EasternDaylightSavingsTimeZone_ReadsAsUtc()
 		{
-			IEnumerable<Token<JsonTokenType>> input = new[]
+			Stream<Token<JsonTokenType>> input = new Stream<Token<JsonTokenType>>(new[]
 				{
 					JsonGrammar.TokenString("2010-07-05T10:51:17.768-05:00")
-				};
-			var enumerator = input.GetEnumerator();
-			Assert.True(enumerator.MoveNext());
+				});
 
 			var expected = new DateTime(2010, 7, 5, 15, 51, 17, 768, DateTimeKind.Utc);
 
 			DateTime actual;
-			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), enumerator, out actual));
+			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), input, out actual));
 
 			Assert.Equal(expected.Kind, actual.Kind);
 			Assert.Equal(expected.Ticks, actual.Ticks);
@@ -159,17 +149,15 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_FutureUtcTimeZone_ReadsAsUtc()
 		{
-			var expected = new DateTime(2099, 12, 31, 23, 59, 59, 999, DateTimeKind.Utc);
-
-			IEnumerable<Token<JsonTokenType>> input = new[]
+			Stream<Token<JsonTokenType>> input = new Stream<Token<JsonTokenType>>(new[]
 				{
 					JsonGrammar.TokenString("2099-12-31T23:59:59.999Z")
-				};
-			var enumerator = input.GetEnumerator();
-			Assert.True(enumerator.MoveNext());
+				});
+
+			var expected = new DateTime(2099, 12, 31, 23, 59, 59, 999, DateTimeKind.Utc);
 
 			DateTime actual;
-			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), enumerator, out actual));
+			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), input, out actual));
 
 			Assert.Equal(expected.Kind, actual.Kind);
 			Assert.Equal(expected.Ticks, actual.Ticks);
@@ -178,17 +166,15 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_FutureUnspecifiedTimeZone_ReadsAsUnspecified()
 		{
-			IEnumerable<Token<JsonTokenType>> input = new[]
+			Stream<Token<JsonTokenType>> input = new Stream<Token<JsonTokenType>>(new[]
 				{
 					JsonGrammar.TokenString("2099-12-31T23:59:59.999")
-				};
-			var enumerator = input.GetEnumerator();
-			Assert.True(enumerator.MoveNext());
+				});
 
 			var expected = new DateTime(2099, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified);
 
 			DateTime actual;
-			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), enumerator, out actual));
+			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), input, out actual));
 
 			Assert.Equal(expected.Kind, actual.Kind);
 			Assert.Equal(expected.Ticks, actual.Ticks);
@@ -197,17 +183,15 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_FutureEasternTimeZone_ReadsAsUtc()
 		{
-			IEnumerable<Token<JsonTokenType>> input = new[]
+			Stream<Token<JsonTokenType>> input = new Stream<Token<JsonTokenType>>(new[]
 				{
 					JsonGrammar.TokenString("2099-12-31T23:59:59.999-05:00")
-				};
-			var enumerator = input.GetEnumerator();
-			Assert.True(enumerator.MoveNext());
+				});
 
 			var expected = new DateTime(2100, 1, 1, 4, 59, 59, 999, DateTimeKind.Utc);
 
 			DateTime actual;
-			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), enumerator, out actual));
+			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), input, out actual));
 
 			Assert.Equal(expected.Kind, actual.Kind);
 			Assert.Equal(expected.Ticks, actual.Ticks);
@@ -216,17 +200,15 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_DateTimeMinValueUnspecified_ReadsAsUnspecified()
 		{
-			IEnumerable<Token<JsonTokenType>> input = new[]
+			Stream<Token<JsonTokenType>> input = new Stream<Token<JsonTokenType>>(new[]
 				{
 					JsonGrammar.TokenString("0001-01-01T00:00:00.000")
-				};
-			var enumerator = input.GetEnumerator();
-			Assert.True(enumerator.MoveNext());
+				});
 
 			var expected = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified);
 
 			DateTime actual;
-			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), enumerator, out actual));
+			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), input, out actual));
 
 			Assert.Equal(expected.Kind, actual.Kind);
 			Assert.Equal(expected.Ticks, actual.Ticks);
@@ -235,17 +217,15 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_DateTimeMinValueUtc_ReadsAsUtc()
 		{
-			IEnumerable<Token<JsonTokenType>> input = new[]
+			Stream<Token<JsonTokenType>> input = new Stream<Token<JsonTokenType>>(new[]
 				{
 					JsonGrammar.TokenString("0001-01-01T00:00:00.000Z")
-				};
-			var enumerator = input.GetEnumerator();
-			Assert.True(enumerator.MoveNext());
+				});
 
 			var expected = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
 
 			DateTime actual;
-			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), enumerator, out actual));
+			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), input, out actual));
 
 			Assert.Equal(expected.Kind, actual.Kind);
 			Assert.Equal(expected.Ticks, actual.Ticks);
@@ -254,17 +234,15 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_DateTimeMaxValueUnspecified_ReadsAsUnspecified()
 		{
-			IEnumerable<Token<JsonTokenType>> input = new[]
+			Stream<Token<JsonTokenType>> input = new Stream<Token<JsonTokenType>>(new[]
 				{
 					JsonGrammar.TokenString("9999-12-31T23:59:59.999")
-				};
-			var enumerator = input.GetEnumerator();
-			Assert.True(enumerator.MoveNext());
+				});
 
 			var expected = new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified);
 
 			DateTime actual;
-			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), enumerator, out actual));
+			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), input, out actual));
 
 			Assert.Equal(expected.Kind, actual.Kind);
 			Assert.Equal(expected.Ticks, actual.Ticks);
@@ -273,17 +251,15 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_DateTimeMaxValueUtc_ReadsAsUtc()
 		{
-			IEnumerable<Token<JsonTokenType>> input = new[]
+			Stream<Token<JsonTokenType>> input = new Stream<Token<JsonTokenType>>(new[]
 				{
 					JsonGrammar.TokenString("9999-12-31T23:59:59.999Z")
-				};
-			var enumerator = input.GetEnumerator();
-			Assert.True(enumerator.MoveNext());
+				});
 
 			var expected = new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Utc);
 
 			DateTime actual;
-			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), enumerator, out actual));
+			Assert.True(new Iso8601DateFilter().TryRead(new DataReaderSettings(), input, out actual));
 
 			Assert.Equal(expected.Kind, actual.Kind);
 			Assert.Equal(expected.Ticks, actual.Ticks);

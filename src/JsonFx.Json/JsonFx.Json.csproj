@@ -71,6 +71,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="About.cs" />
+    <Compile Include="IO\Stream`1.cs" />
     <Compile Include="IO\ITextScanner.cs" />
     <Compile Include="IO\StringScanner.cs" />
     <Compile Include="IO\TextReaderScanner.cs" />

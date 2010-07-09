@@ -33,6 +33,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
+using JsonFx.IO;
 using JsonFx.Serialization;
 
 namespace JsonFx.Json.Filters
@@ -64,9 +65,9 @@ namespace JsonFx.Json.Filters
 
 		#region IDataFilter<JsonTokenType,DateTime> Members
 
-		public override bool TryRead(DataReaderSettings settings, IEnumerator<Token<JsonTokenType>> tokens, out DateTime value)
+		public override bool TryRead(DataReaderSettings settings, Stream<Token<JsonTokenType>> tokens, out DateTime value)
 		{
-			Token<JsonTokenType> token = tokens.Current;
+			Token<JsonTokenType> token = tokens.Peek();
 			if (token == null ||
 				token.TokenType != JsonTokenType.String)
 			{
@@ -74,9 +75,16 @@ namespace JsonFx.Json.Filters
 				return false;
 			}
 
-			return MSAjaxDateFilter.TryParseMSAjaxDate(
+			if (!MSAjaxDateFilter.TryParseMSAjaxDate(
 				Convert.ToString(token.Value, CultureInfo.InvariantCulture),
-				out value);
+				out value))
+			{
+				value = default(DateTime);
+				return false;
+			}
+
+			tokens.Pop();
+			return true;
 		}
 
 		public override bool TryWrite(DataWriterSettings settings, DateTime value, out IEnumerable<Token<JsonTokenType>> tokens)
