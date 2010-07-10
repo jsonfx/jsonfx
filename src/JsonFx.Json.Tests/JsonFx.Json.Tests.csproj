@@ -79,8 +79,8 @@
   <ItemGroup>
     <Compile Include="AssertPatched.cs" />
     <Compile Include="CodeGen\DynamicMethodGeneratorTests.cs" />
-    <Compile Include="IO\StringScannerTests.cs" />
-    <Compile Include="IO\TextReaderScannerTests.cs" />
+    <Compile Include="IO\StringStreamTests.cs" />
+    <Compile Include="IO\TextReaderStreamTests.cs" />
     <Compile Include="Json\JsonWriterTests.cs" />
     <Compile Include="Json\Filters\MSAjaxDateFilterTests.cs" />
     <Compile Include="Json\Filters\Iso8601DateFilterTests.cs" />

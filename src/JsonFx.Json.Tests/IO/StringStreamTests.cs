@@ -35,7 +35,7 @@ using Xunit;
 
 namespace JsonFx.IO
 {
-	public class StringScannerTests
+	public class StringStreamTests
 	{
 		#region Start State Tests
 

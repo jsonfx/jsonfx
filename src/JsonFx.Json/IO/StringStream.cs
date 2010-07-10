@@ -67,7 +67,7 @@ namespace JsonFx.IO
 
 		#endregion Init
 
-		#region ITextScanner Members
+		#region ITextStream Members
 
 		/// <summary>
 		/// Gets the total number of characters read from the input
@@ -93,7 +93,7 @@ namespace JsonFx.IO
 			get { return this.index; }
 		}
 
-		#endregion ITextScanner Members
+		#endregion ITextStream Members
 
 		#region IStream<char> Members
 
