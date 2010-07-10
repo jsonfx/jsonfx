@@ -71,10 +71,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="About.cs" />
+    <Compile Include="IO\IStream`1.cs" />
+    <Compile Include="IO\ITextStream.cs" />
     <Compile Include="IO\Stream`1.cs" />
-    <Compile Include="IO\ITextScanner.cs" />
-    <Compile Include="IO\StringScanner.cs" />
-    <Compile Include="IO\TextReaderScanner.cs" />
+    <Compile Include="IO\StringStream.cs" />
+    <Compile Include="IO\TextReaderStream.cs" />
     <Compile Include="Json\Filters\Iso8601DateFilter.cs" />
     <Compile Include="Json\Filters\JsonFilter`1.cs" />
     <Compile Include="Json\Filters\MSAjaxDateFilter.cs" />

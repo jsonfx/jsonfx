@@ -29,49 +29,40 @@
 #endregion License
 
 using System;
-using System.Collections.Generic;
 
 namespace JsonFx.IO
 {
 	/// <summary>
-	/// Supports a simple iteration over a text input tracking line/column/position
+	/// Supports forward-only iteration over an input sequence
 	/// </summary>
-	public interface ITextScanner : IEnumerator<char>
+	public interface IStream<T> : IDisposable
 	{
 		#region Properties
 
 		/// <summary>
-		/// Gets the total number of characters read from the input
+		/// Determines if the sequence has completed.
 		/// </summary>
-		int Column
-		{
-			get;
-		}
-
-		/// <summary>
-		/// Gets the total number of lines read from the input
-		/// </summary>
-		int Line
-		{
-			get;
-		}
-
-		/// <summary>
-		/// Gets the current position within the input
-		/// </summary>
-		long Index
-		{
-			get;
-		}
-
-		/// <summary>
-		/// Gets if at the end of the input
-		/// </summary>
-		bool IsEnd
+		bool IsCompleted
 		{
 			get;
 		}
 
 		#endregion Properties
+
+		#region Methods
+
+		/// <summary>
+		/// Returns but does not remove the item at the front of the sequence.
+		/// </summary>
+		/// <returns></returns>
+		T Peek();
+
+		/// <summary>
+		/// Returns and removes the top item at the front of the sequence.
+		/// </summary>
+		/// <returns></returns>
+		T Pop();
+
+		#endregion Methods
 	}
 }

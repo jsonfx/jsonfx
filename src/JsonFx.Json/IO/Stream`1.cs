@@ -34,16 +34,16 @@ using System.Collections.Generic;
 namespace JsonFx.IO
 {
 	/// <summary>
-	/// Supports forward-only iteration over an input sequence
+	/// Supports forward-only iteration over an input sequence of <typeparamref name="T"/>
 	/// </summary>
-	public class Stream<T> : IDisposable
+	public class Stream<T> : IStream<T>
 	{
 		#region Fields
 
-		private readonly IEnumerable<T> Sequence;
 		private readonly IEnumerator<T> Enumerator;
 		private bool isReady;
-		private bool isComplete;
+		private bool isCompleted;
+		private T current;
 
 		#endregion Fields
 
@@ -60,60 +60,60 @@ namespace JsonFx.IO
 				throw new ArgumentNullException("sequence");
 			}
 
-			this.Sequence = sequence;
 			this.Enumerator = sequence.GetEnumerator();
 		}
 
 		#endregion Fields
 
-		#region Properties
+		#region IStream<T> Properties
 
-		public bool IsComplete
+		/// <summary>
+		/// Determines if the input sequence has reached the end
+		/// </summary>
+		public virtual bool IsCompleted
 		{
 			get
 			{
 				this.EnsureReady();
 
-				return this.isComplete;
+				return this.isCompleted;
 			}
 		}
 
-		#endregion Properties
+		#endregion IStream<T> Properties
 
-		#region Methods
+		#region IStream<T> Methods
 
 		/// <summary>
 		/// Returns but does not remove the item at the front of the sequence.
 		/// </summary>
 		/// <returns></returns>
-		public T Peek()
+		public virtual T Peek()
 		{
 			this.EnsureReady();
 
 			// return the current item or null if complete
-			return this.isComplete ? default(T) : this.Enumerator.Current;
+			return this.current;
 		}
 
 		/// <summary>
-		/// Returns and removes the top item at the front of the sequence.
+		/// Returns and removes the item at the front of the sequence.
 		/// </summary>
 		/// <returns></returns>
-		public T Pop()
+		public virtual T Pop()
 		{
 			this.EnsureReady();
 
-			if (this.isComplete)
-			{
-				// return null if complete
-				return default(T);
-			}
-
 			// flag as needing to be iterated, but don't execute yet
-			this.isReady = this.isComplete;
+			this.isReady = this.isCompleted;
 
 			// return the current item
-			return this.Enumerator.Current;
+			return this.current;
 		}
+
+		#endregion IStream<T> Methods
+
+		#region Methods
 
 		/// <summary>
 		/// Deferred execution of iterator
@@ -125,10 +125,20 @@ namespace JsonFx.IO
 			{
 				return;
 			}
+			this.isReady = true;
 
 			// lazy execution of MoveNext
-			this.isComplete = !this.Enumerator.MoveNext();
-			this.isReady = true;
+			this.isCompleted = !this.Enumerator.MoveNext();
+
+			// store the current item or null if complete
+			if (this.isCompleted)
+			{
+				this.current = default(T);
+			}
+			else
+			{
+				this.current = this.Enumerator.Current;
+			}
 		}
 
 		#endregion Methods

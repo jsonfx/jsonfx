@@ -40,163 +40,185 @@ namespace JsonFx.IO
 		#region Start State Tests
 
 		[Fact]
-		public void Current_MoveNextNotCalled_ReturnsNullChar()
+		public void Peek_NullString_ReturnsNullChar()
 		{
-			var scanner = new StringScanner(null);
-
-			Assert.Equal('\0', scanner.Current);
+			using (var scanner = new StringStream(null))
+			{
+				Assert.Equal('\0', scanner.Peek());
+			}
 		}
 
 		[Fact]
-		public void Index_MoveNextNotCalled_ReturnsNegOne()
+		public void Pop_NullString_ReturnsNullChar()
 		{
-			var scanner = new StringScanner(null);
-
-			Assert.Equal(-1, scanner.Index);
+			using (var scanner = new StringStream(null))
+			{
+				Assert.Equal('\0', scanner.Pop());
+			}
 		}
 
 		[Fact]
-		public void Line_MoveNextNotCalled_ReturnsNegOne()
+		public void Index_StartState_ReturnsNegOne()
 		{
-			var scanner = new StringScanner(null);
-
-			Assert.Equal(0, scanner.Line);
+			using (var scanner = new StringStream(null))
+			{
+				Assert.Equal(-1, scanner.Index);
+			}
 		}
 
 		[Fact]
-		public void Column_MoveNextNotCalled_ReturnsNegOne()
+		public void Line_StartState_ReturnsNegOne()
 		{
-			var scanner = new StringScanner(null);
-
-			Assert.Equal(0, scanner.Column);
+			using (var scanner = new StringStream(null))
+			{
+				Assert.Equal(0, scanner.Line);
+			}
 		}
 
 		[Fact]
-		public void IsEnd_MoveNextNotCalled_ReturnsFalse()
+		public void Column_StartState_ReturnsNegOne()
 		{
-			var scanner = new StringScanner(null);
+			using (var scanner = new StringStream(null))
+			{
+				Assert.Equal(0, scanner.Column);
+			}
+		}
 
-			Assert.Equal(false, scanner.IsEnd);
+		[Fact]
+		public void IsCompleted_NullString_ReturnsFalse()
+		{
+			using (var scanner = new StringStream(null))
+			{
+				Assert.Equal(true, scanner.IsCompleted);
+			}
 		}
 
 		#endregion Start State Tests
 
-		#region MoveNext Tests
+		#region Pop Tests
 
 		[Fact]
-		public void MoveNext_NullString_ReturnsEmptySequence()
+		public void Pop_NullString_ReturnsEmptySequence()
 		{
-			var scanner = new StringScanner(null);
-
-			var buffer = new StringBuilder();
-			while (scanner.MoveNext())
+			using (var scanner = new StringStream(null))
 			{
-				buffer.Append(scanner.Current);
-			}
+				var buffer = new StringBuilder();
+				while (!scanner.IsCompleted)
+				{
+					buffer.Append(scanner.Pop());
+				}
 
-			Assert.Equal(String.Empty, buffer.ToString());
+				Assert.Equal(String.Empty, buffer.ToString());
+			}
 		}
 
 		[Fact]
-		public void MoveNext_EmptyString_ReturnsEmptySequence()
+		public void Pop_EmptyString_ReturnsEmptySequence()
 		{
 			const string input = "";
 
-			var scanner = new StringScanner(input);
-
-			var buffer = new StringBuilder();
-			while (scanner.MoveNext())
+			using (var scanner = new StringStream(input))
 			{
-				buffer.Append(scanner.Current);
-			}
+				var buffer = new StringBuilder();
+				while (!scanner.IsCompleted)
+				{
+					buffer.Append(scanner.Pop());
+				}
 
-			Assert.Equal(input, buffer.ToString());
+				Assert.Equal(input, buffer.ToString());
+			}
 		}
 
 		[Fact]
-		public void MoveNext_OneCharString_ReturnsSameSequence()
+		public void Pop_OneCharString_ReturnsSameSequence()
 		{
 			const string input = "_";
 
-			var scanner = new StringScanner(input);
-
-			var buffer = new StringBuilder();
-			while (scanner.MoveNext())
+			using (var scanner = new StringStream(input))
 			{
-				buffer.Append(scanner.Current);
-			}
+				var buffer = new StringBuilder();
+				while (!scanner.IsCompleted)
+				{
+					buffer.Append(scanner.Pop());
+				}
 
-			Assert.Equal(input, buffer.ToString());
+				Assert.Equal(input, buffer.ToString());
+			}
 		}
 
 		[Fact]
-		public void MoveNext_LongString_ReturnsSameSequence()
+		public void Pop_LongString_ReturnsSameSequence()
 		{
 			const string input = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-			var scanner = new StringScanner(input);
-
-			var buffer = new StringBuilder();
-			while (scanner.MoveNext())
+			using (var scanner = new StringStream(input))
 			{
-				buffer.Append(scanner.Current);
-			}
+				var buffer = new StringBuilder();
+				while (!scanner.IsCompleted)
+				{
+					buffer.Append(scanner.Pop());
+				}
 
-			Assert.Equal(input, buffer.ToString());
+				Assert.Equal(input, buffer.ToString());
+			}
 		}
 
 		[Fact]
-		public void MoveNext_EscapedSequence_ReturnsSameSequence()
+		public void Pop_EscapedSequence_ReturnsSameSequence()
 		{
 			const string input = @"""\\\b\f\n\r\t\u0123\u4567\u89AB\uCDEF\uabcd\uef4A\""""";
 
-			var scanner = new StringScanner(input);
-
-			var buffer = new StringBuilder();
-			while (scanner.MoveNext())
+			using (var scanner = new StringStream(input))
 			{
-				buffer.Append(scanner.Current);
-			}
+				var buffer = new StringBuilder();
+				while (!scanner.IsCompleted)
+				{
+					buffer.Append(scanner.Pop());
+				}
 
-			Assert.Equal(input, buffer.ToString());
+				Assert.Equal(input, buffer.ToString());
+			}
 		}
 
 		[Fact]
-		public void MoveNext_UnicodeString_ReturnsSameSequence()
+		public void Pop_UnicodeString_ReturnsSameSequence()
 		{
 			const string input = "私が日本語を話すことはありません。";
 
-			var scanner = new StringScanner(input);
-
-			var buffer = new StringBuilder();
-			while (scanner.MoveNext())
+			using (var scanner = new StringStream(input))
 			{
-				buffer.Append(scanner.Current);
-			}
+				var buffer = new StringBuilder();
+				while (!scanner.IsCompleted)
+				{
+					buffer.Append(scanner.Pop());
+				}
 
-			Assert.Equal(input, buffer.ToString());
+				Assert.Equal(input, buffer.ToString());
+			}
 		}
 
-		#endregion MoveNext Tests
+		#endregion Pop Tests
 
-		#region IsEnd Tests
+		#region Peek Tests
 
 		[Fact]
-		public void IsEnd_LongString_ReturnsFalseUntilEnd()
+		public void Peek_LongString_ReturnsSameAsPop()
 		{
 			const string input = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-			var scanner = new StringScanner(input);
-
-			while (scanner.MoveNext())
+			using (var scanner = new StringStream(input))
 			{
-				Assert.Equal(false, scanner.IsEnd);
-			}
+				while (!scanner.IsCompleted)
+				{
+					char ch = scanner.Peek();
+					Assert.Equal(scanner.Pop(), ch);
+				}
 
-			Assert.Equal(true, scanner.IsEnd);
+				Assert.Equal(true, scanner.IsCompleted);
+			}
 		}
 
-		#endregion IsEnd Tests
+		#endregion Peek Tests
 
 		#region Line, Column, Index Tests
 
@@ -208,11 +230,15 @@ Line two
 Line three
 Line Four";
 
-			var scanner = new StringScanner(input);
+			using (var scanner = new StringStream(input))
+			{
+				while (!scanner.IsCompleted)
+				{
+					scanner.Pop();
+				}
 
-			while (scanner.MoveNext());
-
-			Assert.Equal(4, scanner.Line);
+				Assert.Equal(4, scanner.Line);
+			}
 		}
 
 		[Fact]
@@ -223,11 +249,15 @@ Line two
 Line three
 Line Four";
 
-			var scanner = new StringScanner(input);
+			using (var scanner = new StringStream(input))
+			{
+				while (!scanner.IsCompleted)
+				{
+					scanner.Pop();
+				}
 
-			while (scanner.MoveNext());
-
-			Assert.Equal(9, scanner.Column);
+				Assert.Equal(9, scanner.Column);
+			}
 		}
 
 		[Fact]
@@ -238,15 +268,17 @@ Line two
 Line three
 Line Four";
 
-			var scanner = new StringScanner(input);
-
-			long i;
-			for (i=0; scanner.MoveNext(); i++)
+			using (var scanner = new StringStream(input))
 			{
-				Assert.Equal(i, scanner.Index);
-			}
+				long i;
+				for (i=0; !scanner.IsCompleted; i++)
+				{
+					scanner.Pop();
+					Assert.Equal(i, scanner.Index);
+				}
 
-			Assert.Equal(i-1, scanner.Index);
+				Assert.Equal(i-1, scanner.Index);
+			}
 		}
 
 		#endregion Line, Column, Index Tests

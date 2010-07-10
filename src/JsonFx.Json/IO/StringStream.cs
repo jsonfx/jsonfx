@@ -30,30 +30,26 @@
 
 using System;
 using System.Collections;
-using System.IO;
 
 namespace JsonFx.IO
 {
 	/// <summary>
-	/// Supports a simple iteration over a TextReader tracking line/column/position
+	/// Supports a simple iteration over a string tracking line/column/position
 	/// </summary>
-	public class TextReaderScanner : ITextScanner
+	public class StringStream : Stream<char>, ITextStream
 	{
 		#region Constants
 
-		public static readonly TextReaderScanner Null = new TextReaderScanner(TextReader.Null);
+		public static readonly StringStream Null = new StringStream(null);
 
 		#endregion Constants
 
 		#region Fields
 
-		private readonly TextReader Reader;
-		private char current;
-		private bool isInited;
-		private bool isEnd;
 		private int column;
 		private int line;
 		private long index;
+		private char prev;
 
 		#endregion Fields
 
@@ -62,14 +58,14 @@ namespace JsonFx.IO
 		/// <summary>
 		/// Ctor
 		/// </summary>
-		/// <param name="reader"></param>
-		public TextReaderScanner(TextReader reader)
+		/// <param name="value"></param>
+		public StringStream(string value)
+			: base(value ?? String.Empty)
 		{
-			this.Reader = reader;
 			this.index = -1L;
 		}
 
-		#endregion Fields
+		#endregion Init
 
 		#region ITextScanner Members
 
@@ -97,72 +93,35 @@ namespace JsonFx.IO
 			get { return this.index; }
 		}
 
-		/// <summary>
-		/// Gets if at the end of the input
-		/// </summary>
-		public bool IsEnd
-		{
-			get { return this.isEnd; }
-		}
-
 		#endregion ITextScanner Members
 
-		#region IEnumerator<char> Members
+		#region IStream<char> Members
 
 		/// <summary>
-		/// Gets the current character
+		/// Returns and removes the character at the front of the sequence.
 		/// </summary>
-		public char Current
+		/// <returns></returns>
+		public override char Pop()
 		{
-			get { return this.current; }
+			char value = base.Pop();
+
+			this.UpdateStats(this.prev, value);
+
+			// store for next iteration
+			return (this.prev = value);
 		}
 
-		#endregion IEnumerator<char> Members
+		#endregion IStream<char> Members
 
-		#region IEnumerator Members
-
-		/// <summary>
-		/// Gets the current character
-		/// </summary>
-		object IEnumerator.Current
-		{
-			get { return this.Current; }
-		}
+		#region Statistics Methods
 
 		/// <summary>
-		/// Advances the position of the underlying input
+		/// Calculates index, line, and column statistics
 		/// </summary>
-		/// <returns>
-		/// true if the enumerator was successfully advanced to the next element;
-		/// false if the enumerator has passed the end of the collection.
-		/// </returns>
-		public bool MoveNext()
+		/// <param name="prev"></param>
+		/// <param name="value"></param>
+		private void UpdateStats(char prev, char value)
 		{
-			if (this.isEnd)
-			{
-				// no more chars in sequence
-				return false;
-			}
-
-			if (this.isInited)
-			{
-				// consume current peek char
-				this.Reader.Read();
-			}
-			else
-			{
-				// flag as initialized
-				this.isInited = true;
-			}
-
-			int ch = this.Reader.Peek();
-			if (ch < 0)
-			{
-				this.isEnd = true;
-				this.current = '\0';
-				return false;
-			}
-
 			if (this.index < 0)
 			{
 				this.line = this.column = 1;
@@ -171,11 +130,11 @@ namespace JsonFx.IO
 			else
 			{
 				// check for line endings
-				switch (ch)
+				switch (value)
 				{
 					case '\n':
 					{
-						if (this.current == '\r')
+						if (prev == '\r')
 						{
 							// consider CRLF to be one line ending
 							break;
@@ -197,40 +156,8 @@ namespace JsonFx.IO
 				}
 				this.index++;
 			}
-			this.current = (char)ch;
-
-			return true;
 		}
 
-		/// <summary>
-		/// Not supported
-		/// </summary>
-		void IEnumerator.Reset()
-		{
-			throw new NotSupportedException();
-		}
-
-		#endregion IEnumerator Members
-
-		#region IDisposable Members
-
-		/// <summary>
-		/// Releases all resources used by the underlying 
-		/// </summary>
-		public void Dispose()
-		{
-			this.Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-
-		protected virtual void Dispose(bool disposing)
-		{
-			if (disposing)
-			{
-				this.Reader.Dispose();
-			}
-		}
-
-		#endregion IDisposable Members
+		#endregion Statistics Methods
 	}
 }

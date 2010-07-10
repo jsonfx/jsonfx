@@ -30,25 +30,28 @@
 
 using System;
 using System.Collections;
+using System.IO;
 
 namespace JsonFx.IO
 {
 	/// <summary>
-	/// Supports a simple iteration over a string tracking line/column/position
+	/// Supports a simple iteration over a TextReader tracking line/column/position
 	/// </summary>
-	public class StringScanner : ITextScanner
+	public class TextReaderStream : ITextStream
 	{
 		#region Constants
 
-		public static readonly StringScanner Null = new StringScanner(String.Empty);
+		public static readonly TextReaderStream Null = new TextReaderStream(TextReader.Null);
 
 		#endregion Constants
 
 		#region Fields
 
-		private readonly CharEnumerator Enumerator;
-		private bool isEnd;
+		private readonly TextReader Reader;
 		private char current;
+		private char prev;
+		private bool isCompleted;
+		private bool isReady;
 		private int column;
 		private int line;
 		private long index;
@@ -60,14 +63,14 @@ namespace JsonFx.IO
 		/// <summary>
 		/// Ctor
 		/// </summary>
-		/// <param name="value"></param>
-		public StringScanner(string value)
+		/// <param name="reader"></param>
+		public TextReaderStream(TextReader reader)
 		{
-			this.Enumerator = (value ?? String.Empty).GetEnumerator();
+			this.Reader = reader;
 			this.index = -1L;
 		}
 
-		#endregion Init
+		#endregion Fields
 
 		#region ITextScanner Members
 
@@ -95,90 +98,113 @@ namespace JsonFx.IO
 			get { return this.index; }
 		}
 
-		/// <summary>
-		/// Gets if at the end of the input
-		/// </summary>
-		public bool IsEnd
-		{
-			get { return this.isEnd; }
-		}
-
 		#endregion ITextScanner Members
 
-		#region IEnumerator<char> Members
+		#region IStream<T> Properties
 
 		/// <summary>
-		/// Gets the current character
+		/// Determines if the input sequence has reached the end
 		/// </summary>
-		public char Current
+		public virtual bool IsCompleted
 		{
-			get { return this.current; }
-		}
-
-		#endregion IEnumerator<char> Members
-
-		#region IDisposable Members
-
-		public void Dispose()
-		{
-			this.Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-
-		protected virtual void Dispose(bool disposing)
-		{
-			if (disposing)
+			get
 			{
-				((IDisposable)this.Enumerator).Dispose();
+				this.EnsureReady();
+
+				return this.isCompleted;
 			}
 		}
 
-		#endregion IDisposable Members
+		#endregion IStream<T> Properties
 
-		#region IEnumerator Members
+		#region IStream<T> Methods
 
 		/// <summary>
-		/// Gets the current character
+		/// Returns but does not remove the item at the front of the sequence.
 		/// </summary>
-		object IEnumerator.Current
+		/// <returns></returns>
+		public virtual char Peek()
 		{
-			get { return this.Current; }
+			this.EnsureReady();
+
+			// return the current item or null if complete
+			return this.current;
 		}
 
 		/// <summary>
-		/// Advances the position of the underlying input
+		/// Returns and removes the item at the front of the sequence.
 		/// </summary>
-		/// <returns>
-		/// true if the enumerator was successfully advanced to the next element;
-		/// false if the enumerator has passed the end of the collection.
-		/// </returns>
-		public bool MoveNext()
+		/// <returns></returns>
+		public virtual char Pop()
 		{
-			if (this.isEnd)
+			this.EnsureReady();
+
+			if (!this.isCompleted)
 			{
-				// no more chars in sequence
-				return false;
+				// pop the previously peeked cahr
+				this.Reader.Read();
+
+				// flag as needing to be iterated, but don't execute yet
+				this.isReady = false;
 			}
 
-			char prev = this.current;
+			this.UpdateStats(this.prev, this.current);
 
-			if (!this.Enumerator.MoveNext())
+			// store for next iteration
+			return (this.prev = this.current);
+		}
+
+		#endregion IStream<T> Methods
+
+		#region Methods
+
+		/// <summary>
+		/// Deferred execution of iterator
+		/// </summary>
+		private void EnsureReady()
+		{
+			// only execute when requested
+			if (this.isReady)
 			{
-				this.isEnd = true;
-				this.current = '\0';
-				return false;
+				return;
 			}
+			this.isReady = true;
 
+			// lazy execution of reader
+			int value = this.Reader.Peek();
+			this.isCompleted = (value < 0);
+
+			// store the current item or null if complete
+			if (this.isCompleted)
+			{
+				this.current = default(char);
+			}
+			else
+			{
+				this.current = (char)value;
+			}
+		}
+
+		#endregion Methods
+
+		#region Statistics Methods
+
+		/// <summary>
+		/// Calculates index, line, and column statistics
+		/// </summary>
+		/// <param name="prev"></param>
+		/// <param name="value"></param>
+		private void UpdateStats(char prev, char value)
+		{
 			if (this.index < 0)
 			{
-				this.current = this.Enumerator.Current;
 				this.line = this.column = 1;
 				this.index = 0;
 			}
 			else
 			{
 				// check for line endings
-				switch (this.current = this.Enumerator.Current)
+				switch (value)
 				{
 					case '\n':
 					{
@@ -204,24 +230,29 @@ namespace JsonFx.IO
 				}
 				this.index++;
 			}
-
-			return true;
 		}
+
+		#endregion Statistics Methods
+
+		#region IDisposable Members
 
 		/// <summary>
-		/// Resets the enumerator to the beginning of the string
+		/// Releases all resources used by the underlying 
 		/// </summary>
-		public void Reset()
+		public void Dispose()
 		{
-			this.Enumerator.Reset();
-
-			this.current = '\0';
-			this.isEnd = false;
-			this.column = 0;
-			this.line = 0;
-			this.index = -1L;
+			this.Dispose(true);
+			GC.SuppressFinalize(this);
 		}
 
-		#endregion IEnumerator Members
+		protected virtual void Dispose(bool disposing)
+		{
+			if (disposing)
+			{
+				this.Reader.Dispose();
+			}
+		}
+
+		#endregion IDisposable Members
 	}
 }

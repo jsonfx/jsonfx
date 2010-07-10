@@ -148,7 +148,7 @@ namespace JsonFx.Json
 				}
 
 				Stream<Token<JsonTokenType>> stream = new Stream<Token<JsonTokenType>>(tokens);
-				while (!stream.IsComplete)
+				while (!stream.IsCompleted)
 				{
 					yield return this.ConsumeValue(stream, targetType);
 				}
@@ -170,7 +170,7 @@ namespace JsonFx.Json
 				Type resultType = typeof(TResult);
 
 				Stream<Token<JsonTokenType>> stream = new Stream<Token<JsonTokenType>>(tokens);
-				while (!stream.IsComplete)
+				while (!stream.IsCompleted)
 				{
 					// cast each of the values accordingly
 					yield return (TResult)this.ConsumeValue(stream, resultType);
@@ -249,7 +249,7 @@ namespace JsonFx.Json
 					new JsonObject();
 
 				bool hasProperties = false;
-				while (!tokens.IsComplete)
+				while (!tokens.IsCompleted)
 				{
 					token = tokens.Peek();
 					if (hasProperties)
@@ -280,7 +280,7 @@ namespace JsonFx.Json
 							}
 						}
 
-						if (tokens.IsComplete)
+						if (tokens.IsCompleted)
 						{
 							// end of input
 							break;
@@ -331,7 +331,7 @@ namespace JsonFx.Json
 					}
 
 					// move past delim
-					if (tokens.IsComplete)
+					if (tokens.IsCompleted)
 					{
 						// end of input
 						break;
@@ -354,7 +354,7 @@ namespace JsonFx.Json
 						}
 					}
 
-					if (tokens.IsComplete)
+					if (tokens.IsCompleted)
 					{
 						// end of input
 						break;
@@ -416,7 +416,7 @@ namespace JsonFx.Json
 				// using ArrayList since has .ToArray(Type) method
 				// cannot create List<T> at runtime
 				ArrayList array = new ArrayList();
-				while (!tokens.IsComplete)
+				while (!tokens.IsCompleted)
 				{
 					token = tokens.Peek();
 					if (array.Count > 0)
@@ -445,7 +445,7 @@ namespace JsonFx.Json
 							}
 						}
 
-						if (tokens.IsComplete)
+						if (tokens.IsCompleted)
 						{
 							// end of input
 							break;
