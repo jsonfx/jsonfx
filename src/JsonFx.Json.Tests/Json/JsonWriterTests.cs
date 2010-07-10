@@ -35,6 +35,7 @@ using System.IO;
 using JsonFx.Json.Filters;
 using JsonFx.Serialization;
 using Xunit;
+
 using Assert=JsonFx.AssertPatched;
 
 namespace JsonFx.Json
@@ -42,6 +43,23 @@ namespace JsonFx.Json
 	public class JsonWriterTests
 	{
 		#region Array Tests
+
+		[Fact]
+		public void Serialize_OnlyDefaults_SerializesIso8601Dates()
+		{
+			var input = new object[]
+				{
+					"Normal string before",
+					new DateTime(2008, 2, 29, 23, 59, 59, 999, DateTimeKind.Utc),
+					new DateTime(2010, 7, 5, 10, 51, 17, 768, DateTimeKind.Unspecified),
+					"Normal string after"
+				};
+			var expected = @"[""Normal string before"",""2008-02-29T23:59:59.999Z"",""2010-07-05T10:51:17.768"",""Normal string after""]";
+
+			var actual = new JsonWriter().Serialize(input);
+
+			Assert.Equal(expected, actual);
+		}
 
 		[Fact]
 		public void Serialize_RecognizesMultipleDateTimeFiltersIsoFirst_SerializesIso8601Dates()
