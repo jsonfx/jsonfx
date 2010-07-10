@@ -32,6 +32,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
+using JsonFx.Json.Filters;
 using JsonFx.Serialization;
 
 namespace JsonFx.Json
@@ -42,6 +43,23 @@ namespace JsonFx.Json
 	public partial class JsonWriter : DataWriter<JsonTokenType>
 	{
 		#region Init
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		public JsonWriter()
+			: this(new DataWriterSettings())
+		{
+		}
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="settings"></param>
+		public JsonWriter(DataWriterSettings settings)
+			: base(settings, new IDataFilter<JsonTokenType>[] { new Iso8601DateFilter() })
+		{
+		}
 
 		/// <summary>
 		/// Ctor

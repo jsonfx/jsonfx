@@ -31,6 +31,7 @@
 using System;
 using System.Collections.Generic;
 
+using JsonFx.Json.Filters;
 using JsonFx.Serialization;
 
 namespace JsonFx.Json
@@ -41,6 +42,23 @@ namespace JsonFx.Json
 	public partial class JsonReader : DataReader<JsonTokenType>
 	{
 		#region Init
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		public JsonReader()
+			: this(new DataReaderSettings())
+		{
+		}
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="settings"></param>
+		public JsonReader(DataReaderSettings settings)
+			: base(settings, new IDataFilter<JsonTokenType>[] { new Iso8601DateFilter() })
+		{
+		}
 
 		/// <summary>
 		/// Ctor
