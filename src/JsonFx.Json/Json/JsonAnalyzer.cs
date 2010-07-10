@@ -147,7 +147,7 @@ namespace JsonFx.Json
 					throw new ArgumentNullException("tokens");
 				}
 
-				Stream<Token<JsonTokenType>> stream = new Stream<Token<JsonTokenType>>(tokens);
+				IStream<Token<JsonTokenType>> stream = new Stream<Token<JsonTokenType>>(tokens);
 				while (!stream.IsCompleted)
 				{
 					yield return this.ConsumeValue(stream, targetType);
@@ -169,7 +169,7 @@ namespace JsonFx.Json
 
 				Type resultType = typeof(TResult);
 
-				Stream<Token<JsonTokenType>> stream = new Stream<Token<JsonTokenType>>(tokens);
+				IStream<Token<JsonTokenType>> stream = new Stream<Token<JsonTokenType>>(tokens);
 				while (!stream.IsCompleted)
 				{
 					// cast each of the values accordingly
@@ -181,7 +181,7 @@ namespace JsonFx.Json
 
 			#region Consume Methods
 
-			private object ConsumeValue(Stream<Token<JsonTokenType>> tokens, Type targetType)
+			private object ConsumeValue(IStream<Token<JsonTokenType>> tokens, Type targetType)
 			{
 				object result;
 				if (this.TryReadFilters(tokens, out result))
@@ -229,7 +229,7 @@ namespace JsonFx.Json
 				}
 			}
 
-			private object ConsumeObject(Stream<Token<JsonTokenType>> tokens, Type targetType)
+			private object ConsumeObject(IStream<Token<JsonTokenType>> tokens, Type targetType)
 			{
 				Token<JsonTokenType> token = tokens.Pop();
 
@@ -396,7 +396,7 @@ namespace JsonFx.Json
 					JsonAnalyzer.ErrorUnterminatedObject);
 			}
 
-			private object ConsumeArray(Stream<Token<JsonTokenType>> tokens, Type arrayType)
+			private object ConsumeArray(IStream<Token<JsonTokenType>> tokens, Type arrayType)
 			{
 				Token<JsonTokenType> token = tokens.Pop();
 
@@ -536,14 +536,17 @@ namespace JsonFx.Json
 					JsonAnalyzer.ErrorUnterminatedArray);
 			}
 
-			private bool TryReadFilters(Stream<Token<JsonTokenType>> tokens, out object result)
+			private bool TryReadFilters(IStream<Token<JsonTokenType>> tokens, out object result)
 			{
-				foreach (var filter in this.Filters)
+				if (!tokens.IsCompleted)
 				{
-					if (filter.TryRead(this.Settings, tokens, out result))
+					foreach (var filter in this.Filters)
 					{
-						// found a successful match
-						return true;
+						if (filter.TryRead(this.Settings, tokens, out result))
+						{
+							// found a successful match
+							return true;
+						}
 					}
 				}
 

@@ -65,7 +65,7 @@ namespace JsonFx.Json.Filters
 
 		#region IDataFilter<JsonTokenType,DateTime> Members
 
-		public override bool TryRead(DataReaderSettings settings, Stream<Token<JsonTokenType>> tokens, out DateTime value)
+		public override bool TryRead(DataReaderSettings settings, IStream<Token<JsonTokenType>> tokens, out DateTime value)
 		{
 			Token<JsonTokenType> token = tokens.Peek();
 			if (token == null ||

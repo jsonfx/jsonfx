@@ -47,7 +47,7 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_UtcStandardTimeZone_ReadsAsUtc()
 		{
-			Stream<Token<JsonTokenType>> input = new Stream<Token<JsonTokenType>>(new[]
+			var input = new Stream<Token<JsonTokenType>>(new[]
 				{
 					JsonGrammar.TokenString("2008-02-29T23:59:59.999Z")
 				});
@@ -64,7 +64,7 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_UnspecifiedStandardTimeZone_ReadsAsUnspecified()
 		{
-			Stream<Token<JsonTokenType>> input = new Stream<Token<JsonTokenType>>(new[]
+			var input = new Stream<Token<JsonTokenType>>(new[]
 				{
 					JsonGrammar.TokenString("2008-02-29T23:59:59.999")
 				});
@@ -81,7 +81,7 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_EasternStandardTimeZone_ReadsAsUtc()
 		{
-			Stream<Token<JsonTokenType>> input = new Stream<Token<JsonTokenType>>(new[]
+			var input = new Stream<Token<JsonTokenType>>(new[]
 				{
 					JsonGrammar.TokenString("2008-02-29T23:59:59.999-06:00")
 				});
@@ -98,7 +98,7 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_UtcDaylightSavingsTimeZone_ReadsAsUtc()
 		{
-			Stream<Token<JsonTokenType>> input = new Stream<Token<JsonTokenType>>(new[]
+			var input = new Stream<Token<JsonTokenType>>(new[]
 				{
 					JsonGrammar.TokenString("2010-07-05T10:51:17.768Z")
 				});
@@ -115,7 +115,7 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_UnspecifiedDaylightSavingsTimeZone_ReadsAsUnspecified()
 		{
-			Stream<Token<JsonTokenType>> input = new Stream<Token<JsonTokenType>>(new[]
+			var input = new Stream<Token<JsonTokenType>>(new[]
 				{
 					JsonGrammar.TokenString("2010-07-05T10:51:17.768")
 				});
@@ -132,7 +132,7 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_EasternDaylightSavingsTimeZone_ReadsAsUtc()
 		{
-			Stream<Token<JsonTokenType>> input = new Stream<Token<JsonTokenType>>(new[]
+			var input = new Stream<Token<JsonTokenType>>(new[]
 				{
 					JsonGrammar.TokenString("2010-07-05T10:51:17.768-05:00")
 				});
@@ -149,7 +149,7 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_FutureUtcTimeZone_ReadsAsUtc()
 		{
-			Stream<Token<JsonTokenType>> input = new Stream<Token<JsonTokenType>>(new[]
+			var input = new Stream<Token<JsonTokenType>>(new[]
 				{
 					JsonGrammar.TokenString("2099-12-31T23:59:59.999Z")
 				});
@@ -166,7 +166,7 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_FutureUnspecifiedTimeZone_ReadsAsUnspecified()
 		{
-			Stream<Token<JsonTokenType>> input = new Stream<Token<JsonTokenType>>(new[]
+			var input = new Stream<Token<JsonTokenType>>(new[]
 				{
 					JsonGrammar.TokenString("2099-12-31T23:59:59.999")
 				});
@@ -183,7 +183,7 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_FutureEasternTimeZone_ReadsAsUtc()
 		{
-			Stream<Token<JsonTokenType>> input = new Stream<Token<JsonTokenType>>(new[]
+			var input = new Stream<Token<JsonTokenType>>(new[]
 				{
 					JsonGrammar.TokenString("2099-12-31T23:59:59.999-05:00")
 				});
@@ -200,7 +200,7 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_DateTimeMinValueUnspecified_ReadsAsUnspecified()
 		{
-			Stream<Token<JsonTokenType>> input = new Stream<Token<JsonTokenType>>(new[]
+			var input = new Stream<Token<JsonTokenType>>(new[]
 				{
 					JsonGrammar.TokenString("0001-01-01T00:00:00.000")
 				});
@@ -217,7 +217,7 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_DateTimeMinValueUtc_ReadsAsUtc()
 		{
-			Stream<Token<JsonTokenType>> input = new Stream<Token<JsonTokenType>>(new[]
+			var input = new Stream<Token<JsonTokenType>>(new[]
 				{
 					JsonGrammar.TokenString("0001-01-01T00:00:00.000Z")
 				});
@@ -234,7 +234,7 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_DateTimeMaxValueUnspecified_ReadsAsUnspecified()
 		{
-			Stream<Token<JsonTokenType>> input = new Stream<Token<JsonTokenType>>(new[]
+			var input = new Stream<Token<JsonTokenType>>(new[]
 				{
 					JsonGrammar.TokenString("9999-12-31T23:59:59.999")
 				});
@@ -251,7 +251,7 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_DateTimeMaxValueUtc_ReadsAsUtc()
 		{
-			Stream<Token<JsonTokenType>> input = new Stream<Token<JsonTokenType>>(new[]
+			var input = new Stream<Token<JsonTokenType>>(new[]
 				{
 					JsonGrammar.TokenString("9999-12-31T23:59:59.999Z")
 				});

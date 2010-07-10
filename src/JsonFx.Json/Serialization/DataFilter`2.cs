@@ -42,7 +42,7 @@ namespace JsonFx.Serialization
 	{
 		#region IDataFilter<TTokenType,TResult> Members
 
-		public abstract bool TryRead(DataReaderSettings settings, Stream<Token<TTokenType>> tokens, out TResult value);
+		public abstract bool TryRead(DataReaderSettings settings, IStream<Token<TTokenType>> tokens, out TResult value);
 
 		public abstract bool TryWrite(DataWriterSettings settings, TResult value, out IEnumerable<Token<TTokenType>> tokens);
 
@@ -50,7 +50,7 @@ namespace JsonFx.Serialization
 
 		#region IDataFilter<TTokenType> Members
 
-		bool IDataFilter<TTokenType>.TryRead(DataReaderSettings settings, Stream<Token<TTokenType>> tokens, out object value)
+		bool IDataFilter<TTokenType>.TryRead(DataReaderSettings settings, IStream<Token<TTokenType>> tokens, out object value)
 		{
 			TResult result;
 			bool success = this.TryRead(settings, tokens, out result);
