@@ -58,7 +58,7 @@ namespace JsonFx.IO
 		T Peek();
 
 		/// <summary>
-		/// Returns and removes the top item at the front of the sequence.
+		/// Returns and removes the item at the front of the sequence.
 		/// </summary>
 		/// <returns></returns>
 		T Pop();
