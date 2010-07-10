@@ -245,10 +245,15 @@ namespace JsonFx.Json
 			{
 				IEnumerator enumerator = value.GetEnumerator();
 
-				if (enumerator is IEnumerator<KeyValuePair<string, object>> ||
-					enumerator is IDictionaryEnumerator)
+				if (enumerator is IEnumerator<KeyValuePair<string, object>>)
 				{
-					this.GetObjectTokens(tokens, enumerator);
+					this.GetObjectTokens(tokens, (IEnumerator<KeyValuePair<string, object>>)enumerator);
+					return;
+				}
+
+				if (enumerator is IDictionaryEnumerator)
+				{
+					this.GetObjectTokens(tokens, (IDictionaryEnumerator)enumerator);
 					return;
 				}
 
@@ -272,51 +277,48 @@ namespace JsonFx.Json
 				tokens.Enqueue(JsonGrammar.TokenArrayEnd);
 			}
 
-			private void GetObjectTokens(Queue<Token<JsonTokenType>> tokens, IEnumerator enumerator)
+			private void GetObjectTokens(Queue<Token<JsonTokenType>> tokens, IDictionaryEnumerator enumerator)
 			{
 				tokens.Enqueue(JsonGrammar.TokenObjectBegin);
 
-				IEnumerator<KeyValuePair<string, object>> keyValueEnumerator = enumerator as IEnumerator<KeyValuePair<string, object>>;
-				IDictionaryEnumerator dictionaryEnumerator = enumerator as IDictionaryEnumerator;
+				bool appendDelim = false;
+
+				while (enumerator.MoveNext())
+				{
+					if (appendDelim)
+					{
+						tokens.Enqueue(JsonGrammar.TokenValueDelim);
+					}
+					else
+					{
+						appendDelim = true;
+					}
+
+					this.GetPropertyTokens(tokens, enumerator.Key, enumerator.Value);
+				}
+
+				tokens.Enqueue(JsonGrammar.TokenObjectEnd);
+			}
+
+			private void GetObjectTokens(Queue<Token<JsonTokenType>> tokens, IEnumerator<KeyValuePair<string, object>> enumerator)
+			{
+				tokens.Enqueue(JsonGrammar.TokenObjectBegin);
 
 				bool appendDelim = false;
 
-				if (keyValueEnumerator != null)
+				while (enumerator.MoveNext())
 				{
-					while (enumerator.MoveNext())
+					if (appendDelim)
 					{
-						if (appendDelim)
-						{
-							tokens.Enqueue(JsonGrammar.TokenValueDelim);
-						}
-						else
-						{
-							appendDelim = true;
-						}
-
-						KeyValuePair<string, object> pair = keyValueEnumerator.Current;
-						this.GetPropertyTokens(tokens, pair.Key, pair.Value);
+						tokens.Enqueue(JsonGrammar.TokenValueDelim);
 					}
-				}
-				else if (dictionaryEnumerator != null)
-				{
-					while (enumerator.MoveNext())
+					else
 					{
-						if (appendDelim)
-						{
-							tokens.Enqueue(JsonGrammar.TokenValueDelim);
-						}
-						else
-						{
-							appendDelim = true;
-						}
-
-						this.GetPropertyTokens(tokens, dictionaryEnumerator.Key, dictionaryEnumerator.Value);
+						appendDelim = true;
 					}
-				}
-				else
-				{
-					throw new ArgumentException("enumerator", "Expected IDictionaryEnumerator or IEnumerator<KeyValuePair<string, object>>");
+
+					KeyValuePair<string, object> pair = enumerator.Current;
+					this.GetPropertyTokens(tokens, pair.Key, pair.Value);
 				}
 
 				tokens.Enqueue(JsonGrammar.TokenObjectEnd);
