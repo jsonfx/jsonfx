@@ -299,7 +299,7 @@ namespace JsonFx.Bson
 					{
 						if (token.TokenType == BsonTokenType.None)
 						{
-							reader.Dispose();
+							((IDisposable)reader).Dispose();
 							this.Reader = BsonTokenizer.NullBinaryReader;
 							yield break;
 						}
@@ -322,7 +322,7 @@ namespace JsonFx.Bson
 			{
 				if (disposing)
 				{
-					this.Reader.Dispose();
+					((IDisposable)this.Reader).Dispose();
 				}
 			}
 
