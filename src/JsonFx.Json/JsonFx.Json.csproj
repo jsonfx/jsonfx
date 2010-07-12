@@ -71,6 +71,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="About.cs" />
+    <Compile Include="Bson\BsonGrammar.cs" />
+    <Compile Include="Bson\BsonTokenizer.cs" />
+    <Compile Include="Bson\BsonTokenType.cs" />
     <Compile Include="Serialization\GraphCycles\GraphCycleException.cs" />
     <Compile Include="Serialization\GraphCycles\GraphCycleType.cs" />
     <Compile Include="Serialization\GraphCycles\DepthCounter.cs" />
