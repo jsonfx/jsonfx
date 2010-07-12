@@ -220,7 +220,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void Parse_ArrayUnclosed_ThrowsParseException()
+		public void Parse_ArrayUnclosed_ThrowsAnalyzerException()
 		{
 			// input from fail2.json in test suite at http://www.json.org/JSON_checker/
 			var input = new []
@@ -231,7 +231,7 @@ namespace JsonFx.Json
 
 			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings());
 
-			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
+			AnalyzerException<JsonTokenType> ex = Assert.Throws<AnalyzerException<JsonTokenType>>(
 				delegate
 				{
 					var actual = analyzer.Analyze<object>(input).Single();
@@ -242,7 +242,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void Parse_ArrayExtraComma_ThrowsParseException()
+		public void Parse_ArrayExtraComma_ThrowsAnalyzerException()
 		{
 			// input from fail4.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -255,7 +255,7 @@ namespace JsonFx.Json
 
 			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings());
 
-			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
+			AnalyzerException<JsonTokenType> ex = Assert.Throws<AnalyzerException<JsonTokenType>>(
 				delegate
 				{
 					var actual = analyzer.Analyze<object>(input).Single();
@@ -266,7 +266,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void Parse_ArrayDoubleExtraComma_ThrowsParseException()
+		public void Parse_ArrayDoubleExtraComma_ThrowsAnalyzerException()
 		{
 			// input from fail5.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -280,7 +280,7 @@ namespace JsonFx.Json
 
 			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings());
 
-			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
+			AnalyzerException<JsonTokenType> ex = Assert.Throws<AnalyzerException<JsonTokenType>>(
 				delegate
 				{
 					var actual = analyzer.Analyze<object>(input).Single();
@@ -291,7 +291,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void Parse_ArrayMissingValue_ThrowsParseException()
+		public void Parse_ArrayMissingValue_ThrowsAnalyzerException()
 		{
 			// input from fail6.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -304,7 +304,7 @@ namespace JsonFx.Json
 
 			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings());
 
-			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
+			AnalyzerException<JsonTokenType> ex = Assert.Throws<AnalyzerException<JsonTokenType>>(
 				delegate
 				{
 					var actual = analyzer.Analyze<object>(input).Single();
@@ -315,7 +315,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void Parse_ArrayColonInsteadOfComma_ThrowsParseException()
+		public void Parse_ArrayColonInsteadOfComma_ThrowsAnalyzerException()
 		{
 			// input from fail22.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -329,7 +329,7 @@ namespace JsonFx.Json
 
 			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings());
 
-			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
+			AnalyzerException<JsonTokenType> ex = Assert.Throws<AnalyzerException<JsonTokenType>>(
 				delegate
 				{
 					var actual = analyzer.Analyze<object>(input).Single();
@@ -340,7 +340,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void Parse_ArrayBadValue_ThrowsParseException()
+		public void Parse_ArrayBadValue_ThrowsAnalyzerException()
 		{
 			// input from fail23.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -354,7 +354,7 @@ namespace JsonFx.Json
 
 			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings());
 
-			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
+			AnalyzerException<JsonTokenType> ex = Assert.Throws<AnalyzerException<JsonTokenType>>(
 				delegate
 				{
 					var actual = analyzer.Analyze<object>(input).Single();
@@ -365,7 +365,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void Parse_ArrayCloseMismatch_ThrowsParseException()
+		public void Parse_ArrayCloseMismatch_ThrowsAnalyzerException()
 		{
 			// input from fail33.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -377,7 +377,7 @@ namespace JsonFx.Json
 
 			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings());
 
-			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
+			AnalyzerException<JsonTokenType> ex = Assert.Throws<AnalyzerException<JsonTokenType>>(
 				delegate
 				{
 					var actual = analyzer.Analyze<object>(input).Single();
@@ -471,7 +471,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void Parse_ObjectExtraComma_ThrowsParseException()
+		public void Parse_ObjectExtraComma_ThrowsAnalyzerException()
 		{
 			// input from fail9.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -486,7 +486,7 @@ namespace JsonFx.Json
 
 			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings());
 
-			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
+			AnalyzerException<JsonTokenType> ex = Assert.Throws<AnalyzerException<JsonTokenType>>(
 				delegate
 				{
 					var actual = analyzer.Analyze<object>(input).Single();
@@ -497,7 +497,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void Parse_ObjectMissingColon_ThrowsParseException()
+		public void Parse_ObjectMissingColon_ThrowsAnalyzerException()
 		{
 			// input from fail19.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -510,7 +510,7 @@ namespace JsonFx.Json
 
 			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings());
 
-			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
+			AnalyzerException<JsonTokenType> ex = Assert.Throws<AnalyzerException<JsonTokenType>>(
 				delegate
 				{
 					var actual = analyzer.Analyze<object>(input).Single();
@@ -521,7 +521,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void Parse_ObjectDoubleColon_ThrowsParseException()
+		public void Parse_ObjectDoubleColon_ThrowsAnalyzerException()
 		{
 			// input from fail20.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -536,7 +536,7 @@ namespace JsonFx.Json
 
 			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings());
 
-			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
+			AnalyzerException<JsonTokenType> ex = Assert.Throws<AnalyzerException<JsonTokenType>>(
 				delegate
 				{
 					var actual = analyzer.Analyze<object>(input).Single();
@@ -547,7 +547,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void Parse_ObjectCommaInsteadOfColon_ThrowsParseException()
+		public void Parse_ObjectCommaInsteadOfColon_ThrowsAnalyzerException()
 		{
 			// input from fail21.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -561,7 +561,7 @@ namespace JsonFx.Json
 
 			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings());
 
-			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
+			AnalyzerException<JsonTokenType> ex = Assert.Throws<AnalyzerException<JsonTokenType>>(
 				delegate
 				{
 					var actual = analyzer.Analyze<object>(input).Single();
@@ -572,7 +572,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
-		public void Parse_ObjectCommaInsteadOfClose_ThrowsParseException()
+		public void Parse_ObjectCommaInsteadOfClose_ThrowsAnalyzerException()
 		{
 			// input from fail32.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -586,7 +586,7 @@ namespace JsonFx.Json
 
 			var analyzer = new JsonReader.JsonAnalyzer(new DataReaderSettings());
 
-			ParseException<JsonTokenType> ex = Assert.Throws<ParseException<JsonTokenType>>(
+			AnalyzerException<JsonTokenType> ex = Assert.Throws<AnalyzerException<JsonTokenType>>(
 				delegate
 				{
 					var actual = analyzer.Analyze<object>(input).Single();

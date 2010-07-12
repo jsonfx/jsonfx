@@ -29,10 +29,12 @@
 #endregion License
 
 using System;
-using System.Runtime.Serialization;
 
 namespace JsonFx.Serialization
 {
+	/// <summary>
+	/// Indicates an error occurred during serialization
+	/// </summary>
 	[Serializable]
 	public class SerializationException : InvalidOperationException
 	{
@@ -71,6 +73,9 @@ namespace JsonFx.Serialization
 		#endregion Init
 	}
 
+	/// <summary>
+	/// Indicates an error occurred during deserialization
+	/// </summary>
 	[Serializable]
 	public class DeserializationException : SerializationException
 	{
@@ -213,8 +218,12 @@ namespace JsonFx.Serialization
 		#endregion Methods
 	}
 
+	/// <summary>
+	/// Indicates an error occurred during token analysis
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
 	[Serializable]
-	public class ParseException<T> : SerializationException
+	public class AnalyzerException<T> : SerializationException
 	{
 		#region Fields
 
@@ -227,7 +236,7 @@ namespace JsonFx.Serialization
 		/// <summary>
 		/// Ctor
 		/// </summary>
-		public ParseException(Token<T> token)
+		public AnalyzerException(Token<T> token)
 			: base()
 		{
 			this.token = token;
@@ -237,7 +246,7 @@ namespace JsonFx.Serialization
 		/// Ctor
 		/// </summary>
 		/// <param name="message"></param>
-		public ParseException(Token<T> token, string message)
+		public AnalyzerException(Token<T> token, string message)
 			: base(message)
 		{
 			this.token = token;
@@ -248,7 +257,7 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="message"></param>
 		/// <param name="innerException"></param>
-		public ParseException(Token<T> token, string message, Exception innerException)
+		public AnalyzerException(Token<T> token, string message, Exception innerException)
 			: base(message, innerException)
 		{
 			this.token = token;
@@ -259,7 +268,7 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="info"></param>
 		/// <param name="context"></param>
-		public ParseException(
+		public AnalyzerException(
 			System.Runtime.Serialization.SerializationInfo info,
 			System.Runtime.Serialization.StreamingContext context)
 			: base(info, context)
@@ -281,6 +290,9 @@ namespace JsonFx.Serialization
 		#endregion Properties
 	}
 
+	/// <summary>
+	/// Indicates an error occurred during type coercion
+	/// </summary>
 	[Serializable]
 	public class TypeCoercionException : ArgumentException
 	{

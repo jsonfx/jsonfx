@@ -222,7 +222,7 @@ namespace JsonFx.Json
 					{
 						// these are invalid here
 						tokens.Pop();
-						throw new ParseException<JsonTokenType>(
+						throw new AnalyzerException<JsonTokenType>(
 							token,
 							String.Format(JsonAnalyzer.ErrorUnexpectedToken, token.TokenType));
 					}
@@ -236,7 +236,7 @@ namespace JsonFx.Json
 				// verify correct starting state
 				if (token.TokenType != JsonTokenType.ObjectBegin)
 				{
-					throw new ParseException<JsonTokenType>(
+					throw new AnalyzerException<JsonTokenType>(
 						token,
 						String.Format(JsonAnalyzer.ErrorExpectedObject, token.TokenType));
 				}
@@ -274,7 +274,7 @@ namespace JsonFx.Json
 							{
 								// these are invalid here
 								tokens.Pop();
-								throw new ParseException<JsonTokenType>(
+								throw new AnalyzerException<JsonTokenType>(
 									token,
 									String.Format(JsonAnalyzer.ErrorExpectedObjectValueDelim, token.TokenType));
 							}
@@ -316,7 +316,7 @@ namespace JsonFx.Json
 						{
 							// extraneous item delimiter
 							tokens.Pop();
-							throw new ParseException<JsonTokenType>(
+							throw new AnalyzerException<JsonTokenType>(
 								token,
 								JsonAnalyzer.ErrorMissingObjectProperty);
 						}
@@ -324,7 +324,7 @@ namespace JsonFx.Json
 						{
 							// these are invalid here
 							tokens.Pop();
-							throw new ParseException<JsonTokenType>(
+							throw new AnalyzerException<JsonTokenType>(
 								token,
 								String.Format(JsonAnalyzer.ErrorExpectedPropertyName, token.TokenType));
 						}
@@ -348,7 +348,7 @@ namespace JsonFx.Json
 						default:
 						{
 							// these are invalid here
-							throw new ParseException<JsonTokenType>(
+							throw new AnalyzerException<JsonTokenType>(
 								token,
 								String.Format(JsonAnalyzer.ErrorExpectedPropertyPairDelim, token.TokenType));
 						}
@@ -391,7 +391,7 @@ namespace JsonFx.Json
 				}
 
 				// end of input
-				throw new ParseException<JsonTokenType>(
+				throw new AnalyzerException<JsonTokenType>(
 					JsonGrammar.TokenNone,
 					JsonAnalyzer.ErrorUnterminatedObject);
 			}
@@ -403,7 +403,7 @@ namespace JsonFx.Json
 				// verify correct starting state
 				if (token.TokenType != JsonTokenType.ArrayBegin)
 				{
-					throw new ParseException<JsonTokenType>(
+					throw new AnalyzerException<JsonTokenType>(
 						token,
 						String.Format(JsonAnalyzer.ErrorExpectedArray, token.TokenType));
 				}
@@ -439,7 +439,7 @@ namespace JsonFx.Json
 							{
 								// these are invalid here
 								tokens.Pop();
-								throw new ParseException<JsonTokenType>(
+								throw new AnalyzerException<JsonTokenType>(
 									token,
 									String.Format(JsonAnalyzer.ErrorExpectedArrayItemDelim, token.TokenType));
 							}
@@ -505,7 +505,7 @@ namespace JsonFx.Json
 						{
 							// extraneous item delimiter
 							tokens.Pop();
-							throw new ParseException<JsonTokenType>(
+							throw new AnalyzerException<JsonTokenType>(
 								token,
 								JsonAnalyzer.ErrorMissingArrayItem);
 						}
@@ -517,7 +517,7 @@ namespace JsonFx.Json
 						{
 							// these are invalid here
 							tokens.Pop();
-							throw new ParseException<JsonTokenType>(
+							throw new AnalyzerException<JsonTokenType>(
 								token,
 								String.Format(JsonAnalyzer.ErrorExpectedArrayItem, token.TokenType));
 						}
@@ -531,7 +531,7 @@ namespace JsonFx.Json
 				}
 
 				// end of input
-				throw new ParseException<JsonTokenType>(
+				throw new AnalyzerException<JsonTokenType>(
 					JsonGrammar.TokenNone,
 					JsonAnalyzer.ErrorUnterminatedArray);
 			}
