@@ -33,6 +33,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 using JsonFx.Serialization;
+using JsonFx.Serialization.GraphCycles;
 
 namespace JsonFx.Json
 {
@@ -103,157 +104,203 @@ namespace JsonFx.Json
 			{
 				Queue<Token<JsonTokenType>> tokens = new Queue<Token<JsonTokenType>>();
 
-				this.GetTokens(tokens, value);
+				ICycleDetector detector;
+				switch (this.Settings.GraphCycles)
+				{
+					case GraphCycleType.MaxDepth:
+					{
+						detector = new DepthCounter(this.Settings.MaxDepth);
+						break;
+					}
+					default:
+					{
+						detector = new ReferenceSet();
+						break;
+					}
+				}
+
+				this.GetTokens(tokens, detector, value);
 
 				return tokens;
 			}
 
-			private void GetTokens(Queue<Token<JsonTokenType>> tokens, object value)
+			private void GetTokens(Queue<Token<JsonTokenType>> tokens, ICycleDetector detector, object value)
 			{
-				foreach (var filter in this.Filters)
-				{
-					IEnumerable<Token<JsonTokenType>> filterTokens;
-					if (filter.TryWrite(this.Settings, value, out filterTokens))
-					{
-						// found a successful match
-						foreach (Token<JsonTokenType> token in filterTokens)
-						{
-							tokens.Enqueue(token);
-						}
-						return;
-					}
-				}
-
 				if (value == null)
 				{
 					tokens.Enqueue(JsonGrammar.TokenNull);
 					return;
 				}
 
-				Type type = value.GetType();
-
-				// must test enumerations before other value types
-				if (type.IsEnum)
+				if (detector.Add(value))
 				{
-					tokens.Enqueue(JsonGrammar.TokenString((Enum)value));
-					return;
+					switch (this.Settings.GraphCycles)
+					{
+						case GraphCycleType.Reference:
+						{
+							// no need to remove value as was duplicate reference
+							throw new GraphCycleException(GraphCycleType.Reference, "Graph cycle detected: repeated references");
+						}
+						case GraphCycleType.MaxDepth:
+						{
+							throw new GraphCycleException(GraphCycleType.MaxDepth, "Graph cycle potentially detected: maximum depth exceeded");
+						}
+						default:
+						case GraphCycleType.Ignore:
+						{
+							// no need to remove value as was duplicate reference
+							// replace cycle with null
+							tokens.Enqueue(JsonGrammar.TokenNull);
+							return;
+						}
+					}
 				}
 
-				// Type.GetTypeCode() allows us to more efficiently switch type
-				switch (Type.GetTypeCode(type))
+				try
 				{
-					case TypeCode.Boolean:
+					foreach (var filter in this.Filters)
 					{
-						tokens.Enqueue(true.Equals(value) ? JsonGrammar.TokenTrue : JsonGrammar.TokenFalse);
-						return;
+						IEnumerable<Token<JsonTokenType>> filterTokens;
+						if (filter.TryWrite(this.Settings, value, out filterTokens))
+						{
+							// found a successful match
+							foreach (Token<JsonTokenType> token in filterTokens)
+							{
+								tokens.Enqueue(token);
+							}
+							return;
+						}
 					}
-					case TypeCode.Byte:
-					case TypeCode.Decimal:
-					case TypeCode.Int16:
-					case TypeCode.Int32:
-					case TypeCode.Int64:
-					case TypeCode.SByte:
-					case TypeCode.UInt16:
-					case TypeCode.UInt32:
-					case TypeCode.UInt64:
-					{
-						tokens.Enqueue(JsonGrammar.TokenNumber((ValueType)value));
-						return;
-					}
-					case TypeCode.Double:
-					{
-						double doubleVal = (double)value;
 
-						if (Double.IsNaN(doubleVal))
-						{
-							tokens.Enqueue(JsonGrammar.TokenNaN);
-						}
-						else if (Double.IsPositiveInfinity(doubleVal))
-						{
-							tokens.Enqueue(JsonGrammar.TokenPositiveInfinity);
-						}
-						else if (Double.IsNegativeInfinity(doubleVal))
-						{
-							tokens.Enqueue(JsonGrammar.TokenNegativeInfinity);
-						}
-						else
-						{
-							tokens.Enqueue(JsonGrammar.TokenNumber(doubleVal));
-						}
-						return;
-					}
-					case TypeCode.Single:
-					{
-						float floatVal = (float)value;
+					Type type = value.GetType();
 
-						if (Single.IsNaN(floatVal))
-						{
-							tokens.Enqueue(JsonGrammar.TokenNaN);
-						}
-						else if (Single.IsPositiveInfinity(floatVal))
-						{
-							tokens.Enqueue(JsonGrammar.TokenPositiveInfinity);
-						}
-						else if (Single.IsNegativeInfinity(floatVal))
-						{
-							tokens.Enqueue(JsonGrammar.TokenNegativeInfinity);
-						}
-						else
-						{
-							tokens.Enqueue(JsonGrammar.TokenNumber(floatVal));
-						}
+					// must test enumerations before other value types
+					if (type.IsEnum)
+					{
+						tokens.Enqueue(JsonGrammar.TokenString((Enum)value));
 						return;
 					}
-					case TypeCode.Char:
-					case TypeCode.DateTime:
-					case TypeCode.String:
+
+					// Type.GetTypeCode() allows us to more efficiently switch type
+					switch (Type.GetTypeCode(type))
+					{
+						case TypeCode.Boolean:
+						{
+							tokens.Enqueue(true.Equals(value) ? JsonGrammar.TokenTrue : JsonGrammar.TokenFalse);
+							return;
+						}
+						case TypeCode.Byte:
+						case TypeCode.Decimal:
+						case TypeCode.Int16:
+						case TypeCode.Int32:
+						case TypeCode.Int64:
+						case TypeCode.SByte:
+						case TypeCode.UInt16:
+						case TypeCode.UInt32:
+						case TypeCode.UInt64:
+						{
+							tokens.Enqueue(JsonGrammar.TokenNumber((ValueType)value));
+							return;
+						}
+						case TypeCode.Double:
+						{
+							double doubleVal = (double)value;
+
+							if (Double.IsNaN(doubleVal))
+							{
+								tokens.Enqueue(JsonGrammar.TokenNaN);
+							}
+							else if (Double.IsPositiveInfinity(doubleVal))
+							{
+								tokens.Enqueue(JsonGrammar.TokenPositiveInfinity);
+							}
+							else if (Double.IsNegativeInfinity(doubleVal))
+							{
+								tokens.Enqueue(JsonGrammar.TokenNegativeInfinity);
+							}
+							else
+							{
+								tokens.Enqueue(JsonGrammar.TokenNumber(doubleVal));
+							}
+							return;
+						}
+						case TypeCode.Single:
+						{
+							float floatVal = (float)value;
+
+							if (Single.IsNaN(floatVal))
+							{
+								tokens.Enqueue(JsonGrammar.TokenNaN);
+							}
+							else if (Single.IsPositiveInfinity(floatVal))
+							{
+								tokens.Enqueue(JsonGrammar.TokenPositiveInfinity);
+							}
+							else if (Single.IsNegativeInfinity(floatVal))
+							{
+								tokens.Enqueue(JsonGrammar.TokenNegativeInfinity);
+							}
+							else
+							{
+								tokens.Enqueue(JsonGrammar.TokenNumber(floatVal));
+							}
+							return;
+						}
+						case TypeCode.Char:
+						case TypeCode.DateTime:
+						case TypeCode.String:
+						{
+							tokens.Enqueue(JsonGrammar.TokenString(value));
+							return;
+						}
+						case TypeCode.DBNull:
+						case TypeCode.Empty:
+						{
+							tokens.Enqueue(JsonGrammar.TokenNull);
+							return;
+						}
+					}
+
+					if (value is IEnumerable)
+					{
+						this.GetArrayTokens(tokens, detector, (IEnumerable)value);
+						return;
+					}
+
+					if (value is Guid || value is Uri || value is Version)
 					{
 						tokens.Enqueue(JsonGrammar.TokenString(value));
 						return;
 					}
-					case TypeCode.DBNull:
-					case TypeCode.Empty:
+
+					if (value is TimeSpan)
 					{
-						tokens.Enqueue(JsonGrammar.TokenNull);
+						tokens.Enqueue(JsonGrammar.TokenNumber((TimeSpan)value));
 						return;
 					}
-				}
 
-				if (value is IEnumerable)
+					// all other structs and classes
+					this.GetObjectTokens(tokens, detector, value, type);
+				}
+				finally
 				{
-					this.GetArrayTokens(tokens, (IEnumerable)value);
-					return;
+					detector.Remove(value);
 				}
-
-				if (value is Guid || value is Uri || value is Version)
-				{
-					tokens.Enqueue(JsonGrammar.TokenString(value));
-					return;
-				}
-
-				if (value is TimeSpan)
-				{
-					tokens.Enqueue(JsonGrammar.TokenNumber((TimeSpan)value));
-					return;
-				}
-
-				// all other structs and classes
-				this.GetObjectTokens(tokens, value, type);
 			}
 
-			private void GetArrayTokens(Queue<Token<JsonTokenType>> tokens, IEnumerable value)
+			private void GetArrayTokens(Queue<Token<JsonTokenType>> tokens, ICycleDetector detector, IEnumerable value)
 			{
 				IEnumerator enumerator = value.GetEnumerator();
 
 				if (enumerator is IEnumerator<KeyValuePair<string, object>>)
 				{
-					this.GetObjectTokens(tokens, (IEnumerator<KeyValuePair<string, object>>)enumerator);
+					this.GetObjectTokens(tokens, detector, (IEnumerator<KeyValuePair<string, object>>)enumerator);
 					return;
 				}
 
 				if (enumerator is IDictionaryEnumerator)
 				{
-					this.GetObjectTokens(tokens, (IDictionaryEnumerator)enumerator);
+					this.GetObjectTokens(tokens, detector, (IDictionaryEnumerator)enumerator);
 					return;
 				}
 
@@ -271,13 +318,13 @@ namespace JsonFx.Json
 						appendDelim = true;
 					}
 
-					this.GetTokens(tokens, enumerator.Current);
+					this.GetTokens(tokens, detector, enumerator.Current);
 				}
 
 				tokens.Enqueue(JsonGrammar.TokenArrayEnd);
 			}
 
-			private void GetObjectTokens(Queue<Token<JsonTokenType>> tokens, IDictionaryEnumerator enumerator)
+			private void GetObjectTokens(Queue<Token<JsonTokenType>> tokens, ICycleDetector detector, IDictionaryEnumerator enumerator)
 			{
 				tokens.Enqueue(JsonGrammar.TokenObjectBegin);
 
@@ -294,13 +341,13 @@ namespace JsonFx.Json
 						appendDelim = true;
 					}
 
-					this.GetPropertyTokens(tokens, enumerator.Key, enumerator.Value);
+					this.GetPropertyTokens(tokens, detector, enumerator.Key, enumerator.Value);
 				}
 
 				tokens.Enqueue(JsonGrammar.TokenObjectEnd);
 			}
 
-			private void GetObjectTokens(Queue<Token<JsonTokenType>> tokens, IEnumerator<KeyValuePair<string, object>> enumerator)
+			private void GetObjectTokens(Queue<Token<JsonTokenType>> tokens, ICycleDetector detector, IEnumerator<KeyValuePair<string, object>> enumerator)
 			{
 				tokens.Enqueue(JsonGrammar.TokenObjectBegin);
 
@@ -318,13 +365,13 @@ namespace JsonFx.Json
 					}
 
 					KeyValuePair<string, object> pair = enumerator.Current;
-					this.GetPropertyTokens(tokens, pair.Key, pair.Value);
+					this.GetPropertyTokens(tokens, detector, pair.Key, pair.Value);
 				}
 
 				tokens.Enqueue(JsonGrammar.TokenObjectEnd);
 			}
 
-			private void GetObjectTokens(Queue<Token<JsonTokenType>> tokens, object value, Type type)
+			private void GetObjectTokens(Queue<Token<JsonTokenType>> tokens, ICycleDetector detector, object value, Type type)
 			{
 				tokens.Enqueue(JsonGrammar.TokenObjectBegin);
 
@@ -360,18 +407,18 @@ namespace JsonFx.Json
 						appendDelim = true;
 					}
 
-					this.GetPropertyTokens(tokens, map.Key, propertyValue);
+					this.GetPropertyTokens(tokens, detector, map.Key, propertyValue);
 				}
 
 				tokens.Enqueue(JsonGrammar.TokenObjectEnd);
 			}
 
-			private void GetPropertyTokens(Queue<Token<JsonTokenType>> tokens, object key, object value)
+			private void GetPropertyTokens(Queue<Token<JsonTokenType>> tokens, ICycleDetector detector, object key, object value)
 			{
 				tokens.Enqueue(JsonGrammar.TokenString(key));
 				tokens.Enqueue(JsonGrammar.TokenPairDelim);
 
-				this.GetTokens(tokens, value);
+				this.GetTokens(tokens, detector, value);
 			}
 
 			#endregion Walker Methods

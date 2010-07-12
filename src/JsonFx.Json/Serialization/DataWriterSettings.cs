@@ -30,6 +30,8 @@
 
 using System;
 
+using JsonFx.Serialization.GraphCycles;
+
 namespace JsonFx.Serialization
 {
 	/// <summary>
@@ -41,8 +43,9 @@ namespace JsonFx.Serialization
 		#region Fields
 
 		private bool prettyPrint;
+		private GraphCycleType graphCycles = GraphCycleType.Ignore;
 		private string tab = "\t";
-		private int maxDepth = 100;
+		private int maxDepth;
 		private string newLine = Environment.NewLine;
 		private readonly ResolverCache ResolverCache;
 
@@ -81,10 +84,19 @@ namespace JsonFx.Serialization
 		#region Properties
 
 		/// <summary>
+		/// Gets and sets what to do when graph cycles (repeated references) are encounted
+		/// </summary>
+		public GraphCycleType GraphCycles
+		{
+			get { return this.graphCycles; }
+			set { this.graphCycles = value; }
+		}
+
+		/// <summary>
 		/// Gets and sets the maximum nesting depth
 		/// </summary>
 		/// <remarks>
-		/// Depth is fast and easy safegaurd against detecting graph cycles.
+		/// Depth is a fast and easy safegaurd against detecting graph cycles but may produce false positives
 		/// </remarks>
 		public int MaxDepth
 		{
@@ -93,7 +105,7 @@ namespace JsonFx.Serialization
 		}
 
 		/// <summary>
-		/// Gets and sets if JSON will be formatted for human reading.
+		/// Gets and sets if output will be formatted for human reading.
 		/// </summary>
 		public bool PrettyPrint
 		{

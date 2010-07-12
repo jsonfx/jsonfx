@@ -33,13 +33,27 @@ using System.Collections.Generic;
 using System.Linq;
 
 using JsonFx.Serialization;
+using JsonFx.Serialization.GraphCycles;
 using Xunit;
+
 using Assert=JsonFx.AssertPatched;
 
 namespace JsonFx.Json
 {
 	public class JsonWalkerTests
 	{
+		#region Test Types
+
+		public class Person
+		{
+			public string Name { get; set; }
+			public Person Father { get; set; }
+			public Person Mother { get; set; }
+			public Person[] Children { get; set; }
+		}
+
+		#endregion Test Types
+
 		#region Array Tests
 
 		[Fact]
@@ -704,6 +718,294 @@ namespace JsonFx.Json
 		}
 
 		#endregion Complex Graph Tests
+
+		#region Graph Cycles Tests
+
+		[Fact]
+		public void GetTokens_GraphCycleTypeIgnore_ReplacesCycleStartWithNull()
+		{
+			var input = new Person
+			{
+				Name = "John, Jr.",
+				Father = new Person
+				{
+					Name = "John, Sr."
+				},
+				Mother = new Person
+				{
+					Name = "Sally"
+				}
+			};
+
+			// create multiple cycles
+			input.Father.Children = input.Mother.Children = new Person[]
+			{
+				input
+			};
+
+			var walker = new JsonWriter.JsonWalker(new DataWriterSettings
+			{
+				GraphCycles = GraphCycleType.Ignore
+			});
+
+			var expected = new[]
+				{
+					JsonGrammar.TokenObjectBegin,
+					JsonGrammar.TokenString("Name"),
+					JsonGrammar.TokenPairDelim,
+					JsonGrammar.TokenString("John, Jr."),
+					JsonGrammar.TokenValueDelim,
+
+					JsonGrammar.TokenString("Father"),
+					JsonGrammar.TokenPairDelim,
+					JsonGrammar.TokenObjectBegin,
+					JsonGrammar.TokenString("Name"),
+					JsonGrammar.TokenPairDelim,
+					JsonGrammar.TokenString("John, Sr."),
+					JsonGrammar.TokenValueDelim,
+					JsonGrammar.TokenString("Father"),
+					JsonGrammar.TokenPairDelim,
+					JsonGrammar.TokenNull,
+					JsonGrammar.TokenValueDelim,
+					JsonGrammar.TokenString("Mother"),
+					JsonGrammar.TokenPairDelim,
+					JsonGrammar.TokenNull,
+					JsonGrammar.TokenValueDelim,
+					JsonGrammar.TokenString("Children"),
+					JsonGrammar.TokenPairDelim,
+					JsonGrammar.TokenArrayBegin,
+					JsonGrammar.TokenNull,
+					JsonGrammar.TokenArrayEnd,
+					JsonGrammar.TokenObjectEnd,
+					JsonGrammar.TokenValueDelim,
+
+					JsonGrammar.TokenString("Mother"),
+					JsonGrammar.TokenPairDelim,
+					JsonGrammar.TokenObjectBegin,
+					JsonGrammar.TokenString("Name"),
+					JsonGrammar.TokenPairDelim,
+					JsonGrammar.TokenString("Sally"),
+					JsonGrammar.TokenValueDelim,
+					JsonGrammar.TokenString("Father"),
+					JsonGrammar.TokenPairDelim,
+					JsonGrammar.TokenNull,
+					JsonGrammar.TokenValueDelim,
+					JsonGrammar.TokenString("Mother"),
+					JsonGrammar.TokenPairDelim,
+					JsonGrammar.TokenNull,
+					JsonGrammar.TokenValueDelim,
+					JsonGrammar.TokenString("Children"),
+					JsonGrammar.TokenPairDelim,
+					JsonGrammar.TokenArrayBegin,
+					JsonGrammar.TokenNull,
+					JsonGrammar.TokenArrayEnd,
+					JsonGrammar.TokenObjectEnd,
+
+					JsonGrammar.TokenValueDelim,
+					JsonGrammar.TokenString("Children"),
+					JsonGrammar.TokenPairDelim,
+					JsonGrammar.TokenNull,
+
+					JsonGrammar.TokenObjectEnd
+				};
+
+			var actual = walker.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_GraphCycleTypeReferences_ThrowsGraphCycleException()
+		{
+			var input = new Person
+			{
+				Name = "John, Jr.",
+				Father = new Person
+				{
+					Name = "John, Sr."
+				},
+				Mother = new Person
+				{
+					Name = "Sally"
+				}
+			};
+
+			// create multiple cycles
+			input.Father.Children = input.Mother.Children = new Person[]
+			{
+				input
+			};
+
+			var walker = new JsonWriter.JsonWalker(new DataWriterSettings
+			{
+				GraphCycles = GraphCycleType.Reference
+			});
+
+			GraphCycleException ex = Assert.Throws<GraphCycleException>(
+				delegate
+				{
+					walker.GetTokens(input).ToArray();
+				});
+
+			Assert.Equal(GraphCycleType.Reference, ex.CycleType);
+		}
+
+		[Fact]
+		public void GetTokens_GraphCycleTypeMaxDepth_ThrowsGraphCycleException()
+		{
+			var input = new Person
+			{
+				Name = "John, Jr.",
+				Father = new Person
+				{
+					Name = "John, Sr."
+				},
+				Mother = new Person
+				{
+					Name = "Sally"
+				}
+			};
+
+			// create multiple cycles
+			input.Father.Children = input.Mother.Children = new Person[]
+			{
+				input
+			};
+
+			var walker = new JsonWriter.JsonWalker(new DataWriterSettings
+			{
+				GraphCycles = GraphCycleType.MaxDepth,
+				MaxDepth = 25
+			});
+
+			GraphCycleException ex = Assert.Throws<GraphCycleException>(
+				delegate
+				{
+					walker.GetTokens(input).ToArray();
+				});
+
+			Assert.Equal(GraphCycleType.MaxDepth, ex.CycleType);
+		}
+
+		[Fact]
+		public void GetTokens_GraphCycleTypeMaxDepthNoMaxDepth_ThrowsArgumentException()
+		{
+			var input = new Person
+			{
+				Name = "John, Jr.",
+				Father = new Person
+				{
+					Name = "John, Sr."
+				},
+				Mother = new Person
+				{
+					Name = "Sally"
+				}
+			};
+
+			// create multiple cycles
+			input.Father.Children = input.Mother.Children = new Person[]
+			{
+				input
+			};
+
+			var walker = new JsonWriter.JsonWalker(new DataWriterSettings
+			{
+				GraphCycles = GraphCycleType.MaxDepth,
+				MaxDepth = 0
+			});
+
+			ArgumentException ex = Assert.Throws<ArgumentException>(
+				delegate
+				{
+					walker.GetTokens(input).ToArray();
+				});
+
+			Assert.Equal("maxDepth", ex.ParamName);
+		}
+
+		[Fact]
+		public void GetTokens_GraphCycleTypeMaxDepthFalsePositive_ThrowsGraphCycleException()
+		{
+			// input from fail18.json in test suite at http://www.json.org/JSON_checker/
+			var input = new[]
+			{
+				new []
+				{
+					new []
+					{
+						new []
+						{
+							new []
+							{
+								new []
+								{
+									new []
+									{
+										new []
+										{
+											new []
+											{
+												new []
+												{
+													new []
+													{
+														new []
+														{
+															new []
+															{
+																new []
+																{
+																	new []
+																	{
+																		new []
+																		{
+																			new []
+																			{
+																				new []
+																				{
+																					new []
+																					{
+																						new []
+																						{
+																							"Too deep"
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			};
+
+			var walker = new JsonWriter.JsonWalker(new DataWriterSettings
+			{
+				GraphCycles = GraphCycleType.MaxDepth,
+				MaxDepth = 19
+			});
+
+			GraphCycleException ex = Assert.Throws<GraphCycleException>(
+				delegate
+				{
+					walker.GetTokens(input).ToArray();
+				});
+
+			Assert.Equal(GraphCycleType.MaxDepth, ex.CycleType);
+		}
+
+		#endregion Graph Cycles Tests
 
 		#region Input Edge Case Tests
 

@@ -71,6 +71,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="About.cs" />
+    <Compile Include="Serialization\GraphCycles\GraphCycleException.cs" />
+    <Compile Include="Serialization\GraphCycles\GraphCycleType.cs" />
+    <Compile Include="Serialization\GraphCycles\DepthCounter.cs" />
+    <Compile Include="Serialization\GraphCycles\ICycleDetector.cs" />
+    <Compile Include="Serialization\GraphCycles\ReferenceSet.cs" />
     <Compile Include="IO\IStream`1.cs" />
     <Compile Include="IO\ITextStream.cs" />
     <Compile Include="IO\Stream`1.cs" />
