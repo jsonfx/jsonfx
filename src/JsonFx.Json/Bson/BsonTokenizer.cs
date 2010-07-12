@@ -40,7 +40,7 @@ namespace JsonFx.Bson
 	public partial class BsonReader
 	{
 		/// <summary>
-		/// Generates a SAX-like sequence of BSON tokens from text
+		/// Generates a SAX-like sequence of BSON tokens from BSON bytes
 		/// </summary>
 		public class BsonTokenizer : IBinaryTokenizer<BsonTokenType>
 		{

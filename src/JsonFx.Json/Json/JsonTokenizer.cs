@@ -42,7 +42,7 @@ namespace JsonFx.Json
 	public partial class JsonReader
 	{
 		/// <summary>
-		/// Generates a SAX-like sequence of JSON tokens from text
+		/// Generates a SAX-like sequence of JSON tokens from JSON text
 		/// </summary>
 		public class JsonTokenizer : ITextTokenizer<JsonTokenType>
 		{
