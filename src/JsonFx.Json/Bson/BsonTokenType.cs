@@ -65,7 +65,7 @@ namespace JsonFx.Bson
 
 	#endregion Element Types
 
-	#region Element Types
+	#region Binary Subtypes
 
 	public enum BsonBinarySubtype : byte
 	{
@@ -78,7 +78,7 @@ namespace JsonFx.Bson
 		UserDefined = 0x80
 	}
 
-	#endregion Element Types
+	#endregion Binary Subtypes
 
 	/// <summary>
 	/// BSON Lexical Analysis Tokens
