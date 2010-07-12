@@ -85,7 +85,7 @@ namespace JsonFx.Bson
 
 				using (BinaryWriter writer = new BinaryWriter(stream, Encoding.UTF8))
 				{
-					Stream<Token<BsonTokenType>> tokenStream = new Stream<Token<BsonTokenType>>(tokens);
+					IStream<Token<BsonTokenType>> tokenStream = new Stream<Token<BsonTokenType>>(tokens);
 					if (!tokenStream.IsCompleted)
 					{
 						BsonFormatter.WriteDocument(writer, tokenStream);
@@ -103,7 +103,7 @@ namespace JsonFx.Bson
 			/// <param name="writer"></param>
 			/// <param name="tokens"></param>
 			/// <returns>number of bytes written</returns>
-			private static int WriteDocument(BinaryWriter writer, Stream<Token<BsonTokenType>> tokens)
+			private static int WriteDocument(BinaryWriter writer, IStream<Token<BsonTokenType>> tokens)
 			{
 				Token<BsonTokenType> token = tokens.Peek();
 				if (tokens.IsCompleted || token == null ||
@@ -146,7 +146,7 @@ namespace JsonFx.Bson
 			/// <param name="writer"></param>
 			/// <param name="tokens"></param>
 			/// <returns>number of bytes written</returns>
-			private static int WriteElement(BinaryWriter writer, Stream<Token<BsonTokenType>> tokens)
+			private static int WriteElement(BinaryWriter writer, IStream<Token<BsonTokenType>> tokens)
 			{
 				Token<BsonTokenType> token = tokens.Peek();
 				if (tokens.IsCompleted || token == null ||
@@ -417,7 +417,7 @@ namespace JsonFx.Bson
 			/// <param name="writer"></param>
 			/// <param name="tokens"></param>
 			/// <returns>number of bytes written</returns>
-			private static int WriteBinary(BinaryWriter writer, Stream<Token<BsonTokenType>> tokens)
+			private static int WriteBinary(BinaryWriter writer, IStream<Token<BsonTokenType>> tokens)
 			{
 				Token<BsonTokenType> token = tokens.Peek();
 				if (tokens.IsCompleted || token == null ||
@@ -459,7 +459,7 @@ namespace JsonFx.Bson
 			/// <param name="writer"></param>
 			/// <param name="tokens"></param>
 			/// <returns>number of bytes written</returns>
-			private static int WriteCodeWithScope(BinaryWriter writer, Stream<Token<BsonTokenType>> tokens)
+			private static int WriteCodeWithScope(BinaryWriter writer, IStream<Token<BsonTokenType>> tokens)
 			{
 				long start = writer.BaseStream.Position;
 				int total = BsonReader.SizeOfInt32;// code_w_s length
