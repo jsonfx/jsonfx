@@ -44,7 +44,7 @@ namespace JsonFx.Json
 		/// <summary>
 		/// Generates a SAX-like sequence of JSON tokens from text
 		/// </summary>
-		public class JsonTokenizer : IDataTokenizer<JsonTokenType>
+		public class JsonTokenizer : ITextTokenizer<JsonTokenType>
 		{
 			#region Constants
 

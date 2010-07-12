@@ -101,9 +101,13 @@
     <Compile Include="Serialization\CallbackResolverStrategy.cs" />
     <Compile Include="Serialization\CombinedResolverStrategy.cs" />
     <Compile Include="Serialization\DataFilter`2.cs" />
+    <Compile Include="Serialization\IBinaryFormatter`1.cs" />
+    <Compile Include="Serialization\IBinaryTokenizer`1.cs" />
     <Compile Include="Serialization\IDataAnalyzer`1.cs" />
     <Compile Include="Serialization\IDataFilter`2.cs" />
     <Compile Include="Serialization\IDataWalker`1.cs" />
+    <Compile Include="Serialization\ITextFormatter`1.cs" />
+    <Compile Include="Serialization\ITextTokenizer`1.cs" />
     <Compile Include="Serialization\PocoResolverStrategy.cs" />
     <Compile Include="Serialization\DataReaderSettings.cs" />
     <Compile Include="Serialization\DataReader`1.cs" />
@@ -111,9 +115,7 @@
     <Compile Include="Serialization\DataWriter`1.cs" />
     <Compile Include="CodeGen\DynamicMethodGenerator.cs" />
     <Compile Include="Serialization\Exceptions.cs" />
-    <Compile Include="Serialization\IDataFormatter`1.cs" />
     <Compile Include="Serialization\IDataReader.cs" />
-    <Compile Include="Serialization\IDataTokenizer`1.cs" />
     <Compile Include="Serialization\IDataTransformer`2.cs" />
     <Compile Include="Serialization\IDataWriter.cs" />
     <Compile Include="Serialization\IResolverCacheContainer.cs" />

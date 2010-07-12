@@ -38,7 +38,7 @@ namespace JsonFx.Serialization
 	/// Outputs text from a SAX-like input stream of JSON tokens
 	/// </summary>
 	/// <typeparam name="T">token type</typeparam>
-	public interface IDataFormatter<T>
+	public interface IBinaryFormatter<T>
 	{
 		#region Methods
 
@@ -47,13 +47,13 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="writer"></param>
 		/// <param name="tokens"></param>
-		void Format(TextWriter writer, IEnumerable<Token<T>> tokens);
+		void Format(Stream stream, IEnumerable<Token<T>> tokens);
 
 		/// <summary>
 		/// Formats the token sequence as a string
 		/// </summary>
 		/// <param name="tokens"></param>
-		string Format(IEnumerable<Token<T>> tokens);
+		byte[] Format(IEnumerable<Token<T>> tokens);
 
 		#endregion Methods
 	}

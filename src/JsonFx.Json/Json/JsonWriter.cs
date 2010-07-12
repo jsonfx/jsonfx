@@ -128,7 +128,7 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <returns></returns>
-		protected override IDataFormatter<JsonTokenType> GetFormatter()
+		protected override ITextFormatter<JsonTokenType> GetFormatter()
 		{
 			return new JsonWriter.JsonFormatter(this.Settings);
 		}

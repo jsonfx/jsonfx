@@ -42,7 +42,7 @@ namespace JsonFx.Json
 		/// <summary>
 		/// Outputs JSON text from a SAX-like input stream of JSON tokens
 		/// </summary>
-		public class JsonFormatter : IDataFormatter<JsonTokenType>
+		public class JsonFormatter : ITextFormatter<JsonTokenType>
 		{
 			#region Fields
 

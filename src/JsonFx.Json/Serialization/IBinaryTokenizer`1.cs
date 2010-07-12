@@ -30,82 +30,47 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 
-using JsonFx.Json.Filters;
-using JsonFx.Serialization;
-
-namespace JsonFx.Json
+namespace JsonFx.Serialization
 {
 	/// <summary>
-	/// JSON deserializer
+	/// Generates a SAX-like sequence of tokens from a sequence of characters
 	/// </summary>
-	public partial class JsonReader : DataReader<JsonTokenType>
+	/// <typeparam name="T">token type</typeparam>
+	public interface IBinaryTokenizer<T> : IDisposable
 	{
-		#region Init
-
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		public JsonReader()
-			: this(new DataReaderSettings())
-		{
-		}
-
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="settings"></param>
-		public JsonReader(DataReaderSettings settings)
-			: base(settings, new IDataFilter<JsonTokenType>[] { new Iso8601DateFilter() })
-		{
-		}
-
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="settings"></param>
-		/// <param name="filters"></param>
-		public JsonReader(DataReaderSettings settings, params IDataFilter<JsonTokenType>[] filters)
-			: base(settings, (IEnumerable<IDataFilter<JsonTokenType>>)filters)
-		{
-		}
-
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="settings"></param>
-		/// <param name="filters"></param>
-		public JsonReader(DataReaderSettings settings, IEnumerable<IDataFilter<JsonTokenType>> filters)
-			: base(settings, filters)
-		{
-		}
-
-		#endregion Init
-
 		#region Properties
 
 		/// <summary>
-		/// Gets the supported content type of the serialized data
+		/// Gets the current position of the underlying input character sequence
 		/// </summary>
-		public override IEnumerable<string> ContentType
+		/// <remarks>
+		/// Tokenizers not tracking index should return -1.
+		/// </remarks>
+		long Index
 		{
-			get { yield return "application/json"; }
+			get;
 		}
 
 		#endregion Properties
 
-		#region IDataReader Methods
+		#region Methods
 
-		protected override ITextTokenizer<JsonTokenType> GetTokenizer()
-		{
-			return new JsonReader.JsonTokenizer();
-		}
+		/// <summary>
+		/// Tokenizes the input sequence into tokens
+		/// </summary>
+		/// <param name="reader"></param>
+		/// <returns></returns>
+		IEnumerable<Token<T>> GetTokens(Stream stream);
 
-		protected override IDataAnalyzer<JsonTokenType> GetAnalyzer()
-		{
-			return new JsonReader.JsonAnalyzer(this.Settings, this.Filters);
-		}
+		/// <summary>
+		/// Tokenizes the input sequence into tokens
+		/// </summary>
+		/// <param name="text"></param>
+		/// <returns></returns>
+		IEnumerable<Token<T>> GetTokens(byte[] bytes);
 
-		#endregion IDataReader Methods
+		#endregion Methods
 	}
 }

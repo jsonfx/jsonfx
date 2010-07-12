@@ -129,7 +129,7 @@ namespace JsonFx.Serialization
 				throw new ArgumentNullException("walker");
 			}
 
-			IDataFormatter<T> formatter = this.GetFormatter();
+			ITextFormatter<T> formatter = this.GetFormatter();
 			if (formatter == null)
 			{
 				throw new ArgumentNullException("formatter");
@@ -163,7 +163,7 @@ namespace JsonFx.Serialization
 				throw new ArgumentNullException("walker");
 			}
 
-			IDataFormatter<T> formatter = this.GetFormatter();
+			ITextFormatter<T> formatter = this.GetFormatter();
 			if (formatter == null)
 			{
 				throw new ArgumentNullException("formatter");
@@ -196,7 +196,7 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="dataWriterSettings"></param>
 		/// <returns></returns>
-		protected abstract IDataFormatter<T> GetFormatter();
+		protected abstract ITextFormatter<T> GetFormatter();
 
 		#endregion Methods
 	}

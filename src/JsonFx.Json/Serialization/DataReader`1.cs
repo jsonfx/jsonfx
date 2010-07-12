@@ -129,7 +129,7 @@ namespace JsonFx.Serialization
 		/// <param name="targetType">the expected type of the serialized data</param>
 		public virtual object Deserialize(TextReader input, Type targetType)
 		{
-			IDataTokenizer<T> tokenizer = this.GetTokenizer();
+			ITextTokenizer<T> tokenizer = this.GetTokenizer();
 			if (tokenizer == null)
 			{
 				throw new InvalidOperationException("Tokenizer is invalid");
@@ -166,7 +166,7 @@ namespace JsonFx.Serialization
 		/// <param name="targetType">the expected type of the serialized data</param>
 		public virtual object Deserialize(string input, Type targetType)
 		{
-			IDataTokenizer<T> tokenizer = this.GetTokenizer();
+			ITextTokenizer<T> tokenizer = this.GetTokenizer();
 			if (tokenizer == null)
 			{
 				throw new ArgumentNullException("tokenizer");
@@ -184,7 +184,7 @@ namespace JsonFx.Serialization
 		/// </remarks>
 		public IEnumerable StreamedDeserialize(TextReader input)
 		{
-			IDataTokenizer<T> tokenizer = this.GetTokenizer();
+			ITextTokenizer<T> tokenizer = this.GetTokenizer();
 			if (tokenizer == null)
 			{
 				throw new ArgumentNullException("tokenizer");
@@ -211,7 +211,7 @@ namespace JsonFx.Serialization
 			}
 		}
 
-		private object DeserializeInternal(IDataTokenizer<T> tokenizer, IEnumerable<Token<T>> tokens, Type targetType)
+		private object DeserializeInternal(ITextTokenizer<T> tokenizer, IEnumerable<Token<T>> tokens, Type targetType)
 		{
 			IDataAnalyzer<T> analyzer = this.GetAnalyzer();
 			if (analyzer == null)
@@ -248,7 +248,7 @@ namespace JsonFx.Serialization
 			}
 		}
 
-		protected abstract IDataTokenizer<T> GetTokenizer();
+		protected abstract ITextTokenizer<T> GetTokenizer();
 
 		protected abstract IDataAnalyzer<T> GetAnalyzer();
 
