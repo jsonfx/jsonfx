@@ -39,6 +39,26 @@ namespace JsonFx.Bson
 {
 	public partial class BsonReader
 	{
+		#region Constants
+
+		// Error messages
+		internal const string ErrorUnrecognizedToken = "Illegal BSON sequence";
+
+		internal static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+
+		internal const int SizeOfByte = 1;
+		internal const int SizeOfInt32 = 4;
+		internal const int SizeOfInt64 = 8;
+		internal const int SizeOfDouble = 8;
+		internal const int SizeOfObjectID = 12;
+		internal const int SizeOfDBPointer = 12;
+
+		internal const byte NullByte = 0;
+		internal const byte FalseByte = 0;
+		internal const byte TrueByte = 1;
+
+		#endregion Constants
+
 		/// <summary>
 		/// Generates a SAX-like sequence of BSON tokens from BSON bytes
 		/// </summary>
@@ -47,10 +67,8 @@ namespace JsonFx.Bson
 			#region Constants
 
 			// tokenizing errors
-			private const string ErrorUnrecognizedToken = "Illegal BSON sequence";
 			private const string ErrorUnterminatedDocument = "Unterminated BSON document";
 
-			private static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
 			private static readonly BinaryReader NullBinaryReader = new BinaryReader(Stream.Null, Encoding.UTF8);
 
 			#endregion Constants
@@ -136,19 +154,19 @@ namespace JsonFx.Bson
 					}
 					case BsonElementType.ObjectID:
 					{
-						byte[] value = reader.ReadBytes(12);
-						queue.Enqueue(BsonGrammar.TokenBinary(value));
+						byte[] value = reader.ReadBytes(SizeOfObjectID);
+						queue.Enqueue(BsonGrammar.TokenByteArray(value));
 						break;
 					}
 					case BsonElementType.Boolean:
 					{
-						bool value = reader.ReadByte() != 0x00;
+						bool value = reader.ReadByte() != FalseByte;
 						queue.Enqueue(value ? BsonGrammar.TokenTrue : BsonGrammar.TokenFalse);
 						break;
 					}
 					case BsonElementType.DateTimeUtc:
 					{
-						DateTime value = BsonTokenizer.UnixEpoch.AddMilliseconds(reader.ReadInt64());
+						DateTime value = UnixEpoch.AddMilliseconds(reader.ReadInt64());
 						queue.Enqueue(BsonGrammar.TokenUtcDateTime(value));
 						break;
 					}
@@ -166,8 +184,8 @@ namespace JsonFx.Bson
 						string value1 = BsonTokenizer.ReadString(reader);
 						queue.Enqueue(BsonGrammar.TokenString(value1));
 
-						byte[] value2 = reader.ReadBytes(12);
-						queue.Enqueue(BsonGrammar.TokenBinary(value2));
+						byte[] value2 = reader.ReadBytes(SizeOfDBPointer);
+						queue.Enqueue(BsonGrammar.TokenByteArray(value2));
 						break;
 					}
 					case BsonElementType.CodeWithScope:
@@ -198,6 +216,7 @@ namespace JsonFx.Bson
 					case BsonElementType.MinKey:
 					case BsonElementType.MaxKey:
 					{
+						// no data value
 						break;
 					}
 					default:
@@ -215,7 +234,7 @@ namespace JsonFx.Bson
 				queue.Enqueue(BsonGrammar.TokenBinarySubtype(subtype));
 
 				byte[] buffer = reader.ReadBytes(size);
-				queue.Enqueue(BsonGrammar.TokenBinary(buffer));
+				queue.Enqueue(BsonGrammar.TokenByteArray(buffer));
 			}
 
 			private static string ReadString(BinaryReader reader)
@@ -224,7 +243,8 @@ namespace JsonFx.Bson
 
 				char[] buffer = reader.ReadChars(size);
 
-				return new String(buffer, 0, size-1);
+				// trim null char
+				return new String(buffer, 0, size-BsonReader.SizeOfByte);
 			}
 
 			private static string ReadCString(BinaryReader reader)

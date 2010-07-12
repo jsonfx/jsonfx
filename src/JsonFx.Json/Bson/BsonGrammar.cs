@@ -93,9 +93,9 @@ namespace JsonFx.Bson
 			return new Token<BsonTokenType>(BsonTokenType.UtcDateTime, value);
 		}
 
-		public static Token<BsonTokenType> TokenBinary(byte[] value)
+		public static Token<BsonTokenType> TokenByteArray(byte[] value)
 		{
-			return new Token<BsonTokenType>(BsonTokenType.Binary, value);
+			return new Token<BsonTokenType>(BsonTokenType.ByteArray, value);
 		}
 
 		#endregion Reusable Tokens

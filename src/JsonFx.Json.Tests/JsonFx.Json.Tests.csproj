@@ -79,6 +79,7 @@
   <ItemGroup>
     <Compile Include="AssertPatched.cs" />
     <Compile Include="Bson\BsonTokenizerTests.cs" />
+    <Compile Include="Bson\BsonFormatterTests.cs" />
     <Compile Include="CodeGen\DynamicMethodGeneratorTests.cs" />
     <Compile Include="IO\StringStreamTests.cs" />
     <Compile Include="IO\TextReaderStreamTests.cs" />

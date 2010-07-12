@@ -154,6 +154,6 @@ namespace JsonFx.Bson
 		/// <summary>
 		/// Binary data
 		/// </summary>
-		Binary
+		ByteArray
 	}
 }
