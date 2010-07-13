@@ -31,7 +31,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 
 using JsonFx.IO;
 using JsonFx.Serialization.Resolvers;
@@ -297,7 +296,7 @@ namespace JsonFx.Common
 					case CommonTokenType.PropertyKey:
 					{
 						tokens.Pop();
-						propertyName = Convert.ToString(token.Value, CultureInfo.InvariantCulture);
+						propertyName = token.ValueAsString();
 						break;
 					}
 					case CommonTokenType.ObjectEnd:

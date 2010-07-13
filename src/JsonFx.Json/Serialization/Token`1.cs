@@ -30,6 +30,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 namespace JsonFx.Serialization
@@ -85,7 +86,7 @@ namespace JsonFx.Serialization
 			if (this.Value != null)
 			{
 				builder.Append("=");
-				builder.Append(this.Value);
+				builder.Append(this.ValueAsString());
 			}
 			builder.Append(" }");
 
@@ -116,5 +117,14 @@ namespace JsonFx.Serialization
 		}
 
 		#endregion Object Overrides
+
+		#region Utility Methods
+
+		internal string ValueAsString()
+		{
+			return Convert.ToString(this.Value, CultureInfo.InvariantCulture);
+		}
+
+		#endregion Utility Methods
 	}
 }

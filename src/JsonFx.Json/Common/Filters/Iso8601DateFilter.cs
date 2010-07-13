@@ -145,7 +145,7 @@ namespace JsonFx.Common.Filters
 			}
 
 			if (!Iso8601DateFilter.TryParseIso8601(
-				Convert.ToString(token.Value, CultureInfo.InvariantCulture),
+				token.ValueAsString(),
 				out value))
 			{
 				value = default(DateTime);

@@ -77,7 +77,7 @@ namespace JsonFx.Common.Filters
 			}
 
 			if (!MSAjaxDateFilter.TryParseMSAjaxDate(
-				Convert.ToString(token.Value, CultureInfo.InvariantCulture),
+				token.ValueAsString(),
 				out value))
 			{
 				value = default(DateTime);
