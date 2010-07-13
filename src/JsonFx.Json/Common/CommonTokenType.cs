@@ -75,19 +75,9 @@ namespace JsonFx.Common
 		/// </summary>
 		PropertyKey,
 
-		///// <summary>
-		///// Object attribute identifier
-		///// </summary>
-		//AttributeKey,
-
 		/// <summary>
 		/// Value delimiter
 		/// </summary>
-		ValueDelim,
-
-		///// <summary>
-		///// Code comment value
-		///// </summary>
-		//Comment
+		ValueDelim
 	}
 }

@@ -61,11 +61,6 @@ namespace JsonFx.Common
 			return new Token<CommonTokenType>(CommonTokenType.PropertyKey, value);
 		}
 
-		//public static Token<DataTokenType> TokenAttribute(object value)
-		//{
-		//    return new Token<DataTokenType>(DataTokenType.AttributeKey, value);
-		//}
-
 		public static Token<CommonTokenType> TokenValue(object value)
 		{
 			return new Token<CommonTokenType>(CommonTokenType.Value, value);
