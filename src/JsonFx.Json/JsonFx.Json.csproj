@@ -122,7 +122,6 @@
     <Compile Include="Serialization\IDataWriter.cs" />
     <Compile Include="Serialization\Resolvers\CallbackResolverStrategy.cs" />
     <Compile Include="Serialization\Resolvers\CombinedResolverStrategy.cs" />
-    <Compile Include="Serialization\Resolvers\DataContractResolverStrategy.cs" />
     <Compile Include="Serialization\Resolvers\IResolverCacheContainer.cs" />
     <Compile Include="Serialization\Resolvers\IResolverStrategy.cs" />
     <Compile Include="Serialization\Resolvers\PocoResolverStrategy.cs" />
@@ -130,6 +129,9 @@
     <Compile Include="Serialization\Token`1.cs" />
     <Compile Include="Serialization\TypeCoercionUtility.cs" />
     <Compile Include="Xml\Resolvers\XmlResolverStrategy.cs" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFrameworkVersion)' != 'v2.0' And '$(TargetFrameworkVersion)' != 'v3.0' ">
+    <Compile Include="Serialization\Resolvers\DataContractResolverStrategy.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Readme.txt" />
