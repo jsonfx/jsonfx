@@ -91,6 +91,8 @@
     <Compile Include="Json\JsonFormatterTests.cs" />
     <Compile Include="Json\JsonTokenizerTests.cs" />
     <Compile Include="Json\JsonWalkerTests.cs" />
+    <Compile Include="Serialization\DataAnalyzerTests.cs" />
+    <Compile Include="Serialization\DataWalkerTests.cs" />
     <Compile Include="Serialization\TypeCoercionUtilityTests.cs" />
   </ItemGroup>
   <ItemGroup>

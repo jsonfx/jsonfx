@@ -75,6 +75,8 @@
     <Compile Include="Bson\BsonGrammar.cs" />
     <Compile Include="Bson\BsonTokenizer.cs" />
     <Compile Include="Bson\BsonTokenType.cs" />
+    <Compile Include="Serialization\DataAnalyzer.cs" />
+    <Compile Include="Serialization\DataWalker.cs" />
     <Compile Include="Serialization\GraphCycles\GraphCycleException.cs" />
     <Compile Include="Serialization\GraphCycles\GraphCycleType.cs" />
     <Compile Include="Serialization\GraphCycles\DepthCounter.cs" />
@@ -112,6 +114,8 @@
     <Compile Include="Serialization\IDataWalker`1.cs" />
     <Compile Include="Serialization\ITextFormatter`1.cs" />
     <Compile Include="Serialization\ITextTokenizer`1.cs" />
+    <Compile Include="Serialization\DataTokenType.cs" />
+    <Compile Include="Serialization\DataGrammar.cs" />
     <Compile Include="Serialization\PocoResolverStrategy.cs" />
     <Compile Include="Serialization\DataReaderSettings.cs" />
     <Compile Include="Serialization\DataReader`1.cs" />
