@@ -42,9 +42,9 @@ namespace JsonFx.Json
 	public partial class JsonReader
 	{
 		/// <summary>
-		/// Generates a SAX-like sequence of JSON tokens from JSON text
+		/// Generates a SAX-like sequence of tokens from JSON text
 		/// </summary>
-		public class JsonTokenizer : ITextTokenizer<JsonTokenType>
+		public class JsonTokenizer : ITextTokenizer<DataTokenType>
 		{
 			#region Constants
 
@@ -96,89 +96,116 @@ namespace JsonFx.Json
 			/// Returns the next JSON token in the sequence.
 			/// </summary>
 			/// <returns></returns>
-			private static Token<JsonTokenType> NextToken(ITextStream scanner)
+			private static IEnumerable<Token<DataTokenType>> NextToken(ITextStream scanner)
 			{
-				// skip comments and whitespace between tokens
-				JsonTokenizer.SkipCommentsAndWhitespace(scanner);
-
-				if (scanner.IsCompleted)
+				while (true)
 				{
-					return JsonGrammar.TokenNone;
-				}
+					// skip comments and whitespace between tokens
+					JsonTokenizer.SkipCommentsAndWhitespace(scanner);
 
-				bool hasUnaryOp = false;
+					if (scanner.IsCompleted)
+					{
+						scanner.Dispose();
+						yield break;
+					}
 
-				char ch = scanner.Peek();
-				switch (ch)
-				{
-					case JsonGrammar.OperatorArrayBegin:
-					{
-						scanner.Pop();
-						return JsonGrammar.TokenArrayBegin;
-					}
-					case JsonGrammar.OperatorArrayEnd:
-					{
-						scanner.Pop();
-						return JsonGrammar.TokenArrayEnd;
-					}
-					case JsonGrammar.OperatorObjectBegin:
-					{
-						scanner.Pop();
-						return JsonGrammar.TokenObjectBegin;
-					}
-					case JsonGrammar.OperatorObjectEnd:
-					{
-						scanner.Pop();
-						return JsonGrammar.TokenObjectEnd;
-					}
-					case JsonGrammar.OperatorValueDelim:
-					{
-						scanner.Pop();
-						return JsonGrammar.TokenValueDelim;
-					}
-					case JsonGrammar.OperatorPairDelim:
-					{
-						scanner.Pop();
-						return JsonGrammar.TokenPairDelim;
-					}
-					case JsonGrammar.OperatorStringDelim:
-					case JsonGrammar.OperatorStringDelimAlt:
-					{
-						return JsonTokenizer.ScanString(scanner);
-					}
-					case JsonGrammar.OperatorUnaryMinus:
-					case JsonGrammar.OperatorUnaryPlus:
-					{
-						hasUnaryOp = true;
-						break;
-					}
-				}
+					bool hasUnaryOp = false;
 
-				// scan for numbers
-				Token<JsonTokenType> token = JsonTokenizer.ScanNumber(scanner);
-				if (token != null)
-				{
-					return token;
-				}
+					char ch = scanner.Peek();
+					switch (ch)
+					{
+						case JsonGrammar.OperatorArrayBegin:
+						{
+							scanner.Pop();
+							yield return DataGrammar.TokenArrayBegin;
+							continue;
+						}
+						case JsonGrammar.OperatorArrayEnd:
+						{
+							scanner.Pop();
+							yield return DataGrammar.TokenArrayEnd;
+							continue;
+						}
+						case JsonGrammar.OperatorObjectBegin:
+						{
+							scanner.Pop();
+							yield return DataGrammar.TokenObjectBegin;
+							continue;
+						}
+						case JsonGrammar.OperatorObjectEnd:
+						{
+							scanner.Pop();
+							yield return DataGrammar.TokenObjectEnd;
+							continue;
+						}
+						case JsonGrammar.OperatorStringDelim:
+						case JsonGrammar.OperatorStringDelimAlt:
+						{
+							string value = JsonTokenizer.ScanString(scanner);
 
-				// hold for Infinity, clear for others
-				if (!hasUnaryOp)
-				{
-					ch = default(char);
-				}
+							JsonTokenizer.SkipCommentsAndWhitespace(scanner);
+							if (scanner.Peek() == JsonGrammar.OperatorPairDelim)
+							{
+								scanner.Pop();
+								yield return DataGrammar.TokenProperty(value);
+							}
+							else
+							{
+								yield return DataGrammar.TokenValue(value);
+							}
+							continue;
+						}
+						case JsonGrammar.OperatorUnaryMinus:
+						case JsonGrammar.OperatorUnaryPlus:
+						{
+							hasUnaryOp = true;
+							break;
+						}
+						case JsonGrammar.OperatorValueDelim:
+						{
+							scanner.Pop();
+							yield return DataGrammar.TokenValueDelim;
+							continue;
+						}
+						case JsonGrammar.OperatorPairDelim:
+						{
+							throw new DeserializationException(JsonTokenizer.ErrorUnrecognizedToken, scanner.Index+1, scanner.Line, scanner.Column);
+						}
+					}
 
-				// scan for identifiers, then check if they are keywords
-				string ident = JsonTokenizer.ScanIdentifier(scanner);
-				if (!String.IsNullOrEmpty(ident))
-				{
-					token = JsonTokenizer.ScanKeywords(scanner, ident, ch);
+					// scan for numbers
+					Token<DataTokenType> token = JsonTokenizer.ScanNumber(scanner);
 					if (token != null)
 					{
-						return token;
+						yield return token;
+						continue;
 					}
-				}
 
-				throw new DeserializationException(JsonTokenizer.ErrorUnrecognizedToken, scanner.Index+1, scanner.Line, scanner.Column);
+					// hold for Infinity, clear for others
+					if (!hasUnaryOp)
+					{
+						ch = default(char);
+					}
+
+					// store for unterminated cases
+					long strPos = scanner.Index+1;
+					int strLine = scanner.Line;
+					int strCol = scanner.Column;
+
+					// scan for identifiers, then check if they are keywords
+					string ident = JsonTokenizer.ScanIdentifier(scanner);
+					if (!String.IsNullOrEmpty(ident))
+					{
+						token = JsonTokenizer.ScanKeywords(scanner, ident, ch);
+						if (token != null)
+						{
+							yield return token;
+							continue;
+						}
+					}
+
+					throw new DeserializationException(JsonTokenizer.ErrorUnrecognizedToken, strPos, strLine, strCol);
+				}
 			}
 
 			private static void SkipCommentsAndWhitespace(ITextStream scanner)
@@ -274,7 +301,7 @@ namespace JsonFx.Json
 				}
 			}
 
-			private static Token<JsonTokenType> ScanNumber(ITextStream scanner)
+			private static Token<DataTokenType> ScanNumber(ITextStream scanner)
 			{
 				// store for error cases
 				long numPos = scanner.Index+1;
@@ -422,17 +449,17 @@ namespace JsonFx.Json
 					if (number >= Int32.MinValue && number <= Int32.MaxValue)
 					{
 						// int most common
-						return JsonGrammar.TokenNumber((int)number);
+						return DataGrammar.TokenValue((int)number);
 					}
 
 					if (number >= Int64.MinValue && number <= Int64.MaxValue)
 					{
 						// long more flexible
-						return JsonGrammar.TokenNumber((long)number);
+						return DataGrammar.TokenValue((long)number);
 					}
 
 					// decimal most flexible
-					return JsonGrammar.TokenNumber(number);
+					return DataGrammar.TokenValue(number);
 				}
 				else
 				{
@@ -448,11 +475,11 @@ namespace JsonFx.Json
 					}
 
 					// native EcmaScript number (IEEE-754)
-					return JsonGrammar.TokenNumber(number);
+					return DataGrammar.TokenValue(number);
 				}
 			}
 
-			private static Token<JsonTokenType> ScanString(ITextStream scanner)
+			private static string ScanString(ITextStream scanner)
 			{
 				// store for unterminated cases
 				long strPos = scanner.Index+1;
@@ -481,7 +508,7 @@ namespace JsonFx.Json
 						scanner.Pop();
 
 						// output string
-						return JsonGrammar.TokenString(buffer.ToString());
+						return buffer.ToString();
 					}
 
 					if (ch != JsonGrammar.OperatorCharEscape)
@@ -605,7 +632,7 @@ namespace JsonFx.Json
 				}
 			}
 
-			private static Token<JsonTokenType> ScanKeywords(ITextStream scanner, string ident, char unary)
+			private static Token<DataTokenType> ScanKeywords(ITextStream scanner, string ident, char unary)
 			{
 				switch (ident)
 				{
@@ -616,7 +643,7 @@ namespace JsonFx.Json
 							return null;
 						}
 
-						return JsonGrammar.TokenFalse;
+						return DataGrammar.TokenFalse;
 					}
 					case JsonGrammar.KeywordTrue:
 					{
@@ -625,7 +652,7 @@ namespace JsonFx.Json
 							return null;
 						}
 
-						return JsonGrammar.TokenTrue;
+						return DataGrammar.TokenTrue;
 					}
 					case JsonGrammar.KeywordNull:
 					{
@@ -634,7 +661,7 @@ namespace JsonFx.Json
 							return null;
 						}
 
-						return JsonGrammar.TokenNull;
+						return DataGrammar.TokenNull;
 					}
 					case JsonGrammar.KeywordNaN:
 					{
@@ -643,18 +670,18 @@ namespace JsonFx.Json
 							return null;
 						}
 
-						return JsonGrammar.TokenNaN;
+						return DataGrammar.TokenNaN;
 					}
 					case JsonGrammar.KeywordInfinity:
 					{
 						if (unary == default(char) || unary == JsonGrammar.OperatorUnaryPlus)
 						{
-							return JsonGrammar.TokenPositiveInfinity;
+							return DataGrammar.TokenPositiveInfinity;
 						}
 
 						if (unary == JsonGrammar.OperatorUnaryMinus)
 						{
-							return JsonGrammar.TokenNegativeInfinity;
+							return DataGrammar.TokenNegativeInfinity;
 						}
 
 						return null;
@@ -666,7 +693,7 @@ namespace JsonFx.Json
 							return null;
 						}
 
-						return JsonGrammar.TokenUndefined;
+						return DataGrammar.TokenNull;
 					}
 				}
 
@@ -675,7 +702,14 @@ namespace JsonFx.Json
 					ident = unary.ToString()+ident;
 				}
 
-				return JsonGrammar.TokenLiteral(ident);
+				JsonTokenizer.SkipCommentsAndWhitespace(scanner);
+				if (scanner.Peek() == JsonGrammar.OperatorPairDelim)
+				{
+					scanner.Pop();
+					return DataGrammar.TokenProperty(ident);
+				}
+
+				return null;
 			}
 
 			/// <summary>
@@ -720,14 +754,14 @@ namespace JsonFx.Json
 
 			#endregion Scanning Methods
 
-			#region ITokenizer<JsonTokenType> Members
+			#region ITokenizer<DataTokenType> Members
 
 			/// <summary>
 			/// Gets a token sequence from the TextReader
 			/// </summary>
 			/// <param name="reader"></param>
 			/// <returns></returns>
-			public IEnumerable<Token<JsonTokenType>> GetTokens(TextReader reader)
+			public IEnumerable<Token<DataTokenType>> GetTokens(TextReader reader)
 			{
 				return this.GetTokens(new TextReaderStream(reader));
 			}
@@ -737,7 +771,7 @@ namespace JsonFx.Json
 			/// </summary>
 			/// <param name="text"></param>
 			/// <returns></returns>
-			public IEnumerable<Token<JsonTokenType>> GetTokens(string text)
+			public IEnumerable<Token<DataTokenType>> GetTokens(string text)
 			{
 				return this.GetTokens(new StringStream(text));
 			}
@@ -747,7 +781,7 @@ namespace JsonFx.Json
 			/// </summary>
 			/// <param name="scanner"></param>
 			/// <returns></returns>
-			protected IEnumerable<Token<JsonTokenType>> GetTokens(ITextStream scanner)
+			protected IEnumerable<Token<DataTokenType>> GetTokens(ITextStream scanner)
 			{
 				if (scanner == null)
 				{
@@ -756,20 +790,10 @@ namespace JsonFx.Json
 
 				this.Scanner = scanner;
 
-				while (true)
-				{
-					Token<JsonTokenType> token = JsonTokenizer.NextToken(scanner);
-					if (token.TokenType == JsonTokenType.None)
-					{
-						scanner.Dispose();
-						this.Scanner = StringStream.Null;
-						yield break;
-					}
-					yield return token;
-				};
+				return JsonTokenizer.NextToken(scanner);
 			}
 
-			#endregion ITokenizer<JsonTokenType> Members
+			#endregion ITokenizer<DataTokenType> Members
 
 			#region Utility Methods
 

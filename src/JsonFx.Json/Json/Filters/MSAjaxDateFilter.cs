@@ -63,13 +63,14 @@ namespace JsonFx.Json.Filters
 
 		#endregion Constant
 
-		#region IDataFilter<JsonTokenType,DateTime> Members
+		#region IDataFilter<DataTokenType,DateTime> Members
 
-		public override bool TryRead(DataReaderSettings settings, IStream<Token<JsonTokenType>> tokens, out DateTime value)
+		public override bool TryRead(DataReaderSettings settings, IStream<Token<DataTokenType>> tokens, out DateTime value)
 		{
-			Token<JsonTokenType> token = tokens.Peek();
+			Token<DataTokenType> token = tokens.Peek();
 			if (token == null ||
-				token.TokenType != JsonTokenType.String)
+				token.TokenType != DataTokenType.Value ||
+				!(token.Value is string))
 			{
 				value = default(DateTime);
 				return false;
@@ -87,17 +88,17 @@ namespace JsonFx.Json.Filters
 			return true;
 		}
 
-		public override bool TryWrite(DataWriterSettings settings, DateTime value, out IEnumerable<Token<JsonTokenType>> tokens)
+		public override bool TryWrite(DataWriterSettings settings, DateTime value, out IEnumerable<Token<DataTokenType>> tokens)
 		{
-			tokens = new Token<JsonTokenType>[]
+			tokens = new Token<DataTokenType>[]
 				{
-					JsonGrammar.TokenString(this.FormatMSAjaxDate(value))
+					DataGrammar.TokenValue(this.FormatMSAjaxDate(value))
 				};
 
 			return true;
 		}
 
-		#endregion IDataFilter<JsonTokenType,DateTime> Members
+		#endregion IDataFilter<DataTokenType,DateTime> Members
 
 		#region Utility Methods
 

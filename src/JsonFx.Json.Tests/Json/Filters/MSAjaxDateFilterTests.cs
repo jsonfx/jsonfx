@@ -47,9 +47,9 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_StandardTimeZone_ReadsAsUtc()
 		{
-			var input = new Stream<Token<JsonTokenType>>(new[]
+			var input = new Stream<Token<DataTokenType>>(new[]
 				{
-					JsonGrammar.TokenString(@"\/Date(1204329599999)\/")
+					DataGrammar.TokenValue(@"\/Date(1204329599999)\/")
 				});
 
 			var expected = new DateTime(2008, 2, 29, 23, 59, 59, 999, DateTimeKind.Utc);
@@ -64,9 +64,9 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_DaylightSavingsTimeZone_ReadsAsUtc()
 		{
-			var input = new Stream<Token<JsonTokenType>>(new[]
+			var input = new Stream<Token<DataTokenType>>(new[]
 				{
-					JsonGrammar.TokenString(@"\/Date(1278327077768)\/")
+					DataGrammar.TokenValue(@"\/Date(1278327077768)\/")
 				});
 
 			var expected = new DateTime(2010, 7, 5, 10, 51, 17, 768, DateTimeKind.Utc);
@@ -81,9 +81,9 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_FutureTimeZone_ReadsAsUtc()
 		{
-			var input = new Stream<Token<JsonTokenType>>(new[]
+			var input = new Stream<Token<DataTokenType>>(new[]
 				{
-					JsonGrammar.TokenString(@"\/Date(4102444799999)\/")
+					DataGrammar.TokenValue(@"\/Date(4102444799999)\/")
 				});
 
 			var expected = new DateTime(2099, 12, 31, 23, 59, 59, 999, DateTimeKind.Utc);
@@ -100,9 +100,9 @@ namespace JsonFx.Json.Filters
 		{
 			var expected = DateTime.MinValue;
 
-			var input = new Stream<Token<JsonTokenType>>(new[]
+			var input = new Stream<Token<DataTokenType>>(new[]
 				{
-					JsonGrammar.TokenString(@"\/Date(-62135596800000)\/")
+					DataGrammar.TokenValue(@"\/Date(-62135596800000)\/")
 				});
 
 			DateTime actual;
@@ -115,9 +115,9 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_DateTimeMaxValueUtc_ReadsAsDateTimeMaxValue()
 		{
-			var input = new Stream<Token<JsonTokenType>>(new[]
+			var input = new Stream<Token<DataTokenType>>(new[]
 				{
-					JsonGrammar.TokenString(@"\/Date(253402300800000)\/")
+					DataGrammar.TokenValue(@"\/Date(253402300800000)\/")
 				});
 
 			var expected = DateTime.MaxValue;
@@ -140,10 +140,10 @@ namespace JsonFx.Json.Filters
 
 			var expected = new[]
 				{
-					JsonGrammar.TokenString(@"\/Date(1204329599999)\/")
+					DataGrammar.TokenValue(@"\/Date(1204329599999)\/")
 				};
 
-			IEnumerable<Token<JsonTokenType>> actual;
+			IEnumerable<Token<DataTokenType>> actual;
 			Assert.True(new MSAjaxDateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
@@ -160,10 +160,10 @@ namespace JsonFx.Json.Filters
 
 			var expected = new[]
 				{
-					JsonGrammar.TokenString(@"\/Date(1204358399999)\/")
+					DataGrammar.TokenValue(@"\/Date(1204358399999)\/")
 				};
 
-			IEnumerable<Token<JsonTokenType>> actual;
+			IEnumerable<Token<DataTokenType>> actual;
 			Assert.True(new MSAjaxDateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
@@ -179,10 +179,10 @@ namespace JsonFx.Json.Filters
 
 			var expected = new[]
 				{
-					JsonGrammar.TokenString(@"\/Date(1204329599999)\/")
+					DataGrammar.TokenValue(@"\/Date(1204329599999)\/")
 				};
 
-			IEnumerable<Token<JsonTokenType>> actual;
+			IEnumerable<Token<DataTokenType>> actual;
 			Assert.True(new MSAjaxDateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
@@ -198,10 +198,10 @@ namespace JsonFx.Json.Filters
 
 			var expected = new[]
 				{
-					JsonGrammar.TokenString(@"\/Date(1278327077768)\/")
+					DataGrammar.TokenValue(@"\/Date(1278327077768)\/")
 				};
 
-			IEnumerable<Token<JsonTokenType>> actual;
+			IEnumerable<Token<DataTokenType>> actual;
 			Assert.True(new MSAjaxDateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
@@ -218,10 +218,10 @@ namespace JsonFx.Json.Filters
 
 			var expected = new[]
 				{
-					JsonGrammar.TokenString(@"\/Date(1278352277768)\/")
+					DataGrammar.TokenValue(@"\/Date(1278352277768)\/")
 				};
 
-			IEnumerable<Token<JsonTokenType>> actual;
+			IEnumerable<Token<DataTokenType>> actual;
 			Assert.True(new MSAjaxDateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
@@ -237,10 +237,10 @@ namespace JsonFx.Json.Filters
 
 			var expected = new[]
 				{
-					JsonGrammar.TokenString(@"\/Date(1278327077768)\/")
+					DataGrammar.TokenValue(@"\/Date(1278327077768)\/")
 				};
 
-			IEnumerable<Token<JsonTokenType>> actual;
+			IEnumerable<Token<DataTokenType>> actual;
 			Assert.True(new MSAjaxDateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
@@ -256,10 +256,10 @@ namespace JsonFx.Json.Filters
 
 			var expected = new[]
 				{
-					JsonGrammar.TokenString(@"\/Date(4102444799999)\/")
+					DataGrammar.TokenValue(@"\/Date(4102444799999)\/")
 				};
 
-			IEnumerable<Token<JsonTokenType>> actual;
+			IEnumerable<Token<DataTokenType>> actual;
 			Assert.True(new MSAjaxDateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
@@ -276,10 +276,10 @@ namespace JsonFx.Json.Filters
 
 			var expected = new[]
 				{
-					JsonGrammar.TokenString(@"\/Date(4102473599999)\/")
+					DataGrammar.TokenValue(@"\/Date(4102473599999)\/")
 				};
 
-			IEnumerable<Token<JsonTokenType>> actual;
+			IEnumerable<Token<DataTokenType>> actual;
 			Assert.True(new MSAjaxDateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
@@ -295,10 +295,10 @@ namespace JsonFx.Json.Filters
 
 			var expected = new[]
 				{
-					JsonGrammar.TokenString(@"\/Date(4102444799999)\/")
+					DataGrammar.TokenValue(@"\/Date(4102444799999)\/")
 				};
 
-			IEnumerable<Token<JsonTokenType>> actual;
+			IEnumerable<Token<DataTokenType>> actual;
 			Assert.True(new MSAjaxDateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
@@ -314,10 +314,10 @@ namespace JsonFx.Json.Filters
 
 			var expected = new[]
 				{
-					JsonGrammar.TokenString(@"\/Date(-62135596800000)\/")
+					DataGrammar.TokenValue(@"\/Date(-62135596800000)\/")
 				};
 
-			IEnumerable<Token<JsonTokenType>> actual;
+			IEnumerable<Token<DataTokenType>> actual;
 			Assert.True(new MSAjaxDateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
@@ -333,10 +333,10 @@ namespace JsonFx.Json.Filters
 
 			var expected = new[]
 				{
-					JsonGrammar.TokenString(@"\/Date(253402300800000)\/")
+					DataGrammar.TokenValue(@"\/Date(253402300800000)\/")
 				};
 
-			IEnumerable<Token<JsonTokenType>> actual;
+			IEnumerable<Token<DataTokenType>> actual;
 			Assert.True(new MSAjaxDateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);

@@ -39,42 +39,6 @@ namespace JsonFx.Json
 	/// </summary>
 	internal class JsonGrammar
 	{
-		#region Reusable Tokens
-
-		public static readonly Token<JsonTokenType> TokenNone = new Token<JsonTokenType>(JsonTokenType.None);
-
-		public static readonly Token<JsonTokenType> TokenArrayBegin = new Token<JsonTokenType>(JsonTokenType.ArrayBegin);
-		public static readonly Token<JsonTokenType> TokenArrayEnd = new Token<JsonTokenType>(JsonTokenType.ArrayEnd);
-		public static readonly Token<JsonTokenType> TokenObjectBegin = new Token<JsonTokenType>(JsonTokenType.ObjectBegin);
-		public static readonly Token<JsonTokenType> TokenObjectEnd = new Token<JsonTokenType>(JsonTokenType.ObjectEnd);
-		public static readonly Token<JsonTokenType> TokenPairDelim = new Token<JsonTokenType>(JsonTokenType.PairDelim);
-		public static readonly Token<JsonTokenType> TokenValueDelim = new Token<JsonTokenType>(JsonTokenType.ValueDelim);
-
-		public static readonly Token<JsonTokenType> TokenUndefined = new Token<JsonTokenType>(JsonTokenType.Undefined, null);
-		public static readonly Token<JsonTokenType> TokenNull = new Token<JsonTokenType>(JsonTokenType.Null, null);
-		public static readonly Token<JsonTokenType> TokenFalse = new Token<JsonTokenType>(JsonTokenType.Boolean, false);
-		public static readonly Token<JsonTokenType> TokenTrue = new Token<JsonTokenType>(JsonTokenType.Boolean, true);
-		public static readonly Token<JsonTokenType> TokenNaN = new Token<JsonTokenType>(JsonTokenType.Number, Double.NaN);
-		public static readonly Token<JsonTokenType> TokenPositiveInfinity = new Token<JsonTokenType>(JsonTokenType.Number, Double.PositiveInfinity);
-		public static readonly Token<JsonTokenType> TokenNegativeInfinity = new Token<JsonTokenType>(JsonTokenType.Number, Double.NegativeInfinity);
-
-		public static Token<JsonTokenType> TokenLiteral(object value)
-		{
-			return new Token<JsonTokenType>(JsonTokenType.Literal, value);
-		}
-
-		public static Token<JsonTokenType> TokenString(object value)
-		{
-			return new Token<JsonTokenType>(JsonTokenType.String, value);
-		}
-
-		public static Token<JsonTokenType> TokenNumber(ValueType value)
-		{
-			return new Token<JsonTokenType>(JsonTokenType.Number, value);
-		}
-
-		#endregion Reusable Tokens
-
 		#region Keyword Literals
 
 		public const string KeywordUndefined = "undefined";

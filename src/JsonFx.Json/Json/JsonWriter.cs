@@ -40,7 +40,7 @@ namespace JsonFx.Json
 	/// <summary>
 	/// JSON serializer
 	/// </summary>
-	public partial class JsonWriter : DataWriter<JsonTokenType>
+	public partial class JsonWriter : DataWriter<DataTokenType>
 	{
 		#region Init
 
@@ -57,7 +57,7 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="settings"></param>
 		public JsonWriter(DataWriterSettings settings)
-			: base(settings, new IDataFilter<JsonTokenType>[] { new Iso8601DateFilter() })
+			: base(settings, new IDataFilter<DataTokenType>[] { new Iso8601DateFilter() })
 		{
 		}
 
@@ -66,8 +66,8 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <param name="filters"></param>
-		public JsonWriter(DataWriterSettings settings, params IDataFilter<JsonTokenType>[] filters)
-			: base(settings, (IEnumerable<IDataFilter<JsonTokenType>>)filters)
+		public JsonWriter(DataWriterSettings settings, params IDataFilter<DataTokenType>[] filters)
+			: base(settings, (IEnumerable<IDataFilter<DataTokenType>>)filters)
 		{
 		}
 
@@ -76,7 +76,7 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <param name="filters"></param>
-		public JsonWriter(DataWriterSettings settings, IEnumerable<IDataFilter<JsonTokenType>> filters)
+		public JsonWriter(DataWriterSettings settings, IEnumerable<IDataFilter<DataTokenType>> filters)
 			: base(settings, filters)
 		{
 		}
@@ -111,16 +111,16 @@ namespace JsonFx.Json
 
 		#endregion Properties
 
-		#region DataWriter<JsonTokenType> Methods
+		#region DataWriter<DataTokenType> Methods
 
 		/// <summary>
 		/// Gets a walker for JSON
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <returns></returns>
-		protected override IDataWalker<JsonTokenType> GetWalker()
+		protected override IDataWalker<DataTokenType> GetWalker()
 		{
-			return new JsonWriter.JsonWalker(this.Settings, this.Filters);
+			return new DataWriter.DataWalker(this.Settings, this.Filters);
 		}
 
 		/// <summary>
@@ -128,11 +128,11 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <returns></returns>
-		protected override ITextFormatter<JsonTokenType> GetFormatter()
+		protected override ITextFormatter<DataTokenType> GetFormatter()
 		{
 			return new JsonWriter.JsonFormatter(this.Settings);
 		}
 
-		#endregion DataWriter<JsonTokenType> Methods
+		#endregion DataWriter<DataTokenType> Methods
 	}
 }

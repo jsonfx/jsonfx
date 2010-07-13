@@ -86,11 +86,9 @@
     <Compile Include="Json\JsonWriterTests.cs" />
     <Compile Include="Json\Filters\MSAjaxDateFilterTests.cs" />
     <Compile Include="Json\Filters\Iso8601DateFilterTests.cs" />
-    <Compile Include="Json\JsonAnalyzerTests.cs" />
     <Compile Include="Json\JsonReaderTests.cs" />
     <Compile Include="Json\JsonFormatterTests.cs" />
     <Compile Include="Json\JsonTokenizerTests.cs" />
-    <Compile Include="Json\JsonWalkerTests.cs" />
     <Compile Include="Serialization\DataAnalyzerTests.cs" />
     <Compile Include="Serialization\DataWalkerTests.cs" />
     <Compile Include="Serialization\TypeCoercionUtilityTests.cs" />

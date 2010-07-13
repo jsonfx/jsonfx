@@ -63,7 +63,6 @@ namespace JsonFx.Serialization
 
 			private const string ErrorExpectedObject = "Expected object start ({0})";
 			private const string ErrorExpectedPropertyName = "Expected object property name or end of object ({0})";
-			private const string ErrorExpectedPropertyPairDelim = "Expected object property name/value delimiter ({0})";
 			private const string ErrorExpectedObjectValueDelim = "Expected value delimiter or end of object ({0})";
 			private const string ErrorMissingObjectProperty = "Missing object property";
 			private const string ErrorUnterminatedObject = "Unterminated object";
@@ -207,11 +206,6 @@ namespace JsonFx.Serialization
 						tokens.Pop();
 						return this.Coercion.CoerceType(targetType, token.Value);
 					}
-					case DataTokenType.ArrayEnd:
-					case DataTokenType.None:
-					case DataTokenType.ObjectEnd:
-					case DataTokenType.PropertyKey:
-					case DataTokenType.AttributeKey:
 					default:
 					{
 						// these are invalid here
@@ -242,19 +236,33 @@ namespace JsonFx.Serialization
 					this.Coercion.InstantiateObject(targetType) :
 					new JsonObject();
 
+				bool needsValueDelim = false;
 				while (!tokens.IsCompleted)
 				{
 					token = tokens.Peek();
 
-					// consume the property key
-					string propertyName;
+					// consume value delimiter
 					switch (token.TokenType)
 					{
-						case DataTokenType.PropertyKey:
-						case DataTokenType.AttributeKey:
+						case DataTokenType.ValueDelim:
 						{
+							if (!needsValueDelim)
+							{
+								// extraneous item delimiter
+								tokens.Pop();
+								throw new AnalyzerException<DataTokenType>(
+									token,
+									DataAnalyzer.ErrorMissingObjectProperty);
+							}
+
+							// consume delim
 							tokens.Pop();
-							propertyName = Convert.ToString(token.Value, CultureInfo.InvariantCulture);
+							if (tokens.IsCompleted)
+							{
+								// end of input
+								continue;
+							}
+							token = tokens.Peek();
 							break;
 						}
 						case DataTokenType.ObjectEnd:
@@ -262,6 +270,43 @@ namespace JsonFx.Serialization
 							// end of the object loop
 							tokens.Pop();
 							return this.Coercion.CoerceType(targetType, objectValue);
+						}
+						default:
+						{
+							if (needsValueDelim)
+							{
+								// these are invalid here
+								tokens.Pop();
+								throw new AnalyzerException<DataTokenType>(
+									token,
+									String.Format(DataAnalyzer.ErrorExpectedObjectValueDelim, token.TokenType));
+							}
+							else
+							{
+								needsValueDelim = true;
+							}
+							break;
+						}
+					}
+
+					// consume the property key
+					string propertyName;
+					switch (token.TokenType)
+					{
+						case DataTokenType.PropertyKey:
+						{
+							tokens.Pop();
+							propertyName = Convert.ToString(token.Value, CultureInfo.InvariantCulture);
+							break;
+						}
+						case DataTokenType.ObjectEnd:
+						case DataTokenType.ValueDelim:
+						{
+							// extraneous item delimiter
+							tokens.Pop();
+							throw new AnalyzerException<DataTokenType>(
+								token,
+								DataAnalyzer.ErrorMissingObjectProperty);
 						}
 						default:
 						{
@@ -273,14 +318,6 @@ namespace JsonFx.Serialization
 						}
 					}
 
-					// move past delim
-					if (tokens.IsCompleted)
-					{
-						// end of input
-						break;
-					}
-					token = tokens.Peek();
-
 					MemberMap propertyMap;
 					Type propertyType;
 					if (itemType != null)
@@ -290,7 +327,7 @@ namespace JsonFx.Serialization
 						propertyType = itemType;
 					}
 					else if ((memberMap != null) &&
-						memberMap.TryGetValue(propertyName, out propertyMap))
+					memberMap.TryGetValue(propertyName, out propertyMap))
 					{
 						propertyType = (propertyMap != null) ? propertyMap.Type : null;
 					}
@@ -333,20 +370,64 @@ namespace JsonFx.Serialization
 				// using ArrayList since has .ToArray(Type) method
 				// cannot create List<T> at runtime
 				ArrayList array = new ArrayList();
+
+				bool needsValueDelim = false;
 				while (!tokens.IsCompleted)
 				{
 					token = tokens.Peek();
+
+					// consume value delimiter
+					switch (token.TokenType)
+					{
+						case DataTokenType.ValueDelim:
+						{
+							if (!needsValueDelim)
+							{
+								// extraneous item delimiter
+								tokens.Pop();
+								throw new AnalyzerException<DataTokenType>(
+									token,
+									DataAnalyzer.ErrorMissingObjectProperty);
+							}
+
+							// consume delim
+							tokens.Pop();
+							if (tokens.IsCompleted)
+							{
+								// end of input
+								continue;
+							}
+							token = tokens.Peek();
+							break;
+						}
+						case DataTokenType.ArrayEnd:
+						{
+							// end of the array loop
+							tokens.Pop();
+							return this.Coercion.CoerceArrayList(arrayType, itemType, array);
+						}
+						default:
+						{
+							if (needsValueDelim)
+							{
+								// these are invalid here
+								tokens.Pop();
+								throw new AnalyzerException<DataTokenType>(
+									token,
+									String.Format(DataAnalyzer.ErrorExpectedArrayItemDelim, token.TokenType));
+							}
+							else
+							{
+								needsValueDelim = true;
+							}
+							break;
+						}
+					}
 
 					// consume the next item
 					object item;
 					switch (token.TokenType)
 					{
-						case DataTokenType.ArrayEnd:
-						{
-							// end of array loop
-							tokens.Pop();
-							return this.Coercion.CoerceArrayList(arrayType, itemType, array);
-						}
 						case DataTokenType.ArrayBegin:
 						{
 							// array item
@@ -375,10 +456,15 @@ namespace JsonFx.Serialization
 							}
 							break;
 						}
-						case DataTokenType.None:
-						case DataTokenType.ObjectEnd:
-						case DataTokenType.PropertyKey:
-						case DataTokenType.AttributeKey:
+						case DataTokenType.ArrayEnd:
+						case DataTokenType.ValueDelim:
+						{
+							// extraneous item delimiter
+							tokens.Pop();
+							throw new AnalyzerException<DataTokenType>(
+								token,
+								DataAnalyzer.ErrorMissingArrayItem);
+						}
 						default:
 						{
 							// these are invalid here

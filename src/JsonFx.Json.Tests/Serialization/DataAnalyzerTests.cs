@@ -84,8 +84,11 @@ namespace JsonFx.Serialization
 			{
 				DataGrammar.TokenArrayBegin,
 				DataGrammar.TokenValue(0),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenNull,
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenFalse,
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenTrue,
 				DataGrammar.TokenArrayEnd
 			};
@@ -239,6 +242,103 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		public void Parse_ArrayExtraComma_ThrowsAnalyzerException()
+		{
+			// input from fail4.json in test suite at http://www.json.org/JSON_checker/
+			var input = new[]
+			{
+				DataGrammar.TokenArrayBegin,
+				DataGrammar.TokenValue("extra comma"),
+				DataGrammar.TokenValueDelim,
+				DataGrammar.TokenArrayEnd
+			};
+
+			var analyzer = new DataReader.DataAnalyzer(new DataReaderSettings());
+
+			AnalyzerException<DataTokenType> ex = Assert.Throws<AnalyzerException<DataTokenType>>(
+				delegate
+				{
+					var actual = analyzer.Analyze<object>(input).Single();
+				});
+
+			// verify exception is coming from expected token
+			Assert.Equal(DataGrammar.TokenArrayEnd, ex.Token);
+		}
+
+		[Fact]
+		public void Parse_ArrayDoubleExtraComma_ThrowsAnalyzerException()
+		{
+			// input from fail5.json in test suite at http://www.json.org/JSON_checker/
+			var input = new[]
+			{
+				DataGrammar.TokenArrayBegin,
+				DataGrammar.TokenValue("double extra comma"),
+				DataGrammar.TokenValueDelim,
+				DataGrammar.TokenValueDelim,
+				DataGrammar.TokenArrayEnd
+			};
+
+			var analyzer = new DataReader.DataAnalyzer(new DataReaderSettings());
+
+			AnalyzerException<DataTokenType> ex = Assert.Throws<AnalyzerException<DataTokenType>>(
+				delegate
+				{
+					var actual = analyzer.Analyze<object>(input).Single();
+				});
+
+			// verify exception is coming from expected token
+			Assert.Equal(DataGrammar.TokenValueDelim, ex.Token);
+		}
+
+		[Fact]
+		public void Parse_ArrayMissingValue_ThrowsAnalyzerException()
+		{
+			// input from fail6.json in test suite at http://www.json.org/JSON_checker/
+			var input = new[]
+			{
+				DataGrammar.TokenArrayBegin,
+				DataGrammar.TokenValueDelim,
+				DataGrammar.TokenValue("<-- missing value"),
+				DataGrammar.TokenArrayEnd
+			};
+
+			var analyzer = new DataReader.DataAnalyzer(new DataReaderSettings());
+
+			AnalyzerException<DataTokenType> ex = Assert.Throws<AnalyzerException<DataTokenType>>(
+				delegate
+				{
+					var actual = analyzer.Analyze<object>(input).Single();
+				});
+
+			// verify exception is coming from expected token
+			Assert.Equal(DataGrammar.TokenValueDelim, ex.Token);
+		}
+
+		[Fact]
+		public void Parse_ArrayColonInsteadOfComma_ThrowsAnalyzerException()
+		{
+			// input from fail22.json in test suite at http://www.json.org/JSON_checker/
+			var input = new[]
+			{
+				DataGrammar.TokenArrayBegin,
+				DataGrammar.TokenProperty("Colon instead of comma"),
+				DataGrammar.TokenFalse,
+				DataGrammar.TokenArrayEnd
+			};
+
+			var analyzer = new DataReader.DataAnalyzer(new DataReaderSettings());
+
+			AnalyzerException<DataTokenType> ex = Assert.Throws<AnalyzerException<DataTokenType>>(
+				delegate
+				{
+					var actual = analyzer.Analyze<object>(input).Single();
+				});
+
+			// verify exception is coming from expected token
+			Assert.Equal(DataGrammar.TokenProperty("Colon instead of comma"), ex.Token);
+		}
+
+		[Fact]
 		public void Parse_ArrayCloseMismatch_ThrowsAnalyzerException()
 		{
 			// input from fail33.json in test suite at http://www.json.org/JSON_checker/
@@ -315,6 +415,7 @@ namespace JsonFx.Serialization
 				DataGrammar.TokenObjectBegin,
 				DataGrammar.TokenProperty("The outermost value"),
 				DataGrammar.TokenValue("must be an object or array."),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenProperty("In this test"),
 				DataGrammar.TokenValue("It is an object."),
 				DataGrammar.TokenObjectEnd,
@@ -348,7 +449,7 @@ namespace JsonFx.Serialization
 				DataGrammar.TokenObjectBegin,
 				DataGrammar.TokenProperty("Extra comma"),
 				DataGrammar.TokenTrue,
-				DataGrammar.TokenFalse,
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenObjectEnd
 			};
 
@@ -361,7 +462,7 @@ namespace JsonFx.Serialization
 				});
 
 			// verify exception is coming from expected token
-			Assert.Equal(DataGrammar.TokenFalse, ex.Token);
+			Assert.Equal(DataGrammar.TokenObjectEnd, ex.Token);
 		}
 
 		[Fact]
@@ -413,6 +514,55 @@ namespace JsonFx.Serialization
 			Assert.Equal(DataTokenType.PropertyKey, ex.Token.TokenType);
 		}
 
+		[Fact]
+		public void Parse_ObjectUnterminated_ThrowsAnalyzerException()
+		{
+			// input from fail21.json in test suite at http://www.json.org/JSON_checker/
+			var input = new[]
+			{
+				DataGrammar.TokenObjectBegin,
+				DataGrammar.TokenValue("Comma instead of colon"),
+				DataGrammar.TokenValueDelim,
+				DataGrammar.TokenNull,
+				DataGrammar.TokenObjectEnd
+			};
+
+			var analyzer = new DataReader.DataAnalyzer(new DataReaderSettings());
+
+			AnalyzerException<DataTokenType> ex = Assert.Throws<AnalyzerException<DataTokenType>>(
+				delegate
+				{
+					var actual = analyzer.Analyze<object>(input).Single();
+				});
+
+			// verify exception is coming from expected token
+			Assert.Equal(DataGrammar.TokenValue("Comma instead of colon"), ex.Token);
+		}
+
+		[Fact]
+		public void Parse_ObjectCommaInsteadOfClose_ThrowsAnalyzerException()
+		{
+			// input from fail32.json in test suite at http://www.json.org/JSON_checker/
+			var input = new[]
+			{
+				DataGrammar.TokenObjectBegin,
+				DataGrammar.TokenProperty("Comma instead if closing brace"),
+				DataGrammar.TokenTrue,
+				DataGrammar.TokenValueDelim
+			};
+
+			var analyzer = new DataReader.DataAnalyzer(new DataReaderSettings());
+
+			AnalyzerException<DataTokenType> ex = Assert.Throws<AnalyzerException<DataTokenType>>(
+				delegate
+				{
+					var actual = analyzer.Analyze<object>(input).Single();
+				});
+
+			// verify exception is coming from expected token
+			Assert.Equal(DataGrammar.TokenNone, ex.Token);
+		}
+
 		#endregion Object Tests
 
 		#region Complex Graph Tests
@@ -425,114 +575,176 @@ namespace JsonFx.Serialization
 			{
 				DataGrammar.TokenArrayBegin,
 				DataGrammar.TokenValue("JSON Test Pattern pass1"),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenObjectBegin,
 				DataGrammar.TokenProperty("object with 1 member"),
 				DataGrammar.TokenArrayBegin,
 				DataGrammar.TokenValue("array with 1 element"),
 				DataGrammar.TokenArrayEnd,
 				DataGrammar.TokenObjectEnd,
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenObjectBegin,
 				DataGrammar.TokenObjectEnd,
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenArrayBegin,
 				DataGrammar.TokenArrayEnd,
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenValue(-42),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenTrue,
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenFalse,
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenNull,
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenObjectBegin,
 				DataGrammar.TokenProperty("integer"),
 				DataGrammar.TokenValue(1234567890),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenProperty("real"),
 				DataGrammar.TokenValue(-9876.543210),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenProperty("e"),
 				DataGrammar.TokenValue(0.123456789e-12),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenProperty("E"),
 				DataGrammar.TokenValue(1.234567890E+34),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenProperty(""),
 				DataGrammar.TokenValue(23456789012E66),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenProperty("zero"),
 				DataGrammar.TokenValue(0),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenProperty("one"),
 				DataGrammar.TokenValue(1),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenProperty("space"),
 				DataGrammar.TokenValue(" "),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenProperty("quote"),
 				DataGrammar.TokenValue("\""),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenProperty("backslash"),
 				DataGrammar.TokenValue("\\"),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenProperty("controls"),
 				DataGrammar.TokenValue("\b\f\n\r\t"),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenProperty("slash"),
 				DataGrammar.TokenValue("/ & /"),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenProperty("alpha"),
 				DataGrammar.TokenValue("abcdefghijklmnopqrstuvwyz"),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenProperty("ALPHA"),
 				DataGrammar.TokenValue("ABCDEFGHIJKLMNOPQRSTUVWYZ"),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenProperty("digit"),
 				DataGrammar.TokenValue("0123456789"),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenProperty("0123456789"),
 				DataGrammar.TokenValue("digit"),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenProperty("special"),
 				DataGrammar.TokenValue("`1~!@#$%^&*()_+-={':[,]}|;.</>?"),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenProperty("hex"),
 				DataGrammar.TokenValue("\u0123\u4567\u89AB\uCDEF\uabcd\uef4A"),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenProperty("true"),
 				DataGrammar.TokenTrue,
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenProperty("false"),
 				DataGrammar.TokenFalse,
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenProperty("null"),
 				DataGrammar.TokenNull,
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenProperty("array"),
 				DataGrammar.TokenArrayBegin,
 				DataGrammar.TokenArrayEnd,
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenProperty("object"),
 				DataGrammar.TokenObjectBegin,
 				DataGrammar.TokenObjectEnd,
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenProperty("address"),
 				DataGrammar.TokenValue("50 St. James Street"),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenProperty("url"),
 				DataGrammar.TokenValue("http://www.JSON.org/"),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenProperty("comment"),
 				DataGrammar.TokenValue("// /* <!-- --"),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenProperty("# -- --> */"),
 				DataGrammar.TokenValue(" "),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenProperty(" s p a c e d "),
 				DataGrammar.TokenArrayBegin,
 				DataGrammar.TokenValue(1),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenValue(2),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenValue(3),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenValue(4),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenValue(5),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenValue(6),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenValue(7),
 				DataGrammar.TokenArrayEnd,
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenProperty("compact"),
 				DataGrammar.TokenArrayBegin,
 				DataGrammar.TokenValue(1),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenValue(2),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenValue(3),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenValue(4),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenValue(5),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenValue(6),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenValue(7),
 				DataGrammar.TokenArrayEnd,
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenProperty("jsontext"),
 				DataGrammar.TokenValue("{\"object with 1 member\":[\"array with 1 element\"]}"),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenProperty("quotes"),
 				DataGrammar.TokenValue("&#34; \u0022 %22 0x22 034 &#x22;"),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenProperty("/\\\"\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"),
 				DataGrammar.TokenValue("A key can be any string"),
 				DataGrammar.TokenObjectEnd,
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenValue(0.5),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenValue(98.6),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenValue(99.44),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenValue(1066),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenValue(10.0),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenValue(1.0),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenValue(0.1),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenValue(1.0),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenValue(2.0),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenValue(2.0),
+				DataGrammar.TokenValueDelim,
 				DataGrammar.TokenValue("rosebud"),
 				DataGrammar.TokenArrayEnd
 			};

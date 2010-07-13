@@ -90,7 +90,6 @@
     <Compile Include="Json\Filters\Iso8601DateFilter.cs" />
     <Compile Include="Json\Filters\JsonFilter`1.cs" />
     <Compile Include="Json\Filters\MSAjaxDateFilter.cs" />
-    <Compile Include="Json\JsonAnalyzer.cs" />
     <Compile Include="Json\JsonFormatter.cs" />
     <Compile Include="Json\JsonGrammar.cs" />
     <Compile Include="Json\JsonIgnoreAttribute.cs" />
@@ -99,8 +98,6 @@
     <Compile Include="Json\JsonResolverStrategy.cs" />
     <Compile Include="Json\JsonSpecifiedPropertyAttribute.cs" />
     <Compile Include="Json\JsonTokenizer.cs" />
-    <Compile Include="Json\JsonTokenType.cs" />
-    <Compile Include="Json\JsonWalker.cs" />
     <Compile Include="Json\JsonWriter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\AssemblyVersion.cs" />

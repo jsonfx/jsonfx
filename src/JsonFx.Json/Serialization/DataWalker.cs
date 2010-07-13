@@ -305,8 +305,19 @@ namespace JsonFx.Serialization
 
 				tokens.Enqueue(DataGrammar.TokenArrayBegin);
 
+				bool appendDelim = false;
+
 				while (enumerator.MoveNext())
 				{
+					if (appendDelim)
+					{
+						tokens.Enqueue(DataGrammar.TokenValueDelim);
+					}
+					else
+					{
+						appendDelim = true;
+					}
+
 					this.GetTokens(tokens, detector, enumerator.Current);
 				}
 
@@ -317,8 +328,19 @@ namespace JsonFx.Serialization
 			{
 				tokens.Enqueue(DataGrammar.TokenObjectBegin);
 
+				bool appendDelim = false;
+
 				while (enumerator.MoveNext())
 				{
+					if (appendDelim)
+					{
+						tokens.Enqueue(DataGrammar.TokenValueDelim);
+					}
+					else
+					{
+						appendDelim = true;
+					}
+
 					this.GetPropertyTokens(tokens, detector, enumerator.Key, enumerator.Value);
 				}
 
@@ -329,8 +351,19 @@ namespace JsonFx.Serialization
 			{
 				tokens.Enqueue(DataGrammar.TokenObjectBegin);
 
+				bool appendDelim = false;
+
 				while (enumerator.MoveNext())
 				{
+					if (appendDelim)
+					{
+						tokens.Enqueue(DataGrammar.TokenValueDelim);
+					}
+					else
+					{
+						appendDelim = true;
+					}
+
 					KeyValuePair<string, object> pair = enumerator.Current;
 					this.GetPropertyTokens(tokens, detector, pair.Key, pair.Value);
 				}
@@ -350,6 +383,8 @@ namespace JsonFx.Serialization
 					return;
 				}
 
+				bool appendDelim = false;
+
 				foreach (var map in maps)
 				{
 					if (map.Value.Getter == null)
@@ -362,6 +397,15 @@ namespace JsonFx.Serialization
 						map.Value.IsIgnored(value, propertyValue))
 					{
 						continue;
+					}
+
+					if (appendDelim)
+					{
+						tokens.Enqueue(DataGrammar.TokenValueDelim);
+					}
+					else
+					{
+						appendDelim = true;
 					}
 
 					this.GetPropertyTokens(tokens, detector, map.Key, propertyValue);

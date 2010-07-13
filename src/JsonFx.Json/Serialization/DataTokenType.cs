@@ -75,14 +75,19 @@ namespace JsonFx.Serialization
 		/// </summary>
 		PropertyKey,
 
-		/// <summary>
-		/// Object attribute identifier
-		/// </summary>
-		AttributeKey,
+		///// <summary>
+		///// Object attribute identifier
+		///// </summary>
+		//AttributeKey,
 
 		/// <summary>
-		/// Code comment value
+		/// Value delimiter
 		/// </summary>
-		Comment
+		ValueDelim,
+
+		///// <summary>
+		///// Code comment value
+		///// </summary>
+		//Comment
 	}
 }

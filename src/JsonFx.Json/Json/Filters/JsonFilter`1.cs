@@ -38,7 +38,7 @@ namespace JsonFx.Json.Filters
 	/// Allows a mechanism for manipulating JSON serialization
 	/// </summary>
 	/// <typeparam name="T">Defines the type this filter reads/writes</typeparam>
-	public abstract class JsonFilter<T> : DataFilter<JsonTokenType, T>
+	public abstract class JsonFilter<T> : DataFilter<DataTokenType, T>
 	{
 	}
 }

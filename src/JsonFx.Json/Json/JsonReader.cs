@@ -39,7 +39,7 @@ namespace JsonFx.Json
 	/// <summary>
 	/// JSON deserializer
 	/// </summary>
-	public partial class JsonReader : DataReader<JsonTokenType>
+	public partial class JsonReader : DataReader<DataTokenType>
 	{
 		#region Init
 
@@ -56,7 +56,7 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="settings"></param>
 		public JsonReader(DataReaderSettings settings)
-			: base(settings, new IDataFilter<JsonTokenType>[] { new Iso8601DateFilter() })
+			: base(settings, new IDataFilter<DataTokenType>[] { new Iso8601DateFilter() })
 		{
 		}
 
@@ -65,8 +65,8 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <param name="filters"></param>
-		public JsonReader(DataReaderSettings settings, params IDataFilter<JsonTokenType>[] filters)
-			: base(settings, (IEnumerable<IDataFilter<JsonTokenType>>)filters)
+		public JsonReader(DataReaderSettings settings, params IDataFilter<DataTokenType>[] filters)
+			: base(settings, (IEnumerable<IDataFilter<DataTokenType>>)filters)
 		{
 		}
 
@@ -75,7 +75,7 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <param name="filters"></param>
-		public JsonReader(DataReaderSettings settings, IEnumerable<IDataFilter<JsonTokenType>> filters)
+		public JsonReader(DataReaderSettings settings, IEnumerable<IDataFilter<DataTokenType>> filters)
 			: base(settings, filters)
 		{
 		}
@@ -96,14 +96,14 @@ namespace JsonFx.Json
 
 		#region IDataReader Methods
 
-		protected override ITextTokenizer<JsonTokenType> GetTokenizer()
+		protected override ITextTokenizer<DataTokenType> GetTokenizer()
 		{
 			return new JsonReader.JsonTokenizer();
 		}
 
-		protected override IDataAnalyzer<JsonTokenType> GetAnalyzer()
+		protected override IDataAnalyzer<DataTokenType> GetAnalyzer()
 		{
-			return new JsonReader.JsonAnalyzer(this.Settings, this.Filters);
+			return new DataReader.DataAnalyzer(this.Settings, this.Filters);
 		}
 
 		#endregion IDataReader Methods

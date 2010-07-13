@@ -45,6 +45,7 @@ namespace JsonFx.Serialization
 		public static readonly Token<DataTokenType> TokenArrayEnd = new Token<DataTokenType>(DataTokenType.ArrayEnd);
 		public static readonly Token<DataTokenType> TokenObjectBegin = new Token<DataTokenType>(DataTokenType.ObjectBegin);
 		public static readonly Token<DataTokenType> TokenObjectEnd = new Token<DataTokenType>(DataTokenType.ObjectEnd);
+		public static readonly Token<DataTokenType> TokenValueDelim = new Token<DataTokenType>(DataTokenType.ValueDelim);
 
 		public static readonly Token<DataTokenType> TokenNull = new Token<DataTokenType>(DataTokenType.Value, null);
 		public static readonly Token<DataTokenType> TokenFalse = new Token<DataTokenType>(DataTokenType.Value, false);
@@ -58,10 +59,10 @@ namespace JsonFx.Serialization
 			return new Token<DataTokenType>(DataTokenType.PropertyKey, value);
 		}
 
-		public static Token<DataTokenType> TokenAttribute(object value)
-		{
-			return new Token<DataTokenType>(DataTokenType.AttributeKey, value);
-		}
+		//public static Token<DataTokenType> TokenAttribute(object value)
+		//{
+		//    return new Token<DataTokenType>(DataTokenType.AttributeKey, value);
+		//}
 
 		public static Token<DataTokenType> TokenValue(object value)
 		{
