@@ -31,7 +31,7 @@
 using System;
 using System.Reflection;
 
-namespace JsonFx.Serialization
+namespace JsonFx.Serialization.Resolvers
 {
 	/// <summary>
 	/// Gets a delegate which determines if the property or field should not be serialized based upon its value.

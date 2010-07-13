@@ -36,10 +36,10 @@ using System.Text.RegularExpressions;
 using JsonFx.IO;
 using JsonFx.Serialization;
 
-namespace JsonFx.Json.Filters
+namespace JsonFx.Common.Filters
 {
 	/// <summary>
-	/// Defines a filter for JSON serialization of DateTime into an ASP.NET Ajax Date string.
+	/// Defines a filter for JSON-style serialization of DateTime into an ASP.NET Ajax Date string.
 	/// </summary>
 	/// <remarks>
 	/// This is the format used by Microsoft ASP.NET Ajax:
@@ -47,7 +47,7 @@ namespace JsonFx.Json.Filters
 	///	
 	/// NOTE: This format is limited to expressing DateTime at the millisecond level as UTC only.
 	/// </remarks>
-	public class MSAjaxDateFilter : JsonFilter<DateTime>
+	public class MSAjaxDateFilter : CommonFilter<DateTime>
 	{
 		#region Constant
 
@@ -65,11 +65,11 @@ namespace JsonFx.Json.Filters
 
 		#region IDataFilter<DataTokenType,DateTime> Members
 
-		public override bool TryRead(DataReaderSettings settings, IStream<Token<DataTokenType>> tokens, out DateTime value)
+		public override bool TryRead(DataReaderSettings settings, IStream<Token<CommonTokenType>> tokens, out DateTime value)
 		{
-			Token<DataTokenType> token = tokens.Peek();
+			Token<CommonTokenType> token = tokens.Peek();
 			if (token == null ||
-				token.TokenType != DataTokenType.Value ||
+				token.TokenType != CommonTokenType.Value ||
 				!(token.Value is string))
 			{
 				value = default(DateTime);
@@ -88,11 +88,11 @@ namespace JsonFx.Json.Filters
 			return true;
 		}
 
-		public override bool TryWrite(DataWriterSettings settings, DateTime value, out IEnumerable<Token<DataTokenType>> tokens)
+		public override bool TryWrite(DataWriterSettings settings, DateTime value, out IEnumerable<Token<CommonTokenType>> tokens)
 		{
-			tokens = new Token<DataTokenType>[]
+			tokens = new Token<CommonTokenType>[]
 				{
-					DataGrammar.TokenValue(this.FormatMSAjaxDate(value))
+					CommonGrammar.TokenValue(this.FormatMSAjaxDate(value))
 				};
 
 			return true;

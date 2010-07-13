@@ -32,7 +32,7 @@ using System;
 using System.Reflection;
 using System.Runtime.Serialization;
 
-namespace JsonFx.Serialization
+namespace JsonFx.Serialization.Resolvers
 {
 	/// <summary>
 	/// Controls name resolution for IDataReader / IDataWriter using DataContract attributes

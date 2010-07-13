@@ -31,15 +31,17 @@
 using System;
 using System.Collections.Generic;
 
-using JsonFx.Json.Filters;
+using JsonFx.Common;
+using JsonFx.Common.Filters;
 using JsonFx.Serialization;
+using JsonFx.Serialization.Filters;
 
 namespace JsonFx.Json
 {
 	/// <summary>
 	/// JSON deserializer
 	/// </summary>
-	public partial class JsonReader : DataReader<DataTokenType>
+	public partial class JsonReader : DataReader<CommonTokenType>
 	{
 		#region Init
 
@@ -56,7 +58,7 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="settings"></param>
 		public JsonReader(DataReaderSettings settings)
-			: base(settings, new IDataFilter<DataTokenType>[] { new Iso8601DateFilter() })
+			: base(settings, new IDataFilter<CommonTokenType>[] { new Iso8601DateFilter() })
 		{
 		}
 
@@ -65,8 +67,8 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <param name="filters"></param>
-		public JsonReader(DataReaderSettings settings, params IDataFilter<DataTokenType>[] filters)
-			: base(settings, (IEnumerable<IDataFilter<DataTokenType>>)filters)
+		public JsonReader(DataReaderSettings settings, params IDataFilter<CommonTokenType>[] filters)
+			: base(settings, (IEnumerable<IDataFilter<CommonTokenType>>)filters)
 		{
 		}
 
@@ -75,7 +77,7 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <param name="filters"></param>
-		public JsonReader(DataReaderSettings settings, IEnumerable<IDataFilter<DataTokenType>> filters)
+		public JsonReader(DataReaderSettings settings, IEnumerable<IDataFilter<CommonTokenType>> filters)
 			: base(settings, filters)
 		{
 		}
@@ -96,14 +98,14 @@ namespace JsonFx.Json
 
 		#region IDataReader Methods
 
-		protected override ITextTokenizer<DataTokenType> GetTokenizer()
+		protected override ITextTokenizer<CommonTokenType> GetTokenizer()
 		{
 			return new JsonReader.JsonTokenizer();
 		}
 
-		protected override IDataAnalyzer<DataTokenType> GetAnalyzer()
+		protected override IDataAnalyzer<CommonTokenType> GetAnalyzer()
 		{
-			return new DataReader.DataAnalyzer(this.Settings, this.Filters);
+			return new CommonAnalyzer(this.Settings, this.Filters);
 		}
 
 		#endregion IDataReader Methods

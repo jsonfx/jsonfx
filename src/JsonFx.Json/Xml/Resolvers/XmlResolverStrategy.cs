@@ -35,8 +35,9 @@ using System.Xml.Serialization;
 
 using JsonFx.CodeGen;
 using JsonFx.Serialization;
+using JsonFx.Serialization.Resolvers;
 
-namespace JsonFx.Xml
+namespace JsonFx.Xml.Resolvers
 {
 	/// <summary>
 	/// Controls name resolution for IDataReader / IDataWriter using attributes and conventions similar to XmlSerializer semantics

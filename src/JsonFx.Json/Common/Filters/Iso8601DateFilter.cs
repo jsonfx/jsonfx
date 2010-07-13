@@ -35,10 +35,10 @@ using System.Globalization;
 using JsonFx.IO;
 using JsonFx.Serialization;
 
-namespace JsonFx.Json.Filters
+namespace JsonFx.Common.Filters
 {
 	/// <summary>
-	/// Defines a filter for JSON serialization of DateTime into ISO-8601
+	/// Defines a filter for JSON-style serialization of DateTime into ISO-8601 string
 	/// </summary>
 	/// <remarks>
 	/// This is the format used by EcmaScript 5th edition Date.prototype.toJSON(...):
@@ -48,7 +48,7 @@ namespace JsonFx.Json.Filters
 	///	
 	/// NOTE: This format limits expressing DateTime as either UTC or Unspecified. Local (i.e. Server Local) is converted to UTC.
 	/// </remarks>
-	public class Iso8601DateFilter : JsonFilter<DateTime>
+	public class Iso8601DateFilter : CommonFilter<DateTime>
 	{
 		#region Precision
 
@@ -133,11 +133,11 @@ namespace JsonFx.Json.Filters
 
 		#region IDataFilter<DataTokenType,DateTime> Members
 
-		public override bool TryRead(DataReaderSettings settings, IStream<Token<DataTokenType>> tokens, out DateTime value)
+		public override bool TryRead(DataReaderSettings settings, IStream<Token<CommonTokenType>> tokens, out DateTime value)
 		{
-			Token<DataTokenType> token = tokens.Peek();
+			Token<CommonTokenType> token = tokens.Peek();
 			if (token == null ||
-				token.TokenType != DataTokenType.Value ||
+				token.TokenType != CommonTokenType.Value ||
 				!(token.Value is string))
 			{
 				value = default(DateTime);
@@ -156,11 +156,11 @@ namespace JsonFx.Json.Filters
 			return true;
 		}
 
-		public override bool TryWrite(DataWriterSettings settings, DateTime value, out IEnumerable<Token<DataTokenType>> tokens)
+		public override bool TryWrite(DataWriterSettings settings, DateTime value, out IEnumerable<Token<CommonTokenType>> tokens)
 		{
-			tokens = new Token<DataTokenType>[]
+			tokens = new Token<CommonTokenType>[]
 				{
-					DataGrammar.TokenValue(this.FormatIso8601(value))
+					CommonGrammar.TokenValue(this.FormatIso8601(value))
 				};
 
 			return true;

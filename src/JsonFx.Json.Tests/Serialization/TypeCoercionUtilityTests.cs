@@ -34,7 +34,9 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 
+using JsonFx.Common;
 using JsonFx.Json;
+using JsonFx.Json.Resolvers;
 using Xunit;
 
 using Assert=JsonFx.AssertPatched;
@@ -160,12 +162,12 @@ namespace JsonFx.Serialization
 		{
 			var input = new[]
 			{
-				DataGrammar.TokenValue("Two")
+				CommonGrammar.TokenValue("Two")
 			};
 
 			var expected = ExampleEnum.Two;
 
-			var analyzer = new DataReader.DataAnalyzer(new DataReaderSettings(new JsonResolverStrategy()));
+			var analyzer = new CommonAnalyzer(new DataReaderSettings(new JsonResolverStrategy()));
 			var actual = analyzer.Analyze<ExampleEnum>(input).Single();
 
 			Assert.Equal(expected, actual);
@@ -176,12 +178,12 @@ namespace JsonFx.Serialization
 		{
 			var input = new[]
 			{
-				DataGrammar.TokenValue("yellow")
+				CommonGrammar.TokenValue("yellow")
 			};
 
 			var expected = ExampleEnum.Two;
 
-			var analyzer = new DataReader.DataAnalyzer(new DataReaderSettings(new JsonResolverStrategy()));
+			var analyzer = new CommonAnalyzer(new DataReaderSettings(new JsonResolverStrategy()));
 			var actual = analyzer.Analyze<ExampleEnum>(input).Single();
 
 			Assert.Equal(expected, actual);
@@ -192,12 +194,12 @@ namespace JsonFx.Serialization
 		{
 			var input = new[]
 			{
-				DataGrammar.TokenValue(3)
+				CommonGrammar.TokenValue(3)
 			};
 
 			var expected = ExampleEnum.Three;
 
-			var analyzer = new DataReader.DataAnalyzer(new DataReaderSettings(new JsonResolverStrategy()));
+			var analyzer = new CommonAnalyzer(new DataReaderSettings(new JsonResolverStrategy()));
 			var actual = analyzer.Analyze<ExampleEnum>(input).Single();
 
 			Assert.Equal(expected, actual);
@@ -214,7 +216,7 @@ namespace JsonFx.Serialization
 		{
 			var input = new[]
 			{
-				DataGrammar.TokenValue(ExampleEnum.Zero)
+				CommonGrammar.TokenValue(ExampleEnum.Zero)
 			};
 
 			var expected = @"""Zero""";
@@ -230,7 +232,7 @@ namespace JsonFx.Serialization
 		{
 			var input = new[]
 			{
-				DataGrammar.TokenValue(ExampleEnum.One)
+				CommonGrammar.TokenValue(ExampleEnum.One)
 			};
 
 			var expected = @"""One""";
@@ -246,7 +248,7 @@ namespace JsonFx.Serialization
 		{
 			var input = new[]
 			{
-				DataGrammar.TokenValue(ExampleEnum.Two)
+				CommonGrammar.TokenValue(ExampleEnum.Two)
 			};
 
 			var expected = @"""yellow""";
@@ -262,7 +264,7 @@ namespace JsonFx.Serialization
 		{
 			var input = new[]
 			{
-				DataGrammar.TokenValue(ExampleEnum.Three)
+				CommonGrammar.TokenValue(ExampleEnum.Three)
 			};
 
 			var expected = @"""Three""";
@@ -278,7 +280,7 @@ namespace JsonFx.Serialization
 		{
 			var input = new[]
 			{
-				DataGrammar.TokenValue((int)ExampleEnum.Three)
+				CommonGrammar.TokenValue((int)ExampleEnum.Three)
 			};
 
 			var expected = "3";

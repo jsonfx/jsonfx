@@ -34,8 +34,9 @@ using System.Reflection;
 
 using JsonFx.CodeGen;
 using JsonFx.Serialization;
+using JsonFx.Serialization.Resolvers;
 
-namespace JsonFx.Json
+namespace JsonFx.Json.Resolvers
 {
 	/// <summary>
 	/// Controls name resolution for IDataReader / IDataWriter using JsonNameAttribute / JsonIgnoreAttribute / JsonPropertySpecifiedAttribute

@@ -33,6 +33,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
+using JsonFx.Serialization.Filters;
+
 namespace JsonFx.Serialization
 {
 	/// <summary>

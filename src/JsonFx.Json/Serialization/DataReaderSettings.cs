@@ -30,6 +30,8 @@
 
 using System;
 
+using JsonFx.Serialization.Resolvers;
+
 namespace JsonFx.Serialization
 {
 	/// <summary>

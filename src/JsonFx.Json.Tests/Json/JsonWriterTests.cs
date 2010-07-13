@@ -32,7 +32,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-using JsonFx.Json.Filters;
+using JsonFx.Common.Filters;
 using JsonFx.Serialization;
 using Xunit;
 

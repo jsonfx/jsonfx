@@ -37,7 +37,7 @@ using System.Threading;
 
 using JsonFx.CodeGen;
 
-namespace JsonFx.Serialization
+namespace JsonFx.Serialization.Resolvers
 {
 	public class MemberMap
 	{

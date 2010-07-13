@@ -75,8 +75,16 @@
     <Compile Include="Bson\BsonGrammar.cs" />
     <Compile Include="Bson\BsonTokenizer.cs" />
     <Compile Include="Bson\BsonTokenType.cs" />
-    <Compile Include="Serialization\DataAnalyzer.cs" />
-    <Compile Include="Serialization\DataWalker.cs" />
+    <Compile Include="Common\CommonAnalyzer.cs" />
+    <Compile Include="Common\CommonGrammar.cs" />
+    <Compile Include="Common\CommonTokenType.cs" />
+    <Compile Include="Common\CommonWalker.cs" />
+    <Compile Include="Common\Filters\CommonFilter`1.cs" />
+    <Compile Include="Common\Filters\Iso8601DateFilter.cs" />
+    <Compile Include="Common\Filters\MSAjaxDateFilter.cs" />
+    <Compile Include="Json\Resolvers\JsonResolverStrategy.cs" />
+    <Compile Include="Serialization\Filters\DataFilter`2.cs" />
+    <Compile Include="Serialization\Filters\IDataFilter`2.cs" />
     <Compile Include="Serialization\GraphCycles\GraphCycleException.cs" />
     <Compile Include="Serialization\GraphCycles\GraphCycleType.cs" />
     <Compile Include="Serialization\GraphCycles\DepthCounter.cs" />
@@ -87,33 +95,22 @@
     <Compile Include="IO\Stream`1.cs" />
     <Compile Include="IO\StringStream.cs" />
     <Compile Include="IO\TextReaderStream.cs" />
-    <Compile Include="Json\Filters\Iso8601DateFilter.cs" />
-    <Compile Include="Json\Filters\JsonFilter`1.cs" />
-    <Compile Include="Json\Filters\MSAjaxDateFilter.cs" />
     <Compile Include="Json\JsonFormatter.cs" />
     <Compile Include="Json\JsonGrammar.cs" />
     <Compile Include="Json\JsonIgnoreAttribute.cs" />
     <Compile Include="Json\JsonNameAttribute.cs" />
     <Compile Include="Json\JsonReader.cs" />
-    <Compile Include="Json\JsonResolverStrategy.cs" />
     <Compile Include="Json\JsonSpecifiedPropertyAttribute.cs" />
     <Compile Include="Json\JsonTokenizer.cs" />
     <Compile Include="Json\JsonWriter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\AssemblyVersion.cs" />
-    <Compile Include="Serialization\CallbackResolverStrategy.cs" />
-    <Compile Include="Serialization\CombinedResolverStrategy.cs" />
-    <Compile Include="Serialization\DataFilter`2.cs" />
     <Compile Include="Serialization\IBinaryFormatter`1.cs" />
     <Compile Include="Serialization\IBinaryTokenizer`1.cs" />
     <Compile Include="Serialization\IDataAnalyzer`1.cs" />
-    <Compile Include="Serialization\IDataFilter`2.cs" />
     <Compile Include="Serialization\IDataWalker`1.cs" />
     <Compile Include="Serialization\ITextFormatter`1.cs" />
     <Compile Include="Serialization\ITextTokenizer`1.cs" />
-    <Compile Include="Serialization\DataTokenType.cs" />
-    <Compile Include="Serialization\DataGrammar.cs" />
-    <Compile Include="Serialization\PocoResolverStrategy.cs" />
     <Compile Include="Serialization\DataReaderSettings.cs" />
     <Compile Include="Serialization\DataReader`1.cs" />
     <Compile Include="Serialization\DataWriterSettings.cs" />
@@ -123,15 +120,16 @@
     <Compile Include="Serialization\IDataReader.cs" />
     <Compile Include="Serialization\IDataTransformer`2.cs" />
     <Compile Include="Serialization\IDataWriter.cs" />
-    <Compile Include="Serialization\IResolverCacheContainer.cs" />
-    <Compile Include="Serialization\IResolverStrategy.cs" />
-    <Compile Include="Serialization\ResolverCache.cs" />
+    <Compile Include="Serialization\Resolvers\CallbackResolverStrategy.cs" />
+    <Compile Include="Serialization\Resolvers\CombinedResolverStrategy.cs" />
+    <Compile Include="Serialization\Resolvers\DataContractResolverStrategy.cs" />
+    <Compile Include="Serialization\Resolvers\IResolverCacheContainer.cs" />
+    <Compile Include="Serialization\Resolvers\IResolverStrategy.cs" />
+    <Compile Include="Serialization\Resolvers\PocoResolverStrategy.cs" />
+    <Compile Include="Serialization\Resolvers\ResolverCache.cs" />
     <Compile Include="Serialization\Token`1.cs" />
     <Compile Include="Serialization\TypeCoercionUtility.cs" />
-    <Compile Include="Xml\XmlResolverStrategy.cs" />
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFrameworkVersion)' != 'v2.0' And '$(TargetFrameworkVersion)' != 'v3.0' ">
-    <Compile Include="Serialization\DataContractResolverStrategy.cs" />
+    <Compile Include="Xml\Resolvers\XmlResolverStrategy.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Readme.txt" />

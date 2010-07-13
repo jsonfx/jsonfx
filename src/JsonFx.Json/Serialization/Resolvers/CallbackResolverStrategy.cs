@@ -31,7 +31,7 @@
 using System;
 using System.Reflection;
 
-namespace JsonFx.Serialization
+namespace JsonFx.Serialization.Resolvers
 {
 	/// <summary>
 	/// Controls name resolution for IDataReader / IDataWriter by using pluggable delegate callbacks

@@ -38,7 +38,7 @@ using Xunit;
 
 using Assert=JsonFx.AssertPatched;
 
-namespace JsonFx.Json.Filters
+namespace JsonFx.Common.Filters
 {
 	public class Iso8601DateFilterTests
 	{
@@ -47,9 +47,9 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_UtcStandardTimeZone_ReadsAsUtc()
 		{
-			var input = new Stream<Token<DataTokenType>>(new[]
+			var input = new Stream<Token<CommonTokenType>>(new[]
 				{
-					DataGrammar.TokenValue("2008-02-29T23:59:59.999Z")
+					CommonGrammar.TokenValue("2008-02-29T23:59:59.999Z")
 				});
 
 			var expected = new DateTime(2008, 2, 29, 23, 59, 59, 999, DateTimeKind.Utc);
@@ -64,9 +64,9 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_UnspecifiedStandardTimeZone_ReadsAsUnspecified()
 		{
-			var input = new Stream<Token<DataTokenType>>(new[]
+			var input = new Stream<Token<CommonTokenType>>(new[]
 				{
-					DataGrammar.TokenValue("2008-02-29T23:59:59.999")
+					CommonGrammar.TokenValue("2008-02-29T23:59:59.999")
 				});
 
 			var expected = new DateTime(2008, 2, 29, 23, 59, 59, 999, DateTimeKind.Unspecified);
@@ -81,9 +81,9 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_EasternStandardTimeZone_ReadsAsUtc()
 		{
-			var input = new Stream<Token<DataTokenType>>(new[]
+			var input = new Stream<Token<CommonTokenType>>(new[]
 				{
-					DataGrammar.TokenValue("2008-02-29T23:59:59.999-06:00")
+					CommonGrammar.TokenValue("2008-02-29T23:59:59.999-06:00")
 				});
 
 			var expected = new DateTime(2008, 3, 01, 05, 59, 59, 999, DateTimeKind.Utc);
@@ -98,9 +98,9 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_UtcDaylightSavingsTimeZone_ReadsAsUtc()
 		{
-			var input = new Stream<Token<DataTokenType>>(new[]
+			var input = new Stream<Token<CommonTokenType>>(new[]
 				{
-					DataGrammar.TokenValue("2010-07-05T10:51:17.768Z")
+					CommonGrammar.TokenValue("2010-07-05T10:51:17.768Z")
 				});
 
 			var expected = new DateTime(2010, 7, 5, 10, 51, 17, 768, DateTimeKind.Utc);
@@ -115,9 +115,9 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_UnspecifiedDaylightSavingsTimeZone_ReadsAsUnspecified()
 		{
-			var input = new Stream<Token<DataTokenType>>(new[]
+			var input = new Stream<Token<CommonTokenType>>(new[]
 				{
-					DataGrammar.TokenValue("2010-07-05T10:51:17.768")
+					CommonGrammar.TokenValue("2010-07-05T10:51:17.768")
 				});
 
 			var expected = new DateTime(2010, 7, 5, 10, 51, 17, 768, DateTimeKind.Unspecified);
@@ -132,9 +132,9 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_EasternDaylightSavingsTimeZone_ReadsAsUtc()
 		{
-			var input = new Stream<Token<DataTokenType>>(new[]
+			var input = new Stream<Token<CommonTokenType>>(new[]
 				{
-					DataGrammar.TokenValue("2010-07-05T10:51:17.768-05:00")
+					CommonGrammar.TokenValue("2010-07-05T10:51:17.768-05:00")
 				});
 
 			var expected = new DateTime(2010, 7, 5, 15, 51, 17, 768, DateTimeKind.Utc);
@@ -149,9 +149,9 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_FutureUtcTimeZone_ReadsAsUtc()
 		{
-			var input = new Stream<Token<DataTokenType>>(new[]
+			var input = new Stream<Token<CommonTokenType>>(new[]
 				{
-					DataGrammar.TokenValue("2099-12-31T23:59:59.999Z")
+					CommonGrammar.TokenValue("2099-12-31T23:59:59.999Z")
 				});
 
 			var expected = new DateTime(2099, 12, 31, 23, 59, 59, 999, DateTimeKind.Utc);
@@ -166,9 +166,9 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_FutureUnspecifiedTimeZone_ReadsAsUnspecified()
 		{
-			var input = new Stream<Token<DataTokenType>>(new[]
+			var input = new Stream<Token<CommonTokenType>>(new[]
 				{
-					DataGrammar.TokenValue("2099-12-31T23:59:59.999")
+					CommonGrammar.TokenValue("2099-12-31T23:59:59.999")
 				});
 
 			var expected = new DateTime(2099, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified);
@@ -183,9 +183,9 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_FutureEasternTimeZone_ReadsAsUtc()
 		{
-			var input = new Stream<Token<DataTokenType>>(new[]
+			var input = new Stream<Token<CommonTokenType>>(new[]
 				{
-					DataGrammar.TokenValue("2099-12-31T23:59:59.999-05:00")
+					CommonGrammar.TokenValue("2099-12-31T23:59:59.999-05:00")
 				});
 
 			var expected = new DateTime(2100, 1, 1, 4, 59, 59, 999, DateTimeKind.Utc);
@@ -200,9 +200,9 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_DateTimeMinValueUnspecified_ReadsAsUnspecified()
 		{
-			var input = new Stream<Token<DataTokenType>>(new[]
+			var input = new Stream<Token<CommonTokenType>>(new[]
 				{
-					DataGrammar.TokenValue("0001-01-01T00:00:00.000")
+					CommonGrammar.TokenValue("0001-01-01T00:00:00.000")
 				});
 
 			var expected = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified);
@@ -217,9 +217,9 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_DateTimeMinValueUtc_ReadsAsUtc()
 		{
-			var input = new Stream<Token<DataTokenType>>(new[]
+			var input = new Stream<Token<CommonTokenType>>(new[]
 				{
-					DataGrammar.TokenValue("0001-01-01T00:00:00.000Z")
+					CommonGrammar.TokenValue("0001-01-01T00:00:00.000Z")
 				});
 
 			var expected = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
@@ -234,9 +234,9 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_DateTimeMaxValueUnspecified_ReadsAsUnspecified()
 		{
-			var input = new Stream<Token<DataTokenType>>(new[]
+			var input = new Stream<Token<CommonTokenType>>(new[]
 				{
-					DataGrammar.TokenValue("9999-12-31T23:59:59.999")
+					CommonGrammar.TokenValue("9999-12-31T23:59:59.999")
 				});
 
 			var expected = new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified);
@@ -251,9 +251,9 @@ namespace JsonFx.Json.Filters
 		[Fact]
 		public void TryRead_DateTimeMaxValueUtc_ReadsAsUtc()
 		{
-			var input = new Stream<Token<DataTokenType>>(new[]
+			var input = new Stream<Token<CommonTokenType>>(new[]
 				{
-					DataGrammar.TokenValue("9999-12-31T23:59:59.999Z")
+					CommonGrammar.TokenValue("9999-12-31T23:59:59.999Z")
 				});
 
 			var expected = new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Utc);
@@ -276,10 +276,10 @@ namespace JsonFx.Json.Filters
 
 			var expected = new[]
 				{
-					DataGrammar.TokenValue("2008-02-29T23:59:59.999Z")
+					CommonGrammar.TokenValue("2008-02-29T23:59:59.999Z")
 				};
 
-			IEnumerable<Token<DataTokenType>> actual;
+			IEnumerable<Token<CommonTokenType>> actual;
 			Assert.True(new Iso8601DateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
@@ -296,10 +296,10 @@ namespace JsonFx.Json.Filters
 
 			var expected = new[]
 				{
-					DataGrammar.TokenValue("2008-03-01T07:59:59.999Z")
+					CommonGrammar.TokenValue("2008-03-01T07:59:59.999Z")
 				};
 
-			IEnumerable<Token<DataTokenType>> actual;
+			IEnumerable<Token<CommonTokenType>> actual;
 			Assert.True(new Iso8601DateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
@@ -315,10 +315,10 @@ namespace JsonFx.Json.Filters
 
 			var expected = new[]
 				{
-					DataGrammar.TokenValue("2008-02-29T23:59:59.999")
+					CommonGrammar.TokenValue("2008-02-29T23:59:59.999")
 				};
 
-			IEnumerable<Token<DataTokenType>> actual;
+			IEnumerable<Token<CommonTokenType>> actual;
 			Assert.True(new Iso8601DateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
@@ -334,10 +334,10 @@ namespace JsonFx.Json.Filters
 
 			var expected = new[]
 				{
-					DataGrammar.TokenValue("2010-07-05T10:51:17.768Z")
+					CommonGrammar.TokenValue("2010-07-05T10:51:17.768Z")
 				};
 
-			IEnumerable<Token<DataTokenType>> actual;
+			IEnumerable<Token<CommonTokenType>> actual;
 			Assert.True(new Iso8601DateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
@@ -354,10 +354,10 @@ namespace JsonFx.Json.Filters
 
 			var expected = new[]
 				{
-					DataGrammar.TokenValue("2010-07-05T17:51:17.768Z")
+					CommonGrammar.TokenValue("2010-07-05T17:51:17.768Z")
 				};
 
-			IEnumerable<Token<DataTokenType>> actual;
+			IEnumerable<Token<CommonTokenType>> actual;
 			Assert.True(new Iso8601DateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
@@ -373,10 +373,10 @@ namespace JsonFx.Json.Filters
 
 			var expected = new[]
 				{
-					DataGrammar.TokenValue("2010-07-05T10:51:17.768")
+					CommonGrammar.TokenValue("2010-07-05T10:51:17.768")
 				};
 
-			IEnumerable<Token<DataTokenType>> actual;
+			IEnumerable<Token<CommonTokenType>> actual;
 			Assert.True(new Iso8601DateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
@@ -392,10 +392,10 @@ namespace JsonFx.Json.Filters
 
 			var expected = new[]
 				{
-					DataGrammar.TokenValue("2099-12-31T23:59:59.999Z")
+					CommonGrammar.TokenValue("2099-12-31T23:59:59.999Z")
 				};
 
-			IEnumerable<Token<DataTokenType>> actual;
+			IEnumerable<Token<CommonTokenType>> actual;
 			Assert.True(new Iso8601DateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
@@ -412,10 +412,10 @@ namespace JsonFx.Json.Filters
 
 			var expected = new[]
 				{
-					DataGrammar.TokenValue("2100-01-01T07:59:59.999Z")
+					CommonGrammar.TokenValue("2100-01-01T07:59:59.999Z")
 				};
 
-			IEnumerable<Token<DataTokenType>> actual;
+			IEnumerable<Token<CommonTokenType>> actual;
 			Assert.True(new Iso8601DateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
@@ -431,10 +431,10 @@ namespace JsonFx.Json.Filters
 
 			var expected = new[]
 				{
-					DataGrammar.TokenValue("2099-12-31T23:59:59.999")
+					CommonGrammar.TokenValue("2099-12-31T23:59:59.999")
 				};
 
-			IEnumerable<Token<DataTokenType>> actual;
+			IEnumerable<Token<CommonTokenType>> actual;
 			Assert.True(new Iso8601DateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
@@ -451,10 +451,10 @@ namespace JsonFx.Json.Filters
 
 			var expected = new[]
 				{
-					DataGrammar.TokenValue("2010-07-05T23:43:34.3516165Z")
+					CommonGrammar.TokenValue("2010-07-05T23:43:34.3516165Z")
 				};
 
-			IEnumerable<Token<DataTokenType>> actual;
+			IEnumerable<Token<CommonTokenType>> actual;
 			Assert.True(new Iso8601DateFilter { Format=Iso8601DateFilter.Precision.Ticks }
 				.TryWrite(new DataWriterSettings(), input, out actual));
 
@@ -471,10 +471,10 @@ namespace JsonFx.Json.Filters
 
 			var expected = new[]
 				{
-					DataGrammar.TokenValue("0001-01-01T00:00:00.000")
+					CommonGrammar.TokenValue("0001-01-01T00:00:00.000")
 				};
 
-			IEnumerable<Token<DataTokenType>> actual;
+			IEnumerable<Token<CommonTokenType>> actual;
 			Assert.True(new Iso8601DateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
@@ -490,10 +490,10 @@ namespace JsonFx.Json.Filters
 
 			var expected = new[]
 				{
-					DataGrammar.TokenValue("0001-01-01T00:00:00")
+					CommonGrammar.TokenValue("0001-01-01T00:00:00")
 				};
 
-			IEnumerable<Token<DataTokenType>> actual;
+			IEnumerable<Token<CommonTokenType>> actual;
 			Assert.True(new Iso8601DateFilter { Format=Iso8601DateFilter.Precision.Seconds }
 				.TryWrite(new DataWriterSettings(), input, out actual));
 
@@ -510,10 +510,10 @@ namespace JsonFx.Json.Filters
 
 			var expected = new[]
 				{
-					DataGrammar.TokenValue("0001-01-01T00:00:00.000")
+					CommonGrammar.TokenValue("0001-01-01T00:00:00.000")
 				};
 
-			IEnumerable<Token<DataTokenType>> actual;
+			IEnumerable<Token<CommonTokenType>> actual;
 			Assert.True(new Iso8601DateFilter { Format=Iso8601DateFilter.Precision.Milliseconds }
 				.TryWrite(new DataWriterSettings(), input, out actual));
 
@@ -530,10 +530,10 @@ namespace JsonFx.Json.Filters
 
 			var expected = new[]
 				{
-					DataGrammar.TokenValue("0001-01-01T00:00:00")
+					CommonGrammar.TokenValue("0001-01-01T00:00:00")
 				};
 
-			IEnumerable<Token<DataTokenType>> actual;
+			IEnumerable<Token<CommonTokenType>> actual;
 			Assert.True(new Iso8601DateFilter { Format=Iso8601DateFilter.Precision.Ticks }
 				.TryWrite(new DataWriterSettings(), input, out actual));
 
@@ -550,10 +550,10 @@ namespace JsonFx.Json.Filters
 
 			var expected = new[]
 				{
-					DataGrammar.TokenValue("9999-12-31T23:59:59.999")
+					CommonGrammar.TokenValue("9999-12-31T23:59:59.999")
 				};
 
-			IEnumerable<Token<DataTokenType>> actual;
+			IEnumerable<Token<CommonTokenType>> actual;
 			Assert.True(new Iso8601DateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
@@ -569,10 +569,10 @@ namespace JsonFx.Json.Filters
 
 			var expected = new[]
 				{
-					DataGrammar.TokenValue("9999-12-31T23:59:59")
+					CommonGrammar.TokenValue("9999-12-31T23:59:59")
 				};
 
-			IEnumerable<Token<DataTokenType>> actual;
+			IEnumerable<Token<CommonTokenType>> actual;
 			Assert.True(new Iso8601DateFilter { Format=Iso8601DateFilter.Precision.Seconds }
 				.TryWrite(new DataWriterSettings(), input, out actual));
 
@@ -589,10 +589,10 @@ namespace JsonFx.Json.Filters
 
 			var expected = new[]
 				{
-					DataGrammar.TokenValue("9999-12-31T23:59:59.999")
+					CommonGrammar.TokenValue("9999-12-31T23:59:59.999")
 				};
 
-			IEnumerable<Token<DataTokenType>> actual;
+			IEnumerable<Token<CommonTokenType>> actual;
 			Assert.True(new Iso8601DateFilter { Format=Iso8601DateFilter.Precision.Milliseconds }
 				.TryWrite(new DataWriterSettings(), input, out actual));
 
@@ -609,10 +609,10 @@ namespace JsonFx.Json.Filters
 
 			var expected = new[]
 				{
-					DataGrammar.TokenValue("9999-12-31T23:59:59.9999999")
+					CommonGrammar.TokenValue("9999-12-31T23:59:59.9999999")
 				};
 
-			IEnumerable<Token<DataTokenType>> actual;
+			IEnumerable<Token<CommonTokenType>> actual;
 			Assert.True(new Iso8601DateFilter { Format=Iso8601DateFilter.Precision.Ticks }
 				.TryWrite(new DataWriterSettings(), input, out actual));
 

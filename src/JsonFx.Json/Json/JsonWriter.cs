@@ -32,15 +32,17 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-using JsonFx.Json.Filters;
+using JsonFx.Common;
+using JsonFx.Common.Filters;
 using JsonFx.Serialization;
+using JsonFx.Serialization.Filters;
 
 namespace JsonFx.Json
 {
 	/// <summary>
 	/// JSON serializer
 	/// </summary>
-	public partial class JsonWriter : DataWriter<DataTokenType>
+	public partial class JsonWriter : DataWriter<CommonTokenType>
 	{
 		#region Init
 
@@ -57,7 +59,7 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="settings"></param>
 		public JsonWriter(DataWriterSettings settings)
-			: base(settings, new IDataFilter<DataTokenType>[] { new Iso8601DateFilter() })
+			: base(settings, new IDataFilter<CommonTokenType>[] { new Iso8601DateFilter() })
 		{
 		}
 
@@ -66,8 +68,8 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <param name="filters"></param>
-		public JsonWriter(DataWriterSettings settings, params IDataFilter<DataTokenType>[] filters)
-			: base(settings, (IEnumerable<IDataFilter<DataTokenType>>)filters)
+		public JsonWriter(DataWriterSettings settings, params IDataFilter<CommonTokenType>[] filters)
+			: base(settings, (IEnumerable<IDataFilter<CommonTokenType>>)filters)
 		{
 		}
 
@@ -76,7 +78,7 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <param name="filters"></param>
-		public JsonWriter(DataWriterSettings settings, IEnumerable<IDataFilter<DataTokenType>> filters)
+		public JsonWriter(DataWriterSettings settings, IEnumerable<IDataFilter<CommonTokenType>> filters)
 			: base(settings, filters)
 		{
 		}
@@ -118,9 +120,9 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <returns></returns>
-		protected override IDataWalker<DataTokenType> GetWalker()
+		protected override IDataWalker<CommonTokenType> GetWalker()
 		{
-			return new DataWriter.DataWalker(this.Settings, this.Filters);
+			return new CommonWalker(this.Settings, this.Filters);
 		}
 
 		/// <summary>
@@ -128,7 +130,7 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <returns></returns>
-		protected override ITextFormatter<DataTokenType> GetFormatter()
+		protected override ITextFormatter<CommonTokenType> GetFormatter()
 		{
 			return new JsonWriter.JsonFormatter(this.Settings);
 		}

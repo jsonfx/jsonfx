@@ -33,7 +33,7 @@ using System.Collections.Generic;
 
 using JsonFx.IO;
 
-namespace JsonFx.Serialization
+namespace JsonFx.Serialization.Filters
 {
 	/// <summary>
 	/// Allows a mechanism for manipulating serialization

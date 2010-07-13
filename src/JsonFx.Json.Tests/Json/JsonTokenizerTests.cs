@@ -31,6 +31,7 @@
 using System;
 using System.Linq;
 
+using JsonFx.Common;
 using JsonFx.Serialization;
 using Xunit;
 
@@ -48,8 +49,8 @@ namespace JsonFx.Json
 			const string input = "[]";
 			var expected = new []
 			{
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenArrayEnd
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayEnd
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -64,9 +65,9 @@ namespace JsonFx.Json
 			const string input = "[null]";
 			var expected = new []
 			{
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenNull,
-				DataGrammar.TokenArrayEnd
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenNull,
+				CommonGrammar.TokenArrayEnd
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -81,15 +82,15 @@ namespace JsonFx.Json
 			const string input = "[ 0, null,  false,true ]";
 			var expected = new []
 			{
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenValue(0),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenNull,
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenFalse,
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenTrue,
-				DataGrammar.TokenArrayEnd
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenValue(0),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenNull,
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenFalse,
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenTrue,
+				CommonGrammar.TokenArrayEnd
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -105,45 +106,45 @@ namespace JsonFx.Json
 			const string input = @"[[[[[[[[[[[[[[[[[[[""Not too deep""]]]]]]]]]]]]]]]]]]]";
 			var expected = new []
 			{
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenValue("Not too deep"),
-				DataGrammar.TokenArrayEnd,
-				DataGrammar.TokenArrayEnd,
-				DataGrammar.TokenArrayEnd,
-				DataGrammar.TokenArrayEnd,
-				DataGrammar.TokenArrayEnd,
-				DataGrammar.TokenArrayEnd,
-				DataGrammar.TokenArrayEnd,
-				DataGrammar.TokenArrayEnd,
-				DataGrammar.TokenArrayEnd,
-				DataGrammar.TokenArrayEnd,
-				DataGrammar.TokenArrayEnd,
-				DataGrammar.TokenArrayEnd,
-				DataGrammar.TokenArrayEnd,
-				DataGrammar.TokenArrayEnd,
-				DataGrammar.TokenArrayEnd,
-				DataGrammar.TokenArrayEnd,
-				DataGrammar.TokenArrayEnd,
-				DataGrammar.TokenArrayEnd,
-				DataGrammar.TokenArrayEnd
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenValue("Not too deep"),
+				CommonGrammar.TokenArrayEnd,
+				CommonGrammar.TokenArrayEnd,
+				CommonGrammar.TokenArrayEnd,
+				CommonGrammar.TokenArrayEnd,
+				CommonGrammar.TokenArrayEnd,
+				CommonGrammar.TokenArrayEnd,
+				CommonGrammar.TokenArrayEnd,
+				CommonGrammar.TokenArrayEnd,
+				CommonGrammar.TokenArrayEnd,
+				CommonGrammar.TokenArrayEnd,
+				CommonGrammar.TokenArrayEnd,
+				CommonGrammar.TokenArrayEnd,
+				CommonGrammar.TokenArrayEnd,
+				CommonGrammar.TokenArrayEnd,
+				CommonGrammar.TokenArrayEnd,
+				CommonGrammar.TokenArrayEnd,
+				CommonGrammar.TokenArrayEnd,
+				CommonGrammar.TokenArrayEnd,
+				CommonGrammar.TokenArrayEnd
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -161,10 +162,10 @@ namespace JsonFx.Json
 			var input = @"[""extra comma"",]";
 			var expected = new[]
 			{
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenValue("extra comma"),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenArrayEnd
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenValue("extra comma"),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenArrayEnd
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -182,11 +183,11 @@ namespace JsonFx.Json
 			var input = @"[""double extra comma"",,]";
 			var expected = new[]
 			{
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenValue("double extra comma"),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenArrayEnd
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenValue("double extra comma"),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenArrayEnd
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -204,10 +205,10 @@ namespace JsonFx.Json
 			var input = @"[   , ""<-- missing value""]";
 			var expected = new[]
 			{
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenValue("<-- missing value"),
-				DataGrammar.TokenArrayEnd
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenValue("<-- missing value"),
+				CommonGrammar.TokenArrayEnd
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -225,10 +226,10 @@ namespace JsonFx.Json
 			var input = @"[""Colon instead of comma"": false]";
 			var expected = new[]
 			{
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenProperty("Colon instead of comma"),
-				DataGrammar.TokenFalse,
-				DataGrammar.TokenArrayEnd
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenProperty("Colon instead of comma"),
+				CommonGrammar.TokenFalse,
+				CommonGrammar.TokenArrayEnd
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -266,8 +267,8 @@ namespace JsonFx.Json
 			const string input = "{}";
 			var expected = new []
 			{
-				DataGrammar.TokenObjectBegin,
-				DataGrammar.TokenObjectEnd
+				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenObjectEnd
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -282,10 +283,10 @@ namespace JsonFx.Json
 			const string input = @"{""key"":""value""}";
 			var expected = new []
 			{
-				DataGrammar.TokenObjectBegin,
-				DataGrammar.TokenProperty("key"),
-				DataGrammar.TokenValue("value"),
-				DataGrammar.TokenObjectEnd
+				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenProperty("key"),
+				CommonGrammar.TokenValue("value"),
+				CommonGrammar.TokenObjectEnd
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -308,16 +309,16 @@ namespace JsonFx.Json
 
 			var expected = new []
 			{
-				DataGrammar.TokenObjectBegin,
-				DataGrammar.TokenProperty("JSON Test Pattern pass3"),
-				DataGrammar.TokenObjectBegin,
-				DataGrammar.TokenProperty("The outermost value"),
-				DataGrammar.TokenValue("must be an object or array."),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenProperty("In this test"),
-				DataGrammar.TokenValue("It is an object."),
-				DataGrammar.TokenObjectEnd,
-				DataGrammar.TokenObjectEnd
+				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenProperty("JSON Test Pattern pass3"),
+				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenProperty("The outermost value"),
+				CommonGrammar.TokenValue("must be an object or array."),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenProperty("In this test"),
+				CommonGrammar.TokenValue("It is an object."),
+				CommonGrammar.TokenObjectEnd,
+				CommonGrammar.TokenObjectEnd
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -336,11 +337,11 @@ namespace JsonFx.Json
 
 			var expected = new[]
 			{
-				DataGrammar.TokenObjectBegin,
-				DataGrammar.TokenValue("Comma instead of colon"),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenNull,
-				DataGrammar.TokenObjectEnd
+				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenValue("Comma instead of colon"),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenNull,
+				CommonGrammar.TokenObjectEnd
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -359,10 +360,10 @@ namespace JsonFx.Json
 
 			var expected = new[]
 			{
-				DataGrammar.TokenObjectBegin,
-				DataGrammar.TokenProperty("Comma instead of closing brace"),
-				DataGrammar.TokenTrue,
-				DataGrammar.TokenValueDelim
+				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenProperty("Comma instead of closing brace"),
+				CommonGrammar.TokenTrue,
+				CommonGrammar.TokenValueDelim
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -381,7 +382,7 @@ namespace JsonFx.Json
 			const string input = "\"\"";
 			var expected = new []
 			{
-				DataGrammar.TokenValue(String.Empty)
+				CommonGrammar.TokenValue(String.Empty)
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -397,7 +398,7 @@ namespace JsonFx.Json
 			const string input = @"""A JSON payload should be an object or array, not a string.""";
 			var expected = new []
 			{
-				DataGrammar.TokenValue("A JSON payload should be an object or array, not a string.")
+				CommonGrammar.TokenValue("A JSON payload should be an object or array, not a string.")
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -413,7 +414,7 @@ namespace JsonFx.Json
 			const string input = @"""\\\b\f\n\r\t\u0123\u4567\u89AB\uCDEF\uabcd\uef4A\""""";
 			var expected = new []
 			{
-				DataGrammar.TokenValue("\\\b\f\n\r\t\u0123\u4567\u89AB\uCDEF\uabcd\uef4A\"")
+				CommonGrammar.TokenValue("\\\b\f\n\r\t\u0123\u4567\u89AB\uCDEF\uabcd\uef4A\"")
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -428,7 +429,7 @@ namespace JsonFx.Json
 			const string input = @"""\u\u1\u12\u123\u12345""";
 			var expected = new []
 			{
-				DataGrammar.TokenValue("uu1u12u123\u12345")
+				CommonGrammar.TokenValue("uu1u12u123\u12345")
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -444,9 +445,9 @@ namespace JsonFx.Json
 			const string input = @"[""Illegal backslash escape: \x15""]";
 			var expected = new []
 			{
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenValue("Illegal backslash escape: x15"),
-				DataGrammar.TokenArrayEnd
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenValue("Illegal backslash escape: x15"),
+				CommonGrammar.TokenArrayEnd
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -463,9 +464,9 @@ namespace JsonFx.Json
 			const string input = @"[""Illegal backslash escape: \017""]";
 			var expected = new []
 			{
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenValue("Illegal backslash escape: 17"),
-				DataGrammar.TokenArrayEnd
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenValue("Illegal backslash escape: 17"),
+				CommonGrammar.TokenArrayEnd
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -482,9 +483,9 @@ namespace JsonFx.Json
 			const string input = @"['single quote']";
 			var expected = new []
 			{
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenValue("single quote"),
-				DataGrammar.TokenArrayEnd
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenValue("single quote"),
+				CommonGrammar.TokenArrayEnd
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -500,7 +501,7 @@ namespace JsonFx.Json
 			const string input = @"""unescaped ' single quote""";
 			var expected = new []
 			{
-				DataGrammar.TokenValue("unescaped ' single quote"),
+				CommonGrammar.TokenValue("unescaped ' single quote"),
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -515,7 +516,7 @@ namespace JsonFx.Json
 			const string input = @"'unescaped "" quote'";
 			var expected = new []
 			{
-				DataGrammar.TokenValue("unescaped \" quote"),
+				CommonGrammar.TokenValue("unescaped \" quote"),
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -532,9 +533,9 @@ namespace JsonFx.Json
 			const string input = @"[""	tab	character	in	string	""]";
 			var expected = new []
 			{
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenValue("\ttab\tcharacter\tin\tstring\t"),
-				DataGrammar.TokenArrayEnd
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenValue("\ttab\tcharacter\tin\tstring\t"),
+				CommonGrammar.TokenArrayEnd
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -551,9 +552,9 @@ namespace JsonFx.Json
 			const string input = @"[""\	tab\	character\	in\	string\	""]";
 			var expected = new []
 			{
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenValue("\ttab\tcharacter\tin\tstring\t"),
-				DataGrammar.TokenArrayEnd
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenValue("\ttab\tcharacter\tin\tstring\t"),
+				CommonGrammar.TokenArrayEnd
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -646,7 +647,7 @@ break""]";
 			const string input = "123456";
 			var expected = new []
 			{
-				DataGrammar.TokenValue(123456)
+				CommonGrammar.TokenValue(123456)
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -661,7 +662,7 @@ break""]";
 			const string input = "1.23456";
 			var expected = new []
 			{
-				DataGrammar.TokenValue(1.23456)
+				CommonGrammar.TokenValue(1.23456)
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -676,7 +677,7 @@ break""]";
 			const string input = "-0.123456";
 			var expected = new []
 			{
-				DataGrammar.TokenValue(-0.123456)
+				CommonGrammar.TokenValue(-0.123456)
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -691,7 +692,7 @@ break""]";
 			const string input = ".123456";
 			var expected = new []
 			{
-				DataGrammar.TokenValue(.123456)
+				CommonGrammar.TokenValue(.123456)
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -706,7 +707,7 @@ break""]";
 			const string input = "+.123456";
 			var expected = new []
 			{
-				DataGrammar.TokenValue(.123456)
+				CommonGrammar.TokenValue(.123456)
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -721,7 +722,7 @@ break""]";
 			const string input = "-.123456";
 			var expected = new []
 			{
-				DataGrammar.TokenValue(-.123456)
+				CommonGrammar.TokenValue(-.123456)
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -737,10 +738,10 @@ break""]";
 			const string input = @"{""Numbers cannot have leading zeroes"": 013}";
 			var expected = new []
 			{
-				DataGrammar.TokenObjectBegin,
-				DataGrammar.TokenProperty("Numbers cannot have leading zeroes"),
-				DataGrammar.TokenValue(13),
-				DataGrammar.TokenObjectEnd
+				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenProperty("Numbers cannot have leading zeroes"),
+				CommonGrammar.TokenValue(13),
+				CommonGrammar.TokenObjectEnd
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -867,10 +868,10 @@ break""]";
 			const string input = @"{unquoted_key: ""keys must be quoted""}";
 			var expected = new []
 			{
-				DataGrammar.TokenObjectBegin,
-				DataGrammar.TokenProperty("unquoted_key"),
-				DataGrammar.TokenValue("keys must be quoted"),
-				DataGrammar.TokenObjectEnd
+				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenProperty("unquoted_key"),
+				CommonGrammar.TokenValue("keys must be quoted"),
+				CommonGrammar.TokenObjectEnd
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -885,10 +886,10 @@ break""]";
 			const string input = @"{ $abcdefg0123456 : false }";
 			var expected = new []
 			{
-				DataGrammar.TokenObjectBegin,
-				DataGrammar.TokenProperty("$abcdefg0123456"),
-				DataGrammar.TokenFalse,
-				DataGrammar.TokenObjectEnd
+				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenProperty("$abcdefg0123456"),
+				CommonGrammar.TokenFalse,
+				CommonGrammar.TokenObjectEnd
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -903,10 +904,10 @@ break""]";
 			const string input = @"{ _123456 : true }";
 			var expected = new []
 			{
-				DataGrammar.TokenObjectBegin,
-				DataGrammar.TokenProperty("_123456"),
-				DataGrammar.TokenTrue,
-				DataGrammar.TokenObjectEnd
+				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenProperty("_123456"),
+				CommonGrammar.TokenTrue,
+				CommonGrammar.TokenObjectEnd
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -925,7 +926,7 @@ break""]";
 			const string input = @"undefined";
 			var expected = new []
 			{
-				DataGrammar.TokenNull
+				CommonGrammar.TokenNull
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -941,7 +942,7 @@ break""]";
 			const string input = @"null";
 			var expected = new []
 			{
-				DataGrammar.TokenNull
+				CommonGrammar.TokenNull
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -956,7 +957,7 @@ break""]";
 			const string input = @"false";
 			var expected = new []
 			{
-				DataGrammar.TokenFalse
+				CommonGrammar.TokenFalse
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -971,7 +972,7 @@ break""]";
 			const string input = @"true";
 			var expected = new []
 			{
-				DataGrammar.TokenTrue
+				CommonGrammar.TokenTrue
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -986,7 +987,7 @@ break""]";
 			const string input = @"NaN";
 			var expected = new []
 			{
-				DataGrammar.TokenNaN
+				CommonGrammar.TokenNaN
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -1002,7 +1003,7 @@ break""]";
 			const string input = @"Infinity";
 			var expected = new []
 			{
-				DataGrammar.TokenPositiveInfinity
+				CommonGrammar.TokenPositiveInfinity
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -1018,7 +1019,7 @@ break""]";
 			const string input = @"+Infinity";
 			var expected = new []
 			{
-				DataGrammar.TokenPositiveInfinity
+				CommonGrammar.TokenPositiveInfinity
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -1034,7 +1035,7 @@ break""]";
 			const string input = @"-Infinity";
 			var expected = new []
 			{
-				DataGrammar.TokenNegativeInfinity
+				CommonGrammar.TokenNegativeInfinity
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -1064,13 +1065,13 @@ break""]";
 ";
 			var expected = new []
 			{
-				DataGrammar.TokenObjectBegin,
-				DataGrammar.TokenProperty("foo"),
-				DataGrammar.TokenNull,
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenProperty("bar"),
-				DataGrammar.TokenValue("value"),
-				DataGrammar.TokenObjectEnd
+				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenProperty("foo"),
+				CommonGrammar.TokenNull,
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenProperty("bar"),
+				CommonGrammar.TokenValue("value"),
+				CommonGrammar.TokenObjectEnd
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -1144,180 +1145,180 @@ break""]";
 
 			var expected = new[]
 			{
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenValue("JSON Test Pattern pass1"),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenObjectBegin,
-				DataGrammar.TokenProperty("object with 1 member"),
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenValue("array with 1 element"),
-				DataGrammar.TokenArrayEnd,
-				DataGrammar.TokenObjectEnd,
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenObjectBegin,
-				DataGrammar.TokenObjectEnd,
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenArrayEnd,
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenValue(-42),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenTrue,
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenFalse,
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenNull,
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenObjectBegin,
-				DataGrammar.TokenProperty("integer"),
-				DataGrammar.TokenValue(1234567890),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenProperty("real"),
-				DataGrammar.TokenValue(-9876.543210),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenProperty("e"),
-				DataGrammar.TokenValue(0.123456789e-12),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenProperty("E"),
-				DataGrammar.TokenValue(1.234567890E+34),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenProperty(""),
-				DataGrammar.TokenValue(23456789012E66),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenProperty("zero"),
-				DataGrammar.TokenValue(0),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenProperty("one"),
-				DataGrammar.TokenValue(1),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenProperty("space"),
-				DataGrammar.TokenValue(" "),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenProperty("quote"),
-				DataGrammar.TokenValue("\""),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenProperty("backslash"),
-				DataGrammar.TokenValue("\\"),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenProperty("controls"),
-				DataGrammar.TokenValue("\b\f\n\r\t"),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenProperty("slash"),
-				DataGrammar.TokenValue("/ & /"),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenProperty("alpha"),
-				DataGrammar.TokenValue("abcdefghijklmnopqrstuvwyz"),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenProperty("ALPHA"),
-				DataGrammar.TokenValue("ABCDEFGHIJKLMNOPQRSTUVWYZ"),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenProperty("digit"),
-				DataGrammar.TokenValue("0123456789"),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenProperty("0123456789"),
-				DataGrammar.TokenValue("digit"),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenProperty("special"),
-				DataGrammar.TokenValue("`1~!@#$%^&*()_+-={':[,]}|;.</>?"),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenProperty("hex"),
-				DataGrammar.TokenValue("\u0123\u4567\u89AB\uCDEF\uabcd\uef4A"),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenProperty("true"),
-				DataGrammar.TokenTrue,
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenProperty("false"),
-				DataGrammar.TokenFalse,
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenProperty("null"),
-				DataGrammar.TokenNull,
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenProperty("array"),
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenArrayEnd,
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenProperty("object"),
-				DataGrammar.TokenObjectBegin,
-				DataGrammar.TokenObjectEnd,
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenProperty("address"),
-				DataGrammar.TokenValue("50 St. James Street"),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenProperty("url"),
-				DataGrammar.TokenValue("http://www.JSON.org/"),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenProperty("comment"),
-				DataGrammar.TokenValue("// /* <!-- --"),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenProperty("# -- --> */"),
-				DataGrammar.TokenValue(" "),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenProperty(" s p a c e d "),
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenValue(1),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenValue(2),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenValue(3),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenValue(4),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenValue(5),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenValue(6),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenValue(7),
-				DataGrammar.TokenArrayEnd,
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenProperty("compact"),
-				DataGrammar.TokenArrayBegin,
-				DataGrammar.TokenValue(1),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenValue(2),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenValue(3),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenValue(4),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenValue(5),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenValue(6),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenValue(7),
-				DataGrammar.TokenArrayEnd,
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenProperty("jsontext"),
-				DataGrammar.TokenValue("{\"object with 1 member\":[\"array with 1 element\"]}"),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenProperty("quotes"),
-				DataGrammar.TokenValue("&#34; \u0022 %22 0x22 034 &#x22;"),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenProperty("/\\\"\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"),
-				DataGrammar.TokenValue("A key can be any string"),
-				DataGrammar.TokenObjectEnd,
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenValue(0.5),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenValue(98.6),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenValue(99.44),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenValue(1066),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenValue(10.0),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenValue(1.0),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenValue(0.1),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenValue(1.0),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenValue(2.0),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenValue(2.0),
-				DataGrammar.TokenValueDelim,
-				DataGrammar.TokenValue("rosebud"),
-				DataGrammar.TokenArrayEnd
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenValue("JSON Test Pattern pass1"),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenProperty("object with 1 member"),
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenValue("array with 1 element"),
+				CommonGrammar.TokenArrayEnd,
+				CommonGrammar.TokenObjectEnd,
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenObjectEnd,
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayEnd,
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenValue(-42),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenTrue,
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenFalse,
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenNull,
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenProperty("integer"),
+				CommonGrammar.TokenValue(1234567890),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenProperty("real"),
+				CommonGrammar.TokenValue(-9876.543210),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenProperty("e"),
+				CommonGrammar.TokenValue(0.123456789e-12),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenProperty("E"),
+				CommonGrammar.TokenValue(1.234567890E+34),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenProperty(""),
+				CommonGrammar.TokenValue(23456789012E66),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenProperty("zero"),
+				CommonGrammar.TokenValue(0),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenProperty("one"),
+				CommonGrammar.TokenValue(1),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenProperty("space"),
+				CommonGrammar.TokenValue(" "),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenProperty("quote"),
+				CommonGrammar.TokenValue("\""),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenProperty("backslash"),
+				CommonGrammar.TokenValue("\\"),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenProperty("controls"),
+				CommonGrammar.TokenValue("\b\f\n\r\t"),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenProperty("slash"),
+				CommonGrammar.TokenValue("/ & /"),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenProperty("alpha"),
+				CommonGrammar.TokenValue("abcdefghijklmnopqrstuvwyz"),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenProperty("ALPHA"),
+				CommonGrammar.TokenValue("ABCDEFGHIJKLMNOPQRSTUVWYZ"),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenProperty("digit"),
+				CommonGrammar.TokenValue("0123456789"),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenProperty("0123456789"),
+				CommonGrammar.TokenValue("digit"),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenProperty("special"),
+				CommonGrammar.TokenValue("`1~!@#$%^&*()_+-={':[,]}|;.</>?"),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenProperty("hex"),
+				CommonGrammar.TokenValue("\u0123\u4567\u89AB\uCDEF\uabcd\uef4A"),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenProperty("true"),
+				CommonGrammar.TokenTrue,
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenProperty("false"),
+				CommonGrammar.TokenFalse,
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenProperty("null"),
+				CommonGrammar.TokenNull,
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenProperty("array"),
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayEnd,
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenProperty("object"),
+				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenObjectEnd,
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenProperty("address"),
+				CommonGrammar.TokenValue("50 St. James Street"),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenProperty("url"),
+				CommonGrammar.TokenValue("http://www.JSON.org/"),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenProperty("comment"),
+				CommonGrammar.TokenValue("// /* <!-- --"),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenProperty("# -- --> */"),
+				CommonGrammar.TokenValue(" "),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenProperty(" s p a c e d "),
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenValue(1),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenValue(2),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenValue(3),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenValue(4),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenValue(5),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenValue(6),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenValue(7),
+				CommonGrammar.TokenArrayEnd,
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenProperty("compact"),
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenValue(1),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenValue(2),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenValue(3),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenValue(4),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenValue(5),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenValue(6),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenValue(7),
+				CommonGrammar.TokenArrayEnd,
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenProperty("jsontext"),
+				CommonGrammar.TokenValue("{\"object with 1 member\":[\"array with 1 element\"]}"),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenProperty("quotes"),
+				CommonGrammar.TokenValue("&#34; \u0022 %22 0x22 034 &#x22;"),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenProperty("/\\\"\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"),
+				CommonGrammar.TokenValue("A key can be any string"),
+				CommonGrammar.TokenObjectEnd,
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenValue(0.5),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenValue(98.6),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenValue(99.44),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenValue(1066),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenValue(10.0),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenValue(1.0),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenValue(0.1),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenValue(1.0),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenValue(2.0),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenValue(2.0),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenValue("rosebud"),
+				CommonGrammar.TokenArrayEnd
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -1334,7 +1335,7 @@ break""]";
 		public void GetTokens_NullInput_ReturnsEmptySequence()
 		{
 			const string input = null;
-			var expected = new Token<DataTokenType>[0];
+			var expected = new Token<CommonTokenType>[0];
 
 			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
@@ -1346,7 +1347,7 @@ break""]";
 		public void GetTokens_EmptyInput_ReturnsEmptySequence()
 		{
 			const string input = "";
-			var expected = new Token<DataTokenType>[0];
+			var expected = new Token<CommonTokenType>[0];
 
 			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();

@@ -33,6 +33,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 
+using JsonFx.Common;
 using JsonFx.Serialization;
 
 namespace JsonFx.Json
@@ -42,7 +43,7 @@ namespace JsonFx.Json
 		/// <summary>
 		/// Outputs JSON text from a SAX-like input stream of tokens
 		/// </summary>
-		public class JsonFormatter : ITextFormatter<DataTokenType>
+		public class JsonFormatter : ITextFormatter<CommonTokenType>
 		{
 			#region Fields
 
@@ -74,7 +75,7 @@ namespace JsonFx.Json
 			/// Formats the token sequence as a string
 			/// </summary>
 			/// <param name="tokens"></param>
-			public string Format(IEnumerable<Token<DataTokenType>> tokens)
+			public string Format(IEnumerable<Token<CommonTokenType>> tokens)
 			{
 				using (StringWriter writer = new StringWriter())
 				{
@@ -89,7 +90,7 @@ namespace JsonFx.Json
 			/// </summary>
 			/// <param name="writer"></param>
 			/// <param name="tokens"></param>
-			public void Format(TextWriter writer, IEnumerable<Token<DataTokenType>> tokens)
+			public void Format(TextWriter writer, IEnumerable<Token<CommonTokenType>> tokens)
 			{
 				if (tokens == null)
 				{
@@ -102,11 +103,11 @@ namespace JsonFx.Json
 				bool pendingNewLine = false;
 				int depth = 0;
 
-				foreach (Token<DataTokenType> token in tokens)
+				foreach (Token<CommonTokenType> token in tokens)
 				{
 					switch (token.TokenType)
 					{
-						case DataTokenType.ArrayBegin:
+						case CommonTokenType.ArrayBegin:
 						{
 							if (pendingNewLine)
 							{
@@ -120,7 +121,7 @@ namespace JsonFx.Json
 							pendingNewLine = true;
 							continue;
 						}
-						case DataTokenType.ArrayEnd:
+						case CommonTokenType.ArrayEnd:
 						{
 							if (pendingNewLine)
 							{
@@ -133,7 +134,7 @@ namespace JsonFx.Json
 							writer.Write(JsonGrammar.OperatorArrayEnd);
 							continue;
 						}
-						case DataTokenType.Value:
+						case CommonTokenType.Value:
 						{
 							if (pendingNewLine)
 							{
@@ -197,7 +198,7 @@ namespace JsonFx.Json
 							}
 							continue;
 						}
-						case DataTokenType.ObjectBegin:
+						case CommonTokenType.ObjectBegin:
 						{
 							if (pendingNewLine)
 							{
@@ -211,7 +212,7 @@ namespace JsonFx.Json
 							pendingNewLine = true;
 							continue;
 						}
-						case DataTokenType.ObjectEnd:
+						case CommonTokenType.ObjectEnd:
 						{
 							if (pendingNewLine)
 							{
@@ -224,7 +225,7 @@ namespace JsonFx.Json
 							writer.Write(JsonGrammar.OperatorObjectEnd);
 							continue;
 						}
-						case DataTokenType.PropertyKey:
+						case CommonTokenType.PropertyKey:
 						{
 							if (pendingNewLine)
 							{
@@ -249,7 +250,7 @@ namespace JsonFx.Json
 							}
 							continue;
 						}
-						case DataTokenType.ValueDelim:
+						case CommonTokenType.ValueDelim:
 						{
 							writer.Write(JsonGrammar.OperatorValueDelim);
 							if (prettyPrint)
@@ -258,7 +259,7 @@ namespace JsonFx.Json
 							}
 							continue;
 						}
-						case DataTokenType.None:
+						case CommonTokenType.None:
 						default:
 						{
 							throw new NotSupportedException("Unexpected JSON token: "+token);

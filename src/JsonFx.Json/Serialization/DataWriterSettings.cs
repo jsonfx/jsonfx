@@ -31,6 +31,7 @@
 using System;
 
 using JsonFx.Serialization.GraphCycles;
+using JsonFx.Serialization.Resolvers;
 
 namespace JsonFx.Serialization
 {

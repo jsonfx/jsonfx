@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -30,64 +30,15 @@
 
 using System;
 
-namespace JsonFx.Serialization
+using JsonFx.Serialization.Filters;
+
+namespace JsonFx.Common.Filters
 {
 	/// <summary>
-	/// General Lexical Analysis Tokens
+	/// Allows a mechanism for manipulating JSON serialization
 	/// </summary>
-	public enum DataTokenType
+	/// <typeparam name="T">Defines the type this filter reads/writes</typeparam>
+	public abstract class CommonFilter<T> : DataFilter<CommonTokenType, T>
 	{
-		/// <summary>
-		/// No token
-		/// </summary>
-		/// <remarks>
-		/// The state before and after an object graph
-		/// </remarks>
-		None,
-
-		/// <summary>
-		/// Primitive and simple scalar values
-		/// </summary>
-		Value,
-
-		/// <summary>
-		/// Begin Array
-		/// </summary>
-		ArrayBegin,
-
-		/// <summary>
-		/// End Array
-		/// </summary>
-		ArrayEnd,
-
-		/// <summary>
-		/// Begin Object
-		/// </summary>
-		ObjectBegin,
-
-		/// <summary>
-		/// End Object
-		/// </summary>
-		ObjectEnd,
-
-		/// <summary>
-		/// Object property identifier
-		/// </summary>
-		PropertyKey,
-
-		///// <summary>
-		///// Object attribute identifier
-		///// </summary>
-		//AttributeKey,
-
-		/// <summary>
-		/// Value delimiter
-		/// </summary>
-		ValueDelim,
-
-		///// <summary>
-		///// Code comment value
-		///// </summary>
-		//Comment
 	}
 }

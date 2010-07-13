@@ -35,6 +35,8 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 
+using JsonFx.Serialization.Resolvers;
+
 #if NET40
 using JsonObject=System.Dynamic.ExpandoObject;
 #else
@@ -286,7 +288,7 @@ namespace JsonFx.Serialization
 						return date;
 					}
 
-					if (JsonFx.Json.Filters.MSAjaxDateFilter.TryParseMSAjaxDate(
+					if (JsonFx.Common.Filters.MSAjaxDateFilter.TryParseMSAjaxDate(
 						(string)value,
 						out date))
 					{

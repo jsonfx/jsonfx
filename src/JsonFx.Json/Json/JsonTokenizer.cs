@@ -34,6 +34,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 
+using JsonFx.Common;
 using JsonFx.IO;
 using JsonFx.Serialization;
 
@@ -44,7 +45,7 @@ namespace JsonFx.Json
 		/// <summary>
 		/// Generates a SAX-like sequence of tokens from JSON text
 		/// </summary>
-		public class JsonTokenizer : ITextTokenizer<DataTokenType>
+		public class JsonTokenizer : ITextTokenizer<CommonTokenType>
 		{
 			#region Constants
 
@@ -96,7 +97,7 @@ namespace JsonFx.Json
 			/// Returns the next JSON token in the sequence.
 			/// </summary>
 			/// <returns></returns>
-			private static IEnumerable<Token<DataTokenType>> NextToken(ITextStream scanner)
+			private static IEnumerable<Token<CommonTokenType>> NextToken(ITextStream scanner)
 			{
 				while (true)
 				{
@@ -117,25 +118,25 @@ namespace JsonFx.Json
 						case JsonGrammar.OperatorArrayBegin:
 						{
 							scanner.Pop();
-							yield return DataGrammar.TokenArrayBegin;
+							yield return CommonGrammar.TokenArrayBegin;
 							continue;
 						}
 						case JsonGrammar.OperatorArrayEnd:
 						{
 							scanner.Pop();
-							yield return DataGrammar.TokenArrayEnd;
+							yield return CommonGrammar.TokenArrayEnd;
 							continue;
 						}
 						case JsonGrammar.OperatorObjectBegin:
 						{
 							scanner.Pop();
-							yield return DataGrammar.TokenObjectBegin;
+							yield return CommonGrammar.TokenObjectBegin;
 							continue;
 						}
 						case JsonGrammar.OperatorObjectEnd:
 						{
 							scanner.Pop();
-							yield return DataGrammar.TokenObjectEnd;
+							yield return CommonGrammar.TokenObjectEnd;
 							continue;
 						}
 						case JsonGrammar.OperatorStringDelim:
@@ -147,11 +148,11 @@ namespace JsonFx.Json
 							if (scanner.Peek() == JsonGrammar.OperatorPairDelim)
 							{
 								scanner.Pop();
-								yield return DataGrammar.TokenProperty(value);
+								yield return CommonGrammar.TokenProperty(value);
 							}
 							else
 							{
-								yield return DataGrammar.TokenValue(value);
+								yield return CommonGrammar.TokenValue(value);
 							}
 							continue;
 						}
@@ -164,7 +165,7 @@ namespace JsonFx.Json
 						case JsonGrammar.OperatorValueDelim:
 						{
 							scanner.Pop();
-							yield return DataGrammar.TokenValueDelim;
+							yield return CommonGrammar.TokenValueDelim;
 							continue;
 						}
 						case JsonGrammar.OperatorPairDelim:
@@ -174,7 +175,7 @@ namespace JsonFx.Json
 					}
 
 					// scan for numbers
-					Token<DataTokenType> token = JsonTokenizer.ScanNumber(scanner);
+					Token<CommonTokenType> token = JsonTokenizer.ScanNumber(scanner);
 					if (token != null)
 					{
 						yield return token;
@@ -301,7 +302,7 @@ namespace JsonFx.Json
 				}
 			}
 
-			private static Token<DataTokenType> ScanNumber(ITextStream scanner)
+			private static Token<CommonTokenType> ScanNumber(ITextStream scanner)
 			{
 				// store for error cases
 				long numPos = scanner.Index+1;
@@ -449,17 +450,17 @@ namespace JsonFx.Json
 					if (number >= Int32.MinValue && number <= Int32.MaxValue)
 					{
 						// int most common
-						return DataGrammar.TokenValue((int)number);
+						return CommonGrammar.TokenValue((int)number);
 					}
 
 					if (number >= Int64.MinValue && number <= Int64.MaxValue)
 					{
 						// long more flexible
-						return DataGrammar.TokenValue((long)number);
+						return CommonGrammar.TokenValue((long)number);
 					}
 
 					// decimal most flexible
-					return DataGrammar.TokenValue(number);
+					return CommonGrammar.TokenValue(number);
 				}
 				else
 				{
@@ -475,7 +476,7 @@ namespace JsonFx.Json
 					}
 
 					// native EcmaScript number (IEEE-754)
-					return DataGrammar.TokenValue(number);
+					return CommonGrammar.TokenValue(number);
 				}
 			}
 
@@ -632,7 +633,7 @@ namespace JsonFx.Json
 				}
 			}
 
-			private static Token<DataTokenType> ScanKeywords(ITextStream scanner, string ident, char unary)
+			private static Token<CommonTokenType> ScanKeywords(ITextStream scanner, string ident, char unary)
 			{
 				switch (ident)
 				{
@@ -643,7 +644,7 @@ namespace JsonFx.Json
 							return null;
 						}
 
-						return DataGrammar.TokenFalse;
+						return CommonGrammar.TokenFalse;
 					}
 					case JsonGrammar.KeywordTrue:
 					{
@@ -652,7 +653,7 @@ namespace JsonFx.Json
 							return null;
 						}
 
-						return DataGrammar.TokenTrue;
+						return CommonGrammar.TokenTrue;
 					}
 					case JsonGrammar.KeywordNull:
 					{
@@ -661,7 +662,7 @@ namespace JsonFx.Json
 							return null;
 						}
 
-						return DataGrammar.TokenNull;
+						return CommonGrammar.TokenNull;
 					}
 					case JsonGrammar.KeywordNaN:
 					{
@@ -670,18 +671,18 @@ namespace JsonFx.Json
 							return null;
 						}
 
-						return DataGrammar.TokenNaN;
+						return CommonGrammar.TokenNaN;
 					}
 					case JsonGrammar.KeywordInfinity:
 					{
 						if (unary == default(char) || unary == JsonGrammar.OperatorUnaryPlus)
 						{
-							return DataGrammar.TokenPositiveInfinity;
+							return CommonGrammar.TokenPositiveInfinity;
 						}
 
 						if (unary == JsonGrammar.OperatorUnaryMinus)
 						{
-							return DataGrammar.TokenNegativeInfinity;
+							return CommonGrammar.TokenNegativeInfinity;
 						}
 
 						return null;
@@ -693,7 +694,7 @@ namespace JsonFx.Json
 							return null;
 						}
 
-						return DataGrammar.TokenNull;
+						return CommonGrammar.TokenNull;
 					}
 				}
 
@@ -706,7 +707,7 @@ namespace JsonFx.Json
 				if (scanner.Peek() == JsonGrammar.OperatorPairDelim)
 				{
 					scanner.Pop();
-					return DataGrammar.TokenProperty(ident);
+					return CommonGrammar.TokenProperty(ident);
 				}
 
 				return null;
@@ -761,7 +762,7 @@ namespace JsonFx.Json
 			/// </summary>
 			/// <param name="reader"></param>
 			/// <returns></returns>
-			public IEnumerable<Token<DataTokenType>> GetTokens(TextReader reader)
+			public IEnumerable<Token<CommonTokenType>> GetTokens(TextReader reader)
 			{
 				return this.GetTokens(new TextReaderStream(reader));
 			}
@@ -771,7 +772,7 @@ namespace JsonFx.Json
 			/// </summary>
 			/// <param name="text"></param>
 			/// <returns></returns>
-			public IEnumerable<Token<DataTokenType>> GetTokens(string text)
+			public IEnumerable<Token<CommonTokenType>> GetTokens(string text)
 			{
 				return this.GetTokens(new StringStream(text));
 			}
@@ -781,7 +782,7 @@ namespace JsonFx.Json
 			/// </summary>
 			/// <param name="scanner"></param>
 			/// <returns></returns>
-			protected IEnumerable<Token<DataTokenType>> GetTokens(ITextStream scanner)
+			protected IEnumerable<Token<CommonTokenType>> GetTokens(ITextStream scanner)
 			{
 				if (scanner == null)
 				{

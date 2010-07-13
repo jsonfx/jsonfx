@@ -33,7 +33,7 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Collections.Generic;
 
-namespace JsonFx.Serialization
+namespace JsonFx.Serialization.Resolvers
 {
 	/// <summary>
 	/// Controls name resolution for IDataReader / IDataWriter by combining an ordered sequence of any other strategies

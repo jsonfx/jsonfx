@@ -81,16 +81,16 @@
     <Compile Include="Bson\BsonTokenizerTests.cs" />
     <Compile Include="Bson\BsonFormatterTests.cs" />
     <Compile Include="CodeGen\DynamicMethodGeneratorTests.cs" />
+    <Compile Include="Common\CommonAnalyzerTests.cs" />
+    <Compile Include="Common\CommonWalkerTests.cs" />
+    <Compile Include="Common\Filters\Iso8601DateFilterTests.cs" />
+    <Compile Include="Common\Filters\MSAjaxDateFilterTests.cs" />
     <Compile Include="IO\StringStreamTests.cs" />
     <Compile Include="IO\TextReaderStreamTests.cs" />
     <Compile Include="Json\JsonWriterTests.cs" />
-    <Compile Include="Json\Filters\MSAjaxDateFilterTests.cs" />
-    <Compile Include="Json\Filters\Iso8601DateFilterTests.cs" />
     <Compile Include="Json\JsonReaderTests.cs" />
     <Compile Include="Json\JsonFormatterTests.cs" />
     <Compile Include="Json\JsonTokenizerTests.cs" />
-    <Compile Include="Serialization\DataAnalyzerTests.cs" />
-    <Compile Include="Serialization\DataWalkerTests.cs" />
     <Compile Include="Serialization\TypeCoercionUtilityTests.cs" />
   </ItemGroup>
   <ItemGroup>

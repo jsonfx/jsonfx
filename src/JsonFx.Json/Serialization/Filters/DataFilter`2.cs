@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -29,11 +29,43 @@
 #endregion License
 
 using System;
+using System.Collections.Generic;
 
-namespace JsonFx.Serialization
+using JsonFx.IO;
+
+namespace JsonFx.Serialization.Filters
 {
-	public interface IResolverCacheContainer
+	/// <summary>
+	/// Partially implements an IDataFilter
+	/// </summary>
+	public abstract class DataFilter<TTokenType, TResult> : IDataFilter<TTokenType, TResult>
 	{
-		ResolverCache ResolverCache { get; }
+		#region IDataFilter<TTokenType,TResult> Members
+
+		public abstract bool TryRead(DataReaderSettings settings, IStream<Token<TTokenType>> tokens, out TResult value);
+
+		public abstract bool TryWrite(DataWriterSettings settings, TResult value, out IEnumerable<Token<TTokenType>> tokens);
+
+		#endregion IDataFilter<TTokenType,TResult> Members
+
+		#region IDataFilter<TTokenType> Members
+
+		bool IDataFilter<TTokenType>.TryRead(DataReaderSettings settings, IStream<Token<TTokenType>> tokens, out object value)
+		{
+			TResult result;
+			bool success = this.TryRead(settings, tokens, out result);
+
+			value = result;
+			return success;
+		}
+
+		bool IDataFilter<TTokenType>.TryWrite(DataWriterSettings settings, object value, out IEnumerable<Token<TTokenType>> tokens)
+		{
+			tokens = null;
+
+			return (value is TResult) && (this.TryWrite(settings, (TResult)value, out tokens));
+		}
+
+		#endregion IDataFilter<TTokenType> Members
 	}
 }
