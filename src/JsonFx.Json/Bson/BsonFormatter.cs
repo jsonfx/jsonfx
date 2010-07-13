@@ -325,7 +325,7 @@ namespace JsonFx.Bson
 
 						// write bytes
 						writer.Write((byte[])token.Value);
-						total += BsonReader.SizeOfDBPointer;
+						total += BsonReader.SizeOfObjectID;
 						break;
 					}
 					case BsonElementType.CodeWithScope:

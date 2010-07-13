@@ -43,14 +43,14 @@ namespace JsonFx.Bson
 		Document = 0x03,
 		Array = 0x04,
 		Binary = 0x05,
-		//[Obsolete]
+		[Obsolete]
 		Undefined = 0x06,
 		ObjectID = 0x07,
 		Boolean = 0x08,
 		DateTimeUtc = 0x09,
 		Null = 0x0A,
 		RegExp = 0x0B,
-		//[Obsolete]
+		[Obsolete]
 		DBPointer = 0x0C,
 		JavaScriptCode = 0x0D,
 		Symbol = 0x0E,
@@ -71,7 +71,7 @@ namespace JsonFx.Bson
 	{
 		Generic = 0x00,
 		Function = 0x01,
-		//[Obsolete]
+		[Obsolete]
 		BinaryOld = 0x02,
 		UUID = 0x03,
 		MD5 = 0x05,

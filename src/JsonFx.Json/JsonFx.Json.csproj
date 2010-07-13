@@ -25,7 +25,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
-    <NoWarn>1570,1571,1572,1573,1591,1592</NoWarn>
+    <NoWarn>612,1570,1571,1572,1573,1591,1592</NoWarn>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -35,7 +35,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
-    <NoWarn>1570,1571,1572,1573,1591,1592</NoWarn>
+    <NoWarn>612,1570,1571,1572,1573,1591,1592</NoWarn>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Signed' ">
@@ -47,7 +47,7 @@
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
     <AssemblyOriginatorKeyFile>..\..\keys\JsonFx_Key.pfx</AssemblyOriginatorKeyFile>
-    <NoWarn>1570,1571,1572,1573,1591,1592</NoWarn>
+    <NoWarn>612,1570,1571,1572,1573,1591,1592</NoWarn>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFrameworkVersion)' == 'v4.0' ">
@@ -75,6 +75,7 @@
     <Compile Include="Bson\BsonGrammar.cs" />
     <Compile Include="Bson\BsonTokenizer.cs" />
     <Compile Include="Bson\BsonTokenType.cs" />
+    <Compile Include="Bson\BsonTypes.cs" />
     <Compile Include="Common\CommonAnalyzer.cs" />
     <Compile Include="Common\CommonGrammar.cs" />
     <Compile Include="Common\CommonTokenType.cs" />

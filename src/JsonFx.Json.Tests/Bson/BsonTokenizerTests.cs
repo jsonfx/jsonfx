@@ -30,14 +30,14 @@
 
 using System;
 using System.IO;
-using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
+using JsonFx.Common;
 using JsonFx.Serialization;
 using Xunit;
 
 using Assert=JsonFx.AssertPatched;
-using System.Text;
 
 namespace JsonFx.Bson
 {
@@ -55,11 +55,10 @@ namespace JsonFx.Bson
 
 			var expected = new[]
 			{
-				BsonGrammar.TokenDocumentBegin,
-				BsonGrammar.TokenElementType(BsonElementType.String),
-				BsonGrammar.TokenCString("hello"),
-				BsonGrammar.TokenString("world"),
-				BsonGrammar.TokenDocumentEnd
+				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenProperty("hello"),
+				CommonGrammar.TokenValue("world"),
+				CommonGrammar.TokenObjectEnd
 			};
 
 			var tokenizer = new BsonReader.BsonTokenizer();
@@ -95,21 +94,16 @@ namespace JsonFx.Bson
 
 		    var expected = new[]
 		    {
-				BsonGrammar.TokenDocumentBegin,
-				BsonGrammar.TokenElementType(BsonElementType.Array),
-				BsonGrammar.TokenCString("BSON"),
-				BsonGrammar.TokenDocumentBegin,
-				BsonGrammar.TokenElementType(BsonElementType.String),
-				BsonGrammar.TokenCString("0"),
-				BsonGrammar.TokenString("awesome"),
-				BsonGrammar.TokenElementType(BsonElementType.Double),
-				BsonGrammar.TokenCString("1"),
-				BsonGrammar.TokenDouble(5.05),
-				BsonGrammar.TokenElementType(BsonElementType.Int32),
-				BsonGrammar.TokenCString("2"),
-				BsonGrammar.TokenInt32(1986),
-				BsonGrammar.TokenDocumentEnd,
-				BsonGrammar.TokenDocumentEnd
+				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenProperty("BSON"),
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenValue("awesome"),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenValue(5.05),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenValue(1986),
+				CommonGrammar.TokenArrayEnd,
+				CommonGrammar.TokenObjectEnd
 		    };
 
 		    var tokenizer = new BsonReader.BsonTokenizer();
@@ -129,11 +123,10 @@ namespace JsonFx.Bson
 
 			var expected = new[]
 			{
-				BsonGrammar.TokenDocumentBegin,
-				BsonGrammar.TokenElementType(BsonElementType.Boolean),
-				BsonGrammar.TokenCString("valid"),
-				BsonGrammar.TokenTrue,
-				BsonGrammar.TokenDocumentEnd
+				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenProperty("valid"),
+				CommonGrammar.TokenTrue,
+				CommonGrammar.TokenObjectEnd
 			};
 
 			var tokenizer = new BsonReader.BsonTokenizer();
@@ -150,7 +143,7 @@ namespace JsonFx.Bson
 		public void GetTokens_NullByteArray_ThrowsArgumentNullException()
 		{
 			var input = (byte[])null;
-			var expected = new Token<BsonTokenType>[0];
+			var expected = new Token<CommonTokenType>[0];
 
 			var tokenizer = new BsonReader.BsonTokenizer();
 
@@ -167,7 +160,7 @@ namespace JsonFx.Bson
 		public void GetTokens_NullStream_ThrowsArgumentNullException()
 		{
 			var input = (Stream)null;
-			var expected = new Token<BsonTokenType>[0];
+			var expected = new Token<CommonTokenType>[0];
 
 			var tokenizer = new BsonReader.BsonTokenizer();
 
@@ -184,7 +177,7 @@ namespace JsonFx.Bson
 		public void GetTokens_EmptyByteArray_ReturnsEmptySequence()
 		{
 			var input = new byte[0];
-			var expected = new Token<BsonTokenType>[0];
+			var expected = new Token<CommonTokenType>[0];
 
 			var tokenizer = new BsonReader.BsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
@@ -196,7 +189,7 @@ namespace JsonFx.Bson
 		public void GetTokens_EmptyStream_ReturnsEmptySequence()
 		{
 			var input = Stream.Null;
-			var expected = new Token<BsonTokenType>[0];
+			var expected = new Token<CommonTokenType>[0];
 
 			var tokenizer = new BsonReader.BsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
