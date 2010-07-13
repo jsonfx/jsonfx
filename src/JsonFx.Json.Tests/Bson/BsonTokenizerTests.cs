@@ -43,6 +43,44 @@ namespace JsonFx.Bson
 {
 	public class BsonTokenizerTests
 	{
+		#region Array Tests
+
+		[Fact]
+		public void GetTokens_ArrayRoot_ReturnsDocument()
+		{
+			// BSON doesn't provide a way to know if the root element is an array
+
+			var input = new byte[]
+			{
+				0x26, 0x00, 0x00, 0x00,
+					0x02, (byte)'0', 0, 0x08, 0x00, 0x00, 0x00, (byte)'a', (byte)'w', (byte)'e', (byte)'s', (byte)'o', (byte)'m', (byte)'e', 0x00,
+					0x01, (byte)'1', 0, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x14, 0x40,
+					0x10, (byte)'2', 0, 0xC2, 0x07, 0x00, 0x00,
+				0x00
+			};
+
+			var expected = new[]
+		    {
+				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenProperty("0"),
+				CommonGrammar.TokenValue("awesome"),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenProperty("1"),
+				CommonGrammar.TokenValue(5.05),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenProperty("2"),
+				CommonGrammar.TokenValue(1986),
+				CommonGrammar.TokenObjectEnd
+		    };
+
+			var tokenizer = new BsonReader.BsonTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		#endregion Array Tests
+
 		#region Object Tests
 
 		[Fact]
