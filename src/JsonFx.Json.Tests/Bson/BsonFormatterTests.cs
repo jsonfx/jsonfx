@@ -67,7 +67,7 @@ namespace JsonFx.Bson
 		}
 
 		[Fact]
-		public void Format_ArrayProperty_ReturnsDocument()
+		public void Format_ArrayAsProperty_ReturnsDocument()
 		{
 			// input from example at http://bsonspec.org/#/specification
 			var input = new[]

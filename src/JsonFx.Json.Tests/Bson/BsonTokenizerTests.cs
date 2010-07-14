@@ -106,7 +106,7 @@ namespace JsonFx.Bson
 		}
 
 		[Fact]
-		public void GetTokens_ArrayProperty_ReturnsDocument()
+		public void GetTokens_ArrayAsProperty_ReturnsDocument()
 		{
 			// input from example at http://bsonspec.org/#/specification
 

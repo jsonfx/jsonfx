@@ -80,6 +80,7 @@
     <Compile Include="AssertPatched.cs" />
     <Compile Include="Bson\BsonTokenizerTests.cs" />
     <Compile Include="Bson\BsonFormatterTests.cs" />
+    <Compile Include="Bson\BsonConverterTests.cs" />
     <Compile Include="CodeGen\DynamicMethodGeneratorTests.cs" />
     <Compile Include="Common\CommonAnalyzerTests.cs" />
     <Compile Include="Common\CommonWalkerTests.cs" />
