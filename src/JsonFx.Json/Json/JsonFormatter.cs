@@ -134,7 +134,7 @@ namespace JsonFx.Json
 							writer.Write(JsonGrammar.OperatorArrayEnd);
 							continue;
 						}
-						case CommonTokenType.Value:
+						case CommonTokenType.Primitive:
 						{
 							if (pendingNewLine)
 							{
@@ -225,7 +225,7 @@ namespace JsonFx.Json
 							writer.Write(JsonGrammar.OperatorObjectEnd);
 							continue;
 						}
-						case CommonTokenType.PropertyKey:
+						case CommonTokenType.Property:
 						{
 							if (pendingNewLine)
 							{

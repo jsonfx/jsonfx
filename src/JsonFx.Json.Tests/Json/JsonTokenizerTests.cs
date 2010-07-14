@@ -987,7 +987,7 @@ break""]";
 			const string input = @"NaN";
 			var expected = new []
 			{
-				CommonGrammar.TokenNaN
+				CommonGrammar.TokenValue(Double.NaN)
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -1003,7 +1003,7 @@ break""]";
 			const string input = @"Infinity";
 			var expected = new []
 			{
-				CommonGrammar.TokenPositiveInfinity
+				CommonGrammar.TokenValue(Double.PositiveInfinity)
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -1019,7 +1019,7 @@ break""]";
 			const string input = @"+Infinity";
 			var expected = new []
 			{
-				CommonGrammar.TokenPositiveInfinity
+				CommonGrammar.TokenValue(Double.PositiveInfinity)
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();
@@ -1035,7 +1035,7 @@ break""]";
 			const string input = @"-Infinity";
 			var expected = new []
 			{
-				CommonGrammar.TokenNegativeInfinity
+				CommonGrammar.TokenValue(Double.NegativeInfinity)
 			};
 
 			var tokenizer = new JsonReader.JsonTokenizer();

@@ -658,18 +658,18 @@ namespace JsonFx.Json
 							return null;
 						}
 
-						return CommonGrammar.TokenNaN;
+						return CommonGrammar.TokenValue(Double.NaN);
 					}
 					case JsonGrammar.KeywordInfinity:
 					{
 						if (unary == default(char) || unary == JsonGrammar.OperatorUnaryPlus)
 						{
-							return CommonGrammar.TokenPositiveInfinity;
+							return CommonGrammar.TokenValue(Double.PositiveInfinity);
 						}
 
 						if (unary == JsonGrammar.OperatorUnaryMinus)
 						{
-							return CommonGrammar.TokenNegativeInfinity;
+							return CommonGrammar.TokenValue(Double.NegativeInfinity);
 						}
 
 						return null;

@@ -33,7 +33,7 @@ using System;
 namespace JsonFx.Common
 {
 	/// <summary>
-	/// Comon lexical analysis tokens
+	/// Common Data Language tokens
 	/// </summary>
 	public enum CommonTokenType
 	{
@@ -41,43 +41,91 @@ namespace JsonFx.Common
 		/// No token
 		/// </summary>
 		/// <remarks>
-		/// Represents the absence of a token
+		/// The token value must be null.
+		/// Represents the absence of a token and is not represented in the document.
 		/// </remarks>
 		None,
 
 		/// <summary>
-		/// Primitive and simple scalar values
+		/// Begin document, the token value is the document name
 		/// </summary>
-		Value,
+		/// <remarks>
+		/// The token value is optional. In the absence of a document name, one may be automatically chosen.
+		/// This token is often not represented directly in the output as some formats do not have the concept of a named root.
+		/// </remarks>
+		DocumentBegin,
 
 		/// <summary>
-		/// Begin Array
+		/// End document
 		/// </summary>
-		ArrayBegin,
+		/// <remarks>
+		/// The token value must be null.
+		/// This token is often not represented directly in the output as some formats do not have the concept of a named root.
+		/// </remarks>
+		DocumentEnd,
 
 		/// <summary>
-		/// End Array
+		/// Begin object
 		/// </summary>
-		ArrayEnd,
-
-		/// <summary>
-		/// Begin Object
-		/// </summary>
+		/// <remarks>
+		/// The token value must be null.
+		/// Marks the beginning of an associative array of key-value pairs
+		/// </remarks>
 		ObjectBegin,
 
 		/// <summary>
-		/// End Object
+		/// End object
 		/// </summary>
+		/// <remarks>
+		/// The token value must be null.
+		/// Marks the end of the last object property as well as the object itself
+		/// </remarks>
 		ObjectEnd,
 
 		/// <summary>
-		/// Object property identifier
+		/// Begin array
 		/// </summary>
-		PropertyKey,
+		/// <remarks>
+		/// The token value must be null.
+		/// Marks the beginning of a single-dimensional array of values
+		/// </remarks>
+		ArrayBegin,
+
+		/// <summary>
+		/// End array
+		/// </summary>
+		/// <remarks>
+		/// The token value must be null.
+		/// Marks the end of the last array item as well as the array itself
+		/// </remarks>
+		ArrayEnd,
+
+		/// <summary>
+		/// Begin object property, the token value is the property name
+		/// </summary>
+		/// <remarks>
+		/// The token value is required.
+		/// Marks the beginning of an object property.
+		/// </remarks>
+		Property,
+
+		/// <summary>
+		/// Simple primitive value, the token value is the value itself
+		/// </summary>
+		/// <remarks>
+		/// The token value is optional, i.e. null is a valid primitive value.
+		/// Typically token value is serialized directly as a single primitive.
+		/// If the token value is not a CLR primitive, then the value must implement IConvertable, IFormatable or be meaningful when cast to a string.
+		/// </remarks>
+		Primitive,
 
 		/// <summary>
 		/// Value delimiter
 		/// </summary>
+		/// <remarks>
+		/// The token value must be null.
+		/// Marks the end of an object property or array item
+		/// </remarks>
 		ValueDelim
 	}
 }

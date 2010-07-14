@@ -69,7 +69,7 @@ namespace JsonFx.Common.Filters
 		{
 			Token<CommonTokenType> token = tokens.Peek();
 			if (token == null ||
-				token.TokenType != CommonTokenType.Value ||
+				token.TokenType != CommonTokenType.Primitive ||
 				!(token.Value is string))
 			{
 				value = default(DateTime);

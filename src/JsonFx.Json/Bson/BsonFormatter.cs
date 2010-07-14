@@ -181,9 +181,9 @@ namespace JsonFx.Bson
 					}
 					else
 					{
-						if (token.TokenType != CommonTokenType.PropertyKey)
+						if (token.TokenType != CommonTokenType.Property)
 						{
-							throw new AnalyzerException<CommonTokenType>(token, "Expected "+CommonTokenType.PropertyKey+" token");
+							throw new AnalyzerException<CommonTokenType>(token, "Expected "+CommonTokenType.Property+" token");
 						}
 
 						ename = token.ValueAsString();
@@ -239,7 +239,7 @@ namespace JsonFx.Bson
 						elemType = BsonElementType.Array;
 						break;
 					}
-					case CommonTokenType.Value:
+					case CommonTokenType.Primitive:
 					{
 						elemType = BsonFormatter.GetElementType(token.Value);
 						break;
@@ -247,7 +247,7 @@ namespace JsonFx.Bson
 					default:
 					{
 						// the rest are invalid states
-						throw new AnalyzerException<CommonTokenType>(token, "Expected "+CommonTokenType.Value+" token");
+						throw new AnalyzerException<CommonTokenType>(token, "Expected "+CommonTokenType.Primitive+" token");
 					}
 				}
 

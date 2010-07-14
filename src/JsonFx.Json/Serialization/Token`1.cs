@@ -36,7 +36,7 @@ using System.Text;
 namespace JsonFx.Serialization
 {
 	/// <summary>
-	/// Represents a single token in an input character sequence
+	/// Represents a single immutable token in an input sequence
 	/// </summary>
 	public sealed class Token<T>
 	{
@@ -120,23 +120,42 @@ namespace JsonFx.Serialization
 
 		#region Utility Methods
 
-		internal string ValueAsString()
+		/// <summary>
+		/// Gets the value of the token as a string
+		/// </summary>
+		/// <returns></returns>
+		public string ValueAsString()
 		{
+			return Token<T>.ToString(this.Value);
+		}
+
+		/// <summary>
+		/// Converts a value to a string giving opportunity for IConvertible, IFormattable
+		/// </summary>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		public static string ToString(object value)
+		{
+			if (value is string)
+			{
+				return (string)value;
+			}
+
 			// allow IConvertable and IFormattable first chance
-			IConvertible convertible = this.Value as IConvertible;
+			IConvertible convertible = value as IConvertible;
 			if (convertible != null)
 			{
 				return convertible.ToString(CultureInfo.InvariantCulture);
 			}
 
-			IFormattable formattable = this.Value as IFormattable;
+			IFormattable formattable = value as IFormattable;
 			if (formattable != null)
 			{
 				return formattable.ToString(null, CultureInfo.InvariantCulture);
 			}
 
-			// try to use any explicit casts
-			return (this.Value as string) ?? String.Empty;
+			// try to use any explicit cast operators
+			return (string)value ?? String.Empty;
 		}
 
 		#endregion Utility Methods

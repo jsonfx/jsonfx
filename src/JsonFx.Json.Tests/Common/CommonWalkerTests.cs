@@ -378,13 +378,13 @@ namespace JsonFx.Serialization
 		#region Number Case Tests
 
 		[Fact]
-		public void GetTokens_NaN_ReturnsNaNToken()
+		public void GetTokens_DoubleNaN_ReturnsNaNToken()
 		{
 			var input = Double.NaN;
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenNaN
+					CommonGrammar.TokenValue(Double.NaN)
 				};
 
 			var walker = new CommonWalker(new DataWriterSettings());
@@ -394,13 +394,13 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
-		public void GetTokens_PosInfinity_ReturnsPosInfinityToken()
+		public void GetTokens_DoublePosInfinity_ReturnsPosInfinityToken()
 		{
 			var input = Double.PositiveInfinity;
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenPositiveInfinity
+					CommonGrammar.TokenValue(Double.PositiveInfinity)
 				};
 
 			var walker = new CommonWalker(new DataWriterSettings());
@@ -410,13 +410,61 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
-		public void GetTokens_NegInfinity_ReturnsNegInfinityToken()
+		public void GetTokens_DoubleNegInfinity_ReturnsNegInfinityToken()
 		{
 			var input = Double.NegativeInfinity;
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenNegativeInfinity
+					CommonGrammar.TokenValue(Double.NegativeInfinity)
+				};
+
+			var walker = new CommonWalker(new DataWriterSettings());
+			var actual = walker.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_SingleNaN_ReturnsNaNToken()
+		{
+			var input = Single.NaN;
+
+			var expected = new[]
+				{
+					CommonGrammar.TokenValue(Double.NaN)
+				};
+
+			var walker = new CommonWalker(new DataWriterSettings());
+			var actual = walker.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_SinglePosInfinity_ReturnsPosInfinityToken()
+		{
+			var input = Single.PositiveInfinity;
+
+			var expected = new[]
+				{
+					CommonGrammar.TokenValue(Double.PositiveInfinity)
+				};
+
+			var walker = new CommonWalker(new DataWriterSettings());
+			var actual = walker.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_SingleNegInfinity_ReturnsNegInfinityToken()
+		{
+			var input = Single.NegativeInfinity;
+
+			var expected = new[]
+				{
+					CommonGrammar.TokenValue(Double.NegativeInfinity)
 				};
 
 			var walker = new CommonWalker(new DataWriterSettings());

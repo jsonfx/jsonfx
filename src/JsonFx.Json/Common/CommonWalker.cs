@@ -212,15 +212,15 @@ namespace JsonFx.Common
 
 						if (Double.IsNaN(doubleVal))
 						{
-							tokens.Enqueue(CommonGrammar.TokenNaN);
+							tokens.Enqueue(CommonGrammar.TokenValue(Double.NaN));
 						}
 						else if (Double.IsPositiveInfinity(doubleVal))
 						{
-							tokens.Enqueue(CommonGrammar.TokenPositiveInfinity);
+							tokens.Enqueue(CommonGrammar.TokenValue(Double.PositiveInfinity));
 						}
 						else if (Double.IsNegativeInfinity(doubleVal))
 						{
-							tokens.Enqueue(CommonGrammar.TokenNegativeInfinity);
+							tokens.Enqueue(CommonGrammar.TokenValue(Double.NegativeInfinity));
 						}
 						else
 						{
@@ -234,15 +234,15 @@ namespace JsonFx.Common
 
 						if (Single.IsNaN(floatVal))
 						{
-							tokens.Enqueue(CommonGrammar.TokenNaN);
+							tokens.Enqueue(CommonGrammar.TokenValue(Double.NaN));
 						}
 						else if (Single.IsPositiveInfinity(floatVal))
 						{
-							tokens.Enqueue(CommonGrammar.TokenPositiveInfinity);
+							tokens.Enqueue(CommonGrammar.TokenValue(Double.PositiveInfinity));
 						}
 						else if (Single.IsNegativeInfinity(floatVal))
 						{
-							tokens.Enqueue(CommonGrammar.TokenNegativeInfinity);
+							tokens.Enqueue(CommonGrammar.TokenValue(Double.NegativeInfinity));
 						}
 						else
 						{
@@ -346,7 +346,7 @@ namespace JsonFx.Common
 					appendDelim = true;
 				}
 
-				this.GetPropertyTokens(tokens, detector, enumerator.Key, enumerator.Value);
+				this.GetPropertyTokens(tokens, detector, Token<CommonTokenType>.ToString(enumerator.Key), enumerator.Value);
 			}
 
 			tokens.Enqueue(CommonGrammar.TokenObjectEnd);
@@ -419,7 +419,7 @@ namespace JsonFx.Common
 			tokens.Enqueue(CommonGrammar.TokenObjectEnd);
 		}
 
-		private void GetPropertyTokens(Queue<Token<CommonTokenType>> tokens, ICycleDetector detector, object key, object value)
+		private void GetPropertyTokens(Queue<Token<CommonTokenType>> tokens, ICycleDetector detector, string key, object value)
 		{
 			tokens.Enqueue(CommonGrammar.TokenProperty(key));
 			this.GetTokens(tokens, detector, value);

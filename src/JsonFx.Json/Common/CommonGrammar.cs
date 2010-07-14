@@ -35,35 +35,57 @@ using JsonFx.Serialization;
 namespace JsonFx.Common
 {
 	/// <summary>
-	/// Common formal language of tokens for analysis
+	/// Common Data Language grammar helper
 	/// </summary>
-	internal class CommonGrammar
+	/// <remarks>
+	/// Simplifies and guides syntax, and provides a set of reusable tokens to reduce redundant token instantiations
+	/// </remarks>
+	public static class CommonGrammar
 	{
 		#region Reusable Tokens
 
 		public static readonly Token<CommonTokenType> TokenNone = new Token<CommonTokenType>(CommonTokenType.None);
 
-		public static readonly Token<CommonTokenType> TokenArrayBegin = new Token<CommonTokenType>(CommonTokenType.ArrayBegin);
-		public static readonly Token<CommonTokenType> TokenArrayEnd = new Token<CommonTokenType>(CommonTokenType.ArrayEnd);
+		public static readonly Token<CommonTokenType> TokenDocumentEnd = new Token<CommonTokenType>(CommonTokenType.DocumentEnd);
+
 		public static readonly Token<CommonTokenType> TokenObjectBegin = new Token<CommonTokenType>(CommonTokenType.ObjectBegin);
 		public static readonly Token<CommonTokenType> TokenObjectEnd = new Token<CommonTokenType>(CommonTokenType.ObjectEnd);
+		public static readonly Token<CommonTokenType> TokenArrayBegin = new Token<CommonTokenType>(CommonTokenType.ArrayBegin);
+		public static readonly Token<CommonTokenType> TokenArrayEnd = new Token<CommonTokenType>(CommonTokenType.ArrayEnd);
 		public static readonly Token<CommonTokenType> TokenValueDelim = new Token<CommonTokenType>(CommonTokenType.ValueDelim);
 
-		public static readonly Token<CommonTokenType> TokenNull = new Token<CommonTokenType>(CommonTokenType.Value, null);
-		public static readonly Token<CommonTokenType> TokenFalse = new Token<CommonTokenType>(CommonTokenType.Value, false);
-		public static readonly Token<CommonTokenType> TokenTrue = new Token<CommonTokenType>(CommonTokenType.Value, true);
-		public static readonly Token<CommonTokenType> TokenNaN = new Token<CommonTokenType>(CommonTokenType.Value, Double.NaN);
-		public static readonly Token<CommonTokenType> TokenPositiveInfinity = new Token<CommonTokenType>(CommonTokenType.Value, Double.PositiveInfinity);
-		public static readonly Token<CommonTokenType> TokenNegativeInfinity = new Token<CommonTokenType>(CommonTokenType.Value, Double.NegativeInfinity);
+		public static readonly Token<CommonTokenType> TokenNull = new Token<CommonTokenType>(CommonTokenType.Primitive, null);
+		public static readonly Token<CommonTokenType> TokenFalse = new Token<CommonTokenType>(CommonTokenType.Primitive, false);
+		public static readonly Token<CommonTokenType> TokenTrue = new Token<CommonTokenType>(CommonTokenType.Primitive, true);
 
-		public static Token<CommonTokenType> TokenProperty(object value)
+		/// <summary>
+		/// Marks the beginning of a document
+		/// </summary>
+		/// <param name="key">the optional name of the document, typically is serialized as a string</param>
+		/// <returns>DocumentBegin Token</returns>
+		public static Token<CommonTokenType> TokenDocumentBegin(string key)
 		{
-			return new Token<CommonTokenType>(CommonTokenType.PropertyKey, value);
+			return new Token<CommonTokenType>(CommonTokenType.DocumentBegin, key);
 		}
 
+		/// <summary>
+		/// Marks the beginning of an object property
+		/// </summary>
+		/// <param name="key">the required name of the property, typically is serialized as a string</param>
+		/// <returns>PropertyKey Token</returns>
+		public static Token<CommonTokenType> TokenProperty(string key)
+		{
+			return new Token<CommonTokenType>(CommonTokenType.Property, key);
+		}
+
+		/// <summary>
+		/// A simple scalar value (typically serialized as a single primitive value)
+		/// </summary>
+		/// <param name="value"></param>
+		/// <returns>Value Token</returns>
 		public static Token<CommonTokenType> TokenValue(object value)
 		{
-			return new Token<CommonTokenType>(CommonTokenType.Value, value);
+			return new Token<CommonTokenType>(CommonTokenType.Primitive, value);
 		}
 
 		#endregion Reusable Tokens

@@ -512,7 +512,7 @@ namespace JsonFx.Serialization
 				});
 
 			// verify exception is coming from expected token
-			Assert.Equal(CommonTokenType.PropertyKey, ex.Token.TokenType);
+			Assert.Equal(CommonTokenType.Property, ex.Token.TokenType);
 		}
 
 		[Fact]

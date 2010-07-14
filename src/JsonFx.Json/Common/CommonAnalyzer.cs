@@ -200,7 +200,7 @@ namespace JsonFx.Common
 					// found object
 					return this.ConsumeObject(tokens, targetType);
 				}
-				case CommonTokenType.Value:
+				case CommonTokenType.Primitive:
 				{
 					// found primitive
 					tokens.Pop();
@@ -293,7 +293,7 @@ namespace JsonFx.Common
 				string propertyName;
 				switch (token.TokenType)
 				{
-					case CommonTokenType.PropertyKey:
+					case CommonTokenType.Property:
 					{
 						tokens.Pop();
 						propertyName = token.ValueAsString();
@@ -440,7 +440,7 @@ namespace JsonFx.Common
 						item = this.ConsumeObject(tokens, isItemTypeHint ? null : itemType);
 						break;
 					}
-					case CommonTokenType.Value:
+					case CommonTokenType.Primitive:
 					{
 						// primitive item
 						if (!this.TryReadFilters(tokens, out item))
