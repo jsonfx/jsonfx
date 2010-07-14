@@ -145,11 +145,11 @@ namespace JsonFx.Json.Resolvers
 		/// </summary>
 		/// <param name="member"></param>
 		/// <returns></returns>
-		public override string GetName(MemberInfo member)
+		public override DataName GetName(MemberInfo member)
 		{
 			JsonNameAttribute attr = TypeCoercionUtility.GetAttribute<JsonNameAttribute>(member);
 
-			return (attr != null) ? attr.Name : null;
+			return (attr != null && !String.IsNullOrEmpty(attr.Name)) ? new DataName(attr.Name) : null;
 		}
 
 		#endregion Name Resolution Methods

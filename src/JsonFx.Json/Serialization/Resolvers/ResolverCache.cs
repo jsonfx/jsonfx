@@ -47,6 +47,8 @@ namespace JsonFx.Serialization.Resolvers
 
 		public readonly string Name;
 
+		public readonly DataName DataName;
+
 		public readonly Type Type;
 
 		public readonly GetterDelegate Getter;
@@ -63,13 +65,15 @@ namespace JsonFx.Serialization.Resolvers
 		/// Ctor
 		/// </summary>
 		/// <param name="propertyInfo"></param>
-		public MemberMap(PropertyInfo propertyInfo)
+		/// <param name="dataName"></param>
+		public MemberMap(PropertyInfo propertyInfo, DataName dataName)
 		{
 			if (propertyInfo == null)
 			{
 				throw new ArgumentNullException("propertyInfo");
 			}
 
+			this.DataName = dataName;
 			this.MemberInfo = propertyInfo;
 			this.Name = propertyInfo.Name;
 			this.Type = propertyInfo.PropertyType;
@@ -81,13 +85,15 @@ namespace JsonFx.Serialization.Resolvers
 		/// Ctor
 		/// </summary>
 		/// <param name="fieldInfo"></param>
-		public MemberMap(FieldInfo fieldInfo)
+		/// <param name="dataName"></param>
+		public MemberMap(FieldInfo fieldInfo, DataName dataName)
 		{
 			if (fieldInfo == null)
 			{
 				throw new ArgumentNullException("fieldInfo");
 			}
 
+			this.DataName = dataName;
 			this.MemberInfo = fieldInfo;
 			this.Name = fieldInfo.Name;
 			this.Type = fieldInfo.FieldType;
@@ -293,7 +299,7 @@ namespace JsonFx.Serialization.Resolvers
 		private readonly IDictionary<Type, IDictionary<string, MemberMap>> MemberCache = new Dictionary<Type, IDictionary<string, MemberMap>>();
 		private readonly IDictionary<Type, IDictionary<Enum, string>> EnumCache = new Dictionary<Type, IDictionary<Enum, string>>();
 		private readonly IDictionary<Type, FactoryMap> Factories = new Dictionary<Type, FactoryMap>();
-		private readonly IDictionary<Type, string> NameCache = new Dictionary<Type, string>();
+		private readonly IDictionary<Type, DataName> NameCache = new Dictionary<Type, DataName>();
 
 		private readonly IResolverStrategy Strategy;
 
@@ -323,14 +329,14 @@ namespace JsonFx.Serialization.Resolvers
 		/// </summary>
 		/// <param name="type"></param>
 		/// <returns></returns>
-		public string LoadTypeName(Type type)
+		public DataName LoadTypeName(Type type)
 		{
 			if (type == null || type == typeof(object))
 			{
-				return "Object";
+				return new DataName("Object");
 			}
 
-			string name;
+			DataName name;
 
 #if NET20 || NET30
 			this.MapLock.AcquireReaderLock(ResolverCache.LockTimeout);
@@ -467,12 +473,12 @@ namespace JsonFx.Serialization.Resolvers
 		/// Builds a mapping of member name to field/property
 		/// </summary>
 		/// <param name="objectType"></param>
-		private string BuildMap(Type objectType, out IDictionary<string, MemberMap> map)
+		private DataName BuildMap(Type objectType, out IDictionary<string, MemberMap> map)
 		{
-			string typeName = this.Strategy.GetName(objectType);
-			if (String.IsNullOrEmpty(typeName))
+			DataName typeName = this.Strategy.GetName(objectType);
+			if (typeName == null)
 			{
-				typeName = objectType.Name;
+				typeName = new DataName(objectType.Name);
 			}
 
 			if (objectType.IsEnum)
@@ -521,13 +527,13 @@ namespace JsonFx.Serialization.Resolvers
 					continue;
 				}
 
-				string name = this.Strategy.GetName(info);
-				if (String.IsNullOrEmpty(name))
+				DataName name = this.Strategy.GetName(info);
+				if (name == null)
 				{
-					name = info.Name;
+					name = new DataName(info.Name);
 				}
 
-				map[name] = new MemberMap(info);
+				map[name.LocalName] = new MemberMap(info, name);
 			}
 
 			// load fields into property map
@@ -538,13 +544,13 @@ namespace JsonFx.Serialization.Resolvers
 					continue;
 				}
 
-				string name = this.Strategy.GetName(info);
-				if (String.IsNullOrEmpty(name))
+				DataName name = this.Strategy.GetName(info);
+				if (name == null)
 				{
-					name = info.Name;
+					name = new DataName(info.Name);
 				}
 
-				map[name] = new MemberMap(info);
+				map[name.LocalName] = new MemberMap(info, name);
 			}
 
 #if NET20 || NET30
@@ -577,10 +583,10 @@ namespace JsonFx.Serialization.Resolvers
 			}
 
 			// create new maps
-			string typeName = this.Strategy.GetName(enumType);
-			if (String.IsNullOrEmpty(typeName))
+			DataName typeName = this.Strategy.GetName(enumType);
+			if (typeName == null)
 			{
-				typeName = enumType.Name;
+				typeName = new DataName(enumType.Name);
 			}
 
 			IDictionary<string, MemberMap> maps = new Dictionary<string, MemberMap>();
@@ -588,17 +594,16 @@ namespace JsonFx.Serialization.Resolvers
 
 			foreach (FieldInfo info in enumType.GetFields(BindingFlags.Static|BindingFlags.Public))
 			{
-				string name = this.Strategy.GetName(info);
-				if (String.IsNullOrEmpty(name))
+				DataName name = this.Strategy.GetName(info);
+				if (name == null)
 				{
-					name = info.Name;
+					name = new DataName(info.Name);
 				}
 
 				MemberMap enumMap;
-				maps[name] = enumMap = new MemberMap(info);
-				enumMaps[(Enum)enumMap.Getter(null)] = name;
+				maps[name.LocalName] = enumMap = new MemberMap(info, name);
+				enumMaps[(Enum)enumMap.Getter(null)] = name.LocalName;
 			}
-
 
 #if NET20 || NET30
 			this.MapLock.AcquireWriterLock(ResolverCache.LockTimeout);

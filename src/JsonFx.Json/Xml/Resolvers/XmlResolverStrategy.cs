@@ -205,54 +205,49 @@ namespace JsonFx.Xml.Resolvers
 		/// </summary>
 		/// <param name="member"></param>
 		/// <returns></returns>
-		public override string GetName(MemberInfo member)
+		public override DataName GetName(MemberInfo member)
 		{
-			// TODO: add support for namespaces
-
 			if (member is Type)
 			{
 				XmlRootAttribute rootAttr = TypeCoercionUtility.GetAttribute<XmlRootAttribute>(member);
-
-				if (rootAttr != null)
+				if (rootAttr != null && !String.IsNullOrEmpty(rootAttr.ElementName))
 				{
-					return rootAttr.ElementName;
+					return new DataName(rootAttr.ElementName, rootAttr.Namespace);
 				}
 
 				XmlTypeAttribute typeAttr = TypeCoercionUtility.GetAttribute<XmlTypeAttribute>(member);
-
-				if (typeAttr != null)
+				if (typeAttr != null && !String.IsNullOrEmpty(typeAttr.TypeName))
 				{
-					return typeAttr.TypeName;
+					return new DataName(typeAttr.TypeName, typeAttr.Namespace);
 				}
 
 				return null;
 			}
 
 			XmlElementAttribute elemAttr = TypeCoercionUtility.GetAttribute<XmlElementAttribute>(member);
-			if (elemAttr != null)
+			if (elemAttr != null && !String.IsNullOrEmpty(elemAttr.ElementName))
 			{
-				return elemAttr.ElementName;
+				return new DataName(elemAttr.ElementName, elemAttr.Namespace);
 			}
 
 			XmlAttributeAttribute attrAttr = TypeCoercionUtility.GetAttribute<XmlAttributeAttribute>(member);
-			if (attrAttr != null)
+			if (attrAttr != null && !String.IsNullOrEmpty(attrAttr.AttributeName))
 			{
-				return attrAttr.AttributeName;
+				return new DataName(attrAttr.AttributeName, attrAttr.Namespace);
 			}
 
 			XmlArrayAttribute arrayAttr = TypeCoercionUtility.GetAttribute<XmlArrayAttribute>(member);
-			if (arrayAttr != null)
+			if (arrayAttr != null && !String.IsNullOrEmpty(arrayAttr.ElementName))
 			{
-				return arrayAttr.ElementName;
+				return new DataName(arrayAttr.ElementName, arrayAttr.Namespace);
 			}
 
 			if (member is FieldInfo && ((FieldInfo)member).DeclaringType.IsEnum)
 			{
 				XmlEnumAttribute enumAttr = TypeCoercionUtility.GetAttribute<XmlEnumAttribute>(member);
-
-				if (enumAttr != null)
+				if (enumAttr != null && !String.IsNullOrEmpty(enumAttr.Name))
 				{
-					return enumAttr.Name;
+					return new DataName(enumAttr.Name);
 				}
 			}
 

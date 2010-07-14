@@ -171,12 +171,12 @@ namespace JsonFx.Serialization.Resolvers
 		/// <param name="member"></param>
 		/// <returns></returns>
 		/// <returns>custom name if any strategy specifies one, otherwise null</returns>
-		public string GetName(MemberInfo member)
+		public DataName GetName(MemberInfo member)
 		{
 			foreach (IResolverStrategy strategy in this.InnerStrategies)
 			{
-				string name = strategy.GetName(member);
-				if (!String.IsNullOrEmpty(name))
+				DataName name = strategy.GetName(member);
+				if (name != null)
 				{
 					return name;
 				}

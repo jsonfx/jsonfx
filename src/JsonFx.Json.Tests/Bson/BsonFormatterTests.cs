@@ -135,6 +135,31 @@ namespace JsonFx.Bson
 
 		#endregion Object Tests
 
+		#region Namespace Tests
+
+		[Fact]
+		public void Format_ObjectOneNamespacedProperty_CorrectlyIgnoresNamespace()
+		{
+			var input = new[]
+			{
+				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenProperty("key", "http://json.org"),
+				CommonGrammar.TokenValue("value"),
+				CommonGrammar.TokenObjectEnd
+			};
+
+			var expected = Encoding.UTF8.GetBytes(
+				"\x14\x00\x00\x00\x02key\x00"+
+				"\x06\x00\x00\x00value\x00\x00");
+
+			var formatter = new BsonWriter.BsonFormatter();
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		#endregion Namespace Tests
+
 		#region Input Edge Case Tests
 
 		[Fact]

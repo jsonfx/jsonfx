@@ -79,7 +79,7 @@ namespace JsonFx.Serialization.Resolvers
 		/// </summary>
 		/// <param name="value"></param>
 		/// <returns></returns>
-		string GetName(MemberInfo member);
+		DataName GetName(MemberInfo member);
 
 		#endregion Methods
 	}

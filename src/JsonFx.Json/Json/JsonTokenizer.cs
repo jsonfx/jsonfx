@@ -37,6 +37,7 @@ using System.Text;
 using JsonFx.Common;
 using JsonFx.IO;
 using JsonFx.Serialization;
+using JsonFx.Serialization.Resolvers;
 
 namespace JsonFx.Json
 {
@@ -142,7 +143,7 @@ namespace JsonFx.Json
 						if (scanner.Peek() == JsonGrammar.OperatorPairDelim)
 						{
 							scanner.Pop();
-							return CommonGrammar.TokenProperty(value);
+							return CommonGrammar.TokenProperty(new DataName(value));
 						}
 
 						return CommonGrammar.TokenValue(value);
@@ -694,7 +695,7 @@ namespace JsonFx.Json
 				if (scanner.Peek() == JsonGrammar.OperatorPairDelim)
 				{
 					scanner.Pop();
-					return CommonGrammar.TokenProperty(ident);
+					return CommonGrammar.TokenProperty(new DataName(ident));
 				}
 
 				return null;

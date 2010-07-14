@@ -1188,6 +1188,29 @@ namespace JsonFx.Json
 
 		#endregion Complex Graph Tests
 
+		#region Namespace Tests
+
+		[Fact]
+		public void Format_ObjectOneNamespacedProperty_CorrectlyIgnoresNamespace()
+		{
+			var input = new[]
+			{
+				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenProperty("key", "http://json.org"),
+				CommonGrammar.TokenValue("value"),
+				CommonGrammar.TokenObjectEnd
+			};
+
+			const string expected = @"{""key"":""value""}";
+
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		#endregion Namespace Tests
+
 		#region Input Edge Case Tests
 
 		[Fact]

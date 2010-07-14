@@ -73,7 +73,7 @@ namespace JsonFx.Serialization.Resolvers
 			set;
 		}
 
-		public delegate string GetNameDelegate(MemberInfo memberInfo);
+		public delegate DataName GetNameDelegate(MemberInfo memberInfo);
 
 		/// <summary>
 		/// Gets and sets the implementation for naming members
@@ -118,7 +118,7 @@ namespace JsonFx.Serialization.Resolvers
 			return this.GetValueIgnored(member);
 		}
 
-		string IResolverStrategy.GetName(MemberInfo member)
+		DataName IResolverStrategy.GetName(MemberInfo member)
 		{
 			if (this.GetName == null)
 			{

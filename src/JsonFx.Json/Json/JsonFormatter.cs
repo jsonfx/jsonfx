@@ -35,6 +35,7 @@ using System.IO;
 
 using JsonFx.Common;
 using JsonFx.Serialization;
+using JsonFx.Serialization.Resolvers;
 
 namespace JsonFx.Json
 {
@@ -236,7 +237,10 @@ namespace JsonFx.Json
 								pendingNewLine = false;
 							}
 
-							this.WriteString(writer, this.FormatString(token.Value));
+							DataName dataName = token.Value as DataName;
+							string propertyName = (dataName != null) ? dataName.LocalName : token.ValueAsString();
+
+							this.WriteString(writer, this.FormatString(propertyName));
 
 							if (prettyPrint)
 							{

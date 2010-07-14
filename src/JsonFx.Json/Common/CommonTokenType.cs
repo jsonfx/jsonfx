@@ -50,7 +50,7 @@ namespace JsonFx.Common
 		/// Begin document, the token value is the document name
 		/// </summary>
 		/// <remarks>
-		/// The token value is optional. In the absence of a document name, one may be automatically chosen.
+		/// The token value must be a <see cref="JsonFx.Serialization.Resolvers.MemberMap"/>. In the absence of a document name, one may be automatically chosen.
 		/// This token is often not represented directly in the output as some formats do not have the concept of a named root.
 		/// </remarks>
 		DocumentBegin,
@@ -104,7 +104,7 @@ namespace JsonFx.Common
 		/// Begin object property, the token value is the property name
 		/// </summary>
 		/// <remarks>
-		/// The token value is required.
+		/// The token value is required and must be a <see cref="JsonFx.Serialization.Resolvers.MemberMap"/>.
 		/// Marks the beginning of an object property.
 		/// </remarks>
 		Property,

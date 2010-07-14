@@ -31,6 +31,7 @@
 using System;
 
 using JsonFx.Serialization;
+using JsonFx.Serialization.Resolvers;
 
 namespace JsonFx.Common
 {
@@ -61,21 +62,63 @@ namespace JsonFx.Common
 		/// <summary>
 		/// Marks the beginning of a document
 		/// </summary>
-		/// <param name="key">the optional name of the document, typically is serialized as a string</param>
+		/// <param name="name">the local name of the document</param>
 		/// <returns>DocumentBegin Token</returns>
-		public static Token<CommonTokenType> TokenDocumentBegin(string key)
+		public static Token<CommonTokenType> TokenDocumentBegin(string name)
 		{
-			return new Token<CommonTokenType>(CommonTokenType.DocumentBegin, key);
+			return new Token<CommonTokenType>(CommonTokenType.DocumentBegin, new DataName(name));
+		}
+
+		/// <summary>
+		/// Marks the beginning of a document
+		/// </summary>
+		/// <param name="name">the local name of the document</param>
+		/// <param name="namespaceUri">the namespace of the document</param>
+		/// <returns>DocumentBegin Token</returns>
+		public static Token<CommonTokenType> TokenDocumentBegin(string name, string namespaceUri)
+		{
+			return new Token<CommonTokenType>(CommonTokenType.DocumentBegin, new DataName(name, namespaceUri));
+		}
+
+		/// <summary>
+		/// Marks the beginning of a document
+		/// </summary>
+		/// <param name="name">the name of the document</param>
+		/// <returns>DocumentBegin Token</returns>
+		public static Token<CommonTokenType> TokenDocumentBegin(DataName name)
+		{
+			return new Token<CommonTokenType>(CommonTokenType.DocumentBegin, name);
 		}
 
 		/// <summary>
 		/// Marks the beginning of an object property
 		/// </summary>
-		/// <param name="key">the required name of the property, typically is serialized as a string</param>
+		/// <param name="localName">the local name of the property</param>
 		/// <returns>PropertyKey Token</returns>
-		public static Token<CommonTokenType> TokenProperty(string key)
+		public static Token<CommonTokenType> TokenProperty(string localName)
 		{
-			return new Token<CommonTokenType>(CommonTokenType.Property, key);
+			return new Token<CommonTokenType>(CommonTokenType.Property, new DataName(localName));
+		}
+
+		/// <summary>
+		/// Marks the beginning of an object property
+		/// </summary>
+		/// <param name="localName">the local name of the property</param>
+		/// <param name="namespaceUri">the namespace of the property</param>
+		/// <returns>PropertyKey Token</returns>
+		public static Token<CommonTokenType> TokenProperty(string localName, string namespaceUri)
+		{
+			return new Token<CommonTokenType>(CommonTokenType.Property, new DataName(localName, namespaceUri));
+		}
+
+		/// <summary>
+		/// Marks the beginning of an object property
+		/// </summary>
+		/// <param name="name">the name of the property</param>
+		/// <returns>PropertyKey Token</returns>
+		public static Token<CommonTokenType> TokenProperty(DataName name)
+		{
+			return new Token<CommonTokenType>(CommonTokenType.Property, name);
 		}
 
 		/// <summary>

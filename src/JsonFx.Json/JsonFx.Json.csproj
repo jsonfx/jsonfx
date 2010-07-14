@@ -122,6 +122,7 @@
     <Compile Include="Serialization\ITokenAnalyzer`1.cs" />
     <Compile Include="Serialization\Resolvers\CallbackResolverStrategy.cs" />
     <Compile Include="Serialization\Resolvers\CombinedResolverStrategy.cs" />
+    <Compile Include="Serialization\Resolvers\DataName.cs" />
     <Compile Include="Serialization\Resolvers\IResolverCacheContainer.cs" />
     <Compile Include="Serialization\Resolvers\IResolverStrategy.cs" />
     <Compile Include="Serialization\Resolvers\PocoResolverStrategy.cs" />

@@ -88,7 +88,7 @@ namespace JsonFx.Serialization.Resolvers
 		/// </summary>
 		/// <param name="member"></param>
 		/// <returns></returns>
-		public virtual string GetName(MemberInfo member)
+		public virtual DataName GetName(MemberInfo member)
 		{
 			return null;
 		}

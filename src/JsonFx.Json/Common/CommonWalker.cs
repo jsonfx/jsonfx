@@ -346,7 +346,9 @@ namespace JsonFx.Common
 					appendDelim = true;
 				}
 
-				this.GetPropertyTokens(tokens, detector, Token<CommonTokenType>.ToString(enumerator.Key), enumerator.Value);
+				string name = Token<CommonTokenType>.ToString(enumerator.Key);
+				tokens.Enqueue(CommonGrammar.TokenProperty(name));
+				this.GetTokens(tokens, detector, enumerator.Value);
 			}
 
 			tokens.Enqueue(CommonGrammar.TokenObjectEnd);
@@ -370,7 +372,8 @@ namespace JsonFx.Common
 				}
 
 				KeyValuePair<string, object> pair = enumerator.Current;
-				this.GetPropertyTokens(tokens, detector, pair.Key, pair.Value);
+				tokens.Enqueue(CommonGrammar.TokenProperty(pair.Key));
+				this.GetTokens(tokens, detector, pair.Value);
 			}
 
 			tokens.Enqueue(CommonGrammar.TokenObjectEnd);
@@ -413,16 +416,11 @@ namespace JsonFx.Common
 					appendDelim = true;
 				}
 
-				this.GetPropertyTokens(tokens, detector, map.Key, propertyValue);
+				tokens.Enqueue(CommonGrammar.TokenProperty(map.Value.DataName));
+				this.GetTokens(tokens, detector, propertyValue);
 			}
 
 			tokens.Enqueue(CommonGrammar.TokenObjectEnd);
-		}
-
-		private void GetPropertyTokens(Queue<Token<CommonTokenType>> tokens, ICycleDetector detector, string key, object value)
-		{
-			tokens.Enqueue(CommonGrammar.TokenProperty(key));
-			this.GetTokens(tokens, detector, value);
 		}
 
 		#endregion Walker Methods

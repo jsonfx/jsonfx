@@ -38,6 +38,7 @@ using System.Text.RegularExpressions;
 using JsonFx.Common;
 using JsonFx.IO;
 using JsonFx.Serialization;
+using JsonFx.Serialization.Resolvers;
 
 namespace JsonFx.Bson
 {
@@ -186,7 +187,8 @@ namespace JsonFx.Bson
 							throw new AnalyzerException<CommonTokenType>(token, "Expected "+CommonTokenType.Property+" token");
 						}
 
-						ename = token.ValueAsString();
+						DataName name = token.Value as DataName;
+						ename = (name == null) ? token.ValueAsString() : name.LocalName;
 
 						// consume property name
 						tokens.Pop();

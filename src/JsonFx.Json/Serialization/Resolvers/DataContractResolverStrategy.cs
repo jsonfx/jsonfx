@@ -102,18 +102,18 @@ namespace JsonFx.Serialization.Resolvers
 		/// </summary>
 		/// <param name="member"></param>
 		/// <returns></returns>
-		public override string GetName(MemberInfo member)
+		public override DataName GetName(MemberInfo member)
 		{
 			if (member is Type)
 			{
 				DataContractAttribute typeAttr = TypeCoercionUtility.GetAttribute<DataContractAttribute>(member);
 
-				return (typeAttr != null) ? typeAttr.Name : null;
+				return (typeAttr != null && !String.IsNullOrEmpty(typeAttr.Name)) ? new DataName(typeAttr.Name, typeAttr.Namespace) : null;
 			}
 
 			DataMemberAttribute memberAttr = TypeCoercionUtility.GetAttribute<DataMemberAttribute>(member);
 
-			return (memberAttr != null) ? memberAttr.Name : null;
+			return (memberAttr != null && !String.IsNullOrEmpty(memberAttr.Name)) ? new DataName(memberAttr.Name) : null;
 		}
 
 		#endregion Name Resolution Methods

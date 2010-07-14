@@ -136,9 +136,9 @@ namespace JsonFx.Serialization
 		/// <returns></returns>
 		public static string ToString(object value)
 		{
-			if (value is string)
+			if (value == null)
 			{
-				return (string)value;
+				return String.Empty;
 			}
 
 			// allow IConvertable and IFormattable first chance
@@ -155,7 +155,7 @@ namespace JsonFx.Serialization
 			}
 
 			// try to use any explicit cast operators
-			return (string)value ?? String.Empty;
+			return (value as string) ?? value.ToString();
 		}
 
 		#endregion Utility Methods
