@@ -71,10 +71,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="About.cs" />
+    <Compile Include="Bson\BsonElementType.cs" />
     <Compile Include="Bson\BsonFormatter.cs" />
-    <Compile Include="Bson\BsonGrammar.cs" />
     <Compile Include="Bson\BsonTokenizer.cs" />
-    <Compile Include="Bson\BsonTokenType.cs" />
     <Compile Include="Bson\BsonTypes.cs" />
     <Compile Include="Common\CommonAnalyzer.cs" />
     <Compile Include="Common\CommonGrammar.cs" />

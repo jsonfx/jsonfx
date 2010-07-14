@@ -156,13 +156,13 @@ namespace JsonFx.Bson
 					}
 					case BsonElementType.JavaScriptCode:
 					{
-						JavaScriptCode value = (JavaScriptCode)BsonTokenizer.ReadString(reader);
+						BsonJavaScriptCode value = (BsonJavaScriptCode)BsonTokenizer.ReadString(reader);
 						queue.Enqueue(CommonGrammar.TokenValue(value));
 						break;
 					}
 					case BsonElementType.Symbol:
 					{
-						Symbol value = (Symbol)BsonTokenizer.ReadString(reader);
+						BsonSymbol value = (BsonSymbol)BsonTokenizer.ReadString(reader);
 						queue.Enqueue(CommonGrammar.TokenValue(value));
 						break;
 					}
@@ -184,7 +184,7 @@ namespace JsonFx.Bson
 					case BsonElementType.ObjectID:
 					{
 						byte[] value = reader.ReadBytes(SizeOfObjectID);
-						queue.Enqueue(CommonGrammar.TokenValue(new ObjectID(value)));
+						queue.Enqueue(CommonGrammar.TokenValue(new BsonObjectID(value)));
 						break;
 					}
 					case BsonElementType.Boolean:
@@ -211,6 +211,12 @@ namespace JsonFx.Bson
 						{
 							switch (ch)
 							{
+								case 'g':
+								{
+									// TODO: ensure correct encoding of ^$
+									//options |= RegexOptions.Multiline;
+									break;
+								}
 								case 'i':
 								{
 									options |= RegexOptions.IgnoreCase;
@@ -219,12 +225,6 @@ namespace JsonFx.Bson
 								case 'm':
 								{
 									options |= RegexOptions.Multiline;
-									break;
-								}
-								case 'g':
-								{
-									// TODO: ensure correct encoding of ^$
-									//options |= RegexOptions.Multiline;
 									break;
 								}
 							}
@@ -240,7 +240,7 @@ namespace JsonFx.Bson
 						string value1 = BsonTokenizer.ReadString(reader);
 						byte[] value2 = reader.ReadBytes(SizeOfObjectID);
 
-						DBPointer pointer = new DBPointer { Namespace=value1, ObjectID=new ObjectID(value2) };
+						BsonDBPointer pointer = new BsonDBPointer { Namespace=value1, ObjectID=new BsonObjectID(value2) };
 						queue.Enqueue(CommonGrammar.TokenValue(pointer));
 						break;
 					}
@@ -305,7 +305,7 @@ namespace JsonFx.Bson
 						{
 							goto default;
 						}
-						value = new MD5(buffer);
+						value = new BsonMD5(buffer);
 						break;
 					}
 					case BsonBinarySubtype.UUID:
@@ -329,7 +329,7 @@ namespace JsonFx.Bson
 						Buffer.BlockCopy(buffer, 4, temp, 0, size);
 
 						// since obsolete, convert to generic
-						value = new Binary(BsonBinarySubtype.Generic, temp);
+						value = new BsonBinary(BsonBinarySubtype.Generic, temp);
 						break;
 					}
 					case BsonBinarySubtype.Function:
@@ -338,7 +338,7 @@ namespace JsonFx.Bson
 					default:
 					{
 						// TODO: convert Function accordingly
-						value = new Binary(subtype, buffer);
+						value = new BsonBinary(subtype, buffer);
 						break;
 					}
 				}

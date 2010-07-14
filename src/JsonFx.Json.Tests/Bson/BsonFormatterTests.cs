@@ -29,15 +29,14 @@
 #endregion License
 
 using System;
-using System.IO;
 using System.Collections.Generic;
-using System.Linq;
+using System.Text;
 
+using JsonFx.Common;
 using JsonFx.Serialization;
 using Xunit;
 
 using Assert=JsonFx.AssertPatched;
-using System.Text;
 
 namespace JsonFx.Bson
 {
@@ -51,11 +50,10 @@ namespace JsonFx.Bson
 			// input from example at http://bsonspec.org/#/specification
 			var input = new[]
 			{
-				BsonGrammar.TokenDocumentBegin,
-				BsonGrammar.TokenElementType(BsonElementType.String),
-				BsonGrammar.TokenCString("hello"),
-				BsonGrammar.TokenString("world"),
-				BsonGrammar.TokenDocumentEnd
+				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenProperty("hello"),
+				CommonGrammar.TokenValue("world"),
+				CommonGrammar.TokenObjectEnd
 			};
 
 			var expected = Encoding.UTF8.GetBytes(
@@ -74,21 +72,16 @@ namespace JsonFx.Bson
 			// input from example at http://bsonspec.org/#/specification
 			var input = new[]
 		    {
-				BsonGrammar.TokenDocumentBegin,
-				BsonGrammar.TokenElementType(BsonElementType.Array),
-				BsonGrammar.TokenCString("BSON"),
-				BsonGrammar.TokenDocumentBegin,
-				BsonGrammar.TokenElementType(BsonElementType.String),
-				BsonGrammar.TokenCString("0"),
-				BsonGrammar.TokenString("awesome"),
-				BsonGrammar.TokenElementType(BsonElementType.Double),
-				BsonGrammar.TokenCString("1"),
-				BsonGrammar.TokenDouble(5.05),
-				BsonGrammar.TokenElementType(BsonElementType.Int32),
-				BsonGrammar.TokenCString("2"),
-				BsonGrammar.TokenInt32(1986),
-				BsonGrammar.TokenDocumentEnd,
-				BsonGrammar.TokenDocumentEnd
+				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenProperty("BSON"),
+				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenValue("awesome"),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenValue(5.05),
+				CommonGrammar.TokenValueDelim,
+				CommonGrammar.TokenValue(1986),
+				CommonGrammar.TokenArrayEnd,
+				CommonGrammar.TokenObjectEnd
 		    };
 
 			// Encoding doesn't seem to like control chars
@@ -123,11 +116,10 @@ namespace JsonFx.Bson
 			// input from example at http://codebetter.com/blogs/karlseguin/archive/2010/03/05/bson-serialization.aspx
 			var input = new[]
 			{
-				BsonGrammar.TokenDocumentBegin,
-				BsonGrammar.TokenElementType(BsonElementType.Boolean),
-				BsonGrammar.TokenCString("valid"),
-				BsonGrammar.TokenTrue,
-				BsonGrammar.TokenDocumentEnd
+				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenProperty("valid"),
+				CommonGrammar.TokenTrue,
+				CommonGrammar.TokenObjectEnd
 			};
 
 			var expected = new byte[]
@@ -148,7 +140,7 @@ namespace JsonFx.Bson
 		[Fact]
 		public void Format_NullStream_ThrowsArgumentNullException()
 		{
-			var input = new Token<BsonTokenType>[0];
+			var input = new Token<CommonTokenType>[0];
 
 			var formatter = new BsonWriter.BsonFormatter();
 
@@ -164,7 +156,7 @@ namespace JsonFx.Bson
 		[Fact]
 		public void Format_NullTokens_ThrowsArgumentNullException()
 		{
-			var input = (IEnumerable<Token<BsonTokenType>>)null;
+			var input = (IEnumerable<Token<CommonTokenType>>)null;
 
 			var formatter = new BsonWriter.BsonFormatter();
 
@@ -181,7 +173,7 @@ namespace JsonFx.Bson
 		public void Format_EmptySequence_ReturnsEmptyByteArray()
 		{
 			var expected = new byte[0];
-			var input = new Token<BsonTokenType>[0];
+			var input = new Token<CommonTokenType>[0];
 
 			var formatter = new BsonWriter.BsonFormatter();
 			var actual = formatter.Format(input);

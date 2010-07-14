@@ -122,7 +122,21 @@ namespace JsonFx.Serialization
 
 		internal string ValueAsString()
 		{
-			return Convert.ToString(this.Value, CultureInfo.InvariantCulture);
+			// allow IConvertable and IFormattable first chance
+			IConvertible convertible = this.Value as IConvertible;
+			if (convertible != null)
+			{
+				return convertible.ToString(CultureInfo.InvariantCulture);
+			}
+
+			IFormattable formattable = this.Value as IFormattable;
+			if (formattable != null)
+			{
+				return formattable.ToString(null, CultureInfo.InvariantCulture);
+			}
+
+			// try to use any explicit casts
+			return (this.Value as string) ?? String.Empty;
 		}
 
 		#endregion Utility Methods

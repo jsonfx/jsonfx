@@ -38,7 +38,7 @@ namespace JsonFx.Bson
 	/// <summary>
 	/// BSON MD5 Datatype
 	/// </summary>
-	public struct MD5
+	public struct BsonMD5
 	{
 		#region Fields
 
@@ -52,7 +52,7 @@ namespace JsonFx.Bson
 		/// Ctor
 		/// </summary>
 		/// <param name="hash"></param>
-		public MD5(string hash)
+		public BsonMD5(string hash)
 		{
 			this.Hash = new Guid(hash);
 		}
@@ -61,7 +61,7 @@ namespace JsonFx.Bson
 		/// Ctor
 		/// </summary>
 		/// <param name="hash"></param>
-		public MD5(byte[] hash)
+		public BsonMD5(byte[] hash)
 		{
 			this.Hash = new Guid(hash);
 		}
@@ -70,7 +70,7 @@ namespace JsonFx.Bson
 		/// Ctor
 		/// </summary>
 		/// <param name="hash"></param>
-		public MD5(Guid hash)
+		public BsonMD5(Guid hash)
 		{
 			this.Hash = hash;
 		}
@@ -84,7 +84,7 @@ namespace JsonFx.Bson
 		/// </summary>
 		/// <param name="value"></param>
 		/// <returns></returns>
-		public static explicit operator Guid(MD5 value)
+		public static explicit operator Guid(BsonMD5 value)
 		{
 			return value.Hash;
 		}
@@ -94,9 +94,9 @@ namespace JsonFx.Bson
 		/// </summary>
 		/// <param name="value"></param>
 		/// <returns></implicit>
-		public static explicit operator MD5(Guid value)
+		public static explicit operator BsonMD5(Guid value)
 		{
-			return new MD5(value);
+			return new BsonMD5(value);
 		}
 
 		/// <summary>
@@ -122,9 +122,24 @@ namespace JsonFx.Bson
 	}
 
 	/// <summary>
-	/// BSON JavaScriptCode Datatype
+	/// BSON JavaScript Code With Scope Datatype
 	/// </summary>
-	public struct JavaScriptCode
+	public class BsonCodeWithScope
+	{
+		#region Properties
+
+		public BsonJavaScriptCode Code { get; set; }
+
+		//TODO: this is currently broken.
+		public JsonFx.IO.IStream<JsonFx.Serialization.Token<JsonFx.Common.CommonTokenType>> Scope { get; set; }
+
+		#endregion Properties
+	}
+
+	/// <summary>
+	/// BSON JavaScript Code Datatype
+	/// </summary>
+	public struct BsonJavaScriptCode
 	{
 		#region Fields
 
@@ -138,7 +153,7 @@ namespace JsonFx.Bson
 		/// Ctor
 		/// </summary>
 		/// <param name="code"></param>
-		public JavaScriptCode(string code)
+		public BsonJavaScriptCode(string code)
 		{
 			this.Code = code;
 		}
@@ -152,7 +167,7 @@ namespace JsonFx.Bson
 		/// </summary>
 		/// <param name="value"></param>
 		/// <returns></returns>
-		public static explicit operator string(JavaScriptCode value)
+		public static explicit operator string(BsonJavaScriptCode value)
 		{
 			return value.Code;
 		}
@@ -162,9 +177,9 @@ namespace JsonFx.Bson
 		/// </summary>
 		/// <param name="value"></param>
 		/// <returns></implicit>
-		public static explicit operator JavaScriptCode(string value)
+		public static explicit operator BsonJavaScriptCode(string value)
 		{
-			return new JavaScriptCode(value);
+			return new BsonJavaScriptCode(value);
 		}
 
 		/// <summary>
@@ -192,7 +207,7 @@ namespace JsonFx.Bson
 	/// <summary>
 	/// BSON Symbol Datatype
 	/// </summary>
-	public struct Symbol
+	public struct BsonSymbol
 	{
 		#region Fields
 
@@ -206,7 +221,7 @@ namespace JsonFx.Bson
 		/// Ctor
 		/// </summary>
 		/// <param name="code"></param>
-		public Symbol(string code)
+		public BsonSymbol(string code)
 		{
 			this.Code = code;
 		}
@@ -220,7 +235,7 @@ namespace JsonFx.Bson
 		/// </summary>
 		/// <param name="value"></param>
 		/// <returns></returns>
-		public static explicit operator string(Symbol value)
+		public static explicit operator string(BsonSymbol value)
 		{
 			return value.Code;
 		}
@@ -230,9 +245,9 @@ namespace JsonFx.Bson
 		/// </summary>
 		/// <param name="value"></param>
 		/// <returns></implicit>
-		public static explicit operator Symbol(string value)
+		public static explicit operator BsonSymbol(string value)
 		{
-			return new Symbol(value);
+			return new BsonSymbol(value);
 		}
 
 		/// <summary>
@@ -261,13 +276,13 @@ namespace JsonFx.Bson
 	/// BSON DBPointer Datatype (Deprecated)
 	/// </summary>
 	[Obsolete]
-	public class DBPointer
+	public class BsonDBPointer
 	{
 		#region Properties
 
 		public string Namespace { get; set; }
 
-		public ObjectID ObjectID { get; set; }
+		public BsonObjectID ObjectID { get; set; }
 
 		#endregion Properties
 	}
@@ -278,11 +293,11 @@ namespace JsonFx.Bson
 	/// <remarks>
 	/// http://www.mongodb.org/display/DOCS/Object+IDs#ObjectIDs-TheBSONObjectIdDatatype
 	/// </remarks>
-	public struct ObjectID
+	public struct BsonObjectID
 	{
 		#region Constants
 
-		public static readonly ObjectID Empty = new ObjectID(new byte[0]);
+		public static readonly BsonObjectID Empty = new BsonObjectID(new byte[0]);
 
 		#endregion Constants
 
@@ -298,7 +313,7 @@ namespace JsonFx.Bson
 		/// Ctor
 		/// </summary>
 		/// <param name="bytes">12-byte object ID</param>
-		public ObjectID(byte[] bytes)
+		public BsonObjectID(byte[] bytes)
 		{
 			if (bytes == null)
 			{
@@ -319,7 +334,7 @@ namespace JsonFx.Bson
 		/// <param name="machine">3-byte machine ID</param>
 		/// <param name="pid">2-byte process ID</param>
 		/// <param name="inc">3-byte counter</param>
-		public ObjectID(DateTime time, int machine, int pid, int inc)
+		public BsonObjectID(DateTime time, int machine, int pid, int inc)
 		{
 			this.Bytes = new byte[12];
 
@@ -411,7 +426,7 @@ namespace JsonFx.Bson
 		/// </summary>
 		/// <param name="value"></param>
 		/// <returns></returns>
-		public static explicit operator string(ObjectID value)
+		public static explicit operator string(BsonObjectID value)
 		{
 			// simply use ToString implementation
 			return value.ToString();
@@ -422,10 +437,10 @@ namespace JsonFx.Bson
 		/// </summary>
 		/// <param name="value"></param>
 		/// <returns></returns>
-		public static explicit operator ObjectID(string value)
+		public static explicit operator BsonObjectID(string value)
 		{
 			// simply use Parse implementation
-			return ObjectID.Parse(value);
+			return BsonObjectID.Parse(value);
 		}
 
 		/// <summary>
@@ -433,9 +448,9 @@ namespace JsonFx.Bson
 		/// </summary>
 		/// <param name="value"></param>
 		/// <returns></returns>
-		public static explicit operator byte[](ObjectID value)
+		public static explicit operator byte[](BsonObjectID value)
 		{
-			return value.Bytes ?? ObjectID.Empty.Bytes;
+			return value.Bytes ?? BsonObjectID.Empty.Bytes;
 		}
 
 		/// <summary>
@@ -443,9 +458,9 @@ namespace JsonFx.Bson
 		/// </summary>
 		/// <param name="value"></param>
 		/// <returns></returns>
-		public static explicit operator ObjectID(byte[] value)
+		public static explicit operator BsonObjectID(byte[] value)
 		{
-			return new ObjectID(value);
+			return new BsonObjectID(value);
 		}
 
 		public override string ToString()
@@ -454,15 +469,15 @@ namespace JsonFx.Bson
 
 			if (bytes == null)
 			{
-				bytes = ObjectID.Empty.Bytes;
+				bytes = BsonObjectID.Empty.Bytes;
 			}
 
 			char[] hex = new char[24];
 
 			for (int i=0, j=0; i<24; i+=2, j++)
 			{
-				hex[i] = ObjectID.GetHexDigit(bytes[j] / 0x10);
-				hex[i] = ObjectID.GetHexDigit(bytes[j] % 0x10);
+				hex[i] = BsonObjectID.GetHexDigit(bytes[j] / 0x10);
+				hex[i] = BsonObjectID.GetHexDigit(bytes[j] % 0x10);
 			}
 
 			return new String(hex);
@@ -477,11 +492,11 @@ namespace JsonFx.Bson
 			return bytes;
 		}
 
-		public static ObjectID Parse(string value)
+		public static BsonObjectID Parse(string value)
 		{
-			ObjectID result;
+			BsonObjectID result;
 
-			if (ObjectID.TryParse(value, out result))
+			if (BsonObjectID.TryParse(value, out result))
 			{
 				return result;
 			}
@@ -489,12 +504,12 @@ namespace JsonFx.Bson
 			throw new InvalidCastException("String must be exactly 24 hex digits");
 		}
 
-		public static bool TryParse(string value, out ObjectID result)
+		public static bool TryParse(string value, out BsonObjectID result)
 		{
 			if (String.IsNullOrEmpty(value) ||
 				value.Length != 24)
 			{
-				result = ObjectID.Empty;
+				result = BsonObjectID.Empty;
 				return false;
 			}
 
@@ -509,14 +524,14 @@ namespace JsonFx.Bson
 					NumberFormatInfo.InvariantInfo,
 					out digit))
 				{
-					result = ObjectID.Empty;
+					result = BsonObjectID.Empty;
 					return false;
 				}
 
 				bytes[i] = digit;
 			}
 
-			result = new ObjectID(bytes);
+			result = new BsonObjectID(bytes);
 			return true;
 		}
 
@@ -557,11 +572,11 @@ namespace JsonFx.Bson
 	/// <remarks>
 	/// http://api.mongodb.org/java/2.0/org/bson/types/Binary.html
 	/// </remarks>
-	public class Binary : IEnumerable<byte>
+	public class BsonBinary : IEnumerable<byte>
 	{
 		#region Constants
 
-		public static readonly Binary Empty = new Binary(BsonBinarySubtype.Generic, new byte[0]);
+		public static readonly BsonBinary Empty = new BsonBinary(BsonBinarySubtype.Generic, new byte[0]);
 
 		#endregion Constants
 
@@ -579,7 +594,7 @@ namespace JsonFx.Bson
 		/// </summary>
 		/// <param name="subtype">binary type code</param>
 		/// <param name="bytes">byte date</param>
-		public Binary(BsonBinarySubtype subtype, byte[] bytes)
+		public BsonBinary(BsonBinarySubtype subtype, byte[] bytes)
 		{
 			if (bytes == null)
 			{
@@ -593,6 +608,14 @@ namespace JsonFx.Bson
 		#endregion Init
 
 		#region Properties
+
+		/// <summary>
+		/// Gets the binary type code
+		/// </summary>
+		internal byte[] Data
+		{
+			get { return this.Bytes; }
+		}
 
 		/// <summary>
 		/// Gets the binary type code
@@ -627,7 +650,7 @@ namespace JsonFx.Bson
 		/// </summary>
 		/// <param name="value"></param>
 		/// <returns></returns>
-		public static explicit operator string(Binary value)
+		public static explicit operator string(BsonBinary value)
 		{
 			// simply use ToString implementation
 			return value.ToString();
@@ -638,10 +661,10 @@ namespace JsonFx.Bson
 		/// </summary>
 		/// <param name="value"></param>
 		/// <returns></returns>
-		public static explicit operator Binary(string value)
+		public static explicit operator BsonBinary(string value)
 		{
 			// simply use Parse implementation
-			return Binary.Parse(value);
+			return BsonBinary.Parse(value);
 		}
 
 		/// <summary>
@@ -649,7 +672,7 @@ namespace JsonFx.Bson
 		/// </summary>
 		/// <param name="value"></param>
 		/// <returns></returns>
-		public static explicit operator byte[](Binary value)
+		public static explicit operator byte[](BsonBinary value)
 		{
 			return value.Bytes;
 		}
@@ -659,9 +682,9 @@ namespace JsonFx.Bson
 		/// </summary>
 		/// <param name="value"></param>
 		/// <returns></returns>
-		public static explicit operator Binary(byte[] value)
+		public static explicit operator BsonBinary(byte[] value)
 		{
-			return new Binary(BsonBinarySubtype.Generic, value);
+			return new BsonBinary(BsonBinarySubtype.Generic, value);
 		}
 
 		public override string ToString()
@@ -672,8 +695,8 @@ namespace JsonFx.Bson
 
 			for (int i=0, j=0; i<24; i+=2, j++)
 			{
-				hex[i] = Binary.GetHexDigit(bytes[j] / 0x10);
-				hex[i] = Binary.GetHexDigit(bytes[j] % 0x10);
+				hex[i] = BsonBinary.GetHexDigit(bytes[j] / 0x10);
+				hex[i] = BsonBinary.GetHexDigit(bytes[j] % 0x10);
 			}
 
 			return new String(hex);
@@ -688,11 +711,11 @@ namespace JsonFx.Bson
 			return bytes;
 		}
 
-		public static Binary Parse(string value)
+		public static BsonBinary Parse(string value)
 		{
-			Binary result;
+			BsonBinary result;
 
-			if (Binary.TryParse(value, out result))
+			if (BsonBinary.TryParse(value, out result))
 			{
 				return result;
 			}
@@ -700,11 +723,11 @@ namespace JsonFx.Bson
 			throw new InvalidCastException("String must be only hex digits");
 		}
 
-		public static bool TryParse(string value, out Binary result)
+		public static bool TryParse(string value, out BsonBinary result)
 		{
 			if (String.IsNullOrEmpty(value))
 			{
-				result = Binary.Empty;
+				result = BsonBinary.Empty;
 				return true;
 			}
 
@@ -719,14 +742,14 @@ namespace JsonFx.Bson
 					NumberFormatInfo.InvariantInfo,
 					out digit))
 				{
-					result = Binary.Empty;
+					result = BsonBinary.Empty;
 					return false;
 				}
 
 				bytes[i] = digit;
 			}
 
-			result = new Binary(BsonBinarySubtype.Generic, bytes);
+			result = new BsonBinary(BsonBinarySubtype.Generic, bytes);
 			return true;
 		}
 
