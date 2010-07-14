@@ -207,9 +207,56 @@ namespace JsonFx.Xml.Resolvers
 		/// <returns></returns>
 		public override string GetName(MemberInfo member)
 		{
-			XmlElementAttribute attribute = TypeCoercionUtility.GetAttribute<XmlElementAttribute>(member);
+			// TODO: add support for namespaces
 
-			return (attribute != null) ? attribute.ElementName : null;
+			if (member is Type)
+			{
+				XmlRootAttribute rootAttr = TypeCoercionUtility.GetAttribute<XmlRootAttribute>(member);
+
+				if (rootAttr != null)
+				{
+					return rootAttr.ElementName;
+				}
+
+				XmlTypeAttribute typeAttr = TypeCoercionUtility.GetAttribute<XmlTypeAttribute>(member);
+
+				if (typeAttr != null)
+				{
+					return typeAttr.TypeName;
+				}
+
+				return null;
+			}
+
+			XmlElementAttribute elemAttr = TypeCoercionUtility.GetAttribute<XmlElementAttribute>(member);
+			if (elemAttr != null)
+			{
+				return elemAttr.ElementName;
+			}
+
+			XmlAttributeAttribute attrAttr = TypeCoercionUtility.GetAttribute<XmlAttributeAttribute>(member);
+			if (attrAttr != null)
+			{
+				return attrAttr.AttributeName;
+			}
+
+			XmlArrayAttribute arrayAttr = TypeCoercionUtility.GetAttribute<XmlArrayAttribute>(member);
+			if (arrayAttr != null)
+			{
+				return arrayAttr.ElementName;
+			}
+
+			if (member is FieldInfo && ((FieldInfo)member).DeclaringType.IsEnum)
+			{
+				XmlEnumAttribute enumAttr = TypeCoercionUtility.GetAttribute<XmlEnumAttribute>(member);
+
+				if (enumAttr != null)
+				{
+					return enumAttr.Name;
+				}
+			}
+
+			return null;
 		}
 
 		#endregion Name Resolution Methods

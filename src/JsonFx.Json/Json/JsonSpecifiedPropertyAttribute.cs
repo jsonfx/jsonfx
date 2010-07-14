@@ -38,7 +38,7 @@ namespace JsonFx.Json
 	/// <remarks>
 	/// These properties can be marked private/protected/internal and it will still be recognized
 	/// </remarks>
-	[AttributeUsage(AttributeTargets.Property|AttributeTargets.Field, AllowMultiple=false)]
+	[AttributeUsage(AttributeTargets.Field|AttributeTargets.Property, AllowMultiple=false)]
 	public class JsonSpecifiedPropertyAttribute : Attribute
 	{
 		#region Fields

@@ -39,7 +39,7 @@ using JsonFx.CodeGen;
 
 namespace JsonFx.Serialization.Resolvers
 {
-	public class MemberMap
+	public sealed class MemberMap
 	{
 		#region Fields
 
@@ -98,7 +98,7 @@ namespace JsonFx.Serialization.Resolvers
 		#endregion Init
 	}
 
-	public class FactoryMap
+	public sealed class FactoryMap
 	{
 		#region Constants
 
@@ -290,9 +290,11 @@ namespace JsonFx.Serialization.Resolvers
 		private readonly ReaderWriterLockSlim FactoryLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
 #endif
 
-		private readonly IDictionary<Type, IDictionary<string, MemberMap>> Cache = new Dictionary<Type, IDictionary<string, MemberMap>>();
+		private readonly IDictionary<Type, IDictionary<string, MemberMap>> MemberCache = new Dictionary<Type, IDictionary<string, MemberMap>>();
 		private readonly IDictionary<Type, IDictionary<Enum, string>> EnumCache = new Dictionary<Type, IDictionary<Enum, string>>();
 		private readonly IDictionary<Type, FactoryMap> Factories = new Dictionary<Type, FactoryMap>();
+		private readonly IDictionary<Type, string> NameCache = new Dictionary<Type, string>();
+
 		private readonly IResolverStrategy Strategy;
 
 		#endregion Fields
@@ -316,6 +318,46 @@ namespace JsonFx.Serialization.Resolvers
 
 		#region Map Methods
 
+		/// <summary>
+		/// Gets the serialized name of the class
+		/// </summary>
+		/// <param name="type"></param>
+		/// <returns></returns>
+		public string LoadTypeName(Type type)
+		{
+			if (type == null || type == typeof(object))
+			{
+				return "Object";
+			}
+
+			string name;
+
+#if NET20 || NET30
+			this.MapLock.AcquireReaderLock(ResolverCache.LockTimeout);
+#else
+			this.MapLock.EnterReadLock();
+#endif
+			try
+			{
+				if (this.NameCache.TryGetValue(type, out name))
+				{
+					return name;
+				}
+			}
+			finally
+			{
+#if NET20 || NET30
+				this.MapLock.ReleaseReaderLock();
+#else
+				this.MapLock.ExitReadLock();
+#endif
+			}
+
+			// populate maps for type
+			IDictionary<string, MemberMap> maps;
+			return this.BuildMap(type, out maps);
+		}
+
 		public IDictionary<string, MemberMap> LoadMaps(Type type)
 		{
 			if (type == null || type == typeof(object))
@@ -332,7 +374,7 @@ namespace JsonFx.Serialization.Resolvers
 #endif
 			try
 			{
-				if (this.Cache.TryGetValue(type, out map))
+				if (this.MemberCache.TryGetValue(type, out map))
 				{
 					return map;
 				}
@@ -346,7 +388,8 @@ namespace JsonFx.Serialization.Resolvers
 #endif
 			}
 
-			return this.BuildMap(type);
+			this.BuildMap(type, out map);
+			return map;
 		}
 
 		public IDictionary<Enum, string> LoadEnumMaps(Type type)
@@ -379,7 +422,8 @@ namespace JsonFx.Serialization.Resolvers
 #endif
 			}
 
-			return this.BuildEnumMap(type);
+			this.BuildEnumMap(type, out map);
+			return map;
 		}
 
 		/// <summary>
@@ -399,7 +443,8 @@ namespace JsonFx.Serialization.Resolvers
 #endif
 			try
 			{
-				this.Cache.Clear();
+				this.NameCache.Clear();
+				this.MemberCache.Clear();
 				this.EnumCache.Clear();
 				this.Factories.Clear();
 			}
@@ -422,8 +467,22 @@ namespace JsonFx.Serialization.Resolvers
 		/// Builds a mapping of member name to field/property
 		/// </summary>
 		/// <param name="objectType"></param>
-		private IDictionary<string, MemberMap> BuildMap(Type objectType)
+		private string BuildMap(Type objectType, out IDictionary<string, MemberMap> map)
 		{
+			string typeName = this.Strategy.GetName(objectType);
+			if (String.IsNullOrEmpty(typeName))
+			{
+				typeName = objectType.Name;
+			}
+
+			if (objectType.IsEnum)
+			{
+				// create special maps for enum types
+				IDictionary<Enum, string> enumMap;
+				map = this.BuildEnumMap(objectType, out enumMap);
+				return typeName;
+			}
+
 			// do not incurr the cost of member map for dictionaries
 			if (typeof(IDictionary<string, object>).IsAssignableFrom(objectType) ||
 				typeof(IDictionary).IsAssignableFrom(objectType))
@@ -436,7 +495,8 @@ namespace JsonFx.Serialization.Resolvers
 				try
 				{
 					// store marker in cache for future lookups
-					return (this.Cache[objectType] = null);
+					map = (this.MemberCache[objectType] = null);
+					return (this.NameCache[objectType] = typeName);
 				}
 				finally
 				{
@@ -448,16 +508,8 @@ namespace JsonFx.Serialization.Resolvers
 				}
 			}
 
-			IDictionary<string, MemberMap> maps;
-			if (objectType.IsEnum)
-			{
-				// create special maps for enum types
-				this.BuildEnumMap(objectType);
-				return this.Cache.TryGetValue(objectType, out maps) ? maps : null;
-			}
-
 			// create new map
-			maps = new Dictionary<string, MemberMap>();
+			map = new Dictionary<string, MemberMap>();
 
 			bool isAnonymousType = objectType.IsGenericType && objectType.Name.StartsWith(ResolverCache.AnonymousTypePrefix, false, CultureInfo.InvariantCulture);
 
@@ -475,7 +527,7 @@ namespace JsonFx.Serialization.Resolvers
 					name = info.Name;
 				}
 
-				maps[name] = new MemberMap(info);
+				map[name] = new MemberMap(info);
 			}
 
 			// load fields into property map
@@ -492,7 +544,7 @@ namespace JsonFx.Serialization.Resolvers
 					name = info.Name;
 				}
 
-				maps[name] = new MemberMap(info);
+				map[name] = new MemberMap(info);
 			}
 
 #if NET20 || NET30
@@ -503,7 +555,8 @@ namespace JsonFx.Serialization.Resolvers
 			try
 			{
 				// store in cache for future requests
-				return (this.Cache[objectType] = maps);
+				map = (this.MemberCache[objectType] = map);
+				return (this.NameCache[objectType] = typeName);
 			}
 			finally
 			{
@@ -515,16 +568,23 @@ namespace JsonFx.Serialization.Resolvers
 			}
 		}
 
-		private IDictionary<Enum, string> BuildEnumMap(Type enumType)
+		private IDictionary<string, MemberMap> BuildEnumMap(Type enumType, out IDictionary<Enum, string> enumMaps)
 		{
 			if (enumType == null || !enumType.IsEnum)
 			{
+				enumMaps = null;
 				return null;
 			}
 
 			// create new maps
+			string typeName = this.Strategy.GetName(enumType);
+			if (String.IsNullOrEmpty(typeName))
+			{
+				typeName = enumType.Name;
+			}
+
 			IDictionary<string, MemberMap> maps = new Dictionary<string, MemberMap>();
-			IDictionary<Enum, string> enumMaps = new Dictionary<Enum, string>();
+			enumMaps = new Dictionary<Enum, string>();
 
 			foreach (FieldInfo info in enumType.GetFields(BindingFlags.Static|BindingFlags.Public))
 			{
@@ -548,8 +608,9 @@ namespace JsonFx.Serialization.Resolvers
 			try
 			{
 				// store in caches for future requests
-				this.Cache[enumType] = maps;
-				return (this.EnumCache[enumType] = enumMaps);
+				this.NameCache[enumType] = typeName;
+				this.EnumCache[enumType] = enumMaps;
+				return (this.MemberCache[enumType] = maps);
 			}
 			finally
 			{

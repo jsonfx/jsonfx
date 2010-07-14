@@ -147,9 +147,9 @@ namespace JsonFx.Json.Resolvers
 		/// <returns></returns>
 		public override string GetName(MemberInfo member)
 		{
-			JsonNameAttribute attribute = TypeCoercionUtility.GetAttribute<JsonNameAttribute>(member);
+			JsonNameAttribute attr = TypeCoercionUtility.GetAttribute<JsonNameAttribute>(member);
 
-			return (attribute != null) ? attribute.Name : null;
+			return (attr != null) ? attr.Name : null;
 		}
 
 		#endregion Name Resolution Methods

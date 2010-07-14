@@ -35,7 +35,7 @@ namespace JsonFx.Json
 	/// <summary>
 	/// Specifies the naming to use for a property or field when serializing
 	/// </summary>
-	[AttributeUsage(AttributeTargets.All, AllowMultiple=false)]
+	[AttributeUsage(AttributeTargets.Class|AttributeTargets.Enum|AttributeTargets.Field|AttributeTargets.Property|AttributeTargets.Struct, AllowMultiple=false)]
 	public class JsonNameAttribute : Attribute
 	{
 		#region Fields

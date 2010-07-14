@@ -35,7 +35,7 @@ namespace JsonFx.Json
 	/// <summary>
 	/// Designates a property or field to not be serialized.
 	/// </summary>
-	[AttributeUsage(AttributeTargets.All, AllowMultiple=false)]
+	[AttributeUsage(AttributeTargets.Field|AttributeTargets.Property, AllowMultiple=false)]
 	public sealed class JsonIgnoreAttribute : Attribute
 	{
 	}
