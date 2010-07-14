@@ -93,7 +93,7 @@ namespace JsonFx.Common
 
 		#endregion Init
 
-		#region Walker Methods
+		#region IObjectWalker<T> Methods
 
 		/// <summary>
 		/// Generates a sequence of tokens representing the value
@@ -123,6 +123,10 @@ namespace JsonFx.Common
 
 			return tokens;
 		}
+
+		#endregion IObjectWalker<T> Methods
+
+		#region Walker Methods
 
 		private void GetTokens(Queue<Token<CommonTokenType>> tokens, ICycleDetector detector, object value)
 		{

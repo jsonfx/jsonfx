@@ -44,7 +44,7 @@ namespace JsonFx.Bson
 	public partial class BsonWriter
 	{
 		/// <summary>
-		/// Outputs BSON bytes from a SAX-like input stream of BSON tokens
+		/// Outputs BSON bytes from a SAX-like input stream of tokens
 		/// </summary>
 		public class BsonFormatter : IBinaryFormatter<CommonTokenType>
 		{

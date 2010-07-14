@@ -69,7 +69,7 @@ namespace JsonFx.Json
 
 			#endregion Init
 
-			#region Format Methods
+			#region ITextFormatter<T> Methods
 
 			/// <summary>
 			/// Formats the token sequence as a string
@@ -86,7 +86,7 @@ namespace JsonFx.Json
 			}
 
 			/// <summary>
-			/// Formats the token sequence to the output writer
+			/// Formats the token sequence to the writer
 			/// </summary>
 			/// <param name="writer"></param>
 			/// <param name="tokens"></param>
@@ -268,6 +268,10 @@ namespace JsonFx.Json
 				}
 			}
 
+			#endregion ITextFormatter<T> Methods
+
+			#region Write Methods
+
 			protected virtual void WriteNumber(TextWriter writer, TypeCode typeCode, ValueType value)
 			{
 				bool overflowsIEEE754 = false;
@@ -439,10 +443,6 @@ namespace JsonFx.Json
 				writer.Write(JsonGrammar.OperatorStringDelim);
 			}
 
-			#endregion Format Methods
-
-			#region PrettyPrint Methods
-
 			private void WriteLine(TextWriter writer, int depth)
 			{
 				// emit CRLF
@@ -454,7 +454,7 @@ namespace JsonFx.Json
 				}
 			}
 
-			#endregion PrettyPrint Methods
+			#endregion Write Methods
 
 			#region String Methods
 

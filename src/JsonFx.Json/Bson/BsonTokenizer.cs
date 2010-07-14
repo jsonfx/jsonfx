@@ -61,7 +61,7 @@ namespace JsonFx.Bson
 		#endregion Constants
 
 		/// <summary>
-		/// Generates a SAX-like sequence of BSON tokens from BSON bytes
+		/// Generates a SAX-like sequence of tokens from BSON bytes
 		/// </summary>
 		public class BsonTokenizer : IBinaryTokenizer<CommonTokenType>
 		{
@@ -437,7 +437,7 @@ namespace JsonFx.Bson
 				};
 			}
 
-			#endregion ITokenizer<CommonTokenType> Members
+			#endregion IBinaryTokenizer<CommonTokenType> Members
 
 			#region IDisposable Members
 

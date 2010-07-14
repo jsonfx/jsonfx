@@ -120,7 +120,7 @@ namespace JsonFx.Common
 
 		#endregion Init
 
-		#region Analyze Methods
+		#region ITokenAnalyzer<T> Methods
 
 		/// <summary>
 		/// Parses the token stream coercing the result targetType
@@ -175,7 +175,7 @@ namespace JsonFx.Common
 			}
 		}
 
-		#endregion Analyze Methods
+		#endregion ITokenAnalyzer<T> Methods
 
 		#region Consume Methods
 
