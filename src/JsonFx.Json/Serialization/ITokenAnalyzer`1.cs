@@ -29,24 +29,41 @@
 #endregion License
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace JsonFx.Serialization
 {
 	/// <summary>
-	/// Generates a SAX-like sequence of tokens from an object graph
+	/// Consumes a SAX-like sequence of tokens to produce a sequence of objects, optionally coerced to a given type
 	/// </summary>
 	/// <typeparam name="T">token type</typeparam>
-	public interface IDataWalker<T>
+	public interface ITokenAnalyzer<T>
 	{
 		#region Methods
 
 		/// <summary>
-		/// Generates a sequence of tokens representing the value
+		/// Parses the token sequence
 		/// </summary>
-		/// <param name="value"></param>
+		/// <param name="tokens"></param>
 		/// <returns></returns>
-		IEnumerable<Token<T>> GetTokens(object value);
+		IEnumerable Analyze(IEnumerable<Token<T>> tokens);
+
+		/// <summary>
+		/// Parses the token sequence, optionally coercing the result to Type targetType
+		/// </summary>
+		/// <param name="tokens"></param>
+		/// <param name="targetType">optional type for coercion (null if not specified)</param>
+		/// <returns></returns>
+		IEnumerable Analyze(IEnumerable<Token<T>> tokens, Type targetType);
+
+		/// <summary>
+		/// Parses the token sequence, coercing the result to Type TResult
+		/// </summary>
+		/// <typeparam name="TResult">optional type for coercion (null if not specified)</typeparam>
+		/// <param name="tokens"></param>
+		/// <returns></returns>
+		IEnumerable<TResult> Analyze<TResult>(IEnumerable<Token<T>> tokens);
 
 		#endregion Methods
 	}

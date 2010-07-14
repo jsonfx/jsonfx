@@ -42,7 +42,7 @@ namespace JsonFx.Common
 	/// <summary>
 	/// Generates a SAX-like sequence of tokens from an object graph
 	/// </summary>
-	public class CommonWalker : IDataWalker<CommonTokenType>
+	public class CommonWalker : IObjectWalker<CommonTokenType>
 	{
 		#region Fields
 

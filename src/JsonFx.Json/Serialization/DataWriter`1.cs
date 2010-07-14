@@ -125,7 +125,7 @@ namespace JsonFx.Serialization
 		/// <param name="data">the data to be serialized</param>
 		public virtual void Serialize(TextWriter output, object data)
 		{
-			IDataWalker<T> walker = this.GetWalker();
+			IObjectWalker<T> walker = this.GetWalker();
 			if (walker == null)
 			{
 				throw new ArgumentNullException("walker");
@@ -159,7 +159,7 @@ namespace JsonFx.Serialization
 		/// <returns>the serialized data</returns>
 		public virtual string Serialize(object data)
 		{
-			IDataWalker<T> walker = this.GetWalker();
+			IObjectWalker<T> walker = this.GetWalker();
 			if (walker == null)
 			{
 				throw new ArgumentNullException("walker");
@@ -191,7 +191,7 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="dataWriterSettings"></param>
 		/// <returns></returns>
-		protected abstract IDataWalker<T> GetWalker();
+		protected abstract IObjectWalker<T> GetWalker();
 
 		/// <summary>
 		/// Gets the formatter for this DataWriter

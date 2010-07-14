@@ -48,7 +48,7 @@ namespace JsonFx.Common
 	/// <summary>
 	/// Consumes a SAX-like sequence of tokens to produce an object graph optionally coerced to a given type
 	/// </summary>
-	public class CommonAnalyzer : IDataAnalyzer<CommonTokenType>
+	public class CommonAnalyzer : ITokenAnalyzer<CommonTokenType>
 	{
 		#region Constants
 

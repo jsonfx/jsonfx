@@ -103,7 +103,7 @@ namespace JsonFx.Json
 			return new JsonReader.JsonTokenizer();
 		}
 
-		protected override IDataAnalyzer<CommonTokenType> GetAnalyzer()
+		protected override ITokenAnalyzer<CommonTokenType> GetAnalyzer()
 		{
 			return new CommonAnalyzer(this.Settings, this.Filters);
 		}

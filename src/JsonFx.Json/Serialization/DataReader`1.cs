@@ -192,7 +192,7 @@ namespace JsonFx.Serialization
 				throw new ArgumentNullException("tokenizer");
 			}
 
-			IDataAnalyzer<T> analyzer = this.GetAnalyzer();
+			ITokenAnalyzer<T> analyzer = this.GetAnalyzer();
 			if (analyzer == null)
 			{
 				throw new ArgumentNullException("analyzer");
@@ -215,7 +215,7 @@ namespace JsonFx.Serialization
 
 		private object DeserializeInternal(ITextTokenizer<T> tokenizer, IEnumerable<Token<T>> tokens, Type targetType)
 		{
-			IDataAnalyzer<T> analyzer = this.GetAnalyzer();
+			ITokenAnalyzer<T> analyzer = this.GetAnalyzer();
 			if (analyzer == null)
 			{
 				throw new ArgumentNullException("analyzer");
@@ -252,7 +252,7 @@ namespace JsonFx.Serialization
 
 		protected abstract ITextTokenizer<T> GetTokenizer();
 
-		protected abstract IDataAnalyzer<T> GetAnalyzer();
+		protected abstract ITokenAnalyzer<T> GetAnalyzer();
 
 		#endregion Methods
 	}

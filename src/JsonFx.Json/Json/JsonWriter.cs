@@ -120,7 +120,7 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <returns></returns>
-		protected override IDataWalker<CommonTokenType> GetWalker()
+		protected override IObjectWalker<CommonTokenType> GetWalker()
 		{
 			return new CommonWalker(this.Settings, this.Filters);
 		}
