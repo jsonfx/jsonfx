@@ -129,6 +129,7 @@
     <Compile Include="Serialization\Resolvers\ResolverCache.cs" />
     <Compile Include="Serialization\Token`1.cs" />
     <Compile Include="Serialization\TypeCoercionUtility.cs" />
+    <Compile Include="Xml\XmlGrammar.cs" />
     <Compile Include="Xml\XmlFormatter.cs" />
     <Compile Include="Xml\XmlTokenizer.cs" />
     <Compile Include="Xml\Resolvers\XmlResolverStrategy.cs" />

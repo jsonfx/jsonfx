@@ -33,7 +33,9 @@ using System.Collections.Generic;
 using System.IO;
 
 using JsonFx.Common;
+using JsonFx.IO;
 using JsonFx.Serialization;
+using JsonFx.Serialization.Resolvers;
 
 namespace JsonFx.Xml
 {
@@ -47,6 +49,8 @@ namespace JsonFx.Xml
 			#region Fields
 
 			private readonly DataWriterSettings Settings;
+			private int depth;
+			private bool pendingNewLine;
 
 			#endregion Fields
 
@@ -96,10 +100,309 @@ namespace JsonFx.Xml
 					throw new ArgumentNullException("tokens");
 				}
 
-				bool prettyPrint = this.Settings.PrettyPrint;
+				IStream<Token<CommonTokenType>> stream = new Stream<Token<CommonTokenType>>(tokens);
+
+				while (!stream.IsCompleted)
+				{
+					this.WriteValue(writer, stream, null);
+				}
+			}
+
+			/// <summary>
+			/// Formats the token sequence to the writer
+			/// </summary>
+			/// <param name="writer"></param>
+			/// <param name="tokens"></param>
+			public void WriteValue(TextWriter writer, IStream<Token<CommonTokenType>> tokens, string elementName)
+			{
+				if (this.pendingNewLine)
+				{
+					if (this.Settings.PrettyPrint)
+					{
+						this.depth++;
+						this.WriteLine(writer);
+					}
+					this.pendingNewLine = false;
+				}
+
+				Token<CommonTokenType> token = tokens.Peek();
+				switch (token.TokenType)
+				{
+					case CommonTokenType.ArrayBegin:
+					{
+						this.WriteArray(writer, tokens, elementName);
+						break;
+					}
+					case CommonTokenType.ObjectBegin:
+					{
+						this.WriteObject(writer, tokens, elementName);
+						break;
+					}
+					case CommonTokenType.Primitive:
+					{
+						tokens.Pop();
+
+						if (String.IsNullOrEmpty(elementName))
+						{
+							elementName = "Data";
+						}
+
+						string value = token.ValueAsString();
+						if (String.IsNullOrEmpty(value))
+						{
+							WriteTagEmpty(writer, elementName);
+						}
+						else
+						{
+							WriteTagOpen(writer, elementName);
+							writer.Write(value);
+							WriteTagClose(writer, elementName);
+						}
+						break;
+					}
+					default:
+					{
+						throw new TokenException<CommonTokenType>(token, "Unexpected token");
+					}
+				}
+			}
+
+			private void WriteArray(TextWriter writer, IStream<Token<CommonTokenType>> tokens, string elementName)
+			{
+				Token<CommonTokenType> token = tokens.Pop();
+
+				// ensure element has a name
+				if (String.IsNullOrEmpty(elementName))
+				{
+					elementName = (token.Name ?? DataName.Empty).LocalName;
+
+					if (String.IsNullOrEmpty(elementName))
+					{
+						elementName = "Data";
+					}
+				}
+
+				WriteTagOpen(writer, elementName);
+				pendingNewLine = true;
+
+				bool needsValueDelim = false;
+				while (!tokens.IsCompleted)
+				{
+					token = tokens.Peek();
+					switch (token.TokenType)
+					{
+						case CommonTokenType.ArrayEnd:
+						{
+							tokens.Pop();
+
+							if (this.pendingNewLine)
+							{
+								this.pendingNewLine = false;
+							}
+							else if (this.Settings.PrettyPrint)
+							{
+								this.depth--;
+								this.WriteLine(writer);
+							}
+
+							WriteTagClose(writer, elementName);
+							this.pendingNewLine = true;
+							return;
+						}
+						case CommonTokenType.ArrayBegin:
+						case CommonTokenType.ObjectBegin:
+						case CommonTokenType.Primitive:
+						{
+							if (needsValueDelim)
+							{
+								throw new TokenException<CommonTokenType>(token, "Missing value delimiter");
+							}
+
+							if (pendingNewLine)
+							{
+								if (this.Settings.PrettyPrint)
+								{
+									this.depth++;
+									this.WriteLine(writer);
+								}
+								pendingNewLine = false;
+							}
+
+							string propertyName = (token.Name ?? DataName.Empty).LocalName;
+
+							this.WriteValue(writer, tokens, propertyName);
+
+							pendingNewLine = false;
+							needsValueDelim = true;
+							break;
+						}
+						case CommonTokenType.ValueDelim:
+						{
+							tokens.Pop();
+
+							if (!needsValueDelim)
+							{
+								throw new TokenException<CommonTokenType>(token, "Missing array item");
+							}
+
+							if (this.Settings.PrettyPrint)
+							{
+								this.WriteLine(writer);
+							}
+							needsValueDelim = false;
+							break;
+						}
+						default:
+						{
+							throw new TokenException<CommonTokenType>(token, "Unexpected token");
+						}
+					}
+				}
+			}
+
+			private void WriteObject(TextWriter writer, IStream<Token<CommonTokenType>> tokens, string elementName)
+			{
+				Token<CommonTokenType> token = tokens.Pop();
+
+				// ensure element has a name
+				if (String.IsNullOrEmpty(elementName))
+				{
+					elementName = (token.Name ?? DataName.Empty).LocalName;
+
+					if (String.IsNullOrEmpty(elementName))
+					{
+						elementName = "Data";
+					}
+				}
+
+				WriteTagOpen(writer, elementName);
+				this.pendingNewLine = true;
+
+				bool needsValueDelim = false;
+				while (!tokens.IsCompleted)
+				{
+					token = tokens.Peek();
+					switch (token.TokenType)
+					{
+						case CommonTokenType.ObjectEnd:
+						{
+							tokens.Pop();
+
+							if (this.pendingNewLine)
+							{
+								this.pendingNewLine = false;
+							}
+							else if (this.Settings.PrettyPrint)
+							{
+								this.depth--;
+								this.WriteLine(writer);
+							}
+
+							WriteTagClose(writer, elementName);
+							this.pendingNewLine = true;
+							return;
+						}
+						case CommonTokenType.Property:
+						{
+							tokens.Pop();
+
+							if (needsValueDelim)
+							{
+								throw new TokenException<CommonTokenType>(token, "Missing value delimiter");
+							}
+
+							if (pendingNewLine)
+							{
+								if (this.Settings.PrettyPrint)
+								{
+									this.depth++;
+									this.WriteLine(writer);
+								}
+								pendingNewLine = false;
+							}
+
+							string propertyName = (token.Name ?? DataName.Empty).LocalName;
+
+							this.WriteValue(writer, tokens, propertyName);
+
+							pendingNewLine = false;
+							needsValueDelim = true;
+							break;
+						}
+						case CommonTokenType.ValueDelim:
+						{
+							tokens.Pop();
+
+							if (!needsValueDelim)
+							{
+								throw new TokenException<CommonTokenType>(token, "Missing object property");
+							}
+
+							if (this.Settings.PrettyPrint)
+							{
+								this.WriteLine(writer);
+							}
+							needsValueDelim = false;
+							break;
+						}
+						default:
+						{
+							throw new TokenException<CommonTokenType>(token, "Unexpected token");
+						}
+					}
+				}
 			}
 
 			#endregion ITextFormatter<T> Methods
+
+			#region Write Methods
+
+			private void WriteTagOpen(TextWriter writer, string name)
+			{
+				if (this.pendingNewLine)
+				{
+					if (this.Settings.PrettyPrint)
+					{
+						this.depth++;
+						this.WriteLine(writer);
+					}
+					this.pendingNewLine = false;
+				}
+
+				writer.Write(XmlGrammar.OperatorElementBegin);
+				writer.Write(name);
+				writer.Write(XmlGrammar.OperatorElementEnd);
+			}
+
+			private void WriteTagClose(TextWriter writer, string name)
+			{
+				writer.Write(XmlGrammar.OperatorElementBegin);
+				writer.Write(XmlGrammar.OperatorElementClose);
+				writer.Write(name);
+				writer.Write(XmlGrammar.OperatorElementEnd);
+			}
+
+			private void WriteTagEmpty(TextWriter writer, string name)
+			{
+				writer.Write(XmlGrammar.OperatorElementBegin);
+				writer.Write(name);
+				writer.Write(XmlGrammar.OperatorValueDelim);
+				writer.Write(XmlGrammar.OperatorElementClose);
+				writer.Write(XmlGrammar.OperatorElementEnd);
+			}
+
+			private void WriteLine(TextWriter writer)
+			{
+				// emit CRLF
+				writer.Write(this.Settings.NewLine);
+				for (int i=0; i<this.depth; i++)
+				{
+					// indent next line accordingly
+					writer.Write(this.Settings.Tab);
+				}
+			}
+
+			#endregion Write Methods
 		}
 	}
 }
