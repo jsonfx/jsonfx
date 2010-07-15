@@ -47,47 +47,99 @@ namespace JsonFx.Common
 
 		public static readonly Token<CommonTokenType> TokenNone = new Token<CommonTokenType>(CommonTokenType.None);
 
-		public static readonly Token<CommonTokenType> TokenDocumentEnd = new Token<CommonTokenType>(CommonTokenType.DocumentEnd);
-
-		public static readonly Token<CommonTokenType> TokenObjectBegin = new Token<CommonTokenType>(CommonTokenType.ObjectBegin);
-		public static readonly Token<CommonTokenType> TokenObjectEnd = new Token<CommonTokenType>(CommonTokenType.ObjectEnd);
-		public static readonly Token<CommonTokenType> TokenArrayBegin = new Token<CommonTokenType>(CommonTokenType.ArrayBegin);
 		public static readonly Token<CommonTokenType> TokenArrayEnd = new Token<CommonTokenType>(CommonTokenType.ArrayEnd);
+		public static readonly Token<CommonTokenType> TokenObjectEnd = new Token<CommonTokenType>(CommonTokenType.ObjectEnd);
 		public static readonly Token<CommonTokenType> TokenValueDelim = new Token<CommonTokenType>(CommonTokenType.ValueDelim);
 
 		public static readonly Token<CommonTokenType> TokenNull = new Token<CommonTokenType>(CommonTokenType.Primitive, null);
 		public static readonly Token<CommonTokenType> TokenFalse = new Token<CommonTokenType>(CommonTokenType.Primitive, false);
 		public static readonly Token<CommonTokenType> TokenTrue = new Token<CommonTokenType>(CommonTokenType.Primitive, true);
 
+		private static readonly Token<CommonTokenType> TokenArrayBeginAnonymous = new Token<CommonTokenType>(CommonTokenType.ArrayBegin, DataName.Empty);
+		private static readonly Token<CommonTokenType> TokenObjectBeginAnonymous = new Token<CommonTokenType>(CommonTokenType.ObjectBegin, DataName.Empty);
+
+		#endregion Reusable Tokens
+
+		#region Token Factories
+
 		/// <summary>
-		/// Marks the beginning of a document
+		/// Marks the beginning of an unnamed array
 		/// </summary>
-		/// <param name="name">the local name of the document</param>
-		/// <returns>DocumentBegin Token</returns>
-		public static Token<CommonTokenType> TokenDocumentBegin(string name)
+		/// <returns>ArrayBegin Token</returns>
+		public static Token<CommonTokenType> TokenArrayBegin()
 		{
-			return new Token<CommonTokenType>(CommonTokenType.DocumentBegin, new DataName(name));
+			return CommonGrammar.TokenArrayBeginAnonymous;
 		}
 
 		/// <summary>
-		/// Marks the beginning of a document
+		/// Marks the beginning of an array
 		/// </summary>
-		/// <param name="name">the local name of the document</param>
+		/// <param name="name">the local name of the array</param>
+		/// <returns>ArrayBegin Token</returns>
+		public static Token<CommonTokenType> TokenArrayBegin(string name)
+		{
+			return new Token<CommonTokenType>(CommonTokenType.ArrayBegin, new DataName(name));
+		}
+
+		/// <summary>
+		/// Marks the beginning of an array
+		/// </summary>
+		/// <param name="name">the local name of the array</param>
 		/// <param name="namespaceUri">the namespace of the document</param>
-		/// <returns>DocumentBegin Token</returns>
-		public static Token<CommonTokenType> TokenDocumentBegin(string name, string namespaceUri)
+		/// <returns>ArrayBegin Token</returns>
+		public static Token<CommonTokenType> TokenArrayBegin(string name, string namespaceUri)
 		{
-			return new Token<CommonTokenType>(CommonTokenType.DocumentBegin, new DataName(name, namespaceUri));
+			return new Token<CommonTokenType>(CommonTokenType.ArrayBegin, new DataName(name, namespaceUri));
 		}
 
 		/// <summary>
-		/// Marks the beginning of a document
+		/// Marks the beginning of an array
 		/// </summary>
-		/// <param name="name">the name of the document</param>
-		/// <returns>DocumentBegin Token</returns>
-		public static Token<CommonTokenType> TokenDocumentBegin(DataName name)
+		/// <param name="name">the name of the array</param>
+		/// <returns>ArrayBegin Token</returns>
+		public static Token<CommonTokenType> TokenArrayBegin(DataName name)
 		{
-			return new Token<CommonTokenType>(CommonTokenType.DocumentBegin, name);
+			return new Token<CommonTokenType>(CommonTokenType.ArrayBegin, name);
+		}
+
+		/// <summary>
+		/// Marks the beginning of an unnamed object
+		/// </summary>
+		/// <returns>ObjectBegin Token</returns>
+		public static Token<CommonTokenType> TokenObjectBegin()
+		{
+			return CommonGrammar.TokenObjectBeginAnonymous;
+		}
+
+		/// <summary>
+		/// Marks the beginning of an object
+		/// </summary>
+		/// <param name="name">the local name of the object</param>
+		/// <returns>ObjectBegin Token</returns>
+		public static Token<CommonTokenType> TokenObjectBegin(string name)
+		{
+			return new Token<CommonTokenType>(CommonTokenType.ObjectBegin, new DataName(name));
+		}
+
+		/// <summary>
+		/// Marks the beginning of an object
+		/// </summary>
+		/// <param name="name">the local name of the object</param>
+		/// <param name="namespaceUri">the namespace of the document</param>
+		/// <returns>ObjectBegin Token</returns>
+		public static Token<CommonTokenType> TokenObjectBegin(string name, string namespaceUri)
+		{
+			return new Token<CommonTokenType>(CommonTokenType.ObjectBegin, new DataName(name, namespaceUri));
+		}
+
+		/// <summary>
+		/// Marks the beginning of an object
+		/// </summary>
+		/// <param name="name">the name of the object</param>
+		/// <returns>ObjectBegin Token</returns>
+		public static Token<CommonTokenType> TokenObjectBegin(DataName name)
+		{
+			return new Token<CommonTokenType>(CommonTokenType.ObjectBegin, name);
 		}
 
 		/// <summary>
@@ -131,6 +183,6 @@ namespace JsonFx.Common
 			return new Token<CommonTokenType>(CommonTokenType.Primitive, value);
 		}
 
-		#endregion Reusable Tokens
+		#endregion Token Factories
 	}
 }

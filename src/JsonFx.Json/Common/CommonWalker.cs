@@ -120,7 +120,6 @@ namespace JsonFx.Common
 			}
 
 			this.GetTokens(tokens, detector, value);
-
 			return tokens;
 		}
 
@@ -284,7 +283,7 @@ namespace JsonFx.Common
 				}
 
 				// all other structs and classes
-				this.GetObjectTokens(tokens, detector, value, type);
+				this.GetObjectTokens(tokens, detector, type, value);
 			}
 			finally
 			{
@@ -294,21 +293,22 @@ namespace JsonFx.Common
 
 		private void GetArrayTokens(Queue<Token<CommonTokenType>> tokens, ICycleDetector detector, IEnumerable value)
 		{
+			DataName typeName = this.Settings.Resolver.LoadTypeName((value != null) ? value.GetType() : null);
 			IEnumerator enumerator = value.GetEnumerator();
 
 			if (enumerator is IEnumerator<KeyValuePair<string, object>>)
 			{
-				this.GetObjectTokens(tokens, detector, (IEnumerator<KeyValuePair<string, object>>)enumerator);
+				this.GetObjectTokens(tokens, detector, typeName, (IEnumerator<KeyValuePair<string, object>>)enumerator);
 				return;
 			}
 
 			if (enumerator is IDictionaryEnumerator)
 			{
-				this.GetObjectTokens(tokens, detector, (IDictionaryEnumerator)enumerator);
+				this.GetObjectTokens(tokens, detector, typeName, (IDictionaryEnumerator)enumerator);
 				return;
 			}
 
-			tokens.Enqueue(CommonGrammar.TokenArrayBegin);
+			tokens.Enqueue(CommonGrammar.TokenArrayBegin(typeName));
 
 			bool appendDelim = false;
 
@@ -329,9 +329,9 @@ namespace JsonFx.Common
 			tokens.Enqueue(CommonGrammar.TokenArrayEnd);
 		}
 
-		private void GetObjectTokens(Queue<Token<CommonTokenType>> tokens, ICycleDetector detector, IDictionaryEnumerator enumerator)
+		private void GetObjectTokens(Queue<Token<CommonTokenType>> tokens, ICycleDetector detector, DataName typeName, IDictionaryEnumerator enumerator)
 		{
-			tokens.Enqueue(CommonGrammar.TokenObjectBegin);
+			tokens.Enqueue(CommonGrammar.TokenObjectBegin(typeName));
 
 			bool appendDelim = false;
 
@@ -354,9 +354,9 @@ namespace JsonFx.Common
 			tokens.Enqueue(CommonGrammar.TokenObjectEnd);
 		}
 
-		private void GetObjectTokens(Queue<Token<CommonTokenType>> tokens, ICycleDetector detector, IEnumerator<KeyValuePair<string, object>> enumerator)
+		private void GetObjectTokens(Queue<Token<CommonTokenType>> tokens, ICycleDetector detector, DataName typeName, IEnumerator<KeyValuePair<string, object>> enumerator)
 		{
-			tokens.Enqueue(CommonGrammar.TokenObjectBegin);
+			tokens.Enqueue(CommonGrammar.TokenObjectBegin(typeName));
 
 			bool appendDelim = false;
 
@@ -379,9 +379,10 @@ namespace JsonFx.Common
 			tokens.Enqueue(CommonGrammar.TokenObjectEnd);
 		}
 
-		private void GetObjectTokens(Queue<Token<CommonTokenType>> tokens, ICycleDetector detector, object value, Type type)
+		private void GetObjectTokens(Queue<Token<CommonTokenType>> tokens, ICycleDetector detector, Type type, object value)
 		{
-			tokens.Enqueue(CommonGrammar.TokenObjectBegin);
+			DataName name = this.Settings.Resolver.LoadTypeName((value != null) ? value.GetType() : null);
+			tokens.Enqueue(CommonGrammar.TokenObjectBegin(name));
 
 			IDictionary<string, MemberMap> maps = this.Settings.Resolver.LoadMaps(type);
 			if (maps == null)

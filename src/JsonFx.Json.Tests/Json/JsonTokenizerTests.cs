@@ -49,7 +49,7 @@ namespace JsonFx.Json
 			const string input = "[]";
 			var expected = new []
 			{
-				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin(),
 				CommonGrammar.TokenArrayEnd
 			};
 
@@ -65,7 +65,7 @@ namespace JsonFx.Json
 			const string input = "[null]";
 			var expected = new []
 			{
-				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin(),
 				CommonGrammar.TokenNull,
 				CommonGrammar.TokenArrayEnd
 			};
@@ -82,7 +82,7 @@ namespace JsonFx.Json
 			const string input = "[ 0, null,  false,true ]";
 			var expected = new []
 			{
-				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin(),
 				CommonGrammar.TokenValue(0),
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenNull,
@@ -106,25 +106,25 @@ namespace JsonFx.Json
 			const string input = @"[[[[[[[[[[[[[[[[[[[""Not too deep""]]]]]]]]]]]]]]]]]]]";
 			var expected = new []
 			{
-				CommonGrammar.TokenArrayBegin,
-				CommonGrammar.TokenArrayBegin,
-				CommonGrammar.TokenArrayBegin,
-				CommonGrammar.TokenArrayBegin,
-				CommonGrammar.TokenArrayBegin,
-				CommonGrammar.TokenArrayBegin,
-				CommonGrammar.TokenArrayBegin,
-				CommonGrammar.TokenArrayBegin,
-				CommonGrammar.TokenArrayBegin,
-				CommonGrammar.TokenArrayBegin,
-				CommonGrammar.TokenArrayBegin,
-				CommonGrammar.TokenArrayBegin,
-				CommonGrammar.TokenArrayBegin,
-				CommonGrammar.TokenArrayBegin,
-				CommonGrammar.TokenArrayBegin,
-				CommonGrammar.TokenArrayBegin,
-				CommonGrammar.TokenArrayBegin,
-				CommonGrammar.TokenArrayBegin,
-				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBegin(),
 				CommonGrammar.TokenValue("Not too deep"),
 				CommonGrammar.TokenArrayEnd,
 				CommonGrammar.TokenArrayEnd,
@@ -162,7 +162,7 @@ namespace JsonFx.Json
 			var input = @"[""extra comma"",]";
 			var expected = new[]
 			{
-				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin(),
 				CommonGrammar.TokenValue("extra comma"),
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenArrayEnd
@@ -183,7 +183,7 @@ namespace JsonFx.Json
 			var input = @"[""double extra comma"",,]";
 			var expected = new[]
 			{
-				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin(),
 				CommonGrammar.TokenValue("double extra comma"),
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValueDelim,
@@ -205,7 +205,7 @@ namespace JsonFx.Json
 			var input = @"[   , ""<-- missing value""]";
 			var expected = new[]
 			{
-				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin(),
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue("<-- missing value"),
 				CommonGrammar.TokenArrayEnd
@@ -226,7 +226,7 @@ namespace JsonFx.Json
 			var input = @"[""Colon instead of comma"": false]";
 			var expected = new[]
 			{
-				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin(),
 				CommonGrammar.TokenProperty("Colon instead of comma"),
 				CommonGrammar.TokenFalse,
 				CommonGrammar.TokenArrayEnd
@@ -267,7 +267,7 @@ namespace JsonFx.Json
 			const string input = "{}";
 			var expected = new []
 			{
-				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenObjectBegin(),
 				CommonGrammar.TokenObjectEnd
 			};
 
@@ -283,7 +283,7 @@ namespace JsonFx.Json
 			const string input = @"{""key"":""value""}";
 			var expected = new []
 			{
-				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenObjectBegin(),
 				CommonGrammar.TokenProperty("key"),
 				CommonGrammar.TokenValue("value"),
 				CommonGrammar.TokenObjectEnd
@@ -309,9 +309,9 @@ namespace JsonFx.Json
 
 			var expected = new []
 			{
-				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenObjectBegin(),
 				CommonGrammar.TokenProperty("JSON Test Pattern pass3"),
-				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenObjectBegin(),
 				CommonGrammar.TokenProperty("The outermost value"),
 				CommonGrammar.TokenValue("must be an object or array."),
 				CommonGrammar.TokenValueDelim,
@@ -337,7 +337,7 @@ namespace JsonFx.Json
 
 			var expected = new[]
 			{
-				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenObjectBegin(),
 				CommonGrammar.TokenValue("Comma instead of colon"),
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenNull,
@@ -360,7 +360,7 @@ namespace JsonFx.Json
 
 			var expected = new[]
 			{
-				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenObjectBegin(),
 				CommonGrammar.TokenProperty("Comma instead of closing brace"),
 				CommonGrammar.TokenTrue,
 				CommonGrammar.TokenValueDelim
@@ -445,7 +445,7 @@ namespace JsonFx.Json
 			const string input = @"[""Illegal backslash escape: \x15""]";
 			var expected = new []
 			{
-				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin(),
 				CommonGrammar.TokenValue("Illegal backslash escape: x15"),
 				CommonGrammar.TokenArrayEnd
 			};
@@ -464,7 +464,7 @@ namespace JsonFx.Json
 			const string input = @"[""Illegal backslash escape: \017""]";
 			var expected = new []
 			{
-				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin(),
 				CommonGrammar.TokenValue("Illegal backslash escape: 17"),
 				CommonGrammar.TokenArrayEnd
 			};
@@ -483,7 +483,7 @@ namespace JsonFx.Json
 			const string input = @"['single quote']";
 			var expected = new []
 			{
-				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin(),
 				CommonGrammar.TokenValue("single quote"),
 				CommonGrammar.TokenArrayEnd
 			};
@@ -533,7 +533,7 @@ namespace JsonFx.Json
 			const string input = @"[""	tab	character	in	string	""]";
 			var expected = new []
 			{
-				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin(),
 				CommonGrammar.TokenValue("\ttab\tcharacter\tin\tstring\t"),
 				CommonGrammar.TokenArrayEnd
 			};
@@ -552,7 +552,7 @@ namespace JsonFx.Json
 			const string input = @"[""\	tab\	character\	in\	string\	""]";
 			var expected = new []
 			{
-				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin(),
 				CommonGrammar.TokenValue("\ttab\tcharacter\tin\tstring\t"),
 				CommonGrammar.TokenArrayEnd
 			};
@@ -738,7 +738,7 @@ break""]";
 			const string input = @"{""Numbers cannot have leading zeroes"": 013}";
 			var expected = new []
 			{
-				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenObjectBegin(),
 				CommonGrammar.TokenProperty("Numbers cannot have leading zeroes"),
 				CommonGrammar.TokenValue(13),
 				CommonGrammar.TokenObjectEnd
@@ -868,7 +868,7 @@ break""]";
 			const string input = @"{unquoted_key: ""keys must be quoted""}";
 			var expected = new []
 			{
-				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenObjectBegin(),
 				CommonGrammar.TokenProperty("unquoted_key"),
 				CommonGrammar.TokenValue("keys must be quoted"),
 				CommonGrammar.TokenObjectEnd
@@ -886,7 +886,7 @@ break""]";
 			const string input = @"{ $abcdefg0123456 : false }";
 			var expected = new []
 			{
-				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenObjectBegin(),
 				CommonGrammar.TokenProperty("$abcdefg0123456"),
 				CommonGrammar.TokenFalse,
 				CommonGrammar.TokenObjectEnd
@@ -904,7 +904,7 @@ break""]";
 			const string input = @"{ _123456 : true }";
 			var expected = new []
 			{
-				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenObjectBegin(),
 				CommonGrammar.TokenProperty("_123456"),
 				CommonGrammar.TokenTrue,
 				CommonGrammar.TokenObjectEnd
@@ -1065,7 +1065,7 @@ break""]";
 ";
 			var expected = new []
 			{
-				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenObjectBegin(),
 				CommonGrammar.TokenProperty("foo"),
 				CommonGrammar.TokenNull,
 				CommonGrammar.TokenValueDelim,
@@ -1145,20 +1145,20 @@ break""]";
 
 			var expected = new[]
 			{
-				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin(),
 				CommonGrammar.TokenValue("JSON Test Pattern pass1"),
 				CommonGrammar.TokenValueDelim,
-				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenObjectBegin(),
 				CommonGrammar.TokenProperty("object with 1 member"),
-				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin(),
 				CommonGrammar.TokenValue("array with 1 element"),
 				CommonGrammar.TokenArrayEnd,
 				CommonGrammar.TokenObjectEnd,
 				CommonGrammar.TokenValueDelim,
-				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenObjectBegin(),
 				CommonGrammar.TokenObjectEnd,
 				CommonGrammar.TokenValueDelim,
-				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin(),
 				CommonGrammar.TokenArrayEnd,
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(-42),
@@ -1169,7 +1169,7 @@ break""]";
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenNull,
 				CommonGrammar.TokenValueDelim,
-				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenObjectBegin(),
 				CommonGrammar.TokenProperty("integer"),
 				CommonGrammar.TokenValue(1234567890),
 				CommonGrammar.TokenValueDelim,
@@ -1234,11 +1234,11 @@ break""]";
 				CommonGrammar.TokenNull,
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("array"),
-				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin(),
 				CommonGrammar.TokenArrayEnd,
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("object"),
-				CommonGrammar.TokenObjectBegin,
+				CommonGrammar.TokenObjectBegin(),
 				CommonGrammar.TokenObjectEnd,
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("address"),
@@ -1254,7 +1254,7 @@ break""]";
 				CommonGrammar.TokenValue(" "),
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty(" s p a c e d "),
-				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin(),
 				CommonGrammar.TokenValue(1),
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(2),
@@ -1271,7 +1271,7 @@ break""]";
 				CommonGrammar.TokenArrayEnd,
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("compact"),
-				CommonGrammar.TokenArrayBegin,
+				CommonGrammar.TokenArrayBegin(),
 				CommonGrammar.TokenValue(1),
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(2),

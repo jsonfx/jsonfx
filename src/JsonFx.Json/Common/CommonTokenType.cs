@@ -47,28 +47,11 @@ namespace JsonFx.Common
 		None,
 
 		/// <summary>
-		/// Begin document, the token value is the document name
+		/// Begin object, the token value is the object name
 		/// </summary>
 		/// <remarks>
 		/// The token value must be a <see cref="JsonFx.Serialization.Resolvers.MemberMap"/>. In the absence of a document name, one may be automatically chosen.
-		/// This token is often not represented directly in the output as some formats do not have the concept of a named root.
-		/// </remarks>
-		DocumentBegin,
-
-		/// <summary>
-		/// End document
-		/// </summary>
-		/// <remarks>
-		/// The token value must be null.
-		/// This token is often not represented directly in the output as some formats do not have the concept of a named root.
-		/// </remarks>
-		DocumentEnd,
-
-		/// <summary>
-		/// Begin object
-		/// </summary>
-		/// <remarks>
-		/// The token value must be null.
+		/// The token value is often not represented directly in the output as some formats do not have the concept of named objects.
 		/// Marks the beginning of an associative array of key-value pairs
 		/// </remarks>
 		ObjectBegin,
@@ -83,10 +66,11 @@ namespace JsonFx.Common
 		ObjectEnd,
 
 		/// <summary>
-		/// Begin array
+		/// Begin array, the token value is the object name
 		/// </summary>
 		/// <remarks>
-		/// The token value must be null.
+		/// The token value must be a <see cref="JsonFx.Serialization.Resolvers.MemberMap"/>. In the absence of a document name, one may be automatically chosen.
+		/// The token value is often not represented directly in the output as some formats do not have the concept of named objects.
 		/// Marks the beginning of a single-dimensional array of values
 		/// </remarks>
 		ArrayBegin,

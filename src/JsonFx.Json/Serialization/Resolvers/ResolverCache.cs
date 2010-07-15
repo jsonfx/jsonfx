@@ -331,9 +331,9 @@ namespace JsonFx.Serialization.Resolvers
 		/// <returns></returns>
 		public DataName LoadTypeName(Type type)
 		{
-			if (type == null || type == typeof(object))
+			if (type == null)
 			{
-				return new DataName("Object");
+				return DataName.Empty;
 			}
 
 			DataName name;
@@ -475,10 +475,19 @@ namespace JsonFx.Serialization.Resolvers
 		/// <param name="objectType"></param>
 		private DataName BuildMap(Type objectType, out IDictionary<string, MemberMap> map)
 		{
+			bool isAnonymousType = objectType.IsGenericType && objectType.Name.StartsWith(ResolverCache.AnonymousTypePrefix, false, CultureInfo.InvariantCulture);
+
 			DataName typeName = this.Strategy.GetName(objectType);
 			if (typeName == null)
 			{
-				typeName = new DataName(objectType.Name);
+				// TODO: is this the best place for default naming?
+				string objectName = isAnonymousType ? typeof(object).Name : objectType.Name.Replace("[]", typeof(Array).Name);
+				int tick = objectName.IndexOf('`');
+				if (tick >= 0)
+				{
+					objectName = objectName.Substring(0, tick);
+				}
+				typeName = new DataName(objectName);
 			}
 
 			if (objectType.IsEnum)
@@ -516,8 +525,6 @@ namespace JsonFx.Serialization.Resolvers
 
 			// create new map
 			map = new Dictionary<string, MemberMap>();
-
-			bool isAnonymousType = objectType.IsGenericType && objectType.Name.StartsWith(ResolverCache.AnonymousTypePrefix, false, CultureInfo.InvariantCulture);
 
 			// load properties into property map
 			foreach (PropertyInfo info in objectType.GetProperties(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic))

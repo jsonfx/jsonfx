@@ -41,6 +41,12 @@ namespace JsonFx.Serialization.Resolvers
 	/// </remarks>
 	public class DataName
 	{
+		#region Constants
+
+		public static readonly DataName Empty = new DataName(String.Empty);
+
+		#endregion Constants
+
 		#region Fields
 
 		public readonly string LocalName;

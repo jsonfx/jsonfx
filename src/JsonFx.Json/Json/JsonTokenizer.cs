@@ -117,7 +117,7 @@ namespace JsonFx.Json
 					case JsonGrammar.OperatorArrayBegin:
 					{
 						scanner.Pop();
-						return CommonGrammar.TokenArrayBegin;
+						return CommonGrammar.TokenArrayBegin();
 					}
 					case JsonGrammar.OperatorArrayEnd:
 					{
@@ -127,7 +127,7 @@ namespace JsonFx.Json
 					case JsonGrammar.OperatorObjectBegin:
 					{
 						scanner.Pop();
-						return CommonGrammar.TokenObjectBegin;
+						return CommonGrammar.TokenObjectBegin();
 					}
 					case JsonGrammar.OperatorObjectEnd:
 					{
