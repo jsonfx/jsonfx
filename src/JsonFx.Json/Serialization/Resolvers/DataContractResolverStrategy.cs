@@ -48,9 +48,9 @@ namespace JsonFx.Serialization.Resolvers
 		/// Gets a value indicating if the property is to be serialized.
 		/// </summary>
 		/// <param name="member"></param>
-		/// <param name="isAnonymousType"></param>
+		/// <param name="isImmutableType"></param>
 		/// <returns></returns>
-		public override bool IsPropertyIgnored(PropertyInfo member, bool isAnonymousType)
+		public override bool IsPropertyIgnored(PropertyInfo member, bool isImmutableType)
 		{
 			Type objType = member.ReflectedType ?? member.DeclaringType;
 
@@ -63,7 +63,7 @@ namespace JsonFx.Serialization.Resolvers
 			}
 
 			// use POCO rules: must be public read/write (or anonymous object)
-			return base.IsPropertyIgnored(member, isAnonymousType);
+			return base.IsPropertyIgnored(member, isImmutableType);
 		}
 
 		/// <summary>

@@ -62,6 +62,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.XML" />
     <Reference Include="xunit">
       <HintPath>$(SolutionDir)\lib\xUnit.net\xunit.dll</HintPath>
     </Reference>
@@ -93,6 +94,7 @@
     <Compile Include="Json\JsonFormatterTests.cs" />
     <Compile Include="Json\JsonTokenizerTests.cs" />
     <Compile Include="Serialization\TypeCoercionUtilityTests.cs" />
+    <Compile Include="Xml\XmlWriterTests.cs" />
     <Compile Include="Xml\XmlFormatterTests.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -44,10 +44,10 @@ namespace JsonFx.Serialization.Resolvers
 		/// Gets a value indicating if the property is to be serialized.
 		/// </summary>
 		/// <param name="member"></param>
-		/// <param name="isAnonymousType"></param>
+		/// <param name="isImmutableType"></param>
 		/// <returns></returns>
-		/// <remarks>default implementation is must be read/write properties, or read-only anonymous</remarks>
-		public virtual bool IsPropertyIgnored(PropertyInfo member, bool isAnonymousType)
+		/// <remarks>default implementation is must be read/write properties, or immutable</remarks>
+		public virtual bool IsPropertyIgnored(PropertyInfo member, bool isImmutableType)
 		{
 			// must be public read/write (or anonymous object)
 			MethodInfo getter = member.CanRead ? member.GetGetMethod() : null;
@@ -55,7 +55,7 @@ namespace JsonFx.Serialization.Resolvers
 
 			return
 				(getter == null || !getter.IsPublic) ||
-				(!isAnonymousType && (setter == null || !setter.IsPublic));
+				(!isImmutableType && (setter == null || !setter.IsPublic));
 		}
 
 		/// <summary>

@@ -88,14 +88,14 @@ namespace JsonFx.Serialization.Resolvers
 
 		#region IResolverStrategy Members
 
-		bool IResolverStrategy.IsPropertyIgnored(PropertyInfo member, bool isAnonymousType)
+		bool IResolverStrategy.IsPropertyIgnored(PropertyInfo member, bool isImmutableType)
 		{
 			if (this.IsPropertyIgnored == null)
 			{
 				return false;
 			}
 
-			return this.IsPropertyIgnored(member, isAnonymousType);
+			return this.IsPropertyIgnored(member, isImmutableType);
 		}
 
 		bool IResolverStrategy.IsFieldIgnored(FieldInfo member)

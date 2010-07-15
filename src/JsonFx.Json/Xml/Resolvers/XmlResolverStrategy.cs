@@ -57,14 +57,14 @@ namespace JsonFx.Xml.Resolvers
 		/// Gets a value indicating if the property is to be serialized.
 		/// </summary>
 		/// <param name="member"></param>
-		/// <param name="isAnonymousType"></param>
+		/// <param name="isImmutableType"></param>
 		/// <returns></returns>
-		/// <remarks>default implementation is must be read/write properties, or read-only anonymous</remarks>
-		public override bool IsPropertyIgnored(PropertyInfo member, bool isAnonymousType)
+		/// <remarks>default implementation is must be read/write properties, or immutable</remarks>
+		public override bool IsPropertyIgnored(PropertyInfo member, bool isImmutableType)
 		{
 			// must satisfy POCO rules and not be ignored
 			return
-				base.IsPropertyIgnored(member, isAnonymousType) ||
+				base.IsPropertyIgnored(member, isImmutableType) ||
 				TypeCoercionUtility.HasAttribute<XmlIgnoreAttribute>(member);
 		}
 
@@ -127,14 +127,19 @@ namespace JsonFx.Xml.Resolvers
 				{
 					if (shouldSerializeProxy == null)
 					{
-						// situation 1: no need to even create a delegate
-						return null;
+						// situation 1: only need to check if equal to null
+						return delegate(object target, object value)
+						{
+							return (value == null);
+						};
 					}
 
 					// situation 2: create a delegate which simply calls the should serialize method
 					return delegate(object target, object value)
 					{
-						return Object.Equals(false, shouldSerializeProxy(target));
+						return
+							(value == null) ||
+							Object.Equals(false, shouldSerializeProxy(target));
 					};
 				}
 
@@ -143,7 +148,9 @@ namespace JsonFx.Xml.Resolvers
 					// situation 3: create a delegate which simply calls the specified property
 					return delegate(object target, object value)
 					{
-						return Object.Equals(false, specifiedPropertyGetter(target));
+						return
+							(value == null) ||
+							Object.Equals(false, specifiedPropertyGetter(target));
 					};
 				}
 
@@ -151,6 +158,7 @@ namespace JsonFx.Xml.Resolvers
 				return delegate(object target, object value)
 				{
 					return
+						(value == null) ||
 						Object.Equals(false, shouldSerializeProxy(target)) ||
 						Object.Equals(false, specifiedPropertyGetter(target));
 				};
@@ -166,7 +174,9 @@ namespace JsonFx.Xml.Resolvers
 					// situation 5: create a specific delegate which only has to compare the default value to the current value
 					return delegate(object target, object value)
 					{
-						return Object.Equals(defaultValue, value);
+						return
+							(value == null) ||
+							Object.Equals(defaultValue, value);
 					};
 				}
 
@@ -174,6 +184,7 @@ namespace JsonFx.Xml.Resolvers
 				return delegate(object target, object value)
 				{
 					return
+						(value == null) ||
 						Object.Equals(defaultValue, value) ||
 						Object.Equals(false, shouldSerializeProxy(target));
 				};
@@ -185,15 +196,17 @@ namespace JsonFx.Xml.Resolvers
 				return delegate(object target, object value)
 				{
 					return
+						(value == null) ||
 						Object.Equals(defaultValue, value) ||
 						Object.Equals(false, specifiedPropertyGetter(target));
 				};
 			}
 
-			// situation 8: create a combined delegate which checks all three states
+			// situation 8: create a combined delegate which checks all states
 			return delegate(object target, object value)
 			{
 				return
+					(value == null) ||
 					Object.Equals(defaultValue, value) ||
 					Object.Equals(false, shouldSerializeProxy(target)) ||
 					Object.Equals(false, specifiedPropertyGetter(target));

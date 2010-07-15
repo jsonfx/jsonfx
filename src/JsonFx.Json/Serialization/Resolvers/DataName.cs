@@ -29,6 +29,9 @@
 #endregion License
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Globalization;
 
 namespace JsonFx.Serialization.Resolvers
 {
@@ -43,6 +46,9 @@ namespace JsonFx.Serialization.Resolvers
 	{
 		#region Constants
 
+		private const string AnonymousTypePrefix = "<>f__AnonymousType";
+		private static readonly string TypeGenericIDictionary = typeof(IDictionary<,>).FullName;
+
 		public static readonly DataName Empty = new DataName(String.Empty);
 
 		#endregion Constants
@@ -55,6 +61,15 @@ namespace JsonFx.Serialization.Resolvers
 		#endregion Fields
 
 		#region Init
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="type"></param>
+		public DataName(Type type)
+			: this(DataName.GetTypeName(type))
+		{
+		}
 
 		/// <summary>
 		/// Ctor
@@ -91,6 +106,126 @@ namespace JsonFx.Serialization.Resolvers
 		}
 
 		#endregion Init
+
+		#region Utility Methods
+
+		/// <summary>
+		/// Gets the local-name for a Type
+		/// </summary>
+		/// <param name="type"></param>
+		/// <returns></returns>
+		private static string GetTypeName(Type type)
+		{
+			if (type == typeof(object))
+			{
+				type = null;
+			}
+
+			// using XSD-style defaults for .NET primitives
+			switch (Type.GetTypeCode(type))
+			{
+				case TypeCode.DBNull:
+				case TypeCode.Empty:
+				{
+					return "object";
+				}
+				case TypeCode.Boolean:
+				{
+					return "boolean";
+				}
+				case TypeCode.Byte:
+				{
+					return "unsignedByte";
+				}
+				case TypeCode.Char:
+				{
+					return "Char";
+				}
+				case TypeCode.Decimal:
+				{
+					return "decimal";
+				}
+				case TypeCode.Double:
+				{
+					return "double";
+				}
+				case TypeCode.Int16:
+				{
+					return "short";
+				}
+				case TypeCode.Int32:
+				{
+					return "int";
+				}
+				case TypeCode.Int64:
+				{
+					return "long";
+				}
+				case TypeCode.SByte:
+				{
+					return "byte";
+				}
+				case TypeCode.Single:
+				{
+					return "float";
+				}
+				case TypeCode.UInt16:
+				{
+					return "unsignedShort";
+				}
+				case TypeCode.UInt32:
+				{
+					return "unsignedInt";
+				}
+				case TypeCode.UInt64:
+				{
+					return "unsignedLong";
+				}
+				case TypeCode.String:
+				{
+					return "string";
+				}
+				case TypeCode.DateTime:
+				{
+					return "dateTime";
+				}
+				case TypeCode.Object:
+				{
+					break;
+				}
+			}
+
+			if (typeof(IDictionary).IsAssignableFrom(type) || type.GetInterface(DataName.TypeGenericIDictionary) != null)
+			{
+				// generic IDictionary or IDictionary<,>
+				return "object";
+			}
+
+			if (type.IsArray || typeof(IEnumerable).IsAssignableFrom(type))
+			{
+				// generic IEnumerable collection
+				return "array";
+			}
+
+			bool isGeneric = type.IsGenericType;
+
+			if ((isGeneric && type.Name.StartsWith(DataName.AnonymousTypePrefix, false, CultureInfo.InvariantCulture)))
+			{
+				return "object";
+			}
+
+			string typeName = type.Name;
+
+			int tick = isGeneric ? typeName.IndexOf('`') : -1;
+			if (tick >= 0)
+			{
+				typeName = typeName.Substring(0, tick);
+			}
+
+			return typeName;
+		}
+
+		#endregion Utility Methods
 
 		#region Object Overrides
 

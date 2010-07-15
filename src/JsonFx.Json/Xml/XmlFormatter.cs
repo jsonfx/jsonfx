@@ -349,7 +349,8 @@ namespace JsonFx.Xml
 				}
 
 				writer.Write(XmlGrammar.OperatorElementBegin);
-				writer.Write(name.LocalName);
+				// TODO: this is temporary, need to break dependency on XmlConvert
+				writer.Write(System.Xml.XmlConvert.EncodeLocalName(name.LocalName));
 				writer.Write(XmlGrammar.OperatorElementEnd);
 			}
 
@@ -357,14 +358,16 @@ namespace JsonFx.Xml
 			{
 				writer.Write(XmlGrammar.OperatorElementBegin);
 				writer.Write(XmlGrammar.OperatorElementClose);
-				writer.Write(name.LocalName);
+				// TODO: this is temporary, need to break dependency on XmlConvert
+				writer.Write(System.Xml.XmlConvert.EncodeLocalName(name.LocalName));
 				writer.Write(XmlGrammar.OperatorElementEnd);
 			}
 
 			private void WriteTagEmpty(TextWriter writer, DataName name)
 			{
 				writer.Write(XmlGrammar.OperatorElementBegin);
-				writer.Write(name.LocalName);
+				// TODO: this is temporary, need to break dependency on XmlConvert
+				writer.Write(System.Xml.XmlConvert.EncodeLocalName(name.LocalName));
 				writer.Write(XmlGrammar.OperatorValueDelim);
 				writer.Write(XmlGrammar.OperatorElementClose);
 				writer.Write(XmlGrammar.OperatorElementEnd);

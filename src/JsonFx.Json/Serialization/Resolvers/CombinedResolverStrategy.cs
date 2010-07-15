@@ -90,13 +90,13 @@ namespace JsonFx.Serialization.Resolvers
 		/// Gets a value indicating if the property is to be serialized.
 		/// </summary>
 		/// <param name="member"></param>
-		/// <param name="isAnonymousType"></param>
+		/// <param name="isImmutableType"></param>
 		/// <returns>true if any strategy specifies this should be ignored</returns>
-		public bool IsPropertyIgnored(PropertyInfo member, bool isAnonymousType)
+		public bool IsPropertyIgnored(PropertyInfo member, bool isImmutableType)
 		{
 			foreach (IResolverStrategy strategy in this.InnerStrategies)
 			{
-				if (strategy.IsPropertyIgnored(member, isAnonymousType))
+				if (strategy.IsPropertyIgnored(member, isImmutableType))
 				{
 					return true;
 				}

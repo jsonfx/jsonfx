@@ -33,6 +33,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
+using JsonFx.Common.Filters;
 using JsonFx.Serialization.Resolvers;
 
 namespace JsonFx.Serialization
@@ -42,6 +43,12 @@ namespace JsonFx.Serialization
 	/// </summary>
 	public sealed class Token<T>
 	{
+		#region Constants
+
+		private const string FullDateTimeFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'FFFFFFFK";
+
+		#endregion Constants
+
 		#region Fields
 
 		/// <summary>
@@ -173,6 +180,17 @@ namespace JsonFx.Serialization
 			if (value == null)
 			{
 				return String.Empty;
+			}
+
+			if (value is Boolean)
+			{
+				return true.Equals(value) ? "true" : "false";
+			}
+
+			if (value is DateTime)
+			{
+				// default unhandled dates to ISO-8601 with full precision
+				return ((DateTime)value).ToString(Token<T>.FullDateTimeFormat);
 			}
 
 			// allow IConvertable and IFormattable first chance

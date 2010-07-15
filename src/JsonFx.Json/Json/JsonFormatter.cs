@@ -474,17 +474,12 @@ namespace JsonFx.Json
 			/// <returns></returns>
 			private string FormatString(object value)
 			{
-				if (value is string)
-				{
-					return (string)value;
-				}
-
 				if (value is Enum)
 				{
 					return this.FormatEnum((Enum)value);
 				}
 
-				return Convert.ToString(value, CultureInfo.InvariantCulture);
+				return Token<CommonTokenType>.ToString(value);
 			}
 
 			#endregion String Methods

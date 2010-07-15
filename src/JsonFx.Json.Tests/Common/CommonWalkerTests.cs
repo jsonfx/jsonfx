@@ -63,7 +63,7 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenArrayBegin("Array"),
+					CommonGrammar.TokenArrayBegin("array"),
 					CommonGrammar.TokenArrayEnd
 				};
 
@@ -80,7 +80,7 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenArrayBegin("List"),
+					CommonGrammar.TokenArrayBegin("array"),
 					CommonGrammar.TokenArrayEnd
 				};
 
@@ -100,7 +100,7 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenArrayBegin("Array"),
+					CommonGrammar.TokenArrayBegin("array"),
 					CommonGrammar.TokenNull,
 					CommonGrammar.TokenArrayEnd
 				};
@@ -129,7 +129,7 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenArrayBegin("Array"),
+					CommonGrammar.TokenArrayBegin("array"),
 					CommonGrammar.TokenFalse,
 					CommonGrammar.TokenValueDelim,
 					CommonGrammar.TokenTrue,
@@ -180,14 +180,14 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenArrayBegin("Array"),
+					CommonGrammar.TokenArrayBegin("array"),
 					CommonGrammar.TokenFalse,
 					CommonGrammar.TokenValueDelim,
 					CommonGrammar.TokenTrue,
 					CommonGrammar.TokenValueDelim,
 					CommonGrammar.TokenNull,
 					CommonGrammar.TokenValueDelim,
-					CommonGrammar.TokenArrayBegin("Array"),
+					CommonGrammar.TokenArrayBegin("array"),
 					CommonGrammar.TokenValue('a'),
 					CommonGrammar.TokenValueDelim,
 					CommonGrammar.TokenValue('b'),
@@ -195,7 +195,7 @@ namespace JsonFx.Serialization
 					CommonGrammar.TokenValue('c'),
 					CommonGrammar.TokenArrayEnd,
 					CommonGrammar.TokenValueDelim,
-					CommonGrammar.TokenArrayBegin("Array"),
+					CommonGrammar.TokenArrayBegin("array"),
 					CommonGrammar.TokenValue(1),
 					CommonGrammar.TokenValueDelim,
 					CommonGrammar.TokenValue(2),
@@ -222,7 +222,7 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenObjectBegin("Object"),
+					CommonGrammar.TokenObjectBegin("object"),
 					CommonGrammar.TokenObjectEnd
 				};
 
@@ -239,7 +239,7 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenObjectBegin("Dictionary"),
+					CommonGrammar.TokenObjectBegin("object"),
 					CommonGrammar.TokenObjectEnd
 				};
 
@@ -261,7 +261,7 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenObjectBegin("Object"),
+					CommonGrammar.TokenObjectBegin("object"),
 					CommonGrammar.TokenProperty("One"),
 					CommonGrammar.TokenValue(1),
 					CommonGrammar.TokenValueDelim,
@@ -289,7 +289,7 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenObjectBegin("ExpandoObject"),
+					CommonGrammar.TokenObjectBegin("object"),
 					CommonGrammar.TokenProperty("One"),
 					CommonGrammar.TokenValue(1),
 					CommonGrammar.TokenValueDelim,
@@ -319,7 +319,7 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenObjectBegin("Dictionary"),
+					CommonGrammar.TokenObjectBegin("object"),
 					CommonGrammar.TokenProperty("One"),
 					CommonGrammar.TokenValue(1),
 					CommonGrammar.TokenValueDelim,
@@ -541,20 +541,20 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 			{
-				CommonGrammar.TokenArrayBegin("Array"),
+				CommonGrammar.TokenArrayBegin("array"),
 				CommonGrammar.TokenValue("JSON Test Pattern pass1"),
 				CommonGrammar.TokenValueDelim,
-				CommonGrammar.TokenObjectBegin("Dictionary"),
+				CommonGrammar.TokenObjectBegin("object"),
 				CommonGrammar.TokenProperty("object with 1 member"),
-				CommonGrammar.TokenArrayBegin("Array"),
+				CommonGrammar.TokenArrayBegin("array"),
 				CommonGrammar.TokenValue("array with 1 element"),
 				CommonGrammar.TokenArrayEnd,
 				CommonGrammar.TokenObjectEnd,
 				CommonGrammar.TokenValueDelim,
-				CommonGrammar.TokenObjectBegin("Dictionary"),
+				CommonGrammar.TokenObjectBegin("object"),
 				CommonGrammar.TokenObjectEnd,
 				CommonGrammar.TokenValueDelim,
-				CommonGrammar.TokenArrayBegin("Array"),
+				CommonGrammar.TokenArrayBegin("array"),
 				CommonGrammar.TokenArrayEnd,
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(-42),
@@ -565,7 +565,7 @@ namespace JsonFx.Serialization
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenNull,
 				CommonGrammar.TokenValueDelim,
-				CommonGrammar.TokenObjectBegin("Dictionary"),
+				CommonGrammar.TokenObjectBegin("object"),
 				CommonGrammar.TokenProperty("integer"),
 				CommonGrammar.TokenValue(1234567890),
 				CommonGrammar.TokenValueDelim,
@@ -630,11 +630,11 @@ namespace JsonFx.Serialization
 				CommonGrammar.TokenNull,
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("array"),
-				CommonGrammar.TokenArrayBegin("Array"),
+				CommonGrammar.TokenArrayBegin("array"),
 				CommonGrammar.TokenArrayEnd,
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("object"),
-				CommonGrammar.TokenObjectBegin("Dictionary"),
+				CommonGrammar.TokenObjectBegin("object"),
 				CommonGrammar.TokenObjectEnd,
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("address"),
@@ -650,7 +650,7 @@ namespace JsonFx.Serialization
 				CommonGrammar.TokenValue(" "),
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty(" s p a c e d "),
-				CommonGrammar.TokenArrayBegin("Array"),
+				CommonGrammar.TokenArrayBegin("array"),
 				CommonGrammar.TokenValue(1),
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(2),
@@ -667,7 +667,7 @@ namespace JsonFx.Serialization
 				CommonGrammar.TokenArrayEnd,
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("compact"),
-				CommonGrammar.TokenArrayBegin("Array"),
+				CommonGrammar.TokenArrayBegin("array"),
 				CommonGrammar.TokenValue(1),
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(2),
@@ -773,7 +773,7 @@ namespace JsonFx.Serialization
 				CommonGrammar.TokenNull,
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("Children"),
-				CommonGrammar.TokenArrayBegin("Array"),
+				CommonGrammar.TokenArrayBegin("array"),
 				CommonGrammar.TokenNull,
 				CommonGrammar.TokenArrayEnd,
 				CommonGrammar.TokenObjectEnd,
@@ -791,7 +791,7 @@ namespace JsonFx.Serialization
 				CommonGrammar.TokenNull,
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("Children"),
-				CommonGrammar.TokenArrayBegin("Array"),
+				CommonGrammar.TokenArrayBegin("array"),
 				CommonGrammar.TokenNull,
 				CommonGrammar.TokenArrayEnd,
 				CommonGrammar.TokenObjectEnd,

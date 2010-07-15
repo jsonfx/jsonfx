@@ -54,9 +54,9 @@ namespace JsonFx.Serialization.Resolvers
 		/// Gets a value indicating if the property is to be serialized.
 		/// </summary>
 		/// <param name="member"></param>
-		/// <param name="isAnonymousType"></param>
+		/// <param name="isImmutableType"></param>
 		/// <returns></returns>
-		bool IsPropertyIgnored(PropertyInfo member, bool isAnonymousType);
+		bool IsPropertyIgnored(PropertyInfo member, bool isImmutableType);
 
 		/// <summary>
 		/// Gets a value indicating if the field is to be serialized.

@@ -52,14 +52,14 @@ namespace JsonFx.Json.Resolvers
 		/// Gets a value indicating if the property is to be serialized.
 		/// </summary>
 		/// <param name="member"></param>
-		/// <param name="isAnonymousType"></param>
+		/// <param name="isImmutableType"></param>
 		/// <returns></returns>
-		/// <remarks>default implementation is must be read/write properties, or read-only anonymous</remarks>
-		public override bool IsPropertyIgnored(PropertyInfo member, bool isAnonymousType)
+		/// <remarks>default implementation is must be read/write properties, or immutable</remarks>
+		public override bool IsPropertyIgnored(PropertyInfo member, bool isImmutableType)
 		{
 			// must satisfy POCO rules and not be ignored
 			return
-				base.IsPropertyIgnored(member, isAnonymousType) ||
+				base.IsPropertyIgnored(member, isImmutableType) ||
 				TypeCoercionUtility.HasAttribute<JsonIgnoreAttribute>(member);
 		}
 

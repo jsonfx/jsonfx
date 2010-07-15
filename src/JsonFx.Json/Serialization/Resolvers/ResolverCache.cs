@@ -66,7 +66,8 @@ namespace JsonFx.Serialization.Resolvers
 		/// </summary>
 		/// <param name="propertyInfo"></param>
 		/// <param name="dataName"></param>
-		public MemberMap(PropertyInfo propertyInfo, DataName dataName)
+		/// <param name="isIgnored"></param>
+		public MemberMap(PropertyInfo propertyInfo, DataName dataName, ValueIgnoredDelegate isIgnored)
 		{
 			if (propertyInfo == null)
 			{
@@ -79,6 +80,7 @@ namespace JsonFx.Serialization.Resolvers
 			this.Type = propertyInfo.PropertyType;
 			this.Getter = DynamicMethodGenerator.GetPropertyGetter(propertyInfo);
 			this.Setter = DynamicMethodGenerator.GetPropertySetter(propertyInfo);
+			this.IsIgnored = isIgnored;
 		}
 
 		/// <summary>
@@ -86,7 +88,8 @@ namespace JsonFx.Serialization.Resolvers
 		/// </summary>
 		/// <param name="fieldInfo"></param>
 		/// <param name="dataName"></param>
-		public MemberMap(FieldInfo fieldInfo, DataName dataName)
+		/// <param name="isIgnored"></param>
+		public MemberMap(FieldInfo fieldInfo, DataName dataName, ValueIgnoredDelegate isIgnored)
 		{
 			if (fieldInfo == null)
 			{
@@ -99,6 +102,7 @@ namespace JsonFx.Serialization.Resolvers
 			this.Type = fieldInfo.FieldType;
 			this.Getter = DynamicMethodGenerator.GetFieldGetter(fieldInfo);
 			this.Setter = DynamicMethodGenerator.GetFieldSetter(fieldInfo);
+			this.IsIgnored = isIgnored;
 		}
 
 		#endregion Init
@@ -276,12 +280,10 @@ namespace JsonFx.Serialization.Resolvers
 		#region Constants
 
 		private const string AnonymousTypePrefix = "<>f__AnonymousType";
+
 #if NET20 || NET30
 		private const int LockTimeout = 250;
 #endif
-
-		private static readonly DataName GenericObjectName = new DataName(typeof(Object).Name);
-		private static readonly DataName GenericArrayName = new DataName(typeof(Array).Name);
 
 		#endregion Constants
 
@@ -336,7 +338,7 @@ namespace JsonFx.Serialization.Resolvers
 		{
 			if (type == null)
 			{
-				return this.GetDefaultName(type);
+				return new DataName(type);
 			}
 
 			DataName name;
@@ -481,7 +483,7 @@ namespace JsonFx.Serialization.Resolvers
 			DataName typeName = this.Strategy.GetName(objectType);
 			if (typeName == null)
 			{
-				typeName = this.GetDefaultName(objectType);
+				typeName = new DataName(objectType);
 			}
 
 			if (objectType.IsEnum)
@@ -520,12 +522,12 @@ namespace JsonFx.Serialization.Resolvers
 			// create new map
 			map = new Dictionary<string, MemberMap>();
 
-			bool isAnonymousType = objectType.IsGenericType && objectType.Name.StartsWith(ResolverCache.AnonymousTypePrefix, false, CultureInfo.InvariantCulture);
+			bool isImmutableType = objectType.IsGenericType && objectType.Name.StartsWith(ResolverCache.AnonymousTypePrefix, false, CultureInfo.InvariantCulture);
 
 			// load properties into property map
 			foreach (PropertyInfo info in objectType.GetProperties(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic))
 			{
-				if (this.Strategy.IsPropertyIgnored(info, isAnonymousType))
+				if (this.Strategy.IsPropertyIgnored(info, isImmutableType))
 				{
 					continue;
 				}
@@ -536,7 +538,9 @@ namespace JsonFx.Serialization.Resolvers
 					name = new DataName(info.Name);
 				}
 
-				map[name.LocalName] = new MemberMap(info, name);
+				ValueIgnoredDelegate isIgnored = this.Strategy.GetValueIgnoredCallback(info);
+
+				map[name.LocalName] = new MemberMap(info, name, isIgnored);
 			}
 
 			// load fields into property map
@@ -553,7 +557,9 @@ namespace JsonFx.Serialization.Resolvers
 					name = new DataName(info.Name);
 				}
 
-				map[name.LocalName] = new MemberMap(info, name);
+				ValueIgnoredDelegate isIgnored = this.Strategy.GetValueIgnoredCallback(info);
+
+				map[name.LocalName] = new MemberMap(info, name, isIgnored);
 			}
 
 #if NET20 || NET30
@@ -589,7 +595,7 @@ namespace JsonFx.Serialization.Resolvers
 			DataName typeName = this.Strategy.GetName(enumType);
 			if (typeName == null)
 			{
-				typeName = this.GetDefaultName(enumType);
+				typeName = new DataName(enumType);
 			}
 
 			IDictionary<string, MemberMap> maps = new Dictionary<string, MemberMap>();
@@ -604,7 +610,7 @@ namespace JsonFx.Serialization.Resolvers
 				}
 
 				MemberMap enumMap;
-				maps[name.LocalName] = enumMap = new MemberMap(info, name);
+				maps[name.LocalName] = enumMap = new MemberMap(info, name, null);
 				enumMaps[(Enum)enumMap.Getter(null)] = name.LocalName;
 			}
 
@@ -687,33 +693,5 @@ namespace JsonFx.Serialization.Resolvers
 		}
 
 		#endregion Factory Methods
-
-		#region Utility Methods
-
-		private DataName GetDefaultName(Type type)
-		{
-			if (type == null ||
-				(type.IsGenericType && type.Name.StartsWith(ResolverCache.AnonymousTypePrefix, false, CultureInfo.InvariantCulture)))
-			{
-				return ResolverCache.GenericObjectName;
-			}
-			
-			if (type.IsArray)
-			{
-				return ResolverCache.GenericArrayName;
-			}
-
-			string typeName = type.Name;
-
-			int tick = typeName.IndexOf('`');
-			if (tick >= 0)
-			{
-				typeName = typeName.Substring(0, tick);
-			}
-
-			return new DataName(typeName);
-		}
-
-		#endregion Utility Methods
 	}
 }
