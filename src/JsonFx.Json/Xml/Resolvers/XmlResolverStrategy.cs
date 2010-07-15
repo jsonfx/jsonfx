@@ -239,6 +239,8 @@ namespace JsonFx.Xml.Resolvers
 			XmlArrayAttribute arrayAttr = TypeCoercionUtility.GetAttribute<XmlArrayAttribute>(member);
 			if (arrayAttr != null && !String.IsNullOrEmpty(arrayAttr.ElementName))
 			{
+				// TODO: figure out a way to surface XmlArrayItemAttribute name too
+
 				return new DataName(arrayAttr.ElementName, arrayAttr.Namespace);
 			}
 

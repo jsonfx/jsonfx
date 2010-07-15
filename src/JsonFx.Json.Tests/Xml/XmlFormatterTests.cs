@@ -53,7 +53,7 @@ namespace JsonFx.Xml
 				CommonGrammar.TokenArrayEnd
 			};
 
-			const string expected = @"<Data></Data>";
+			const string expected = @"<Array></Array>";
 
 			var formatter = new XmlWriter.XmlFormatter(new DataWriterSettings());
 			var actual = formatter.Format(input);
@@ -70,7 +70,7 @@ namespace JsonFx.Xml
 				CommonGrammar.TokenArrayEnd
 			};
 
-			const string expected = @"<Data></Data>";
+			const string expected = @"<Array></Array>";
 
 			var formatter = new XmlWriter.XmlFormatter(new DataWriterSettings { PrettyPrint=true });
 			var actual = formatter.Format(input);
@@ -88,7 +88,7 @@ namespace JsonFx.Xml
 				CommonGrammar.TokenArrayEnd
 			};
 
-			const string expected = @"<Data><Data /></Data>";
+			const string expected = @"<Array><Object /></Array>";
 
 			var formatter = new XmlWriter.XmlFormatter(new DataWriterSettings());
 			var actual = formatter.Format(input);
@@ -107,9 +107,9 @@ namespace JsonFx.Xml
 			};
 
 			const string expected =
-@"<Data>
-	<Data />
-</Data>";
+@"<Array>
+	<Object />
+</Array>";
 
 			var formatter = new XmlWriter.XmlFormatter(new DataWriterSettings { PrettyPrint=true });
 			var actual = formatter.Format(input);
@@ -134,7 +134,7 @@ namespace JsonFx.Xml
 			};
 
 			// TODO: update when primitives are correctly converting
-			const string expected = @"<Data><Data>0</Data><Data /><Data>False</Data><Data>True</Data></Data>";
+			const string expected = @"<Array><Int32>0</Int32><Object /><Boolean>False</Boolean><Boolean>True</Boolean></Array>";
 
 			var formatter = new XmlWriter.XmlFormatter(new DataWriterSettings());
 			var actual = formatter.Format(input);
@@ -160,12 +160,12 @@ namespace JsonFx.Xml
 
 			// TODO: update when primitives are correctly converting
 			const string expected =
-@"<Data>
-	<Data>0</Data>
-	<Data />
-	<Data>False</Data>
-	<Data>True</Data>
-</Data>";
+@"<Array>
+	<Int32>0</Int32>
+	<Object />
+	<Boolean>False</Boolean>
+	<Boolean>True</Boolean>
+</Array>";
 
 			var formatter = new XmlWriter.XmlFormatter(new DataWriterSettings { PrettyPrint=true });
 			var actual = formatter.Format(input);
@@ -220,7 +220,7 @@ namespace JsonFx.Xml
 				CommonGrammar.TokenArrayEnd
 			};
 
-			const string expected = @"<Data><Data><Data><Data><Data><Data><Data><Data><Data><Data><Data><Data><Data><Data><Data><Data><Data><Data><Data><Data>Not too deep</Data></Data></Data></Data></Data></Data></Data></Data></Data></Data></Data></Data></Data></Data></Data></Data></Data></Data></Data></Data>";
+			const string expected = @"<Array><Array><Array><Array><Array><Array><Array><Array><Array><Array><Array><Array><Array><Array><Array><Array><Array><Array><Array><String>Not too deep</String></Array></Array></Array></Array></Array></Array></Array></Array></Array></Array></Array></Array></Array></Array></Array></Array></Array></Array></Array>";
 
 			var formatter = new XmlWriter.XmlFormatter(new DataWriterSettings());
 			var actual = formatter.Format(input);
@@ -276,45 +276,45 @@ namespace JsonFx.Xml
 			};
 
 			const string expected =
-@"<Data>
-	<Data>
-		<Data>
-			<Data>
-				<Data>
-					<Data>
-						<Data>
-							<Data>
-								<Data>
-									<Data>
-										<Data>
-											<Data>
-												<Data>
-													<Data>
-														<Data>
-															<Data>
-																<Data>
-																	<Data>
-																		<Data>
-																			<Data>Not too deep</Data>
-																		</Data>
-																	</Data>
-																</Data>
-															</Data>
-														</Data>
-													</Data>
-												</Data>
-											</Data>
-										</Data>
-									</Data>
-								</Data>
-							</Data>
-						</Data>
-					</Data>
-				</Data>
-			</Data>
-		</Data>
-	</Data>
-</Data>";
+@"<Array>
+	<Array>
+		<Array>
+			<Array>
+				<Array>
+					<Array>
+						<Array>
+							<Array>
+								<Array>
+									<Array>
+										<Array>
+											<Array>
+												<Array>
+													<Array>
+														<Array>
+															<Array>
+																<Array>
+																	<Array>
+																		<Array>
+																			<String>Not too deep</String>
+																		</Array>
+																	</Array>
+																</Array>
+															</Array>
+														</Array>
+													</Array>
+												</Array>
+											</Array>
+										</Array>
+									</Array>
+								</Array>
+							</Array>
+						</Array>
+					</Array>
+				</Array>
+			</Array>
+		</Array>
+	</Array>
+</Array>";
 
 			var formatter = new XmlWriter.XmlFormatter(new DataWriterSettings { PrettyPrint=true });
 			var actual = formatter.Format(input);
@@ -335,7 +335,7 @@ namespace JsonFx.Xml
 				CommonGrammar.TokenObjectEnd
 			};
 
-			const string expected = @"<Data></Data>";
+			const string expected = @"<Object></Object>";
 
 			var formatter = new XmlWriter.XmlFormatter(new DataWriterSettings());
 			var actual = formatter.Format(input);
@@ -352,7 +352,7 @@ namespace JsonFx.Xml
 				CommonGrammar.TokenObjectEnd
 			};
 
-			const string expected = @"<Data></Data>";
+			const string expected = @"<Object></Object>";
 
 			var formatter = new XmlWriter.XmlFormatter(new DataWriterSettings { PrettyPrint = true });
 			var actual = formatter.Format(input);
@@ -371,7 +371,7 @@ namespace JsonFx.Xml
 				CommonGrammar.TokenObjectEnd
 			};
 
-			const string expected = @"<Data><key>value</key></Data>";
+			const string expected = @"<Object><key>value</key></Object>";
 
 			var formatter = new XmlWriter.XmlFormatter(new DataWriterSettings());
 			var actual = formatter.Format(input);
@@ -384,16 +384,16 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBegin("Object"),
+				CommonGrammar.TokenObjectBegin("Yada"),
 				CommonGrammar.TokenProperty("key"),
 				CommonGrammar.TokenValue("value"),
 				CommonGrammar.TokenObjectEnd
 			};
 
 			const string expected =
-@"<Object>
+@"<Yada>
 	<key>value</key>
-</Object>";
+</Yada>";
 
 			var formatter = new XmlWriter.XmlFormatter(new DataWriterSettings { PrettyPrint = true });
 			var actual = formatter.Format(input);
@@ -420,7 +420,7 @@ namespace JsonFx.Xml
 			};
 
 			// TODO: encode DataName values
-			const string expected = @"<Data><JSON Test Pattern pass3><The outermost value>must be an object or array.</The outermost value><In this test>It is an object.</In this test></JSON Test Pattern pass3></Data>";
+			const string expected = @"<Object><JSON Test Pattern pass3><The outermost value>must be an object or array.</The outermost value><In this test>It is an object.</In this test></JSON Test Pattern pass3></Object>";
 
 			var formatter = new XmlWriter.XmlFormatter(new DataWriterSettings());
 			var actual = formatter.Format(input);
@@ -465,8 +465,8 @@ namespace JsonFx.Xml
 
 		#region Namespace Tests
 
-		[Fact]
-		public void Format_ObjectOneNamespacedProperty_CorrectlyIgnoresNamespace()
+		[Fact(Skip="XML Namespaces are not yet implemented")]
+		public void Format_NamespacedObjectOneProperty_CorrectlyIgnoresNamespace()
 		{
 			var input = new[]
 			{
@@ -476,8 +476,26 @@ namespace JsonFx.Xml
 				CommonGrammar.TokenObjectEnd
 			};
 
-			// TODO: support namespaces
-			const string expected = @"<foo><key>value</key></foo>";
+			const string expected = @"<foo><a:key xmlns:a=""http://json.org"">value</a:key></foo>";
+
+			var formatter = new XmlWriter.XmlFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact(Skip="XML Namespaces are not yet implemented")]
+		public void Format_ObjectOneNamespacedProperty_CorrectlyIgnoresNamespace()
+		{
+			var input = new[]
+			{
+				CommonGrammar.TokenObjectBegin("foo", "http://json.org"),
+				CommonGrammar.TokenProperty("key"),
+				CommonGrammar.TokenValue("value"),
+				CommonGrammar.TokenObjectEnd
+			};
+
+			const string expected = @"<a:foo xmlns:a=""http://json.org""><key>value</key></a:foo>";
 
 			var formatter = new XmlWriter.XmlFormatter(new DataWriterSettings());
 			var actual = formatter.Format(input);

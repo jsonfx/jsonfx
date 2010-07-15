@@ -113,7 +113,7 @@ namespace JsonFx.Xml
 			/// </summary>
 			/// <param name="writer"></param>
 			/// <param name="tokens"></param>
-			public void WriteValue(TextWriter writer, IStream<Token<CommonTokenType>> tokens, string elementName)
+			private void WriteValue(TextWriter writer, IStream<Token<CommonTokenType>> tokens, DataName elementName)
 			{
 				if (this.pendingNewLine)
 				{
@@ -142,18 +142,15 @@ namespace JsonFx.Xml
 					{
 						tokens.Pop();
 
-						if (String.IsNullOrEmpty(elementName))
-						{
-							elementName = "Data";
-						}
-
 						string value = token.ValueAsString();
 						if (String.IsNullOrEmpty(value))
 						{
+							elementName = this.EnsureName(elementName ?? token.Name, null);
 							WriteTagEmpty(writer, elementName);
 						}
 						else
 						{
+							elementName = this.EnsureName(elementName ?? token.Name, token.Value.GetType());
 							WriteTagOpen(writer, elementName);
 							writer.Write(value);
 							WriteTagClose(writer, elementName);
@@ -167,23 +164,17 @@ namespace JsonFx.Xml
 				}
 			}
 
-			private void WriteArray(TextWriter writer, IStream<Token<CommonTokenType>> tokens, string elementName)
+			private void WriteArray(TextWriter writer, IStream<Token<CommonTokenType>> tokens, DataName elementName)
 			{
 				Token<CommonTokenType> token = tokens.Pop();
 
 				// ensure element has a name
-				if (String.IsNullOrEmpty(elementName))
-				{
-					elementName = (token.Name ?? DataName.Empty).LocalName;
+				elementName = this.EnsureName(elementName ?? token.Name, typeof(Array));
 
-					if (String.IsNullOrEmpty(elementName))
-					{
-						elementName = "Data";
-					}
-				}
+				// TODO: figure out a way to surface XmlArrayItemAttribute name too
 
 				WriteTagOpen(writer, elementName);
-				pendingNewLine = true;
+				this.pendingNewLine = true;
 
 				bool needsValueDelim = false;
 				while (!tokens.IsCompleted)
@@ -218,21 +209,19 @@ namespace JsonFx.Xml
 								throw new TokenException<CommonTokenType>(token, "Missing value delimiter");
 							}
 
-							if (pendingNewLine)
+							if (this.pendingNewLine)
 							{
 								if (this.Settings.PrettyPrint)
 								{
 									this.depth++;
 									this.WriteLine(writer);
 								}
-								pendingNewLine = false;
+								this.pendingNewLine = false;
 							}
 
-							string propertyName = (token.Name ?? DataName.Empty).LocalName;
+							this.WriteValue(writer, tokens, (token.Name ?? DataName.Empty));
 
-							this.WriteValue(writer, tokens, propertyName);
-
-							pendingNewLine = false;
+							this.pendingNewLine = false;
 							needsValueDelim = true;
 							break;
 						}
@@ -260,20 +249,12 @@ namespace JsonFx.Xml
 				}
 			}
 
-			private void WriteObject(TextWriter writer, IStream<Token<CommonTokenType>> tokens, string elementName)
+			private void WriteObject(TextWriter writer, IStream<Token<CommonTokenType>> tokens, DataName elementName)
 			{
 				Token<CommonTokenType> token = tokens.Pop();
 
 				// ensure element has a name
-				if (String.IsNullOrEmpty(elementName))
-				{
-					elementName = (token.Name ?? DataName.Empty).LocalName;
-
-					if (String.IsNullOrEmpty(elementName))
-					{
-						elementName = "Data";
-					}
-				}
+				elementName = this.EnsureName(elementName ?? token.Name, typeof(Object));
 
 				WriteTagOpen(writer, elementName);
 				this.pendingNewLine = true;
@@ -311,21 +292,19 @@ namespace JsonFx.Xml
 								throw new TokenException<CommonTokenType>(token, "Missing value delimiter");
 							}
 
-							if (pendingNewLine)
+							if (this.pendingNewLine)
 							{
 								if (this.Settings.PrettyPrint)
 								{
 									this.depth++;
 									this.WriteLine(writer);
 								}
-								pendingNewLine = false;
+								this.pendingNewLine = false;
 							}
 
-							string propertyName = (token.Name ?? DataName.Empty).LocalName;
+							this.WriteValue(writer, tokens, (token.Name ?? DataName.Empty));
 
-							this.WriteValue(writer, tokens, propertyName);
-
-							pendingNewLine = false;
+							this.pendingNewLine = false;
 							needsValueDelim = true;
 							break;
 						}
@@ -357,7 +336,7 @@ namespace JsonFx.Xml
 
 			#region Write Methods
 
-			private void WriteTagOpen(TextWriter writer, string name)
+			private void WriteTagOpen(TextWriter writer, DataName name)
 			{
 				if (this.pendingNewLine)
 				{
@@ -370,22 +349,22 @@ namespace JsonFx.Xml
 				}
 
 				writer.Write(XmlGrammar.OperatorElementBegin);
-				writer.Write(name);
+				writer.Write(name.LocalName);
 				writer.Write(XmlGrammar.OperatorElementEnd);
 			}
 
-			private void WriteTagClose(TextWriter writer, string name)
+			private void WriteTagClose(TextWriter writer, DataName name)
 			{
 				writer.Write(XmlGrammar.OperatorElementBegin);
 				writer.Write(XmlGrammar.OperatorElementClose);
-				writer.Write(name);
+				writer.Write(name.LocalName);
 				writer.Write(XmlGrammar.OperatorElementEnd);
 			}
 
-			private void WriteTagEmpty(TextWriter writer, string name)
+			private void WriteTagEmpty(TextWriter writer, DataName name)
 			{
 				writer.Write(XmlGrammar.OperatorElementBegin);
-				writer.Write(name);
+				writer.Write(name.LocalName);
 				writer.Write(XmlGrammar.OperatorValueDelim);
 				writer.Write(XmlGrammar.OperatorElementClose);
 				writer.Write(XmlGrammar.OperatorElementEnd);
@@ -403,6 +382,20 @@ namespace JsonFx.Xml
 			}
 
 			#endregion Write Methods
+
+			#region Utility Methods
+
+			private DataName EnsureName(DataName name, Type type)
+			{
+				if (name == null || String.IsNullOrEmpty(name.LocalName))
+				{
+					return this.Settings.Resolver.LoadTypeName(type);
+				}
+
+				return name;
+			}
+
+			#endregion Utility Methods
 		}
 	}
 }

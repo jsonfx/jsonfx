@@ -280,6 +280,9 @@ namespace JsonFx.Serialization.Resolvers
 		private const int LockTimeout = 250;
 #endif
 
+		private static readonly DataName GenericObjectName = new DataName(typeof(Object).Name);
+		private static readonly DataName GenericArrayName = new DataName(typeof(Array).Name);
+
 		#endregion Constants
 
 		#region Fields
@@ -333,7 +336,7 @@ namespace JsonFx.Serialization.Resolvers
 		{
 			if (type == null)
 			{
-				return DataName.Empty;
+				return this.GetDefaultName(type);
 			}
 
 			DataName name;
@@ -475,19 +478,10 @@ namespace JsonFx.Serialization.Resolvers
 		/// <param name="objectType"></param>
 		private DataName BuildMap(Type objectType, out IDictionary<string, MemberMap> map)
 		{
-			bool isAnonymousType = objectType.IsGenericType && objectType.Name.StartsWith(ResolverCache.AnonymousTypePrefix, false, CultureInfo.InvariantCulture);
-
 			DataName typeName = this.Strategy.GetName(objectType);
 			if (typeName == null)
 			{
-				// TODO: is this the best place for default naming?
-				string objectName = isAnonymousType ? typeof(object).Name : objectType.Name.Replace("[]", typeof(Array).Name);
-				int tick = objectName.IndexOf('`');
-				if (tick >= 0)
-				{
-					objectName = objectName.Substring(0, tick);
-				}
-				typeName = new DataName(objectName);
+				typeName = this.GetDefaultName(objectType);
 			}
 
 			if (objectType.IsEnum)
@@ -525,6 +519,8 @@ namespace JsonFx.Serialization.Resolvers
 
 			// create new map
 			map = new Dictionary<string, MemberMap>();
+
+			bool isAnonymousType = objectType.IsGenericType && objectType.Name.StartsWith(ResolverCache.AnonymousTypePrefix, false, CultureInfo.InvariantCulture);
 
 			// load properties into property map
 			foreach (PropertyInfo info in objectType.GetProperties(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic))
@@ -593,7 +589,7 @@ namespace JsonFx.Serialization.Resolvers
 			DataName typeName = this.Strategy.GetName(enumType);
 			if (typeName == null)
 			{
-				typeName = new DataName(enumType.Name);
+				typeName = this.GetDefaultName(enumType);
 			}
 
 			IDictionary<string, MemberMap> maps = new Dictionary<string, MemberMap>();
@@ -691,5 +687,33 @@ namespace JsonFx.Serialization.Resolvers
 		}
 
 		#endregion Factory Methods
+
+		#region Utility Methods
+
+		private DataName GetDefaultName(Type type)
+		{
+			if (type == null ||
+				(type.IsGenericType && type.Name.StartsWith(ResolverCache.AnonymousTypePrefix, false, CultureInfo.InvariantCulture)))
+			{
+				return ResolverCache.GenericObjectName;
+			}
+			
+			if (type.IsArray)
+			{
+				return ResolverCache.GenericArrayName;
+			}
+
+			string typeName = type.Name;
+
+			int tick = typeName.IndexOf('`');
+			if (tick >= 0)
+			{
+				typeName = typeName.Substring(0, tick);
+			}
+
+			return new DataName(typeName);
+		}
+
+		#endregion Utility Methods
 	}
 }
