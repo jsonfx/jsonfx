@@ -51,7 +51,7 @@ namespace JsonFx.Common
 		public static readonly Token<CommonTokenType> TokenObjectEnd = new Token<CommonTokenType>(CommonTokenType.ObjectEnd);
 		public static readonly Token<CommonTokenType> TokenValueDelim = new Token<CommonTokenType>(CommonTokenType.ValueDelim);
 
-		public static readonly Token<CommonTokenType> TokenNull = new Token<CommonTokenType>(CommonTokenType.Primitive, null);
+		public static readonly Token<CommonTokenType> TokenNull = new Token<CommonTokenType>(CommonTokenType.Primitive);
 		public static readonly Token<CommonTokenType> TokenFalse = new Token<CommonTokenType>(CommonTokenType.Primitive, false);
 		public static readonly Token<CommonTokenType> TokenTrue = new Token<CommonTokenType>(CommonTokenType.Primitive, true);
 
@@ -140,6 +140,18 @@ namespace JsonFx.Common
 		public static Token<CommonTokenType> TokenObjectBegin(DataName name)
 		{
 			return new Token<CommonTokenType>(CommonTokenType.ObjectBegin, name);
+		}
+
+		/// <summary>
+		/// Marks the beginning of an object property
+		/// </summary>
+		/// <param name="localName">the local name of the property</param>
+		/// <returns>PropertyKey Token</returns>
+		internal static Token<CommonTokenType> TokenProperty(object localName)
+		{
+			string name = Token<CommonTokenType>.ToString(localName);
+
+			return new Token<CommonTokenType>(CommonTokenType.Property, new DataName(name));
 		}
 
 		/// <summary>

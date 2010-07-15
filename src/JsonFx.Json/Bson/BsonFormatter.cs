@@ -213,8 +213,7 @@ namespace JsonFx.Bson
 								String.Format(BsonWriter.ErrorUnexpectedToken, token.TokenType));
 						}
 
-						DataName name = token.Value as DataName;
-						ename = (name == null) ? token.ValueAsString() : name.LocalName;
+						ename = (token.Name ?? DataName.Empty).LocalName;
 
 						// consume property name
 						tokens.Pop();

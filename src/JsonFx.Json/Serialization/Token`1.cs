@@ -33,6 +33,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
+using JsonFx.Serialization.Resolvers;
+
 namespace JsonFx.Serialization
 {
 	/// <summary>
@@ -42,7 +44,19 @@ namespace JsonFx.Serialization
 	{
 		#region Fields
 
+		/// <summary>
+		/// The type of the token
+		/// </summary>
 		public readonly T TokenType;
+
+		/// <summary>
+		/// The name of the token (mutually exclusive with value and null when not applicable)
+		/// </summary>
+		public readonly DataName Name;
+
+		/// <summary>
+		/// The value of the token (mutually exclusive with name and null when not applicable)
+		/// </summary>
 		public readonly object Value;
 
 		#endregion Fields
@@ -54,8 +68,8 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="tokenType"></param>
 		public Token(T tokenType)
-			: this(tokenType, null)
 		{
+			this.TokenType = tokenType;
 		}
 
 		/// <summary>
@@ -67,6 +81,17 @@ namespace JsonFx.Serialization
 		{
 			this.TokenType = tokenType;
 			this.Value = value;
+		}
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="tokenType"></param>
+		/// <param name="name"></param>
+		public Token(T tokenType, DataName name)
+		{
+			this.TokenType = tokenType;
+			this.Name = name;
 		}
 
 		#endregion Init
@@ -83,7 +108,12 @@ namespace JsonFx.Serialization
 
 			builder.Append("{ ");
 			builder.Append(this.TokenType);
-			if (this.Value != null)
+			if (this.Name != null)
+			{
+				builder.Append("=");
+				builder.Append(this.Name);
+			}
+			else if (this.Value != null)
 			{
 				builder.Append("=");
 				builder.Append(this.ValueAsString());
@@ -103,15 +133,19 @@ namespace JsonFx.Serialization
 
 			return
 				EqualityComparer<T>.Default.Equals(this.TokenType, that.TokenType) &&
+				EqualityComparer<DataName>.Default.Equals(this.Name, that.Name) &&
 				EqualityComparer<object>.Default.Equals(this.Value, that.Value);
 		}
 
 		public override int GetHashCode()
 		{
+			// equivalent to new { this.TokenType, this.Name, this.Value }.GetHashCode()
+
 			const int ShiftValue = -1521134295;
 
-			int hashcode = -1321491941;
+			int hashcode = 0x43F0F47E;
 			hashcode = (ShiftValue * hashcode) + EqualityComparer<T>.Default.GetHashCode(this.TokenType);
+			hashcode = (ShiftValue * hashcode) + EqualityComparer<DataName>.Default.GetHashCode(this.Name);
 			hashcode = (ShiftValue * hashcode) + EqualityComparer<object>.Default.GetHashCode(this.Value);
 			return hashcode;
 		}

@@ -346,8 +346,7 @@ namespace JsonFx.Common
 					appendDelim = true;
 				}
 
-				string name = Token<CommonTokenType>.ToString(enumerator.Key);
-				tokens.Enqueue(CommonGrammar.TokenProperty(name));
+				tokens.Enqueue(CommonGrammar.TokenProperty(enumerator.Key));
 				this.GetTokens(tokens, detector, enumerator.Value);
 			}
 
