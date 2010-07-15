@@ -219,11 +219,11 @@ namespace JsonFx.Serialization
 	}
 
 	/// <summary>
-	/// Indicates an error occurred during token analysis
+	/// Indicates an error occurred during token consumption
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
 	[Serializable]
-	public class AnalyzerException<T> : SerializationException
+	public class TokenException<T> : SerializationException
 	{
 		#region Fields
 
@@ -236,7 +236,7 @@ namespace JsonFx.Serialization
 		/// <summary>
 		/// Ctor
 		/// </summary>
-		public AnalyzerException(Token<T> token)
+		public TokenException(Token<T> token)
 			: base()
 		{
 			this.token = token;
@@ -246,7 +246,7 @@ namespace JsonFx.Serialization
 		/// Ctor
 		/// </summary>
 		/// <param name="message"></param>
-		public AnalyzerException(Token<T> token, string message)
+		public TokenException(Token<T> token, string message)
 			: base(message)
 		{
 			this.token = token;
@@ -257,7 +257,7 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="message"></param>
 		/// <param name="innerException"></param>
-		public AnalyzerException(Token<T> token, string message, Exception innerException)
+		public TokenException(Token<T> token, string message, Exception innerException)
 			: base(message, innerException)
 		{
 			this.token = token;
@@ -268,7 +268,7 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="info"></param>
 		/// <param name="context"></param>
-		public AnalyzerException(
+		public TokenException(
 			System.Runtime.Serialization.SerializationInfo info,
 			System.Runtime.Serialization.StreamingContext context)
 			: base(info, context)

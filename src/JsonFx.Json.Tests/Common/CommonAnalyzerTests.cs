@@ -232,7 +232,7 @@ namespace JsonFx.Serialization
 
 			var analyzer = new CommonAnalyzer(new DataReaderSettings());
 
-			AnalyzerException<CommonTokenType> ex = Assert.Throws<AnalyzerException<CommonTokenType>>(
+			TokenException<CommonTokenType> ex = Assert.Throws<TokenException<CommonTokenType>>(
 				delegate
 				{
 					var actual = analyzer.Analyze<object>(input).Single();
@@ -256,7 +256,7 @@ namespace JsonFx.Serialization
 
 			var analyzer = new CommonAnalyzer(new DataReaderSettings());
 
-			AnalyzerException<CommonTokenType> ex = Assert.Throws<AnalyzerException<CommonTokenType>>(
+			TokenException<CommonTokenType> ex = Assert.Throws<TokenException<CommonTokenType>>(
 				delegate
 				{
 					var actual = analyzer.Analyze<object>(input).Single();
@@ -281,7 +281,7 @@ namespace JsonFx.Serialization
 
 			var analyzer = new CommonAnalyzer(new DataReaderSettings());
 
-			AnalyzerException<CommonTokenType> ex = Assert.Throws<AnalyzerException<CommonTokenType>>(
+			TokenException<CommonTokenType> ex = Assert.Throws<TokenException<CommonTokenType>>(
 				delegate
 				{
 					var actual = analyzer.Analyze<object>(input).Single();
@@ -305,7 +305,7 @@ namespace JsonFx.Serialization
 
 			var analyzer = new CommonAnalyzer(new DataReaderSettings());
 
-			AnalyzerException<CommonTokenType> ex = Assert.Throws<AnalyzerException<CommonTokenType>>(
+			TokenException<CommonTokenType> ex = Assert.Throws<TokenException<CommonTokenType>>(
 				delegate
 				{
 					var actual = analyzer.Analyze<object>(input).Single();
@@ -329,7 +329,7 @@ namespace JsonFx.Serialization
 
 			var analyzer = new CommonAnalyzer(new DataReaderSettings());
 
-			AnalyzerException<CommonTokenType> ex = Assert.Throws<AnalyzerException<CommonTokenType>>(
+			TokenException<CommonTokenType> ex = Assert.Throws<TokenException<CommonTokenType>>(
 				delegate
 				{
 					var actual = analyzer.Analyze<object>(input).Single();
@@ -352,7 +352,7 @@ namespace JsonFx.Serialization
 
 			var analyzer = new CommonAnalyzer(new DataReaderSettings());
 
-			AnalyzerException<CommonTokenType> ex = Assert.Throws<AnalyzerException<CommonTokenType>>(
+			TokenException<CommonTokenType> ex = Assert.Throws<TokenException<CommonTokenType>>(
 				delegate
 				{
 					var actual = analyzer.Analyze<object>(input).Single();
@@ -456,7 +456,7 @@ namespace JsonFx.Serialization
 
 			var analyzer = new CommonAnalyzer(new DataReaderSettings());
 
-			AnalyzerException<CommonTokenType> ex = Assert.Throws<AnalyzerException<CommonTokenType>>(
+			TokenException<CommonTokenType> ex = Assert.Throws<TokenException<CommonTokenType>>(
 				delegate
 				{
 					var actual = analyzer.Analyze<object>(input).Single();
@@ -480,7 +480,7 @@ namespace JsonFx.Serialization
 
 			var analyzer = new CommonAnalyzer(new DataReaderSettings());
 
-			AnalyzerException<CommonTokenType> ex = Assert.Throws<AnalyzerException<CommonTokenType>>(
+			TokenException<CommonTokenType> ex = Assert.Throws<TokenException<CommonTokenType>>(
 				delegate
 				{
 					var actual = analyzer.Analyze<object>(input).Single();
@@ -505,7 +505,7 @@ namespace JsonFx.Serialization
 
 			var analyzer = new CommonAnalyzer(new DataReaderSettings());
 
-			AnalyzerException<CommonTokenType> ex = Assert.Throws<AnalyzerException<CommonTokenType>>(
+			TokenException<CommonTokenType> ex = Assert.Throws<TokenException<CommonTokenType>>(
 				delegate
 				{
 					var actual = analyzer.Analyze<object>(input).Single();
@@ -530,7 +530,7 @@ namespace JsonFx.Serialization
 
 			var analyzer = new CommonAnalyzer(new DataReaderSettings());
 
-			AnalyzerException<CommonTokenType> ex = Assert.Throws<AnalyzerException<CommonTokenType>>(
+			TokenException<CommonTokenType> ex = Assert.Throws<TokenException<CommonTokenType>>(
 				delegate
 				{
 					var actual = analyzer.Analyze<object>(input).Single();
@@ -554,7 +554,7 @@ namespace JsonFx.Serialization
 
 			var analyzer = new CommonAnalyzer(new DataReaderSettings());
 
-			AnalyzerException<CommonTokenType> ex = Assert.Throws<AnalyzerException<CommonTokenType>>(
+			TokenException<CommonTokenType> ex = Assert.Throws<TokenException<CommonTokenType>>(
 				delegate
 				{
 					var actual = analyzer.Analyze<object>(input).Single();

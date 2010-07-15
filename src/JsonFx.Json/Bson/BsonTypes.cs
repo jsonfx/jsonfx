@@ -341,7 +341,7 @@ namespace JsonFx.Bson
 			// NOTE: time is stored as a BigEndian UInt16
 			// http://www.mongodb.org/display/DOCS/Object+IDs#ObjectIDs-TheBSONObjectIdDatatype
 
-			int seconds = (int)time.Subtract(BsonReader.UnixEpoch).TotalSeconds;
+			int seconds = (int)time.Subtract(BsonWriter.UnixEpoch).TotalSeconds;
 			if ((seconds < UInt16.MinValue) || (seconds > UInt16.MaxValue))
 			{
 				throw new ArgumentOutOfRangeException("ObjectID only supports a limited range of dates ("+UInt16.MaxValue+" seconds since Unix epoch).");
@@ -371,7 +371,7 @@ namespace JsonFx.Bson
 				// http://www.mongodb.org/display/DOCS/Object+IDs#ObjectIDs-TheBSONObjectIdDatatype
 
 				int seconds = ((((this.Bytes[0] << 0x18) | (this.Bytes[1] << 0x10)) | (this.Bytes[2] << 0x08)) | this.Bytes[3]);
-				return BsonReader.UnixEpoch.AddSeconds(seconds);
+				return BsonWriter.UnixEpoch.AddSeconds(seconds);
 			}
 		}
 

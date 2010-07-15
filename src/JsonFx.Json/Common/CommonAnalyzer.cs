@@ -210,7 +210,7 @@ namespace JsonFx.Common
 				{
 					// these are invalid here
 					tokens.Pop();
-					throw new AnalyzerException<CommonTokenType>(
+					throw new TokenException<CommonTokenType>(
 						token,
 						String.Format(CommonAnalyzer.ErrorUnexpectedToken, token.TokenType));
 				}
@@ -224,7 +224,7 @@ namespace JsonFx.Common
 			// verify correct starting state
 			if (token.TokenType != CommonTokenType.ObjectBegin)
 			{
-				throw new AnalyzerException<CommonTokenType>(
+				throw new TokenException<CommonTokenType>(
 					token,
 					String.Format(CommonAnalyzer.ErrorExpectedObject, token.TokenType));
 			}
@@ -250,7 +250,7 @@ namespace JsonFx.Common
 						{
 							// extraneous item delimiter
 							tokens.Pop();
-							throw new AnalyzerException<CommonTokenType>(
+							throw new TokenException<CommonTokenType>(
 								token,
 								CommonAnalyzer.ErrorMissingObjectProperty);
 						}
@@ -277,7 +277,7 @@ namespace JsonFx.Common
 						{
 							// these are invalid here
 							tokens.Pop();
-							throw new AnalyzerException<CommonTokenType>(
+							throw new TokenException<CommonTokenType>(
 								token,
 								String.Format(CommonAnalyzer.ErrorExpectedObjectValueDelim, token.TokenType));
 						}
@@ -305,7 +305,7 @@ namespace JsonFx.Common
 					{
 						// extraneous item delimiter
 						tokens.Pop();
-						throw new AnalyzerException<CommonTokenType>(
+						throw new TokenException<CommonTokenType>(
 							token,
 							CommonAnalyzer.ErrorMissingObjectProperty);
 					}
@@ -313,7 +313,7 @@ namespace JsonFx.Common
 					{
 						// these are invalid here
 						tokens.Pop();
-						throw new AnalyzerException<CommonTokenType>(
+						throw new TokenException<CommonTokenType>(
 							token,
 							String.Format(CommonAnalyzer.ErrorExpectedPropertyName, token.TokenType));
 					}
@@ -346,7 +346,7 @@ namespace JsonFx.Common
 			}
 
 			// end of input
-			throw new AnalyzerException<CommonTokenType>(
+			throw new TokenException<CommonTokenType>(
 				CommonGrammar.TokenNone,
 				CommonAnalyzer.ErrorUnterminatedObject);
 		}
@@ -358,7 +358,7 @@ namespace JsonFx.Common
 			// verify correct starting state
 			if (token.TokenType != CommonTokenType.ArrayBegin)
 			{
-				throw new AnalyzerException<CommonTokenType>(
+				throw new TokenException<CommonTokenType>(
 					token,
 					String.Format(CommonAnalyzer.ErrorExpectedArray, token.TokenType));
 			}
@@ -386,7 +386,7 @@ namespace JsonFx.Common
 						{
 							// extraneous item delimiter
 							tokens.Pop();
-							throw new AnalyzerException<CommonTokenType>(
+							throw new TokenException<CommonTokenType>(
 								token,
 								CommonAnalyzer.ErrorMissingObjectProperty);
 						}
@@ -413,7 +413,7 @@ namespace JsonFx.Common
 						{
 							// these are invalid here
 							tokens.Pop();
-							throw new AnalyzerException<CommonTokenType>(
+							throw new TokenException<CommonTokenType>(
 								token,
 								String.Format(CommonAnalyzer.ErrorExpectedArrayItemDelim, token.TokenType));
 						}
@@ -462,7 +462,7 @@ namespace JsonFx.Common
 					{
 						// extraneous item delimiter
 						tokens.Pop();
-						throw new AnalyzerException<CommonTokenType>(
+						throw new TokenException<CommonTokenType>(
 							token,
 							CommonAnalyzer.ErrorMissingArrayItem);
 					}
@@ -470,7 +470,7 @@ namespace JsonFx.Common
 					{
 						// these are invalid here
 						tokens.Pop();
-						throw new AnalyzerException<CommonTokenType>(
+						throw new TokenException<CommonTokenType>(
 							token,
 							String.Format(CommonAnalyzer.ErrorExpectedArrayItem, token.TokenType));
 					}
@@ -484,7 +484,7 @@ namespace JsonFx.Common
 			}
 
 			// end of input
-			throw new AnalyzerException<CommonTokenType>(
+			throw new TokenException<CommonTokenType>(
 				CommonGrammar.TokenNone,
 				CommonAnalyzer.ErrorUnterminatedArray);
 		}

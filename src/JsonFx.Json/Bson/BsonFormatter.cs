@@ -44,6 +44,27 @@ namespace JsonFx.Bson
 {
 	public partial class BsonWriter
 	{
+		#region Constants
+
+		// error messages
+		internal const string ErrorUnterminated = "Unterminated document";
+		private const string ErrorUnexpectedToken = "Unexpected token ({0})";
+		private const string ErrorExpectedObjectValueDelim = "Expected value delimiter or end of document ({0})";
+
+		internal static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+
+		internal const int SizeOfByte = 1;
+		internal const int SizeOfInt32 = 4;
+		internal const int SizeOfInt64 = 8;
+		internal const int SizeOfDouble = 8;
+		internal const int SizeOfObjectID = 12;
+
+		internal const byte NullByte = 0;
+		internal const byte FalseByte = 0;
+		internal const byte TrueByte = 1;
+
+		#endregion Constants
+
 		/// <summary>
 		/// Outputs BSON bytes from a SAX-like input stream of tokens
 		/// </summary>
@@ -111,7 +132,7 @@ namespace JsonFx.Bson
 				Token<CommonTokenType> token = tokens.Peek();
 				if (tokens.IsCompleted || token == null)
 				{
-					throw new AnalyzerException<CommonTokenType>(token, "Unexpected end of document");
+					throw new TokenException<CommonTokenType>(token, BsonWriter.ErrorUnterminated);
 				}
 
 				bool isArray;
@@ -125,15 +146,17 @@ namespace JsonFx.Bson
 				}
 				else
 				{
-					throw new AnalyzerException<CommonTokenType>(token, "Expected "+CommonTokenType.ObjectBegin+" token");
+					// root must be a document
+					throw new TokenException<CommonTokenType>(token,
+						String.Format(BsonWriter.ErrorUnexpectedToken, token.TokenType));
 				}
 				tokens.Pop();
 
 				long start = writer.BaseStream.Position;
-				int total = BsonReader.SizeOfInt32 + BsonReader.SizeOfByte;// length + terminal
+				int total = BsonWriter.SizeOfInt32 + BsonWriter.SizeOfByte;// length + terminal
 
 				// leave room for length
-				writer.Seek(BsonReader.SizeOfInt32, SeekOrigin.Current);
+				writer.Seek(BsonWriter.SizeOfInt32, SeekOrigin.Current);
 
 				token = tokens.Peek();
 
@@ -163,7 +186,9 @@ namespace JsonFx.Bson
 					{
 						if (token.TokenType != CommonTokenType.ValueDelim)
 						{
-							throw new AnalyzerException<CommonTokenType>(token, "Expected "+CommonTokenType.ValueDelim+" token");
+							// delimiter required
+							throw new TokenException<CommonTokenType>(token,
+								String.Format(BsonWriter.ErrorExpectedObjectValueDelim, token.TokenType));
 						}
 
 						// consume delimiter
@@ -171,7 +196,7 @@ namespace JsonFx.Bson
 						token = tokens.Peek();
 						if (tokens.IsCompleted || token == null)
 						{
-							throw new AnalyzerException<CommonTokenType>(token, "Unexpected end of document");
+							throw new TokenException<CommonTokenType>(token, BsonWriter.ErrorUnterminated);
 						}
 					}
 
@@ -184,7 +209,8 @@ namespace JsonFx.Bson
 					{
 						if (token.TokenType != CommonTokenType.Property)
 						{
-							throw new AnalyzerException<CommonTokenType>(token, "Expected "+CommonTokenType.Property+" token");
+							throw new TokenException<CommonTokenType>(token,
+								String.Format(BsonWriter.ErrorUnexpectedToken, token.TokenType));
 						}
 
 						DataName name = token.Value as DataName;
@@ -200,7 +226,7 @@ namespace JsonFx.Bson
 				}
 
 				// write terminal
-				writer.Write(BsonReader.NullByte);
+				writer.Write(BsonWriter.NullByte);
 
 				// seek back to write out length
 				long end = writer.BaseStream.Position;
@@ -208,7 +234,7 @@ namespace JsonFx.Bson
 				writer.Write(total);
 
 				// seek back to end
-				writer.Seek((int)(end-start-BsonReader.SizeOfInt32), SeekOrigin.Current);
+				writer.Seek((int)(end-start-BsonWriter.SizeOfInt32), SeekOrigin.Current);
 
 				return total;
 			}
@@ -225,7 +251,7 @@ namespace JsonFx.Bson
 				Token<CommonTokenType> token = tokens.Peek();
 				if (tokens.IsCompleted || token == null)
 				{
-					throw new AnalyzerException<CommonTokenType>(token, "Unexpected end of document");
+					throw new TokenException<CommonTokenType>(token, BsonWriter.ErrorUnterminated);
 				}
 
 				BsonElementType elemType;
@@ -249,13 +275,14 @@ namespace JsonFx.Bson
 					default:
 					{
 						// the rest are invalid states
-						throw new AnalyzerException<CommonTokenType>(token, "Expected "+CommonTokenType.Primitive+" token");
+						throw new TokenException<CommonTokenType>(token,
+							String.Format(BsonWriter.ErrorUnexpectedToken, token.TokenType));
 					}
 				}
 
 				// write element type
 				writer.Write((byte)elemType);
-				int total = BsonReader.SizeOfByte; // for element type
+				int total = BsonWriter.SizeOfByte; // for element type
 
 				// write EName
 				total += BsonFormatter.WriteString(writer, ename, true);
@@ -269,7 +296,7 @@ namespace JsonFx.Bson
 
 						// write double data
 						writer.Write((double)token.Value);
-						total += BsonReader.SizeOfDouble;
+						total += BsonWriter.SizeOfDouble;
 						break;
 					}
 					case BsonElementType.String:
@@ -305,7 +332,7 @@ namespace JsonFx.Bson
 
 						// write ObjectID data
 						writer.Write((byte[])token.Value);
-						total += BsonReader.SizeOfObjectID;
+						total += BsonWriter.SizeOfObjectID;
 						break;
 					}
 					case BsonElementType.Boolean:
@@ -315,8 +342,8 @@ namespace JsonFx.Bson
 
 						// write bool data
 						bool value = true.Equals(token.Value);
-						writer.Write(value ? BsonReader.TrueByte : BsonReader.FalseByte);
-						total += BsonReader.SizeOfByte;
+						writer.Write(value ? BsonWriter.TrueByte : BsonWriter.FalseByte);
+						total += BsonWriter.SizeOfByte;
 						break;
 					}
 					case BsonElementType.DateTimeUtc:
@@ -332,14 +359,14 @@ namespace JsonFx.Bson
 						}
 
 						// find the duration since Jan 1, 1970
-						TimeSpan duration = value.Subtract(BsonReader.UnixEpoch);
+						TimeSpan duration = value.Subtract(BsonWriter.UnixEpoch);
 
 						// get the total milliseconds
 						long ticks = (long)duration.TotalMilliseconds;
 
 						// write long data
 						writer.Write((long)ticks);
-						total += BsonReader.SizeOfInt64;
+						total += BsonWriter.SizeOfInt64;
 						break;
 					}
 					case BsonElementType.RegExp:
@@ -393,7 +420,7 @@ namespace JsonFx.Bson
 
 						// write bytes
 						writer.Write((byte[])pointer.ObjectID);
-						total += BsonReader.SizeOfObjectID;
+						total += BsonWriter.SizeOfObjectID;
 						break;
 					}
 					case BsonElementType.CodeWithScope:
@@ -417,7 +444,7 @@ namespace JsonFx.Bson
 
 						// write int data
 						writer.Write((int)token.Value);
-						total += BsonReader.SizeOfInt32;
+						total += BsonWriter.SizeOfInt32;
 						break;
 					}
 					case BsonElementType.TimeStamp:
@@ -430,7 +457,7 @@ namespace JsonFx.Bson
 
 						// write long data
 						writer.Write((long)token.Value);
-						total += BsonReader.SizeOfInt64;
+						total += BsonWriter.SizeOfInt64;
 						break;
 					}
 					case BsonElementType.Undefined:
@@ -446,7 +473,9 @@ namespace JsonFx.Bson
 					}
 					default:
 					{
-						throw new AnalyzerException<CommonTokenType>(token, BsonReader.ErrorUnrecognizedToken);
+						// the rest are invalid states
+						throw new TokenException<CommonTokenType>(token,
+							String.Format(BsonWriter.ErrorUnexpectedToken, token.TokenType));
 					}
 				}
 
@@ -461,14 +490,14 @@ namespace JsonFx.Bson
 			/// <returns>number of bytes written</returns>
 			private static int WriteString(BinaryWriter writer, string value, bool asCString)
 			{
-				int total = BsonReader.SizeOfByte; // for terminal
+				int total = BsonWriter.SizeOfByte; // for terminal
 				byte[] bytes = Encoding.UTF8.GetBytes(value);
 
 				if (!asCString)
 				{
 					// write length prefix
-					writer.Write(bytes.Length+BsonReader.SizeOfByte);
-					total += BsonReader.SizeOfInt32;
+					writer.Write(bytes.Length+BsonWriter.SizeOfByte);
+					total += BsonWriter.SizeOfInt32;
 				}
 
 				// write character data
@@ -476,7 +505,7 @@ namespace JsonFx.Bson
 				total += bytes.Length;
 
 				// write terminal
-				writer.Write(BsonReader.NullByte);
+				writer.Write(BsonWriter.NullByte);
 
 				return total;
 			}
@@ -501,7 +530,7 @@ namespace JsonFx.Bson
 				writer.Write(binary.Data);
 
 				// length + subtype + bytes
-				return BsonReader.SizeOfInt64 + BsonReader.SizeOfByte + binary.Count;
+				return BsonWriter.SizeOfInt64 + BsonWriter.SizeOfByte + binary.Count;
 			}
 
 			/// <summary>
@@ -513,10 +542,10 @@ namespace JsonFx.Bson
 			private static int WriteCodeWithScope(BinaryWriter writer, BsonCodeWithScope value)
 			{
 				long start = writer.BaseStream.Position;
-				int total = BsonReader.SizeOfInt32;// code_w_s length field
+				int total = BsonWriter.SizeOfInt32;// code_w_s length field
 
 				// leave room for length
-				writer.Seek(BsonReader.SizeOfInt32, SeekOrigin.Current);
+				writer.Seek(BsonWriter.SizeOfInt32, SeekOrigin.Current);
 
 				// write code
 				total += BsonFormatter.WriteString(writer, (string)value.Code, false);
@@ -532,7 +561,7 @@ namespace JsonFx.Bson
 				writer.Write(total);
 
 				// seek back to end
-				writer.Seek((int)(end-start-BsonReader.SizeOfInt32), SeekOrigin.Current);
+				writer.Seek((int)(end-start-BsonWriter.SizeOfInt32), SeekOrigin.Current);
 
 				return total;
 			}

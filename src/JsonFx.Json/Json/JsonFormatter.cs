@@ -176,7 +176,7 @@ namespace JsonFx.Json
 										goto default;
 									}
 
-									this.WriteNumber(writer, typeCode, (ValueType)token.Value);
+									this.WriteNumber(writer, token, typeCode);
 									break;
 								}
 								case TypeCode.DBNull:
@@ -187,6 +187,12 @@ namespace JsonFx.Json
 								}
 								default:
 								{
+									if (token.Value is TimeSpan)
+									{
+										this.WriteNumber(writer, token, typeCode);
+										break;
+									}
+
 									this.WriteString(writer, this.FormatString(token.Value));
 									break;
 								}
@@ -266,7 +272,7 @@ namespace JsonFx.Json
 						case CommonTokenType.None:
 						default:
 						{
-							throw new NotSupportedException("Unexpected JSON token: "+token);
+							throw new TokenException<CommonTokenType>(token, "Unexpected token");
 						}
 					}
 				}
@@ -276,7 +282,7 @@ namespace JsonFx.Json
 
 			#region Write Methods
 
-			protected virtual void WriteNumber(TextWriter writer, TypeCode typeCode, ValueType value)
+			protected virtual void WriteNumber(TextWriter writer, Token<CommonTokenType> token, TypeCode typeCode)
 			{
 				bool overflowsIEEE754 = false;
 
@@ -285,82 +291,82 @@ namespace JsonFx.Json
 				{
 					case TypeCode.Boolean:
 					{
-						number = true.Equals(value) ? "1" : "0";
+						number = true.Equals(token.Value) ? "1" : "0";
 						break;
 					}
 					case TypeCode.Byte:
 					{
-						number = ((byte)value).ToString("g", CultureInfo.InvariantCulture);
+						number = ((byte)token.Value).ToString("g", CultureInfo.InvariantCulture);
 						break;
 					}
 					case TypeCode.Double:
 					{
-						number = ((double)value).ToString("g", CultureInfo.InvariantCulture);
+						number = ((double)token.Value).ToString("g", CultureInfo.InvariantCulture);
 						break;
 					}
 					case TypeCode.Int16:
 					{
-						number = ((short)value).ToString("g", CultureInfo.InvariantCulture);
+						number = ((short)token.Value).ToString("g", CultureInfo.InvariantCulture);
 						break;
 					}
 					case TypeCode.Int32:
 					{
-						number = ((int)value).ToString("g", CultureInfo.InvariantCulture);
+						number = ((int)token.Value).ToString("g", CultureInfo.InvariantCulture);
 						break;
 					}
 					case TypeCode.SByte:
 					{
-						number = ((sbyte)value).ToString("g", CultureInfo.InvariantCulture);
+						number = ((sbyte)token.Value).ToString("g", CultureInfo.InvariantCulture);
 						break;
 					}
 					case TypeCode.Single:
 					{
-						number = ((float)value).ToString("g", CultureInfo.InvariantCulture);
+						number = ((float)token.Value).ToString("g", CultureInfo.InvariantCulture);
 						break;
 					}
 					case TypeCode.UInt16:
 					{
-						number = ((ushort)value).ToString("g", CultureInfo.InvariantCulture);
+						number = ((ushort)token.Value).ToString("g", CultureInfo.InvariantCulture);
 						break;
 					}
 					case TypeCode.Decimal:
 					{
 						overflowsIEEE754 = true;
-						number = ((decimal)value).ToString("g", CultureInfo.InvariantCulture);
+						number = ((decimal)token.Value).ToString("g", CultureInfo.InvariantCulture);
 						break;
 					}
 					case TypeCode.Int64:
 					{
 						overflowsIEEE754 = true;
-						number = ((long)value).ToString("g", CultureInfo.InvariantCulture);
+						number = ((long)token.Value).ToString("g", CultureInfo.InvariantCulture);
 						break;
 					}
 					case TypeCode.UInt32:
 					{
 						overflowsIEEE754 = true;
-						number = ((uint)value).ToString("g", CultureInfo.InvariantCulture);
+						number = ((uint)token.Value).ToString("g", CultureInfo.InvariantCulture);
 						break;
 					}
 					case TypeCode.UInt64:
 					{
 						overflowsIEEE754 = true;
-						number = ((ulong)value).ToString("g", CultureInfo.InvariantCulture);
+						number = ((ulong)token.Value).ToString("g", CultureInfo.InvariantCulture);
 						break;
 					}
 					default:
 					{
-						if (value is TimeSpan)
+						if (token.Value is TimeSpan)
 						{
 							overflowsIEEE754 = true;
-							number = ((TimeSpan)value).Ticks.ToString("g", CultureInfo.InvariantCulture);
+							number = ((TimeSpan)token.Value).Ticks.ToString("g", CultureInfo.InvariantCulture);
 							break;
 						}
 
-						throw new SerializationException("Invalid Number token: "+value);
+						throw new TokenException<CommonTokenType>(token, "Invalid number token");
 					}
 				}
 
-				if (overflowsIEEE754 && this.InvalidIEEE754(Convert.ToDecimal(value)))
+				if (overflowsIEEE754 && this.InvalidIEEE754(Convert.ToDecimal(token.Value)))
 				{
 					// checks for IEEE-754 overflow and emit as strings
 					this.WriteString(writer, number);
