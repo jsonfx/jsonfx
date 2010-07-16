@@ -349,8 +349,7 @@ namespace JsonFx.Xml
 				}
 
 				writer.Write(XmlGrammar.OperatorElementBegin);
-				// TODO: this is temporary, need to break dependency on XmlConvert
-				writer.Write(System.Xml.XmlConvert.EncodeLocalName(name.LocalName));
+				this.WriteLocalName(writer, name.LocalName);
 				writer.Write(XmlGrammar.OperatorElementEnd);
 			}
 
@@ -358,16 +357,14 @@ namespace JsonFx.Xml
 			{
 				writer.Write(XmlGrammar.OperatorElementBegin);
 				writer.Write(XmlGrammar.OperatorElementClose);
-				// TODO: this is temporary, need to break dependency on XmlConvert
-				writer.Write(System.Xml.XmlConvert.EncodeLocalName(name.LocalName));
+				this.WriteLocalName(writer, name.LocalName);
 				writer.Write(XmlGrammar.OperatorElementEnd);
 			}
 
 			private void WriteTagEmpty(TextWriter writer, DataName name)
 			{
 				writer.Write(XmlGrammar.OperatorElementBegin);
-				// TODO: this is temporary, need to break dependency on XmlConvert
-				writer.Write(System.Xml.XmlConvert.EncodeLocalName(name.LocalName));
+				this.WriteLocalName(writer, name.LocalName);
 				writer.Write(XmlGrammar.OperatorValueDelim);
 				writer.Write(XmlGrammar.OperatorElementClose);
 				writer.Write(XmlGrammar.OperatorElementEnd);
@@ -381,6 +378,43 @@ namespace JsonFx.Xml
 				{
 					// indent next line accordingly
 					writer.Write(this.Settings.Tab);
+				}
+			}
+
+			private void WriteLocalName(TextWriter writer, string value)
+			{
+				int start = 0,
+					length = value.Length;
+
+				for (int i=start; i<length; i++)
+				{
+					char ch = value[i];
+
+					if ((ch >= 'A' && ch <= 'Z') ||
+						(ch >= 'a' && ch <= 'z') ||
+						(ch == '_'))
+					{
+						continue;
+					}
+					if ((i > 0) && ((ch >= '0' && ch <= '9') || (ch == '-') || (ch == '.')))
+					{
+						continue;
+					}
+
+					if (i > start)
+					{
+						writer.Write(value.Substring(start, i-start));
+					}
+					start = i+1;
+
+					writer.Write("_x");
+					writer.Write(Char.ConvertToUtf32(value, i).ToString("X4"));
+					writer.Write("_");
+				}
+
+				if (length > start)
+				{
+					writer.Write(value.Substring(start, length-start));
 				}
 			}
 
