@@ -31,11 +31,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Text;
 
 using JsonFx.Serialization;
+using JsonFx.Serialization.Resolvers;
 using JsonFx.Xml.Resolvers;
 using Xunit;
+
 using Assert=JsonFx.AssertPatched;
 
 namespace JsonFx.Xml
@@ -50,6 +53,20 @@ namespace JsonFx.Xml
 			public Person Father { get; set; }
 			public Person Mother { get; set; }
 			public Person[] Children { get; set; }
+		}
+
+		[DataContract(Name = "PersonContract", Namespace = "http://schemas.contoso.com")]
+		public class Person2
+		{
+			[DataMember(Name = "AddressMember")]
+			public Address theAddress;
+		}
+
+		[DataContract(Name = "AddressContract", Namespace = "http://schemas.contoso.com")]
+		public class Address
+		{
+			[DataMember(Name = "StreetMember")]
+			public string street;
 		}
 
 		#endregion Test Types
@@ -336,6 +353,34 @@ namespace JsonFx.Xml
 		}
 
 		#endregion Comparison Tests
+
+		#region Namespace Tests
+
+		[Fact(Skip="XML Namespaces are not yet implemented")]
+		public void Format_DataContract_CorrectlySerializesNamespaces()
+		{
+			var input = new Person2
+			{
+				theAddress = new Address
+				{
+					street = "123 Main Street"
+				}
+			};
+
+			const string expected = 
+@"<PersonContract xmlns=""http://schemas.contoso.com"">
+	<AddressMember>
+		<StreetMember>123 Main Street</StreetMember>
+	</AddressMember>
+</PersonContract>";
+
+			var writer = new XmlWriter(new DataWriterSettings(new DataContractResolverStrategy()) { PrettyPrint=true });
+			var actual = writer.Serialize(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		#endregion Namespace Tests
 
 		#region Utility Method
 
