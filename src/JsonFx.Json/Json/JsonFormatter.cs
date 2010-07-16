@@ -288,14 +288,20 @@ namespace JsonFx.Json
 				string number;
 				switch (typeCode)
 				{
+					case TypeCode.Byte:
+					{
+						number = ((byte)token.Value).ToString("g", CultureInfo.InvariantCulture);
+						break;
+					}
 					case TypeCode.Boolean:
 					{
 						number = true.Equals(token.Value) ? "1" : "0";
 						break;
 					}
-					case TypeCode.Byte:
+					case TypeCode.Decimal:
 					{
-						number = ((byte)token.Value).ToString("g", CultureInfo.InvariantCulture);
+						overflowsIEEE754 = true;
+						number = ((decimal)token.Value).ToString("g", CultureInfo.InvariantCulture);
 						break;
 					}
 					case TypeCode.Double:
@@ -313,6 +319,12 @@ namespace JsonFx.Json
 						number = ((int)token.Value).ToString("g", CultureInfo.InvariantCulture);
 						break;
 					}
+					case TypeCode.Int64:
+					{
+						overflowsIEEE754 = true;
+						number = ((long)token.Value).ToString("g", CultureInfo.InvariantCulture);
+						break;
+					}
 					case TypeCode.SByte:
 					{
 						number = ((sbyte)token.Value).ToString("g", CultureInfo.InvariantCulture);
@@ -326,18 +338,6 @@ namespace JsonFx.Json
 					case TypeCode.UInt16:
 					{
 						number = ((ushort)token.Value).ToString("g", CultureInfo.InvariantCulture);
-						break;
-					}
-					case TypeCode.Decimal:
-					{
-						overflowsIEEE754 = true;
-						number = ((decimal)token.Value).ToString("g", CultureInfo.InvariantCulture);
-						break;
-					}
-					case TypeCode.Int64:
-					{
-						overflowsIEEE754 = true;
-						number = ((long)token.Value).ToString("g", CultureInfo.InvariantCulture);
 						break;
 					}
 					case TypeCode.UInt32:

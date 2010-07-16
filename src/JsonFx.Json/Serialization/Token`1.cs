@@ -177,23 +177,80 @@ namespace JsonFx.Serialization
 		/// <returns></returns>
 		public static string ToString(object value)
 		{
-			if (value == null)
+			Type type = (value == null) ? null : value.GetType();
+
+			// explicitly control BCL primitives
+			switch (Type.GetTypeCode(type))
 			{
-				return String.Empty;
+				case TypeCode.Boolean:
+				{
+					return true.Equals(value) ? "true" : "false";
+				}
+				case TypeCode.Byte:
+				{
+					return ((byte)value).ToString("g", CultureInfo.InvariantCulture);
+				}
+				case TypeCode.Char:
+				{
+					return Char.ToString((char)value);
+				}
+				case TypeCode.DateTime:
+				{
+					// default unhandled dates to ISO-8601 with full precision
+					return ((DateTime)value).ToString(Token<T>.FullDateTimeFormat);
+				}
+				case TypeCode.DBNull:
+				case TypeCode.Empty:
+				{
+					return String.Empty;
+				}
+				case TypeCode.Decimal:
+				{
+					return ((decimal)value).ToString("g", CultureInfo.InvariantCulture);
+				}
+				case TypeCode.Double:
+				{
+					return ((double)value).ToString("g", CultureInfo.InvariantCulture);
+				}
+				case TypeCode.Int16:
+				{
+					return ((short)value).ToString("g", CultureInfo.InvariantCulture);
+				}
+				case TypeCode.Int32:
+				{
+					return ((int)value).ToString("g", CultureInfo.InvariantCulture);
+				}
+				case TypeCode.Int64:
+				{
+					return ((long)value).ToString("g", CultureInfo.InvariantCulture);
+				}
+				case TypeCode.SByte:
+				{
+					return ((sbyte)value).ToString("g", CultureInfo.InvariantCulture);
+				}
+				case TypeCode.Single:
+				{
+					return ((float)value).ToString("g", CultureInfo.InvariantCulture);
+				}
+				case TypeCode.String:
+				{
+					return (string)value;
+				}
+				case TypeCode.UInt16:
+				{
+					return ((ushort)value).ToString("g", CultureInfo.InvariantCulture);
+				}
+				case TypeCode.UInt32:
+				{
+					return ((uint)value).ToString("g", CultureInfo.InvariantCulture);
+				}
+				case TypeCode.UInt64:
+				{
+					return ((ulong)value).ToString("g", CultureInfo.InvariantCulture);
+				}
 			}
 
-			if (value is Boolean)
-			{
-				return true.Equals(value) ? "true" : "false";
-			}
-
-			if (value is DateTime)
-			{
-				// default unhandled dates to ISO-8601 with full precision
-				return ((DateTime)value).ToString(Token<T>.FullDateTimeFormat);
-			}
-
-			// allow IConvertable and IFormattable first chance
+			// allow IConvertable and IFormattable next chance
 			IConvertible convertible = value as IConvertible;
 			if (convertible != null)
 			{
