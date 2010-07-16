@@ -171,7 +171,8 @@ namespace JsonFx.Xml
 				// ensure element has a name
 				elementName = this.EnsureName(elementName.IsEmpty ? token.Name : elementName, typeof(Array));
 
-				// TODO: figure out a way to surface XmlArrayItemAttribute name too
+				// TODO: figure out a way to surface XmlArrayItemAttribute name
+				DataName itemName = DataName.Empty;//new DataName("arrayItem");
 
 				WriteTagOpen(writer, elementName);
 				this.pendingNewLine = true;
@@ -219,7 +220,7 @@ namespace JsonFx.Xml
 								this.pendingNewLine = false;
 							}
 
-							this.WriteValue(writer, tokens, token.Name);
+							this.WriteValue(writer, tokens, itemName);
 
 							this.pendingNewLine = false;
 							needsValueDelim = true;
@@ -640,6 +641,7 @@ namespace JsonFx.Xml
 
 			private DataName EnsureName(DataName name, Type type)
 			{
+				// String.Empty is a valid DataName.LocalName, so must replace
 				if (String.IsNullOrEmpty(name.LocalName))
 				{
 					return this.Settings.Resolver.LoadTypeName(type);
