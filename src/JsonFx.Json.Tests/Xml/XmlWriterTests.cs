@@ -147,7 +147,7 @@ namespace JsonFx.Xml
 			//Assert.Equal(expected.ToString(), actual);
 		}
 
-		[Fact(Skip="System.Xml.XmlSerializer array output is worthless.")]
+		//[Fact(Skip="System.Xml.XmlSerializer array output is worthless.")]
 		public void Serialize_CompareArrayListOutputToXmlSerializer_Serializes()
 		{
 			var input = new ArrayList
@@ -164,7 +164,7 @@ namespace JsonFx.Xml
 			Assert.Equal(expected.ToString(), actual);
 		}
 
-		[Fact(Skip="System.Xml.XmlSerializer array output is worthless.")]
+		//[Fact(Skip="System.Xml.XmlSerializer array output is worthless.")]
 		public void Serialize_CompareArrayOutputToXmlSerializer_Serializes()
 		{
 			var input = new object[]
@@ -324,7 +324,7 @@ namespace JsonFx.Xml
 			Assert.Equal(expected.ToString(), actual);
 		}
 
-		[Fact(Skip="System.Xml.XmlSerializer outputs the ordinal value of chars.")]
+		//[Fact(Skip="System.Xml.XmlSerializer outputs the ordinal value of chars.")]
 		public void Serialize_CompareCharOutputToXmlSerializer_Serializes()
 		{
 			var input = 'a';
