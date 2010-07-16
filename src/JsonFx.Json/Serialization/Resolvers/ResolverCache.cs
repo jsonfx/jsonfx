@@ -33,13 +33,24 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
-using System.Threading;
 
 using JsonFx.CodeGen;
 
 namespace JsonFx.Serialization.Resolvers
 {
-	public sealed class MemberMap
+#if NET40
+	using EnumCacheDictionary=System.Collections.Concurrent.ConcurrentDictionary<Type, IDictionary<Enum, string>>;
+	using FactoriesDictionary=System.Collections.Concurrent.ConcurrentDictionary<Type, FactoryMap>;
+	using MemberCacheDictionary=System.Collections.Concurrent.ConcurrentDictionary<Type, IDictionary<string, MemberMap>>;
+	using NameCacheDictionary=System.Collections.Concurrent.ConcurrentDictionary<Type, DataName>;
+#else
+	using MemberCacheDictionary=System.Collections.Generic.Dictionary<Type, IDictionary<string, MemberMap>>;
+	using EnumCacheDictionary=System.Collections.Generic.Dictionary<Type, IDictionary<Enum, string>>;
+	using FactoriesDictionary=System.Collections.Generic.Dictionary<Type, FactoryMap>;
+	using NameCacheDictionary=System.Collections.Generic.Dictionary<Type, DataName>;
+#endif
+
+	public sealed class MemberMap : IComparable<MemberMap>
 	{
 		#region Fields
 
@@ -129,6 +140,20 @@ namespace JsonFx.Serialization.Resolvers
 		}
 
 		#endregion Init
+
+		#region IComparable<MemberMap> Members
+
+		public int CompareTo(MemberMap that)
+		{
+			if (that == null)
+			{
+				return 1;
+			}
+
+			return this.DataName.CompareTo(that.DataName);
+		}
+
+		#endregion IComparable<MemberMap> Members
 	}
 
 	public sealed class FactoryMap
@@ -296,7 +321,7 @@ namespace JsonFx.Serialization.Resolvers
 	}
 
 	/// <summary>
-	/// Caches name resolution mappings for IDataReader / IDataWriter
+	/// Cache of name resolution mappings for IDataReader / IDataWriter
 	/// </summary>
 	public sealed class ResolverCache
 	{
@@ -304,30 +329,24 @@ namespace JsonFx.Serialization.Resolvers
 
 		private const string AnonymousTypePrefix = "<>f__AnonymousType";
 
-#if NET20 || NET30
-		private const int LockTimeout = 250;
-#endif
-
 		#endregion Constants
 
 		#region Fields
 
 #if NET20 || NET30
-		private readonly ReaderWriterLock MapLock = new ReaderWriterLock();
-#else
-		private readonly ReaderWriterLockSlim MapLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+		private const int LockTimeout = 250;
+
+		private readonly System.Threading.ReaderWriterLock MapLock = new System.Threading.ReaderWriterLock();
+		private readonly System.Threading.ReaderWriterLock FactoryLock = new System.Threading.ReaderWriterLock();
+#elif NET35
+		private readonly System.Threading.ReaderWriterLockSlim MapLock = new System.Threading.ReaderWriterLockSlim(System.Threading.LockRecursionPolicy.NoRecursion);
+		private readonly System.Threading.ReaderWriterLockSlim FactoryLock = new System.Threading.ReaderWriterLockSlim(System.Threading.LockRecursionPolicy.NoRecursion);
 #endif
 
-#if NET20 || NET30
-		private readonly ReaderWriterLock FactoryLock = new ReaderWriterLock();
-#else
-		private readonly ReaderWriterLockSlim FactoryLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
-#endif
-
-		private readonly IDictionary<Type, IDictionary<string, MemberMap>> MemberCache = new Dictionary<Type, IDictionary<string, MemberMap>>();
-		private readonly IDictionary<Type, IDictionary<Enum, string>> EnumCache = new Dictionary<Type, IDictionary<Enum, string>>();
-		private readonly IDictionary<Type, FactoryMap> Factories = new Dictionary<Type, FactoryMap>();
-		private readonly IDictionary<Type, DataName> NameCache = new Dictionary<Type, DataName>();
+		private readonly IDictionary<Type, IDictionary<string, MemberMap>> MemberCache = new MemberCacheDictionary();
+		private readonly IDictionary<Type, IDictionary<Enum, string>> EnumCache = new EnumCacheDictionary();
+		private readonly IDictionary<Type, FactoryMap> Factories = new FactoriesDictionary();
+		private readonly IDictionary<Type, DataName> NameCache = new NameCacheDictionary();
 
 		private readonly IResolverStrategy Strategy;
 
@@ -368,7 +387,7 @@ namespace JsonFx.Serialization.Resolvers
 
 #if NET20 || NET30
 			this.MapLock.AcquireReaderLock(ResolverCache.LockTimeout);
-#else
+#elif NET35
 			this.MapLock.EnterReadLock();
 #endif
 			try
@@ -382,7 +401,7 @@ namespace JsonFx.Serialization.Resolvers
 			{
 #if NET20 || NET30
 				this.MapLock.ReleaseReaderLock();
-#else
+#elif NET35
 				this.MapLock.ExitReadLock();
 #endif
 			}
@@ -403,21 +422,25 @@ namespace JsonFx.Serialization.Resolvers
 
 #if NET20 || NET30
 			this.MapLock.AcquireReaderLock(ResolverCache.LockTimeout);
-#else
+#elif NET35
 			this.MapLock.EnterReadLock();
 #endif
+#if !NET40
 			try
+#endif
 			{
 				if (this.MemberCache.TryGetValue(type, out map))
 				{
 					return map;
 				}
 			}
+#if !NET40
 			finally
+#endif
 			{
 #if NET20 || NET30
 				this.MapLock.ReleaseReaderLock();
-#else
+#elif NET35
 				this.MapLock.ExitReadLock();
 #endif
 			}
@@ -437,21 +460,25 @@ namespace JsonFx.Serialization.Resolvers
 
 #if NET20 || NET30
 			this.MapLock.AcquireReaderLock(ResolverCache.LockTimeout);
-#else
+#elif NET35
 			this.MapLock.EnterReadLock();
 #endif
+#if !NET40
 			try
+#endif
 			{
 				if (this.EnumCache.TryGetValue(type, out map))
 				{
 					return map;
 				}
 			}
+#if !NET40
 			finally
+#endif
 			{
 #if NET20 || NET30
 				this.MapLock.ReleaseReaderLock();
-#else
+#elif NET35
 				this.MapLock.ExitReadLock();
 #endif
 			}
@@ -467,31 +494,35 @@ namespace JsonFx.Serialization.Resolvers
 		{
 #if NET20 || NET30
 			this.MapLock.AcquireWriterLock(ResolverCache.LockTimeout);
-#else
+#elif NET35
 			this.MapLock.EnterWriteLock();
 #endif
 #if NET20 || NET30
 			this.FactoryLock.AcquireWriterLock(ResolverCache.LockTimeout);
-#else
+#elif NET35
 			this.FactoryLock.EnterWriteLock();
 #endif
+#if !NET40
 			try
+#endif
 			{
 				this.NameCache.Clear();
 				this.MemberCache.Clear();
 				this.EnumCache.Clear();
 				this.Factories.Clear();
 			}
+#if !NET40
 			finally
+#endif
 			{
 #if NET20 || NET30
 				this.FactoryLock.ReleaseWriterLock();
-#else
+#elif NET35
 				this.FactoryLock.ExitWriteLock();
 #endif
 #if NET20 || NET30
 				this.MapLock.ReleaseWriterLock();
-#else
+#elif NET35
 				this.MapLock.ExitWriteLock();
 #endif
 			}
@@ -501,7 +532,7 @@ namespace JsonFx.Serialization.Resolvers
 		/// Builds a mapping of member name to field/property
 		/// </summary>
 		/// <param name="objectType"></param>
-		private DataName BuildMap(Type objectType, out IDictionary<string, MemberMap> map)
+		private DataName BuildMap(Type objectType, out IDictionary<string, MemberMap> maps)
 		{
 			DataName typeName = this.Strategy.GetName(objectType);
 			if (typeName.IsEmpty)
@@ -513,7 +544,7 @@ namespace JsonFx.Serialization.Resolvers
 			{
 				// create special maps for enum types
 				IDictionary<Enum, string> enumMap;
-				map = this.BuildEnumMap(objectType, out enumMap);
+				maps = this.BuildEnumMap(objectType, out enumMap);
 				return typeName;
 			}
 
@@ -523,27 +554,31 @@ namespace JsonFx.Serialization.Resolvers
 			{
 #if NET20 || NET30
 				this.MapLock.AcquireWriterLock(ResolverCache.LockTimeout);
-#else
+#elif NET35
 				this.MapLock.EnterWriteLock();
 #endif
+#if !NET40
 				try
+#endif
 				{
 					// store marker in cache for future lookups
-					map = (this.MemberCache[objectType] = null);
+					maps = (this.MemberCache[objectType] = null);
 					return (this.NameCache[objectType] = typeName);
 				}
+#if !NET40
 				finally
+#endif
 				{
 #if NET20 || NET30
 					this.MapLock.ReleaseWriterLock();
-#else
+#elif NET35
 					this.MapLock.ExitWriteLock();
 #endif
 				}
 			}
 
-			// create new map
-			map = new Dictionary<string, MemberMap>();
+			// create new mapping
+			maps = new Dictionary<string, MemberMap>();
 
 			bool isImmutableType = objectType.IsGenericType && objectType.Name.StartsWith(ResolverCache.AnonymousTypePrefix, false, CultureInfo.InvariantCulture);
 
@@ -563,7 +598,7 @@ namespace JsonFx.Serialization.Resolvers
 
 				ValueIgnoredDelegate isIgnored = this.Strategy.GetValueIgnoredCallback(info);
 
-				map[name.LocalName] = new MemberMap(info, name, isIgnored);
+				maps[name.LocalName] = new MemberMap(info, name, isIgnored);
 			}
 
 			// load fields into property map
@@ -582,25 +617,29 @@ namespace JsonFx.Serialization.Resolvers
 
 				ValueIgnoredDelegate isIgnored = this.Strategy.GetValueIgnoredCallback(info);
 
-				map[name.LocalName] = new MemberMap(info, name, isIgnored);
+				maps[name.LocalName] = new MemberMap(info, name, isIgnored);
 			}
 
 #if NET20 || NET30
 			this.MapLock.AcquireWriterLock(ResolverCache.LockTimeout);
-#else
+#elif NET35
 			this.MapLock.EnterWriteLock();
 #endif
+#if !NET40
 			try
+#endif
 			{
 				// store in cache for future requests
-				map = (this.MemberCache[objectType] = map);
+				this.MemberCache[objectType] = maps;
 				return (this.NameCache[objectType] = typeName);
 			}
+#if !NET40
 			finally
+#endif
 			{
 #if NET20 || NET30
 				this.MapLock.ReleaseWriterLock();
-#else
+#elif NET35
 				this.MapLock.ExitWriteLock();
 #endif
 			}
@@ -639,21 +678,25 @@ namespace JsonFx.Serialization.Resolvers
 
 #if NET20 || NET30
 			this.MapLock.AcquireWriterLock(ResolverCache.LockTimeout);
-#else
+#elif NET35
 			this.MapLock.EnterWriteLock();
 #endif
+#if !NET40
 			try
+#endif
 			{
 				// store in caches for future requests
 				this.NameCache[enumType] = typeName;
 				this.EnumCache[enumType] = enumMaps;
 				return (this.MemberCache[enumType] = maps);
 			}
+#if !NET40
 			finally
+#endif
 			{
 #if NET20 || NET30
 				this.MapLock.ReleaseWriterLock();
-#else
+#elif NET35
 				this.MapLock.ExitWriteLock();
 #endif
 			}
@@ -674,21 +717,25 @@ namespace JsonFx.Serialization.Resolvers
 
 #if NET20 || NET30
 			this.FactoryLock.AcquireReaderLock(ResolverCache.LockTimeout);
-#else
+#elif NET35
 			this.FactoryLock.EnterReadLock();
 #endif
+#if !NET40
 			try
+#endif
 			{
 				if (this.Factories.TryGetValue(type, out map))
 				{
 					return map;
 				}
 			}
+#if !NET40
 			finally
+#endif
 			{
 #if NET20 || NET30
 				this.FactoryLock.ReleaseReaderLock();
-#else
+#elif NET35
 				this.FactoryLock.ExitReadLock();
 #endif
 			}
@@ -697,19 +744,23 @@ namespace JsonFx.Serialization.Resolvers
 
 #if NET20 || NET30
 			this.FactoryLock.AcquireWriterLock(ResolverCache.LockTimeout);
-#else
+#elif NET35
 			this.FactoryLock.EnterWriteLock();
 #endif
+#if !NET40
 			try
+#endif
 			{
 				// store in cache for future requests
 				return (this.Factories[type] = map);
 			}
+#if !NET40
 			finally
+#endif
 			{
 #if NET20 || NET30
 				this.FactoryLock.ReleaseWriterLock();
-#else
+#elif NET35
 				this.FactoryLock.ExitWriteLock();
 #endif
 			}

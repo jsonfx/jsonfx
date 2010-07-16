@@ -179,11 +179,6 @@ namespace JsonFx.Serialization
 			// ignore non-applicable members
 		}
 
-		internal IDictionary<string, MemberMap> LoadMaps(Type type)
-		{
-			return this.ResolverCache.LoadMaps(type);
-		}
-
 		#endregion Object Manipulation Methods
 
 		#region Coercion Methods
@@ -239,10 +234,10 @@ namespace JsonFx.Serialization
 				{
 					if (!Enum.IsDefined(targetType, value))
 					{
-						IDictionary<string, MemberMap> map = this.ResolverCache.LoadMaps(targetType);
-						if (map != null && map.ContainsKey((string)value))
+						IDictionary<string, MemberMap> maps = this.ResolverCache.LoadMaps(targetType);
+						if (maps != null && maps.ContainsKey((string)value))
 						{
-							value = map[(string)value].Name;
+							value = maps[(string)value].Name;
 						}
 					}
 

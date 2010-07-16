@@ -393,16 +393,18 @@ namespace JsonFx.Common
 
 			bool appendDelim = false;
 
-			foreach (var map in maps)
+			// TODO: sort such that attribute members are first
+
+			foreach (var map in maps.Values)
 			{
-				if (map.Value.Getter == null)
+				if (map.Getter == null)
 				{
 					continue;
 				}
 
-				object propertyValue = map.Value.Getter(value);
-				if (map.Value.IsIgnored != null &&
-					map.Value.IsIgnored(value, propertyValue))
+				object propertyValue = map.Getter(value);
+				if (map.IsIgnored != null &&
+					map.IsIgnored(value, propertyValue))
 				{
 					continue;
 				}
@@ -416,7 +418,7 @@ namespace JsonFx.Common
 					appendDelim = true;
 				}
 
-				tokens.Enqueue(CommonGrammar.TokenProperty(map.Value.DataName));
+				tokens.Enqueue(CommonGrammar.TokenProperty(map.DataName));
 				this.GetTokens(tokens, detector, propertyValue);
 			}
 

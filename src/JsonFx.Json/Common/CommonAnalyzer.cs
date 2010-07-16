@@ -229,7 +229,7 @@ namespace JsonFx.Common
 					String.Format(CommonAnalyzer.ErrorExpectedObject, token.TokenType));
 			}
 
-			IDictionary<string, MemberMap> memberMap = this.Coercion.LoadMaps(targetType);
+			IDictionary<string, MemberMap> maps = this.Settings.Resolver.LoadMaps(targetType);
 
 			Type itemType = TypeCoercionUtility.GetDictionaryItemType(targetType);
 			object objectValue = (itemType != null) ?
@@ -326,8 +326,8 @@ namespace JsonFx.Common
 					propertyMap = null;
 					propertyType = itemType;
 				}
-				else if ((memberMap != null) &&
-				memberMap.TryGetValue(propertyName, out propertyMap))
+				else if ((maps != null) &&
+					maps.TryGetValue(propertyName, out propertyMap))
 				{
 					propertyType = (propertyMap != null) ? propertyMap.Type : null;
 				}
