@@ -42,6 +42,9 @@ namespace JsonFx.Xml.Resolvers
 	/// <summary>
 	/// Controls name resolution for IDataReader / IDataWriter using attributes and conventions similar to XmlSerializer semantics
 	/// </summary>
+	/// <remarks>
+	/// http://msdn.microsoft.com/en-us/library/83y7df3e.aspx
+	/// </remarks>
 	public class XmlResolverStrategy : PocoResolverStrategy
 	{
 		#region Constants
