@@ -232,12 +232,12 @@ namespace JsonFx.Xml
 		<quote>""</quote>
 		<backslash>\</backslash>
 		<controls>"+"\b\f\n\r\t"+@"</controls>
-		<slash>/ & /</slash>
+		<slash>/ &amp; /</slash>
 		<alpha>abcdefghijklmnopqrstuvwyz</alpha>
 		<ALPHA>ABCDEFGHIJKLMNOPQRSTUVWYZ</ALPHA>
 		<digit>0123456789</digit>
 		<_x0030_123456789>digit</_x0030_123456789>
-		<special>`1~!@#$%^&*()_+-={':[,]}|;.</>?</special>
+		<special>`1~!@#$%^&amp;*()_+-={':[,]}|;.&lt;/&gt;?</special>
 		<hex>"+"\u0123\u4567\u89AB\uCDEF\uABCD\uEF4A"+@"</hex>
 		<true>true</true>
 		<false>false</false>
@@ -246,7 +246,7 @@ namespace JsonFx.Xml
 		<object></object>
 		<address>50 St. James Street</address>
 		<url>http://www.JSON.org/</url>
-		<comment>// /* <!-- --</comment>
+		<comment>// /* &lt;!-- --</comment>
 		<_x0023__x0020_--_x0020_--_x003E__x0020__x002A__x002F_> </_x0023__x0020_--_x0020_--_x003E__x0020__x002A__x002F_>
 		<_x0020_s_x0020_p_x0020_a_x0020_c_x0020_e_x0020_d_x0020_>
 			<int>1</int>
@@ -267,7 +267,7 @@ namespace JsonFx.Xml
 			<int>7</int>
 		</compact>
 		<jsontext>{""object with 1 member"":[""array with 1 element""]}</jsontext>
-		<quotes>&#34; "" %22 0x22 034 &#x22;</quotes>
+		<quotes>&amp;#34; "" %22 0x22 034 &amp;#x22;</quotes>
 		<_x002F__x005C__x0022_"+"\uCAFE\uBABE\uAB98\uFCDE\uBCDA"+@"_xEF4A__x0008__x000C__x000A__x000D__x0009__x0060_1_x007E__x0021__x0040__x0023__x0024__x0025__x005E__x0026__x002A__x0028__x0029___x002B_-_x003D__x005B__x005D__x007B__x007D__x007C__x003B__x003A__x0027__x002C_._x002F__x003C__x003E__x003F_>A key can be any string</_x002F__x005C__x0022_"+"\uCAFE\uBABE\uAB98\uFCDE\uBCDA"+@"_xEF4A__x0008__x000C__x000A__x000D__x0009__x0060_1_x007E__x0021__x0040__x0023__x0024__x0025__x005E__x0026__x002A__x0028__x0029___x002B_-_x003D__x005B__x005D__x007B__x007D__x007C__x003B__x003A__x0027__x002C_._x002F__x003C__x003E__x003F_>
 	</object>
 	<double>0.5</double>

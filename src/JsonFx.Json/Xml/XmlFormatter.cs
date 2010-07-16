@@ -152,7 +152,7 @@ namespace JsonFx.Xml
 						{
 							elementName = this.EnsureName(elementName ?? token.Name, token.Value.GetType());
 							WriteTagOpen(writer, elementName);
-							this.WriteLiteral(writer, value);
+							this.WriteCharData(writer, value);
 							WriteTagClose(writer, elementName);
 						}
 						break;
@@ -387,7 +387,8 @@ namespace JsonFx.Xml
 			/// <param name="writer"></param>
 			/// <param name="value"></param>
 			/// <remarks>
-			/// BNF from http://www.w3.org/TR/xml/#sec-common-syn
+			/// Explicitly escaping ':' to maintain compatibility with XML Namespaces.
+			/// From XML 1.0, 5th ed. http://www.w3.org/TR/xml/#sec-common-syn
 			///		Name			= NameStartChar (NameChar)*
 			///		NameStartChar	= ":"
 			///						| [A-Z]
@@ -479,17 +480,133 @@ namespace JsonFx.Xml
 			}
 
 			/// <summary>
-			/// Emits a valid XML literal
+			/// Emits valid XML character data
 			/// </summary>
 			/// <param name="writer"></param>
 			/// <param name="value"></param>
 			/// <remarks>
-			/// BNF from http://www.w3.org/TR/xml/#sec-common-syn
+			/// From XML 1.0, 5th ed. http://www.w3.org/TR/xml/#syntax
+			///		CharData is defined as all chars except less-than ('&lt;'), ampersand ('&amp;'), the sequence "]]>", optionally encoding greater-than ('>').
+			///	
+			///	Rather than detect "]]>", this simply encodes all '>'.
 			/// </remarks>
-			private void WriteLiteral(TextWriter writer, string value)
+			private void WriteCharData(TextWriter writer, string value)
 			{
-				// TODO: escape
-				writer.Write(value);
+				int start = 0,
+					length = value.Length;
+
+				for (int i=start; i<length; i++)
+				{
+					string entity;
+					switch (value[i])
+					{
+						case '<':
+						{
+							entity = "&lt;";
+							break;
+						}
+						case '>':
+						{
+							entity = "&gt;";
+							break;
+						}
+						case '&':
+						{
+							entity = "&amp;";
+							break;
+						}
+						default:
+						{
+							continue;
+						}
+					}
+
+					if (i > start)
+					{
+						// copy any leading unescaped chunk
+						writer.Write(value.Substring(start, i-start));
+					}
+					start = i+1;
+
+					// use XML named entity
+					writer.Write(entity);
+				}
+
+				if (length > start)
+				{
+					// copy any trailing unescaped chunk
+					writer.Write(value.Substring(start, length-start));
+				}
+			}
+
+			/// <summary>
+			/// Emits valid XML attribute character data
+			/// </summary>
+			/// <param name="writer"></param>
+			/// <param name="value"></param>
+			/// <remarks>
+			/// From XML 1.0, 5th ed. http://www.w3.org/TR/xml/#syntax
+			///		CharData is defined as all chars except less-than ('&lt;'), ampersand ('&amp;'), the sequence "]]>", optionally encoding greater-than ('>').
+			///		Attributes should additionally encode double-quote ('"') and single-quote ('\'')
+			///	Rather than detect "]]>", this simply encodes all '>'.
+			/// </remarks>
+			private void WriteAttributeValue(TextWriter writer, string value)
+			{
+				int start = 0,
+					length = value.Length;
+
+				for (int i=start; i<length; i++)
+				{
+					string entity;
+					switch (value[i])
+					{
+						case '<':
+						{
+							entity = "&lt;";
+							break;
+						}
+						case '>':
+						{
+							entity = "&gt;";
+							break;
+						}
+						case '&':
+						{
+							entity = "&amp;";
+							break;
+						}
+						case '"':
+						{
+							entity = "&quot;";
+							break;
+						}
+						case '\'':
+						{
+							entity = "&apos;";
+							break;
+						}
+						default:
+						{
+							continue;
+						}
+					}
+
+					if (i > start)
+					{
+						// copy any leading unescaped chunk
+						writer.Write(value.Substring(start, i-start));
+					}
+					start = i+1;
+
+					// use XML named entity
+					writer.Write(entity);
+				}
+
+				if (length > start)
+				{
+					// copy any trailing unescaped chunk
+					writer.Write(value.Substring(start, length-start));
+				}
 			}
 
 			#endregion Write Methods
