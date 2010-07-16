@@ -152,7 +152,7 @@ namespace JsonFx.Xml
 						{
 							elementName = this.EnsureName(elementName ?? token.Name, token.Value.GetType());
 							WriteTagOpen(writer, elementName);
-							writer.Write(value);
+							this.WriteLiteral(writer, value);
 							WriteTagClose(writer, elementName);
 						}
 						break;
@@ -381,8 +381,41 @@ namespace JsonFx.Xml
 				}
 			}
 
+			/// <summary>
+			/// Emits a valid XML local-name (i.e. encodes invalid chars including ':')
+			/// </summary>
+			/// <param name="writer"></param>
+			/// <param name="value"></param>
+			/// <remarks>
+			/// BNF from http://www.w3.org/TR/xml/#sec-common-syn
+			///		Name			= NameStartChar (NameChar)*
+			///		NameStartChar	= ":"
+			///						| [A-Z]
+			///						| "_"
+			///						| [a-z]
+			///						| [#xC0-#xD6]
+			///						| [#xD8-#xF6]
+			///						| [#xF8-#x2FF]
+			///						| [#x370-#x37D]
+			///						| [#x37F-#x1FFF]
+			///						| [#x200C-#x200D]
+			///						| [#x2070-#x218F]
+			///						| [#x2C00-#x2FEF]
+			///						| [#x3001-#xD7FF]
+			///						| [#xF900-#xFDCF]
+			///						| [#xFDF0-#xFFFD]
+			///						| [#x10000-#xEFFFF]
+			///		NameChar		= NameStartChar
+			///						| "-"
+			///						| "."
+			///						| [0-9]
+			///						| #xB7
+			///						| [#x0300-#x036F]
+			///						| [#x203F-#x2040]
+			/// </remarks>
 			private void WriteLocalName(TextWriter writer, string value)
 			{
+				bool isStartChar = true;
 				int start = 0,
 					length = value.Length;
 
@@ -390,23 +423,49 @@ namespace JsonFx.Xml
 				{
 					char ch = value[i];
 
-					if ((ch >= 'A' && ch <= 'Z') ||
-						(ch >= 'a' && ch <= 'z') ||
-						(ch == '_'))
+					if ((ch >= 'a' && ch <= 'z') ||
+						(ch >= 'A' && ch <= 'Z') ||
+						(ch == '_') ||
+						(ch >= '\u00C0' && ch <= '\u00D6') ||
+						(ch >= '\u00D8' && ch <= '\u00F6') ||
+						(ch >= '\u00F8' && ch <= '\u02FF') ||
+						(ch >= '\u0370' && ch <= '\u037D') ||
+						(ch >= '\u037F' && ch <= '\u1FFF') ||
+						(ch >= '\u200C' && ch <= '\u200D') ||
+						(ch >= '\u2070' && ch <= '\u218F') ||
+						(ch >= '\u2C00' && ch <= '\u2FEF') ||
+						(ch >= '\u3001' && ch <= '\uD7FF') ||
+						(ch >= '\uF900' && ch <= '\uFDCF') ||
+						(ch >= '\uFDF0' && ch <= '\uFFFD'))
 					{
+						// purposefully leaving out ':' to implement namespace prefixes
+						// and cannot represent [#x10000-#xEFFFF] as single char so this will incorrectly escape
 						continue;
 					}
-					if ((i > 0) && ((ch >= '0' && ch <= '9') || (ch == '-') || (ch == '.')))
+
+					if (isStartChar)
 					{
+						isStartChar = false;
+					}
+					else if ((ch >= '0' && ch <= '9') ||
+						(ch == '-') ||
+						(ch == '.') ||
+						(ch == '\u00B7') ||
+						(ch >= '\u0300' && ch <= '\u036F') ||
+						(ch >= '\u203F' && ch <= '\u2040'))
+					{
+						// these chars are only valid after initial char
 						continue;
 					}
 
 					if (i > start)
 					{
+						// copy any leading unescaped chunk
 						writer.Write(value.Substring(start, i-start));
 					}
 					start = i+1;
 
+					// use XmlSerializer-hex-style encoding of UTF-16
 					writer.Write("_x");
 					writer.Write(Char.ConvertToUtf32(value, i).ToString("X4"));
 					writer.Write("_");
@@ -414,8 +473,23 @@ namespace JsonFx.Xml
 
 				if (length > start)
 				{
+					// copy any trailing unescaped chunk
 					writer.Write(value.Substring(start, length-start));
 				}
+			}
+
+			/// <summary>
+			/// Emits a valid XML literal
+			/// </summary>
+			/// <param name="writer"></param>
+			/// <param name="value"></param>
+			/// <remarks>
+			/// BNF from http://www.w3.org/TR/xml/#sec-common-syn
+			/// </remarks>
+			private void WriteLiteral(TextWriter writer, string value)
+			{
+				// TODO: escape
+				writer.Write(value);
 			}
 
 			#endregion Write Methods

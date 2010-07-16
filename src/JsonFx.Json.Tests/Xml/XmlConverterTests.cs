@@ -268,7 +268,7 @@ namespace JsonFx.Xml
 		</compact>
 		<jsontext>{""object with 1 member"":[""array with 1 element""]}</jsontext>
 		<quotes>&#34; "" %22 0x22 034 &#x22;</quotes>
-		<_x002F__x005C__x0022__xCAFE__xBABE__xAB98__xFCDE__xBCDA__xEF4A__x0008__x000C__x000A__x000D__x0009__x0060_1_x007E__x0021__x0040__x0023__x0024__x0025__x005E__x0026__x002A__x0028__x0029___x002B_-_x003D__x005B__x005D__x007B__x007D__x007C__x003B__x003A__x0027__x002C_._x002F__x003C__x003E__x003F_>A key can be any string</_x002F__x005C__x0022__xCAFE__xBABE__xAB98__xFCDE__xBCDA__xEF4A__x0008__x000C__x000A__x000D__x0009__x0060_1_x007E__x0021__x0040__x0023__x0024__x0025__x005E__x0026__x002A__x0028__x0029___x002B_-_x003D__x005B__x005D__x007B__x007D__x007C__x003B__x003A__x0027__x002C_._x002F__x003C__x003E__x003F_>
+		<_x002F__x005C__x0022_"+"\uCAFE\uBABE\uAB98\uFCDE\uBCDA"+@"_xEF4A__x0008__x000C__x000A__x000D__x0009__x0060_1_x007E__x0021__x0040__x0023__x0024__x0025__x005E__x0026__x002A__x0028__x0029___x002B_-_x003D__x005B__x005D__x007B__x007D__x007C__x003B__x003A__x0027__x002C_._x002F__x003C__x003E__x003F_>A key can be any string</_x002F__x005C__x0022_"+"\uCAFE\uBABE\uAB98\uFCDE\uBCDA"+@"_xEF4A__x0008__x000C__x000A__x000D__x0009__x0060_1_x007E__x0021__x0040__x0023__x0024__x0025__x005E__x0026__x002A__x0028__x0029___x002B_-_x003D__x005B__x005D__x007B__x007D__x007C__x003B__x003A__x0027__x002C_._x002F__x003C__x003E__x003F_>
 	</object>
 	<double>0.5</double>
 	<double>98.6</double>
