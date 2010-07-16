@@ -489,6 +489,9 @@ namespace JsonFx.Xml
 			///		CharData is defined as all chars except less-than ('&lt;'), ampersand ('&amp;'), the sequence "]]>", optionally encoding greater-than ('>').
 			///	
 			///	Rather than detect "]]>", this simply encodes all '>'.
+			///	From XML 1.0, 5th ed. http://www.w3.org/TR/xml/#sec-line-ends
+			///		"the XML processor must behave as if it normalized all line breaks in external parsed entities (including the document entity) on input, before parsing"
+			///	Therefore, this encodes all CR ('\r') chars to preserve them in the final output.
 			/// </remarks>
 			private void WriteCharData(TextWriter writer, string value)
 			{
@@ -513,6 +516,12 @@ namespace JsonFx.Xml
 						case '&':
 						{
 							entity = "&amp;";
+							break;
+						}
+						case '\r':
+						{
+							// http://www.w3.org/TR/xml/#sec-line-ends
+							entity = "&#xD;";
 							break;
 						}
 						default:
@@ -580,9 +589,25 @@ namespace JsonFx.Xml
 							entity = "&quot;";
 							break;
 						}
-						case '\'':
+						// NOTE: emitting with double-quotes removes need for this escaping
+						//case '\'':
+						//{
+						//    entity = "&apos;";
+						//    break;
+						//}
+						case '\t':
 						{
-							entity = "&apos;";
+							entity = "&#x9;";
+							break;
+						}
+						case '\r':
+						{
+							entity = "&#xD;";
+							break;
+						}
+						case '\n':
+						{
+							entity = "&#xA;";
 							break;
 						}
 						default:

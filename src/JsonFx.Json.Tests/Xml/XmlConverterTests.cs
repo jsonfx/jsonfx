@@ -231,7 +231,7 @@ namespace JsonFx.Xml
 		<space> </space>
 		<quote>""</quote>
 		<backslash>\</backslash>
-		<controls>"+"\b\f\n\r\t"+@"</controls>
+		<controls>"+"\b\f\n&#xD;\t"+@"</controls>
 		<slash>/ &amp; /</slash>
 		<alpha>abcdefghijklmnopqrstuvwyz</alpha>
 		<ALPHA>ABCDEFGHIJKLMNOPQRSTUVWYZ</ALPHA>
