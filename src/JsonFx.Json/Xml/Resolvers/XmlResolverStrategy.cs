@@ -83,16 +83,6 @@ namespace JsonFx.Xml.Resolvers
 		}
 
 		/// <summary>
-		/// Gets a value indicating if the member is to be serialized as an attribute.
-		/// </summary>
-		/// <param name="member"></param>
-		/// <returns>true if member is marked with XmlAttributeAttribute</returns>
-		public override bool IsAttribute(MemberInfo member)
-		{
-			return TypeCoercionUtility.HasAttribute<XmlAttributeAttribute>(member);
-		}
-
-		/// <summary>
 		/// Gets a delegate which determines if the property or field should not be serialized based upon its value.
 		/// </summary>
 		/// <param name="member"></param>
@@ -256,7 +246,7 @@ namespace JsonFx.Xml.Resolvers
 			XmlAttributeAttribute attrAttr = TypeCoercionUtility.GetAttribute<XmlAttributeAttribute>(member);
 			if (attrAttr != null && !String.IsNullOrEmpty(attrAttr.AttributeName))
 			{
-				return new DataName(attrAttr.AttributeName, attrAttr.Namespace);
+				return new DataName(attrAttr.AttributeName, attrAttr.Namespace, true);
 			}
 
 			XmlArrayAttribute arrayAttr = TypeCoercionUtility.GetAttribute<XmlArrayAttribute>(member);

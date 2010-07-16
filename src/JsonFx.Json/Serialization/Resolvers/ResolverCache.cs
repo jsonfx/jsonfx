@@ -78,11 +78,6 @@ namespace JsonFx.Serialization.Resolvers
 		/// </summary>
 		public readonly ValueIgnoredDelegate IsIgnored;
 
-		/// <summary>
-		/// Determines if should be persisted as an attribute member
-		/// </summary>
-		public readonly bool IsAttribute;
-
 		#endregion Fields
 
 		#region Init
@@ -94,7 +89,7 @@ namespace JsonFx.Serialization.Resolvers
 		/// <param name="dataName"></param>
 		/// <param name="isIgnored"></param>
 		/// <param name="isAttribute"></param>
-		public MemberMap(PropertyInfo propertyInfo, DataName dataName, ValueIgnoredDelegate isIgnored, bool isAttribute)
+		public MemberMap(PropertyInfo propertyInfo, DataName dataName, ValueIgnoredDelegate isIgnored)
 		{
 			if (propertyInfo == null)
 			{
@@ -117,7 +112,7 @@ namespace JsonFx.Serialization.Resolvers
 		/// <param name="dataName"></param>
 		/// <param name="isIgnored"></param>
 		/// <param name="isAttribute"></param>
-		public MemberMap(FieldInfo fieldInfo, DataName dataName, ValueIgnoredDelegate isIgnored, bool isAttribute)
+		public MemberMap(FieldInfo fieldInfo, DataName dataName, ValueIgnoredDelegate isIgnored)
 		{
 			if (fieldInfo == null)
 			{
@@ -568,9 +563,7 @@ namespace JsonFx.Serialization.Resolvers
 
 				ValueIgnoredDelegate isIgnored = this.Strategy.GetValueIgnoredCallback(info);
 
-				bool isAttribute = this.Strategy.IsAttribute(info);
-
-				map[name.LocalName] = new MemberMap(info, name, isIgnored, isAttribute);
+				map[name.LocalName] = new MemberMap(info, name, isIgnored);
 			}
 
 			// load fields into property map
@@ -589,9 +582,7 @@ namespace JsonFx.Serialization.Resolvers
 
 				ValueIgnoredDelegate isIgnored = this.Strategy.GetValueIgnoredCallback(info);
 
-				bool isAttribute = this.Strategy.IsAttribute(info);
-
-				map[name.LocalName] = new MemberMap(info, name, isIgnored, isAttribute);
+				map[name.LocalName] = new MemberMap(info, name, isIgnored);
 			}
 
 #if NET20 || NET30
@@ -642,7 +633,7 @@ namespace JsonFx.Serialization.Resolvers
 				}
 
 				MemberMap enumMap;
-				maps[name.LocalName] = enumMap = new MemberMap(info, name, null, false);
+				maps[name.LocalName] = enumMap = new MemberMap(info, name, null);
 				enumMaps[(Enum)enumMap.Getter(null)] = name.LocalName;
 			}
 

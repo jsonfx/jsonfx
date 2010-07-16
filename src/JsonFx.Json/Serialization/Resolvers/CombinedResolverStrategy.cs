@@ -124,25 +124,6 @@ namespace JsonFx.Serialization.Resolvers
 		}
 
 		/// <summary>
-		/// Gets a value indicating if the member is to be serialized as an attribute.
-		/// </summary>
-		/// <param name="member"></param>
-		/// <returns></returns>
-		/// <returns>true if any strategy specifies should be an attributes</returns>
-		public bool IsAttribute(MemberInfo member)
-		{
-			foreach (IResolverStrategy strategy in this.InnerStrategies)
-			{
-				if (strategy.IsAttribute(member))
-				{
-					return true;
-				}
-			}
-
-			return false;
-		}
-
-		/// <summary>
 		/// Gets a delegate which determines if the property or field should not be serialized based upon its value.
 		/// </summary>
 		/// <param name="member"></param>

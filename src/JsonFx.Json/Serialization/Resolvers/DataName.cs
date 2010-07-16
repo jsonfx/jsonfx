@@ -55,8 +55,20 @@ namespace JsonFx.Serialization.Resolvers
 
 		#region Fields
 
+		/// <summary>
+		/// local-name of the member or type
+		/// </summary>
 		public readonly string LocalName;
+
+		/// <summary>
+		/// namespace of the member or type
+		/// </summary>
 		public readonly string NamespaceUri;
+
+		/// <summary>
+		/// Determines if name should be an attribute name
+		/// </summary>
+		public readonly bool IsAttribute;
 
 		#endregion Fields
 
@@ -82,7 +94,7 @@ namespace JsonFx.Serialization.Resolvers
 		/// This constructor implicitly delcares the namespace to be empty.
 		/// </remarks>
 		public DataName(string localName)
-			: this(localName, null)
+			: this(localName, null, false)
 		{
 		}
 
@@ -98,6 +110,23 @@ namespace JsonFx.Serialization.Resolvers
 		/// Relative URIs are officially deprecated for namespaces: http://www.w3.org/2000/09/xppa
 		/// </remarks>
 		public DataName(string localName, string namespaceUri)
+			: this(localName, namespaceUri, false)
+		{
+		}
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="localName">any string is a valid local-name</param>
+		/// <param name="namespaceUri">an absolute URI string, or null</param>
+		/// <param name="isAttribute">determines if name should be an attribute name</param>
+		/// <exception cref="ArgumentNullException">thrown if <paramref name="localName"/> is null</exception>
+		/// <exception cref="ArgumentNullException">thrown if <paramref name="namespaceUri"/> is an invalid absolute URI</exception>
+		/// <remarks>
+		/// The namespace field follows XML recommendation of absolute URIs.
+		/// Relative URIs are officially deprecated for namespaces: http://www.w3.org/2000/09/xppa
+		/// </remarks>
+		public DataName(string localName, string namespaceUri, bool isAttribute)
 		{
 			if (localName == null)
 			{
@@ -115,6 +144,7 @@ namespace JsonFx.Serialization.Resolvers
 
 			this.LocalName = localName;
 			this.NamespaceUri = namespaceUri;
+			this.IsAttribute = isAttribute;
 		}
 
 		#endregion Init
