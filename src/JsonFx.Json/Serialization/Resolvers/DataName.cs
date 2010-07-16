@@ -42,14 +42,14 @@ namespace JsonFx.Serialization.Resolvers
 	/// Namespaces must be a URI, but local-name can be any non-null string.
 	/// It is up to formatters to determine how to properly represent names which are invalid for the format.
 	/// </remarks>
-	public class DataName
+	public struct DataName
 	{
 		#region Constants
 
 		private const string AnonymousTypePrefix = "<>f__AnonymousType";
 		private static readonly string TypeGenericIDictionary = typeof(IDictionary<,>).FullName;
 
-		public static readonly DataName Empty = new DataName(String.Empty);
+		public static readonly DataName Empty = new DataName();
 
 		#endregion Constants
 
@@ -118,6 +118,18 @@ namespace JsonFx.Serialization.Resolvers
 		}
 
 		#endregion Init
+
+		#region Properties
+
+		/// <summary>
+		/// Determines if this is an empty DataName
+		/// </summary>
+		public bool IsEmpty
+		{
+			get { return this.LocalName == null; }
+		}
+
+		#endregion Properties
 
 		#region Utility Methods
 
@@ -257,7 +269,16 @@ namespace JsonFx.Serialization.Resolvers
 
 		public override bool Equals(object obj)
 		{
-			DataName that = obj as DataName;
+			if (!(obj is DataName))
+			{
+				return false;
+			}
+
+			return this.Equals((DataName)obj);
+		}
+
+		public bool Equals(DataName that)
+		{
 			if (that == null)
 			{
 				return false;
@@ -279,5 +300,24 @@ namespace JsonFx.Serialization.Resolvers
 		}
 
 		#endregion Object Overrides
+
+		#region Operators
+
+		public static bool operator ==(DataName a, DataName b)
+		{
+			if (Object.ReferenceEquals(a, null))
+			{
+				return Object.ReferenceEquals(b, null);
+			}
+
+			return a.Equals(b);
+		}
+
+		public static bool operator !=(DataName a, DataName b)
+		{
+			return !(a == b);
+		}
+
+		#endregion Operators
 	}
 }

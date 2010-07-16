@@ -481,7 +481,7 @@ namespace JsonFx.Serialization.Resolvers
 		private DataName BuildMap(Type objectType, out IDictionary<string, MemberMap> map)
 		{
 			DataName typeName = this.Strategy.GetName(objectType);
-			if (typeName == null)
+			if (typeName.IsEmpty)
 			{
 				typeName = new DataName(objectType);
 			}
@@ -533,7 +533,7 @@ namespace JsonFx.Serialization.Resolvers
 				}
 
 				DataName name = this.Strategy.GetName(info);
-				if (name == null)
+				if (name.IsEmpty)
 				{
 					name = new DataName(info.Name);
 				}
@@ -552,7 +552,7 @@ namespace JsonFx.Serialization.Resolvers
 				}
 
 				DataName name = this.Strategy.GetName(info);
-				if (name == null)
+				if (name.IsEmpty)
 				{
 					name = new DataName(info.Name);
 				}
@@ -593,7 +593,7 @@ namespace JsonFx.Serialization.Resolvers
 
 			// create new maps
 			DataName typeName = this.Strategy.GetName(enumType);
-			if (typeName == null)
+			if (typeName.IsEmpty)
 			{
 				typeName = new DataName(enumType);
 			}
@@ -604,7 +604,7 @@ namespace JsonFx.Serialization.Resolvers
 			foreach (FieldInfo info in enumType.GetFields(BindingFlags.Static|BindingFlags.Public))
 			{
 				DataName name = this.Strategy.GetName(info);
-				if (name == null)
+				if (name.IsEmpty)
 				{
 					name = new DataName(info.Name);
 				}

@@ -296,7 +296,7 @@ namespace JsonFx.Common
 					case CommonTokenType.Property:
 					{
 						tokens.Pop();
-						propertyName = (token.Name ?? DataName.Empty).LocalName;
+						propertyName = token.Name.LocalName;
 						break;
 					}
 					case CommonTokenType.ObjectEnd:

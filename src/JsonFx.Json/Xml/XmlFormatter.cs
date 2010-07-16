@@ -104,7 +104,7 @@ namespace JsonFx.Xml
 
 				while (!stream.IsCompleted)
 				{
-					this.WriteValue(writer, stream, null);
+					this.WriteValue(writer, stream, DataName.Empty);
 				}
 			}
 
@@ -145,12 +145,12 @@ namespace JsonFx.Xml
 						string value = token.ValueAsString();
 						if (String.IsNullOrEmpty(value))
 						{
-							elementName = this.EnsureName(elementName ?? token.Name, null);
+							elementName = this.EnsureName(elementName.IsEmpty ? token.Name : elementName, null);
 							WriteTagEmpty(writer, elementName);
 						}
 						else
 						{
-							elementName = this.EnsureName(elementName ?? token.Name, token.Value.GetType());
+							elementName = this.EnsureName(elementName.IsEmpty ? token.Name : elementName, token.Value.GetType());
 							WriteTagOpen(writer, elementName);
 							this.WriteCharData(writer, value);
 							WriteTagClose(writer, elementName);
@@ -169,7 +169,7 @@ namespace JsonFx.Xml
 				Token<CommonTokenType> token = tokens.Pop();
 
 				// ensure element has a name
-				elementName = this.EnsureName(elementName ?? token.Name, typeof(Array));
+				elementName = this.EnsureName(elementName.IsEmpty ? token.Name : elementName, typeof(Array));
 
 				// TODO: figure out a way to surface XmlArrayItemAttribute name too
 
@@ -219,7 +219,7 @@ namespace JsonFx.Xml
 								this.pendingNewLine = false;
 							}
 
-							this.WriteValue(writer, tokens, (token.Name ?? DataName.Empty));
+							this.WriteValue(writer, tokens, token.Name);
 
 							this.pendingNewLine = false;
 							needsValueDelim = true;
@@ -254,7 +254,7 @@ namespace JsonFx.Xml
 				Token<CommonTokenType> token = tokens.Pop();
 
 				// ensure element has a name
-				elementName = this.EnsureName(elementName ?? token.Name, typeof(Object));
+				elementName = this.EnsureName(elementName.IsEmpty ? token.Name : elementName, typeof(Object));
 
 				WriteTagOpen(writer, elementName);
 				this.pendingNewLine = true;
@@ -302,7 +302,7 @@ namespace JsonFx.Xml
 								this.pendingNewLine = false;
 							}
 
-							this.WriteValue(writer, tokens, (token.Name ?? DataName.Empty));
+							this.WriteValue(writer, tokens, token.Name);
 
 							this.pendingNewLine = false;
 							needsValueDelim = true;
@@ -640,7 +640,7 @@ namespace JsonFx.Xml
 
 			private DataName EnsureName(DataName name, Type type)
 			{
-				if (name == null || String.IsNullOrEmpty(name.LocalName))
+				if (String.IsNullOrEmpty(name.LocalName))
 				{
 					return this.Settings.Resolver.LoadTypeName(type);
 				}

@@ -122,7 +122,7 @@ namespace JsonFx.Serialization.Resolvers
 		{
 			if (this.GetName == null)
 			{
-				return null;
+				return DataName.Empty;
 			}
 
 			return this.GetName(member);

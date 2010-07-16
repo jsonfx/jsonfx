@@ -149,7 +149,8 @@ namespace JsonFx.Json.Resolvers
 		{
 			JsonNameAttribute attr = TypeCoercionUtility.GetAttribute<JsonNameAttribute>(member);
 
-			return (attr != null && !String.IsNullOrEmpty(attr.Name)) ? new DataName(attr.Name) : null;
+			// NOTE: JSON allows String.Empty as a valid property name
+			return ((attr != null) && (attr.Name != null)) ? new DataName(attr.Name) : DataName.Empty;
 		}
 
 		#endregion Name Resolution Methods

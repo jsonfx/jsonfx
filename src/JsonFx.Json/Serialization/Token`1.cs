@@ -33,7 +33,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
-using JsonFx.Common.Filters;
 using JsonFx.Serialization.Resolvers;
 
 namespace JsonFx.Serialization
@@ -57,12 +56,12 @@ namespace JsonFx.Serialization
 		public readonly T TokenType;
 
 		/// <summary>
-		/// The name of the token (mutually exclusive with value and null when not applicable)
+		/// The name of the token (mutually exclusive with Value and <see cref="DataName.Empty"/> when not applicable)
 		/// </summary>
 		public readonly DataName Name;
 
 		/// <summary>
-		/// The value of the token (mutually exclusive with name and null when not applicable)
+		/// The value of the token (mutually exclusive with Name and null when not applicable)
 		/// </summary>
 		public readonly object Value;
 
@@ -77,6 +76,7 @@ namespace JsonFx.Serialization
 		public Token(T tokenType)
 		{
 			this.TokenType = tokenType;
+			this.Name = DataName.Empty;
 		}
 
 		/// <summary>
@@ -88,6 +88,7 @@ namespace JsonFx.Serialization
 		{
 			this.TokenType = tokenType;
 			this.Value = value;
+			this.Name = DataName.Empty;
 		}
 
 		/// <summary>
@@ -115,7 +116,7 @@ namespace JsonFx.Serialization
 
 			builder.Append("{ ");
 			builder.Append(this.TokenType);
-			if (this.Name != null)
+			if (!this.Name.IsEmpty)
 			{
 				builder.Append("=");
 				builder.Append(this.Name);
@@ -135,7 +136,7 @@ namespace JsonFx.Serialization
 			Token<T> that = obj as Token<T>;
 			if (that == null)
 			{
-				return base.Equals(obj);
+				return false;
 			}
 
 			return

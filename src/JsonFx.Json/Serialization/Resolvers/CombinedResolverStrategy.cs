@@ -176,13 +176,13 @@ namespace JsonFx.Serialization.Resolvers
 			foreach (IResolverStrategy strategy in this.InnerStrategies)
 			{
 				DataName name = strategy.GetName(member);
-				if (name != null)
+				if (!name.IsEmpty)
 				{
 					return name;
 				}
 			}
 
-			return null;
+			return DataName.Empty;
 		}
 
 		#endregion Name Resolution Methods

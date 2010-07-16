@@ -234,7 +234,7 @@ namespace JsonFx.Xml.Resolvers
 					return new DataName(typeAttr.TypeName, typeAttr.Namespace);
 				}
 
-				return null;
+				return DataName.Empty;
 			}
 
 			XmlElementAttribute elemAttr = TypeCoercionUtility.GetAttribute<XmlElementAttribute>(member);
@@ -266,7 +266,7 @@ namespace JsonFx.Xml.Resolvers
 				}
 			}
 
-			return null;
+			return DataName.Empty;
 		}
 
 		#endregion Name Resolution Methods

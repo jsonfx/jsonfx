@@ -243,7 +243,7 @@ namespace JsonFx.Json
 								pendingNewLine = false;
 							}
 
-							string propertyName = (token.Name ?? DataName.Empty).LocalName;
+							string propertyName = token.Name.LocalName;
 
 							this.WriteString(writer, this.FormatString(propertyName));
 

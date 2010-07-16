@@ -90,7 +90,7 @@ namespace JsonFx.Serialization.Resolvers
 		/// <returns></returns>
 		public virtual DataName GetName(MemberInfo member)
 		{
-			return null;
+			return DataName.Empty;
 		}
 
 		#endregion Name Resolution Methods
