@@ -65,7 +65,10 @@ namespace JsonFx.Serialization.Resolvers
 		/// <summary>
 		/// Ctor
 		/// </summary>
-		/// <param name="type"></param>
+		/// <param name="type">a CLR Type used to generate the local-name</param>
+		/// <remarks>
+		/// This constructor implicitly delcares the namespace to be empty.
+		/// </remarks>
 		public DataName(Type type)
 			: this(DataName.GetTypeName(type))
 		{
@@ -74,7 +77,10 @@ namespace JsonFx.Serialization.Resolvers
 		/// <summary>
 		/// Ctor
 		/// </summary>
-		/// <param name="localName"></param>
+		/// <param name="localName">any string is a valid local-name</param>
+		/// <remarks>
+		/// This constructor implicitly delcares the namespace to be empty.
+		/// </remarks>
 		public DataName(string localName)
 			: this(localName, null)
 		{
@@ -83,8 +89,14 @@ namespace JsonFx.Serialization.Resolvers
 		/// <summary>
 		/// Ctor
 		/// </summary>
-		/// <param name="localName"></param>
-		/// <param name="namespaceUri"></param>
+		/// <param name="localName">any string is a valid local-name</param>
+		/// <param name="namespaceUri">an absolute URI string, or null</param>
+		/// <exception cref="ArgumentNullException">thrown if <paramref name="localName"/> is null</exception>
+		/// <exception cref="ArgumentNullException">thrown if <paramref name="namespaceUri"/> is an invalid absolute URI</exception>
+		/// <remarks>
+		/// The namespace field follows XML recommendation of absolute URIs.
+		/// Relative URIs are officially deprecated for namespaces: http://www.w3.org/2000/09/xppa
+		/// </remarks>
 		public DataName(string localName, string namespaceUri)
 		{
 			if (localName == null)
@@ -98,7 +110,7 @@ namespace JsonFx.Serialization.Resolvers
 			}
 			else if (!Uri.IsWellFormedUriString(namespaceUri, UriKind.Absolute))
 			{
-				throw new ArgumentNullException("namespaceUri");
+				throw new ArgumentException("Namespace must be an absolute URI or empty", "namespaceUri");
 			}
 
 			this.LocalName = localName;
