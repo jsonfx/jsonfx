@@ -66,6 +66,13 @@ namespace JsonFx.Serialization.Resolvers
 		bool IsFieldIgnored(FieldInfo member);
 
 		/// <summary>
+		/// Gets a value indicating if the member is to be serialized as an attribute.
+		/// </summary>
+		/// <param name="member"></param>
+		/// <returns></returns>
+		bool IsAttribute(MemberInfo info);
+
+		/// <summary>
 		/// Determines if the property or field should not be serialized.
 		/// </summary>
 		/// <param name="member"></param>

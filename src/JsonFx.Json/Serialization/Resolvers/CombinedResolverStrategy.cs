@@ -91,7 +91,7 @@ namespace JsonFx.Serialization.Resolvers
 		/// </summary>
 		/// <param name="member"></param>
 		/// <param name="isImmutableType"></param>
-		/// <returns>true if any strategy specifies this should be ignored</returns>
+		/// <returns>true if any strategy specifies should be ignored</returns>
 		public bool IsPropertyIgnored(PropertyInfo member, bool isImmutableType)
 		{
 			foreach (IResolverStrategy strategy in this.InnerStrategies)
@@ -109,12 +109,31 @@ namespace JsonFx.Serialization.Resolvers
 		/// Gets a value indicating if the field is to be serialized.
 		/// </summary>
 		/// <param name="member"></param>
-		/// <returns>true if any strategy specifies this should be ignored</returns>
+		/// <returns>true if any strategy specifies should be ignored</returns>
 		public bool IsFieldIgnored(FieldInfo member)
 		{
 			foreach (IResolverStrategy strategy in this.InnerStrategies)
 			{
 				if (strategy.IsFieldIgnored(member))
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// Gets a value indicating if the member is to be serialized as an attribute.
+		/// </summary>
+		/// <param name="member"></param>
+		/// <returns></returns>
+		/// <returns>true if any strategy specifies should be an attributes</returns>
+		public bool IsAttribute(MemberInfo member)
+		{
+			foreach (IResolverStrategy strategy in this.InnerStrategies)
+			{
+				if (strategy.IsAttribute(member))
 				{
 					return true;
 				}

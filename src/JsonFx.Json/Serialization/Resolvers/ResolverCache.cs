@@ -43,19 +43,45 @@ namespace JsonFx.Serialization.Resolvers
 	{
 		#region Fields
 
+		/// <summary>
+		/// The original member info
+		/// </summary>
 		public readonly MemberInfo MemberInfo;
 
+		/// <summary>
+		/// The original member name
+		/// </summary>
 		public readonly string Name;
 
+		/// <summary>
+		/// The member data name
+		/// </summary>
 		public readonly DataName DataName;
 
+		/// <summary>
+		/// The member type
+		/// </summary>
 		public readonly Type Type;
 
+		/// <summary>
+		/// The getter method
+		/// </summary>
 		public readonly GetterDelegate Getter;
 
+		/// <summary>
+		/// The setter method
+		/// </summary>
 		public readonly SetterDelegate Setter;
 
+		/// <summary>
+		/// The logic for determining if a value is ignored
+		/// </summary>
 		public readonly ValueIgnoredDelegate IsIgnored;
+
+		/// <summary>
+		/// Determines if should be persisted as an attribute member
+		/// </summary>
+		public readonly bool IsAttribute;
 
 		#endregion Fields
 
@@ -67,7 +93,8 @@ namespace JsonFx.Serialization.Resolvers
 		/// <param name="propertyInfo"></param>
 		/// <param name="dataName"></param>
 		/// <param name="isIgnored"></param>
-		public MemberMap(PropertyInfo propertyInfo, DataName dataName, ValueIgnoredDelegate isIgnored)
+		/// <param name="isAttribute"></param>
+		public MemberMap(PropertyInfo propertyInfo, DataName dataName, ValueIgnoredDelegate isIgnored, bool isAttribute)
 		{
 			if (propertyInfo == null)
 			{
@@ -89,7 +116,8 @@ namespace JsonFx.Serialization.Resolvers
 		/// <param name="fieldInfo"></param>
 		/// <param name="dataName"></param>
 		/// <param name="isIgnored"></param>
-		public MemberMap(FieldInfo fieldInfo, DataName dataName, ValueIgnoredDelegate isIgnored)
+		/// <param name="isAttribute"></param>
+		public MemberMap(FieldInfo fieldInfo, DataName dataName, ValueIgnoredDelegate isIgnored, bool isAttribute)
 		{
 			if (fieldInfo == null)
 			{
@@ -540,7 +568,9 @@ namespace JsonFx.Serialization.Resolvers
 
 				ValueIgnoredDelegate isIgnored = this.Strategy.GetValueIgnoredCallback(info);
 
-				map[name.LocalName] = new MemberMap(info, name, isIgnored);
+				bool isAttribute = this.Strategy.IsAttribute(info);
+
+				map[name.LocalName] = new MemberMap(info, name, isIgnored, isAttribute);
 			}
 
 			// load fields into property map
@@ -559,7 +589,9 @@ namespace JsonFx.Serialization.Resolvers
 
 				ValueIgnoredDelegate isIgnored = this.Strategy.GetValueIgnoredCallback(info);
 
-				map[name.LocalName] = new MemberMap(info, name, isIgnored);
+				bool isAttribute = this.Strategy.IsAttribute(info);
+
+				map[name.LocalName] = new MemberMap(info, name, isIgnored, isAttribute);
 			}
 
 #if NET20 || NET30
@@ -610,7 +642,7 @@ namespace JsonFx.Serialization.Resolvers
 				}
 
 				MemberMap enumMap;
-				maps[name.LocalName] = enumMap = new MemberMap(info, name, null);
+				maps[name.LocalName] = enumMap = new MemberMap(info, name, null, false);
 				enumMaps[(Enum)enumMap.Getter(null)] = name.LocalName;
 			}
 

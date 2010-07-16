@@ -62,6 +62,17 @@ namespace JsonFx.Serialization.Resolvers
 			set;
 		}
 
+		public delegate bool MemberAttributeDelegate(MemberInfo fieldInfo);
+
+		/// <summary>
+		/// Gets and sets the implementation for setting members as attributes
+		/// </summary>
+		public MemberAttributeDelegate IsAttribute
+		{
+			get;
+			set;
+		}
+
 		public delegate ValueIgnoredDelegate GetValueIgnoredDelegate(MemberInfo memberInfo);
 
 		/// <summary>
@@ -106,6 +117,22 @@ namespace JsonFx.Serialization.Resolvers
 			}
 
 			return this.IsFieldIgnored(member);
+		}
+
+		/// <summary>
+		/// Gets a value indicating if the member is to be serialized as an attribute.
+		/// </summary>
+		/// <param name="member"></param>
+		/// <returns></returns>
+		/// <remarks>default is no attributes</remarks>
+		bool IResolverStrategy.IsAttribute(MemberInfo member)
+		{
+			if (this.IsAttribute == null)
+			{
+				return false;
+			}
+
+			return this.IsAttribute(member);
 		}
 
 		ValueIgnoredDelegate IResolverStrategy.GetValueIgnoredCallback(MemberInfo member)
