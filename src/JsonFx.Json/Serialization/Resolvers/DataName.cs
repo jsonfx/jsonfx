@@ -42,7 +42,7 @@ namespace JsonFx.Serialization.Resolvers
 	/// Namespaces must be a URI, but local-name can be any non-null string.
 	/// It is up to formatters to determine how to properly represent names which are invalid for the format.
 	/// </remarks>
-	public struct DataName
+	public struct DataName : IComparable<DataName>
 	{
 		#region Constants
 
@@ -349,5 +349,30 @@ namespace JsonFx.Serialization.Resolvers
 		}
 
 		#endregion Operators
+
+		#region IComparable<DataName> Members
+
+		/// <summary>
+		/// Compares two <see cref="DataName"/> values and returns an indication of their relative sort order.
+		/// </summary>
+		/// <param name="that"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// Performs ordering according to XML Canonicalization document order http://www.w3.org/TR/xml-c14n#DocumentOrder
+		/// "An element's namespace nodes are sorted lexicographically by local name (the default namespace node, if one exists, has no local name and is therefore lexicographically least)."
+		/// "An element's attribute nodes are sorted lexicographically with namespace URI as the primary key and local name as the secondary key (an empty namespace URI is lexicographically least)."
+		/// </remarks>
+		public int CompareTo(DataName that)
+		{
+			int nsCompare = StringComparer.Ordinal.Compare(this.NamespaceUri, that.NamespaceUri);
+			if (nsCompare != 0)
+			{
+				return nsCompare;
+			}
+
+			return StringComparer.Ordinal.Compare(this.LocalName, that.LocalName);
+		}
+
+		#endregion IComparable<DataName> Members
 	}
 }

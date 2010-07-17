@@ -264,6 +264,7 @@ namespace JsonFx.Xml
 				this.BeginWriteTagOpen(writer, elementName);
 
 				bool needsEndTag = true;
+				SortedList<DataName, string> attributes = null;
 
 				bool needsValueDelim = false;
 				while (!tokens.IsCompleted)
@@ -278,6 +279,11 @@ namespace JsonFx.Xml
 							if (needsEndTag)
 							{
 								needsEndTag = false;
+								if (attributes != null)
+								{
+									// write out namespaces and attributes
+									this.WriteAttributesAndNamespaces(writer, attributes);
+								}
 								this.EndWriteTagOpen(writer);
 								this.pendingNewLine = true;
 							}
@@ -309,15 +315,46 @@ namespace JsonFx.Xml
 							{
 								if (token.Name.IsAttribute)
 								{
-									this.WriteAttribute(writer, tokens, token.Name);
+									if (attributes == null)
+									{
+										// allocate and sort attributes
+										attributes = new SortedList<DataName, string>();
+									}
+									DataName attrName = token.Name;
+
+									// consume attribute value
+									token = tokens.Peek();
+									if (token.TokenType != CommonTokenType.Primitive)
+									{
+										throw new TokenException<CommonTokenType>(token, "Attribute values must be primitive tokens.");
+									}
+									tokens.Pop();
+
+									if (attrName.IsEmpty)
+									{
+										attrName = token.Name;
+									}
+
+									// according to XML rules cannot duplicate attribute names
+									if (!attributes.ContainsKey(attrName))
+									{
+										attributes.Add(attrName, token.ValueAsString());
+									}
+
 									this.pendingNewLine = false;
 									needsValueDelim = true;
 									break;
 								}
 								else
 								{
-									// end attributes with first non-attribute child
 									needsEndTag = false;
+
+									// end attributes with first non-attribute child
+									if (attributes != null)
+									{
+										// write out namespaces and attributes
+										this.WriteAttributesAndNamespaces(writer, attributes);
+									}
 									this.EndWriteTagOpen(writer);
 									this.pendingNewLine = true;
 								}
@@ -363,35 +400,54 @@ namespace JsonFx.Xml
 				}
 			}
 
-			private void WriteAttribute(TextWriter writer, IStream<Token<CommonTokenType>> tokens, DataName attributeName)
+			private void WriteAttributesAndNamespaces(TextWriter writer, SortedList<DataName, string> attributes)
 			{
-				Token<CommonTokenType> token = tokens.Peek();
-				if (token.TokenType != CommonTokenType.Primitive)
+				SortedList<string, string> prefixes = new SortedList<string, string>();
+
+				string defaultNS = (this.xmlns.Count > 0) ? this.xmlns.Peek() : String.Empty;
+				string prevUri = null;
+				foreach (DataName next in attributes.Keys)
 				{
-					throw new TokenException<CommonTokenType>(token, "Attribute values must be primitive tokens.");
+					if (StringComparer.Ordinal.Equals(next.NamespaceUri, defaultNS) ||
+						StringComparer.Ordinal.Equals(next.NamespaceUri, prevUri))
+					{
+						// dedup
+						continue;
+					}
+
+					string prefix = String.Concat("q", (prefixes.Count+1));
+					prefixes[next.NamespaceUri] = prefix;
+					this.WriteXmlns(writer, prefix, next.NamespaceUri);
+
+					prevUri = next.NamespaceUri;
 				}
 
-				// consume attribute value
-				tokens.Pop();
-
-				if ((this.xmlns.Count > 0 && this.xmlns.Peek() != attributeName.NamespaceUri) ||
-					!String.IsNullOrEmpty(attributeName.NamespaceUri))
+				foreach (var attr in attributes)
 				{
-					this.WriteXmlns(writer, "prefix", attributeName.NamespaceUri);
+					string prefix;
+					if (prefixes.TryGetValue(attr.Key.NamespaceUri, out prefix) &&
+						(this.xmlns.Count > 0 && this.xmlns.Peek() != attr.Key.NamespaceUri))
+					{
+						// " q1:"
+						writer.Write(XmlGrammar.OperatorValueDelim);
+						this.WriteLocalName(writer, prefix);
+						writer.Write(XmlGrammar.OperatorPrefixDelim);
+					}
+					else
+					{
+						// " "
+						writer.Write(XmlGrammar.OperatorValueDelim);
+					}
 
-					writer.Write(XmlGrammar.OperatorValueDelim);
-					this.WriteLocalName(writer, "prefix");
-					writer.Write(XmlGrammar.OperatorPrefixDelim);
+					// name="value"
+					this.WriteLocalName(writer, attr.Key.LocalName);
+					writer.Write(XmlGrammar.OperatorPairDelim);
+					writer.Write(XmlGrammar.OperatorStringDelim);
+					this.WriteAttributeValue(writer, attr.Value);
+					writer.Write(XmlGrammar.OperatorStringDelim);
 				}
-				else
-				{
-					writer.Write(XmlGrammar.OperatorValueDelim);
-				}
-				this.WriteLocalName(writer, attributeName.LocalName);
-				writer.Write(XmlGrammar.OperatorPairDelim);
-				writer.Write(XmlGrammar.OperatorStringDelim);
-				this.WriteAttributeValue(writer, token.ValueAsString());
-				writer.Write(XmlGrammar.OperatorStringDelim);
+
+				attributes.Clear();
 			}
 
 			#endregion ITextFormatter<T> Methods
@@ -413,11 +469,13 @@ namespace JsonFx.Xml
 				writer.Write(XmlGrammar.OperatorElementBegin);
 				this.WriteLocalName(writer, name.LocalName);
 
-				if (!String.IsNullOrEmpty(name.NamespaceUri))
+				if ((this.xmlns.Count > 0 && this.xmlns.Peek() != name.NamespaceUri) ||
+					(this.xmlns.Count < 1 && !String.IsNullOrEmpty(name.NamespaceUri)))
 				{
-					this.xmlns.Push(name.NamespaceUri);
+					// emit if namespace doesn't match, or has a namespace and none exist
 					this.WriteXmlns(writer, null, name.NamespaceUri);
 				}
+				this.xmlns.Push(name.NamespaceUri);
 			}
 
 			private void WriteXmlns(TextWriter writer, string prefix, string uri)
@@ -501,7 +559,6 @@ namespace JsonFx.Xml
 			/// </remarks>
 			private void WriteLocalName(TextWriter writer, string value)
 			{
-				bool isStartChar = true;
 				int start = 0,
 					length = value.Length;
 
@@ -529,16 +586,13 @@ namespace JsonFx.Xml
 						continue;
 					}
 
-					if (isStartChar)
-					{
-						isStartChar = false;
-					}
-					else if ((ch >= '0' && ch <= '9') ||
+					if ((i > 0) &&
+						((ch >= '0' && ch <= '9') ||
 						(ch == '-') ||
 						(ch == '.') ||
 						(ch == '\u00B7') ||
 						(ch >= '\u0300' && ch <= '\u036F') ||
-						(ch >= '\u203F' && ch <= '\u2040'))
+						(ch >= '\u203F' && ch <= '\u2040')))
 					{
 						// these chars are only valid after initial char
 						continue;

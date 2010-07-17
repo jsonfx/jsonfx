@@ -484,7 +484,26 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
-		public void Format_ObjectOneNamespacedProperty_CorrectlyEmitsNamespace()
+		public void Format_ObjectAndPropertyShareNamespace_CorrectlyEmitsNamespace()
+		{
+			var input = new[]
+			{
+				CommonGrammar.TokenObjectBegin(new DataName("foo", "http://json.org")),
+				CommonGrammar.TokenProperty(new DataName("key", "http://json.org")),
+				CommonGrammar.TokenValue("value"),
+				CommonGrammar.TokenObjectEnd
+			};
+
+			const string expected = @"<foo xmlns=""http://json.org""><key>value</key></foo>";
+
+			var formatter = new XmlWriter.XmlFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void Format_NamespacedObjectNonNamespacedProperty_CorrectlyEmitsNamespace()
 		{
 			var input = new[]
 			{
@@ -494,7 +513,7 @@ namespace JsonFx.Xml
 				CommonGrammar.TokenObjectEnd
 			};
 
-			const string expected = @"<foo xmlns=""http://json.org""><key>value</key></foo>";
+			const string expected = @"<foo xmlns=""http://json.org""><key xmlns="""">value</key></foo>";
 
 			var formatter = new XmlWriter.XmlFormatter(new DataWriterSettings());
 			var actual = formatter.Format(input);
@@ -522,7 +541,26 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
-		public void Format_NamespacedObjectOneDifferentNamespaceAttribute_CorrectlyEmitsNamespaces()
+		public void Format_ObjectAndAttributeShareNamespace_CorrectlyEmitsNamespace()
+		{
+			var input = new[]
+			{
+				CommonGrammar.TokenObjectBegin(new DataName("foo", "http://json.org")),
+				CommonGrammar.TokenProperty(new DataName("key", "http://json.org", true)),
+				CommonGrammar.TokenValue("value"),
+				CommonGrammar.TokenObjectEnd
+			};
+
+			const string expected = @"<foo xmlns=""http://json.org"" key=""value""></foo>";
+
+			var formatter = new XmlWriter.XmlFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void Format_ObjectAndAttributeDifferentNamespaces_CorrectlyEmitsNamespaces()
 		{
 			var input = new[]
 			{
@@ -532,7 +570,7 @@ namespace JsonFx.Xml
 				CommonGrammar.TokenObjectEnd
 			};
 
-			const string expected = @"<foo xmlns=""http://json.org"" xmlns:prefix=""http://jsonfx.net"" prefix:key=""value""></foo>";
+			const string expected = @"<foo xmlns=""http://json.org"" xmlns:q1=""http://jsonfx.net"" q1:key=""value""></foo>";
 
 			var formatter = new XmlWriter.XmlFormatter(new DataWriterSettings());
 			var actual = formatter.Format(input);

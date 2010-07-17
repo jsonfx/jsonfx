@@ -273,15 +273,41 @@ namespace JsonFx.Xml.Resolvers
 			return DataName.Empty;
 		}
 
+		/// <summary>
+		/// Sorts members to ensure proper document order where attributes precede all child elements.
+		/// </summary>
+		/// <param name="members"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// Performs the first stage of XML Canonicalization document order http://www.w3.org/TR/xml-c14n#DocumentOrder
+		/// "An element's namespace and attribute nodes have a document order position greater than the element but less than any child node of the element."
+		/// </remarks>
 		public override IEnumerable<MemberMap> SortMembers(IEnumerable<MemberMap> members)
 		{
 			// need to keep the order but partition into two groups: attributes and elements
 
+			int count;
+			if (members is ICollection<MemberMap>)
+			{
+				count = ((ICollection<MemberMap>)members).Count;
+
+				if (count <= 1)
+				{
+					// special cases which don't require reordering
+					foreach (MemberMap map in members)
+					{
+						yield return map;
+					}
+					yield break;
+				}
+			}
+			else
+			{
+				count = 5;
+			}
+
 			// assume most are elements so will need to have same size queue
-			Queue<MemberMap> queue =
-				members is ICollection<MemberMap> ?
-				new Queue<MemberMap>(((ICollection<MemberMap>)members).Count) :
-				new Queue<MemberMap>(5);
+			Queue<MemberMap> queue = new Queue<MemberMap>(count);
 
 			foreach (MemberMap map in members)
 			{
