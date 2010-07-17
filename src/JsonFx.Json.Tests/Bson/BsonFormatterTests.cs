@@ -34,6 +34,7 @@ using System.Text;
 
 using JsonFx.Common;
 using JsonFx.Serialization;
+using JsonFx.Serialization.Resolvers;
 using Xunit;
 
 using Assert=JsonFx.AssertPatched;
@@ -143,7 +144,7 @@ namespace JsonFx.Bson
 			var input = new[]
 			{
 				CommonGrammar.TokenObjectBegin(),
-				CommonGrammar.TokenProperty("key", "http://json.org"),
+				CommonGrammar.TokenProperty(new DataName("key", "http://json.org")),
 				CommonGrammar.TokenValue("value"),
 				CommonGrammar.TokenObjectEnd
 			};

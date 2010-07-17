@@ -124,17 +124,6 @@ namespace JsonFx.Common
 		/// <summary>
 		/// Marks the beginning of an object
 		/// </summary>
-		/// <param name="name">the local name of the object</param>
-		/// <param name="namespaceUri">the namespace of the document</param>
-		/// <returns>ObjectBegin Token</returns>
-		public static Token<CommonTokenType> TokenObjectBegin(string name, string namespaceUri)
-		{
-			return new Token<CommonTokenType>(CommonTokenType.ObjectBegin, new DataName(name, namespaceUri));
-		}
-
-		/// <summary>
-		/// Marks the beginning of an object
-		/// </summary>
 		/// <param name="name">the name of the object</param>
 		/// <returns>ObjectBegin Token</returns>
 		public static Token<CommonTokenType> TokenObjectBegin(DataName name)
@@ -162,17 +151,6 @@ namespace JsonFx.Common
 		public static Token<CommonTokenType> TokenProperty(string localName)
 		{
 			return new Token<CommonTokenType>(CommonTokenType.Property, new DataName(localName));
-		}
-
-		/// <summary>
-		/// Marks the beginning of an object property
-		/// </summary>
-		/// <param name="localName">the local name of the property</param>
-		/// <param name="namespaceUri">the namespace of the property</param>
-		/// <returns>PropertyKey Token</returns>
-		public static Token<CommonTokenType> TokenProperty(string localName, string namespaceUri)
-		{
-			return new Token<CommonTokenType>(CommonTokenType.Property, new DataName(localName, namespaceUri));
 		}
 
 		/// <summary>

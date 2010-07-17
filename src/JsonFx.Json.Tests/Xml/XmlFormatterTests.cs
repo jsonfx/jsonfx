@@ -470,7 +470,7 @@ namespace JsonFx.Xml
 			var input = new[]
 			{
 				CommonGrammar.TokenObjectBegin("foo"),
-				CommonGrammar.TokenProperty("key", "http://json.org"),
+				CommonGrammar.TokenProperty(new DataName("key", "http://json.org")),
 				CommonGrammar.TokenValue("value"),
 				CommonGrammar.TokenObjectEnd
 			};
@@ -488,7 +488,7 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBegin("foo", "http://json.org"),
+				CommonGrammar.TokenObjectBegin(new DataName("foo", "http://json.org")),
 				CommonGrammar.TokenProperty("key"),
 				CommonGrammar.TokenValue("value"),
 				CommonGrammar.TokenObjectEnd
@@ -507,8 +507,8 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBegin("foo", "http://json.org"),
-				CommonGrammar.TokenProperty("key", "http://jsonfx.net"),
+				CommonGrammar.TokenObjectBegin(new DataName("foo", "http://json.org")),
+				CommonGrammar.TokenProperty(new DataName("key", "http://jsonfx.net")),
 				CommonGrammar.TokenValue("value"),
 				CommonGrammar.TokenObjectEnd
 			};
@@ -526,7 +526,7 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBegin("foo", "http://json.org"),
+				CommonGrammar.TokenObjectBegin(new DataName("foo", "http://json.org")),
 				CommonGrammar.TokenProperty(new DataName("key", "http://jsonfx.net", true)),
 				CommonGrammar.TokenValue("value"),
 				CommonGrammar.TokenObjectEnd
