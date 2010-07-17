@@ -10,9 +10,9 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>JsonFx</RootNamespace>
-    <AssemblyName>JsonFx.Json</AssemblyName>
+    <AssemblyName>JsonFx</AssemblyName>
     <OutputPath>..\..\build\$(Configuration)_$(TargetFrameworkVersion)</OutputPath>
-    <DocumentationFile>..\..\build\$(Configuration)_$(TargetFrameworkVersion)\JsonFx.Json.XML</DocumentationFile>
+    <DocumentationFile>..\..\build\$(Configuration)_$(TargetFrameworkVersion)\JsonFx.XML</DocumentationFile>
     <MapFileExtensions>true</MapFileExtensions>
     <UseApplicationTrust>false</UseApplicationTrust>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>

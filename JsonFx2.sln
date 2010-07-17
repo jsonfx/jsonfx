@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonFx.Json", "src\JsonFx.Json\JsonFx.Json.csproj", "{3082284B-B579-4808-A4A4-D88DDA4025CB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonFx", "src\JsonFx\JsonFx.csproj", "{3082284B-B579-4808-A4A4-D88DDA4025CB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonFx.Json.Tests", "src\JsonFx.Json.Tests\JsonFx.Json.Tests.csproj", "{0B5CB626-AC40-4CAD-BDED-51B539F19233}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonFx.Tests", "src\JsonFx.Tests\JsonFx.Tests.csproj", "{0B5CB626-AC40-4CAD-BDED-51B539F19233}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

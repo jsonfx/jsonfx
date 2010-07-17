@@ -10,7 +10,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>JsonFx</RootNamespace>
-    <AssemblyName>JsonFx.Json.Tests</AssemblyName>
+    <AssemblyName>JsonFx.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <MapFileExtensions>true</MapFileExtensions>
@@ -24,7 +24,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>$(SolutionDir)build\Tests\$(Configuration)_$(TargetFrameworkVersion)</OutputPath>
-    <DocumentationFile>$(SolutionDir)build\Tests\$(Configuration)_$(TargetFrameworkVersion)\JsonFx.Json.XML</DocumentationFile>
+    <DocumentationFile>$(SolutionDir)build\Tests\$(Configuration)_$(TargetFrameworkVersion)\JsonFx.Tests.XML</DocumentationFile>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -100,9 +100,9 @@
     <Compile Include="Xml\XmlFormatterTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\JsonFx.Json\JsonFx.Json.csproj">
+    <ProjectReference Include="..\JsonFx\JsonFx.csproj">
       <Project>{3082284B-B579-4808-A4A4-D88DDA4025CB}</Project>
-      <Name>JsonFx.Json</Name>
+      <Name>JsonFx</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

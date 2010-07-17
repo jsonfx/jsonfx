@@ -32,9 +32,9 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("JsonFx.Json")]
-[assembly: AssemblyDescription("JsonFx JSON Serialization")]
-[assembly: AssemblyProduct("JsonFx.NET")]
+[assembly: AssemblyTitle("JsonFx")]
+[assembly: AssemblyDescription("JsonFx Serialization Framework")]
+[assembly: AssemblyProduct("JsonFx v2")]
 [assembly: AssemblyCopyright("Copyright © 2006-2010 Stephen M. McKamey. All rights reserved.")]
 [assembly: AssemblyCompany("http://jsonfx.net")]
 
@@ -59,5 +59,5 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 [assembly: Guid("D98A5EF8-4709-4FF8-B162-8EA04B281400")]
 #if !STRONG
-[assembly: InternalsVisibleTo("JsonFx.Json.Tests")]
+[assembly: InternalsVisibleTo("JsonFx.Tests")]
 #endif

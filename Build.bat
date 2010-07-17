@@ -20,7 +20,7 @@ ECHO Building unit test pass...
 "%MSBuild%" JsonFx2.sln /target:rebuild /property:TargetFrameworkVersion=v4.0;Configuration=Release;RunTests=True
 
 ECHO Building specific builds for v2.0, v3.5, v4.0...
-FOR %%i IN (v2.0 v3.5 v4.0) DO "%MSBuild%" src/JsonFx.Json/JsonFx.Json.csproj /target:rebuild /property:TargetFrameworkVersion=%%i;Configuration=%Configuration%
+FOR %%i IN (v2.0 v3.5 v4.0) DO "%MSBuild%" src/JsonFx/JsonFx.csproj /target:rebuild /property:TargetFrameworkVersion=%%i;Configuration=%Configuration%
 
 :END
 POPD
