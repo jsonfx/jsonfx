@@ -139,6 +139,16 @@ namespace JsonFx.Serialization
 				return false;
 			}
 
+			return this.Equals(that);
+		}
+
+		public bool Equals(Token<T> that)
+		{
+			if (that == null)
+			{
+				return false;
+			}
+
 			return
 				EqualityComparer<T>.Default.Equals(this.TokenType, that.TokenType) &&
 				EqualityComparer<DataName>.Default.Equals(this.Name, that.Name) &&
@@ -159,6 +169,25 @@ namespace JsonFx.Serialization
 		}
 
 		#endregion Object Overrides
+
+		#region Operators
+
+		public static bool operator ==(Token<T> a, Token<T> b)
+		{
+			if (Object.ReferenceEquals(a, null))
+			{
+				return Object.ReferenceEquals(b, null);
+			}
+
+			return a.Equals(b);
+		}
+
+		public static bool operator !=(Token<T> a, Token<T> b)
+		{
+			return !(a == b);
+		}
+
+		#endregion Operators
 
 		#region Utility Methods
 
