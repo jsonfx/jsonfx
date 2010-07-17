@@ -393,9 +393,10 @@ namespace JsonFx.Common
 
 			bool appendDelim = false;
 
-			// TODO: sort such that attribute members are first
+			// allow the resolver to optionally sort the members
+			IEnumerable<MemberMap> members = this.Settings.Resolver.SortMembers(maps.Values);
 
-			foreach (var map in maps.Values)
+			foreach (var map in members)
 			{
 				if (map.Getter == null)
 				{

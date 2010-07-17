@@ -29,6 +29,7 @@
 #endregion License
 
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace JsonFx.Serialization.Resolvers
@@ -84,6 +85,17 @@ namespace JsonFx.Serialization.Resolvers
 			set;
 		}
 
+		public delegate IEnumerable<MemberMap> SortMembersDelegate(IEnumerable<MemberMap> members);
+
+		/// <summary>
+		/// Gets and sets the implementation for sorting members
+		/// </summary>
+		public SortMembersDelegate SortMembers
+		{
+			get;
+			set;
+		}
+
 		#endregion Properties
 
 		#region IResolverStrategy Members
@@ -126,6 +138,16 @@ namespace JsonFx.Serialization.Resolvers
 			}
 
 			return this.GetName(member);
+		}
+
+		IEnumerable<MemberMap> IResolverStrategy.SortMembers(IEnumerable<MemberMap> members)
+		{
+			if (this.SortMembers == null)
+			{
+				return members;
+			}
+
+			return this.SortMembers(members);
 		}
 
 		#endregion IResolverStrategy Members

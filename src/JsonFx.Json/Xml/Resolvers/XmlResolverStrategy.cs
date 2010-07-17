@@ -29,6 +29,7 @@
 #endregion License
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
 using System.Xml.Serialization;
@@ -270,6 +271,34 @@ namespace JsonFx.Xml.Resolvers
 			}
 
 			return DataName.Empty;
+		}
+
+		public override IEnumerable<MemberMap> SortMembers(IEnumerable<MemberMap> members)
+		{
+			// need to keep the order but partition into two groups: attributes and elements
+
+			// assume most are elements so will need to have same size queue
+			Queue<MemberMap> queue =
+				members is ICollection<MemberMap> ?
+				new Queue<MemberMap>(((ICollection<MemberMap>)members).Count) :
+				new Queue<MemberMap>(5);
+
+			foreach (MemberMap map in members)
+			{
+				if (map.DataName.IsAttribute)
+				{
+					// pull out all the attributes first
+					yield return map;
+				}
+
+				queue.Enqueue(map);
+			}
+
+			while (queue.Count > 0)
+			{
+				// pull out all the elements next
+				yield return queue.Dequeue();
+			}
 		}
 
 		#endregion Name Resolution Methods

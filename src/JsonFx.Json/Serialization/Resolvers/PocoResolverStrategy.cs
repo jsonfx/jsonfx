@@ -29,6 +29,7 @@
 #endregion License
 
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace JsonFx.Serialization.Resolvers
@@ -91,6 +92,19 @@ namespace JsonFx.Serialization.Resolvers
 		public virtual DataName GetName(MemberInfo member)
 		{
 			return DataName.Empty;
+		}
+
+		/// <summary>
+		/// Allows a strategy to perform a custom sort order to outputted members
+		/// </summary>
+		/// <param name="members"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// A common usage is to ensure that Attributes sort first
+		/// </remarks>
+		public virtual IEnumerable<MemberMap> SortMembers(IEnumerable<MemberMap> members)
+		{
+			return members;
 		}
 
 		#endregion Name Resolution Methods

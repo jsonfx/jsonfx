@@ -50,7 +50,7 @@ namespace JsonFx.Serialization.Resolvers
 	using NameCacheDictionary=System.Collections.Generic.Dictionary<Type, DataName>;
 #endif
 
-	public sealed class MemberMap : IComparable<MemberMap>
+	public sealed class MemberMap
 	{
 		#region Fields
 
@@ -140,20 +140,6 @@ namespace JsonFx.Serialization.Resolvers
 		}
 
 		#endregion Init
-
-		#region IComparable<MemberMap> Members
-
-		public int CompareTo(MemberMap that)
-		{
-			if (that == null)
-			{
-				return 1;
-			}
-
-			return this.DataName.CompareTo(that.DataName);
-		}
-
-		#endregion IComparable<MemberMap> Members
 	}
 
 	public sealed class FactoryMap
@@ -368,6 +354,15 @@ namespace JsonFx.Serialization.Resolvers
 		}
 
 		#endregion Init
+
+		#region Sort Methods
+
+		public IEnumerable<MemberMap> SortMembers(IEnumerable<MemberMap> members)
+		{
+			return this.Strategy.SortMembers(members) ?? members;
+		}
+
+		#endregion Sort Methods
 
 		#region Map Methods
 
