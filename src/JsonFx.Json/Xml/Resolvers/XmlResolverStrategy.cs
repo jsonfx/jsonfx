@@ -289,6 +289,7 @@ namespace JsonFx.Xml.Resolvers
 				{
 					// pull out all the attributes first
 					yield return map;
+					continue;
 				}
 
 				queue.Enqueue(map);

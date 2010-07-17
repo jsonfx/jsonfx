@@ -45,6 +45,9 @@ namespace JsonFx.Xml
 		public const char OperatorValueDelim = ' ';
 		public const char OperatorPairDelim = '=';
 
+		public const string OperatorElementEndEmpty = " />";
+		public const string OperatorElementBeginClose = "</";
+
 		public const char OperatorStringDelim = '"';
 		public const char OperatorStringDelimAlt = '\'';
 		public const char OperatorCharEscape = '&';

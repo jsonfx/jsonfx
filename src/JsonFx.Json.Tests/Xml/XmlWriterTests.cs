@@ -33,6 +33,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Xml.Serialization;
 
 using JsonFx.Serialization;
 using JsonFx.Serialization.Resolvers;
@@ -52,6 +53,10 @@ namespace JsonFx.Xml
 			public string Name { get; set; }
 			public Person Father { get; set; }
 			public Person Mother { get; set; }
+
+			[XmlAttribute("theNickname")]
+			public string Nickname { get; set; }
+
 			public Person[] Children { get; set; }
 		}
 
@@ -79,13 +84,16 @@ namespace JsonFx.Xml
 			var input = new Person
 			{
 				Name = "John, Jr.",
+				Nickname = "Junior",
 				Father = new Person
 				{
-					Name = "John, Sr."
+					Name = "John, Sr.",
+					Nickname = "Jack"
 				},
 				Mother = new Person
 				{
-					Name = "Sally"
+					Name = "Sally",
+					Nickname = "Sal"
 				}
 			};
 

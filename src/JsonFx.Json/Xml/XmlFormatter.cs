@@ -146,14 +146,16 @@ namespace JsonFx.Xml
 						if (String.IsNullOrEmpty(value))
 						{
 							elementName = this.EnsureName(elementName.IsEmpty ? token.Name : elementName, null);
-							WriteTagEmpty(writer, elementName);
+							this.BeginWriteTagOpen(writer, elementName);
+							this.EndWriteTagEmpty(writer);
 						}
 						else
 						{
 							elementName = this.EnsureName(elementName.IsEmpty ? token.Name : elementName, token.Value.GetType());
-							WriteTagOpen(writer, elementName);
+							this.BeginWriteTagOpen(writer, elementName);
+							this.EndWriteTagOpen(writer);
 							this.WriteCharData(writer, value);
-							WriteTagClose(writer, elementName);
+							this.WriteTagClose(writer, elementName);
 						}
 						break;
 					}
@@ -174,7 +176,8 @@ namespace JsonFx.Xml
 				// TODO: figure out a way to surface XmlArrayItemAttribute name
 				DataName itemName = DataName.Empty;//new DataName("arrayItem");
 
-				WriteTagOpen(writer, elementName);
+				this.BeginWriteTagOpen(writer, elementName);
+				this.EndWriteTagOpen(writer);
 				this.pendingNewLine = true;
 
 				bool needsValueDelim = false;
@@ -257,8 +260,9 @@ namespace JsonFx.Xml
 				// ensure element has a name
 				elementName = this.EnsureName(elementName.IsEmpty ? token.Name : elementName, typeof(Object));
 
-				WriteTagOpen(writer, elementName);
-				this.pendingNewLine = true;
+				this.BeginWriteTagOpen(writer, elementName);
+
+				bool needsEndTag = true;
 
 				bool needsValueDelim = false;
 				while (!tokens.IsCompleted)
@@ -269,6 +273,13 @@ namespace JsonFx.Xml
 						case CommonTokenType.ObjectEnd:
 						{
 							tokens.Pop();
+
+							if (needsEndTag)
+							{
+								needsEndTag = false;
+								this.EndWriteTagOpen(writer);
+								this.pendingNewLine = true;
+							}
 
 							if (this.pendingNewLine)
 							{
@@ -291,6 +302,24 @@ namespace JsonFx.Xml
 							if (needsValueDelim)
 							{
 								throw new TokenException<CommonTokenType>(token, "Missing value delimiter");
+							}
+
+							if (needsEndTag)
+							{
+								if (token.Name.IsAttribute)
+								{
+									this.WriteAttribute(writer, tokens, token.Name);
+									this.pendingNewLine = false;
+									needsValueDelim = true;
+									break;
+								}
+								else
+								{
+									// end attributes with first non-attribute child
+									needsEndTag = false;
+									this.EndWriteTagOpen(writer);
+									this.pendingNewLine = true;
+								}
 							}
 
 							if (this.pendingNewLine)
@@ -333,11 +362,30 @@ namespace JsonFx.Xml
 				}
 			}
 
+			private void WriteAttribute(TextWriter writer, IStream<Token<CommonTokenType>> tokens, DataName attributeName)
+			{
+				Token<CommonTokenType> token = tokens.Peek();
+				if (token.TokenType != CommonTokenType.Primitive)
+				{
+					throw new TokenException<CommonTokenType>(token, "Attribute values must be primitive tokens.");
+				}
+
+				// consume attribute value
+				tokens.Pop();
+
+				writer.Write(XmlGrammar.OperatorValueDelim);
+				this.WriteLocalName(writer, attributeName.LocalName);
+				writer.Write(XmlGrammar.OperatorPairDelim);
+				writer.Write(XmlGrammar.OperatorStringDelim);
+				this.WriteAttributeValue(writer, token.ValueAsString());
+				writer.Write(XmlGrammar.OperatorStringDelim);
+			}
+
 			#endregion ITextFormatter<T> Methods
 
 			#region Write Methods
 
-			private void WriteTagOpen(TextWriter writer, DataName name)
+			private void BeginWriteTagOpen(TextWriter writer, DataName name)
 			{
 				if (this.pendingNewLine)
 				{
@@ -351,23 +399,22 @@ namespace JsonFx.Xml
 
 				writer.Write(XmlGrammar.OperatorElementBegin);
 				this.WriteLocalName(writer, name.LocalName);
+			}
+
+			private void EndWriteTagOpen(TextWriter writer)
+			{
 				writer.Write(XmlGrammar.OperatorElementEnd);
+			}
+
+			private void EndWriteTagEmpty(TextWriter writer)
+			{
+				writer.Write(XmlGrammar.OperatorElementEndEmpty);
 			}
 
 			private void WriteTagClose(TextWriter writer, DataName name)
 			{
-				writer.Write(XmlGrammar.OperatorElementBegin);
-				writer.Write(XmlGrammar.OperatorElementClose);
+				writer.Write(XmlGrammar.OperatorElementBeginClose);
 				this.WriteLocalName(writer, name.LocalName);
-				writer.Write(XmlGrammar.OperatorElementEnd);
-			}
-
-			private void WriteTagEmpty(TextWriter writer, DataName name)
-			{
-				writer.Write(XmlGrammar.OperatorElementBegin);
-				this.WriteLocalName(writer, name.LocalName);
-				writer.Write(XmlGrammar.OperatorValueDelim);
-				writer.Write(XmlGrammar.OperatorElementClose);
 				writer.Write(XmlGrammar.OperatorElementEnd);
 			}
 
@@ -562,6 +609,11 @@ namespace JsonFx.Xml
 			/// </remarks>
 			private void WriteAttributeValue(TextWriter writer, string value)
 			{
+				if (String.IsNullOrEmpty(value))
+				{
+					return;
+				}
+
 				int start = 0,
 					length = value.Length;
 
