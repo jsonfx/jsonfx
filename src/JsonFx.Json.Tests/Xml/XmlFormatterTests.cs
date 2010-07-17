@@ -34,6 +34,7 @@ using System.Linq;
 
 using JsonFx.Common;
 using JsonFx.Serialization;
+using JsonFx.Serialization.Resolvers;
 using Xunit;
 
 using Assert=JsonFx.AssertPatched;
@@ -463,8 +464,8 @@ namespace JsonFx.Xml
 
 		#region Namespace Tests
 
-		[Fact(Skip="XML Namespaces are not yet implemented")]
-		public void Format_NamespacedObjectOneProperty_CorrectlyIgnoresNamespace()
+		[Fact]
+		public void Format_NamespacedObjectOneProperty_CorrectlyEmitsNamespace()
 		{
 			var input = new[]
 			{
@@ -474,7 +475,7 @@ namespace JsonFx.Xml
 				CommonGrammar.TokenObjectEnd
 			};
 
-			const string expected = @"<foo><a:key xmlns:a=""http://json.org"">value</a:key></foo>";
+			const string expected = @"<foo><key xmlns=""http://json.org"">value</key></foo>";
 
 			var formatter = new XmlWriter.XmlFormatter(new DataWriterSettings());
 			var actual = formatter.Format(input);
@@ -482,8 +483,8 @@ namespace JsonFx.Xml
 			Assert.Equal(expected, actual);
 		}
 
-		[Fact(Skip="XML Namespaces are not yet implemented")]
-		public void Format_ObjectOneNamespacedProperty_CorrectlyIgnoresNamespace()
+		[Fact]
+		public void Format_ObjectOneNamespacedProperty_CorrectlyEmitsNamespace()
 		{
 			var input = new[]
 			{
@@ -493,7 +494,45 @@ namespace JsonFx.Xml
 				CommonGrammar.TokenObjectEnd
 			};
 
-			const string expected = @"<a:foo xmlns:a=""http://json.org""><key>value</key></a:foo>";
+			const string expected = @"<foo xmlns=""http://json.org""><key>value</key></foo>";
+
+			var formatter = new XmlWriter.XmlFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void Format_NamespacedObjectOneDifferentNamespaceProperty_CorrectlyEmitsNamespaces()
+		{
+			var input = new[]
+			{
+				CommonGrammar.TokenObjectBegin("foo", "http://json.org"),
+				CommonGrammar.TokenProperty("key", "http://jsonfx.net"),
+				CommonGrammar.TokenValue("value"),
+				CommonGrammar.TokenObjectEnd
+			};
+
+			const string expected = @"<foo xmlns=""http://json.org""><key xmlns=""http://jsonfx.net"">value</key></foo>";
+
+			var formatter = new XmlWriter.XmlFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void Format_NamespacedObjectOneDifferentNamespaceAttribute_CorrectlyEmitsNamespaces()
+		{
+			var input = new[]
+			{
+				CommonGrammar.TokenObjectBegin("foo", "http://json.org"),
+				CommonGrammar.TokenProperty(new DataName("key", "http://jsonfx.net", true)),
+				CommonGrammar.TokenValue("value"),
+				CommonGrammar.TokenObjectEnd
+			};
+
+			const string expected = @"<foo xmlns=""http://json.org"" xmlns:prefix=""http://jsonfx.net"" prefix:key=""value""></foo>";
 
 			var formatter = new XmlWriter.XmlFormatter(new DataWriterSettings());
 			var actual = formatter.Format(input);

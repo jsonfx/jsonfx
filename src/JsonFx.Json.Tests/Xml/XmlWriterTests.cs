@@ -364,7 +364,7 @@ namespace JsonFx.Xml
 
 		#region Namespace Tests
 
-		[Fact(Skip="XML Namespaces are not yet implemented")]
+		[Fact]
 		public void Format_DataContract_CorrectlySerializesNamespaces()
 		{
 			var input = new Person2

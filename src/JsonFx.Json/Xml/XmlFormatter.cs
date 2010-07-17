@@ -51,6 +51,7 @@ namespace JsonFx.Xml
 			private readonly DataWriterSettings Settings;
 			private int depth;
 			private bool pendingNewLine;
+			private Stack<string> xmlns = new Stack<string>();
 
 			#endregion Fields
 
@@ -373,7 +374,19 @@ namespace JsonFx.Xml
 				// consume attribute value
 				tokens.Pop();
 
-				writer.Write(XmlGrammar.OperatorValueDelim);
+				if ((this.xmlns.Count > 0 && this.xmlns.Peek() != attributeName.NamespaceUri) ||
+					!String.IsNullOrEmpty(attributeName.NamespaceUri))
+				{
+					this.WriteXmlns(writer, "prefix", attributeName.NamespaceUri);
+
+					writer.Write(XmlGrammar.OperatorValueDelim);
+					this.WriteLocalName(writer, "prefix");
+					writer.Write(XmlGrammar.OperatorPrefixDelim);
+				}
+				else
+				{
+					writer.Write(XmlGrammar.OperatorValueDelim);
+				}
 				this.WriteLocalName(writer, attributeName.LocalName);
 				writer.Write(XmlGrammar.OperatorPairDelim);
 				writer.Write(XmlGrammar.OperatorStringDelim);
@@ -399,6 +412,25 @@ namespace JsonFx.Xml
 
 				writer.Write(XmlGrammar.OperatorElementBegin);
 				this.WriteLocalName(writer, name.LocalName);
+
+				if (!String.IsNullOrEmpty(name.NamespaceUri))
+				{
+					this.xmlns.Push(name.NamespaceUri);
+					this.WriteXmlns(writer, null, name.NamespaceUri);
+				}
+			}
+
+			private void WriteXmlns(TextWriter writer, string prefix, string uri)
+			{
+				writer.Write(" xmlns");
+				if (!String.IsNullOrEmpty(prefix))
+				{
+					writer.Write(XmlGrammar.OperatorPrefixDelim);
+					this.WriteLocalName(writer, prefix);
+				}
+				writer.Write("=\"");
+				this.WriteAttributeValue(writer, uri);
+				writer.Write(XmlGrammar.OperatorStringDelim);
 			}
 
 			private void EndWriteTagOpen(TextWriter writer)
@@ -413,6 +445,11 @@ namespace JsonFx.Xml
 
 			private void WriteTagClose(TextWriter writer, DataName name)
 			{
+				if (this.xmlns.Count > 0 && this.xmlns.Peek() == name.NamespaceUri)
+				{
+					this.xmlns.Pop();
+				}
+
 				writer.Write(XmlGrammar.OperatorElementBeginClose);
 				this.WriteLocalName(writer, name.LocalName);
 				writer.Write(XmlGrammar.OperatorElementEnd);
