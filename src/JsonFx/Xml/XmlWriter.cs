@@ -33,7 +33,6 @@ using System.Collections.Generic;
 using System.Text;
 
 using JsonFx.Common;
-using JsonFx.Common.Filters;
 using JsonFx.Serialization;
 using JsonFx.Serialization.Filters;
 
