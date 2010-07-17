@@ -41,6 +41,12 @@ namespace JsonFx.Json
 {
 	public partial class JsonWriter
 	{
+		#region Constants
+
+		private const string ErrorUnexpectedToken = "Unexpected token ({0})";
+
+		#endregion Constants
+
 		/// <summary>
 		/// Outputs JSON text from a SAX-like input stream of tokens
 		/// </summary>
@@ -271,7 +277,9 @@ namespace JsonFx.Json
 						case CommonTokenType.None:
 						default:
 						{
-							throw new TokenException<CommonTokenType>(token, "Unexpected token");
+							throw new TokenException<CommonTokenType>(
+								token,
+								String.Format(ErrorUnexpectedToken, token.TokenType));
 						}
 					}
 				}
