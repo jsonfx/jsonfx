@@ -411,10 +411,11 @@ namespace JsonFx.Xml
 					if (StringComparer.Ordinal.Equals(next.NamespaceUri, defaultNS) ||
 						StringComparer.Ordinal.Equals(next.NamespaceUri, prevUri))
 					{
-						// dedup
+						// dedup xmlns
 						continue;
 					}
 
+					// TODO: establish better prefix generation
 					string prefix = String.Concat("q", (prefixes.Count+1));
 					prefixes[next.NamespaceUri] = prefix;
 					this.WriteXmlns(writer, prefix, next.NamespaceUri);
@@ -425,8 +426,7 @@ namespace JsonFx.Xml
 				foreach (var attr in attributes)
 				{
 					string prefix;
-					if (prefixes.TryGetValue(attr.Key.NamespaceUri, out prefix) &&
-						(this.xmlns.Count > 0 && this.xmlns.Peek() != attr.Key.NamespaceUri))
+					if (prefixes.TryGetValue(attr.Key.NamespaceUri, out prefix))
 					{
 						// " q1:"
 						writer.Write(XmlGrammar.OperatorValueDelim);
