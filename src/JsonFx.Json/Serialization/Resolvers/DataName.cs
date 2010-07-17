@@ -36,7 +36,8 @@ using System.Globalization;
 namespace JsonFx.Serialization.Resolvers
 {
 	/// <summary>
-	/// Represents a property or document name, and a corresponding namespace URI if applicable
+	/// Represents a property or document name, and a corresponding namespace URI (or empty string).
+	/// Analogous to XML "expanded name": http://www.w3.org/TR/REC-xml-names/#dt-expname
 	/// </summary>
 	/// <remarks>
 	/// Namespaces must be a URI, but local-name can be any non-null string.
