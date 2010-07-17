@@ -41,6 +41,12 @@ namespace JsonFx.Xml
 {
 	public partial class XmlWriter
 	{
+		#region Constants
+
+		private const string ErrorUnexpectedToken = "Unexpected token ({0})";
+
+		#endregion Constants
+
 		/// <summary>
 		/// Outputs XML text from a SAX-like input stream of tokens
 		/// </summary>
@@ -143,6 +149,7 @@ namespace JsonFx.Xml
 					{
 						tokens.Pop();
 
+						// TODO: determine how mixed content (i.e. plain text outside of tag) is represented
 						string value = token.ValueAsString();
 						if (String.IsNullOrEmpty(value))
 						{
@@ -160,7 +167,9 @@ namespace JsonFx.Xml
 					}
 					default:
 					{
-						throw new TokenException<CommonTokenType>(token, "Unexpected token");
+						throw new TokenException<CommonTokenType>(
+							token,
+							String.Format(ErrorUnexpectedToken, token.TokenType));
 					}
 				}
 			}
@@ -245,7 +254,9 @@ namespace JsonFx.Xml
 						}
 						default:
 						{
-							throw new TokenException<CommonTokenType>(token, "Unexpected token");
+							throw new TokenException<CommonTokenType>(
+								token,
+								String.Format(ErrorUnexpectedToken, token.TokenType));
 						}
 					}
 				}
@@ -381,7 +392,9 @@ namespace JsonFx.Xml
 						}
 						default:
 						{
-							throw new TokenException<CommonTokenType>(token, "Unexpected token");
+							throw new TokenException<CommonTokenType>(
+								token,
+								String.Format(ErrorUnexpectedToken, token.TokenType));
 						}
 					}
 				}
@@ -410,7 +423,7 @@ namespace JsonFx.Xml
 					(this.xmlns.Count < 1 && !String.IsNullOrEmpty(elementName.NamespaceUri)))
 				{
 					// emit if namespace doesn't match, or has a namespace and none exist
-					this.WriteXmlns(writer, null, elementName.NamespaceUri);
+					this.WriteAttribute(writer, null, "xmlns", elementName.NamespaceUri);
 				}
 				this.xmlns.Push(elementName.NamespaceUri);
 
@@ -422,16 +435,17 @@ namespace JsonFx.Xml
 				{
 					foreach (DataName next in attributes.Keys)
 					{
-						if (StringComparer.Ordinal.Equals(next.NamespaceUri, defaultNS) ||
-						StringComparer.Ordinal.Equals(next.NamespaceUri, prevUri))
+						// NOTE: default namespace does not apply to attributes http://www.w3.org/TR/REC-xml-names/#defaulting
+						if (StringComparer.Ordinal.Equals(next.NamespaceUri, prevUri) ||
+							(String.IsNullOrEmpty(defaultNS) && String.IsNullOrEmpty(next.NamespaceUri)))
 						{
-							// dedup xmlns
+							// dedup xmlns declarations
 							continue;
 						}
 
-						string prefix = this.GeneratePrefix("q", prefixes.Count+1);
+						string prefix = this.GeneratePrefix(next.NamespaceUri, prefixes.Count+1);
 						prefixes[next.NamespaceUri] = prefix;
-						this.WriteXmlns(writer, prefix, next.NamespaceUri);
+						this.WriteAttribute(writer, "xmlns", prefix, next.NamespaceUri);
 
 						prevUri = next.NamespaceUri;
 					}
@@ -439,25 +453,12 @@ namespace JsonFx.Xml
 					foreach (var attr in attributes)
 					{
 						string prefix;
-						if (prefixes.TryGetValue(attr.Key.NamespaceUri, out prefix))
+						if (!prefixes.TryGetValue(attr.Key.NamespaceUri, out prefix))
 						{
-							// " q1:"
-							writer.Write(XmlGrammar.OperatorValueDelim);
-							this.WriteLocalName(writer, prefix);
-							writer.Write(XmlGrammar.OperatorPrefixDelim);
-						}
-						else
-						{
-							// " "
-							writer.Write(XmlGrammar.OperatorValueDelim);
+							prefix = null;
 						}
 
-						// name="value"
-						this.WriteLocalName(writer, attr.Key.LocalName);
-						writer.Write(XmlGrammar.OperatorPairDelim);
-						writer.Write(XmlGrammar.OperatorStringDelim);
-						this.WriteAttributeValue(writer, attr.Value);
-						writer.Write(XmlGrammar.OperatorStringDelim);
+						this.WriteAttribute(writer, prefix, attr.Key.LocalName, attr.Value);
 					}
 
 					attributes.Clear();
@@ -473,6 +474,29 @@ namespace JsonFx.Xml
 				}
 			}
 
+			private void WriteAttribute(TextWriter writer, string prefix, string name, string value)
+			{
+				if (String.IsNullOrEmpty(prefix))
+				{
+					// " "
+					writer.Write(XmlGrammar.OperatorValueDelim);
+				}
+				else
+				{
+					// " prefix:"
+					writer.Write(XmlGrammar.OperatorValueDelim);
+					this.WriteLocalName(writer, prefix);
+					writer.Write(XmlGrammar.OperatorPrefixDelim);
+				}
+
+				// name="value"
+				this.WriteLocalName(writer, name);
+				writer.Write(XmlGrammar.OperatorPairDelim);
+				writer.Write(XmlGrammar.OperatorStringDelim);
+				this.WriteAttributeValue(writer, value);
+				writer.Write(XmlGrammar.OperatorStringDelim);
+			}
+
 			private void WriteTagClose(TextWriter writer, DataName name)
 			{
 				if (this.xmlns.Count > 0 && this.xmlns.Peek() == name.NamespaceUri)
@@ -483,19 +507,6 @@ namespace JsonFx.Xml
 				writer.Write(XmlGrammar.OperatorElementBeginClose);
 				this.WriteLocalName(writer, name.LocalName);
 				writer.Write(XmlGrammar.OperatorElementEnd);
-			}
-
-			private void WriteXmlns(TextWriter writer, string prefix, string uri)
-			{
-				writer.Write(" xmlns");
-				if (!String.IsNullOrEmpty(prefix))
-				{
-					writer.Write(XmlGrammar.OperatorPrefixDelim);
-					this.WriteLocalName(writer, prefix);
-				}
-				writer.Write("=\"");
-				this.WriteAttributeValue(writer, uri);
-				writer.Write(XmlGrammar.OperatorStringDelim);
 			}
 
 			/// <summary>

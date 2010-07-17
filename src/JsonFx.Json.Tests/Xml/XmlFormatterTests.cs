@@ -551,7 +551,7 @@ namespace JsonFx.Xml
 				CommonGrammar.TokenObjectEnd
 			};
 
-			const string expected = @"<foo xmlns=""http://json.org"" key=""value""></foo>";
+			const string expected = @"<foo xmlns=""http://json.org"" xmlns:q1=""http://json.org"" q1:key=""value""></foo>";
 
 			var formatter = new XmlWriter.XmlFormatter(new DataWriterSettings());
 			var actual = formatter.Format(input);
@@ -573,6 +573,124 @@ namespace JsonFx.Xml
 			const string expected = @"<foo xmlns=""http://json.org"" xmlns:q1=""http://jsonfx.net"" q1:key=""value""></foo>";
 
 			var formatter = new XmlWriter.XmlFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void Format_NestedObjectsSkippingNamespaces_CorrectlyEmitsNamespaces()
+		{
+			var input = new[]
+			{
+				CommonGrammar.TokenObjectBegin(new DataName("foo1", "http://json.org")),
+				CommonGrammar.TokenProperty(new DataName("key1", "http://jsonfx.net")),
+
+				CommonGrammar.TokenObjectBegin(new DataName("foo2", "http://json.org")),
+				CommonGrammar.TokenProperty(new DataName("key2", "http://jsonfx.net")),
+				CommonGrammar.TokenValue("value"),
+				CommonGrammar.TokenObjectEnd,
+
+				CommonGrammar.TokenObjectEnd
+			};
+
+			const string expected =
+@"<foo1 xmlns=""http://json.org"">
+	<key1 xmlns=""http://jsonfx.net"">
+		<key2>value</key2>
+	</key1>
+</foo1>";
+
+			var formatter = new XmlWriter.XmlFormatter(new DataWriterSettings { PrettyPrint=true });
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void Format_NestedObjectsAlternatingNamespaces_CorrectlyEmitsNamespaces()
+		{
+			var input = new[]
+			{
+				CommonGrammar.TokenObjectBegin(new DataName("foo1", "http://json.org")),
+				CommonGrammar.TokenProperty(new DataName("key1", "http://jsonfx.net")),
+
+				CommonGrammar.TokenObjectBegin(new DataName("foo2", "http://jsonfx.net")),
+				CommonGrammar.TokenProperty(new DataName("key2", "http://json.org")),
+				CommonGrammar.TokenValue("value"),
+				CommonGrammar.TokenObjectEnd,
+
+				CommonGrammar.TokenObjectEnd
+			};
+
+			const string expected =
+@"<foo1 xmlns=""http://json.org"">
+	<key1 xmlns=""http://jsonfx.net"">
+		<key2 xmlns=""http://json.org"">value</key2>
+	</key1>
+</foo1>";
+
+			var formatter = new XmlWriter.XmlFormatter(new DataWriterSettings { PrettyPrint=true });
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact(Skip="Object form is complex to unambiguously process. Need to reconcile with JsonML serialization.")]
+		public void Format_HtmlContent_CorrectlyEmitsHtml()
+		{
+			var input = new[]
+			{
+				CommonGrammar.TokenObjectBegin("div"),
+					CommonGrammar.TokenProperty(new DataName("class", null, true)),
+					CommonGrammar.TokenValue("content"),
+					CommonGrammar.TokenValueDelim,
+
+					CommonGrammar.TokenProperty(String.Empty),// default content
+					CommonGrammar.TokenArrayBegin(),
+
+						CommonGrammar.TokenObjectBegin("p"),
+							CommonGrammar.TokenProperty(new DataName("style", null, true)),
+							CommonGrammar.TokenValue("color:red"),
+							CommonGrammar.TokenValueDelim,
+
+							CommonGrammar.TokenProperty(String.Empty),// default content
+							CommonGrammar.TokenArrayBegin(),
+
+								CommonGrammar.TokenObjectBegin("strong"),
+									CommonGrammar.TokenProperty(String.Empty),// default content
+									CommonGrammar.TokenArrayBegin(),
+										CommonGrammar.TokenValue("Lorem ipsum"),
+									CommonGrammar.TokenArrayEnd,
+								CommonGrammar.TokenObjectEnd,
+								CommonGrammar.TokenValueDelim,
+
+								CommonGrammar.TokenValue(" dolor sit amet, "),
+								CommonGrammar.TokenValueDelim,
+
+								CommonGrammar.TokenObjectBegin("i"),
+									CommonGrammar.TokenProperty(String.Empty),// default content
+									CommonGrammar.TokenArrayBegin(),
+										CommonGrammar.TokenValue("consectetur"),
+									CommonGrammar.TokenArrayEnd,
+								CommonGrammar.TokenObjectEnd,
+								CommonGrammar.TokenValueDelim,
+
+								CommonGrammar.TokenValue(" adipiscing elit."),
+							CommonGrammar.TokenArrayEnd,
+						CommonGrammar.TokenObjectEnd,
+					CommonGrammar.TokenArrayEnd,
+				CommonGrammar.TokenObjectEnd
+			};
+
+			const string expected =
+@"<div class=""content"">
+	<p style=""color:red"">
+		<strong>Lorem ipsum</strong> dolor sit amet, <i>consectetur<i> adipiscing elit.
+	</p>
+</div>";
+
+			var formatter = new XmlWriter.XmlFormatter(new DataWriterSettings { PrettyPrint=true });
 			var actual = formatter.Format(input);
 
 			Assert.Equal(expected, actual);
