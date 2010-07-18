@@ -102,8 +102,6 @@ namespace JsonFx.Common
 		/// <returns></returns>
 		public IEnumerable<Token<CommonTokenType>> GetTokens(object value)
 		{
-			Queue<Token<CommonTokenType>> tokens = new Queue<Token<CommonTokenType>>();
-
 			ICycleDetector detector;
 			switch (this.Settings.GraphCycles)
 			{
@@ -119,6 +117,7 @@ namespace JsonFx.Common
 				}
 			}
 
+			Queue<Token<CommonTokenType>> tokens = new Queue<Token<CommonTokenType>>();
 			this.GetTokens(tokens, detector, value);
 			return tokens;
 		}
@@ -135,6 +134,7 @@ namespace JsonFx.Common
 				return;
 			}
 
+			// test for cycles
 			if (detector.Add(value))
 			{
 				switch (this.Settings.GraphCycles)
@@ -163,11 +163,11 @@ namespace JsonFx.Common
 			{
 				foreach (var filter in this.Filters)
 				{
-					IEnumerable<Token<CommonTokenType>> filterTokens;
-					if (filter.TryWrite(this.Settings, value, out filterTokens))
+					IEnumerable<Token<CommonTokenType>> filterResult;
+					if (filter.TryWrite(this.Settings, value, out filterResult))
 					{
 						// found a successful match
-						foreach (Token<CommonTokenType> token in filterTokens)
+						foreach (Token<CommonTokenType> token in filterResult)
 						{
 							tokens.Enqueue(token);
 						}
