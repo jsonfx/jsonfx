@@ -55,21 +55,16 @@ namespace JsonFx.Common
 		public static readonly Token<CommonTokenType> TokenFalse = new Token<CommonTokenType>(CommonTokenType.Primitive, false);
 		public static readonly Token<CommonTokenType> TokenTrue = new Token<CommonTokenType>(CommonTokenType.Primitive, true);
 
-		private static readonly Token<CommonTokenType> TokenArrayBeginAnonymous = new Token<CommonTokenType>(CommonTokenType.ArrayBegin, DataName.Empty);
-		private static readonly Token<CommonTokenType> TokenObjectBeginAnonymous = new Token<CommonTokenType>(CommonTokenType.ObjectBegin, DataName.Empty);
+		public static readonly Token<CommonTokenType> TokenArrayBeginNoName = new Token<CommonTokenType>(CommonTokenType.ArrayBegin);
+		public static readonly Token<CommonTokenType> TokenObjectBeginNoName = new Token<CommonTokenType>(CommonTokenType.ObjectBegin);
+
+		internal static readonly Token<CommonTokenType> TokenNaN = new Token<CommonTokenType>(CommonTokenType.Primitive, Double.NaN);
+		internal static readonly Token<CommonTokenType> TokenPositiveInfinity = new Token<CommonTokenType>(CommonTokenType.Primitive, Double.PositiveInfinity);
+		internal static readonly Token<CommonTokenType> TokenNegativeInfinity = new Token<CommonTokenType>(CommonTokenType.Primitive, Double.NegativeInfinity);
 
 		#endregion Reusable Tokens
 
 		#region Token Factories
-
-		/// <summary>
-		/// Marks the beginning of an unnamed array
-		/// </summary>
-		/// <returns>ArrayBegin Token</returns>
-		public static Token<CommonTokenType> TokenArrayBegin()
-		{
-			return CommonGrammar.TokenArrayBeginAnonymous;
-		}
 
 		/// <summary>
 		/// Marks the beginning of an array
@@ -100,15 +95,6 @@ namespace JsonFx.Common
 		public static Token<CommonTokenType> TokenArrayBegin(DataName name)
 		{
 			return new Token<CommonTokenType>(CommonTokenType.ArrayBegin, name);
-		}
-
-		/// <summary>
-		/// Marks the beginning of an unnamed object
-		/// </summary>
-		/// <returns>ObjectBegin Token</returns>
-		public static Token<CommonTokenType> TokenObjectBegin()
-		{
-			return CommonGrammar.TokenObjectBeginAnonymous;
 		}
 
 		/// <summary>

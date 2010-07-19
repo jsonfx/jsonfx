@@ -73,9 +73,9 @@ namespace JsonFx.Bson
 			// input from example at http://bsonspec.org/#/specification
 			var input = new[]
 		    {
-				CommonGrammar.TokenObjectBegin(),
+				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenProperty("BSON"),
-				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenValue("awesome"),
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(5.05),
@@ -143,7 +143,7 @@ namespace JsonFx.Bson
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBegin(),
+				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenProperty(new DataName("key", "http://json.org")),
 				CommonGrammar.TokenValue("value"),
 				CommonGrammar.TokenObjectEnd

@@ -50,7 +50,7 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenArrayEnd
 			};
 
@@ -67,7 +67,7 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenArrayEnd
 			};
 
@@ -84,7 +84,7 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenNull,
 				CommonGrammar.TokenArrayEnd
 			};
@@ -102,7 +102,7 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenNull,
 				CommonGrammar.TokenArrayEnd
 			};
@@ -123,7 +123,7 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenValue(0),
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenNull,
@@ -147,7 +147,7 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenValue(0),
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenNull,
@@ -178,25 +178,25 @@ namespace JsonFx.Xml
 			// input from pass2.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenValue("Not too deep"),
 				CommonGrammar.TokenArrayEnd,
 				CommonGrammar.TokenArrayEnd,
@@ -233,25 +233,25 @@ namespace JsonFx.Xml
 			// input from pass2.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenValue("Not too deep"),
 				CommonGrammar.TokenArrayEnd,
 				CommonGrammar.TokenArrayEnd,
@@ -330,7 +330,7 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBegin(),
+				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenObjectEnd
 			};
 
@@ -347,7 +347,7 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBegin(),
+				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenObjectEnd
 			};
 
@@ -364,7 +364,7 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBegin(),
+				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenProperty("key"),
 				CommonGrammar.TokenValue("value"),
 				CommonGrammar.TokenObjectEnd
@@ -406,9 +406,9 @@ namespace JsonFx.Xml
 			// input from pass3.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBegin(),
+				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenProperty("JSON Test Pattern pass3"),
-				CommonGrammar.TokenObjectBegin(),
+				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenProperty("The outermost value"),
 				CommonGrammar.TokenValue("must be an object or array."),
 				CommonGrammar.TokenValueDelim,
@@ -435,7 +435,7 @@ namespace JsonFx.Xml
 			{
 				CommonGrammar.TokenObjectBegin("Root"),
 				CommonGrammar.TokenProperty("JSON Test Pattern pass3"),
-				CommonGrammar.TokenObjectBegin(),
+				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenProperty("The outermost value"),
 				CommonGrammar.TokenValue("must be an object or array."),
 				CommonGrammar.TokenValueDelim,
@@ -647,7 +647,7 @@ namespace JsonFx.Xml
 					CommonGrammar.TokenValueDelim,
 
 					CommonGrammar.TokenProperty(String.Empty),// default content
-					CommonGrammar.TokenArrayBegin(),
+					CommonGrammar.TokenArrayBeginNoName,
 
 						CommonGrammar.TokenObjectBegin("p"),
 							CommonGrammar.TokenProperty(new DataName("style", null, true)),
@@ -655,11 +655,11 @@ namespace JsonFx.Xml
 							CommonGrammar.TokenValueDelim,
 
 							CommonGrammar.TokenProperty(String.Empty),// default content
-							CommonGrammar.TokenArrayBegin(),
+							CommonGrammar.TokenArrayBeginNoName,
 
 								CommonGrammar.TokenObjectBegin("strong"),
 									CommonGrammar.TokenProperty(String.Empty),// default content
-									CommonGrammar.TokenArrayBegin(),
+									CommonGrammar.TokenArrayBeginNoName,
 										CommonGrammar.TokenValue("Lorem ipsum"),
 									CommonGrammar.TokenArrayEnd,
 								CommonGrammar.TokenObjectEnd,
@@ -670,7 +670,7 @@ namespace JsonFx.Xml
 
 								CommonGrammar.TokenObjectBegin("i"),
 									CommonGrammar.TokenProperty(String.Empty),// default content
-									CommonGrammar.TokenArrayBegin(),
+									CommonGrammar.TokenArrayBeginNoName,
 										CommonGrammar.TokenValue("consectetur"),
 									CommonGrammar.TokenArrayEnd,
 								CommonGrammar.TokenObjectEnd,

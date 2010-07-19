@@ -61,7 +61,7 @@ namespace JsonFx.Bson
 
 			var expected = new[]
 		    {
-				CommonGrammar.TokenObjectBegin(),
+				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenProperty("0"),
 				CommonGrammar.TokenValue("awesome"),
 				CommonGrammar.TokenValueDelim,
@@ -93,7 +93,7 @@ namespace JsonFx.Bson
 
 			var expected = new[]
 			{
-				CommonGrammar.TokenObjectBegin(),
+				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenProperty("hello"),
 				CommonGrammar.TokenValue("world"),
 				CommonGrammar.TokenObjectEnd
@@ -132,9 +132,9 @@ namespace JsonFx.Bson
 
 		    var expected = new[]
 		    {
-				CommonGrammar.TokenObjectBegin(),
+				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenProperty("BSON"),
-				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenValue("awesome"),
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(5.05),
@@ -161,7 +161,7 @@ namespace JsonFx.Bson
 
 			var expected = new[]
 			{
-				CommonGrammar.TokenObjectBegin(),
+				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenProperty("valid"),
 				CommonGrammar.TokenTrue,
 				CommonGrammar.TokenObjectEnd

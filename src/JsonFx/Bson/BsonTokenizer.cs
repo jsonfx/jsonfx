@@ -85,7 +85,7 @@ namespace JsonFx.Bson
 				long start = reader.BaseStream.Position;
 				int size = reader.ReadInt32();
 
-				queue.Add(isArray ? CommonGrammar.TokenArrayBegin() : CommonGrammar.TokenObjectBegin());
+				queue.Add(isArray ? CommonGrammar.TokenArrayBeginNoName : CommonGrammar.TokenObjectBeginNoName);
 
 				bool needsValueDelim = false;
 				while (reader.BaseStream.Position-start < size-1)

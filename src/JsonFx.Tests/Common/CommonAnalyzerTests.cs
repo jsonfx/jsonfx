@@ -48,7 +48,7 @@ namespace JsonFx.Serialization
 		{
 			var input = new []
 			{
-				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenArrayEnd
 			};
 
@@ -65,7 +65,7 @@ namespace JsonFx.Serialization
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenNull,
 				CommonGrammar.TokenArrayEnd
 			};
@@ -83,7 +83,7 @@ namespace JsonFx.Serialization
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenValue(0),
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenNull,
@@ -114,25 +114,25 @@ namespace JsonFx.Serialization
 			// input from pass2.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
-				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenValue("Not too deep"),
 				CommonGrammar.TokenArrayEnd,
 				CommonGrammar.TokenArrayEnd,
@@ -226,7 +226,7 @@ namespace JsonFx.Serialization
 			// input from fail2.json in test suite at http://www.json.org/JSON_checker/
 			var input = new []
 			{
-				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenValue("Unclosed array")
 			};
 
@@ -248,7 +248,7 @@ namespace JsonFx.Serialization
 			// input from fail4.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenValue("extra comma"),
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenArrayEnd
@@ -272,7 +272,7 @@ namespace JsonFx.Serialization
 			// input from fail5.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenValue("double extra comma"),
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValueDelim,
@@ -297,7 +297,7 @@ namespace JsonFx.Serialization
 			// input from fail6.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue("<-- missing value"),
 				CommonGrammar.TokenArrayEnd
@@ -321,7 +321,7 @@ namespace JsonFx.Serialization
 			// input from fail22.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenProperty("Colon instead of comma"),
 				CommonGrammar.TokenFalse,
 				CommonGrammar.TokenArrayEnd
@@ -345,7 +345,7 @@ namespace JsonFx.Serialization
 			// input from fail33.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenValue("mismatch"),
 				CommonGrammar.TokenObjectEnd
 			};
@@ -371,7 +371,7 @@ namespace JsonFx.Serialization
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBegin(),
+				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenObjectEnd
 			};
 
@@ -388,7 +388,7 @@ namespace JsonFx.Serialization
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBegin(),
+				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenProperty("key"),
 				CommonGrammar.TokenValue("value"),
 				CommonGrammar.TokenObjectEnd
@@ -411,9 +411,9 @@ namespace JsonFx.Serialization
 			// input from pass3.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBegin(),
+				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenProperty("JSON Test Pattern pass3"),
-				CommonGrammar.TokenObjectBegin(),
+				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenProperty("The outermost value"),
 				CommonGrammar.TokenValue("must be an object or array."),
 				CommonGrammar.TokenValueDelim,
@@ -447,7 +447,7 @@ namespace JsonFx.Serialization
 			// input from fail9.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBegin(),
+				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenProperty("Extra comma"),
 				CommonGrammar.TokenTrue,
 				CommonGrammar.TokenValueDelim,
@@ -472,7 +472,7 @@ namespace JsonFx.Serialization
 			// input from fail19.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBegin(),
+				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenValue("Missing colon"),
 				CommonGrammar.TokenNull,
 				CommonGrammar.TokenObjectEnd
@@ -496,7 +496,7 @@ namespace JsonFx.Serialization
 			// input from fail20.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBegin(),
+				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenProperty("Double colon"),
 				CommonGrammar.TokenProperty(""),
 				CommonGrammar.TokenNull,
@@ -521,7 +521,7 @@ namespace JsonFx.Serialization
 			// input from fail21.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBegin(),
+				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenValue("Comma instead of colon"),
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenNull,
@@ -546,7 +546,7 @@ namespace JsonFx.Serialization
 			// input from fail32.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBegin(),
+				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenProperty("Comma instead if closing brace"),
 				CommonGrammar.TokenTrue,
 				CommonGrammar.TokenValueDelim
@@ -574,20 +574,20 @@ namespace JsonFx.Serialization
 			// input from pass1.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenValue("JSON Test Pattern pass1"),
 				CommonGrammar.TokenValueDelim,
-				CommonGrammar.TokenObjectBegin(),
+				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenProperty("object with 1 member"),
-				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenValue("array with 1 element"),
 				CommonGrammar.TokenArrayEnd,
 				CommonGrammar.TokenObjectEnd,
 				CommonGrammar.TokenValueDelim,
-				CommonGrammar.TokenObjectBegin(),
+				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenObjectEnd,
 				CommonGrammar.TokenValueDelim,
-				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenArrayEnd,
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(-42),
@@ -598,7 +598,7 @@ namespace JsonFx.Serialization
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenNull,
 				CommonGrammar.TokenValueDelim,
-				CommonGrammar.TokenObjectBegin(),
+				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenProperty("integer"),
 				CommonGrammar.TokenValue(1234567890),
 				CommonGrammar.TokenValueDelim,
@@ -663,11 +663,11 @@ namespace JsonFx.Serialization
 				CommonGrammar.TokenNull,
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("array"),
-				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenArrayEnd,
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("object"),
-				CommonGrammar.TokenObjectBegin(),
+				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenObjectEnd,
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("address"),
@@ -683,7 +683,7 @@ namespace JsonFx.Serialization
 				CommonGrammar.TokenValue(" "),
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty(" s p a c e d "),
-				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenValue(1),
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(2),
@@ -700,7 +700,7 @@ namespace JsonFx.Serialization
 				CommonGrammar.TokenArrayEnd,
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("compact"),
-				CommonGrammar.TokenArrayBegin(),
+				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenValue(1),
 				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(2),

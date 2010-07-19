@@ -208,15 +208,15 @@ namespace JsonFx.Common
 
 						if (Double.IsNaN(doubleVal))
 						{
-							tokens.Add(CommonGrammar.TokenValue(Double.NaN));
+							tokens.Add(CommonGrammar.TokenNaN);
 						}
 						else if (Double.IsPositiveInfinity(doubleVal))
 						{
-							tokens.Add(CommonGrammar.TokenValue(Double.PositiveInfinity));
+							tokens.Add(CommonGrammar.TokenPositiveInfinity);
 						}
 						else if (Double.IsNegativeInfinity(doubleVal))
 						{
-							tokens.Add(CommonGrammar.TokenValue(Double.NegativeInfinity));
+							tokens.Add(CommonGrammar.TokenNegativeInfinity);
 						}
 						else
 						{
@@ -231,17 +231,17 @@ namespace JsonFx.Common
 						if (Single.IsNaN(floatVal))
 						{
 							// use the Double equivalent
-							tokens.Add(CommonGrammar.TokenValue(Double.NaN));
+							tokens.Add(CommonGrammar.TokenNaN);
 						}
 						else if (Single.IsPositiveInfinity(floatVal))
 						{
 							// use the Double equivalent
-							tokens.Add(CommonGrammar.TokenValue(Double.PositiveInfinity));
+							tokens.Add(CommonGrammar.TokenPositiveInfinity);
 						}
 						else if (Single.IsNegativeInfinity(floatVal))
 						{
 							// use the Double equivalent
-							tokens.Add(CommonGrammar.TokenValue(Double.NegativeInfinity));
+							tokens.Add(CommonGrammar.TokenNegativeInfinity);
 						}
 						else
 						{

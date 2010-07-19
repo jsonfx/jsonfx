@@ -117,7 +117,7 @@ namespace JsonFx.Json
 					case JsonGrammar.OperatorArrayBegin:
 					{
 						scanner.Pop();
-						return CommonGrammar.TokenArrayBegin();
+						return CommonGrammar.TokenArrayBeginNoName;
 					}
 					case JsonGrammar.OperatorArrayEnd:
 					{
@@ -127,7 +127,7 @@ namespace JsonFx.Json
 					case JsonGrammar.OperatorObjectBegin:
 					{
 						scanner.Pop();
-						return CommonGrammar.TokenObjectBegin();
+						return CommonGrammar.TokenObjectBeginNoName;
 					}
 					case JsonGrammar.OperatorObjectEnd:
 					{
@@ -659,18 +659,18 @@ namespace JsonFx.Json
 							return null;
 						}
 
-						return CommonGrammar.TokenValue(Double.NaN);
+						return CommonGrammar.TokenNaN;
 					}
 					case JsonGrammar.KeywordInfinity:
 					{
 						if (unary == default(char) || unary == JsonGrammar.OperatorUnaryPlus)
 						{
-							return CommonGrammar.TokenValue(Double.PositiveInfinity);
+							return CommonGrammar.TokenPositiveInfinity;
 						}
 
 						if (unary == JsonGrammar.OperatorUnaryMinus)
 						{
-							return CommonGrammar.TokenValue(Double.NegativeInfinity);
+							return CommonGrammar.TokenNegativeInfinity;
 						}
 
 						return null;
