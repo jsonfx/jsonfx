@@ -56,6 +56,8 @@ namespace JsonFx.Json
 			private const string ErrorUnterminatedString = "Unterminated JSON string";
 			private const string ErrorIllegalNumber = "Illegal JSON number";
 
+			private const int DefaultBufferSize = 0x20;
+
 			#endregion Constants
 
 			#region Fields
@@ -297,7 +299,7 @@ namespace JsonFx.Json
 				int numLine = scanner.Line;
 				int numCol = scanner.Column;
 
-				StringBuilder buffer = new StringBuilder();
+				StringBuilder buffer = new StringBuilder(JsonTokenizer.DefaultBufferSize);
 
 				char ch = scanner.Peek();
 				bool isNeg = false;
@@ -479,7 +481,7 @@ namespace JsonFx.Json
 				scanner.Pop();
 				char ch = scanner.Peek();
 
-				StringBuilder buffer = new StringBuilder();
+				StringBuilder buffer = new StringBuilder(JsonTokenizer.DefaultBufferSize);
 				while (true)
 				{
 					// look ahead
@@ -719,7 +721,7 @@ namespace JsonFx.Json
 			{
 				bool identPart = false;
 
-				StringBuilder buffer = new StringBuilder();
+				StringBuilder buffer = new StringBuilder(JsonTokenizer.DefaultBufferSize);
 				while (true)
 				{
 					char ch = scanner.Peek();
