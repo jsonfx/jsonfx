@@ -82,6 +82,7 @@
     <Compile Include="Common\Filters\CommonFilter`1.cs" />
     <Compile Include="Common\Filters\Iso8601DateFilter.cs" />
     <Compile Include="Common\Filters\MSAjaxDateFilter.cs" />
+    <Compile Include="IO\CharBuffer.cs" />
     <Compile Include="Json\Resolvers\JsonResolverStrategy.cs" />
     <Compile Include="Serialization\Filters\DataFilter`2.cs" />
     <Compile Include="Serialization\Filters\IDataFilter`2.cs" />

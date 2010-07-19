@@ -58,7 +58,7 @@ namespace JsonFx.IO
 		private int line;
 		private long index;
 
-		private StringBuilder chunk;
+		private CharBuffer chunk;
 
 		#endregion Fields
 
@@ -133,11 +133,11 @@ namespace JsonFx.IO
 		{
 			if (this.chunk == null)
 			{
-				this.chunk = new StringBuilder(TextReaderStream.DefaultBufferSize);
+				this.chunk = new CharBuffer(TextReaderStream.DefaultBufferSize);
 			}
 			else
 			{
-				this.chunk.Length = 0;
+				this.chunk.Clear();
 			}
 		}
 
@@ -171,8 +171,8 @@ namespace JsonFx.IO
 				throw new InvalidOperationException("Not currently chunking.");
 			}
 
-			// append chunk value
-			buffer.Append(this.chunk.ToString());
+			// copy chunk value into user buffer
+			this.chunk.CopyTo(buffer);
 
 			// reset internal buffer
 			this.chunk = null;
