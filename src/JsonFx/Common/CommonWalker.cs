@@ -82,7 +82,7 @@ namespace JsonFx.Common
 			}
 			this.Filters = filters;
 
-			foreach (var filter in this.Filters)
+			foreach (var filter in filters)
 			{
 				if (filter == null)
 				{
@@ -117,7 +117,7 @@ namespace JsonFx.Common
 				}
 			}
 
-			Queue<Token<CommonTokenType>> tokens = new Queue<Token<CommonTokenType>>();
+			List<Token<CommonTokenType>> tokens = new List<Token<CommonTokenType>>();
 			this.GetTokens(tokens, detector, value);
 			return tokens;
 		}
@@ -126,11 +126,11 @@ namespace JsonFx.Common
 
 		#region Walker Methods
 
-		private void GetTokens(Queue<Token<CommonTokenType>> tokens, ICycleDetector detector, object value)
+		private void GetTokens(List<Token<CommonTokenType>> tokens, ICycleDetector detector, object value)
 		{
 			if (value == null)
 			{
-				tokens.Enqueue(CommonGrammar.TokenNull);
+				tokens.Add(CommonGrammar.TokenNull);
 				return;
 			}
 
@@ -153,7 +153,7 @@ namespace JsonFx.Common
 					{
 						// no need to remove value as was duplicate reference
 						// replace cycle with null
-						tokens.Enqueue(CommonGrammar.TokenNull);
+						tokens.Add(CommonGrammar.TokenNull);
 						return;
 					}
 				}
@@ -167,10 +167,7 @@ namespace JsonFx.Common
 					if (filter.TryWrite(this.Settings, value, out filterResult))
 					{
 						// found a successful match
-						foreach (Token<CommonTokenType> token in filterResult)
-						{
-							tokens.Enqueue(token);
-						}
+						tokens.AddRange(filterResult);
 						return;
 					}
 				}
@@ -180,7 +177,7 @@ namespace JsonFx.Common
 				// must test enumerations before other value types
 				if (type.IsEnum)
 				{
-					tokens.Enqueue(CommonGrammar.TokenValue((Enum)value));
+					tokens.Add(CommonGrammar.TokenValue((Enum)value));
 					return;
 				}
 
@@ -189,7 +186,7 @@ namespace JsonFx.Common
 				{
 					case TypeCode.Boolean:
 					{
-						tokens.Enqueue(true.Equals(value) ? CommonGrammar.TokenTrue : CommonGrammar.TokenFalse);
+						tokens.Add(true.Equals(value) ? CommonGrammar.TokenTrue : CommonGrammar.TokenFalse);
 						return;
 					}
 					case TypeCode.Byte:
@@ -202,7 +199,7 @@ namespace JsonFx.Common
 					case TypeCode.UInt32:
 					case TypeCode.UInt64:
 					{
-						tokens.Enqueue(CommonGrammar.TokenValue((ValueType)value));
+						tokens.Add(CommonGrammar.TokenValue((ValueType)value));
 						return;
 					}
 					case TypeCode.Double:
@@ -211,19 +208,19 @@ namespace JsonFx.Common
 
 						if (Double.IsNaN(doubleVal))
 						{
-							tokens.Enqueue(CommonGrammar.TokenValue(Double.NaN));
+							tokens.Add(CommonGrammar.TokenValue(Double.NaN));
 						}
 						else if (Double.IsPositiveInfinity(doubleVal))
 						{
-							tokens.Enqueue(CommonGrammar.TokenValue(Double.PositiveInfinity));
+							tokens.Add(CommonGrammar.TokenValue(Double.PositiveInfinity));
 						}
 						else if (Double.IsNegativeInfinity(doubleVal))
 						{
-							tokens.Enqueue(CommonGrammar.TokenValue(Double.NegativeInfinity));
+							tokens.Add(CommonGrammar.TokenValue(Double.NegativeInfinity));
 						}
 						else
 						{
-							tokens.Enqueue(CommonGrammar.TokenValue(doubleVal));
+							tokens.Add(CommonGrammar.TokenValue(doubleVal));
 						}
 						return;
 					}
@@ -233,19 +230,22 @@ namespace JsonFx.Common
 
 						if (Single.IsNaN(floatVal))
 						{
-							tokens.Enqueue(CommonGrammar.TokenValue(Double.NaN));
+							// use the Double equivalent
+							tokens.Add(CommonGrammar.TokenValue(Double.NaN));
 						}
 						else if (Single.IsPositiveInfinity(floatVal))
 						{
-							tokens.Enqueue(CommonGrammar.TokenValue(Double.PositiveInfinity));
+							// use the Double equivalent
+							tokens.Add(CommonGrammar.TokenValue(Double.PositiveInfinity));
 						}
 						else if (Single.IsNegativeInfinity(floatVal))
 						{
-							tokens.Enqueue(CommonGrammar.TokenValue(Double.NegativeInfinity));
+							// use the Double equivalent
+							tokens.Add(CommonGrammar.TokenValue(Double.NegativeInfinity));
 						}
 						else
 						{
-							tokens.Enqueue(CommonGrammar.TokenValue(floatVal));
+							tokens.Add(CommonGrammar.TokenValue(floatVal));
 						}
 						return;
 					}
@@ -253,13 +253,13 @@ namespace JsonFx.Common
 					case TypeCode.DateTime:
 					case TypeCode.String:
 					{
-						tokens.Enqueue(CommonGrammar.TokenValue(value));
+						tokens.Add(CommonGrammar.TokenValue(value));
 						return;
 					}
 					case TypeCode.DBNull:
 					case TypeCode.Empty:
 					{
-						tokens.Enqueue(CommonGrammar.TokenNull);
+						tokens.Add(CommonGrammar.TokenNull);
 						return;
 					}
 				}
@@ -272,13 +272,13 @@ namespace JsonFx.Common
 
 				if (value is Guid || value is Uri || value is Version)
 				{
-					tokens.Enqueue(CommonGrammar.TokenValue(value));
+					tokens.Add(CommonGrammar.TokenValue(value));
 					return;
 				}
 
 				if (value is TimeSpan)
 				{
-					tokens.Enqueue(CommonGrammar.TokenValue((TimeSpan)value));
+					tokens.Add(CommonGrammar.TokenValue((TimeSpan)value));
 					return;
 				}
 
@@ -291,7 +291,7 @@ namespace JsonFx.Common
 			}
 		}
 
-		private void GetArrayTokens(Queue<Token<CommonTokenType>> tokens, ICycleDetector detector, IEnumerable value)
+		private void GetArrayTokens(List<Token<CommonTokenType>> tokens, ICycleDetector detector, IEnumerable value)
 		{
 			DataName typeName = this.Settings.Resolver.LoadTypeName((value != null) ? value.GetType() : null);
 			IEnumerator enumerator = value.GetEnumerator();
@@ -308,7 +308,7 @@ namespace JsonFx.Common
 				return;
 			}
 
-			tokens.Enqueue(CommonGrammar.TokenArrayBegin(typeName));
+			tokens.Add(CommonGrammar.TokenArrayBegin(typeName));
 
 			bool appendDelim = false;
 
@@ -316,7 +316,7 @@ namespace JsonFx.Common
 			{
 				if (appendDelim)
 				{
-					tokens.Enqueue(CommonGrammar.TokenValueDelim);
+					tokens.Add(CommonGrammar.TokenValueDelim);
 				}
 				else
 				{
@@ -326,12 +326,12 @@ namespace JsonFx.Common
 				this.GetTokens(tokens, detector, enumerator.Current);
 			}
 
-			tokens.Enqueue(CommonGrammar.TokenArrayEnd);
+			tokens.Add(CommonGrammar.TokenArrayEnd);
 		}
 
-		private void GetObjectTokens(Queue<Token<CommonTokenType>> tokens, ICycleDetector detector, DataName typeName, IDictionaryEnumerator enumerator)
+		private void GetObjectTokens(List<Token<CommonTokenType>> tokens, ICycleDetector detector, DataName typeName, IDictionaryEnumerator enumerator)
 		{
-			tokens.Enqueue(CommonGrammar.TokenObjectBegin(typeName));
+			tokens.Add(CommonGrammar.TokenObjectBegin(typeName));
 
 			bool appendDelim = false;
 
@@ -339,23 +339,23 @@ namespace JsonFx.Common
 			{
 				if (appendDelim)
 				{
-					tokens.Enqueue(CommonGrammar.TokenValueDelim);
+					tokens.Add(CommonGrammar.TokenValueDelim);
 				}
 				else
 				{
 					appendDelim = true;
 				}
 
-				tokens.Enqueue(CommonGrammar.TokenProperty(enumerator.Key));
+				tokens.Add(CommonGrammar.TokenProperty(enumerator.Key));
 				this.GetTokens(tokens, detector, enumerator.Value);
 			}
 
-			tokens.Enqueue(CommonGrammar.TokenObjectEnd);
+			tokens.Add(CommonGrammar.TokenObjectEnd);
 		}
 
-		private void GetObjectTokens(Queue<Token<CommonTokenType>> tokens, ICycleDetector detector, DataName typeName, IEnumerator<KeyValuePair<string, object>> enumerator)
+		private void GetObjectTokens(List<Token<CommonTokenType>> tokens, ICycleDetector detector, DataName typeName, IEnumerator<KeyValuePair<string, object>> enumerator)
 		{
-			tokens.Enqueue(CommonGrammar.TokenObjectBegin(typeName));
+			tokens.Add(CommonGrammar.TokenObjectBegin(typeName));
 
 			bool appendDelim = false;
 
@@ -363,7 +363,7 @@ namespace JsonFx.Common
 			{
 				if (appendDelim)
 				{
-					tokens.Enqueue(CommonGrammar.TokenValueDelim);
+					tokens.Add(CommonGrammar.TokenValueDelim);
 				}
 				else
 				{
@@ -371,23 +371,23 @@ namespace JsonFx.Common
 				}
 
 				KeyValuePair<string, object> pair = enumerator.Current;
-				tokens.Enqueue(CommonGrammar.TokenProperty(pair.Key));
+				tokens.Add(CommonGrammar.TokenProperty(pair.Key));
 				this.GetTokens(tokens, detector, pair.Value);
 			}
 
-			tokens.Enqueue(CommonGrammar.TokenObjectEnd);
+			tokens.Add(CommonGrammar.TokenObjectEnd);
 		}
 
-		private void GetObjectTokens(Queue<Token<CommonTokenType>> tokens, ICycleDetector detector, Type type, object value)
+		private void GetObjectTokens(List<Token<CommonTokenType>> tokens, ICycleDetector detector, Type type, object value)
 		{
 			DataName name = this.Settings.Resolver.LoadTypeName((value != null) ? value.GetType() : null);
-			tokens.Enqueue(CommonGrammar.TokenObjectBegin(name));
+			tokens.Add(CommonGrammar.TokenObjectBegin(name));
 
 			IDictionary<string, MemberMap> maps = this.Settings.Resolver.LoadMaps(type);
 			if (maps == null)
 			{
 				// TODO: verify no other valid situations here
-				tokens.Enqueue(CommonGrammar.TokenObjectEnd);
+				tokens.Add(CommonGrammar.TokenObjectEnd);
 				return;
 			}
 
@@ -412,18 +412,18 @@ namespace JsonFx.Common
 
 				if (appendDelim)
 				{
-					tokens.Enqueue(CommonGrammar.TokenValueDelim);
+					tokens.Add(CommonGrammar.TokenValueDelim);
 				}
 				else
 				{
 					appendDelim = true;
 				}
 
-				tokens.Enqueue(CommonGrammar.TokenProperty(map.DataName));
+				tokens.Add(CommonGrammar.TokenProperty(map.DataName));
 				this.GetTokens(tokens, detector, propertyValue);
 			}
 
-			tokens.Enqueue(CommonGrammar.TokenObjectEnd);
+			tokens.Add(CommonGrammar.TokenObjectEnd);
 		}
 
 		#endregion Walker Methods

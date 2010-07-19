@@ -107,7 +107,7 @@ namespace JsonFx.Common
 			}
 			this.Filters = filters;
 
-			foreach (var filter in this.Filters)
+			foreach (var filter in filters)
 			{
 				if (filter == null)
 				{

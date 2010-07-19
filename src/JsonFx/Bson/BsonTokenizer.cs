@@ -75,25 +75,24 @@ namespace JsonFx.Bson
 
 			#region Scanning Methods
 
-			private static void ReadDocument(Queue<Token<CommonTokenType>> queue, BinaryReader reader, bool isArray)
+			private static void ReadDocument(List<Token<CommonTokenType>> queue, BinaryReader reader, bool isArray)
 			{
 				if (reader.PeekChar() < 0)
 				{
-					queue.Enqueue(CommonGrammar.TokenNone);
 					return;
 				}
 
 				long start = reader.BaseStream.Position;
 				int size = reader.ReadInt32();
 
-				queue.Enqueue(isArray ? CommonGrammar.TokenArrayBegin() : CommonGrammar.TokenObjectBegin());
+				queue.Add(isArray ? CommonGrammar.TokenArrayBegin() : CommonGrammar.TokenObjectBegin());
 
 				bool needsValueDelim = false;
 				while (reader.BaseStream.Position-start < size-1)
 				{
 					if (needsValueDelim)
 					{
-						queue.Enqueue(CommonGrammar.TokenValueDelim);
+						queue.Add(CommonGrammar.TokenValueDelim);
 					}
 					else
 					{
@@ -108,17 +107,17 @@ namespace JsonFx.Bson
 					throw new DeserializationException(BsonWriter.ErrorUnterminated, start);
 				}
 
-				queue.Enqueue(isArray ? CommonGrammar.TokenArrayEnd : CommonGrammar.TokenObjectEnd);
+				queue.Add(isArray ? CommonGrammar.TokenArrayEnd : CommonGrammar.TokenObjectEnd);
 			}
 
-			private static void ReadElement(Queue<Token<CommonTokenType>> queue, BinaryReader reader, bool isArrayItem)
+			private static void ReadElement(List<Token<CommonTokenType>> queue, BinaryReader reader, bool isArrayItem)
 			{
 				BsonElementType elemType = (BsonElementType)reader.ReadByte();
 
 				string ename = BsonTokenizer.ReadCString(reader);
 				if (!isArrayItem)
 				{
-					queue.Enqueue(CommonGrammar.TokenProperty(ename));
+					queue.Add(CommonGrammar.TokenProperty(ename));
 				}
 
 				switch (elemType)
@@ -126,25 +125,25 @@ namespace JsonFx.Bson
 					case BsonElementType.Double:
 					{
 						double value = reader.ReadDouble();
-						queue.Enqueue(CommonGrammar.TokenValue(value));
+						queue.Add(CommonGrammar.TokenValue(value));
 						break;
 					}
 					case BsonElementType.String:
 					{
 						string value = BsonTokenizer.ReadString(reader);
-						queue.Enqueue(CommonGrammar.TokenValue(value));
+						queue.Add(CommonGrammar.TokenValue(value));
 						break;
 					}
 					case BsonElementType.JavaScriptCode:
 					{
 						BsonJavaScriptCode value = (BsonJavaScriptCode)BsonTokenizer.ReadString(reader);
-						queue.Enqueue(CommonGrammar.TokenValue(value));
+						queue.Add(CommonGrammar.TokenValue(value));
 						break;
 					}
 					case BsonElementType.Symbol:
 					{
 						BsonSymbol value = (BsonSymbol)BsonTokenizer.ReadString(reader);
-						queue.Enqueue(CommonGrammar.TokenValue(value));
+						queue.Add(CommonGrammar.TokenValue(value));
 						break;
 					}
 					case BsonElementType.Document:
@@ -165,19 +164,19 @@ namespace JsonFx.Bson
 					case BsonElementType.ObjectID:
 					{
 						byte[] value = reader.ReadBytes(BsonWriter.SizeOfObjectID);
-						queue.Enqueue(CommonGrammar.TokenValue(new BsonObjectID(value)));
+						queue.Add(CommonGrammar.TokenValue(new BsonObjectID(value)));
 						break;
 					}
 					case BsonElementType.Boolean:
 					{
 						bool value = reader.ReadByte() != BsonWriter.FalseByte;
-						queue.Enqueue(value ? CommonGrammar.TokenTrue : CommonGrammar.TokenFalse);
+						queue.Add(value ? CommonGrammar.TokenTrue : CommonGrammar.TokenFalse);
 						break;
 					}
 					case BsonElementType.DateTimeUtc:
 					{
 						DateTime value = BsonWriter.UnixEpoch.AddMilliseconds(reader.ReadInt64());
-						queue.Enqueue(CommonGrammar.TokenValue(value));
+						queue.Add(CommonGrammar.TokenValue(value));
 						break;
 					}
 					case BsonElementType.RegExp:
@@ -188,8 +187,9 @@ namespace JsonFx.Bson
 
 						RegexOptions options = RegexOptions.ECMAScript;
 
-						foreach (char ch in optionsStr)
+						for (int i=optionsStr.Length-1; i>=0; i--)
 						{
+							char ch = optionsStr[i];
 							switch (ch)
 							{
 								case 'g':
@@ -213,7 +213,7 @@ namespace JsonFx.Bson
 
 						Regex regex = new Regex(pattern, options);
 
-						queue.Enqueue(CommonGrammar.TokenValue(regex));
+						queue.Add(CommonGrammar.TokenValue(regex));
 						break;
 					}
 					case BsonElementType.DBPointer:
@@ -222,7 +222,7 @@ namespace JsonFx.Bson
 						byte[] value2 = reader.ReadBytes(BsonWriter.SizeOfObjectID);
 
 						BsonDBPointer pointer = new BsonDBPointer { Namespace=value1, ObjectID=new BsonObjectID(value2) };
-						queue.Enqueue(CommonGrammar.TokenValue(pointer));
+						queue.Add(CommonGrammar.TokenValue(pointer));
 						break;
 					}
 					case BsonElementType.CodeWithScope:
@@ -230,7 +230,7 @@ namespace JsonFx.Bson
 						int size = reader.ReadInt32();
 						string value = BsonTokenizer.ReadString(reader);
 
-						queue.Enqueue(CommonGrammar.TokenValue(value));
+						queue.Add(CommonGrammar.TokenValue(value));
 
 						BsonTokenizer.ReadDocument(queue, reader, false);
 						break;
@@ -238,20 +238,20 @@ namespace JsonFx.Bson
 					case BsonElementType.Int32:
 					{
 						int value = reader.ReadInt32();
-						queue.Enqueue(CommonGrammar.TokenValue(value));
+						queue.Add(CommonGrammar.TokenValue(value));
 						break;
 					}
 					case BsonElementType.TimeStamp:
 					{
 						long value = reader.ReadInt64();
 						// TODO: convert to TimeSpan?
-						queue.Enqueue(CommonGrammar.TokenValue(value));
+						queue.Add(CommonGrammar.TokenValue(value));
 						break;
 					}
 					case BsonElementType.Int64:
 					{
 						long value = reader.ReadInt64();
-						queue.Enqueue(CommonGrammar.TokenValue(value));
+						queue.Add(CommonGrammar.TokenValue(value));
 						break;
 					}
 					case BsonElementType.Undefined:
@@ -271,7 +271,7 @@ namespace JsonFx.Bson
 				}
 			}
 
-			private static void ReadBinary(Queue<Token<CommonTokenType>> queue, BinaryReader reader)
+			private static void ReadBinary(List<Token<CommonTokenType>> queue, BinaryReader reader)
 			{
 				int size = reader.ReadInt32();
 
@@ -326,7 +326,7 @@ namespace JsonFx.Bson
 					}
 				}
 
-				queue.Enqueue(CommonGrammar.TokenValue(value));
+				queue.Add(CommonGrammar.TokenValue(value));
 			}
 
 			private static string ReadString(BinaryReader reader)
@@ -400,23 +400,14 @@ namespace JsonFx.Bson
 				}
 
 				this.Reader = reader;
-
-				while (true)
+				using (reader)
 				{
-					Queue<Token<CommonTokenType>> queue = new Queue<Token<CommonTokenType>>();
+					List<Token<CommonTokenType>> queue = new List<Token<CommonTokenType>>();
 
 					BsonTokenizer.ReadDocument(queue, reader, false);
 
-					foreach (Token<CommonTokenType> token in queue)
-					{
-						if (token.TokenType == CommonTokenType.None)
-						{
-							((IDisposable)reader).Dispose();
-							this.Reader = BsonTokenizer.NullBinaryReader;
-							yield break;
-						}
-						yield return token;
-					}
+					this.Reader = BsonTokenizer.NullBinaryReader;
+					return queue;
 				};
 			}
 

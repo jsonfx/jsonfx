@@ -294,10 +294,7 @@ namespace JsonFx.Xml.Resolvers
 				if (count <= 1)
 				{
 					// special cases which don't require reordering
-					foreach (MemberMap map in members)
-					{
-						yield return map;
-					}
+					foreach (MemberMap map in members) { yield return map; }
 					yield break;
 				}
 			}
@@ -307,7 +304,7 @@ namespace JsonFx.Xml.Resolvers
 			}
 
 			// assume most are elements so will need to have same size queue
-			Queue<MemberMap> queue = new Queue<MemberMap>(count);
+			List<MemberMap> queue = new List<MemberMap>(count);
 
 			foreach (MemberMap map in members)
 			{
@@ -318,13 +315,13 @@ namespace JsonFx.Xml.Resolvers
 					continue;
 				}
 
-				queue.Enqueue(map);
+				queue.Add(map);
 			}
 
-			while (queue.Count > 0)
+			foreach (MemberMap map in queue)
 			{
 				// pull out all the elements next
-				yield return queue.Dequeue();
+				yield return map;
 			}
 		}
 

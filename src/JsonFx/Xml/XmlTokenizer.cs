@@ -133,8 +133,8 @@ namespace JsonFx.Xml
 					Token<CommonTokenType> token = XmlTokenizer.NextToken(scanner);
 					if (token.TokenType == CommonTokenType.None)
 					{
-						scanner.Dispose();
 						this.Scanner = StringStream.Null;
+						scanner.Dispose();
 						yield break;
 					}
 					yield return token;
