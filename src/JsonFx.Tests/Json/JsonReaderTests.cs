@@ -111,7 +111,7 @@ namespace JsonFx.Json
 			// input from fail7.json in test suite at http://www.json.org/JSON_checker/
 			var input = @"[""Comma after the close""],";
 
-			var reader = new JsonReader(new DataReaderSettings());
+			var reader = new JsonReader(new DataReaderSettings { AllowTrailingContent=false });
 
 			DeserializationException ex = Assert.Throws<DeserializationException>(
 				delegate
@@ -129,7 +129,7 @@ namespace JsonFx.Json
 			// input from fail8.json in test suite at http://www.json.org/JSON_checker/
 			var input = @"[""Extra close""]]";
 
-			var reader = new JsonReader(new DataReaderSettings());
+			var reader = new JsonReader(new DataReaderSettings { AllowTrailingContent=false });
 
 			DeserializationException ex = Assert.Throws<DeserializationException>(
 				delegate
@@ -151,7 +151,7 @@ namespace JsonFx.Json
 			// input from fail10.json in test suite at http://www.json.org/JSON_checker/
 			var input = @"{""Extra value after close"": true} ""misplaced quoted value""";
 
-			var reader = new JsonReader(new DataReaderSettings());
+			var reader = new JsonReader(new DataReaderSettings { AllowTrailingContent=false });
 
 			DeserializationException ex = Assert.Throws<DeserializationException>(
 				delegate
