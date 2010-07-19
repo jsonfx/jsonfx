@@ -299,7 +299,7 @@ namespace JsonFx.Json
 				int numLine = scanner.Line;
 				int numCol = scanner.Column;
 
-				StringBuilder buffer = new StringBuilder(JsonTokenizer.DefaultBufferSize);
+				scanner.BeginChunk();
 
 				char ch = scanner.Peek();
 				bool isNeg = false;
@@ -308,11 +308,13 @@ namespace JsonFx.Json
 					// consume positive signing (as is extraneous)
 					scanner.Pop();
 					ch = scanner.Peek();
+
+					// reset buffering
+					scanner.BeginChunk();
 				}
 				else if (ch == JsonGrammar.OperatorUnaryMinus)
 				{
 					// optional minus part
-					buffer.Append(ch);
 					scanner.Pop();
 					ch = scanner.Peek();
 					isNeg = true;
@@ -322,6 +324,7 @@ namespace JsonFx.Json
 					ch != JsonGrammar.OperatorDecimalPoint)
 				{
 					// possibly "-Infinity"
+					scanner.EndChunk();
 					return null;
 				}
 
@@ -329,7 +332,6 @@ namespace JsonFx.Json
 				while (!scanner.IsCompleted && IsDigit(ch))
 				{
 					// consume digit
-					buffer.Append(ch);
 					scanner.Pop();
 					ch = scanner.Peek();
 				}
@@ -339,7 +341,6 @@ namespace JsonFx.Json
 				if (!scanner.IsCompleted && (ch == JsonGrammar.OperatorDecimalPoint))
 				{
 					// consume decimal
-					buffer.Append(ch);
 					scanner.Pop();
 					ch = scanner.Peek();
 
@@ -347,7 +348,6 @@ namespace JsonFx.Json
 					while (!scanner.IsCompleted && IsDigit(ch))
 					{
 						// consume digit
-						buffer.Append(ch);
 						scanner.Pop();
 						ch = scanner.Peek();
 						hasDecimal = true;
@@ -361,7 +361,7 @@ namespace JsonFx.Json
 				}
 
 				// note the number of significant digits
-				int precision = buffer.Length;
+				int precision = scanner.ChunkSize;
 				if (hasDecimal)
 				{
 					precision--;
@@ -383,7 +383,6 @@ namespace JsonFx.Json
 				if (!scanner.IsCompleted && (ch == 'e' || ch == 'E'))
 				{
 					// consume 'e'
-					buffer.Append(ch);
 					scanner.Pop();
 					ch = scanner.Peek();
 
@@ -393,7 +392,6 @@ namespace JsonFx.Json
 						ch == JsonGrammar.OperatorUnaryPlus)
 					{
 						// consume sign
-						buffer.Append(ch);
 						scanner.Pop();
 						ch = scanner.Peek();
 					}
@@ -402,7 +400,6 @@ namespace JsonFx.Json
 					while (!scanner.IsCompleted && IsDigit(ch))
 					{
 						// consume digit
-						buffer.Append(ch);
 						scanner.Pop();
 						ch = scanner.Peek();
 
@@ -424,12 +421,13 @@ namespace JsonFx.Json
 
 				// by this point, we have the full number string and know its characteristics
 
+				string buffer = scanner.EndChunk();
 				if (!hasDecimal && !hasExponent && precision < 19)
 				{
 					// Integer value
 					decimal number;
 					if (!Decimal.TryParse(
-						buffer.ToString(),
+						buffer,
 						NumberStyles.Integer,
 						NumberFormatInfo.InvariantInfo,
 						out number))
@@ -457,7 +455,7 @@ namespace JsonFx.Json
 					// Floating Point value
 					double number;
 					if (!Double.TryParse(
-						 buffer.ToString(),
+						 buffer,
 						 NumberStyles.Float,
 						 NumberFormatInfo.InvariantInfo,
 						 out number))
@@ -481,7 +479,10 @@ namespace JsonFx.Json
 				scanner.Pop();
 				char ch = scanner.Peek();
 
+				// start chunking
+				scanner.BeginChunk();
 				StringBuilder buffer = new StringBuilder(JsonTokenizer.DefaultBufferSize);
+				
 				while (true)
 				{
 					// look ahead
@@ -495,6 +496,9 @@ namespace JsonFx.Json
 					// check each character for ending delim
 					if (ch == stringDelim)
 					{
+						// end chunking
+						scanner.EndChunk(buffer);
+
 						// flush closing delim
 						scanner.Pop();
 
@@ -505,11 +509,13 @@ namespace JsonFx.Json
 					if (ch != JsonGrammar.OperatorCharEscape)
 					{
 						// accumulate
-						buffer.Append(ch);
 						scanner.Pop();
 						ch = scanner.Peek();
 						continue;
 					}
+
+					// pause chunking to replace escape char
+					scanner.EndChunk(buffer);
 
 					// flush escape char
 					scanner.Pop();
@@ -620,6 +626,9 @@ namespace JsonFx.Json
 							break;
 						}
 					}
+
+					// resume chunking
+					scanner.BeginChunk();
 				}
 			}
 
@@ -721,7 +730,7 @@ namespace JsonFx.Json
 			{
 				bool identPart = false;
 
-				StringBuilder buffer = new StringBuilder(JsonTokenizer.DefaultBufferSize);
+				scanner.BeginChunk();
 				while (true)
 				{
 					char ch = scanner.Peek();
@@ -732,14 +741,13 @@ namespace JsonFx.Json
 						IsLetter(ch) || (ch == '_') || (ch == '$'))
 					{
 						identPart = true;
-						buffer.Append(ch);
 						scanner.Pop();
 						ch = scanner.Peek();
 						continue;
 					}
 
 					// get ident string
-					return buffer.ToString();
+					return scanner.EndChunk();
 				}
 			}
 

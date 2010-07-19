@@ -29,14 +29,14 @@
 #endregion License
 
 using System;
-using System.Collections;
+using System.Text;
 
 namespace JsonFx.IO
 {
 	/// <summary>
 	/// Supports a simple iteration over a string tracking line/column/position
 	/// </summary>
-	public class StringStream : Stream<char>, ITextStream
+	public class StringStream : IStream<char>, ITextStream
 	{
 		#region Constants
 
@@ -46,10 +46,16 @@ namespace JsonFx.IO
 
 		#region Fields
 
+		private bool isCompleted;
+		private bool isReady;
+		private char current;
+
 		private int column;
 		private int line;
-		private long index;
-		private char prev;
+		private int index;
+
+		private readonly string Buffer;
+		private int start = -1;
 
 		#endregion Fields
 
@@ -60,9 +66,9 @@ namespace JsonFx.IO
 		/// </summary>
 		/// <param name="value"></param>
 		public StringStream(string value)
-			: base(value ?? String.Empty)
 		{
-			this.index = -1L;
+			this.Buffer = value ?? String.Empty;
+			this.index = -1;
 		}
 
 		#endregion Init
@@ -93,34 +99,160 @@ namespace JsonFx.IO
 			get { return this.index; }
 		}
 
+		/// <summary>
+		/// Gets the number of characters currently chunked
+		/// </summary>
+		public int ChunkSize
+		{
+			get
+			{
+				if (this.start < 0)
+				{
+					throw new InvalidOperationException("Not currently chunking.");
+				}
+
+				return (1+this.index-this.start);
+			}
+		}
+
+		/// <summary>
+		/// Gets a value indicating if the <see cref="StringStream"/> is currently chunking
+		/// </summary>
+		public bool IsChunking
+		{
+			get { return (this.start >= 0); }
+		}
+
+		/// <summary>
+		/// Begins chunking at the current index
+		/// </summary>
+		public void BeginChunk()
+		{
+			this.start = this.index+1;
+		}
+
+		/// <summary>
+		/// Ends chunking at the current index and returns the buffered text chunk
+		/// </summary>
+		/// <returns></returns>
+		public string EndChunk()
+		{
+			if (this.start < 0)
+			{
+				throw new InvalidOperationException("Not currently chunking.");
+			}
+
+			// build chunk value
+			string value = this.Buffer.Substring(this.start, (1+this.index-this.start));
+
+			// reset chunk start
+			this.start = -1;
+
+			return value;
+		}
+
+		/// <summary>
+		/// Ends chunking at the current index and returns the buffered text chunk
+		/// </summary>
+		/// <returns></returns>
+		public void EndChunk(StringBuilder buffer)
+		{
+			if (this.start < 0)
+			{
+				throw new InvalidOperationException("Not currently chunking.");
+			}
+
+			// append chunk value
+			buffer.Append(this.Buffer, this.start, (1+this.index-this.start));
+
+			// reset chunk start
+			this.start = -1;
+		}
+
 		#endregion ITextStream Members
 
 		#region IStream<char> Members
 
 		/// <summary>
-		/// Returns and removes the character at the front of the sequence.
+		/// Determines if the input sequence has reached the end
+		/// </summary>
+		public virtual bool IsCompleted
+		{
+			get
+			{
+				this.EnsureReady();
+
+				return this.isCompleted;
+			}
+		}
+
+		/// <summary>
+		/// Returns but does not remove the item at the front of the sequence.
 		/// </summary>
 		/// <returns></returns>
-		public override char Pop()
+		public virtual char Peek()
 		{
-			char value = base.Pop();
+			this.EnsureReady();
 
-			this.UpdateStats(this.prev, value);
+			// return the current item or null if complete
+			return this.current;
+		}
 
-			// store for next iteration
-			return (this.prev = value);
+		/// <summary>
+		/// Returns and removes the item at the front of the sequence.
+		/// </summary>
+		/// <returns></returns>
+		public virtual char Pop()
+		{
+			this.EnsureReady();
+
+			if (this.isCompleted)
+			{
+				return this.current;
+			}
+
+			// flag as needing to be iterated, but don't execute yet
+			this.isReady = false;
+
+			this.UpdateStats();
+
+			return this.current;
 		}
 
 		#endregion IStream<char> Members
 
-		#region Statistics Methods
+		#region Methods
+
+		/// <summary>
+		/// Deferred execution of iterator
+		/// </summary>
+		private void EnsureReady()
+		{
+			// only execute when requested
+			if (this.isReady)
+			{
+				return;
+			}
+			this.isReady = true;
+
+			// store the current item or null if complete
+			int next = this.index+1;
+			if (next < this.Buffer.Length)
+			{
+				this.isCompleted = false;
+				this.current = this.Buffer[next];
+			}
+			else
+			{
+				this.isCompleted = true;
+				this.current = default(char);
+			}
+		}
 
 		/// <summary>
 		/// Calculates index, line, and column statistics
 		/// </summary>
-		/// <param name="prev"></param>
-		/// <param name="value"></param>
-		private void UpdateStats(char prev, char value)
+		private void UpdateStats()
 		{
 			if (this.index < 0)
 			{
@@ -130,11 +262,11 @@ namespace JsonFx.IO
 			else
 			{
 				// check for line endings
-				switch (value)
+				switch (this.current)
 				{
 					case '\n':
 					{
-						if (prev == '\r')
+						if (this.Buffer[this.index] == '\r')
 						{
 							// consider CRLF to be one line ending
 							break;
@@ -158,6 +290,23 @@ namespace JsonFx.IO
 			}
 		}
 
-		#endregion Statistics Methods
+		#endregion Methods
+
+		#region IDisposable Members
+
+		/// <summary>
+		/// Releases all resources used
+		/// </summary>
+		public void Dispose()
+		{
+			this.Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		protected virtual void Dispose(bool disposing)
+		{
+		}
+
+		#endregion IDisposable Members
 	}
 }

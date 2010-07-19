@@ -29,8 +29,8 @@
 #endregion License
 
 using System;
-using System.Collections;
 using System.IO;
+using System.Text;
 
 namespace JsonFx.IO
 {
@@ -42,6 +42,7 @@ namespace JsonFx.IO
 		#region Constants
 
 		public static readonly TextReaderStream Null = new TextReaderStream(TextReader.Null);
+		private const int DefaultBufferSize = 0x20;
 
 		#endregion Constants
 
@@ -52,9 +53,12 @@ namespace JsonFx.IO
 		private char prev;
 		private bool isCompleted;
 		private bool isReady;
+
 		private int column;
 		private int line;
 		private long index;
+
+		private StringBuilder chunk;
 
 		#endregion Fields
 
@@ -98,9 +102,85 @@ namespace JsonFx.IO
 			get { return this.index; }
 		}
 
+		/// <summary>
+		/// Gets the number of characters currently chunked
+		/// </summary>
+		public int ChunkSize
+		{
+			get
+			{
+				if (this.chunk == null)
+				{
+					throw new InvalidOperationException("Not currently chunking.");
+				}
+
+				return this.chunk.Length;
+			}
+		}
+
+		/// <summary>
+		/// Gets a value indicating if the <see cref="TextReaderStream"/> is currently chunking
+		/// </summary>
+		public bool IsChunking
+		{
+			get { return (this.chunk != null); }
+		}
+
+		/// <summary>
+		/// Begins chunking at the current index
+		/// </summary>
+		public void BeginChunk()
+		{
+			if (this.chunk == null)
+			{
+				this.chunk = new StringBuilder(TextReaderStream.DefaultBufferSize);
+			}
+			else
+			{
+				this.chunk.Length = 0;
+			}
+		}
+
+		/// <summary>
+		/// Ends chunking at the current index and returns the buffered text chunk
+		/// </summary>
+		/// <returns></returns>
+		public string EndChunk()
+		{
+			if (this.chunk == null)
+			{
+				throw new InvalidOperationException("Not currently chunking.");
+			}
+
+			// build chunk value
+			string value = this.chunk.ToString();
+
+			// reset internal buffer
+			this.chunk = null;
+
+			return value;
+		}
+
+		/// <summary>
+		/// Ends chunking at the current index and returns the buffered text chunk
+		/// </summary>
+		public void EndChunk(StringBuilder buffer)
+		{
+			if (this.chunk == null)
+			{
+				throw new InvalidOperationException("Not currently chunking.");
+			}
+
+			// append chunk value
+			buffer.Append(this.chunk.ToString());
+
+			// reset internal buffer
+			this.chunk = null;
+		}
+
 		#endregion ITextStream Members
 
-		#region IStream<T> Properties
+		#region IStream<char> Members
 
 		/// <summary>
 		/// Determines if the input sequence has reached the end
@@ -114,10 +194,6 @@ namespace JsonFx.IO
 				return this.isCompleted;
 			}
 		}
-
-		#endregion IStream<T> Properties
-
-		#region IStream<T> Methods
 
 		/// <summary>
 		/// Returns but does not remove the item at the front of the sequence.
@@ -139,14 +215,20 @@ namespace JsonFx.IO
 		{
 			this.EnsureReady();
 
-			if (!this.isCompleted)
+			if (this.isCompleted)
 			{
-				// pop the previously peeked cahr
-				this.Reader.Read();
-
-				// flag as needing to be iterated, but don't execute yet
-				this.isReady = false;
+				return this.current;
 			}
+
+			// pop the previously peeked char
+			this.Reader.Read();
+			if (this.chunk != null)
+			{
+				this.chunk.Append(this.current);
+			}
+
+			// flag as needing to be iterated, but don't execute yet
+			this.isReady = false;
 
 			this.UpdateStats(this.prev, this.current);
 
@@ -154,7 +236,7 @@ namespace JsonFx.IO
 			return (this.prev = this.current);
 		}
 
-		#endregion IStream<T> Methods
+		#endregion IStream<char> Members
 
 		#region Methods
 
@@ -184,10 +266,6 @@ namespace JsonFx.IO
 				this.current = (char)value;
 			}
 		}
-
-		#endregion Methods
-
-		#region Statistics Methods
 
 		/// <summary>
 		/// Calculates index, line, and column statistics
@@ -232,12 +310,12 @@ namespace JsonFx.IO
 			}
 		}
 
-		#endregion Statistics Methods
+		#endregion Methods
 
 		#region IDisposable Members
 
 		/// <summary>
-		/// Releases all resources used by the underlying 
+		/// Releases all resources used by the underlying reader
 		/// </summary>
 		public void Dispose()
 		{
