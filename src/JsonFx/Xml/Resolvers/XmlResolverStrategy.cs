@@ -304,7 +304,7 @@ namespace JsonFx.Xml.Resolvers
 			}
 
 			// assume most are elements so will need to have same size queue
-			List<MemberMap> queue = new List<MemberMap>(count);
+			List<MemberMap> elements = new List<MemberMap>(count);
 
 			foreach (MemberMap map in members)
 			{
@@ -315,10 +315,10 @@ namespace JsonFx.Xml.Resolvers
 					continue;
 				}
 
-				queue.Add(map);
+				elements.Add(map);
 			}
 
-			foreach (MemberMap map in queue)
+			foreach (MemberMap map in elements)
 			{
 				// pull out all the elements next
 				yield return map;
