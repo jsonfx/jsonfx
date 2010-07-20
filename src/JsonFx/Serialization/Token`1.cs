@@ -56,12 +56,12 @@ namespace JsonFx.Serialization
 		public readonly T TokenType;
 
 		/// <summary>
-		/// The name of the token (mutually exclusive with Value and <see cref="DataName.Empty"/> when not applicable)
+		/// The name of the token
 		/// </summary>
 		public readonly DataName Name;
 
 		/// <summary>
-		/// The value of the token (mutually exclusive with Name and null when not applicable)
+		/// The value of the token
 		/// </summary>
 		public readonly object Value;
 
@@ -102,6 +102,18 @@ namespace JsonFx.Serialization
 			this.Name = name;
 		}
 
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="tokenType"></param>
+		/// <param name="name"></param>
+		public Token(T tokenType, DataName name, object value)
+		{
+			this.TokenType = tokenType;
+			this.Name = name;
+			this.Value = value;
+		}
+
 		#endregion Init
 
 		#region Object Overrides
@@ -121,7 +133,7 @@ namespace JsonFx.Serialization
 				builder.Append("=");
 				builder.Append(this.Name);
 			}
-			else if (this.Value != null)
+			if (this.Value != null)
 			{
 				builder.Append("=");
 				builder.Append(this.ValueAsString());

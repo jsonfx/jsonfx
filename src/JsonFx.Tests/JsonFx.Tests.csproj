@@ -95,6 +95,7 @@
     <Compile Include="Json\JsonFormatterTests.cs" />
     <Compile Include="Json\JsonTokenizerTests.cs" />
     <Compile Include="Serialization\TypeCoercionUtilityTests.cs" />
+    <Compile Include="Xml\Sax\SaxTokenizerTests.cs" />
     <Compile Include="Xml\XmlConverterTests.cs" />
     <Compile Include="Xml\XmlWriterTests.cs" />
     <Compile Include="Xml\XmlFormatterTests.cs" />
@@ -105,6 +106,7 @@
       <Name>JsonFx</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="AfterBuild" Condition=" '$(Configuration)' != 'Signed' And '$(RunTests)' == 'True' ">
     <xunit Assembly="$(TargetDir)\$(AssemblyName).dll" Html="$(SolutionDir)build\$(AssemblyName)_$(Configuration)_$(TargetFrameworkVersion).html" Verbose="true" />
