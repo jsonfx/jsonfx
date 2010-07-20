@@ -29,68 +29,18 @@
 #endregion License
 
 using System;
-using System.Collections.Generic;
 
 namespace JsonFx.Serialization.Providers
 {
 	/// <summary>
-	/// Provides lookup capabilities for finding matching IDataReader
+	/// Provides lookup capabilities for finding an IDataWriter
 	/// </summary>
-	public class DataReaderProvider : IDataReaderProvider
+	public interface IDataWriterProvider
 	{
-		#region Fields
+		IDataWriter DefaultDataWriter { get; }
 
-		private readonly IDictionary<string, IDataReader> ReadersByMime = new Dictionary<string, IDataReader>(StringComparer.OrdinalIgnoreCase);
+		IDataWriter Find(string extension);
 
-		#endregion Fields
-
-		#region Init
-
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="readers">inject with all possible readers</param>
-		public DataReaderProvider(IEnumerable<IDataReader> readers)
-		{
-			if (readers != null)
-			{
-				foreach (IDataReader reader in readers)
-				{
-					foreach (string contentType in reader.ContentType)
-					{
-						if (String.IsNullOrEmpty(contentType) ||
-							this.ReadersByMime.ContainsKey(contentType))
-						{
-							continue;
-						}
-
-						this.ReadersByMime[contentType] = reader;
-					}
-				}
-			}
-		}
-
-		#endregion Init
-
-		#region Methods
-
-		/// <summary>
-		/// Finds an IDataReader by content-type header
-		/// </summary>
-		/// <param name="contentTypeHeader"></param>
-		/// <returns></returns>
-		public IDataReader Find(string contentTypeHeader)
-		{
-			string type = DataWriterProvider.ParseMediaType(contentTypeHeader);
-
-			if (this.ReadersByMime.ContainsKey(type))
-			{
-				return ReadersByMime[type];
-			}
-
-			return null;
-		}
-
-		#endregion Methods
+		IDataWriter Find(string acceptHeader, string contentTypeHeader);
 	}
 }

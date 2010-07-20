@@ -34,15 +34,6 @@ using System.IO;
 
 namespace JsonFx.Serialization.Providers
 {
-	public interface IDataWriterProvider
-	{
-		IDataWriter DefaultDataWriter { get; }
-
-		IDataWriter Find(string extension);
-
-		IDataWriter Find(string acceptHeader, string contentTypeHeader);
-	}
-
 	/// <summary>
 	/// Provides lookup capabilities for finding an IDataWriter
 	/// </summary>
