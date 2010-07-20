@@ -5,7 +5,7 @@
 
 	The MIT License
 
-	Copyright (c) 2006-2009 Stephen M. McKamey
+	Copyright (c) 2006-2010 Stephen M. McKamey
 
 	Permission is hereby granted, free of charge, to any person obtaining a copy
 	of this software and associated documentation files (the "Software"), to deal
@@ -110,9 +110,10 @@ namespace JsonFx.Serialization.Providers
 		{
 			extension = DataWriterProvider.NormalizeExtension(extension);
 
-			if (this.WritersByExt.ContainsKey(extension))
+			IDataWriter writer;
+			if (this.WritersByExt.TryGetValue(extension, out writer))
 			{
-				return WritersByExt[extension];
+				return writer;
 			}
 
 			return null;
@@ -120,11 +121,12 @@ namespace JsonFx.Serialization.Providers
 
 		public IDataWriter Find(string acceptHeader, string contentTypeHeader)
 		{
+			IDataWriter writer;
 			foreach (string type in DataWriterProvider.ParseHeaders(acceptHeader, contentTypeHeader))
 			{
-				if (this.WritersByMime.ContainsKey(type))
+				if (this.WritersByMime.TryGetValue(type, out writer))
 				{
-					return WritersByMime[type];
+					return writer;
 				}
 			}
 
