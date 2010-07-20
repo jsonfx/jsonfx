@@ -91,7 +91,12 @@ namespace JsonFx.Json
 		/// </summary>
 		public override IEnumerable<string> ContentType
 		{
-			get { yield return "application/json"; }
+			get
+			{
+				yield return "application/json";
+				yield return "text/json";
+				yield return "text/x-json";
+			}
 		}
 
 		#endregion Properties
