@@ -121,6 +121,8 @@
     <Compile Include="Serialization\IDataTransformer`2.cs" />
     <Compile Include="Serialization\IDataWriter.cs" />
     <Compile Include="Serialization\ITokenAnalyzer`1.cs" />
+    <Compile Include="Serialization\Providers\DataReaderProvider.cs" />
+    <Compile Include="Serialization\Providers\DataWriterProvider.cs" />
     <Compile Include="Serialization\Resolvers\CallbackResolverStrategy.cs" />
     <Compile Include="Serialization\Resolvers\CombinedResolverStrategy.cs" />
     <Compile Include="Serialization\Resolvers\DataName.cs" />
