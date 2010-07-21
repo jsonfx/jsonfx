@@ -100,14 +100,9 @@ namespace JsonFx.Xml.Sax
 			return new Token<SaxTokenType>(SaxTokenType.ElementEnd, name);
 		}
 
-		public static Token<SaxTokenType> TokenAttribute(DataName name, string value)
+		public static Token<SaxTokenType> TokenAttribute(DataName name)
 		{
-			if (value == null)
-			{
-				throw new ArgumentNullException("value", "Attribute value cannot be null");
-			}
-
-			return new Token<SaxTokenType>(SaxTokenType.Attribute, name, value);
+			return new Token<SaxTokenType>(SaxTokenType.Attribute, name);
 		}
 
 		public static Token<SaxTokenType> TokenText(char ch)

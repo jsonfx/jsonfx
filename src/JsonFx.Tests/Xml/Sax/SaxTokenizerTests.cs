@@ -210,7 +210,8 @@ namespace JsonFx.Xml.Sax
 			        SaxGrammar.TokenPrefixBegin("", "http://example.org"),
 			        SaxGrammar.TokenPrefixBegin("blah", "http://example.org"),
 			        SaxGrammar.TokenElementBegin(new DataName("foo", "http://example.org")),
-			        SaxGrammar.TokenAttribute(new DataName("key", "http://example.org"), "value"),
+			        SaxGrammar.TokenAttribute(new DataName("key", "http://example.org")),
+			        SaxGrammar.TokenText("value"),
 			        SaxGrammar.TokenElementEnd(new DataName("foo", "http://example.org")),
 			        SaxGrammar.TokenPrefixEnd("", "http://example.org"),
 			        SaxGrammar.TokenPrefixEnd("blah", "http://example.org")
@@ -262,7 +263,8 @@ namespace JsonFx.Xml.Sax
 			var expected = new[]
 			    {
 			        SaxGrammar.TokenElementBegin(new DataName("root")),
-			        SaxGrammar.TokenAttribute(new DataName("attrName"), "attrValue"),
+			        SaxGrammar.TokenAttribute(new DataName("attrName")),
+			        SaxGrammar.TokenText("attrValue"),
 			        SaxGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
@@ -279,7 +281,8 @@ namespace JsonFx.Xml.Sax
 			var expected = new[]
 			    {
 			        SaxGrammar.TokenElementBegin(new DataName("root")),
-			        SaxGrammar.TokenAttribute(new DataName("noValue"), String.Empty),
+			        SaxGrammar.TokenAttribute(new DataName("noValue")),
+			        SaxGrammar.TokenText(String.Empty),
 			        SaxGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
@@ -296,7 +299,8 @@ namespace JsonFx.Xml.Sax
 			var expected = new[]
 			    {
 			        SaxGrammar.TokenElementBegin(new DataName("root")),
-			        SaxGrammar.TokenAttribute(new DataName("emptyValue"), String.Empty),
+			        SaxGrammar.TokenAttribute(new DataName("emptyValue")),
+			        SaxGrammar.TokenText(String.Empty),
 			        SaxGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
@@ -313,7 +317,8 @@ namespace JsonFx.Xml.Sax
 			var expected = new[]
 			    {
 			        SaxGrammar.TokenElementBegin(new DataName("root")),
-			        SaxGrammar.TokenAttribute(new DataName("white"), " extra whitespace around quote delims "),
+			        SaxGrammar.TokenAttribute(new DataName("white")),
+			        SaxGrammar.TokenText(" extra whitespace around quote delims "),
 			        SaxGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
@@ -330,7 +335,8 @@ namespace JsonFx.Xml.Sax
 			var expected = new[]
 			    {
 			        SaxGrammar.TokenElementBegin(new DataName("root")),
-			        SaxGrammar.TokenAttribute(new DataName("white"), " extra whitespace around apostrophe delims "),
+			        SaxGrammar.TokenAttribute(new DataName("white")),
+			        SaxGrammar.TokenText(" extra whitespace around apostrophe delims "),
 			        SaxGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
@@ -347,7 +353,8 @@ namespace JsonFx.Xml.Sax
 			var expected = new[]
 			    {
 			        SaxGrammar.TokenElementBegin(new DataName("root")),
-			        SaxGrammar.TokenAttribute(new DataName("whitespace"), " this contains whitespace "),
+			        SaxGrammar.TokenAttribute(new DataName("whitespace")),
+			        SaxGrammar.TokenText(" this contains whitespace "),
 			        SaxGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
@@ -364,7 +371,8 @@ namespace JsonFx.Xml.Sax
 			var expected = new[]
 			    {
 			        SaxGrammar.TokenElementBegin(new DataName("root")),
-			        SaxGrammar.TokenAttribute(new DataName("singleQuoted"), "apostrophe"),
+			        SaxGrammar.TokenAttribute(new DataName("singleQuoted")),
+			        SaxGrammar.TokenText("apostrophe"),
 			        SaxGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
@@ -381,7 +389,8 @@ namespace JsonFx.Xml.Sax
 			var expected = new[]
 			    {
 			        SaxGrammar.TokenElementBegin(new DataName("root")),
-			        SaxGrammar.TokenAttribute(new DataName("singleQuoted_whitespace"), " apostrophe with whitespace "),
+			        SaxGrammar.TokenAttribute(new DataName("singleQuoted_whitespace")),
+			        SaxGrammar.TokenText(" apostrophe with whitespace "),
 			        SaxGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
@@ -398,9 +407,12 @@ namespace JsonFx.Xml.Sax
 			var expected = new[]
 			    {
 			        SaxGrammar.TokenElementBegin(new DataName("root")),
-			        SaxGrammar.TokenAttribute(new DataName("no-value"), String.Empty),
-			        SaxGrammar.TokenAttribute(new DataName("whitespace"), " this contains whitespace "),
-			        SaxGrammar.TokenAttribute(new DataName("anyQuotedText"), @"/\\\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"),
+			        SaxGrammar.TokenAttribute(new DataName("no-value")),
+			        SaxGrammar.TokenText(String.Empty),
+			        SaxGrammar.TokenAttribute(new DataName("whitespace")),
+			        SaxGrammar.TokenText(" this contains whitespace "),
+			        SaxGrammar.TokenAttribute(new DataName("anyQuotedText")),
+			        SaxGrammar.TokenText(@"/\\\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"),
 			        SaxGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
@@ -606,9 +618,11 @@ namespace JsonFx.Xml.Sax
 			var expected = new[]
 			    {
 			        SaxGrammar.TokenElementBegin(new DataName("div")),
-			        SaxGrammar.TokenAttribute(new DataName("class"), "content"),
+			        SaxGrammar.TokenAttribute(new DataName("class")),
+			        SaxGrammar.TokenText("content"),
 			        SaxGrammar.TokenElementBegin(new DataName("p")),
-			        SaxGrammar.TokenAttribute(new DataName("style"), "color:red"),
+			        SaxGrammar.TokenAttribute(new DataName("style")),
+			        SaxGrammar.TokenText("color:red"),
 			        SaxGrammar.TokenElementBegin(new DataName("strong")),
 			        SaxGrammar.TokenText("Lorem ipsum"),
 			        SaxGrammar.TokenElementEnd(new DataName("strong")),
@@ -640,10 +654,12 @@ namespace JsonFx.Xml.Sax
 			var expected = new[]
 			    {
 			        SaxGrammar.TokenElementBegin(new DataName("div")),
-			        SaxGrammar.TokenAttribute(new DataName("class"), "content"),
+			        SaxGrammar.TokenAttribute(new DataName("class")),
+			        SaxGrammar.TokenText("content"),
 			        SaxGrammar.TokenWhitespace("\r\n\t"),
 			        SaxGrammar.TokenElementBegin(new DataName("p")),
-			        SaxGrammar.TokenAttribute(new DataName("style"), "color:red"),
+			        SaxGrammar.TokenAttribute(new DataName("style")),
+			        SaxGrammar.TokenText("color:red"),
 			        SaxGrammar.TokenWhitespace("\r\n\t\t"),
 			        SaxGrammar.TokenElementBegin(new DataName("strong")),
 			        SaxGrammar.TokenText("Lorem ipsum"),

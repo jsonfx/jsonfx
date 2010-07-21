@@ -115,7 +115,7 @@ namespace JsonFx.Xml.Sax
 
 			public SaxQName QName { get; set; }
 
-			public string Value { get; set; }
+			public Token<SaxTokenType> Value { get; set; }
 
 			#endregion Properties
 
@@ -127,7 +127,7 @@ namespace JsonFx.Xml.Sax
 					this.QName,
 					SaxGrammar.OperatorPairDelim,
 					SaxGrammar.OperatorStringDelim,
-					this.Value,
+					(this.Value != null) ? this.Value.ValueAsString() : String.Empty,
 					SaxGrammar.OperatorStringDelim);
 			}
 
@@ -238,10 +238,10 @@ namespace JsonFx.Xml.Sax
 				return;
 			}
 
-			string unparsed = this.ScanUnparsedTag(scanner);
-			if (!String.IsNullOrEmpty(unparsed))
+			Token<SaxTokenType> unparsed = this.ScanUnparsedTag(scanner);
+			if (unparsed != null)
 			{
-				this.EmitUnparsedTag(tokens, unparsed);
+				tokens.Add(unparsed);
 				return;
 			}
 
@@ -307,7 +307,7 @@ namespace JsonFx.Xml.Sax
 			this.EmitTag(tokens, tagType, tagName, attributes);
 		}
 
-		private string ScanUnparsedTag(ITextStream scanner)
+		private Token<SaxTokenType> ScanUnparsedTag(ITextStream scanner)
 		{
 			char ch = scanner.Peek();
 			switch (ch)
@@ -321,6 +321,14 @@ namespace JsonFx.Xml.Sax
 					// "<%#",  "%>"		// ASP.NET/JBST databind expression
 					// "<%$",  "%>"		// ASP.NET/JBST extension
 					// "<%",   "%>"		// ASP code block / JSP scriptlet
+					if (SaxGrammar.OperatorCode != scanner.Pop())
+					{
+						throw new DeserializationException(
+							"Expected code block",
+							scanner.Index,
+							scanner.Line,
+							scanner.Column);
+					}
 
 					// TODO: scan code block
 					throw new NotImplementedException("scan code block");
@@ -330,6 +338,14 @@ namespace JsonFx.Xml.Sax
 					// "<!--", "-->"		// HTML/XML/SGML comment
 					// "<![CDATA[", "]]>"	// CDATA section
 					// "<!", ">"			// SGML declaration (e.g. DOCTYPE or SSI)
+					if (SaxGrammar.OperatorComment != scanner.Pop())
+					{
+						throw new DeserializationException(
+							"Expected comment",
+							scanner.Index,
+							scanner.Line,
+							scanner.Column);
+					}
 
 					// TODO: scan comment
 					throw new NotImplementedException("scan comment");
@@ -337,6 +353,14 @@ namespace JsonFx.Xml.Sax
 				case SaxGrammar.OperatorProcessingInstruction:
 				{
 					// "<?", "?>"	// XML processing instruction (e.g. XML declaration)
+					if (SaxGrammar.OperatorProcessingInstruction != scanner.Pop())
+					{
+						throw new DeserializationException(
+							"Expected processing instruction",
+							scanner.Index,
+							scanner.Line,
+							scanner.Column);
+					}
 
 					// TODO: scan processing instruction
 					throw new NotImplementedException("scan processing instruction");
@@ -346,13 +370,13 @@ namespace JsonFx.Xml.Sax
 			return null;
 		}
 
-		private string ScanAttributeValue(ITextStream scanner)
+		private Token<SaxTokenType> ScanAttributeValue(ITextStream scanner)
 		{
 			SaxTokenizer.SkipWhitespace(scanner);
 
 			if (scanner.Peek() != SaxGrammar.OperatorPairDelim)
 			{
-				return String.Empty;
+				return SaxGrammar.TokenText(String.Empty);
 			}
 
 			scanner.Pop();
@@ -365,13 +389,41 @@ namespace JsonFx.Xml.Sax
 				scanner.Pop();
 				char ch = scanner.Peek();
 
-				if (ch == SaxGrammar.OperatorElementBegin)
-				{
-					// TODO: scan for code blocks
-				}
-
 				// start chunking
 				scanner.BeginChunk();
+
+				if (ch == SaxGrammar.OperatorElementBegin)
+				{
+					scanner.Pop();
+					Token<SaxTokenType> unparsed = this.ScanUnparsedTag(scanner);
+					if (unparsed != null)
+					{
+						ch = scanner.Peek();
+						while (!scanner.IsCompleted &&
+							!SaxTokenizer.IsWhiteSpace(ch))
+						{
+							// consume until ending delim
+							scanner.Pop();
+							ch = scanner.Peek();
+						}
+
+						if (scanner.IsCompleted ||
+							ch != stringDelim)
+						{
+							throw new DeserializationException(
+								"Missing attribute value closing delimiter",
+								scanner.Index,
+								scanner.Line,
+								scanner.Column);
+						}
+
+						// flush closing delim
+						scanner.Pop();
+						return unparsed;
+					}
+
+					// otherwise treat as less than
+				}
 
 				// check each character for ending delim
 				while (!scanner.IsCompleted &&
@@ -398,20 +450,24 @@ namespace JsonFx.Xml.Sax
 				scanner.Pop();
 
 				// output string
-				return value;
+				return SaxGrammar.TokenText(value);
 			}
 			else
 			{
+				// start chunking
+				scanner.BeginChunk();
+
 				if (stringDelim == SaxGrammar.OperatorElementBegin)
 				{
 					scanner.Pop();
-					string codeBlock = this.ScanUnparsedTag(scanner);
+					Token<SaxTokenType> unparsed = this.ScanUnparsedTag(scanner);
+					if (unparsed != null)
+					{
+						return unparsed;
+					}
 
-					// TODO: scan for code blocks
+					// otherwise treat as less than
 				}
-
-				// start chunking
-				scanner.BeginChunk();
 
 				char ch = scanner.Peek();
 
@@ -436,7 +492,7 @@ namespace JsonFx.Xml.Sax
 				}
 
 				// return chunk
-				return scanner.EndChunk();
+				return SaxGrammar.TokenText(scanner.EndChunk());
 			}
 		}
 
@@ -604,7 +660,11 @@ namespace JsonFx.Xml.Sax
 						if (attribute.QName.Name == "xmlns")
 						{
 							// begin tracking new default namespace
-							scope[String.Empty] = attribute.Value;
+							if (attribute.Value == null)
+							{
+								throw new InvalidOperationException("xmlns value was null");
+							}
+							scope[String.Empty] = attribute.Value.ValueAsString();
 							attributes.RemoveAt(i);
 							continue;
 						}
@@ -613,7 +673,11 @@ namespace JsonFx.Xml.Sax
 
 					if (attribute.QName.Prefix == "xmlns")
 					{
-						scope[attribute.QName.Name] = attribute.Value;
+						if (attribute.Value == null)
+						{
+							throw new InvalidOperationException("xmlns value was null");
+						}
+						scope[attribute.QName.Name] = attribute.Value.ValueAsString();
 						attributes.RemoveAt(i);
 						continue;
 					}
@@ -636,7 +700,8 @@ namespace JsonFx.Xml.Sax
 				foreach (var attr in attributes)
 				{
 					DataName attrName = new DataName(attr.QName.Name, this.ScopeChain.Resolve(attr.QName.Prefix));
-					tokens.Add(SaxGrammar.TokenAttribute(attrName, attr.Value));
+					tokens.Add(SaxGrammar.TokenAttribute(attrName));
+					tokens.Add(attr.Value);
 				}
 			}
 
@@ -652,12 +717,6 @@ namespace JsonFx.Xml.Sax
 					tokens.Add(SaxGrammar.TokenPrefixEnd(mapping.Key, mapping.Value));
 				}
 			}
-		}
-
-		private void EmitUnparsedTag(List<Token<SaxTokenType>> tokens, string unparsed)
-		{
-			// TODO: emit unparsed tag
-			throw new NotImplementedException("emit unparsed tag");
 		}
 
 		private void EmitText(List<Token<SaxTokenType>> tokens, string value)
