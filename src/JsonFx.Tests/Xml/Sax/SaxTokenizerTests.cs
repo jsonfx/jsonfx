@@ -520,6 +520,38 @@ namespace JsonFx.Xml.Sax
 		}
 
 		[Fact]
+		public void GetTokens_EntityWithLeadingText_ReturnsSequence()
+		{
+			const string input = @"leading&amp;";
+			var expected = new[]
+			    {
+			        SaxGrammar.TokenText("leading"),
+			        SaxGrammar.TokenText("&")
+			    };
+
+			var tokenizer = new SaxTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_EntityWithTrailingText_ReturnsSequence()
+		{
+			const string input = @"&amp;trailing";
+			var expected = new[]
+			    {
+			        SaxGrammar.TokenText("&"),
+			        SaxGrammar.TokenText("trailing")
+			    };
+
+			var tokenizer = new SaxTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
 		public void GetTokens_MixedEntities_ReturnsSequence()
 		{
 			const string input = @"there should &lt;b&gt;e decoded chars &amp; inside this text";
@@ -531,7 +563,29 @@ namespace JsonFx.Xml.Sax
 			        SaxGrammar.TokenText(@">"),
 			        SaxGrammar.TokenText(@"e decoded chars "),
 			        SaxGrammar.TokenText(@"&"),
-			        SaxGrammar.TokenText(@" inside this text"),
+			        SaxGrammar.TokenText(@" inside this text")
+			    };
+
+			var tokenizer = new SaxTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_MixedEntitiesMalformed_ReturnsSequence()
+		{
+			const string input = @"there should &#xnot &Xltb&#gte decoded chars & inside this text";
+			var expected = new[]
+			    {
+			        SaxGrammar.TokenText(@"there should "),
+			        SaxGrammar.TokenText(@"&#x"),
+			        SaxGrammar.TokenText(@"not "),
+			        SaxGrammar.TokenText(@"&Xltb"),
+			        SaxGrammar.TokenText(@"&#"),
+			        SaxGrammar.TokenText(@"gte decoded chars "),
+			        SaxGrammar.TokenText(@"&"),
+			        SaxGrammar.TokenText(@" inside this text")
 			    };
 
 			var tokenizer = new SaxTokenizer();
