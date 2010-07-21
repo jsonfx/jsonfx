@@ -33,12 +33,12 @@ using System;
 using JsonFx.Serialization;
 using JsonFx.Serialization.Resolvers;
 
-namespace JsonFx.Xml.Sax
+namespace JsonFx.Xml.Stax
 {
 	/// <summary>
-	/// Formal language of tokens and symbols for XML
+	/// Formal language of tokens and symbols for XML-like markup
 	/// </summary>
-	internal class SaxGrammar
+	internal class StaxGrammar
 	{
 		#region Operators
 
@@ -78,51 +78,51 @@ namespace JsonFx.Xml.Sax
 
 		#region Reusable Tokens
 
-		public static readonly Token<SaxTokenType> TokenNone = new Token<SaxTokenType>(SaxTokenType.None);
+		public static readonly Token<StaxTokenType> TokenNone = new Token<StaxTokenType>(StaxTokenType.None);
 
-		public static Token<SaxTokenType> TokenUnparsed(string name, string text)
+		public static Token<StaxTokenType> TokenUnparsed(string name, string text)
 		{
-			return new Token<SaxTokenType>(SaxTokenType.UnparsedBlock, new DataName(name), text);
+			return new Token<StaxTokenType>(StaxTokenType.UnparsedBlock, new DataName(name), text);
 		}
 
-		public static Token<SaxTokenType> TokenPrefixBegin(string prefix, string namespaceUri)
+		public static Token<StaxTokenType> TokenPrefixBegin(string prefix, string namespaceUri)
 		{
-			return new Token<SaxTokenType>(SaxTokenType.PrefixBegin, new DataName(prefix, namespaceUri));
+			return new Token<StaxTokenType>(StaxTokenType.PrefixBegin, new DataName(prefix, namespaceUri));
 		}
 
-		public static Token<SaxTokenType> TokenPrefixEnd(string prefix, string namespaceUri)
+		public static Token<StaxTokenType> TokenPrefixEnd(string prefix, string namespaceUri)
 		{
-			return new Token<SaxTokenType>(SaxTokenType.PrefixEnd, new DataName(prefix, namespaceUri));
+			return new Token<StaxTokenType>(StaxTokenType.PrefixEnd, new DataName(prefix, namespaceUri));
 		}
 
-		public static Token<SaxTokenType> TokenElementBegin(DataName name)
+		public static Token<StaxTokenType> TokenElementBegin(DataName name)
 		{
-			return new Token<SaxTokenType>(SaxTokenType.ElementBegin, name);
+			return new Token<StaxTokenType>(StaxTokenType.ElementBegin, name);
 		}
 
-		public static Token<SaxTokenType> TokenElementEnd(DataName name)
+		public static Token<StaxTokenType> TokenElementEnd(DataName name)
 		{
-			return new Token<SaxTokenType>(SaxTokenType.ElementEnd, name);
+			return new Token<StaxTokenType>(StaxTokenType.ElementEnd, name);
 		}
 
-		public static Token<SaxTokenType> TokenAttribute(DataName name)
+		public static Token<StaxTokenType> TokenAttribute(DataName name)
 		{
-			return new Token<SaxTokenType>(SaxTokenType.Attribute, name);
+			return new Token<StaxTokenType>(StaxTokenType.Attribute, name);
 		}
 
-		public static Token<SaxTokenType> TokenText(char ch)
+		public static Token<StaxTokenType> TokenText(char ch)
 		{
-			return new Token<SaxTokenType>(SaxTokenType.TextValue, ch);
+			return new Token<StaxTokenType>(StaxTokenType.TextValue, ch);
 		}
 
-		public static Token<SaxTokenType> TokenText(string text)
+		public static Token<StaxTokenType> TokenText(string text)
 		{
-			return new Token<SaxTokenType>(SaxTokenType.TextValue, text);
+			return new Token<StaxTokenType>(StaxTokenType.TextValue, text);
 		}
 
-		public static Token<SaxTokenType> TokenWhitespace(string text)
+		public static Token<StaxTokenType> TokenWhitespace(string text)
 		{
-			return new Token<SaxTokenType>(SaxTokenType.Whitespace, text);
+			return new Token<StaxTokenType>(StaxTokenType.Whitespace, text);
 		}
 
 		#endregion Reusable Tokens

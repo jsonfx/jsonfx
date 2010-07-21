@@ -46,7 +46,7 @@ using JsonObject=System.Collections.Generic.Dictionary<string, object>;
 namespace JsonFx.Common
 {
 	/// <summary>
-	/// Consumes a SAX-like sequence of tokens to produce an object graph optionally coerced to a given type
+	/// Consumes a StAX-like sequence of tokens to produce an object graph optionally coerced to a given type
 	/// </summary>
 	public class CommonAnalyzer : ITokenAnalyzer<CommonTokenType>
 	{

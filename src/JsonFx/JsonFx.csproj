@@ -134,10 +134,10 @@
     <Compile Include="Serialization\Resolvers\ResolverCache.cs" />
     <Compile Include="Serialization\Token`1.cs" />
     <Compile Include="Serialization\TypeCoercionUtility.cs" />
-    <Compile Include="Xml\Sax\PrefixScopeChain.cs" />
-    <Compile Include="Xml\Sax\SaxGrammar.cs" />
-    <Compile Include="Xml\Sax\SaxTokenizer.cs" />
-    <Compile Include="Xml\Sax\SaxTokenType.cs" />
+    <Compile Include="Xml\Stax\PrefixScopeChain.cs" />
+    <Compile Include="Xml\Stax\StaxGrammar.cs" />
+    <Compile Include="Xml\Stax\StaxTokenizer.cs" />
+    <Compile Include="Xml\Stax\StaxTokenType.cs" />
     <Compile Include="Xml\XmlWriter.cs" />
     <Compile Include="Xml\XmlGrammar.cs" />
     <Compile Include="Xml\XmlFormatter.cs" />

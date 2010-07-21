@@ -66,7 +66,7 @@ namespace JsonFx.Bson
 		#endregion Constants
 
 		/// <summary>
-		/// Outputs BSON bytes from a SAX-like input stream of tokens
+		/// Outputs BSON bytes from a StAX-like input stream of tokens
 		/// </summary>
 		public class BsonFormatter : IBinaryFormatter<CommonTokenType>
 		{

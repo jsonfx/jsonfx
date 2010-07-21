@@ -30,12 +30,12 @@
 
 using System;
 
-namespace JsonFx.Xml.Sax
+namespace JsonFx.Xml.Stax
 {
 	/// <summary>
-	/// SAX-like tokens
+	/// StAX-like tokens
 	/// </summary>
-	public enum SaxTokenType
+	public enum StaxTokenType
 	{
 		/// <summary>
 		/// No token
@@ -100,7 +100,7 @@ namespace JsonFx.Xml.Sax
 		/// </summary>
 		/// <remarks>
 		/// The token <see cref="Token<CommonTokenType>.Value"/> and <see cref="Token<CommonTokenType>.Name"/> must be left empty.
-		/// The element Name is determined by the <see cref="SaxTokenType.ElementBegin"/> token.
+		/// The element Name is determined by the <see cref="StaxTokenType.ElementBegin"/> token.
 		/// Marks the end of the last object property as well as the object itself.
 		/// </remarks>
 		ElementEnd,

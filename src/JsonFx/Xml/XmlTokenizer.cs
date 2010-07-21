@@ -41,7 +41,7 @@ namespace JsonFx.Xml
 	public partial class XmlReader
 	{
 		/// <summary>
-		/// Generates a SAX-like sequence of tokens from XML text
+		/// Generates a StAX-like sequence of tokens from XML text
 		/// </summary>
 		public class XmlTokenizer : ITextTokenizer<CommonTokenType>
 		{

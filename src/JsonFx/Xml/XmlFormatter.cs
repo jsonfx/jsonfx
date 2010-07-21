@@ -48,7 +48,7 @@ namespace JsonFx.Xml
 		#endregion Constants
 
 		/// <summary>
-		/// Outputs XML text from a SAX-like input stream of tokens
+		/// Outputs XML text from a StAX-like input stream of tokens
 		/// </summary>
 		public class XmlFormatter : ITextFormatter<CommonTokenType>
 		{

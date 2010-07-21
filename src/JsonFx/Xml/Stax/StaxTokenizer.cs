@@ -37,17 +37,16 @@ using JsonFx.IO;
 using JsonFx.Serialization;
 using JsonFx.Serialization.Resolvers;
 
-namespace JsonFx.Xml.Sax
+namespace JsonFx.Xml.Stax
 {
 	/// <summary>
-	/// Generates a SAX-like sequence of tokens from XML text
+	/// Generates a StAX-like sequence of tokens from markup text
 	/// </summary>
 	/// <remarks>
-	/// Like SAX, this generates a stream of tokens (similar to SAX-events) but
-	/// unlike SAX, this follows a more permissive markup format with automatic recovery
-	/// most similar to HTML5.
+	/// Like StAX, this generates a stream of tokens
+	/// Unlike StAX, this follows a more permissive markup format with automatic recovery most similar to HTML5.
 	/// </remarks>
-	public class SaxTokenizer : ITextTokenizer<SaxTokenType>
+	public class StaxTokenizer : ITextTokenizer<StaxTokenType>
 	{
 		#region TagType
 
@@ -86,7 +85,7 @@ namespace JsonFx.Xml.Sax
 
 		#region Inner Types
 
-		private class SaxQName
+		private class StaxQName
 		{
 			#region Properties
 
@@ -102,20 +101,20 @@ namespace JsonFx.Xml.Sax
 			{
 				return String.Concat(
 					this.Prefix,
-					SaxGrammar.OperatorPrefixDelim,
+					StaxGrammar.OperatorPrefixDelim,
 					this.Name);
 			}
 
 			#endregion Object Overrides
 		}
 
-		private class SaxAttribute
+		private class StaxAttribute
 		{
 			#region Properties
 
-			public SaxQName QName { get; set; }
+			public StaxQName QName { get; set; }
 
-			public Token<SaxTokenType> Value { get; set; }
+			public Token<StaxTokenType> Value { get; set; }
 
 			#endregion Properties
 
@@ -125,10 +124,10 @@ namespace JsonFx.Xml.Sax
 			{
 				return String.Concat(
 					this.QName,
-					SaxGrammar.OperatorPairDelim,
-					SaxGrammar.OperatorStringDelim,
+					StaxGrammar.OperatorPairDelim,
+					StaxGrammar.OperatorStringDelim,
 					(this.Value != null) ? this.Value.ValueAsString() : String.Empty,
-					SaxGrammar.OperatorStringDelim);
+					StaxGrammar.OperatorStringDelim);
 			}
 
 			#endregion Object Overrides
@@ -177,14 +176,14 @@ namespace JsonFx.Xml.Sax
 
 		#region Scanning Methods
 
-		private void GetTokens(List<Token<SaxTokenType>> tokens, ITextStream scanner)
+		private void GetTokens(List<Token<StaxTokenType>> tokens, ITextStream scanner)
 		{
 			scanner.BeginChunk();
 			while (!scanner.IsCompleted)
 			{
 				switch (scanner.Peek())
 				{
-					case SaxGrammar.OperatorElementBegin:
+					case StaxGrammar.OperatorElementBegin:
 					{
 						// emit any leading text
 						this.EmitText(tokens, scanner.EndChunk());
@@ -196,7 +195,7 @@ namespace JsonFx.Xml.Sax
 						scanner.BeginChunk();
 						break;
 					}
-					case SaxGrammar.OperatorEntityBegin:
+					case StaxGrammar.OperatorEntityBegin:
 					{
 						// emit any leading text
 						this.EmitText(tokens, scanner.EndChunk());
@@ -220,9 +219,9 @@ namespace JsonFx.Xml.Sax
 			this.EmitText(tokens, scanner.EndChunk());
 		}
 
-		private void ScanTag(List<Token<SaxTokenType>> tokens, ITextStream scanner)
+		private void ScanTag(List<Token<StaxTokenType>> tokens, ITextStream scanner)
 		{
-			if (scanner.Pop() != SaxGrammar.OperatorElementBegin)
+			if (scanner.Pop() != StaxGrammar.OperatorElementBegin)
 			{
 				throw new DeserializationException("Invalid tag start char", scanner.Index, scanner.Line, scanner.Column);
 			}
@@ -234,11 +233,11 @@ namespace JsonFx.Xml.Sax
 				{
 					throw new DeserializationException("Unexpected end of file", scanner.Index, scanner.Line, scanner.Column);
 				}
-				tokens.Add(SaxGrammar.TokenText(SaxGrammar.OperatorElementBegin));
+				tokens.Add(StaxGrammar.TokenText(StaxGrammar.OperatorElementBegin));
 				return;
 			}
 
-			Token<SaxTokenType> unparsed = this.ScanUnparsedBlock(scanner);
+			Token<StaxTokenType> unparsed = this.ScanUnparsedBlock(scanner);
 			if (unparsed != null)
 			{
 				tokens.Add(unparsed);
@@ -247,14 +246,14 @@ namespace JsonFx.Xml.Sax
 
 			char ch = scanner.Peek();
 			TagType tagType = TagType.BeginTag;
-			if (ch == SaxGrammar.OperatorElementClose)
+			if (ch == StaxGrammar.OperatorElementClose)
 			{
 				tagType = TagType.EndTag;
 				scanner.Pop();
 				ch = scanner.Peek();
 			}
 
-			SaxQName tagName = SaxTokenizer.ScanQName(scanner);
+			StaxQName tagName = StaxTokenizer.ScanQName(scanner);
 			if (tagName == null)
 			{
 				if (this.strictMode)
@@ -267,23 +266,23 @@ namespace JsonFx.Xml.Sax
 				}
 
 				// treat as literal text
-				string text = Char.ToString(SaxGrammar.OperatorElementBegin);
+				string text = Char.ToString(StaxGrammar.OperatorElementBegin);
 				if (tagType == TagType.EndTag)
 				{
-					text += SaxGrammar.OperatorElementClose;
+					text += StaxGrammar.OperatorElementClose;
 				}
 
-				tokens.Add(SaxGrammar.TokenText(text));
+				tokens.Add(StaxGrammar.TokenText(text));
 				return;
 			}
 
-			List<SaxAttribute> attributes = null;
+			List<StaxAttribute> attributes = null;
 
 			while (!this.IsTagComplete(scanner, ref tagType))
 			{
-				SaxAttribute attribute = new SaxAttribute
+				StaxAttribute attribute = new StaxAttribute
 				{
-					QName = SaxTokenizer.ScanQName(scanner),
+					QName = StaxTokenizer.ScanQName(scanner),
 					Value = this.ScanAttributeValue(scanner)
 				};
 
@@ -298,7 +297,7 @@ namespace JsonFx.Xml.Sax
 
 				if (attributes == null)
 				{
-					attributes = new List<SaxAttribute>();
+					attributes = new List<StaxAttribute>();
 				}
 
 				attributes.Add(attribute);
@@ -307,48 +306,48 @@ namespace JsonFx.Xml.Sax
 			this.EmitTag(tokens, tagType, tagName, attributes);
 		}
 
-		private Token<SaxTokenType> ScanUnparsedBlock(ITextStream scanner)
+		private Token<StaxTokenType> ScanUnparsedBlock(ITextStream scanner)
 		{
 			char ch = scanner.Peek();
 			switch (ch)
 			{
-				case SaxGrammar.OperatorComment:
+				case StaxGrammar.OperatorComment:
 				{
 					// consume '!'
 					scanner.Pop();
 
 					// "<!--", "-->"		// XML/HTML/SGML comment
-					string comment = this.ScanUnparsedValue(scanner, SaxGrammar.OperatorCommentBegin, SaxGrammar.OperatorCommentEnd);
+					string comment = this.ScanUnparsedValue(scanner, StaxGrammar.OperatorCommentBegin, StaxGrammar.OperatorCommentEnd);
 					if (comment != null)
 					{
 						// emit as an unparsed comment
-						return SaxGrammar.TokenUnparsed(String.Concat(SaxGrammar.OperatorComment, SaxGrammar.OperatorCommentBegin), comment);
+						return StaxGrammar.TokenUnparsed(String.Concat(StaxGrammar.OperatorComment, StaxGrammar.OperatorCommentBegin), comment);
 					}
 
 					// "<![CDATA[", "]]>"	// CDATA section
-					comment = this.ScanUnparsedValue(scanner, SaxGrammar.OperatorCDataBegin, SaxGrammar.OperatorCDataEnd);
+					comment = this.ScanUnparsedValue(scanner, StaxGrammar.OperatorCDataBegin, StaxGrammar.OperatorCDataEnd);
 					if (comment != null)
 					{
 						// convert CData to text
-						return SaxGrammar.TokenText(comment);
+						return StaxGrammar.TokenText(comment);
 					}
 
 					// "<!", ">"			// SGML declaration (e.g. DOCTYPE or SSI)
-					return SaxGrammar.TokenUnparsed(
-						Char.ToString(SaxGrammar.OperatorComment),
+					return StaxGrammar.TokenUnparsed(
+						Char.ToString(StaxGrammar.OperatorComment),
 						this.ScanUnparsedValue(scanner, String.Empty, String.Empty));
 				}
-				case SaxGrammar.OperatorProcessingInstruction:
+				case StaxGrammar.OperatorProcessingInstruction:
 				{
 					// consume '?'
 					scanner.Pop();
 
 					// "<?", "?>"	// XML processing instruction (e.g. XML declaration)
-					return SaxGrammar.TokenUnparsed(
-						Char.ToString(SaxGrammar.OperatorProcessingInstruction),
-						this.ScanUnparsedValue(scanner, String.Empty, Char.ToString(SaxGrammar.OperatorProcessingInstruction)));
+					return StaxGrammar.TokenUnparsed(
+						Char.ToString(StaxGrammar.OperatorProcessingInstruction),
+						this.ScanUnparsedValue(scanner, String.Empty, Char.ToString(StaxGrammar.OperatorProcessingInstruction)));
 				}
-				case SaxGrammar.OperatorCode:
+				case StaxGrammar.OperatorCode:
 				{
 					// consume '%'
 					scanner.Pop();
@@ -356,31 +355,31 @@ namespace JsonFx.Xml.Sax
 
 					switch (ch)
 					{
-						case SaxGrammar.OperatorCommentDelim:		// "<%--", "--%>"	ASP/JSP-style code comment
+						case StaxGrammar.OperatorCommentDelim:		// "<%--", "--%>"	ASP/JSP-style code comment
 						{
-							return SaxGrammar.TokenUnparsed(
-								String.Concat(SaxGrammar.OperatorCode, SaxGrammar.OperatorCommentBegin),
-								this.ScanUnparsedValue(scanner, SaxGrammar.OperatorCommentBegin, String.Concat(SaxGrammar.OperatorCommentEnd, SaxGrammar.OperatorCode)));
+							return StaxGrammar.TokenUnparsed(
+								String.Concat(StaxGrammar.OperatorCode, StaxGrammar.OperatorCommentBegin),
+								this.ScanUnparsedValue(scanner, StaxGrammar.OperatorCommentBegin, String.Concat(StaxGrammar.OperatorCommentEnd, StaxGrammar.OperatorCode)));
 						}
-						case SaxGrammar.OperatorCodeDirective:		// "<%@",  "%>"		ASP/JSP directive
-						case SaxGrammar.OperatorCodeExpression:		// "<%=",  "%>"		ASP/JSP/JBST expression
-						case SaxGrammar.OperatorCodeDeclaration:	// "<%!",  "%>"		JSP/JBST declaration
-						case SaxGrammar.OperatorCodeDataBind:		// "<%#",  "%>"		ASP.NET/JBST databind expression
-						case SaxGrammar.OperatorCodeExtension:		// "<%$",  "%>"		ASP.NET/JBST extension
+						case StaxGrammar.OperatorCodeDirective:		// "<%@",  "%>"		ASP/JSP directive
+						case StaxGrammar.OperatorCodeExpression:		// "<%=",  "%>"		ASP/JSP/JBST expression
+						case StaxGrammar.OperatorCodeDeclaration:	// "<%!",  "%>"		JSP/JBST declaration
+						case StaxGrammar.OperatorCodeDataBind:		// "<%#",  "%>"		ASP.NET/JBST databind expression
+						case StaxGrammar.OperatorCodeExtension:		// "<%$",  "%>"		ASP.NET/JBST extension
 						{
 							// consume code block type char
 							scanner.Pop();
 
-							return SaxGrammar.TokenUnparsed(
-								String.Concat(SaxGrammar.OperatorCode, ch),
-								this.ScanUnparsedValue(scanner, String.Empty, Char.ToString(SaxGrammar.OperatorCode)));
+							return StaxGrammar.TokenUnparsed(
+								String.Concat(StaxGrammar.OperatorCode, ch),
+								this.ScanUnparsedValue(scanner, String.Empty, Char.ToString(StaxGrammar.OperatorCode)));
 						}
 						default:									// "<%",   "%>"		ASP code block / JSP scriptlet
 						{
 							// simple code block
-							return SaxGrammar.TokenUnparsed(
-								Char.ToString(SaxGrammar.OperatorCode),
-								this.ScanUnparsedValue(scanner, String.Empty, Char.ToString(SaxGrammar.OperatorCode)));
+							return StaxGrammar.TokenUnparsed(
+								Char.ToString(StaxGrammar.OperatorCode),
+								this.ScanUnparsedValue(scanner, String.Empty, Char.ToString(StaxGrammar.OperatorCode)));
 						}
 					}
 				}
@@ -418,7 +417,7 @@ namespace JsonFx.Xml.Sax
 					scanner.Column);
 			}
 
-			end += SaxGrammar.OperatorElementEnd;
+			end += StaxGrammar.OperatorElementEnd;
 
 			int endLength = end.Length;
 			for (int i=0; !scanner.IsCompleted && i<endLength; )
@@ -456,21 +455,21 @@ namespace JsonFx.Xml.Sax
 			return value;
 		}
 
-		private Token<SaxTokenType> ScanAttributeValue(ITextStream scanner)
+		private Token<StaxTokenType> ScanAttributeValue(ITextStream scanner)
 		{
-			SaxTokenizer.SkipWhitespace(scanner);
+			StaxTokenizer.SkipWhitespace(scanner);
 
-			if (scanner.Peek() != SaxGrammar.OperatorPairDelim)
+			if (scanner.Peek() != StaxGrammar.OperatorPairDelim)
 			{
-				return SaxGrammar.TokenText(String.Empty);
+				return StaxGrammar.TokenText(String.Empty);
 			}
 
 			scanner.Pop();
-			SaxTokenizer.SkipWhitespace(scanner);
+			StaxTokenizer.SkipWhitespace(scanner);
 
 			char stringDelim = scanner.Peek();
-			if (stringDelim == SaxGrammar.OperatorStringDelim ||
-				stringDelim == SaxGrammar.OperatorStringDelimAlt)
+			if (stringDelim == StaxGrammar.OperatorStringDelim ||
+				stringDelim == StaxGrammar.OperatorStringDelimAlt)
 			{
 				scanner.Pop();
 				char ch = scanner.Peek();
@@ -478,15 +477,15 @@ namespace JsonFx.Xml.Sax
 				// start chunking
 				scanner.BeginChunk();
 
-				if (ch == SaxGrammar.OperatorElementBegin)
+				if (ch == StaxGrammar.OperatorElementBegin)
 				{
 					scanner.Pop();
-					Token<SaxTokenType> unparsed = this.ScanUnparsedBlock(scanner);
+					Token<StaxTokenType> unparsed = this.ScanUnparsedBlock(scanner);
 					if (unparsed != null)
 					{
 						ch = scanner.Peek();
 						while (!scanner.IsCompleted &&
-							!SaxTokenizer.IsWhiteSpace(ch))
+							!StaxTokenizer.IsWhiteSpace(ch))
 						{
 							// consume until ending delim
 							scanner.Pop();
@@ -536,17 +535,17 @@ namespace JsonFx.Xml.Sax
 				scanner.Pop();
 
 				// output string
-				return SaxGrammar.TokenText(value);
+				return StaxGrammar.TokenText(value);
 			}
 			else
 			{
 				// start chunking
 				scanner.BeginChunk();
 
-				if (stringDelim == SaxGrammar.OperatorElementBegin)
+				if (stringDelim == StaxGrammar.OperatorElementBegin)
 				{
 					scanner.Pop();
-					Token<SaxTokenType> unparsed = this.ScanUnparsedBlock(scanner);
+					Token<StaxTokenType> unparsed = this.ScanUnparsedBlock(scanner);
 					if (unparsed != null)
 					{
 						return unparsed;
@@ -559,9 +558,9 @@ namespace JsonFx.Xml.Sax
 
 				// check each character for ending delim
 				while (!scanner.IsCompleted &&
-					ch != SaxGrammar.OperatorElementClose &&
-					ch != SaxGrammar.OperatorElementEnd &&
-					!SaxTokenizer.IsWhiteSpace(ch))
+					ch != StaxGrammar.OperatorElementClose &&
+					ch != StaxGrammar.OperatorElementEnd &&
+					!StaxTokenizer.IsWhiteSpace(ch))
 				{
 					// accumulate
 					scanner.Pop();
@@ -578,14 +577,14 @@ namespace JsonFx.Xml.Sax
 				}
 
 				// return chunk
-				return SaxGrammar.TokenText(scanner.EndChunk());
+				return StaxGrammar.TokenText(scanner.EndChunk());
 			}
 		}
 
-		private static SaxQName ScanQName(ITextStream scanner)
+		private static StaxQName ScanQName(ITextStream scanner)
 		{
 			char ch = scanner.Peek();
-			if (!SaxTokenizer.IsNameStartChar(ch))
+			if (!StaxTokenizer.IsNameStartChar(ch))
 			{
 				return null;
 			}
@@ -598,17 +597,17 @@ namespace JsonFx.Xml.Sax
 				// consume until reach non-name char
 				scanner.Pop();
 				ch = scanner.Peek();
-			} while (!scanner.IsCompleted && SaxTokenizer.IsNameChar(ch));
+			} while (!scanner.IsCompleted && StaxTokenizer.IsNameChar(ch));
 
 			string name = scanner.EndChunk();
 
-			SaxQName qName;
+			StaxQName qName;
 			string[] nameParts = name.Split(':');
 			switch (nameParts.Length)
 			{
 				case 1:
 				{
-					qName = new SaxQName
+					qName = new StaxQName
 					{
 						Name = nameParts[0]
 					};
@@ -616,7 +615,7 @@ namespace JsonFx.Xml.Sax
 				}
 				case 2:
 				{
-					qName = new SaxQName
+					qName = new StaxQName
 					{
 						Prefix = nameParts[0],
 						Name = nameParts[1]
@@ -649,14 +648,14 @@ namespace JsonFx.Xml.Sax
 					scanner.Column);
 			}
 
-			SaxTokenizer.SkipWhitespace(scanner);
+			StaxTokenizer.SkipWhitespace(scanner);
 
 			switch (scanner.Peek())
 			{
-				case SaxGrammar.OperatorElementClose:
+				case StaxGrammar.OperatorElementClose:
 				{
 					scanner.Pop();
-					if (scanner.Peek() == SaxGrammar.OperatorElementEnd)
+					if (scanner.Peek() == StaxGrammar.OperatorElementEnd)
 					{
 						if (tagType != TagType.BeginTag)
 						{
@@ -687,7 +686,7 @@ namespace JsonFx.Xml.Sax
 					// TODO: error recovery
 					throw new NotImplementedException("error recovery");
 				}
-				case SaxGrammar.OperatorElementEnd:
+				case StaxGrammar.OperatorElementEnd:
 				{
 					scanner.Pop();
 					return true;
@@ -699,7 +698,7 @@ namespace JsonFx.Xml.Sax
 			}
 		}
 
-		private void EmitTag(List<Token<SaxTokenType>> tokens, TagType tagType, SaxQName qName, List<SaxAttribute> attributes)
+		private void EmitTag(List<Token<StaxTokenType>> tokens, TagType tagType, StaxQName qName, List<StaxAttribute> attributes)
 		{
 			PrefixScopeChain.Scope scope;
 
@@ -723,11 +722,11 @@ namespace JsonFx.Xml.Sax
 					throw new NotImplementedException("auto tag balancing");
 				}
 
-				tokens.Add(SaxGrammar.TokenElementEnd(scope.TagName));
+				tokens.Add(StaxGrammar.TokenElementEnd(scope.TagName));
 
 				foreach (var mapping in scope)
 				{
-					tokens.Add(SaxGrammar.TokenPrefixEnd(mapping.Key, mapping.Value));
+					tokens.Add(StaxGrammar.TokenPrefixEnd(mapping.Key, mapping.Value));
 				}
 				return;
 			}
@@ -776,17 +775,17 @@ namespace JsonFx.Xml.Sax
 
 			foreach (var mapping in scope)
 			{
-				tokens.Add(SaxGrammar.TokenPrefixBegin(mapping.Key, mapping.Value));
+				tokens.Add(StaxGrammar.TokenPrefixBegin(mapping.Key, mapping.Value));
 			}
 
-			tokens.Add(SaxGrammar.TokenElementBegin(scope.TagName));
+			tokens.Add(StaxGrammar.TokenElementBegin(scope.TagName));
 
 			if (attributes != null)
 			{
 				foreach (var attr in attributes)
 				{
 					DataName attrName = new DataName(attr.QName.Name, this.ScopeChain.Resolve(attr.QName.Prefix));
-					tokens.Add(SaxGrammar.TokenAttribute(attrName));
+					tokens.Add(StaxGrammar.TokenAttribute(attrName));
 					tokens.Add(attr.Value);
 				}
 			}
@@ -796,29 +795,29 @@ namespace JsonFx.Xml.Sax
 				// immediately remove from scope chain
 				this.ScopeChain.Pop();
 
-				tokens.Add(SaxGrammar.TokenElementEnd(scope.TagName));
+				tokens.Add(StaxGrammar.TokenElementEnd(scope.TagName));
 
 				foreach (var mapping in scope)
 				{
-					tokens.Add(SaxGrammar.TokenPrefixEnd(mapping.Key, mapping.Value));
+					tokens.Add(StaxGrammar.TokenPrefixEnd(mapping.Key, mapping.Value));
 				}
 			}
 		}
 
-		private void EmitText(List<Token<SaxTokenType>> tokens, string value)
+		private void EmitText(List<Token<StaxTokenType>> tokens, string value)
 		{
 			if (String.IsNullOrEmpty(value))
 			{
 				return;
 			}
 
-			if (SaxTokenizer.IsNullOrWhiteSpace(value))
+			if (StaxTokenizer.IsNullOrWhiteSpace(value))
 			{
-				tokens.Add(SaxGrammar.TokenWhitespace(value));
+				tokens.Add(StaxGrammar.TokenWhitespace(value));
 			}
 			else
 			{
-				tokens.Add(SaxGrammar.TokenText(value));
+				tokens.Add(StaxGrammar.TokenText(value));
 			}
 		}
 
@@ -828,7 +827,7 @@ namespace JsonFx.Xml.Sax
 
 		private static void SkipWhitespace(ITextStream scanner)
 		{
-			while (!scanner.IsCompleted && SaxTokenizer.IsWhiteSpace(scanner.Peek()))
+			while (!scanner.IsCompleted && StaxTokenizer.IsWhiteSpace(scanner.Peek()))
 			{
 				scanner.Pop();
 			}
@@ -846,7 +845,7 @@ namespace JsonFx.Xml.Sax
 		public string DecodeEntity(ITextStream scanner)
 		{
 			// consume '&'
-			if (scanner.Pop() != SaxGrammar.OperatorEntityBegin)
+			if (scanner.Pop() != StaxGrammar.OperatorEntityBegin)
 			{
 				throw new DeserializationException(
 					"Malformed entity",
@@ -859,14 +858,14 @@ namespace JsonFx.Xml.Sax
 
 			char ch = scanner.Peek();
 			if (scanner.IsCompleted ||
-				SaxTokenizer.IsWhiteSpace(ch) ||
-				ch == SaxGrammar.OperatorEntityBegin ||
-				ch == SaxGrammar.OperatorElementBegin)
+				StaxTokenizer.IsWhiteSpace(ch) ||
+				ch == StaxGrammar.OperatorEntityBegin ||
+				ch == StaxGrammar.OperatorElementBegin)
 			{
-				return Char.ToString(SaxGrammar.OperatorEntityBegin);
+				return Char.ToString(StaxGrammar.OperatorEntityBegin);
 			}
 
-			if (ch == SaxGrammar.OperatorEntityNum)
+			if (ch == StaxGrammar.OperatorEntityNum)
 			{
 				// entity is Unicode Code Point
 
@@ -876,8 +875,8 @@ namespace JsonFx.Xml.Sax
 
 				bool isHex = false;
 				if (!scanner.IsCompleted &&
-					((ch == SaxGrammar.OperatorEntityHex) ||
-					(ch == SaxGrammar.OperatorEntityHexAlt)))
+					((ch == StaxGrammar.OperatorEntityHex) ||
+					(ch == StaxGrammar.OperatorEntityHexAlt)))
 				{
 					isHex = true;
 
@@ -889,7 +888,7 @@ namespace JsonFx.Xml.Sax
 				scanner.BeginChunk();
 
 				while (!scanner.IsCompleted &&
-					SaxTokenizer.IsHexDigit(ch))
+					StaxTokenizer.IsHexDigit(ch))
 				{
 					// consume [0-9a-fA-F]
 					scanner.Pop();
@@ -908,7 +907,7 @@ namespace JsonFx.Xml.Sax
 					entity = Char.ConvertFromUtf32(utf16);
 
 					if (!scanner.IsCompleted &&
-						ch == SaxGrammar.OperatorEntityEnd)
+						ch == StaxGrammar.OperatorEntityEnd)
 					{
 						scanner.Pop();
 					}
@@ -918,23 +917,23 @@ namespace JsonFx.Xml.Sax
 				{
 					// NOTE this potentially changes "&#X..." to "&#x...";
 					return String.Concat(
-						SaxGrammar.OperatorEntityBegin,
-						SaxGrammar.OperatorEntityNum,
-						SaxGrammar.OperatorEntityHex,
+						StaxGrammar.OperatorEntityBegin,
+						StaxGrammar.OperatorEntityNum,
+						StaxGrammar.OperatorEntityHex,
 						chunk);
 				}
 				else
 				{
 					return String.Concat(
-						SaxGrammar.OperatorEntityBegin,
-						SaxGrammar.OperatorEntityNum,
+						StaxGrammar.OperatorEntityBegin,
+						StaxGrammar.OperatorEntityNum,
 						chunk);
 				}
 			}
 
 			scanner.BeginChunk();
 			while (!scanner.IsCompleted &&
-				SaxTokenizer.IsLetter(ch))
+				StaxTokenizer.IsLetter(ch))
 			{
 				// consume [a-zA-Z]
 				scanner.Pop();
@@ -942,16 +941,16 @@ namespace JsonFx.Xml.Sax
 			}
 
 			chunk = scanner.EndChunk();
-			entity = SaxTokenizer.DecodeEntityName(chunk);
+			entity = StaxTokenizer.DecodeEntityName(chunk);
 			if (String.IsNullOrEmpty(entity))
 			{
 				return String.Concat(
-					SaxGrammar.OperatorEntityBegin,
+					StaxGrammar.OperatorEntityBegin,
 					chunk);
 			}
 
 			if (!scanner.IsCompleted &&
-				ch == SaxGrammar.OperatorEntityEnd)
+				ch == StaxGrammar.OperatorEntityEnd)
 			{
 				scanner.Pop();
 			}
@@ -1266,7 +1265,7 @@ namespace JsonFx.Xml.Sax
 		private static bool IsNameChar(char ch)
 		{
 			return
-				SaxTokenizer.IsNameStartChar(ch) ||
+				StaxTokenizer.IsNameStartChar(ch) ||
 				(ch >= '0' && ch <= '9') ||
 				(ch == '-') ||
 				(ch == '.') ||
@@ -1357,9 +1356,9 @@ namespace JsonFx.Xml.Sax
 		/// </summary>
 		/// <param name="reader"></param>
 		/// <returns></returns>
-		public IEnumerable<Token<SaxTokenType>> GetTokens(TextReader reader)
+		public IEnumerable<Token<StaxTokenType>> GetTokens(TextReader reader)
 		{
-			List<Token<SaxTokenType>> tokens = new List<Token<SaxTokenType>>();
+			List<Token<StaxTokenType>> tokens = new List<Token<StaxTokenType>>();
 
 			this.GetTokens(tokens, (this.Scanner = new TextReaderStream(reader)));
 
@@ -1371,9 +1370,9 @@ namespace JsonFx.Xml.Sax
 		/// </summary>
 		/// <param name="text"></param>
 		/// <returns></returns>
-		public IEnumerable<Token<SaxTokenType>> GetTokens(string text)
+		public IEnumerable<Token<StaxTokenType>> GetTokens(string text)
 		{
-			List<Token<SaxTokenType>> tokens = new List<Token<SaxTokenType>>();
+			List<Token<StaxTokenType>> tokens = new List<Token<StaxTokenType>>();
 
 			this.GetTokens(tokens, (this.Scanner = new StringStream(text)));
 

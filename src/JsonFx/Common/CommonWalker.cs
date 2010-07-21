@@ -40,7 +40,7 @@ using JsonFx.Serialization.Resolvers;
 namespace JsonFx.Common
 {
 	/// <summary>
-	/// Generates a SAX-like sequence of tokens from an object graph
+	/// Generates a StAX-like sequence of tokens from an object graph
 	/// </summary>
 	public class CommonWalker : IObjectWalker<CommonTokenType>
 	{

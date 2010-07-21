@@ -34,10 +34,10 @@ using System.Collections.Generic;
 
 using JsonFx.Serialization.Resolvers;
 
-namespace JsonFx.Xml.Sax
+namespace JsonFx.Xml.Stax
 {
 	/// <summary>
-	/// Maintains scope chain for SAX prefixes
+	/// Maintains scope chain for StAX prefixes
 	/// </summary>
 	internal class PrefixScopeChain
 	{

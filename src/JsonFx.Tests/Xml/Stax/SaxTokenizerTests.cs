@@ -37,9 +37,9 @@ using Xunit;
 using Assert=JsonFx.AssertPatched;
 using JsonFx.Serialization.Resolvers;
 
-namespace JsonFx.Xml.Sax
+namespace JsonFx.Xml.Stax
 {
-	public class SaxTokenizerTests
+	public class StaxTokenizerTests
 	{
 		#region Simple Single Element Tests
 
@@ -49,11 +49,11 @@ namespace JsonFx.Xml.Sax
 			const string input = @"<root></root>";
 			var expected = new[]
 			    {
-			        SaxGrammar.TokenElementBegin(new DataName("root")),
-			        SaxGrammar.TokenElementEnd(new DataName("root"))
+			        StaxGrammar.TokenElementBegin(new DataName("root")),
+			        StaxGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
-			var tokenizer = new SaxTokenizer();
+			var tokenizer = new StaxTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -65,11 +65,11 @@ namespace JsonFx.Xml.Sax
 			const string input = @"<root />";
 			var expected = new[]
 			    {
-			        SaxGrammar.TokenElementBegin(new DataName("root")),
-			        SaxGrammar.TokenElementEnd(new DataName("root"))
+			        StaxGrammar.TokenElementBegin(new DataName("root")),
+			        StaxGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
-			var tokenizer = new SaxTokenizer();
+			var tokenizer = new StaxTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -85,13 +85,13 @@ namespace JsonFx.Xml.Sax
 			const string input = @"<root xmlns=""http://example.com/schema""></root>";
 			var expected = new[]
 			    {
-			        SaxGrammar.TokenPrefixBegin("", "http://example.com/schema"),
-			        SaxGrammar.TokenElementBegin(new DataName("root", "http://example.com/schema")),
-			        SaxGrammar.TokenElementEnd(new DataName("root", "http://example.com/schema")),
-			        SaxGrammar.TokenPrefixEnd("", "http://example.com/schema"),
+			        StaxGrammar.TokenPrefixBegin("", "http://example.com/schema"),
+			        StaxGrammar.TokenElementBegin(new DataName("root", "http://example.com/schema")),
+			        StaxGrammar.TokenElementEnd(new DataName("root", "http://example.com/schema")),
+			        StaxGrammar.TokenPrefixEnd("", "http://example.com/schema"),
 			    };
 
-			var tokenizer = new SaxTokenizer();
+			var tokenizer = new StaxTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -103,13 +103,13 @@ namespace JsonFx.Xml.Sax
 			const string input = @"<prefix:root xmlns:prefix=""http://example.com/schema""></prefix:root>";
 			var expected = new[]
 			    {
-			        SaxGrammar.TokenPrefixBegin("prefix", "http://example.com/schema"),
-			        SaxGrammar.TokenElementBegin(new DataName("root", "http://example.com/schema")),
-			        SaxGrammar.TokenElementEnd(new DataName("root", "http://example.com/schema")),
-			        SaxGrammar.TokenPrefixEnd("prefix", "http://example.com/schema"),
+			        StaxGrammar.TokenPrefixBegin("prefix", "http://example.com/schema"),
+			        StaxGrammar.TokenElementBegin(new DataName("root", "http://example.com/schema")),
+			        StaxGrammar.TokenElementEnd(new DataName("root", "http://example.com/schema")),
+			        StaxGrammar.TokenPrefixEnd("prefix", "http://example.com/schema"),
 			    };
 
-			var tokenizer = new SaxTokenizer();
+			var tokenizer = new StaxTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -121,16 +121,16 @@ namespace JsonFx.Xml.Sax
 			const string input = @"<foo><child xmlns=""http://example.com/schema"">value</child></foo>";
 			var expected = new[]
 			    {
-			        SaxGrammar.TokenElementBegin(new DataName("foo")),
-			        SaxGrammar.TokenPrefixBegin("", "http://example.com/schema"),
-			        SaxGrammar.TokenElementBegin(new DataName("child", "http://example.com/schema")),
-			        SaxGrammar.TokenText("value"),
-			        SaxGrammar.TokenElementEnd(new DataName("child", "http://example.com/schema")),
-			        SaxGrammar.TokenPrefixEnd("", "http://example.com/schema"),
-			        SaxGrammar.TokenElementEnd(new DataName("foo"))
+			        StaxGrammar.TokenElementBegin(new DataName("foo")),
+			        StaxGrammar.TokenPrefixBegin("", "http://example.com/schema"),
+			        StaxGrammar.TokenElementBegin(new DataName("child", "http://example.com/schema")),
+			        StaxGrammar.TokenText("value"),
+			        StaxGrammar.TokenElementEnd(new DataName("child", "http://example.com/schema")),
+			        StaxGrammar.TokenPrefixEnd("", "http://example.com/schema"),
+			        StaxGrammar.TokenElementEnd(new DataName("foo"))
 			    };
 
-			var tokenizer = new SaxTokenizer();
+			var tokenizer = new StaxTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -142,16 +142,16 @@ namespace JsonFx.Xml.Sax
 			const string input = @"<foo xmlns=""http://example.org""><child>value</child></foo>";
 			var expected = new[]
 			    {
-			        SaxGrammar.TokenPrefixBegin("", "http://example.org"),
-			        SaxGrammar.TokenElementBegin(new DataName("foo", "http://example.org")),
-			        SaxGrammar.TokenElementBegin(new DataName("child", "http://example.org")),
-			        SaxGrammar.TokenText("value"),
-			        SaxGrammar.TokenElementEnd(new DataName("child", "http://example.org")),
-			        SaxGrammar.TokenElementEnd(new DataName("foo", "http://example.org")),
-			        SaxGrammar.TokenPrefixEnd("", "http://example.org")
+			        StaxGrammar.TokenPrefixBegin("", "http://example.org"),
+			        StaxGrammar.TokenElementBegin(new DataName("foo", "http://example.org")),
+			        StaxGrammar.TokenElementBegin(new DataName("child", "http://example.org")),
+			        StaxGrammar.TokenText("value"),
+			        StaxGrammar.TokenElementEnd(new DataName("child", "http://example.org")),
+			        StaxGrammar.TokenElementEnd(new DataName("foo", "http://example.org")),
+			        StaxGrammar.TokenPrefixEnd("", "http://example.org")
 			    };
 
-			var tokenizer = new SaxTokenizer();
+			var tokenizer = new StaxTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -163,16 +163,16 @@ namespace JsonFx.Xml.Sax
 			const string input = @"<bar:foo xmlns:bar=""http://example.org""><bar:child>value</bar:child></bar:foo>";
 			var expected = new[]
 			    {
-			        SaxGrammar.TokenPrefixBegin("bar", "http://example.org"),
-			        SaxGrammar.TokenElementBegin(new DataName("foo", "http://example.org")),
-			        SaxGrammar.TokenElementBegin(new DataName("child", "http://example.org")),
-			        SaxGrammar.TokenText("value"),
-			        SaxGrammar.TokenElementEnd(new DataName("child", "http://example.org")),
-			        SaxGrammar.TokenElementEnd(new DataName("foo", "http://example.org")),
-			        SaxGrammar.TokenPrefixEnd("bar", "http://example.org")
+			        StaxGrammar.TokenPrefixBegin("bar", "http://example.org"),
+			        StaxGrammar.TokenElementBegin(new DataName("foo", "http://example.org")),
+			        StaxGrammar.TokenElementBegin(new DataName("child", "http://example.org")),
+			        StaxGrammar.TokenText("value"),
+			        StaxGrammar.TokenElementEnd(new DataName("child", "http://example.org")),
+			        StaxGrammar.TokenElementEnd(new DataName("foo", "http://example.org")),
+			        StaxGrammar.TokenPrefixEnd("bar", "http://example.org")
 			    };
 
-			var tokenizer = new SaxTokenizer();
+			var tokenizer = new StaxTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -184,18 +184,18 @@ namespace JsonFx.Xml.Sax
 			const string input = @"<foo xmlns=""http://json.org""><child xmlns=""http://jsonfx.net"">text value</child></foo>";
 			var expected = new[]
 			    {
-			        SaxGrammar.TokenPrefixBegin("", "http://json.org"),
-			        SaxGrammar.TokenElementBegin(new DataName("foo", "http://json.org")),
-			        SaxGrammar.TokenPrefixBegin("", "http://jsonfx.net"),
-			        SaxGrammar.TokenElementBegin(new DataName("child", "http://jsonfx.net")),
-			        SaxGrammar.TokenText("text value"),
-			        SaxGrammar.TokenElementEnd(new DataName("child", "http://jsonfx.net")),
-			        SaxGrammar.TokenPrefixEnd("", "http://jsonfx.net"),
-			        SaxGrammar.TokenElementEnd(new DataName("foo", "http://json.org")),
-			        SaxGrammar.TokenPrefixEnd("", "http://json.org")
+			        StaxGrammar.TokenPrefixBegin("", "http://json.org"),
+			        StaxGrammar.TokenElementBegin(new DataName("foo", "http://json.org")),
+			        StaxGrammar.TokenPrefixBegin("", "http://jsonfx.net"),
+			        StaxGrammar.TokenElementBegin(new DataName("child", "http://jsonfx.net")),
+			        StaxGrammar.TokenText("text value"),
+			        StaxGrammar.TokenElementEnd(new DataName("child", "http://jsonfx.net")),
+			        StaxGrammar.TokenPrefixEnd("", "http://jsonfx.net"),
+			        StaxGrammar.TokenElementEnd(new DataName("foo", "http://json.org")),
+			        StaxGrammar.TokenPrefixEnd("", "http://json.org")
 			    };
 
-			var tokenizer = new SaxTokenizer();
+			var tokenizer = new StaxTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -207,17 +207,17 @@ namespace JsonFx.Xml.Sax
 			const string input = @"<foo xmlns=""http://example.org"" xmlns:blah=""http://example.org"" blah:key=""value"" />";
 			var expected = new[]
 			    {
-			        SaxGrammar.TokenPrefixBegin("", "http://example.org"),
-			        SaxGrammar.TokenPrefixBegin("blah", "http://example.org"),
-			        SaxGrammar.TokenElementBegin(new DataName("foo", "http://example.org")),
-			        SaxGrammar.TokenAttribute(new DataName("key", "http://example.org")),
-			        SaxGrammar.TokenText("value"),
-			        SaxGrammar.TokenElementEnd(new DataName("foo", "http://example.org")),
-			        SaxGrammar.TokenPrefixEnd("", "http://example.org"),
-			        SaxGrammar.TokenPrefixEnd("blah", "http://example.org")
+			        StaxGrammar.TokenPrefixBegin("", "http://example.org"),
+			        StaxGrammar.TokenPrefixBegin("blah", "http://example.org"),
+			        StaxGrammar.TokenElementBegin(new DataName("foo", "http://example.org")),
+			        StaxGrammar.TokenAttribute(new DataName("key", "http://example.org")),
+			        StaxGrammar.TokenText("value"),
+			        StaxGrammar.TokenElementEnd(new DataName("foo", "http://example.org")),
+			        StaxGrammar.TokenPrefixEnd("", "http://example.org"),
+			        StaxGrammar.TokenPrefixEnd("blah", "http://example.org")
 			    };
 
-			var tokenizer = new SaxTokenizer();
+			var tokenizer = new StaxTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -230,23 +230,23 @@ namespace JsonFx.Xml.Sax
 
 			var expected = new[]
 			    {
-			        SaxGrammar.TokenPrefixBegin("", "http://example.org/outer"),
-			        SaxGrammar.TokenElementBegin(new DataName("outer", "http://example.org/outer")),
-			        SaxGrammar.TokenPrefixBegin("", "http://example.org/inner"),
-			        SaxGrammar.TokenElementBegin(new DataName("middle-1", "http://example.org/inner")),
-			        SaxGrammar.TokenElementBegin(new DataName("inner", "http://example.org/inner")),
-			        SaxGrammar.TokenText("this should be inner"),
-			        SaxGrammar.TokenElementEnd(new DataName("inner", "http://example.org/inner")),
-			        SaxGrammar.TokenElementEnd(new DataName("middle-1", "http://example.org/inner")),
-			        SaxGrammar.TokenPrefixEnd("", "http://example.org/inner"),
-			        SaxGrammar.TokenElementBegin(new DataName("middle-2", "http://example.org/outer")),
-			        SaxGrammar.TokenText("this should be outer"),
-			        SaxGrammar.TokenElementEnd(new DataName("middle-2", "http://example.org/outer")),
-			        SaxGrammar.TokenElementEnd(new DataName("outer", "http://example.org/outer")),
-			        SaxGrammar.TokenPrefixEnd("", "http://example.org/outer")
+			        StaxGrammar.TokenPrefixBegin("", "http://example.org/outer"),
+			        StaxGrammar.TokenElementBegin(new DataName("outer", "http://example.org/outer")),
+			        StaxGrammar.TokenPrefixBegin("", "http://example.org/inner"),
+			        StaxGrammar.TokenElementBegin(new DataName("middle-1", "http://example.org/inner")),
+			        StaxGrammar.TokenElementBegin(new DataName("inner", "http://example.org/inner")),
+			        StaxGrammar.TokenText("this should be inner"),
+			        StaxGrammar.TokenElementEnd(new DataName("inner", "http://example.org/inner")),
+			        StaxGrammar.TokenElementEnd(new DataName("middle-1", "http://example.org/inner")),
+			        StaxGrammar.TokenPrefixEnd("", "http://example.org/inner"),
+			        StaxGrammar.TokenElementBegin(new DataName("middle-2", "http://example.org/outer")),
+			        StaxGrammar.TokenText("this should be outer"),
+			        StaxGrammar.TokenElementEnd(new DataName("middle-2", "http://example.org/outer")),
+			        StaxGrammar.TokenElementEnd(new DataName("outer", "http://example.org/outer")),
+			        StaxGrammar.TokenPrefixEnd("", "http://example.org/outer")
 			    };
 
-			var tokenizer = new SaxTokenizer();
+			var tokenizer = new StaxTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -262,13 +262,13 @@ namespace JsonFx.Xml.Sax
 			const string input = @"<root attrName=""attrValue""></root>";
 			var expected = new[]
 			    {
-			        SaxGrammar.TokenElementBegin(new DataName("root")),
-			        SaxGrammar.TokenAttribute(new DataName("attrName")),
-			        SaxGrammar.TokenText("attrValue"),
-			        SaxGrammar.TokenElementEnd(new DataName("root"))
+			        StaxGrammar.TokenElementBegin(new DataName("root")),
+			        StaxGrammar.TokenAttribute(new DataName("attrName")),
+			        StaxGrammar.TokenText("attrValue"),
+			        StaxGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
-			var tokenizer = new SaxTokenizer();
+			var tokenizer = new StaxTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -280,13 +280,13 @@ namespace JsonFx.Xml.Sax
 			const string input = @"<root noValue></root>";
 			var expected = new[]
 			    {
-			        SaxGrammar.TokenElementBegin(new DataName("root")),
-			        SaxGrammar.TokenAttribute(new DataName("noValue")),
-			        SaxGrammar.TokenText(String.Empty),
-			        SaxGrammar.TokenElementEnd(new DataName("root"))
+			        StaxGrammar.TokenElementBegin(new DataName("root")),
+			        StaxGrammar.TokenAttribute(new DataName("noValue")),
+			        StaxGrammar.TokenText(String.Empty),
+			        StaxGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
-			var tokenizer = new SaxTokenizer();
+			var tokenizer = new StaxTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -298,13 +298,13 @@ namespace JsonFx.Xml.Sax
 			const string input = @"<root emptyValue=""""></root>";
 			var expected = new[]
 			    {
-			        SaxGrammar.TokenElementBegin(new DataName("root")),
-			        SaxGrammar.TokenAttribute(new DataName("emptyValue")),
-			        SaxGrammar.TokenText(String.Empty),
-			        SaxGrammar.TokenElementEnd(new DataName("root"))
+			        StaxGrammar.TokenElementBegin(new DataName("root")),
+			        StaxGrammar.TokenAttribute(new DataName("emptyValue")),
+			        StaxGrammar.TokenText(String.Empty),
+			        StaxGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
-			var tokenizer = new SaxTokenizer();
+			var tokenizer = new StaxTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -316,13 +316,13 @@ namespace JsonFx.Xml.Sax
 			const string input = @"<root white  =  "" extra whitespace around quote delims "" ></root>";
 			var expected = new[]
 			    {
-			        SaxGrammar.TokenElementBegin(new DataName("root")),
-			        SaxGrammar.TokenAttribute(new DataName("white")),
-			        SaxGrammar.TokenText(" extra whitespace around quote delims "),
-			        SaxGrammar.TokenElementEnd(new DataName("root"))
+			        StaxGrammar.TokenElementBegin(new DataName("root")),
+			        StaxGrammar.TokenAttribute(new DataName("white")),
+			        StaxGrammar.TokenText(" extra whitespace around quote delims "),
+			        StaxGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
-			var tokenizer = new SaxTokenizer();
+			var tokenizer = new StaxTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -334,13 +334,13 @@ namespace JsonFx.Xml.Sax
 			const string input = @"<root white  =  ' extra whitespace around apostrophe delims ' ></root>";
 			var expected = new[]
 			    {
-			        SaxGrammar.TokenElementBegin(new DataName("root")),
-			        SaxGrammar.TokenAttribute(new DataName("white")),
-			        SaxGrammar.TokenText(" extra whitespace around apostrophe delims "),
-			        SaxGrammar.TokenElementEnd(new DataName("root"))
+			        StaxGrammar.TokenElementBegin(new DataName("root")),
+			        StaxGrammar.TokenAttribute(new DataName("white")),
+			        StaxGrammar.TokenText(" extra whitespace around apostrophe delims "),
+			        StaxGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
-			var tokenizer = new SaxTokenizer();
+			var tokenizer = new StaxTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -352,13 +352,13 @@ namespace JsonFx.Xml.Sax
 			const string input = @"<root whitespace="" this contains whitespace ""></root>";
 			var expected = new[]
 			    {
-			        SaxGrammar.TokenElementBegin(new DataName("root")),
-			        SaxGrammar.TokenAttribute(new DataName("whitespace")),
-			        SaxGrammar.TokenText(" this contains whitespace "),
-			        SaxGrammar.TokenElementEnd(new DataName("root"))
+			        StaxGrammar.TokenElementBegin(new DataName("root")),
+			        StaxGrammar.TokenAttribute(new DataName("whitespace")),
+			        StaxGrammar.TokenText(" this contains whitespace "),
+			        StaxGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
-			var tokenizer = new SaxTokenizer();
+			var tokenizer = new StaxTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -370,13 +370,13 @@ namespace JsonFx.Xml.Sax
 			const string input = @"<root singleQuoted='apostrophe'></root>";
 			var expected = new[]
 			    {
-			        SaxGrammar.TokenElementBegin(new DataName("root")),
-			        SaxGrammar.TokenAttribute(new DataName("singleQuoted")),
-			        SaxGrammar.TokenText("apostrophe"),
-			        SaxGrammar.TokenElementEnd(new DataName("root"))
+			        StaxGrammar.TokenElementBegin(new DataName("root")),
+			        StaxGrammar.TokenAttribute(new DataName("singleQuoted")),
+			        StaxGrammar.TokenText("apostrophe"),
+			        StaxGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
-			var tokenizer = new SaxTokenizer();
+			var tokenizer = new StaxTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -388,13 +388,13 @@ namespace JsonFx.Xml.Sax
 			const string input = @"<root singleQuoted_whitespace=' apostrophe with whitespace '></root>";
 			var expected = new[]
 			    {
-			        SaxGrammar.TokenElementBegin(new DataName("root")),
-			        SaxGrammar.TokenAttribute(new DataName("singleQuoted_whitespace")),
-			        SaxGrammar.TokenText(" apostrophe with whitespace "),
-			        SaxGrammar.TokenElementEnd(new DataName("root"))
+			        StaxGrammar.TokenElementBegin(new DataName("root")),
+			        StaxGrammar.TokenAttribute(new DataName("singleQuoted_whitespace")),
+			        StaxGrammar.TokenText(" apostrophe with whitespace "),
+			        StaxGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
-			var tokenizer = new SaxTokenizer();
+			var tokenizer = new StaxTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -406,17 +406,17 @@ namespace JsonFx.Xml.Sax
 			const string input = @"<root no-value whitespace="" this contains whitespace "" anyQuotedText=""/\\\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?""></root>";
 			var expected = new[]
 			    {
-			        SaxGrammar.TokenElementBegin(new DataName("root")),
-			        SaxGrammar.TokenAttribute(new DataName("no-value")),
-			        SaxGrammar.TokenText(String.Empty),
-			        SaxGrammar.TokenAttribute(new DataName("whitespace")),
-			        SaxGrammar.TokenText(" this contains whitespace "),
-			        SaxGrammar.TokenAttribute(new DataName("anyQuotedText")),
-			        SaxGrammar.TokenText(@"/\\\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"),
-			        SaxGrammar.TokenElementEnd(new DataName("root"))
+			        StaxGrammar.TokenElementBegin(new DataName("root")),
+			        StaxGrammar.TokenAttribute(new DataName("no-value")),
+			        StaxGrammar.TokenText(String.Empty),
+			        StaxGrammar.TokenAttribute(new DataName("whitespace")),
+			        StaxGrammar.TokenText(" this contains whitespace "),
+			        StaxGrammar.TokenAttribute(new DataName("anyQuotedText")),
+			        StaxGrammar.TokenText(@"/\\\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"),
+			        StaxGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
-			var tokenizer = new SaxTokenizer();
+			var tokenizer = new StaxTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -432,10 +432,10 @@ namespace JsonFx.Xml.Sax
 			const string input = @"&lt;";
 			var expected = new[]
 			    {
-			        SaxGrammar.TokenText("<")
+			        StaxGrammar.TokenText("<")
 			    };
 
-			var tokenizer = new SaxTokenizer();
+			var tokenizer = new StaxTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -447,10 +447,10 @@ namespace JsonFx.Xml.Sax
 			const string input = @"&#66;";
 			var expected = new[]
 			    {
-			        SaxGrammar.TokenText("B")
+			        StaxGrammar.TokenText("B")
 			    };
 
-			var tokenizer = new SaxTokenizer();
+			var tokenizer = new StaxTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -462,10 +462,10 @@ namespace JsonFx.Xml.Sax
 			const string input = @"&#x37;";
 			var expected = new[]
 			    {
-			        SaxGrammar.TokenText("7")
+			        StaxGrammar.TokenText("7")
 			    };
 
-			var tokenizer = new SaxTokenizer();
+			var tokenizer = new StaxTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -477,10 +477,10 @@ namespace JsonFx.Xml.Sax
 			const string input = @"&#X38;";
 			var expected = new[]
 			    {
-			        SaxGrammar.TokenText("8")
+			        StaxGrammar.TokenText("8")
 			    };
 
-			var tokenizer = new SaxTokenizer();
+			var tokenizer = new StaxTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -492,10 +492,10 @@ namespace JsonFx.Xml.Sax
 			const string input = @"&#xABCD;";
 			var expected = new[]
 			    {
-			        SaxGrammar.TokenText("\uABCD")
+			        StaxGrammar.TokenText("\uABCD")
 			    };
 
-			var tokenizer = new SaxTokenizer();
+			var tokenizer = new StaxTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -507,10 +507,10 @@ namespace JsonFx.Xml.Sax
 			const string input = @"&#xabcd;";
 			var expected = new[]
 			    {
-			        SaxGrammar.TokenText("\uabcd")
+			        StaxGrammar.TokenText("\uabcd")
 			    };
 
-			var tokenizer = new SaxTokenizer();
+			var tokenizer = new StaxTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -522,10 +522,10 @@ namespace JsonFx.Xml.Sax
 			const string input = @"&euro;";
 			var expected = new[]
 			    {
-			        SaxGrammar.TokenText("€")
+			        StaxGrammar.TokenText("€")
 			    };
 
-			var tokenizer = new SaxTokenizer();
+			var tokenizer = new StaxTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -537,11 +537,11 @@ namespace JsonFx.Xml.Sax
 			const string input = @"leading&amp;";
 			var expected = new[]
 			    {
-			        SaxGrammar.TokenText("leading"),
-			        SaxGrammar.TokenText("&")
+			        StaxGrammar.TokenText("leading"),
+			        StaxGrammar.TokenText("&")
 			    };
 
-			var tokenizer = new SaxTokenizer();
+			var tokenizer = new StaxTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -553,11 +553,11 @@ namespace JsonFx.Xml.Sax
 			const string input = @"&amp;trailing";
 			var expected = new[]
 			    {
-			        SaxGrammar.TokenText("&"),
-			        SaxGrammar.TokenText("trailing")
+			        StaxGrammar.TokenText("&"),
+			        StaxGrammar.TokenText("trailing")
 			    };
 
-			var tokenizer = new SaxTokenizer();
+			var tokenizer = new StaxTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -569,16 +569,16 @@ namespace JsonFx.Xml.Sax
 			const string input = @"there should &lt;b&gt;e decoded chars &amp; inside this text";
 			var expected = new[]
 			    {
-			        SaxGrammar.TokenText(@"there should "),
-			        SaxGrammar.TokenText(@"<"),
-			        SaxGrammar.TokenText(@"b"),
-			        SaxGrammar.TokenText(@">"),
-			        SaxGrammar.TokenText(@"e decoded chars "),
-			        SaxGrammar.TokenText(@"&"),
-			        SaxGrammar.TokenText(@" inside this text")
+			        StaxGrammar.TokenText(@"there should "),
+			        StaxGrammar.TokenText(@"<"),
+			        StaxGrammar.TokenText(@"b"),
+			        StaxGrammar.TokenText(@">"),
+			        StaxGrammar.TokenText(@"e decoded chars "),
+			        StaxGrammar.TokenText(@"&"),
+			        StaxGrammar.TokenText(@" inside this text")
 			    };
 
-			var tokenizer = new SaxTokenizer();
+			var tokenizer = new StaxTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -590,17 +590,17 @@ namespace JsonFx.Xml.Sax
 			const string input = @"there should &#xnot &Xltb&#gte decoded chars & inside this text";
 			var expected = new[]
 			    {
-			        SaxGrammar.TokenText(@"there should "),
-			        SaxGrammar.TokenText(@"&#x"),
-			        SaxGrammar.TokenText(@"not "),
-			        SaxGrammar.TokenText(@"&Xltb"),
-			        SaxGrammar.TokenText(@"&#"),
-			        SaxGrammar.TokenText(@"gte decoded chars "),
-			        SaxGrammar.TokenText(@"&"),
-			        SaxGrammar.TokenText(@" inside this text")
+			        StaxGrammar.TokenText(@"there should "),
+			        StaxGrammar.TokenText(@"&#x"),
+			        StaxGrammar.TokenText(@"not "),
+			        StaxGrammar.TokenText(@"&Xltb"),
+			        StaxGrammar.TokenText(@"&#"),
+			        StaxGrammar.TokenText(@"gte decoded chars "),
+			        StaxGrammar.TokenText(@"&"),
+			        StaxGrammar.TokenText(@" inside this text")
 			    };
 
-			var tokenizer = new SaxTokenizer();
+			var tokenizer = new StaxTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -617,25 +617,25 @@ namespace JsonFx.Xml.Sax
 
 			var expected = new[]
 			    {
-			        SaxGrammar.TokenElementBegin(new DataName("div")),
-			        SaxGrammar.TokenAttribute(new DataName("class")),
-			        SaxGrammar.TokenText("content"),
-			        SaxGrammar.TokenElementBegin(new DataName("p")),
-			        SaxGrammar.TokenAttribute(new DataName("style")),
-			        SaxGrammar.TokenText("color:red"),
-			        SaxGrammar.TokenElementBegin(new DataName("strong")),
-			        SaxGrammar.TokenText("Lorem ipsum"),
-			        SaxGrammar.TokenElementEnd(new DataName("strong")),
-			        SaxGrammar.TokenText(" dolor sit amet, "),
-			        SaxGrammar.TokenElementBegin(new DataName("i")),
-			        SaxGrammar.TokenText("consectetur"),
-			        SaxGrammar.TokenElementEnd(new DataName("i")),
-			        SaxGrammar.TokenText(" adipiscing elit."),
-			        SaxGrammar.TokenElementEnd(new DataName("p")),
-					SaxGrammar.TokenElementEnd(new DataName("div")),
+			        StaxGrammar.TokenElementBegin(new DataName("div")),
+			        StaxGrammar.TokenAttribute(new DataName("class")),
+			        StaxGrammar.TokenText("content"),
+			        StaxGrammar.TokenElementBegin(new DataName("p")),
+			        StaxGrammar.TokenAttribute(new DataName("style")),
+			        StaxGrammar.TokenText("color:red"),
+			        StaxGrammar.TokenElementBegin(new DataName("strong")),
+			        StaxGrammar.TokenText("Lorem ipsum"),
+			        StaxGrammar.TokenElementEnd(new DataName("strong")),
+			        StaxGrammar.TokenText(" dolor sit amet, "),
+			        StaxGrammar.TokenElementBegin(new DataName("i")),
+			        StaxGrammar.TokenText("consectetur"),
+			        StaxGrammar.TokenElementEnd(new DataName("i")),
+			        StaxGrammar.TokenText(" adipiscing elit."),
+			        StaxGrammar.TokenElementEnd(new DataName("p")),
+					StaxGrammar.TokenElementEnd(new DataName("div")),
 			    };
 
-			var tokenizer = new SaxTokenizer();
+			var tokenizer = new StaxTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -653,28 +653,28 @@ namespace JsonFx.Xml.Sax
 
 			var expected = new[]
 			    {
-			        SaxGrammar.TokenElementBegin(new DataName("div")),
-			        SaxGrammar.TokenAttribute(new DataName("class")),
-			        SaxGrammar.TokenText("content"),
-			        SaxGrammar.TokenWhitespace("\r\n\t"),
-			        SaxGrammar.TokenElementBegin(new DataName("p")),
-			        SaxGrammar.TokenAttribute(new DataName("style")),
-			        SaxGrammar.TokenText("color:red"),
-			        SaxGrammar.TokenWhitespace("\r\n\t\t"),
-			        SaxGrammar.TokenElementBegin(new DataName("strong")),
-			        SaxGrammar.TokenText("Lorem ipsum"),
-			        SaxGrammar.TokenElementEnd(new DataName("strong")),
-			        SaxGrammar.TokenText(" dolor sit amet, "),
-			        SaxGrammar.TokenElementBegin(new DataName("i")),
-			        SaxGrammar.TokenText("consectetur"),
-			        SaxGrammar.TokenElementEnd(new DataName("i")),
-			        SaxGrammar.TokenText(" adipiscing elit.\r\n\t"),
-			        SaxGrammar.TokenElementEnd(new DataName("p")),
-			        SaxGrammar.TokenWhitespace("\r\n"),
-					SaxGrammar.TokenElementEnd(new DataName("div")),
+			        StaxGrammar.TokenElementBegin(new DataName("div")),
+			        StaxGrammar.TokenAttribute(new DataName("class")),
+			        StaxGrammar.TokenText("content"),
+			        StaxGrammar.TokenWhitespace("\r\n\t"),
+			        StaxGrammar.TokenElementBegin(new DataName("p")),
+			        StaxGrammar.TokenAttribute(new DataName("style")),
+			        StaxGrammar.TokenText("color:red"),
+			        StaxGrammar.TokenWhitespace("\r\n\t\t"),
+			        StaxGrammar.TokenElementBegin(new DataName("strong")),
+			        StaxGrammar.TokenText("Lorem ipsum"),
+			        StaxGrammar.TokenElementEnd(new DataName("strong")),
+			        StaxGrammar.TokenText(" dolor sit amet, "),
+			        StaxGrammar.TokenElementBegin(new DataName("i")),
+			        StaxGrammar.TokenText("consectetur"),
+			        StaxGrammar.TokenElementEnd(new DataName("i")),
+			        StaxGrammar.TokenText(" adipiscing elit.\r\n\t"),
+			        StaxGrammar.TokenElementEnd(new DataName("p")),
+			        StaxGrammar.TokenWhitespace("\r\n"),
+					StaxGrammar.TokenElementEnd(new DataName("div")),
 			    };
 
-			var tokenizer = new SaxTokenizer();
+			var tokenizer = new StaxTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -690,10 +690,10 @@ namespace JsonFx.Xml.Sax
 			const string input = @"<root>";
 			var expected = new[]
 			    {
-			        SaxGrammar.TokenElementBegin(new DataName("root"))
+			        StaxGrammar.TokenElementBegin(new DataName("root"))
 			    };
 
-			var tokenizer = new SaxTokenizer();
+			var tokenizer = new StaxTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			// TODO: determine how this should be handled
@@ -708,9 +708,9 @@ namespace JsonFx.Xml.Sax
 		public void GetTokens_NullInput_ReturnsEmptySequence()
 		{
 			const string input = null;
-			var expected = new Token<SaxTokenType>[0];
+			var expected = new Token<StaxTokenType>[0];
 
-			var tokenizer = new SaxTokenizer();
+			var tokenizer = new StaxTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -720,9 +720,9 @@ namespace JsonFx.Xml.Sax
 		public void GetTokens_EmptyInput_ReturnsEmptySequence()
 		{
 			const string input = "";
-			var expected = new Token<SaxTokenType>[0];
+			var expected = new Token<StaxTokenType>[0];
 
-			var tokenizer = new SaxTokenizer();
+			var tokenizer = new StaxTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
