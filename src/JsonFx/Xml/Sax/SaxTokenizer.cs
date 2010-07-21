@@ -322,7 +322,7 @@ namespace JsonFx.Xml.Sax
 					if (comment != null)
 					{
 						// emit as an unparsed comment
-						return SaxGrammar.Unparsed(String.Concat(SaxGrammar.OperatorComment, SaxGrammar.OperatorCommentBegin), comment);
+						return SaxGrammar.TokenUnparsed(String.Concat(SaxGrammar.OperatorComment, SaxGrammar.OperatorCommentBegin), comment);
 					}
 
 					// "<![CDATA[", "]]>"	// CDATA section
@@ -334,7 +334,7 @@ namespace JsonFx.Xml.Sax
 					}
 
 					// "<!", ">"			// SGML declaration (e.g. DOCTYPE or SSI)
-					return SaxGrammar.Unparsed(
+					return SaxGrammar.TokenUnparsed(
 						Char.ToString(SaxGrammar.OperatorComment),
 						this.ScanUnparsedValue(scanner, String.Empty, String.Empty));
 				}
@@ -344,7 +344,7 @@ namespace JsonFx.Xml.Sax
 					scanner.Pop();
 
 					// "<?", "?>"	// XML processing instruction (e.g. XML declaration)
-					return SaxGrammar.Unparsed(
+					return SaxGrammar.TokenUnparsed(
 						Char.ToString(SaxGrammar.OperatorProcessingInstruction),
 						this.ScanUnparsedValue(scanner, String.Empty, Char.ToString(SaxGrammar.OperatorProcessingInstruction)));
 				}
@@ -358,7 +358,7 @@ namespace JsonFx.Xml.Sax
 					{
 						case SaxGrammar.OperatorCommentDelim:		// "<%--", "--%>"	ASP/JSP-style code comment
 						{
-							return SaxGrammar.Unparsed(
+							return SaxGrammar.TokenUnparsed(
 								String.Concat(SaxGrammar.OperatorCode, SaxGrammar.OperatorCommentBegin),
 								this.ScanUnparsedValue(scanner, SaxGrammar.OperatorCommentBegin, String.Concat(SaxGrammar.OperatorCommentEnd, SaxGrammar.OperatorCode)));
 						}
@@ -371,14 +371,14 @@ namespace JsonFx.Xml.Sax
 							// consume code block type char
 							scanner.Pop();
 
-							return SaxGrammar.Unparsed(
+							return SaxGrammar.TokenUnparsed(
 								String.Concat(SaxGrammar.OperatorCode, ch),
 								this.ScanUnparsedValue(scanner, String.Empty, Char.ToString(SaxGrammar.OperatorCode)));
 						}
 						default:									// "<%",   "%>"		ASP code block / JSP scriptlet
 						{
 							// simple code block
-							return SaxGrammar.Unparsed(
+							return SaxGrammar.TokenUnparsed(
 								Char.ToString(SaxGrammar.OperatorCode),
 								this.ScanUnparsedValue(scanner, String.Empty, Char.ToString(SaxGrammar.OperatorCode)));
 						}
