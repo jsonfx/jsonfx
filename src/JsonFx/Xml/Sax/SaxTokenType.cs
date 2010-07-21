@@ -47,23 +47,26 @@ namespace JsonFx.Xml.Sax
 		None,
 
 		/// <summary>
-		/// Begin element, the token contains the element Name
+		/// Any of a number of unparsed tags which typically contain specialized processing instructions
 		/// </summary>
 		/// <remarks>
-		/// The element <see cref="Token<CommonTokenType>.Name"/> is required.
-		/// Marks the beginning of an element and all its children including attributes.
+		/// The name of the token is the beginning delimiter (not including the '&lt;')
+		/// Includes the following types:
+		/// 
+		///		"&lt;!--", "-->"	XML/HTML/SGML comment
+		///		"&lt;!", ">"		XML/SGML declaration (e.g. DOCTYPE or server-side includes)
+		/// 
+		///		"&lt;?", "?>"		XML processing instruction (e.g. the XML declaration)
+		/// 
+		///		"&lt;%--", "--%>"	ASP/JSP-style code comment
+		///		"&lt;%@",  "%>"		ASP/JSP directive
+		///		"&lt;%=",  "%>"		ASP/JSP/JBST expression
+		///		"&lt;%!",  "%>"		JSP/JBST declaration
+		///		"&lt;%#",  "%>"		ASP.NET/JBST databind expression
+		///		"&lt;%$",  "%>"		ASP.NET/JBST extension
+		///		"&lt;%",   "%>"		ASP code block / JSP scriptlet
 		/// </remarks>
-		ElementBegin,
-
-		/// <summary>
-		/// End object
-		/// </summary>
-		/// <remarks>
-		/// The token <see cref="Token<CommonTokenType>.Value"/> and <see cref="Token<CommonTokenType>.Name"/> must be left empty.
-		/// The element Name is determined by the <see cref="SaxTokenType.ElementBegin"/> token.
-		/// Marks the end of the last object property as well as the object itself.
-		/// </remarks>
-		ElementEnd,
+		UnparsedBlock,
 
 		/// <summary>
 		/// Begin mapping a prefix to a namespace URI
@@ -82,6 +85,25 @@ namespace JsonFx.Xml.Sax
 		/// Marks the end of a namespace prefix scope.
 		/// </remarks>
 		PrefixEnd,
+
+		/// <summary>
+		/// Begin element, the token contains the element Name
+		/// </summary>
+		/// <remarks>
+		/// The element <see cref="Token<CommonTokenType>.Name"/> is required.
+		/// Marks the beginning of an element and all its children including attributes.
+		/// </remarks>
+		ElementBegin,
+
+		/// <summary>
+		/// End object
+		/// </summary>
+		/// <remarks>
+		/// The token <see cref="Token<CommonTokenType>.Value"/> and <see cref="Token<CommonTokenType>.Name"/> must be left empty.
+		/// The element Name is determined by the <see cref="SaxTokenType.ElementBegin"/> token.
+		/// Marks the end of the last object property as well as the object itself.
+		/// </remarks>
+		ElementEnd,
 
 		/// <summary>
 		/// Begin attribute, the token contains both the attribute Name and Value

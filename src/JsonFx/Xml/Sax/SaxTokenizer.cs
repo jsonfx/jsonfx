@@ -238,7 +238,7 @@ namespace JsonFx.Xml.Sax
 				return;
 			}
 
-			Token<SaxTokenType> unparsed = this.ScanUnparsedTag(scanner);
+			Token<SaxTokenType> unparsed = this.ScanUnparsedBlock(scanner);
 			if (unparsed != null)
 			{
 				tokens.Add(unparsed);
@@ -307,67 +307,153 @@ namespace JsonFx.Xml.Sax
 			this.EmitTag(tokens, tagType, tagName, attributes);
 		}
 
-		private Token<SaxTokenType> ScanUnparsedTag(ITextStream scanner)
+		private Token<SaxTokenType> ScanUnparsedBlock(ITextStream scanner)
 		{
 			char ch = scanner.Peek();
 			switch (ch)
 			{
-				case SaxGrammar.OperatorCode:
-				{
-					// "<%--", "--%>"	// ASP/JSP-style code comment
-					// "<%@",  "%>"		// ASP/JSP directive
-					// "<%=",  "%>"		// ASP/JSP/JBST expression
-					// "<%!",  "%>"		// JSP/JBST declaration
-					// "<%#",  "%>"		// ASP.NET/JBST databind expression
-					// "<%$",  "%>"		// ASP.NET/JBST extension
-					// "<%",   "%>"		// ASP code block / JSP scriptlet
-					if (SaxGrammar.OperatorCode != scanner.Pop())
-					{
-						throw new DeserializationException(
-							"Expected code block",
-							scanner.Index,
-							scanner.Line,
-							scanner.Column);
-					}
-
-					// TODO: scan code block
-					throw new NotImplementedException("scan code block");
-				}
 				case SaxGrammar.OperatorComment:
 				{
-					// "<!--", "-->"		// HTML/XML/SGML comment
-					// "<![CDATA[", "]]>"	// CDATA section
-					// "<!", ">"			// SGML declaration (e.g. DOCTYPE or SSI)
-					if (SaxGrammar.OperatorComment != scanner.Pop())
+					// consume '!'
+					scanner.Pop();
+
+					// "<!--", "-->"		// XML/HTML/SGML comment
+					string comment = this.ScanUnparsedValue(scanner, SaxGrammar.OperatorCommentBegin, SaxGrammar.OperatorCommentEnd);
+					if (comment != null)
 					{
-						throw new DeserializationException(
-							"Expected comment",
-							scanner.Index,
-							scanner.Line,
-							scanner.Column);
+						// emit as an unparsed comment
+						return SaxGrammar.Unparsed(String.Concat(SaxGrammar.OperatorComment, SaxGrammar.OperatorCommentBegin), comment);
 					}
 
-					// TODO: scan comment
-					throw new NotImplementedException("scan comment");
+					// "<![CDATA[", "]]>"	// CDATA section
+					comment = this.ScanUnparsedValue(scanner, SaxGrammar.OperatorCDataBegin, SaxGrammar.OperatorCDataEnd);
+					if (comment != null)
+					{
+						// convert CData to text
+						return SaxGrammar.TokenText(comment);
+					}
+
+					// "<!", ">"			// SGML declaration (e.g. DOCTYPE or SSI)
+					return SaxGrammar.Unparsed(
+						Char.ToString(SaxGrammar.OperatorComment),
+						this.ScanUnparsedValue(scanner, String.Empty, String.Empty));
 				}
 				case SaxGrammar.OperatorProcessingInstruction:
 				{
-					// "<?", "?>"	// XML processing instruction (e.g. XML declaration)
-					if (SaxGrammar.OperatorProcessingInstruction != scanner.Pop())
-					{
-						throw new DeserializationException(
-							"Expected processing instruction",
-							scanner.Index,
-							scanner.Line,
-							scanner.Column);
-					}
+					// consume '?'
+					scanner.Pop();
 
-					// TODO: scan processing instruction
-					throw new NotImplementedException("scan processing instruction");
+					// "<?", "?>"	// XML processing instruction (e.g. XML declaration)
+					return SaxGrammar.Unparsed(
+						Char.ToString(SaxGrammar.OperatorProcessingInstruction),
+						this.ScanUnparsedValue(scanner, String.Empty, Char.ToString(SaxGrammar.OperatorProcessingInstruction)));
+				}
+				case SaxGrammar.OperatorCode:
+				{
+					// consume '%'
+					scanner.Pop();
+					ch = scanner.Peek();
+
+					switch (ch)
+					{
+						case SaxGrammar.OperatorCommentDelim:		// "<%--", "--%>"	ASP/JSP-style code comment
+						{
+							return SaxGrammar.Unparsed(
+								String.Concat(SaxGrammar.OperatorCode, SaxGrammar.OperatorCommentBegin),
+								this.ScanUnparsedValue(scanner, SaxGrammar.OperatorCommentBegin, String.Concat(SaxGrammar.OperatorCommentEnd, SaxGrammar.OperatorCode)));
+						}
+						case SaxGrammar.OperatorCodeDirective:		// "<%@",  "%>"		ASP/JSP directive
+						case SaxGrammar.OperatorCodeExpression:		// "<%=",  "%>"		ASP/JSP/JBST expression
+						case SaxGrammar.OperatorCodeDeclaration:	// "<%!",  "%>"		JSP/JBST declaration
+						case SaxGrammar.OperatorCodeDataBind:		// "<%#",  "%>"		ASP.NET/JBST databind expression
+						case SaxGrammar.OperatorCodeExtension:		// "<%$",  "%>"		ASP.NET/JBST extension
+						{
+							// consume code block type char
+							scanner.Pop();
+
+							return SaxGrammar.Unparsed(
+								String.Concat(SaxGrammar.OperatorCode, ch),
+								this.ScanUnparsedValue(scanner, String.Empty, Char.ToString(SaxGrammar.OperatorCode)));
+						}
+						default:									// "<%",   "%>"		ASP code block / JSP scriptlet
+						{
+							// simple code block
+							return SaxGrammar.Unparsed(
+								Char.ToString(SaxGrammar.OperatorCode),
+								this.ScanUnparsedValue(scanner, String.Empty, Char.ToString(SaxGrammar.OperatorCode)));
+						}
+					}
 				}
 			}
 
+			// none matched
 			return null;
+		}
+
+		private string ScanUnparsedValue(ITextStream scanner, string begin, string end)
+		{
+			char ch = scanner.Peek();
+
+			int beginLength = begin.Length;
+			for (int i=0; i<beginLength; i++)
+			{
+				if (!scanner.IsCompleted &&
+					ch == begin[i])
+				{
+					scanner.Pop();
+					ch = scanner.Peek();
+					continue;
+				}
+
+				if (i == 0)
+				{
+					// didn't match anything but didn't consume either
+					return null;
+				}
+
+				throw new DeserializationException(
+					"Unrecognized unparsed tag",
+					scanner.Index,
+					scanner.Line,
+					scanner.Column);
+			}
+
+			end += SaxGrammar.OperatorElementEnd;
+
+			int endLength = end.Length;
+			for (int i=0; !scanner.IsCompleted && i<endLength; )
+			{
+				if (ch == end[i])
+				{
+					i++;
+				}
+				else
+				{
+					i = 0;
+				}
+
+				scanner.Pop();
+				ch = scanner.Peek();
+			}
+
+			if (scanner.IsCompleted)
+			{
+				throw new DeserializationException(
+					"Unexpected end of file",
+					scanner.Index,
+					scanner.Line,
+					scanner.Column);
+			}
+
+			string value = scanner.EndChunk();
+
+			// consume '>'
+			scanner.Pop();
+
+			// trim ending delimiter
+			value = value.Remove(value.Length-endLength);
+
+			return value;
 		}
 
 		private Token<SaxTokenType> ScanAttributeValue(ITextStream scanner)
@@ -395,7 +481,7 @@ namespace JsonFx.Xml.Sax
 				if (ch == SaxGrammar.OperatorElementBegin)
 				{
 					scanner.Pop();
-					Token<SaxTokenType> unparsed = this.ScanUnparsedTag(scanner);
+					Token<SaxTokenType> unparsed = this.ScanUnparsedBlock(scanner);
 					if (unparsed != null)
 					{
 						ch = scanner.Peek();
@@ -460,7 +546,7 @@ namespace JsonFx.Xml.Sax
 				if (stringDelim == SaxGrammar.OperatorElementBegin)
 				{
 					scanner.Pop();
-					Token<SaxTokenType> unparsed = this.ScanUnparsedTag(scanner);
+					Token<SaxTokenType> unparsed = this.ScanUnparsedBlock(scanner);
 					if (unparsed != null)
 					{
 						return unparsed;

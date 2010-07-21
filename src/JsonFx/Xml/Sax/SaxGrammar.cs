@@ -80,6 +80,11 @@ namespace JsonFx.Xml.Sax
 
 		public static readonly Token<SaxTokenType> TokenNone = new Token<SaxTokenType>(SaxTokenType.None);
 
+		public static Token<SaxTokenType> Unparsed(string name, string text)
+		{
+			return new Token<SaxTokenType>(SaxTokenType.UnparsedBlock, new DataName(name), text);
+		}
+
 		public static Token<SaxTokenType> TokenPrefixBegin(string prefix, string namespaceUri)
 		{
 			return new Token<SaxTokenType>(SaxTokenType.PrefixBegin, new DataName(prefix, namespaceUri));
