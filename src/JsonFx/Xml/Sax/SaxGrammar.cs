@@ -58,11 +58,21 @@ namespace JsonFx.Xml.Sax
 		public const char OperatorEntityHexAlt = 'X';
 		public const char OperatorEntityEnd = ';';
 
-		public const string OperatorCommentBegin = "<!--";
-		public const string OperatorCommentEnd = "-->";
+		public const char OperatorComment = '!';
+		public const char OperatorCommentDelim = '-';
+		public const string OperatorCommentBegin = "--";
+		public const string OperatorCommentEnd = "--";
+		public const string OperatorCDataBegin = "[CDATA[";
+		public const string OperatorCDataEnd = "]]";
 
-		public const string OperatorCDataStart = "<![CDATA[";
-		public const string OperatorCDataEnd = "]]>";
+		public const char OperatorProcessingInstruction = '?';
+
+		public const char OperatorCode = '%';
+		public const char OperatorCodeDirective = '@';
+		public const char OperatorCodeExpression = '=';
+		public const char OperatorCodeDeclaration = '!';
+		public const char OperatorCodeDataBind = '#';
+		public const char OperatorCodeExtension = '$';
 
 		#endregion Operators
 

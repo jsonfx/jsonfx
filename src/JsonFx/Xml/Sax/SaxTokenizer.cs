@@ -220,32 +220,6 @@ namespace JsonFx.Xml.Sax
 			this.EmitText(tokens, scanner.EndChunk());
 		}
 
-		private void EmitText(List<Token<SaxTokenType>> tokens, string value)
-		{
-			if (String.IsNullOrEmpty(value))
-			{
-				return;
-			}
-
-			//Token<SaxTokenType> token = (tokens.Count > 0) ? tokens[tokens.Count-1] : null;
-			//if (token != null &&
-			//    token.TokenType == SaxTokenType.TextValue)
-			//{
-			//    // concat onto previous token
-			//    tokens[tokens.Count-1] = SaxGrammar.TokenText(token.ValueAsString()+value);
-			//    return;
-			//}
-
-			if (SaxTokenizer.IsNullOrWhiteSpace(value))
-			{
-				tokens.Add(SaxGrammar.TokenWhitespace(value));
-			}
-			else
-			{
-				tokens.Add(SaxGrammar.TokenText(value));
-			}
-		}
-
 		private void ScanTag(List<Token<SaxTokenType>> tokens, ITextStream scanner)
 		{
 			if (scanner.Pop() != SaxGrammar.OperatorElementBegin)
@@ -338,195 +312,38 @@ namespace JsonFx.Xml.Sax
 			char ch = scanner.Peek();
 			switch (ch)
 			{
-				case '%':
+				case SaxGrammar.OperatorCode:
 				{
 					// "<%--", "--%>"	// ASP/JSP-style code comment
-					// "<%@", "%>"		// ASP/JSP directive
-					// "<%=", "%>"		// ASP/JSP/JBST expression
-					// "<%!", "%>"		// JSP/JBST declaration
-					// "<%#", "%>"		// ASP.NET/JBST databind expression
-					// "<%$", "%>"		// ASP.NET/JBST expression
-					// "<%", "%>"		// ASP wrapper / JSP scriptlet
-					throw new NotImplementedException("code block");
+					// "<%@",  "%>"		// ASP/JSP directive
+					// "<%=",  "%>"		// ASP/JSP/JBST expression
+					// "<%!",  "%>"		// JSP/JBST declaration
+					// "<%#",  "%>"		// ASP.NET/JBST databind expression
+					// "<%$",  "%>"		// ASP.NET/JBST extension
+					// "<%",   "%>"		// ASP code block / JSP scriptlet
+
+					// TODO: scan code block
+					throw new NotImplementedException("scan code block");
 				}
-				case '!':
+				case SaxGrammar.OperatorComment:
 				{
 					// "<!--", "-->"		// HTML/XML/SGML comment
 					// "<![CDATA[", "]]>"	// CDATA section
-					// SGML processing instruction (e.g. DOCTYPE or SSI)
-					throw new NotImplementedException("SGML comment");
+					// "<!", ">"			// SGML declaration (e.g. DOCTYPE or SSI)
+
+					// TODO: scan comment
+					throw new NotImplementedException("scan comment");
 				}
-				case '?':
+				case SaxGrammar.OperatorProcessingInstruction:
 				{
-					// "<?", ">"	// XML processing instruction (e.g. XML declaration)
-					throw new NotImplementedException("XML processing instruction");
+					// "<?", "?>"	// XML processing instruction (e.g. XML declaration)
+
+					// TODO: scan processing instruction
+					throw new NotImplementedException("scan processing instruction");
 				}
 			}
 
 			return null;
-		}
-
-		private bool IsTagComplete(
-			ITextStream scanner,
-			ref TagType tagType)
-		{
-			if (scanner.IsCompleted)
-			{
-				throw new DeserializationException(
-					"Unexpected end of file",
-					scanner.Index,
-					scanner.Line,
-					scanner.Column);
-			}
-
-			SaxTokenizer.SkipWhitespace(scanner);
-
-			switch (scanner.Peek())
-			{
-				case SaxGrammar.OperatorElementClose:
-				{
-					scanner.Pop();
-					if (scanner.Peek() == SaxGrammar.OperatorElementEnd)
-					{
-						if (tagType != TagType.BeginTag)
-						{
-							if (this.strictMode)
-							{
-								throw new DeserializationException(
-									"Malformed element tag",
-									scanner.Index,
-									scanner.Line,
-									scanner.Column);
-							}
-						}
-
-						scanner.Pop();
-						tagType = TagType.VoidTag;
-						return true;
-					}
-
-					if (this.strictMode)
-					{
-						throw new DeserializationException(
-							"Malformed element tag",
-							scanner.Index,
-							scanner.Line,
-							scanner.Column);
-					}
-
-					throw new NotImplementedException("Error recovery");
-				}
-				case SaxGrammar.OperatorElementEnd:
-				{
-					scanner.Pop();
-					return true;
-				}
-				default:
-				{
-					return false;
-				}
-			}
-		}
-
-		private void EmitUnparsedTag(List<Token<SaxTokenType>> tokens, string unparsed)
-		{
-			throw new NotImplementedException("emit unparsed tag");
-		}
-
-		private void EmitTag(List<Token<SaxTokenType>> tokens, TagType tagType, SaxQName qName, List<SaxAttribute> attributes)
-		{
-			PrefixScopeChain.Scope scope;
-
-			if (tagType == TagType.EndTag)
-			{
-				DataName closeTagName = new DataName(qName.Name, this.ScopeChain.Resolve(qName.Prefix));
-				scope = this.ScopeChain.Pop();
-
-				if (scope.TagName != closeTagName)
-				{
-					if (this.strictMode)
-					{
-						throw new DeserializationException(
-							String.Format("Tag not balanced: {0}", closeTagName),
-							this.Index,
-							this.Line,
-							this.Column);
-					}
-
-					throw new NotImplementedException("Auto tag balancing");
-				}
-
-				tokens.Add(SaxGrammar.TokenElementEnd(scope.TagName));
-
-				foreach (var mapping in scope)
-				{
-					tokens.Add(SaxGrammar.TokenPrefixEnd(mapping.Key, mapping.Value));
-				}
-				return;
-			}
-
-			scope = new PrefixScopeChain.Scope();
-
-			if (attributes != null)
-			{
-				// search in reverse removing xmlns attributes
-				for (int i=attributes.Count-1; i>=0; i--)
-				{
-					var attribute = attributes[i];
-
-					if (String.IsNullOrEmpty(attribute.QName.Prefix))
-					{
-						if (attribute.QName.Name == "xmlns")
-						{
-							// begin tracking new default namespace
-							scope[String.Empty] = attribute.Value;
-							attributes.RemoveAt(i);
-							continue;
-						}
-
-					}
-
-					if (attribute.QName.Prefix == "xmlns")
-					{
-						scope[attribute.QName.Name] = attribute.Value;
-						attributes.RemoveAt(i);
-						continue;
-					}
-				}
-			}
-
-			// add to scope chain, resolve QName, and store tag name
-			this.ScopeChain.Push(scope);
-			scope.TagName = new DataName(qName.Name, this.ScopeChain.Resolve(qName.Prefix));
-
-			foreach (var mapping in scope)
-			{
-				tokens.Add(SaxGrammar.TokenPrefixBegin(mapping.Key, mapping.Value));
-			}
-
-			tokens.Add(SaxGrammar.TokenElementBegin(scope.TagName));
-
-			if (attributes != null)
-			{
-				foreach (var attr in attributes)
-				{
-					DataName attrName = new DataName(attr.QName.Name, this.ScopeChain.Resolve(attr.QName.Prefix));
-					tokens.Add(SaxGrammar.TokenAttribute(attrName, attr.Value));
-				}
-			}
-
-			if (tagType == TagType.VoidTag)
-			{
-				// immediately remove from scope chain
-				this.ScopeChain.Pop();
-
-				tokens.Add(SaxGrammar.TokenElementEnd(scope.TagName));
-
-				foreach (var mapping in scope)
-				{
-					tokens.Add(SaxGrammar.TokenPrefixEnd(mapping.Key, mapping.Value));
-				}
-			}
 		}
 
 		private string ScanAttributeValue(ITextStream scanner)
@@ -677,6 +494,189 @@ namespace JsonFx.Xml.Sax
 			return qName;
 		}
 
+		private bool IsTagComplete(
+			ITextStream scanner,
+			ref TagType tagType)
+		{
+			if (scanner.IsCompleted)
+			{
+				throw new DeserializationException(
+					"Unexpected end of file",
+					scanner.Index,
+					scanner.Line,
+					scanner.Column);
+			}
+
+			SaxTokenizer.SkipWhitespace(scanner);
+
+			switch (scanner.Peek())
+			{
+				case SaxGrammar.OperatorElementClose:
+				{
+					scanner.Pop();
+					if (scanner.Peek() == SaxGrammar.OperatorElementEnd)
+					{
+						if (tagType != TagType.BeginTag)
+						{
+							if (this.strictMode)
+							{
+								throw new DeserializationException(
+									"Malformed element tag",
+									scanner.Index,
+									scanner.Line,
+									scanner.Column);
+							}
+						}
+
+						scanner.Pop();
+						tagType = TagType.VoidTag;
+						return true;
+					}
+
+					if (this.strictMode)
+					{
+						throw new DeserializationException(
+							"Malformed element tag",
+							scanner.Index,
+							scanner.Line,
+							scanner.Column);
+					}
+
+					// TODO: error recovery
+					throw new NotImplementedException("error recovery");
+				}
+				case SaxGrammar.OperatorElementEnd:
+				{
+					scanner.Pop();
+					return true;
+				}
+				default:
+				{
+					return false;
+				}
+			}
+		}
+
+		private void EmitTag(List<Token<SaxTokenType>> tokens, TagType tagType, SaxQName qName, List<SaxAttribute> attributes)
+		{
+			PrefixScopeChain.Scope scope;
+
+			if (tagType == TagType.EndTag)
+			{
+				DataName closeTagName = new DataName(qName.Name, this.ScopeChain.Resolve(qName.Prefix));
+				scope = this.ScopeChain.Pop();
+
+				if (scope.TagName != closeTagName)
+				{
+					if (this.strictMode)
+					{
+						throw new DeserializationException(
+							String.Format("Tag not balanced: {0}", closeTagName),
+							this.Index,
+							this.Line,
+							this.Column);
+					}
+
+					// TODO: auto tag balancing
+					throw new NotImplementedException("auto tag balancing");
+				}
+
+				tokens.Add(SaxGrammar.TokenElementEnd(scope.TagName));
+
+				foreach (var mapping in scope)
+				{
+					tokens.Add(SaxGrammar.TokenPrefixEnd(mapping.Key, mapping.Value));
+				}
+				return;
+			}
+
+			scope = new PrefixScopeChain.Scope();
+
+			if (attributes != null)
+			{
+				// search in reverse removing xmlns attributes
+				for (int i=attributes.Count-1; i>=0; i--)
+				{
+					var attribute = attributes[i];
+
+					if (String.IsNullOrEmpty(attribute.QName.Prefix))
+					{
+						if (attribute.QName.Name == "xmlns")
+						{
+							// begin tracking new default namespace
+							scope[String.Empty] = attribute.Value;
+							attributes.RemoveAt(i);
+							continue;
+						}
+
+					}
+
+					if (attribute.QName.Prefix == "xmlns")
+					{
+						scope[attribute.QName.Name] = attribute.Value;
+						attributes.RemoveAt(i);
+						continue;
+					}
+				}
+			}
+
+			// add to scope chain, resolve QName, and store tag name
+			this.ScopeChain.Push(scope);
+			scope.TagName = new DataName(qName.Name, this.ScopeChain.Resolve(qName.Prefix));
+
+			foreach (var mapping in scope)
+			{
+				tokens.Add(SaxGrammar.TokenPrefixBegin(mapping.Key, mapping.Value));
+			}
+
+			tokens.Add(SaxGrammar.TokenElementBegin(scope.TagName));
+
+			if (attributes != null)
+			{
+				foreach (var attr in attributes)
+				{
+					DataName attrName = new DataName(attr.QName.Name, this.ScopeChain.Resolve(attr.QName.Prefix));
+					tokens.Add(SaxGrammar.TokenAttribute(attrName, attr.Value));
+				}
+			}
+
+			if (tagType == TagType.VoidTag)
+			{
+				// immediately remove from scope chain
+				this.ScopeChain.Pop();
+
+				tokens.Add(SaxGrammar.TokenElementEnd(scope.TagName));
+
+				foreach (var mapping in scope)
+				{
+					tokens.Add(SaxGrammar.TokenPrefixEnd(mapping.Key, mapping.Value));
+				}
+			}
+		}
+
+		private void EmitUnparsedTag(List<Token<SaxTokenType>> tokens, string unparsed)
+		{
+			// TODO: emit unparsed tag
+			throw new NotImplementedException("emit unparsed tag");
+		}
+
+		private void EmitText(List<Token<SaxTokenType>> tokens, string value)
+		{
+			if (String.IsNullOrEmpty(value))
+			{
+				return;
+			}
+
+			if (SaxTokenizer.IsNullOrWhiteSpace(value))
+			{
+				tokens.Add(SaxGrammar.TokenWhitespace(value));
+			}
+			else
+			{
+				tokens.Add(SaxGrammar.TokenText(value));
+			}
+		}
+
 		#endregion Scanning Methods
 
 		#region Utility Methods
@@ -813,6 +813,11 @@ namespace JsonFx.Xml.Sax
 			return entity;
 		}
 
+		/// <summary>
+		/// Decodes most known named entities
+		/// </summary>
+		/// <param name="name"></param>
+		/// <returns></returns>
 		private static string DecodeEntityName(string name)
 		{
 			// http://www.w3.org/TR/REC-html40/sgml/entities.html
@@ -1077,7 +1082,7 @@ namespace JsonFx.Xml.Sax
 		}
 
 		/// <summary>
-		/// 
+		/// Checks for element start char
 		/// </summary>
 		/// <param name="ch"></param>
 		/// <returns></returns>
@@ -1106,7 +1111,7 @@ namespace JsonFx.Xml.Sax
 		}
 
 		/// <summary>
-		/// 
+		/// Checks for element name char
 		/// </summary>
 		/// <param name="ch"></param>
 		/// <returns></returns>
