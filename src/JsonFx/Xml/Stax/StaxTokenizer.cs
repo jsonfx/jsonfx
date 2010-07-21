@@ -140,13 +140,32 @@ namespace JsonFx.Xml.Stax
 		private const int DefaultBufferSize = 0x20;
 
 		private ITextStream Scanner = TextReaderStream.Null;
-		private bool strictMode = true;
+		private bool autoBalanceTags;
+		private bool errorRecovery;
 
 		private PrefixScopeChain ScopeChain = new PrefixScopeChain();
 
 		#endregion Fields
 
 		#region Properties
+
+		/// <summary>
+		/// Gets and sets a value indicating if should attempt to auto-balance mismatched tags.
+		/// </summary>
+		public bool AutoBalanceTags
+		{
+			get { return this.autoBalanceTags; }
+			set { this.autoBalanceTags = value; }
+		}
+
+		/// <summary>
+		/// Gets and sets a value indicating if should attempt parse error recovery
+		/// </summary>
+		public bool ErrorRecovery
+		{
+			get { return this.errorRecovery; }
+			set { this.errorRecovery = value; }
+		}
 
 		/// <summary>
 		/// Gets the total number of characters read from the input
@@ -178,45 +197,83 @@ namespace JsonFx.Xml.Stax
 
 		private void GetTokens(List<Token<StaxTokenType>> tokens, ITextStream scanner)
 		{
-			scanner.BeginChunk();
-			while (!scanner.IsCompleted)
+			try
 			{
-				switch (scanner.Peek())
+				scanner.BeginChunk();
+				while (!scanner.IsCompleted)
 				{
-					case StaxGrammar.OperatorElementBegin:
+					switch (scanner.Peek())
 					{
-						// emit any leading text
-						this.EmitText(tokens, scanner.EndChunk());
+						case StaxGrammar.OperatorElementBegin:
+						{
+							// emit any leading text
+							this.EmitText(tokens, scanner.EndChunk());
 
-						// process tag
-						this.ScanTag(tokens, scanner);
+							// process tag
+							this.ScanTag(tokens, scanner);
 
-						// resume chunking and capture
-						scanner.BeginChunk();
-						break;
+							// resume chunking and capture
+							scanner.BeginChunk();
+							break;
+						}
+						case StaxGrammar.OperatorEntityBegin:
+						{
+							// emit any leading text
+							this.EmitText(tokens, scanner.EndChunk());
+
+							// process entity
+							this.EmitText(tokens, this.DecodeEntity(scanner));
+
+							// resume chunking and capture
+							scanner.BeginChunk();
+							break;
+						}
+						default:
+						{
+							scanner.Pop();
+							break;
+						}
 					}
-					case StaxGrammar.OperatorEntityBegin:
+				}
+
+				// emit any trailing text
+				this.EmitText(tokens, scanner.EndChunk());
+
+				if (this.ScopeChain.HasScope)
+				{
+					if (!this.errorRecovery)
 					{
-						// emit any leading text
-						this.EmitText(tokens, scanner.EndChunk());
-
-						// process entity
-						this.EmitText(tokens, this.DecodeEntity(scanner));
-
-						// resume chunking and capture
-						scanner.BeginChunk();
-						break;
+						throw new DeserializationException(
+							"Unclosed elements",
+							scanner.Index,
+							scanner.Line,
+							scanner.Column);
 					}
-					default:
+
+					if (this.autoBalanceTags)
 					{
-						scanner.Pop();
-						break;
+						while (this.ScopeChain.HasScope)
+						{
+							PrefixScopeChain.Scope scope = this.ScopeChain.Pop();
+
+							tokens.Add(StaxGrammar.TokenElementEnd(scope.TagName));
+							foreach (var mapping in scope)
+							{
+								tokens.Add(StaxGrammar.TokenPrefixEnd(mapping.Key, mapping.Value));
+							}
+
+						}
 					}
 				}
 			}
-
-			// emit any trailing text
-			this.EmitText(tokens, scanner.EndChunk());
+			catch (DeserializationException)
+			{
+				throw;
+			}
+			catch (Exception ex)
+			{
+				throw new DeserializationException(ex.Message, scanner.Index, scanner.Line, scanner.Column, ex);
+			}
 		}
 
 		private void ScanTag(List<Token<StaxTokenType>> tokens, ITextStream scanner)
@@ -229,7 +286,7 @@ namespace JsonFx.Xml.Stax
 			if (scanner.IsCompleted)
 			{
 				// end of file
-				if (this.strictMode)
+				if (!this.errorRecovery)
 				{
 					throw new DeserializationException("Unexpected end of file", scanner.Index, scanner.Line, scanner.Column);
 				}
@@ -256,7 +313,7 @@ namespace JsonFx.Xml.Stax
 			StaxQName tagName = StaxTokenizer.ScanQName(scanner);
 			if (tagName == null)
 			{
-				if (this.strictMode)
+				if (!this.errorRecovery)
 				{
 					throw new DeserializationException(
 						"Maltformed element name",
@@ -690,14 +747,11 @@ namespace JsonFx.Xml.Stax
 					{
 						if (tagType != TagType.BeginTag)
 						{
-							if (this.strictMode)
-							{
-								throw new DeserializationException(
-									"Malformed element tag",
-									scanner.Index,
-									scanner.Line,
-									scanner.Column);
-							}
+							throw new DeserializationException(
+								"Malformed element tag",
+								scanner.Index,
+								scanner.Line,
+								scanner.Column);
 						}
 
 						scanner.Pop();
@@ -705,17 +759,11 @@ namespace JsonFx.Xml.Stax
 						return true;
 					}
 
-					if (this.strictMode)
-					{
-						throw new DeserializationException(
-							"Malformed element tag",
-							scanner.Index,
-							scanner.Line,
-							scanner.Column);
-					}
-
-					// TODO: error recovery
-					throw new NotImplementedException("error recovery");
+					throw new DeserializationException(
+						"Malformed element tag",
+						scanner.Index,
+						scanner.Line,
+						scanner.Column);
 				}
 				case StaxGrammar.OperatorElementEnd:
 				{
@@ -735,33 +783,67 @@ namespace JsonFx.Xml.Stax
 
 			if (tagType == TagType.EndTag)
 			{
-				DataName closeTagName = new DataName(qName.Name, this.ScopeChain.Resolve(qName.Prefix));
-				scope = this.ScopeChain.Pop();
+				DataName closeTagName = new DataName(qName.Name, this.ScopeChain.Resolve(qName.Prefix, !this.errorRecovery));
 
-				if (scope.TagName != closeTagName)
+				scope = this.ScopeChain.Pop();
+				if (scope == null ||
+					scope.TagName != closeTagName)
 				{
-					if (this.strictMode)
+					if (!this.errorRecovery)
 					{
+						// restore scope item
+						if (scope != null)
+						{
+							this.ScopeChain.Push(scope);
+						}
+
 						throw new DeserializationException(
-							String.Format("Tag not balanced: {0}", closeTagName),
+							String.Format("Element close tag ({0}) does not match open tag ({1}).", closeTagName, (scope != null) ? scope.TagName : DataName.Empty),
 							this.Index,
 							this.Line,
 							this.Column);
 					}
 
-					// TODO: auto tag balancing
-					throw new NotImplementedException("auto tag balancing");
+					if (!this.autoBalanceTags)
+					{
+						// restore scope item
+						if (scope != null)
+						{
+							this.ScopeChain.Push(scope);
+						}
+
+						// no known scope to end prefixes but can close element
+						tokens.Add(StaxGrammar.TokenElementEnd(closeTagName));
+						return;
+					}
+
+					if (!this.ScopeChain.Contains(closeTagName))
+					{
+						// restore scope item
+						if (scope != null)
+						{
+							this.ScopeChain.Push(scope);
+						}
+
+						// auto-balance just ignores extraneous close tags
+						return;
+					}
 				}
 
-				tokens.Add(StaxGrammar.TokenElementEnd(scope.TagName));
-
-				foreach (var mapping in scope)
+				do
 				{
-					tokens.Add(StaxGrammar.TokenPrefixEnd(mapping.Key, mapping.Value));
-				}
+					tokens.Add(StaxGrammar.TokenElementEnd(scope.TagName));
+					foreach (var mapping in scope)
+					{
+						tokens.Add(StaxGrammar.TokenPrefixEnd(mapping.Key, mapping.Value));
+					}
+
+				} while (scope.TagName != closeTagName &&
+					(scope = this.ScopeChain.Pop()) != null);
 				return;
 			}
 
+			// create new element scope
 			scope = new PrefixScopeChain.Scope();
 
 			if (attributes != null)
@@ -802,7 +884,7 @@ namespace JsonFx.Xml.Stax
 
 			// add to scope chain, resolve QName, and store tag name
 			this.ScopeChain.Push(scope);
-			scope.TagName = new DataName(qName.Name, this.ScopeChain.Resolve(qName.Prefix));
+			scope.TagName = new DataName(qName.Name, this.ScopeChain.Resolve(qName.Prefix, !this.errorRecovery));
 
 			foreach (var mapping in scope)
 			{
@@ -815,7 +897,7 @@ namespace JsonFx.Xml.Stax
 			{
 				foreach (var attr in attributes)
 				{
-					DataName attrName = new DataName(attr.QName.Name, this.ScopeChain.Resolve(attr.QName.Prefix));
+					DataName attrName = new DataName(attr.QName.Name, this.ScopeChain.Resolve(attr.QName.Prefix, !this.errorRecovery));
 					tokens.Add(StaxGrammar.TokenAttribute(attrName));
 					tokens.Add(attr.Value);
 				}

@@ -165,6 +165,11 @@ namespace JsonFx.Xml.Stax
 			get { return this.Chain.Count; }
 		}
 
+		public bool HasScope
+		{
+			get { return (this.Chain.Count > 0); }
+		}
+
 		#endregion Properties
 
 		#region Methods
@@ -221,7 +226,7 @@ namespace JsonFx.Xml.Stax
 		/// </summary>
 		/// <param name="prefix"></param>
 		/// <returns></returns>
-		public string Resolve(string prefix)
+		public string Resolve(string prefix, bool throwOnUndeclared)
 		{
 			if (prefix == null)
 			{
@@ -229,9 +234,30 @@ namespace JsonFx.Xml.Stax
 			}
 
 			// find the last scope in chain that resolves prefix
-			Scope scope = this.Chain.FindLast(m => m.ContainsPrefix(prefix));
+			Scope scope = this.Chain.FindLast(item => item.ContainsPrefix(prefix));
+			if (scope == null &&
+				!String.IsNullOrEmpty(prefix))
+			{
+				if (throwOnUndeclared)
+				{
+					throw new InvalidOperationException(
+						String.Format("Unknown scope prefix ({0})", prefix));
+				}
+
+				scope = this.Chain.FindLast(item => item.ContainsPrefix(String.Empty));
+			}
 
 			return (scope != null) ? scope[prefix] : null;
+		}
+
+		/// <summary>
+		/// Checks if the matching begin tag exists on the stack
+		/// </summary>
+		/// <returns></returns>
+		public bool Contains(DataName closeTag)
+		{
+			int index = this.Chain.FindLastIndex(item => item.TagName == closeTag);
+			return (index >= 0);
 		}
 
 		#endregion Methods

@@ -252,6 +252,51 @@ namespace JsonFx.Xml.Stax
 			Assert.Equal(expected, actual);
 		}
 
+		[Fact]
+		public void GetTokens_UndeclaredPrefixesErrorRecovery_ReturnsAsDefault()
+		{
+			const string input = @"<a:one><b:two><c:three></d:three></e:two></f:one>";
+			var expected = new[]
+			    {
+			        StaxGrammar.TokenElementBegin(new DataName("one")),
+			        StaxGrammar.TokenElementBegin(new DataName("two")),
+			        StaxGrammar.TokenElementBegin(new DataName("three")),
+			        StaxGrammar.TokenElementEnd(new DataName("three")),
+			        StaxGrammar.TokenElementEnd(new DataName("two")),
+			        StaxGrammar.TokenElementEnd(new DataName("one"))
+			    };
+
+			var tokenizer = new StaxTokenizer { ErrorRecovery=false };
+
+			DeserializationException ex = Assert.Throws<DeserializationException>(
+				delegate()
+				{
+					var actual = tokenizer.GetTokens(input).ToArray();
+				});
+
+			Assert.Equal(6, ex.Index);
+		}
+
+		[Fact]
+		public void GetTokens_UndeclaredPrefixes_ReturnsAsDefault()
+		{
+			const string input = @"<a:one><b:two><c:three></d:three></e:two></f:one>";
+			var expected = new[]
+			    {
+			        StaxGrammar.TokenElementBegin(new DataName("one")),
+			        StaxGrammar.TokenElementBegin(new DataName("two")),
+			        StaxGrammar.TokenElementBegin(new DataName("three")),
+			        StaxGrammar.TokenElementEnd(new DataName("three")),
+			        StaxGrammar.TokenElementEnd(new DataName("two")),
+			        StaxGrammar.TokenElementEnd(new DataName("one"))
+			    };
+
+			var tokenizer = new StaxTokenizer { ErrorRecovery=true };
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
 		#endregion Namespace Tests
 
 		#region Simple Attribute Tests
@@ -693,10 +738,178 @@ namespace JsonFx.Xml.Stax
 			        StaxGrammar.TokenElementBegin(new DataName("root"))
 			    };
 
-			var tokenizer = new StaxTokenizer();
+			var tokenizer = new StaxTokenizer { ErrorRecovery=true };
 			var actual = tokenizer.GetTokens(input).ToArray();
 
-			// TODO: determine how this should be handled
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_UnclosedOpenTagAutoBalance_ReturnsSequence()
+		{
+			const string input = @"<root>";
+			var expected = new[]
+			    {
+			        StaxGrammar.TokenElementBegin(new DataName("root")),
+			        StaxGrammar.TokenElementEnd(new DataName("root"))
+			    };
+
+			var tokenizer = new StaxTokenizer { ErrorRecovery=true, AutoBalanceTags=true };
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_UnopenedCloseTag_ReturnsSequence()
+		{
+			const string input = @"</foo>";
+			var expected = new []
+				{
+					StaxGrammar.TokenElementEnd(new DataName("foo"))
+				};
+
+			var tokenizer = new StaxTokenizer { ErrorRecovery=true };
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_UnopenedCloseTagAutoBalance_ReturnsSequence()
+		{
+			const string input = @"</foo>";
+			var expected = new Token<StaxTokenType>[0];
+
+			var tokenizer = new StaxTokenizer { ErrorRecovery=true, AutoBalanceTags=true };
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_OverlappingTagsNoRecovery_ReturnsSequenceAsIs()
+		{
+			const string input = @"<odd><auto-closed><even></odd></ignored></even>";
+			var expected = new[]
+			    {
+			        StaxGrammar.TokenElementBegin(new DataName("odd")),
+			        StaxGrammar.TokenElementBegin(new DataName("auto-closed")),
+			        StaxGrammar.TokenElementBegin(new DataName("even")),
+			        StaxGrammar.TokenElementEnd(new DataName("odd")),
+			        StaxGrammar.TokenElementEnd(new DataName("ignored")),
+			        StaxGrammar.TokenElementEnd(new DataName("even"))
+			    };
+
+			var tokenizer = new StaxTokenizer { ErrorRecovery=false };
+
+			DeserializationException ex = Assert.Throws<DeserializationException>(
+				delegate()
+				{
+					var actual = tokenizer.GetTokens(input).ToArray();
+				});
+
+			Assert.Equal(29, ex.Index);
+		}
+
+		[Fact]
+		public void GetTokens_OverlappingTags_ReturnsSequenceAsIs()
+		{
+			const string input = @"<odd><auto-closed><even></odd></ignored></even>";
+			var expected = new[]
+			    {
+			        StaxGrammar.TokenElementBegin(new DataName("odd")),
+			        StaxGrammar.TokenElementBegin(new DataName("auto-closed")),
+			        StaxGrammar.TokenElementBegin(new DataName("even")),
+			        StaxGrammar.TokenElementEnd(new DataName("odd")),
+			        StaxGrammar.TokenElementEnd(new DataName("ignored")),
+			        StaxGrammar.TokenElementEnd(new DataName("even"))
+			    };
+
+			var tokenizer = new StaxTokenizer { ErrorRecovery=true };
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_OverlappingTagsAutoBalancing_ReturnsSequenceRebalanced()
+		{
+			const string input = @"<odd><auto-closed><even></odd></ignored></even>";
+			var expected = new[]
+			    {
+			        StaxGrammar.TokenElementBegin(new DataName("odd")),
+			        StaxGrammar.TokenElementBegin(new DataName("auto-closed")),
+			        StaxGrammar.TokenElementBegin(new DataName("even")),
+			        StaxGrammar.TokenElementEnd(new DataName("even")),
+			        StaxGrammar.TokenElementEnd(new DataName("auto-closed")),
+			        StaxGrammar.TokenElementEnd(new DataName("odd"))
+			    };
+
+			var tokenizer = new StaxTokenizer { ErrorRecovery=true, AutoBalanceTags=true };
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_OverlappingNamespacedTagsErrorRecovery_ReturnsSequenceAsIs()
+		{
+			const string input = @"<a:odd xmlns=""http://example.com/odd"" xmlns:a=""http://example.com/odd/a""><b:auto-closed xmlns=""http://example.com/auto-closed"" xmlns:b=""http://example.com/auto-closed/b""><c:even xmlns=""http://example.com/even"" xmlns:c=""http://example.com/even/c""></a:odd></d:ignored></c:even>";
+			var expected = new[]
+			    {
+			        StaxGrammar.TokenPrefixBegin("", "http://example.com/odd"),
+			        StaxGrammar.TokenPrefixBegin("a", "http://example.com/odd/a"),
+			        StaxGrammar.TokenElementBegin(new DataName("odd", "http://example.com/odd/a")),
+			        StaxGrammar.TokenPrefixBegin("", "http://example.com/auto-closed"),
+			        StaxGrammar.TokenPrefixBegin("b", "http://example.com/auto-closed/b"),
+			        StaxGrammar.TokenElementBegin(new DataName("auto-closed", "http://example.com/auto-closed/b")),
+			        StaxGrammar.TokenPrefixBegin("", "http://example.com/even"),
+			        StaxGrammar.TokenPrefixBegin("c", "http://example.com/even/c"),
+			        StaxGrammar.TokenElementBegin(new DataName("even", "http://example.com/even/c")),
+			        StaxGrammar.TokenElementEnd(new DataName("odd", "http://example.com/odd/a")),
+			        // NOTE: skips prefix ending for odd because can't know odd declared them
+			        StaxGrammar.TokenElementEnd(new DataName("ignored")),
+			        StaxGrammar.TokenElementEnd(new DataName("even", "http://example.com/even/c")),
+			        StaxGrammar.TokenPrefixEnd("", "http://example.com/even"),
+			        StaxGrammar.TokenPrefixEnd("c", "http://example.com/even/c")
+			    };
+
+			var tokenizer = new StaxTokenizer { ErrorRecovery=true };
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_OverlappingNamespacedTagsErrorRecoveryAutoBalancing_ReturnsSequenceAsIs()
+		{
+			const string input = @"<a:odd xmlns=""http://example.com/odd"" xmlns:a=""http://example.com/odd/a""><b:auto-closed xmlns=""http://example.com/auto-closed"" xmlns:b=""http://example.com/auto-closed/b""><c:even xmlns=""http://example.com/even"" xmlns:c=""http://example.com/even/c""></a:odd></d:ignored></c:even>";
+			var expected = new[]
+			    {
+			        StaxGrammar.TokenPrefixBegin("", "http://example.com/odd"),
+			        StaxGrammar.TokenPrefixBegin("a", "http://example.com/odd/a"),
+			        StaxGrammar.TokenElementBegin(new DataName("odd", "http://example.com/odd/a")),
+			        StaxGrammar.TokenPrefixBegin("", "http://example.com/auto-closed"),
+			        StaxGrammar.TokenPrefixBegin("b", "http://example.com/auto-closed/b"),
+			        StaxGrammar.TokenElementBegin(new DataName("auto-closed", "http://example.com/auto-closed/b")),
+			        StaxGrammar.TokenPrefixBegin("", "http://example.com/even"),
+			        StaxGrammar.TokenPrefixBegin("c", "http://example.com/even/c"),
+			        StaxGrammar.TokenElementBegin(new DataName("even", "http://example.com/even/c")),
+					StaxGrammar.TokenElementEnd(new DataName("even", "http://example.com/even/c")),
+			        StaxGrammar.TokenPrefixEnd("", "http://example.com/even"),
+			        StaxGrammar.TokenPrefixEnd("c", "http://example.com/even/c"),
+			        StaxGrammar.TokenElementEnd(new DataName("auto-closed", "http://example.com/auto-closed/b")),
+			        StaxGrammar.TokenPrefixEnd("", "http://example.com/auto-closed"),
+			        StaxGrammar.TokenPrefixEnd("b", "http://example.com/auto-closed/b"),
+			        StaxGrammar.TokenElementEnd(new DataName("odd", "http://example.com/odd/a")),
+					StaxGrammar.TokenPrefixEnd("", "http://example.com/odd"),
+			        StaxGrammar.TokenPrefixEnd("a", "http://example.com/odd/a"),
+			    };
+
+			var tokenizer = new StaxTokenizer { ErrorRecovery=true, AutoBalanceTags=true };
+			var actual = tokenizer.GetTokens(input).ToArray();
+
 			Assert.Equal(expected, actual);
 		}
 
