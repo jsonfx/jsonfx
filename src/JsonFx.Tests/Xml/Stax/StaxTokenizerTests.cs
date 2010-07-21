@@ -32,10 +32,10 @@ using System;
 using System.Linq;
 
 using JsonFx.Serialization;
+using JsonFx.Serialization.Resolvers;
 using Xunit;
 
 using Assert=JsonFx.AssertPatched;
-using JsonFx.Serialization.Resolvers;
 
 namespace JsonFx.Xml.Stax
 {
@@ -701,6 +701,235 @@ namespace JsonFx.Xml.Stax
 		}
 
 		#endregion Error Recovery Tests
+
+		#region Unparsed Block Tests Tests
+
+		[Fact]
+		public void GetTokens_XmlDeclaration_ReturnsUnparsed()
+		{
+			const string input = @"<?xml version=""1.0""?>";
+			var expected = new[]
+			    {
+			        StaxGrammar.TokenUnparsed("?", @"xml version=""1.0""")
+			    };
+
+			var tokenizer = new StaxTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_XmlComment_ReturnsUnparsed()
+		{
+			const string input = @"<!-- a quick note -->";
+			var expected = new[]
+			    {
+			        StaxGrammar.TokenUnparsed("!--", @" a quick note ")
+			    };
+
+			var tokenizer = new StaxTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_XmlCData_ReturnsTextValue()
+		{
+			const string input = @"<![CDATA[value>""0"" && value<""10"" ?""valid"":""error""]]>";
+			var expected = new[]
+			    {
+			        StaxGrammar.TokenText(@"value>""0"" && value<""10"" ?""valid"":""error""")
+			    };
+
+			var tokenizer = new StaxTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_XmlCDataMixed_ReturnsTextValue()
+		{
+			const string input =
+@"<p>You can add a string to a number, but this stringifies the number:</p>
+<math>
+	<ms><![CDATA[x<y]]></ms>
+	<mo>+</mo>
+	<mn>3</mn>
+	<mo>=</mo>
+	<ms><![CDATA[x<y3]]></ms>
+</math>";
+			var expected = new[]
+			    {
+			        StaxGrammar.TokenElementBegin(new DataName("p")),
+			        StaxGrammar.TokenText(@"You can add a string to a number, but this stringifies the number:"),
+			        StaxGrammar.TokenElementEnd(new DataName("p")),
+			        StaxGrammar.TokenWhitespace("\r\n"),
+			        StaxGrammar.TokenElementBegin(new DataName("math")),
+			        StaxGrammar.TokenWhitespace("\r\n\t"),
+			        StaxGrammar.TokenElementBegin(new DataName("ms")),
+			        StaxGrammar.TokenText(@"x<y"),
+			        StaxGrammar.TokenElementEnd(new DataName("ms")),
+			        StaxGrammar.TokenWhitespace("\r\n\t"),
+			        StaxGrammar.TokenElementBegin(new DataName("mo")),
+			        StaxGrammar.TokenText(@"+"),
+			        StaxGrammar.TokenElementEnd(new DataName("mo")),
+			        StaxGrammar.TokenWhitespace("\r\n\t"),
+			        StaxGrammar.TokenElementBegin(new DataName("mn")),
+			        StaxGrammar.TokenText(@"3"),
+			        StaxGrammar.TokenElementEnd(new DataName("mn")),
+			        StaxGrammar.TokenWhitespace("\r\n\t"),
+			        StaxGrammar.TokenElementBegin(new DataName("mo")),
+			        StaxGrammar.TokenText(@"="),
+			        StaxGrammar.TokenElementEnd(new DataName("mo")),
+			        StaxGrammar.TokenWhitespace("\r\n\t"),
+			        StaxGrammar.TokenElementBegin(new DataName("ms")),
+			        StaxGrammar.TokenText(@"x<y3"),
+			        StaxGrammar.TokenElementEnd(new DataName("ms")),
+			        StaxGrammar.TokenWhitespace("\r\n"),
+			        StaxGrammar.TokenElementEnd(new DataName("math")),
+			    };
+
+			var tokenizer = new StaxTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_XmlDocTypeExternal_ReturnsUnparsed()
+		{
+			const string input =
+@"<!DOCTYPE html PUBLIC
+	""-//W3C//DTD XHTML 1.1//EN""
+	""http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"">";
+
+			var expected = new[]
+			    {
+			        StaxGrammar.TokenUnparsed("!",
+@"DOCTYPE html PUBLIC
+	""-//W3C//DTD XHTML 1.1//EN""
+	""http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd""")
+			    };
+
+			var tokenizer = new StaxTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		//[Fact(Skip="Embedded DOCTYPE not supported")]
+		public void GetTokens_XmlDocTypeLocal_ReturnsUnparsed()
+		{
+			const string input =
+@"<!DOCTYPE doc [
+	<!ATTLIST normId id ID #IMPLIED>
+	<!ATTLIST normNames attr NMTOKENS #IMPLIED>
+]>";
+			var expected = new[]
+			    {
+			        StaxGrammar.TokenUnparsed("!",
+@"DOCTYPE doc [
+	<!ATTLIST normId id ID #IMPLIED>
+	<!ATTLIST normNames attr NMTOKENS #IMPLIED>
+]")
+			    };
+
+			var tokenizer = new StaxTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_AspNetPageDeclaration_ReturnsUnparsed()
+		{
+			const string input = @"<%@ Page Language=""C#"" AutoEventWireup=""true"" CodeBehind=""Default.aspx.cs"" Inherits=""Foo._Default"" %>";
+
+			var expected = new[]
+			    {
+			        StaxGrammar.TokenUnparsed("%@", @" Page Language=""C#"" AutoEventWireup=""true"" CodeBehind=""Default.aspx.cs"" Inherits=""Foo._Default"" ")
+			    };
+
+			var tokenizer = new StaxTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_PhpHelloWorld_ReturnsSequence()
+		{
+			const string input =
+@"<html>
+	<head>
+		<title>PHP Test</title>
+	</head>
+	<body>
+		<?php echo '<p>Hello World</p>'; ?>
+	</body>
+</html>";
+
+			var expected = new[]
+			    {
+			        StaxGrammar.TokenElementBegin(new DataName("html")),
+			        StaxGrammar.TokenWhitespace("\r\n\t"),
+			        StaxGrammar.TokenElementBegin(new DataName("head")),
+			        StaxGrammar.TokenWhitespace("\r\n\t\t"),
+			        StaxGrammar.TokenElementBegin(new DataName("title")),
+			        StaxGrammar.TokenText("PHP Test"),
+			        StaxGrammar.TokenElementEnd(new DataName("title")),
+			        StaxGrammar.TokenWhitespace("\r\n\t"),
+			        StaxGrammar.TokenElementEnd(new DataName("head")),
+			        StaxGrammar.TokenWhitespace("\r\n\t"),
+			        StaxGrammar.TokenElementBegin(new DataName("body")),
+			        StaxGrammar.TokenWhitespace("\r\n\t\t"),
+			        StaxGrammar.TokenUnparsed("?", @"php echo '<p>Hello World</p>'; "),
+			        StaxGrammar.TokenWhitespace("\r\n\t"),
+			        StaxGrammar.TokenElementEnd(new DataName("body")),
+			        StaxGrammar.TokenWhitespace("\r\n"),
+			        StaxGrammar.TokenElementEnd(new DataName("html")),
+			    };
+
+			var tokenizer = new StaxTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_CodeCommentAroundMarkup_ReturnsSingleUnparsedBlock()
+		{
+			const string input =
+@"<%--
+<html>
+	<body style=""color:lime"">
+		<!-- not much to say here -->
+	</body>
+</html>
+--%>";
+
+			var expected = new[]
+			    {
+			        StaxGrammar.TokenUnparsed("%--",
+@"
+<html>
+	<body style=""color:lime"">
+		<!-- not much to say here -->
+	</body>
+</html>
+")
+			    };
+
+			var tokenizer = new StaxTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		#endregion Unparsed Block Tests
 
 		#region Input Edge Case Tests
 

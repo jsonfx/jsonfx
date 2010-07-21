@@ -444,13 +444,31 @@ namespace JsonFx.Xml.Stax
 			}
 
 			end += StaxGrammar.OperatorElementEnd;
+			scanner.BeginChunk();
 
 			int endLength = end.Length;
-			for (int i=0; !scanner.IsCompleted && i<endLength; )
+			for (int i=0; !scanner.IsCompleted; )
 			{
 				if (ch == end[i])
 				{
 					i++;
+
+					if (i >= endLength)
+					{
+						string value = scanner.EndChunk();
+
+						// consume '>'
+						scanner.Pop();
+
+						endLength--;
+						if (endLength > 0)
+						{
+							// trim ending delimiter
+							value = value.Remove(value.Length-endLength);
+						}
+
+						return value;
+					}
 				}
 				else
 				{
@@ -461,24 +479,11 @@ namespace JsonFx.Xml.Stax
 				ch = scanner.Peek();
 			}
 
-			if (scanner.IsCompleted)
-			{
-				throw new DeserializationException(
-					"Unexpected end of file",
-					scanner.Index,
-					scanner.Line,
-					scanner.Column);
-			}
-
-			string value = scanner.EndChunk();
-
-			// consume '>'
-			scanner.Pop();
-
-			// trim ending delimiter
-			value = value.Remove(value.Length-endLength);
-
-			return value;
+			throw new DeserializationException(
+				"Unexpected end of file",
+				scanner.Index,
+				scanner.Line,
+				scanner.Column);
 		}
 
 		private Token<StaxTokenType> ScanAttributeValue(ITextStream scanner)
