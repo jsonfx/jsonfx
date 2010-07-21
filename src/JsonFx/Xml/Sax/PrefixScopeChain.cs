@@ -223,6 +223,11 @@ namespace JsonFx.Xml.Sax
 		/// <returns></returns>
 		public string Resolve(string prefix)
 		{
+			if (prefix == null)
+			{
+				prefix = String.Empty;
+			}
+
 			// find the last scope in chain that resolves prefix
 			Scope scope = this.Chain.FindLast(m => m.ContainsPrefix(prefix));
 

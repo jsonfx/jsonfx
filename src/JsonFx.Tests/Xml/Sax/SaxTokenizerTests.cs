@@ -77,6 +77,182 @@ namespace JsonFx.Xml.Sax
 
 		#endregion Simple Single Element Tests
 
+		#region Namespace Tests
+
+		[Fact]
+		public void GetTokens_DefaultNamespaceTag_ReturnsSequence()
+		{
+			const string input = @"<root xmlns=""http://example.com/schema""></root>";
+			var expected = new[]
+			    {
+			        SaxGrammar.TokenPrefixBegin("", "http://example.com/schema"),
+			        SaxGrammar.TokenElementBegin(new DataName("root", "http://example.com/schema")),
+			        SaxGrammar.TokenElementEnd(new DataName("root", "http://example.com/schema")),
+			        SaxGrammar.TokenPrefixEnd("", "http://example.com/schema"),
+			    };
+
+			var tokenizer = new SaxTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_NamespacePrefixTag_ReturnsSequence()
+		{
+			const string input = @"<prefix:root xmlns:prefix=""http://example.com/schema""></prefix:root>";
+			var expected = new[]
+			    {
+			        SaxGrammar.TokenPrefixBegin("prefix", "http://example.com/schema"),
+			        SaxGrammar.TokenElementBegin(new DataName("root", "http://example.com/schema")),
+			        SaxGrammar.TokenElementEnd(new DataName("root", "http://example.com/schema")),
+			        SaxGrammar.TokenPrefixEnd("prefix", "http://example.com/schema"),
+			    };
+
+			var tokenizer = new SaxTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_NamespacedChildTag_ReturnsSequence()
+		{
+			const string input = @"<foo><child xmlns=""http://example.com/schema"">value</child></foo>";
+			var expected = new[]
+			    {
+			        SaxGrammar.TokenElementBegin(new DataName("foo")),
+			        SaxGrammar.TokenPrefixBegin("", "http://example.com/schema"),
+			        SaxGrammar.TokenElementBegin(new DataName("child", "http://example.com/schema")),
+			        SaxGrammar.TokenText("value"),
+			        SaxGrammar.TokenElementEnd(new DataName("child", "http://example.com/schema")),
+			        SaxGrammar.TokenPrefixEnd("", "http://example.com/schema"),
+			        SaxGrammar.TokenElementEnd(new DataName("foo"))
+			    };
+
+			var tokenizer = new SaxTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_ParentAndChildShareDefaultNamespace_ReturnsSequence()
+		{
+			const string input = @"<foo xmlns=""http://example.org""><child>value</child></foo>";
+			var expected = new[]
+			    {
+			        SaxGrammar.TokenPrefixBegin("", "http://example.org"),
+			        SaxGrammar.TokenElementBegin(new DataName("foo", "http://example.org")),
+			        SaxGrammar.TokenElementBegin(new DataName("child", "http://example.org")),
+			        SaxGrammar.TokenText("value"),
+			        SaxGrammar.TokenElementEnd(new DataName("child", "http://example.org")),
+			        SaxGrammar.TokenElementEnd(new DataName("foo", "http://example.org")),
+			        SaxGrammar.TokenPrefixEnd("", "http://example.org")
+			    };
+
+			var tokenizer = new SaxTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_ParentAndChildSharePrefixedNamespace_ReturnsSequence()
+		{
+			const string input = @"<bar:foo xmlns:bar=""http://example.org""><bar:child>value</bar:child></bar:foo>";
+			var expected = new[]
+			    {
+			        SaxGrammar.TokenPrefixBegin("bar", "http://example.org"),
+			        SaxGrammar.TokenElementBegin(new DataName("foo", "http://example.org")),
+			        SaxGrammar.TokenElementBegin(new DataName("child", "http://example.org")),
+			        SaxGrammar.TokenText("value"),
+			        SaxGrammar.TokenElementEnd(new DataName("child", "http://example.org")),
+			        SaxGrammar.TokenElementEnd(new DataName("foo", "http://example.org")),
+			        SaxGrammar.TokenPrefixEnd("bar", "http://example.org")
+			    };
+
+			var tokenizer = new SaxTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_ParentAndChildDifferentDefaultNamespaces_ReturnsSequence()
+		{
+			const string input = @"<foo xmlns=""http://json.org""><child xmlns=""http://jsonfx.net"">text value</child></foo>";
+			var expected = new[]
+			    {
+			        SaxGrammar.TokenPrefixBegin("", "http://json.org"),
+			        SaxGrammar.TokenElementBegin(new DataName("foo", "http://json.org")),
+			        SaxGrammar.TokenPrefixBegin("", "http://jsonfx.net"),
+			        SaxGrammar.TokenElementBegin(new DataName("child", "http://jsonfx.net")),
+			        SaxGrammar.TokenText("text value"),
+			        SaxGrammar.TokenElementEnd(new DataName("child", "http://jsonfx.net")),
+			        SaxGrammar.TokenPrefixEnd("", "http://jsonfx.net"),
+			        SaxGrammar.TokenElementEnd(new DataName("foo", "http://json.org")),
+			        SaxGrammar.TokenPrefixEnd("", "http://json.org")
+			    };
+
+			var tokenizer = new SaxTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_DifferentPrefixSameNamespace_ReturnsSequence()
+		{
+			const string input = @"<foo xmlns=""http://example.org"" xmlns:blah=""http://example.org"" blah:key=""value"" />";
+			var expected = new[]
+			    {
+			        SaxGrammar.TokenPrefixBegin("", "http://example.org"),
+			        SaxGrammar.TokenPrefixBegin("blah", "http://example.org"),
+			        SaxGrammar.TokenElementBegin(new DataName("foo", "http://example.org")),
+			        SaxGrammar.TokenAttribute(new DataName("key", "http://example.org"), "value"),
+			        SaxGrammar.TokenElementEnd(new DataName("foo", "http://example.org")),
+			        SaxGrammar.TokenPrefixEnd("", "http://example.org"),
+			        SaxGrammar.TokenPrefixEnd("blah", "http://example.org")
+			    };
+
+			var tokenizer = new SaxTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_NestedDefaultNamespaces_ReturnsSequence()
+		{
+			const string input = @"<outer xmlns=""http://example.org/outer""><middle-1 xmlns=""http://example.org/inner""><inner>this should be inner</inner></middle-1><middle-2>this should be outer</middle-2></outer>";
+
+			var expected = new[]
+			    {
+			        SaxGrammar.TokenPrefixBegin("", "http://example.org/outer"),
+			        SaxGrammar.TokenElementBegin(new DataName("outer", "http://example.org/outer")),
+			        SaxGrammar.TokenPrefixBegin("", "http://example.org/inner"),
+			        SaxGrammar.TokenElementBegin(new DataName("middle-1", "http://example.org/inner")),
+			        SaxGrammar.TokenElementBegin(new DataName("inner", "http://example.org/inner")),
+			        SaxGrammar.TokenText("this should be inner"),
+			        SaxGrammar.TokenElementEnd(new DataName("inner", "http://example.org/inner")),
+			        SaxGrammar.TokenElementEnd(new DataName("middle-1", "http://example.org/inner")),
+			        SaxGrammar.TokenPrefixEnd("", "http://example.org/inner"),
+			        SaxGrammar.TokenElementBegin(new DataName("middle-2", "http://example.org/outer")),
+			        SaxGrammar.TokenText("this should be outer"),
+			        SaxGrammar.TokenElementEnd(new DataName("middle-2", "http://example.org/outer")),
+			        SaxGrammar.TokenElementEnd(new DataName("outer", "http://example.org/outer")),
+			        SaxGrammar.TokenPrefixEnd("", "http://example.org/outer")
+			    };
+
+			var tokenizer = new SaxTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		#endregion Namespace Tests
+
 		#region Simple Attribute Tests
 
 		[Fact]
@@ -235,6 +411,76 @@ namespace JsonFx.Xml.Sax
 		}
 
 		#endregion Simple Attribute Tests
+
+		#region Mixed Content Tests
+
+		[Fact]
+		public void GetTokens_HtmlContent_ReturnsSequence()
+		{
+			const string input = @"<div class=""content""><p style=""color:red""><strong>Lorem ipsum</strong> dolor sit amet, <i>consectetur</i> adipiscing elit.</p></div>";
+
+			var expected = new[]
+			    {
+			        SaxGrammar.TokenElementBegin(new DataName("div")),
+			        SaxGrammar.TokenAttribute(new DataName("class"), "content"),
+			        SaxGrammar.TokenElementBegin(new DataName("p")),
+			        SaxGrammar.TokenAttribute(new DataName("style"), "color:red"),
+			        SaxGrammar.TokenElementBegin(new DataName("strong")),
+			        SaxGrammar.TokenText("Lorem ipsum"),
+			        SaxGrammar.TokenElementEnd(new DataName("strong")),
+			        SaxGrammar.TokenText(" dolor sit amet, "),
+			        SaxGrammar.TokenElementBegin(new DataName("i")),
+			        SaxGrammar.TokenText("consectetur"),
+			        SaxGrammar.TokenElementEnd(new DataName("i")),
+			        SaxGrammar.TokenText(" adipiscing elit."),
+			        SaxGrammar.TokenElementEnd(new DataName("p")),
+					SaxGrammar.TokenElementEnd(new DataName("div")),
+			    };
+
+			var tokenizer = new SaxTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_HtmlContentPrettyPrinted_ReturnsSequence()
+		{
+			const string input =
+@"<div class=""content"">
+	<p style=""color:red"">
+		<strong>Lorem ipsum</strong> dolor sit amet, <i>consectetur</i> adipiscing elit.
+	</p>
+</div>";
+
+			var expected = new[]
+			    {
+			        SaxGrammar.TokenElementBegin(new DataName("div")),
+			        SaxGrammar.TokenAttribute(new DataName("class"), "content"),
+			        SaxGrammar.TokenWhitespace("\r\n\t"),
+			        SaxGrammar.TokenElementBegin(new DataName("p")),
+			        SaxGrammar.TokenAttribute(new DataName("style"), "color:red"),
+			        SaxGrammar.TokenWhitespace("\r\n\t\t"),
+			        SaxGrammar.TokenElementBegin(new DataName("strong")),
+			        SaxGrammar.TokenText("Lorem ipsum"),
+			        SaxGrammar.TokenElementEnd(new DataName("strong")),
+			        SaxGrammar.TokenText(" dolor sit amet, "),
+			        SaxGrammar.TokenElementBegin(new DataName("i")),
+			        SaxGrammar.TokenText("consectetur"),
+			        SaxGrammar.TokenElementEnd(new DataName("i")),
+			        SaxGrammar.TokenText(" adipiscing elit.\r\n\t"),
+			        SaxGrammar.TokenElementEnd(new DataName("p")),
+			        SaxGrammar.TokenWhitespace("\r\n"),
+					SaxGrammar.TokenElementEnd(new DataName("div")),
+			    };
+
+			var tokenizer = new SaxTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		#endregion Mixed Content Tests
 
 		#region Error Recovery Tests
 

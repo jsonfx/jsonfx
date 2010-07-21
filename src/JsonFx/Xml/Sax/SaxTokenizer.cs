@@ -181,28 +181,54 @@ namespace JsonFx.Xml.Sax
 			scanner.BeginChunk();
 			while (!scanner.IsCompleted)
 			{
-				if (scanner.Peek() == SaxGrammar.OperatorElementBegin)
+				switch (scanner.Peek())
 				{
-					// pause chunking and process capture
-					string chunk = scanner.EndChunk();
-					if (!String.IsNullOrEmpty(chunk))
+					case SaxGrammar.OperatorElementBegin:
 					{
-						if (SaxTokenizer.IsNullOrWhiteSpace(chunk))
-						{
-							tokens.Add(SaxGrammar.TokenWhitespace(chunk));
-						}
-						else
-						{
-							tokens.Add(SaxGrammar.TokenText(chunk));
-						}
+						this.FlushBufferAsText(tokens, scanner);
+
+						// process tag
+						this.ScanTag(tokens, scanner);
+
+						// resume chunking and process capture
+						scanner.BeginChunk();
+						break;
 					}
+					case SaxGrammar.OperatorEntityBegin:
+					{
+						this.FlushBufferAsText(tokens, scanner);
 
-					// process tag
-					this.ScanTag(tokens, scanner);
+						// TODO: decode entities here
+						{
+							scanner.Pop();
+						}
 
-					// resume chunking and process capture
-					scanner.BeginChunk();
-					continue;
+						// resume chunking and process capture
+						scanner.BeginChunk();
+						break;
+					}
+					default:
+					{
+						scanner.Pop();
+						break;
+					}
+				}
+			}
+		}
+
+		private void FlushBufferAsText(List<Token<SaxTokenType>> tokens, ITextStream scanner)
+		{
+			// pause chunking and process capture
+			string chunk = scanner.EndChunk();
+			if (!String.IsNullOrEmpty(chunk))
+			{
+				if (SaxTokenizer.IsNullOrWhiteSpace(chunk))
+				{
+					tokens.Add(SaxGrammar.TokenWhitespace(chunk));
+				}
+				else
+				{
+					tokens.Add(SaxGrammar.TokenText(chunk));
 				}
 			}
 		}

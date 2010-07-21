@@ -636,66 +636,6 @@ namespace JsonFx.Xml
 			Assert.Equal(expected, actual);
 		}
 
-		[Fact(Skip="Object form is complex to unambiguously process. Need to reconcile with JsonML serialization.")]
-		public void Format_HtmlContent_CorrectlyEmitsHtml()
-		{
-			var input = new[]
-			{
-				CommonGrammar.TokenObjectBegin("div"),
-					CommonGrammar.TokenProperty(new DataName("class", null, true)),
-					CommonGrammar.TokenValue("content"),
-					CommonGrammar.TokenValueDelim,
-
-					CommonGrammar.TokenProperty(String.Empty),// default content
-					CommonGrammar.TokenArrayBeginNoName,
-
-						CommonGrammar.TokenObjectBegin("p"),
-							CommonGrammar.TokenProperty(new DataName("style", null, true)),
-							CommonGrammar.TokenValue("color:red"),
-							CommonGrammar.TokenValueDelim,
-
-							CommonGrammar.TokenProperty(String.Empty),// default content
-							CommonGrammar.TokenArrayBeginNoName,
-
-								CommonGrammar.TokenObjectBegin("strong"),
-									CommonGrammar.TokenProperty(String.Empty),// default content
-									CommonGrammar.TokenArrayBeginNoName,
-										CommonGrammar.TokenValue("Lorem ipsum"),
-									CommonGrammar.TokenArrayEnd,
-								CommonGrammar.TokenObjectEnd,
-								CommonGrammar.TokenValueDelim,
-
-								CommonGrammar.TokenValue(" dolor sit amet, "),
-								CommonGrammar.TokenValueDelim,
-
-								CommonGrammar.TokenObjectBegin("i"),
-									CommonGrammar.TokenProperty(String.Empty),// default content
-									CommonGrammar.TokenArrayBeginNoName,
-										CommonGrammar.TokenValue("consectetur"),
-									CommonGrammar.TokenArrayEnd,
-								CommonGrammar.TokenObjectEnd,
-								CommonGrammar.TokenValueDelim,
-
-								CommonGrammar.TokenValue(" adipiscing elit."),
-							CommonGrammar.TokenArrayEnd,
-						CommonGrammar.TokenObjectEnd,
-					CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenObjectEnd
-			};
-
-			const string expected =
-@"<div class=""content"">
-	<p style=""color:red"">
-		<strong>Lorem ipsum</strong> dolor sit amet, <i>consectetur<i> adipiscing elit.
-	</p>
-</div>";
-
-			var formatter = new XmlWriter.XmlFormatter(new DataWriterSettings { PrettyPrint=true });
-			var actual = formatter.Format(input);
-
-			Assert.Equal(expected, actual);
-		}
-
 		#endregion Namespace Tests
 
 		#region Input Edge Case Tests
