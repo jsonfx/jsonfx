@@ -66,6 +66,8 @@ namespace JsonFx.Xml.Stax
 		public const string OperatorCDataEnd = "]]";
 
 		public const char OperatorProcessingInstruction = '?';
+		public const string OperatorPhpExpressionBegin = "?=";
+		public const string OperatorProcessingInstructionEnd = "?";
 
 		public const char OperatorCode = '%';
 		public const char OperatorCodeDirective = '@';

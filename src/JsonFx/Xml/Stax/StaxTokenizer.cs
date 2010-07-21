@@ -316,36 +316,62 @@ namespace JsonFx.Xml.Stax
 					// consume '!'
 					scanner.Pop();
 
-					// "<!--", "-->"		// XML/HTML/SGML comment
-					string comment = this.ScanUnparsedValue(scanner, StaxGrammar.OperatorCommentBegin, StaxGrammar.OperatorCommentEnd);
-					if (comment != null)
+					switch (scanner.Peek())
 					{
-						// emit as an unparsed comment
-						return StaxGrammar.TokenUnparsed(String.Concat(StaxGrammar.OperatorComment, StaxGrammar.OperatorCommentBegin), comment);
-					}
+						case '-':									// "<!--", "-->"		XML/HTML/SGML comment
+						{
+							string value = this.ScanUnparsedValue(scanner, StaxGrammar.OperatorCommentBegin, StaxGrammar.OperatorCommentEnd);
+							if (value != null)
+							{
+								// emit as an unparsed comment
+								return StaxGrammar.TokenUnparsed(
+									String.Concat(StaxGrammar.OperatorComment, StaxGrammar.OperatorCommentBegin),
+									value);
+							}
 
-					// "<![CDATA[", "]]>"	// CDATA section
-					comment = this.ScanUnparsedValue(scanner, StaxGrammar.OperatorCDataBegin, StaxGrammar.OperatorCDataEnd);
-					if (comment != null)
-					{
-						// convert CData to text
-						return StaxGrammar.TokenText(comment);
-					}
+							// process as generic declaration
+							goto default;
+						}
+						case '[':									// "<![CDATA[", "]]>"	CDATA section
+						{
+							string value = this.ScanUnparsedValue(scanner, StaxGrammar.OperatorCDataBegin, StaxGrammar.OperatorCDataEnd);
+							if (value != null)
+							{
+								// convert CData to text
+								return StaxGrammar.TokenText(value);
+							}
 
-					// "<!", ">"			// SGML declaration (e.g. DOCTYPE or SSI)
-					return StaxGrammar.TokenUnparsed(
-						Char.ToString(StaxGrammar.OperatorComment),
-						this.ScanUnparsedValue(scanner, String.Empty, String.Empty));
+							// process as generic declaration
+							goto default;
+						}
+						default:									// "<!", ">"			SGML declaration (e.g. DOCTYPE or server-side include)
+						{
+							return StaxGrammar.TokenUnparsed(
+								Char.ToString(StaxGrammar.OperatorComment),
+								this.ScanUnparsedValue(scanner, String.Empty, String.Empty));
+						}
+					}
 				}
 				case StaxGrammar.OperatorProcessingInstruction:
 				{
 					// consume '?'
 					scanner.Pop();
 
-					// "<?", "?>"	// XML processing instruction (e.g. XML declaration)
-					return StaxGrammar.TokenUnparsed(
-						Char.ToString(StaxGrammar.OperatorProcessingInstruction),
-						this.ScanUnparsedValue(scanner, String.Empty, Char.ToString(StaxGrammar.OperatorProcessingInstruction)));
+					switch (scanner.Peek())
+					{
+						case StaxGrammar.OperatorCodeExpression:	// "<?=", "?>"			PHP expression code block
+						{
+							return StaxGrammar.TokenUnparsed(
+								Char.ToString(StaxGrammar.OperatorProcessingInstruction),
+								this.ScanUnparsedValue(scanner, StaxGrammar.OperatorPhpExpressionBegin, StaxGrammar.OperatorProcessingInstructionEnd));
+						}
+						default:									// "<?", "?>"			PHP code block / XML processing instruction (e.g. XML declaration)
+						{
+							return StaxGrammar.TokenUnparsed(
+								Char.ToString(StaxGrammar.OperatorProcessingInstruction),
+								this.ScanUnparsedValue(scanner, String.Empty, StaxGrammar.OperatorProcessingInstructionEnd));
+						}
+					}
 				}
 				case StaxGrammar.OperatorCode:
 				{
@@ -355,26 +381,26 @@ namespace JsonFx.Xml.Stax
 
 					switch (ch)
 					{
-						case StaxGrammar.OperatorCommentDelim:		// "<%--", "--%>"	ASP/JSP-style code comment
+						case StaxGrammar.OperatorCommentDelim:		// "<%--", "--%>"		ASP/PSP/JSP-style code comment
 						{
 							return StaxGrammar.TokenUnparsed(
 								String.Concat(StaxGrammar.OperatorCode, StaxGrammar.OperatorCommentBegin),
 								this.ScanUnparsedValue(scanner, StaxGrammar.OperatorCommentBegin, String.Concat(StaxGrammar.OperatorCommentEnd, StaxGrammar.OperatorCode)));
 						}
-						case StaxGrammar.OperatorCodeDirective:		// "<%@",  "%>"		ASP/JSP directive
-						case StaxGrammar.OperatorCodeExpression:		// "<%=",  "%>"		ASP/JSP/JBST expression
-						case StaxGrammar.OperatorCodeDeclaration:	// "<%!",  "%>"		JSP/JBST declaration
-						case StaxGrammar.OperatorCodeDataBind:		// "<%#",  "%>"		ASP.NET/JBST databind expression
-						case StaxGrammar.OperatorCodeExtension:		// "<%$",  "%>"		ASP.NET/JBST extension
+						case StaxGrammar.OperatorCodeDirective:		// "<%@",  "%>"			ASP/PSP/JSP directive
+						case StaxGrammar.OperatorCodeExpression:	// "<%=",  "%>"			ASP/PSP/JSP/JBST expression
+						case StaxGrammar.OperatorCodeDeclaration:	// "<%!",  "%>"			JSP/JBST declaration
+						case StaxGrammar.OperatorCodeDataBind:		// "<%#",  "%>"			ASP.NET/JBST databind expression
+						case StaxGrammar.OperatorCodeExtension:		// "<%$",  "%>"			ASP.NET/JBST extension
 						{
-							// consume code block type char
+							// consume code block type differentiating char
 							scanner.Pop();
 
 							return StaxGrammar.TokenUnparsed(
 								String.Concat(StaxGrammar.OperatorCode, ch),
 								this.ScanUnparsedValue(scanner, String.Empty, Char.ToString(StaxGrammar.OperatorCode)));
 						}
-						default:									// "<%",   "%>"		ASP code block / JSP scriptlet
+						default:									// "<%",   "%>"			ASP/PSP/JSP code block
 						{
 							// simple code block
 							return StaxGrammar.TokenUnparsed(

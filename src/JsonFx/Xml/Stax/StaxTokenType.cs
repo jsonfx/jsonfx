@@ -56,15 +56,16 @@ namespace JsonFx.Xml.Stax
 		///		"&lt;!--", "-->"	XML/HTML/SGML comment
 		///		"&lt;!", ">"		XML/SGML declaration (e.g. DOCTYPE or server-side includes)
 		/// 
-		///		"&lt;?", "?>"		XML processing instruction (e.g. the XML declaration)
+		///		"&lt;?=", "?>"		PHP expression
+		///		"&lt;?", "?>"		PHP code block /XML processing instruction (e.g. the XML declaration)
 		/// 
-		///		"&lt;%--", "--%>"	ASP/JSP-style code comment
-		///		"&lt;%@",  "%>"		ASP/JSP directive
-		///		"&lt;%=",  "%>"		ASP/JSP/JBST expression
+		///		"&lt;%--", "--%>"	ASP/PSP/JSP-style code comment
+		///		"&lt;%@",  "%>"		ASP/PSP/JSP directive
+		///		"&lt;%=",  "%>"		ASP/PSP/JSP/JBST expression
 		///		"&lt;%!",  "%>"		JSP/JBST declaration
 		///		"&lt;%#",  "%>"		ASP.NET/JBST databind expression
 		///		"&lt;%$",  "%>"		ASP.NET/JBST extension
-		///		"&lt;%",   "%>"		ASP code block / JSP scriptlet
+		///		"&lt;%",   "%>"		ASP code block / JSP scriptlet / PSP code block
 		/// </remarks>
 		UnparsedBlock,
 
