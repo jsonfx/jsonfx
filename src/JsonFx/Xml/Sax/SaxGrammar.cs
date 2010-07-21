@@ -51,8 +51,11 @@ namespace JsonFx.Xml.Sax
 
 		public const char OperatorStringDelim = '"';
 		public const char OperatorStringDelimAlt = '\'';
+
 		public const char OperatorEntityBegin = '&';
-		public const char OperatorEntityOrdinal = '#';
+		public const char OperatorEntityNum = '#';
+		public const char OperatorEntityHex = 'x';
+		public const char OperatorEntityHexAlt = 'X';
 		public const char OperatorEntityEnd = ';';
 
 		public const string OperatorCommentBegin = "<!--";

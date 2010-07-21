@@ -412,6 +412,136 @@ namespace JsonFx.Xml.Sax
 
 		#endregion Simple Attribute Tests
 
+		#region Text Content Tests
+
+		[Fact]
+		public void GetTokens_XmlEntityLt_ReturnsSequence()
+		{
+			const string input = @"&lt;";
+			var expected = new[]
+			    {
+			        SaxGrammar.TokenText("<")
+			    };
+
+			var tokenizer = new SaxTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_XmlEntityB_ReturnsSequence()
+		{
+			const string input = @"&#66;";
+			var expected = new[]
+			    {
+			        SaxGrammar.TokenText("B")
+			    };
+
+			var tokenizer = new SaxTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_XmlEntityHexLowerX_ReturnsSequence()
+		{
+			const string input = @"&#x37;";
+			var expected = new[]
+			    {
+			        SaxGrammar.TokenText("7")
+			    };
+
+			var tokenizer = new SaxTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_XmlEntityHexUpperX_ReturnsSequence()
+		{
+			const string input = @"&#X38;";
+			var expected = new[]
+			    {
+			        SaxGrammar.TokenText("8")
+			    };
+
+			var tokenizer = new SaxTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_XmlEntityHexUpperCase_ReturnsSequence()
+		{
+			const string input = @"&#xABCD;";
+			var expected = new[]
+			    {
+			        SaxGrammar.TokenText("\uABCD")
+			    };
+
+			var tokenizer = new SaxTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_XmlEntityHexLowerCase_ReturnsSequence()
+		{
+			const string input = @"&#xabcd;";
+			var expected = new[]
+			    {
+			        SaxGrammar.TokenText("\uabcd")
+			    };
+
+			var tokenizer = new SaxTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_HtmlEntityEuro_ReturnsSequence()
+		{
+			const string input = @"&euro;";
+			var expected = new[]
+			    {
+			        SaxGrammar.TokenText("€")
+			    };
+
+			var tokenizer = new SaxTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_MixedEntities_ReturnsSequence()
+		{
+			const string input = @"there should &lt;b&gt;e decoded chars &amp; inside this text";
+			var expected = new[]
+			    {
+			        SaxGrammar.TokenText(@"there should "),
+			        SaxGrammar.TokenText(@"<"),
+			        SaxGrammar.TokenText(@"b"),
+			        SaxGrammar.TokenText(@">"),
+			        SaxGrammar.TokenText(@"e decoded chars "),
+			        SaxGrammar.TokenText(@"&"),
+			        SaxGrammar.TokenText(@" inside this text"),
+			    };
+
+			var tokenizer = new SaxTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		#endregion Text Content Tests
+
 		#region Mixed Content Tests
 
 		[Fact]

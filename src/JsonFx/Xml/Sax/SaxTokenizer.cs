@@ -30,6 +30,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 
 using JsonFx.IO;
@@ -185,25 +186,25 @@ namespace JsonFx.Xml.Sax
 				{
 					case SaxGrammar.OperatorElementBegin:
 					{
-						this.FlushBufferAsText(tokens, scanner);
+						// emit any leading text
+						this.EmitText(tokens, scanner.EndChunk());
 
 						// process tag
 						this.ScanTag(tokens, scanner);
 
-						// resume chunking and process capture
+						// resume chunking and capture
 						scanner.BeginChunk();
 						break;
 					}
 					case SaxGrammar.OperatorEntityBegin:
 					{
-						this.FlushBufferAsText(tokens, scanner);
+						// emit any leading text
+						this.EmitText(tokens, scanner.EndChunk());
 
-						// TODO: decode entities here
-						{
-							scanner.Pop();
-						}
+						// process entity
+						this.EmitText(tokens, this.DecodeEntity(scanner));
 
-						// resume chunking and process capture
+						// resume chunking and capture
 						scanner.BeginChunk();
 						break;
 					}
@@ -214,22 +215,34 @@ namespace JsonFx.Xml.Sax
 					}
 				}
 			}
+
+			// emit any trailing text
+			this.EmitText(tokens, scanner.EndChunk());
 		}
 
-		private void FlushBufferAsText(List<Token<SaxTokenType>> tokens, ITextStream scanner)
+		private void EmitText(List<Token<SaxTokenType>> tokens, string value)
 		{
-			// pause chunking and process capture
-			string chunk = scanner.EndChunk();
-			if (!String.IsNullOrEmpty(chunk))
+			if (String.IsNullOrEmpty(value))
 			{
-				if (SaxTokenizer.IsNullOrWhiteSpace(chunk))
-				{
-					tokens.Add(SaxGrammar.TokenWhitespace(chunk));
-				}
-				else
-				{
-					tokens.Add(SaxGrammar.TokenText(chunk));
-				}
+				return;
+			}
+
+			//Token<SaxTokenType> token = (tokens.Count > 0) ? tokens[tokens.Count-1] : null;
+			//if (token != null &&
+			//    token.TokenType == SaxTokenType.TextValue)
+			//{
+			//    // concat onto previous token
+			//    tokens[tokens.Count-1] = SaxGrammar.TokenText(token.ValueAsString()+value);
+			//    return;
+			//}
+
+			if (SaxTokenizer.IsNullOrWhiteSpace(value))
+			{
+				tokens.Add(SaxGrammar.TokenWhitespace(value));
+			}
+			else
+			{
+				tokens.Add(SaxGrammar.TokenText(value));
 			}
 		}
 
@@ -677,6 +690,393 @@ namespace JsonFx.Xml.Sax
 		}
 
 		/// <summary>
+		/// Decodes HTML-style entities into special characters
+		/// </summary>
+		/// <param name="scanner"></param>
+		/// <returns>the entity text</returns>
+		/// <remarks>
+		/// TODO: validate against HTML5-style entities
+		/// http://www.w3.org/TR/html5/tokenization.html#consume-a-character-reference
+		/// </remarks>
+		public string DecodeEntity(ITextStream scanner)
+		{
+			// consume '&'
+			if (scanner.Pop() != SaxGrammar.OperatorEntityBegin)
+			{
+				throw new DeserializationException(
+					"Malformed entity",
+					scanner.Index,
+					scanner.Line,
+					scanner.Column);
+			}
+
+			string entity, chunk;
+
+			char ch = scanner.Peek();
+			if (scanner.IsCompleted ||
+				SaxTokenizer.IsWhiteSpace(ch) ||
+				ch == SaxGrammar.OperatorEntityBegin ||
+				ch == SaxGrammar.OperatorElementBegin)
+			{
+				return Char.ToString(SaxGrammar.OperatorEntityBegin);
+			}
+
+			if (ch == SaxGrammar.OperatorEntityNum)
+			{
+				// entity is Unicode Code Point
+
+				// consume '#'
+				scanner.Pop();
+				ch = scanner.Peek();
+
+				bool isHex = false;
+				if (!scanner.IsCompleted &&
+					((ch == SaxGrammar.OperatorEntityHex) ||
+					(ch == SaxGrammar.OperatorEntityHexAlt)))
+				{
+					isHex = true;
+
+					// consume 'x'
+					scanner.Pop();
+					ch = scanner.Peek();
+				}
+
+				scanner.BeginChunk();
+
+				while (!scanner.IsCompleted &&
+					SaxTokenizer.IsHexDigit(ch))
+				{
+					// consume [0-9a-fA-F]
+					scanner.Pop();
+					ch = scanner.Peek();
+				}
+
+				chunk = scanner.EndChunk();
+
+				int utf16;
+				if (Int32.TryParse(
+					chunk,
+					isHex ? NumberStyles.AllowHexSpecifier : NumberStyles.None,
+					CultureInfo.InvariantCulture,
+					out utf16))
+				{
+					entity = Char.ConvertFromUtf32(utf16);
+
+					if (!scanner.IsCompleted &&
+						ch == SaxGrammar.OperatorEntityEnd)
+					{
+						scanner.Pop();
+					}
+					return entity;
+				}
+				else if (isHex)
+				{
+					// NOTE this potentially changes "&#X..." to "&#x...";
+					return String.Concat(
+						SaxGrammar.OperatorEntityBegin,
+						SaxGrammar.OperatorEntityNum,
+						SaxGrammar.OperatorEntityHex,
+						chunk);
+				}
+				else
+				{
+					return String.Concat(
+						SaxGrammar.OperatorEntityBegin,
+						SaxGrammar.OperatorEntityNum,
+						chunk);
+				}
+			}
+
+			scanner.BeginChunk();
+			while (!scanner.IsCompleted &&
+				SaxTokenizer.IsLetter(ch))
+			{
+				// consume [a-zA-Z]
+				scanner.Pop();
+				ch = scanner.Peek();
+			}
+
+			chunk = scanner.EndChunk();
+			entity = SaxTokenizer.DecodeEntityName(chunk);
+			if (String.IsNullOrEmpty(entity))
+			{
+				return String.Concat(
+					SaxGrammar.OperatorEntityBegin,
+					chunk);
+			}
+
+			if (!scanner.IsCompleted &&
+				ch == SaxGrammar.OperatorEntityEnd)
+			{
+				scanner.Pop();
+			}
+			return entity;
+		}
+
+		private static string DecodeEntityName(string name)
+		{
+			// http://www.w3.org/TR/REC-html40/sgml/entities.html
+			// http://www.bigbaer.com/sidebars/entities/
+			// NOTE: entity names are case-sensitive
+			switch (name)
+			{
+				case "quot": { return Char.ConvertFromUtf32(34); }
+				case "amp": { return Char.ConvertFromUtf32(38); }
+				case "lt": { return Char.ConvertFromUtf32(60); }
+				case "gt": { return Char.ConvertFromUtf32(62); }
+				case "nbsp": { return Char.ConvertFromUtf32(160); }
+				case "iexcl": { return Char.ConvertFromUtf32(161); }
+				case "cent": { return Char.ConvertFromUtf32(162); }
+				case "pound": { return Char.ConvertFromUtf32(163); }
+				case "curren": { return Char.ConvertFromUtf32(164); }
+				case "yen": { return Char.ConvertFromUtf32(165); }
+				case "euro": { return Char.ConvertFromUtf32(8364); }
+				case "brvbar": { return Char.ConvertFromUtf32(166); }
+				case "sect": { return Char.ConvertFromUtf32(167); }
+				case "uml": { return Char.ConvertFromUtf32(168); }
+				case "copy": { return Char.ConvertFromUtf32(169); }
+				case "ordf": { return Char.ConvertFromUtf32(170); }
+				case "laquo": { return Char.ConvertFromUtf32(171); }
+				case "not": { return Char.ConvertFromUtf32(172); }
+				case "shy": { return Char.ConvertFromUtf32(173); }
+				case "reg": { return Char.ConvertFromUtf32(174); }
+				case "trade": { return Char.ConvertFromUtf32(8482); }
+				case "macr": { return Char.ConvertFromUtf32(175); }
+				case "deg": { return Char.ConvertFromUtf32(176); }
+				case "plusmn": { return Char.ConvertFromUtf32(177); }
+				case "sup2": { return Char.ConvertFromUtf32(178); }
+				case "sup3": { return Char.ConvertFromUtf32(179); }
+				case "acute": { return Char.ConvertFromUtf32(180); }
+				case "micro": { return Char.ConvertFromUtf32(181); }
+				case "para": { return Char.ConvertFromUtf32(182); }
+				case "middot": { return Char.ConvertFromUtf32(183); }
+				case "cedil": { return Char.ConvertFromUtf32(184); }
+				case "sup1": { return Char.ConvertFromUtf32(185); }
+				case "ordm": { return Char.ConvertFromUtf32(186); }
+				case "raquo": { return Char.ConvertFromUtf32(187); }
+				case "frac14": { return Char.ConvertFromUtf32(188); }
+				case "frac12": { return Char.ConvertFromUtf32(189); }
+				case "frac34": { return Char.ConvertFromUtf32(190); }
+				case "iquest": { return Char.ConvertFromUtf32(191); }
+				case "times": { return Char.ConvertFromUtf32(215); }
+				case "divide": { return Char.ConvertFromUtf32(247); }
+				case "Agrave": { return Char.ConvertFromUtf32(192); }
+				case "Aacute": { return Char.ConvertFromUtf32(193); }
+				case "Acirc": { return Char.ConvertFromUtf32(194); }
+				case "Atilde": { return Char.ConvertFromUtf32(195); }
+				case "Auml": { return Char.ConvertFromUtf32(196); }
+				case "Aring": { return Char.ConvertFromUtf32(197); }
+				case "AElig": { return Char.ConvertFromUtf32(198); }
+				case "Ccedil": { return Char.ConvertFromUtf32(199); }
+				case "Egrave": { return Char.ConvertFromUtf32(200); }
+				case "Eacute": { return Char.ConvertFromUtf32(201); }
+				case "Ecirc": { return Char.ConvertFromUtf32(202); }
+				case "Euml": { return Char.ConvertFromUtf32(203); }
+				case "Igrave": { return Char.ConvertFromUtf32(204); }
+				case "Iacute": { return Char.ConvertFromUtf32(205); }
+				case "Icirc": { return Char.ConvertFromUtf32(206); }
+				case "Iuml": { return Char.ConvertFromUtf32(207); }
+				case "ETH": { return Char.ConvertFromUtf32(208); }
+				case "Ntilde": { return Char.ConvertFromUtf32(209); }
+				case "Ograve": { return Char.ConvertFromUtf32(210); }
+				case "Oacute": { return Char.ConvertFromUtf32(211); }
+				case "Ocirc": { return Char.ConvertFromUtf32(212); }
+				case "Otilde": { return Char.ConvertFromUtf32(213); }
+				case "Ouml": { return Char.ConvertFromUtf32(214); }
+				case "Oslash": { return Char.ConvertFromUtf32(216); }
+				case "Ugrave": { return Char.ConvertFromUtf32(217); }
+				case "Uacute": { return Char.ConvertFromUtf32(218); }
+				case "Ucirc": { return Char.ConvertFromUtf32(219); }
+				case "Uuml": { return Char.ConvertFromUtf32(220); }
+				case "Yacute": { return Char.ConvertFromUtf32(221); }
+				case "THORN": { return Char.ConvertFromUtf32(222); }
+				case "szlig": { return Char.ConvertFromUtf32(223); }
+				case "agrave": { return Char.ConvertFromUtf32(224); }
+				case "aacute": { return Char.ConvertFromUtf32(225); }
+				case "acirc": { return Char.ConvertFromUtf32(226); }
+				case "atilde": { return Char.ConvertFromUtf32(227); }
+				case "auml": { return Char.ConvertFromUtf32(228); }
+				case "aring": { return Char.ConvertFromUtf32(229); }
+				case "aelig": { return Char.ConvertFromUtf32(230); }
+				case "ccedil": { return Char.ConvertFromUtf32(231); }
+				case "egrave": { return Char.ConvertFromUtf32(232); }
+				case "eacute": { return Char.ConvertFromUtf32(233); }
+				case "ecirc": { return Char.ConvertFromUtf32(234); }
+				case "euml": { return Char.ConvertFromUtf32(235); }
+				case "igrave": { return Char.ConvertFromUtf32(236); }
+				case "iacute": { return Char.ConvertFromUtf32(237); }
+				case "icirc": { return Char.ConvertFromUtf32(238); }
+				case "iuml": { return Char.ConvertFromUtf32(239); }
+				case "eth": { return Char.ConvertFromUtf32(240); }
+				case "ntilde": { return Char.ConvertFromUtf32(241); }
+				case "ograve": { return Char.ConvertFromUtf32(242); }
+				case "oacute": { return Char.ConvertFromUtf32(243); }
+				case "ocirc": { return Char.ConvertFromUtf32(244); }
+				case "otilde": { return Char.ConvertFromUtf32(245); }
+				case "ouml": { return Char.ConvertFromUtf32(246); }
+				case "oslash": { return Char.ConvertFromUtf32(248); }
+				case "ugrave": { return Char.ConvertFromUtf32(249); }
+				case "uacute": { return Char.ConvertFromUtf32(250); }
+				case "ucirc": { return Char.ConvertFromUtf32(251); }
+				case "uuml": { return Char.ConvertFromUtf32(252); }
+				case "yacute": { return Char.ConvertFromUtf32(253); }
+				case "thorn": { return Char.ConvertFromUtf32(254); }
+				case "yuml": { return Char.ConvertFromUtf32(255); }
+				case "OElig": { return Char.ConvertFromUtf32(338); }
+				case "oelig": { return Char.ConvertFromUtf32(339); }
+				case "Scaron": { return Char.ConvertFromUtf32(352); }
+				case "scaron": { return Char.ConvertFromUtf32(353); }
+				case "Yuml": { return Char.ConvertFromUtf32(376); }
+				case "circ": { return Char.ConvertFromUtf32(710); }
+				case "tilde": { return Char.ConvertFromUtf32(732); }
+				case "ensp": { return Char.ConvertFromUtf32(8194); }
+				case "emsp": { return Char.ConvertFromUtf32(8195); }
+				case "thinsp": { return Char.ConvertFromUtf32(8201); }
+				case "zwnj": { return Char.ConvertFromUtf32(8204); }
+				case "zwj": { return Char.ConvertFromUtf32(8205); }
+				case "lrm": { return Char.ConvertFromUtf32(8206); }
+				case "rlm": { return Char.ConvertFromUtf32(8207); }
+				case "ndash": { return Char.ConvertFromUtf32(8211); }
+				case "mdash": { return Char.ConvertFromUtf32(8212); }
+				case "lsquo": { return Char.ConvertFromUtf32(8216); }
+				case "rsquo": { return Char.ConvertFromUtf32(8217); }
+				case "sbquo": { return Char.ConvertFromUtf32(8218); }
+				case "ldquo": { return Char.ConvertFromUtf32(8220); }
+				case "rdquo": { return Char.ConvertFromUtf32(8221); }
+				case "bdquo": { return Char.ConvertFromUtf32(8222); }
+				case "dagger": { return Char.ConvertFromUtf32(8224); }
+				case "Dagger": { return Char.ConvertFromUtf32(8225); }
+				case "permil": { return Char.ConvertFromUtf32(8240); }
+				case "lsaquo": { return Char.ConvertFromUtf32(8249); }
+				case "rsaquo": { return Char.ConvertFromUtf32(8250); }
+				case "fnof": { return Char.ConvertFromUtf32(402); }
+				case "bull": { return Char.ConvertFromUtf32(8226); }
+				case "hellip": { return Char.ConvertFromUtf32(8230); }
+				case "prime": { return Char.ConvertFromUtf32(8242); }
+				case "Prime": { return Char.ConvertFromUtf32(8243); }
+				case "oline": { return Char.ConvertFromUtf32(8254); }
+				case "frasl": { return Char.ConvertFromUtf32(8260); }
+				case "weierp": { return Char.ConvertFromUtf32(8472); }
+				case "image": { return Char.ConvertFromUtf32(8465); }
+				case "real": { return Char.ConvertFromUtf32(8476); }
+				case "alefsym": { return Char.ConvertFromUtf32(8501); }
+				case "larr": { return Char.ConvertFromUtf32(8592); }
+				case "uarr": { return Char.ConvertFromUtf32(8593); }
+				case "rarr": { return Char.ConvertFromUtf32(8594); }
+				case "darr": { return Char.ConvertFromUtf32(8495); }
+				case "harr": { return Char.ConvertFromUtf32(8596); }
+				case "crarr": { return Char.ConvertFromUtf32(8629); }
+				case "lArr": { return Char.ConvertFromUtf32(8656); }
+				case "uArr": { return Char.ConvertFromUtf32(8657); }
+				case "rArr": { return Char.ConvertFromUtf32(8658); }
+				case "dArr": { return Char.ConvertFromUtf32(8659); }
+				case "hArr": { return Char.ConvertFromUtf32(8660); }
+				case "forall": { return Char.ConvertFromUtf32(8704); }
+				case "part": { return Char.ConvertFromUtf32(8706); }
+				case "exist": { return Char.ConvertFromUtf32(8707); }
+				case "empty": { return Char.ConvertFromUtf32(8709); }
+				case "nabla": { return Char.ConvertFromUtf32(8711); }
+				case "isin": { return Char.ConvertFromUtf32(8712); }
+				case "notin": { return Char.ConvertFromUtf32(8713); }
+				case "ni": { return Char.ConvertFromUtf32(8715); }
+				case "prod": { return Char.ConvertFromUtf32(8719); }
+				case "sum": { return Char.ConvertFromUtf32(8721); }
+				case "minus": { return Char.ConvertFromUtf32(8722); }
+				case "lowast": { return Char.ConvertFromUtf32(8727); }
+				case "radic": { return Char.ConvertFromUtf32(8730); }
+				case "prop": { return Char.ConvertFromUtf32(8733); }
+				case "infin": { return Char.ConvertFromUtf32(8734); }
+				case "ang": { return Char.ConvertFromUtf32(8736); }
+				case "and": { return Char.ConvertFromUtf32(8743); }
+				case "or": { return Char.ConvertFromUtf32(8744); }
+				case "cap": { return Char.ConvertFromUtf32(8745); }
+				case "cup": { return Char.ConvertFromUtf32(8746); }
+				case "int": { return Char.ConvertFromUtf32(8747); }
+				case "there4": { return Char.ConvertFromUtf32(8756); }
+				case "sim": { return Char.ConvertFromUtf32(8764); }
+				case "cong": { return Char.ConvertFromUtf32(8773); }
+				case "asymp": { return Char.ConvertFromUtf32(8776); }
+				case "ne": { return Char.ConvertFromUtf32(8800); }
+				case "equiv": { return Char.ConvertFromUtf32(8801); }
+				case "le": { return Char.ConvertFromUtf32(8804); }
+				case "ge": { return Char.ConvertFromUtf32(8805); }
+				case "sub": { return Char.ConvertFromUtf32(8834); }
+				case "sup": { return Char.ConvertFromUtf32(8835); }
+				case "nsub": { return Char.ConvertFromUtf32(8836); }
+				case "sube": { return Char.ConvertFromUtf32(8838); }
+				case "supe": { return Char.ConvertFromUtf32(8839); }
+				case "oplus": { return Char.ConvertFromUtf32(8853); }
+				case "otimes": { return Char.ConvertFromUtf32(8855); }
+				case "perp": { return Char.ConvertFromUtf32(8869); }
+				case "sdot": { return Char.ConvertFromUtf32(8901); }
+				case "lceil": { return Char.ConvertFromUtf32(8968); }
+				case "rceil": { return Char.ConvertFromUtf32(8969); }
+				case "lfloor": { return Char.ConvertFromUtf32(8970); }
+				case "rfloor": { return Char.ConvertFromUtf32(8971); }
+				case "lang": { return Char.ConvertFromUtf32(9001); }
+				case "rang": { return Char.ConvertFromUtf32(9002); }
+				case "loz": { return Char.ConvertFromUtf32(9674); }
+				case "spades": { return Char.ConvertFromUtf32(9824); }
+				case "clubs": { return Char.ConvertFromUtf32(9827); }
+				case "hearts": { return Char.ConvertFromUtf32(9829); }
+				case "diams": { return Char.ConvertFromUtf32(9830); }
+				case "Alpha": { return Char.ConvertFromUtf32(913); }
+				case "Beta": { return Char.ConvertFromUtf32(914); }
+				case "Gamma": { return Char.ConvertFromUtf32(915); }
+				case "Delta": { return Char.ConvertFromUtf32(916); }
+				case "Epsilon": { return Char.ConvertFromUtf32(917); }
+				case "Zeta": { return Char.ConvertFromUtf32(918); }
+				case "Eta": { return Char.ConvertFromUtf32(919); }
+				case "Theta": { return Char.ConvertFromUtf32(920); }
+				case "Iota": { return Char.ConvertFromUtf32(921); }
+				case "Kappa": { return Char.ConvertFromUtf32(922); }
+				case "Lambda": { return Char.ConvertFromUtf32(923); }
+				case "Mu": { return Char.ConvertFromUtf32(924); }
+				case "Nu": { return Char.ConvertFromUtf32(925); }
+				case "Xi": { return Char.ConvertFromUtf32(926); }
+				case "Omicron": { return Char.ConvertFromUtf32(927); }
+				case "Pi": { return Char.ConvertFromUtf32(928); }
+				case "Rho": { return Char.ConvertFromUtf32(929); }
+				case "Sigma": { return Char.ConvertFromUtf32(931); }
+				case "Tau": { return Char.ConvertFromUtf32(932); }
+				case "Upsilon": { return Char.ConvertFromUtf32(933); }
+				case "Phi": { return Char.ConvertFromUtf32(934); }
+				case "Chi": { return Char.ConvertFromUtf32(935); }
+				case "Psi": { return Char.ConvertFromUtf32(936); }
+				case "Omega": { return Char.ConvertFromUtf32(937); }
+				case "alpha": { return Char.ConvertFromUtf32(945); }
+				case "beta": { return Char.ConvertFromUtf32(946); }
+				case "gamma": { return Char.ConvertFromUtf32(947); }
+				case "delta": { return Char.ConvertFromUtf32(948); }
+				case "epsilon": { return Char.ConvertFromUtf32(949); }
+				case "zeta": { return Char.ConvertFromUtf32(950); }
+				case "eta": { return Char.ConvertFromUtf32(951); }
+				case "theta": { return Char.ConvertFromUtf32(952); }
+				case "iota": { return Char.ConvertFromUtf32(953); }
+				case "kappa": { return Char.ConvertFromUtf32(954); }
+				case "lambda": { return Char.ConvertFromUtf32(955); }
+				case "mu": { return Char.ConvertFromUtf32(956); }
+				case "nu": { return Char.ConvertFromUtf32(957); }
+				case "xi": { return Char.ConvertFromUtf32(958); }
+				case "omicron": { return Char.ConvertFromUtf32(959); }
+				case "pi": { return Char.ConvertFromUtf32(960); }
+				case "rho": { return Char.ConvertFromUtf32(961); }
+				case "sigmaf": { return Char.ConvertFromUtf32(962); }
+				case "sigma": { return Char.ConvertFromUtf32(963); }
+				case "tau": { return Char.ConvertFromUtf32(964); }
+				case "upsilon": { return Char.ConvertFromUtf32(965); }
+				case "phi": { return Char.ConvertFromUtf32(966); }
+				case "chi": { return Char.ConvertFromUtf32(967); }
+				case "psi": { return Char.ConvertFromUtf32(968); }
+				case "omega": { return Char.ConvertFromUtf32(969); }
+				case "thetasym": { return Char.ConvertFromUtf32(977); }
+				case "upsih": { return Char.ConvertFromUtf32(978); }
+				case "piv": { return Char.ConvertFromUtf32(982); }
+				default: { return null; }
+			}
+		}
+
+		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="ch"></param>
@@ -723,6 +1123,41 @@ namespace JsonFx.Xml.Sax
 				(ch == '\u00B7') ||
 				(ch >= '\u0300' && ch <= '\u036F') ||
 				(ch >= '\u203F' && ch <= '\u2040');
+		}
+
+		/// <summary>
+		/// Checks if character matches [A-Za-z]
+		/// </summary>
+		/// <param name="ch"></param>
+		/// <returns></returns>
+		private static bool IsLetter(char ch)
+		{
+			return
+				((ch >= 'a') && (ch <= 'z')) ||
+				((ch >= 'A') && (ch <= 'Z'));
+		}
+
+		/// <summary>
+		/// Checks if character matches [0-9]
+		/// </summary>
+		/// <param name="ch"></param>
+		/// <returns></returns>
+		private static bool IsDigit(char ch)
+		{
+			return (ch >= '0') && (ch <= '9');
+		}
+
+		/// <summary>
+		/// Checks if character matches [0-9A-Fa-f]
+		/// </summary>
+		/// <param name="ch"></param>
+		/// <returns></returns>
+		private static bool IsHexDigit(char ch)
+		{
+			return
+				(ch >= '0' && ch <= '9') ||
+				(ch >= 'A' && ch <= 'F') ||
+				(ch >= 'a' && ch <= 'f');
 		}
 
 		/// <summary>
