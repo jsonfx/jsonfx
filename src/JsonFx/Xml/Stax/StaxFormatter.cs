@@ -131,13 +131,12 @@ namespace JsonFx.Xml.Stax
 						scope.TagName = token.Name;
 						this.ScopeChain.Push(scope);
 
+						stream.Pop();
+						token = stream.Peek();
+
 						SortedList<DataName, Token<StaxTokenType>> attributes = null;
-
-						do
+						while (!stream.IsCompleted && token.TokenType == StaxTokenType.Attribute)
 						{
-							stream.Pop();
-							token = stream.Peek();
-
 							if (attributes == null)
 							{
 								attributes = new SortedList<DataName, Token<StaxTokenType>>();
@@ -148,7 +147,10 @@ namespace JsonFx.Xml.Stax
 							token = stream.Peek();
 
 							attributes[attrName] = token;
-						} while (!stream.IsCompleted && token.TokenType == StaxTokenType.Attribute);
+
+							stream.Pop();
+							token = stream.Peek();
+						}
 
 						this.WriteTag(writer, StaxTagType.BeginTag, scope.TagName, attributes, scope);
 
@@ -471,12 +473,12 @@ namespace JsonFx.Xml.Stax
 						entity = "&amp;";
 						break;
 					}
-					case '\r':
-					{
-						// http://www.w3.org/TR/xml/#sec-line-ends
-						entity = "&#xD;";
-						break;
-					}
+					//case '\r':
+					//{
+					//    // http://www.w3.org/TR/xml/#sec-line-ends
+					//    entity = "&#xD;";
+					//    break;
+					//}
 					default:
 					{
 						continue;
