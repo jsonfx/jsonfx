@@ -448,7 +448,7 @@ namespace JsonFx.Xml.Stax
 		[Fact]
 		public void GetTokens_SingleTagMultipleAttributes_ReturnsSequence()
 		{
-			const string input = @"<root no-value whitespace="" this contains whitespace "" anyQuotedText=""/\\\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?""></root>";
+			const string input = @"<root no-value whitespace="" this contains whitespace "" anyQuotedText="""+"/\\\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"+@"""></root>";
 			var expected = new[]
 			    {
 			        StaxGrammar.TokenElementBegin(new DataName("root")),
@@ -457,7 +457,7 @@ namespace JsonFx.Xml.Stax
 			        StaxGrammar.TokenAttribute(new DataName("whitespace")),
 			        StaxGrammar.TokenText(" this contains whitespace "),
 			        StaxGrammar.TokenAttribute(new DataName("anyQuotedText")),
-			        StaxGrammar.TokenText(@"/\\\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"),
+			        StaxGrammar.TokenText("/\\\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"),
 			        StaxGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
