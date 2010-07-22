@@ -289,7 +289,19 @@ namespace JsonFx.Xml.Stax
 			{
 				foreach (var attribute in attributes)
 				{
-					string attrPrefix = this.ResolvePrefix(attribute.Key.NamespaceUri);
+					// Not sure if this is correct: http://stackoverflow.com/questions/3312390
+					// "The namespace name for an unprefixed attribute name always has no value"
+					// "The attribute value in a default namespace declaration MAY be empty.
+					// This has the same effect, within the scope of the declaration, of there being no default namespace."
+					// http://www.w3.org/TR/xml-names/#defaulting
+
+					// an unqualified attribute has its element as the expanded name,
+					// so reversing this is easiest to unqualify if has element's namespace
+					// http://www.w3.org/TR/xml-names/#defaulting
+					string attrPrefix =
+						(attribute.Key.NamespaceUri == tagName.NamespaceUri) ?
+						null :
+						this.ResolvePrefix(attribute.Key.NamespaceUri);
 
 					this.WriteAttribute(writer, attrPrefix, attribute.Key.LocalName, attribute.Value);
 				}
