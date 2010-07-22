@@ -1063,7 +1063,7 @@ namespace JsonFx.Xml.Stax
 
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenUnparsed("%@{0}@%", @" Page Language=""C#"" AutoEventWireup=""true"" CodeBehind=""Default.aspx.cs"" Inherits=""Foo._Default"" ")
+			        StaxGrammar.TokenUnparsed("%@{0}%", @" Page Language=""C#"" AutoEventWireup=""true"" CodeBehind=""Default.aspx.cs"" Inherits=""Foo._Default"" ")
 			    };
 
 			var tokenizer = new StaxTokenizer();
