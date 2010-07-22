@@ -923,7 +923,7 @@ namespace JsonFx.Xml.Stax
 			const string input = @"<?xml version=""1.0""?>";
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenUnparsed("?", @"xml version=""1.0""")
+			        StaxGrammar.TokenUnparsed("?{0}?", @"xml version=""1.0""")
 			    };
 
 			var tokenizer = new StaxTokenizer();
@@ -938,7 +938,7 @@ namespace JsonFx.Xml.Stax
 			const string input = @"<!-- a quick note -->";
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenUnparsed("!--", @" a quick note ")
+			        StaxGrammar.TokenUnparsed("!--{0}--", @" a quick note ")
 			    };
 
 			var tokenizer = new StaxTokenizer();
@@ -1021,7 +1021,7 @@ namespace JsonFx.Xml.Stax
 
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenUnparsed("!",
+			        StaxGrammar.TokenUnparsed("!{0}",
 @"DOCTYPE html PUBLIC
 	""-//W3C//DTD XHTML 1.1//EN""
 	""http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd""")
@@ -1043,7 +1043,7 @@ namespace JsonFx.Xml.Stax
 ]>";
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenUnparsed("!",
+			        StaxGrammar.TokenUnparsed("!{0}",
 @"DOCTYPE doc [
 	<!ATTLIST normId id ID #IMPLIED>
 	<!ATTLIST normNames attr NMTOKENS #IMPLIED>
@@ -1063,7 +1063,7 @@ namespace JsonFx.Xml.Stax
 
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenUnparsed("%@", @" Page Language=""C#"" AutoEventWireup=""true"" CodeBehind=""Default.aspx.cs"" Inherits=""Foo._Default"" ")
+			        StaxGrammar.TokenUnparsed("%@{0}@%", @" Page Language=""C#"" AutoEventWireup=""true"" CodeBehind=""Default.aspx.cs"" Inherits=""Foo._Default"" ")
 			    };
 
 			var tokenizer = new StaxTokenizer();
@@ -1099,7 +1099,7 @@ namespace JsonFx.Xml.Stax
 			        StaxGrammar.TokenWhitespace("\r\n\t"),
 			        StaxGrammar.TokenElementBegin(new DataName("body")),
 			        StaxGrammar.TokenWhitespace("\r\n\t\t"),
-			        StaxGrammar.TokenUnparsed("?", @"php echo '<p>Hello World</p>'; "),
+			        StaxGrammar.TokenUnparsed("?{0}?", @"php echo '<p>Hello World</p>'; "),
 			        StaxGrammar.TokenWhitespace("\r\n\t"),
 			        StaxGrammar.TokenElementEnd(new DataName("body")),
 			        StaxGrammar.TokenWhitespace("\r\n"),
@@ -1126,7 +1126,7 @@ namespace JsonFx.Xml.Stax
 
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenUnparsed("%--",
+			        StaxGrammar.TokenUnparsed("%--{0}--%",
 @"
 <html>
 	<body style=""color:lime"">

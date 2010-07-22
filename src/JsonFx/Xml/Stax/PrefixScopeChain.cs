@@ -108,17 +108,51 @@ namespace JsonFx.Xml.Stax
 			}
 
 			/// <summary>
+			/// Returns if this scope boundary contains a mapping for a particular namespace
+			/// </summary>
+			/// <param name="prefix"></param>
+			/// <returns>if this scope boundary contains a mapping for a particular namespace</returns>
+			public bool ContainsNamespace(string namespaceUri)
+			{
+				return (this.prefixes != null) && (this.prefixes.ContainsValue(namespaceUri));
+			}
+
+			/// <summary>
 			/// Returns if this scope boundary contains a mapping for a particular prefix
 			/// setting the namespace URI if one was found.
 			/// </summary>
 			/// <param name="prefix"></param>
 			/// <param name="namespaceUri">the resolved namespace URI</param>
 			/// <returns>if this scope boundary contains a mapping for a particular prefix</returns>
-			public bool TryGetPrefix(string prefix, out string namespaceUri)
+			public bool TryGetNamespace(string prefix, out string namespaceUri)
 			{
 				namespaceUri = null;
 
 				return (this.prefixes != null) && (this.prefixes.TryGetValue(prefix, out namespaceUri));
+			}
+
+			/// <summary>
+			/// Returns if this scope boundary contains a mapping for a particular prefix
+			/// setting the prefix if one was found.
+			/// </summary>
+			/// <param name="namespaceUri"></param>
+			/// <param name="prefix">the resolved prefix</param>
+			/// <returns>if this scope boundary contains a mapping for a particular prefix</returns>
+			public bool TryGetPrefix(string namespaceUri, out string prefix)
+			{
+				prefix = null;
+				if (this.prefixes == null)
+				{
+					return false;
+				}
+				int index = this.prefixes.IndexOfValue(namespaceUri);
+				if (index < 0)
+				{
+					return false;
+				}
+
+				prefix = this.prefixes.Keys[index];
+				return true;
 			}
 
 			#endregion Methods
@@ -222,11 +256,11 @@ namespace JsonFx.Xml.Stax
 		}
 
 		/// <summary>
-		/// Resolves the namespace URI for a given prefix within the curren scope chain
+		/// Finds the namespace URI for a given prefix within the curren scope chain
 		/// </summary>
 		/// <param name="prefix"></param>
 		/// <returns></returns>
-		public string Resolve(string prefix, bool throwOnUndeclared)
+		public string GetNamespace(string prefix, bool throwOnUndeclared)
 		{
 			if (prefix == null)
 			{
@@ -247,14 +281,57 @@ namespace JsonFx.Xml.Stax
 				scope = this.Chain.FindLast(item => item.ContainsPrefix(String.Empty));
 			}
 
-			return (scope != null) ? scope[prefix] : null;
+			string namespaceUri;
+			if (scope != null &&
+				scope.TryGetNamespace(prefix, out namespaceUri))
+			{
+				return namespaceUri;
+			}
+
+			return null;
+		}
+
+		/// <summary>
+		/// Finds the prefix for a given namespace URI within the curren scope chain
+		/// </summary>
+		/// <param name="prefix"></param>
+		/// <returns></returns>
+		public string GetPrefix(string namespaceUri, bool throwOnUndeclared)
+		{
+			if (namespaceUri == null)
+			{
+				namespaceUri = String.Empty;
+			}
+
+			// find the last scope in chain that resolves prefix
+			Scope scope = this.Chain.FindLast(item => item.ContainsNamespace(namespaceUri));
+			if (scope == null &&
+				!String.IsNullOrEmpty(namespaceUri))
+			{
+				if (throwOnUndeclared)
+				{
+					throw new InvalidOperationException(
+						String.Format("Unknown scope prefix ({0})", namespaceUri));
+				}
+
+				scope = this.Chain.FindLast(item => item.ContainsNamespace(String.Empty));
+			}
+
+			string prefix;
+			if (scope != null &&
+				scope.TryGetPrefix(namespaceUri, out prefix))
+			{
+				return prefix;
+			}
+
+			return null;
 		}
 
 		/// <summary>
 		/// Checks if the matching begin tag exists on the stack
 		/// </summary>
 		/// <returns></returns>
-		public bool Contains(DataName closeTag)
+		public bool ContainsTag(DataName closeTag)
 		{
 			int index = this.Chain.FindLastIndex(item => item.TagName == closeTag);
 			return (index >= 0);

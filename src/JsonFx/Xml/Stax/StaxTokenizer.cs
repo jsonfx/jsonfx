@@ -48,41 +48,6 @@ namespace JsonFx.Xml.Stax
 	/// </remarks>
 	public class StaxTokenizer : ITextTokenizer<StaxTokenType>
 	{
-		#region TagType
-
-		/// <summary>
-		/// Defines the type of tag
-		/// </summary>
-		private enum TagType
-		{
-			/// <summary>
-			/// Not set
-			/// </summary>
-			None,
-
-			/// <summary>
-			/// Unparsed block
-			/// </summary>
-			Unparsed,
-
-			/// <summary>
-			/// Opening tag
-			/// </summary>
-			BeginTag,
-
-			/// <summary>
-			/// Closing tag
-			/// </summary>
-			EndTag,
-
-			/// <summary>
-			/// Empty tag
-			/// </summary>
-			VoidTag
-		}
-
-		#endregion TagType
-
 		#region Inner Types
 
 		private class StaxQName
@@ -138,12 +103,11 @@ namespace JsonFx.Xml.Stax
 		#region Fields
 
 		private const int DefaultBufferSize = 0x20;
+		private readonly PrefixScopeChain ScopeChain = new PrefixScopeChain();
 
 		private ITextStream Scanner = TextReaderStream.Null;
 		private bool autoBalanceTags;
 		private bool errorRecovery;
-
-		private PrefixScopeChain ScopeChain = new PrefixScopeChain();
 
 		#endregion Fields
 
@@ -302,10 +266,10 @@ namespace JsonFx.Xml.Stax
 			}
 
 			char ch = scanner.Peek();
-			TagType tagType = TagType.BeginTag;
+			StaxTagType tagType = StaxTagType.BeginTag;
 			if (ch == StaxGrammar.OperatorElementClose)
 			{
-				tagType = TagType.EndTag;
+				tagType = StaxTagType.EndTag;
 				scanner.Pop();
 				ch = scanner.Peek();
 			}
@@ -324,7 +288,7 @@ namespace JsonFx.Xml.Stax
 
 				// treat as literal text
 				string text = Char.ToString(StaxGrammar.OperatorElementBegin);
-				if (tagType == TagType.EndTag)
+				if (tagType == StaxTagType.EndTag)
 				{
 					text += StaxGrammar.OperatorElementClose;
 				}
@@ -382,7 +346,7 @@ namespace JsonFx.Xml.Stax
 							{
 								// emit as an unparsed comment
 								return StaxGrammar.TokenUnparsed(
-									String.Concat(StaxGrammar.OperatorComment, StaxGrammar.OperatorCommentBegin),
+									String.Concat("!--{0}--"),
 									value);
 							}
 
@@ -404,7 +368,7 @@ namespace JsonFx.Xml.Stax
 						default:									// "<!", ">"			SGML declaration (e.g. DOCTYPE or server-side include)
 						{
 							return StaxGrammar.TokenUnparsed(
-								Char.ToString(StaxGrammar.OperatorComment),
+								"!{0}",
 								this.ScanUnparsedValue(scanner, String.Empty, String.Empty));
 						}
 					}
@@ -419,13 +383,13 @@ namespace JsonFx.Xml.Stax
 						case StaxGrammar.OperatorCodeExpression:	// "<?=", "?>"			PHP expression code block
 						{
 							return StaxGrammar.TokenUnparsed(
-								Char.ToString(StaxGrammar.OperatorProcessingInstruction),
+								"?={0}?",
 								this.ScanUnparsedValue(scanner, StaxGrammar.OperatorPhpExpressionBegin, StaxGrammar.OperatorProcessingInstructionEnd));
 						}
 						default:									// "<?", "?>"			PHP code block / XML processing instruction (e.g. XML declaration)
 						{
 							return StaxGrammar.TokenUnparsed(
-								Char.ToString(StaxGrammar.OperatorProcessingInstruction),
+								"?{0}?",
 								this.ScanUnparsedValue(scanner, String.Empty, StaxGrammar.OperatorProcessingInstructionEnd));
 						}
 					}
@@ -441,7 +405,7 @@ namespace JsonFx.Xml.Stax
 						case StaxGrammar.OperatorCommentDelim:		// "<%--", "--%>"		ASP/PSP/JSP-style code comment
 						{
 							return StaxGrammar.TokenUnparsed(
-								String.Concat(StaxGrammar.OperatorCode, StaxGrammar.OperatorCommentBegin),
+								"%--{0}--%",
 								this.ScanUnparsedValue(scanner, StaxGrammar.OperatorCommentBegin, String.Concat(StaxGrammar.OperatorCommentEnd, StaxGrammar.OperatorCode)));
 						}
 						case StaxGrammar.OperatorCodeDirective:		// "<%@",  "%>"			ASP/PSP/JSP directive
@@ -454,14 +418,14 @@ namespace JsonFx.Xml.Stax
 							scanner.Pop();
 
 							return StaxGrammar.TokenUnparsed(
-								String.Concat(StaxGrammar.OperatorCode, ch),
+								String.Concat(StaxGrammar.OperatorCode, ch, "{0}", StaxGrammar.OperatorCode),
 								this.ScanUnparsedValue(scanner, String.Empty, Char.ToString(StaxGrammar.OperatorCode)));
 						}
 						default:									// "<%",   "%>"			ASP/PSP/JSP code block
 						{
 							// simple code block
 							return StaxGrammar.TokenUnparsed(
-								Char.ToString(StaxGrammar.OperatorCode),
+								"%{0}%",
 								this.ScanUnparsedValue(scanner, String.Empty, Char.ToString(StaxGrammar.OperatorCode)));
 						}
 					}
@@ -725,7 +689,7 @@ namespace JsonFx.Xml.Stax
 
 		private bool IsTagComplete(
 			ITextStream scanner,
-			ref TagType tagType)
+			ref StaxTagType tagType)
 		{
 			if (scanner.IsCompleted)
 			{
@@ -745,7 +709,7 @@ namespace JsonFx.Xml.Stax
 					scanner.Pop();
 					if (scanner.Peek() == StaxGrammar.OperatorElementEnd)
 					{
-						if (tagType != TagType.BeginTag)
+						if (tagType != StaxTagType.BeginTag)
 						{
 							throw new DeserializationException(
 								"Malformed element tag",
@@ -755,7 +719,7 @@ namespace JsonFx.Xml.Stax
 						}
 
 						scanner.Pop();
-						tagType = TagType.VoidTag;
+						tagType = StaxTagType.VoidTag;
 						return true;
 					}
 
@@ -777,13 +741,13 @@ namespace JsonFx.Xml.Stax
 			}
 		}
 
-		private void EmitTag(List<Token<StaxTokenType>> tokens, TagType tagType, StaxQName qName, List<StaxAttribute> attributes)
+		private void EmitTag(List<Token<StaxTokenType>> tokens, StaxTagType tagType, StaxQName qName, List<StaxAttribute> attributes)
 		{
 			PrefixScopeChain.Scope scope;
 
-			if (tagType == TagType.EndTag)
+			if (tagType == StaxTagType.EndTag)
 			{
-				DataName closeTagName = new DataName(qName.Name, this.ScopeChain.Resolve(qName.Prefix, !this.errorRecovery));
+				DataName closeTagName = new DataName(qName.Name, this.ScopeChain.GetNamespace(qName.Prefix, !this.errorRecovery));
 
 				scope = this.ScopeChain.Pop();
 				if (scope == null ||
@@ -817,7 +781,7 @@ namespace JsonFx.Xml.Stax
 						return;
 					}
 
-					if (!this.ScopeChain.Contains(closeTagName))
+					if (!this.ScopeChain.ContainsTag(closeTagName))
 					{
 						// restore scope item
 						if (scope != null)
@@ -884,7 +848,7 @@ namespace JsonFx.Xml.Stax
 
 			// add to scope chain, resolve QName, and store tag name
 			this.ScopeChain.Push(scope);
-			scope.TagName = new DataName(qName.Name, this.ScopeChain.Resolve(qName.Prefix, !this.errorRecovery));
+			scope.TagName = new DataName(qName.Name, this.ScopeChain.GetNamespace(qName.Prefix, !this.errorRecovery));
 
 			foreach (var mapping in scope)
 			{
@@ -897,13 +861,13 @@ namespace JsonFx.Xml.Stax
 			{
 				foreach (var attr in attributes)
 				{
-					DataName attrName = new DataName(attr.QName.Name, this.ScopeChain.Resolve(attr.QName.Prefix, !this.errorRecovery));
+					DataName attrName = new DataName(attr.QName.Name, this.ScopeChain.GetNamespace(attr.QName.Prefix, !this.errorRecovery));
 					tokens.Add(StaxGrammar.TokenAttribute(attrName));
 					tokens.Add(attr.Value);
 				}
 			}
 
-			if (tagType == TagType.VoidTag)
+			if (tagType == StaxTagType.VoidTag)
 			{
 				// immediately remove from scope chain
 				this.ScopeChain.Pop();
