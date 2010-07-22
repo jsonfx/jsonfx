@@ -113,6 +113,11 @@ namespace JsonFx.Xml.Stax
 				{
 					case StaxTokenType.PrefixBegin:
 					{
+						if (scope == null)
+						{
+							scope = new PrefixScopeChain.Scope();
+						}
+
 						do
 						{
 							scope[token.Name.LocalName] = token.Name.NamespaceUri;
