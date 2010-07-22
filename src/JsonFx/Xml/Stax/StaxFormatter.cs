@@ -30,6 +30,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 
 using JsonFx.IO;
@@ -54,6 +55,7 @@ namespace JsonFx.Xml.Stax
 		private readonly DataWriterSettings Settings;
 		private readonly PrefixScopeChain ScopeChain = new PrefixScopeChain();
 		private int nsCounter;
+		private bool encodeNonAscii = false;
 
 		#endregion Fields
 
@@ -74,6 +76,22 @@ namespace JsonFx.Xml.Stax
 		}
 
 		#endregion Init
+
+		#region Properties
+
+		/// <summary>
+		/// Gets and sets a value indicating if should encode text chars above the ASCII range
+		/// </summary>
+		/// <remarks>
+		/// This option can help when the output is being embedded within an unknown encoding
+		/// </remarks>
+		public bool EncodeNonAscii
+		{
+			get { return this.encodeNonAscii; }
+			set { this.encodeNonAscii = value; }
+		}
+
+		#endregion Properties
 
 		#region ITextFormatter<T> Methods
 
@@ -460,8 +478,10 @@ namespace JsonFx.Xml.Stax
 
 			for (int i=start; i<length; i++)
 			{
+				char ch = value[i];
+
 				string entity;
-				switch (value[i])
+				switch (ch)
 				{
 					case '<':
 					{
@@ -486,6 +506,17 @@ namespace JsonFx.Xml.Stax
 					//}
 					default:
 					{
+						if (((ch < ' ') && (ch != '\n') && (ch != '\r') && (ch != '\t')) ||
+							(this.encodeNonAscii && (ch >= 0x7F)) ||
+							((ch >= 0x7F) && (ch <= 0x84)) ||
+							((ch >= 0x86) && (ch <= 0x9F)) ||
+							((ch >= 0xFDD0) && (ch <= 0xFDEF)))
+						{
+							// encode all control chars except CRLF/Tab: http://www.w3.org/TR/xml/#charsets
+							int utf16 = Char.ConvertToUtf32(value, i);
+							entity = String.Concat("&#x", utf16.ToString("X", CultureInfo.InvariantCulture), ';');
+							break;
+						}
 						continue;
 					}
 				}
@@ -531,8 +562,10 @@ namespace JsonFx.Xml.Stax
 
 			for (int i=start; i<length; i++)
 			{
+				char ch = value[i];
+
 				string entity;
-				switch (value[i])
+				switch (ch)
 				{
 					case '<':
 					{
@@ -560,23 +593,19 @@ namespace JsonFx.Xml.Stax
 					//    entity = "&apos;";
 					//    break;
 					//}
-					case '\t':
-					{
-						entity = "&#x9;";
-						break;
-					}
-					case '\r':
-					{
-						entity = "&#xD;";
-						break;
-					}
-					case '\n':
-					{
-						entity = "&#xA;";
-						break;
-					}
 					default:
 					{
+						if ((ch < ' ') ||
+							(this.encodeNonAscii && (ch >= 0x7F)) ||
+							((ch >= 0x7F) && (ch <= 0x84)) ||
+							((ch >= 0x86) && (ch <= 0x9F)) ||
+							((ch >= 0xFDD0) && (ch <= 0xFDEF)))
+						{
+							// encode all control chars: http://www.w3.org/TR/xml/#charsets
+							int utf16 = Char.ConvertToUtf32(value, i);
+							entity = String.Concat("&#x", utf16.ToString("X", CultureInfo.InvariantCulture), ';');
+							break;
+						}
 						continue;
 					}
 				}
