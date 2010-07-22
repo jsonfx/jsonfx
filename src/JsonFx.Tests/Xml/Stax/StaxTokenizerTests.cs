@@ -302,7 +302,7 @@ namespace JsonFx.Xml.Stax
 		#region Simple Attribute Tests
 
 		[Fact]
-		public void GetTokens_SingleTagSingleAttribute_ReturnsSequence()
+		public void GetTokens_SingleAttribute_ReturnsSequence()
 		{
 			const string input = @"<root attrName=""attrValue""></root>";
 			var expected = new[]
@@ -320,7 +320,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
-		public void GetTokens_SingleTagSingleAttributeNoValue_ReturnsSequence()
+		public void GetTokens_SingleEmptyAttributeHtmlStyle_ReturnsSequence()
 		{
 			const string input = @"<root noValue></root>";
 			var expected = new[]
@@ -338,7 +338,25 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
-		public void GetTokens_SingleTagSingleAttributeEmptyValue_ReturnsSequence()
+		public void GetTokens_SingleEmptyAttributeXmlStyle_ReturnsSequence()
+		{
+			const string input = @"<root noValue=""""></root>";
+			var expected = new[]
+			    {
+			        StaxGrammar.TokenElementBegin(new DataName("root")),
+			        StaxGrammar.TokenAttribute(new DataName("noValue")),
+			        StaxGrammar.TokenText(String.Empty),
+			        StaxGrammar.TokenElementEnd(new DataName("root"))
+			    };
+
+			var tokenizer = new StaxTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		public void GetTokens_SingleAttributeEmptyValue_ReturnsSequence()
 		{
 			const string input = @"<root emptyValue=""""></root>";
 			var expected = new[]
@@ -356,7 +374,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
-		public void GetTokens_SingleTagWhitespaceAttributeQuotDelims_ReturnsSequence()
+		public void GetTokens_AttributeWhitespaceQuotDelims_ReturnsSequence()
 		{
 			const string input = @"<root white  =  "" extra whitespace around quote delims "" ></root>";
 			var expected = new[]
@@ -374,7 +392,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
-		public void GetTokens_SingleTagWhitespaceAttributeAposDelims_ReturnsSequence()
+		public void GetTokens_WhitespaceAttributeAposDelims_ReturnsSequence()
 		{
 			const string input = @"<root white  =  ' extra whitespace around apostrophe delims ' ></root>";
 			var expected = new[]
@@ -392,7 +410,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
-		public void GetTokens_SingleTagSingleAttributeWhitespace_ReturnsSequence()
+		public void GetTokens_SingleAttributeWhitespace_ReturnsSequence()
 		{
 			const string input = @"<root whitespace="" this contains whitespace ""></root>";
 			var expected = new[]
@@ -410,7 +428,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
-		public void GetTokens_SingleTagSingleAttributeSingleQuoted_ReturnsSequence()
+		public void GetTokens_SingleAttributeSingleQuoted_ReturnsSequence()
 		{
 			const string input = @"<root singleQuoted='apostrophe'></root>";
 			var expected = new[]
@@ -428,7 +446,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
-		public void GetTokens_SingleTagSingleAttributeSingleQuotedWhitespace_ReturnsSequence()
+		public void GetTokens_SingleAttributeSingleQuotedWhitespace_ReturnsSequence()
 		{
 			const string input = @"<root singleQuoted_whitespace=' apostrophe with whitespace '></root>";
 			var expected = new[]
@@ -446,7 +464,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
-		public void GetTokens_SingleTagMultipleAttributes_ReturnsSequence()
+		public void GetTokens_MultipleAttributes_ReturnsSequence()
 		{
 			const string input = @"<root no-value whitespace="" this contains whitespace "" anyQuotedText="""+"/\\\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"+@"""></root>";
 			var expected = new[]
@@ -788,18 +806,9 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
-		public void GetTokens_OverlappingTagsNoRecovery_ReturnsSequenceAsIs()
+		public void GetTokens_OverlappingTagsNoRecovery_ThrowsDeserializationException()
 		{
 			const string input = @"<odd><auto-closed><even></odd></ignored></even>";
-			var expected = new[]
-			    {
-			        StaxGrammar.TokenElementBegin(new DataName("odd")),
-			        StaxGrammar.TokenElementBegin(new DataName("auto-closed")),
-			        StaxGrammar.TokenElementBegin(new DataName("even")),
-			        StaxGrammar.TokenElementEnd(new DataName("odd")),
-			        StaxGrammar.TokenElementEnd(new DataName("ignored")),
-			        StaxGrammar.TokenElementEnd(new DataName("even"))
-			    };
 
 			var tokenizer = new StaxTokenizer { ErrorRecovery=false };
 
