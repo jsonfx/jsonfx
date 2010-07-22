@@ -43,9 +43,17 @@ namespace JsonFx.Bson
 {
 	public class BsonTokenizerTests
 	{
+		#region Constants
+
+		private const string TraitName = "BSON";
+		private const string TraitValue = "Deserialization";
+
+		#endregion Constants
+
 		#region Array Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_ArrayRoot_ReturnsDocument()
 		{
 			// BSON doesn't provide a way to know if the root element is an array
@@ -84,6 +92,7 @@ namespace JsonFx.Bson
 		#region Object Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_HelloWorld_ReturnsDocument()
 		{
 			// input from example at http://bsonspec.org/#/specification
@@ -106,6 +115,7 @@ namespace JsonFx.Bson
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_ArrayAsProperty_ReturnsDocument()
 		{
 			// input from example at http://bsonspec.org/#/specification
@@ -151,6 +161,7 @@ namespace JsonFx.Bson
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_BooleanValue_ReturnsDocument()
 		{
 			// input from example at http://codebetter.com/blogs/karlseguin/archive/2010/03/05/bson-serialization.aspx
@@ -178,6 +189,7 @@ namespace JsonFx.Bson
 		#region Input Edge Case Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_NullByteArray_ThrowsArgumentNullException()
 		{
 			var input = (byte[])null;
@@ -195,6 +207,7 @@ namespace JsonFx.Bson
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_NullStream_ThrowsArgumentNullException()
 		{
 			var input = (Stream)null;
@@ -212,6 +225,7 @@ namespace JsonFx.Bson
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_EmptyByteArray_ReturnsEmptySequence()
 		{
 			var input = new byte[0];
@@ -224,6 +238,7 @@ namespace JsonFx.Bson
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_EmptyStream_ReturnsEmptySequence()
 		{
 			var input = Stream.Null;

@@ -38,9 +38,17 @@ namespace JsonFx.IO
 {
 	public class TextReaderStreamTests
 	{
+		#region Constants
+
+		private const string TraitName = "Text";
+		private const string TraitValue = "Deserialization";
+
+		#endregion Constants
+
 		#region Start State Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Peek_NullReader_ReturnsNullChar()
 		{
 			using (var scanner = new TextReaderStream(TextReader.Null))
@@ -50,6 +58,7 @@ namespace JsonFx.IO
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Pop_NullReader_ReturnsNullChar()
 		{
 			using (var scanner = new TextReaderStream(TextReader.Null))
@@ -59,6 +68,7 @@ namespace JsonFx.IO
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Index_StartState_ReturnsNegOne()
 		{
 			using (var scanner = new TextReaderStream(TextReader.Null))
@@ -68,6 +78,7 @@ namespace JsonFx.IO
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Line_StartState_ReturnsNegOne()
 		{
 			using (var scanner = new TextReaderStream(TextReader.Null))
@@ -77,6 +88,7 @@ namespace JsonFx.IO
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Column_StartState_ReturnsNegOne()
 		{
 			using (var scanner = new TextReaderStream(TextReader.Null))
@@ -86,6 +98,7 @@ namespace JsonFx.IO
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void IsCompleted_NullReader_ReturnsFalse()
 		{
 			using (var scanner = new TextReaderStream(TextReader.Null))
@@ -99,6 +112,7 @@ namespace JsonFx.IO
 		#region Pop Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Pop_NullReader_ReturnsEmptySequence()
 		{
 			using (var scanner = new TextReaderStream(TextReader.Null))
@@ -114,6 +128,7 @@ namespace JsonFx.IO
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Pop_EmptySequence_ReturnsEmptySequence()
 		{
 			const string input = "";
@@ -131,6 +146,7 @@ namespace JsonFx.IO
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Pop_OneCharSequence_ReturnsSameSequence()
 		{
 			const string input = "_";
@@ -148,6 +164,7 @@ namespace JsonFx.IO
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Pop_LongSequence_ReturnsSameSequence()
 		{
 			const string input = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -165,6 +182,7 @@ namespace JsonFx.IO
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Pop_EscapedSequence_ReturnsSameSequence()
 		{
 			const string input = @"""\\\b\f\n\r\t\u0123\u4567\u89AB\uCDEF\uabcd\uef4A\""""";
@@ -182,6 +200,7 @@ namespace JsonFx.IO
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Pop_UnicodeSequence_ReturnsSameSequence()
 		{
 			const string input = "私が日本語を話すことはありません。";
@@ -203,6 +222,7 @@ namespace JsonFx.IO
 		#region Peek Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Peek_LongString_ReturnsSameAsPop()
 		{
 			const string input = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -224,6 +244,7 @@ namespace JsonFx.IO
 		#region Line, Column, Index Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Line_MultilineString_CountsCorrectNumberOfLines()
 		{
 			const string input = @"Line one
@@ -243,6 +264,7 @@ Line Four";
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Column_MultilineString_CountsCorrectNumberOfColumns()
 		{
 			const string input = @"Line one
@@ -262,6 +284,7 @@ Line Four";
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Index_MultilineString_CountsCorrectNumberOfChars()
 		{
 			const string input = @"Line one

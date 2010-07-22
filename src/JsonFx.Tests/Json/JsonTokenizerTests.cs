@@ -41,9 +41,17 @@ namespace JsonFx.Json
 {
 	public class JsonTokenizerTests
 	{
+		#region Constants
+
+		private const string TraitName = "JSON";
+		private const string TraitValue = "Deserialization";
+
+		#endregion Constants
+
 		#region Array Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_ArrayEmpty_ReturnsEmptyArrayTokens()
 		{
 			const string input = "[]";
@@ -60,6 +68,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_ArrayOneItem_ReturnsArrayTokens()
 		{
 			const string input = "[null]";
@@ -77,6 +86,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_ArrayMultiItemWhitespace_ReturnsSimpleArrayTokens()
 		{
 			const string input = "[ 0, null,  false,true ]";
@@ -100,6 +110,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_ArrayNestedDeeply_ReturnsNestedArrayTokens()
 		{
 			// input from pass2.json in test suite at http://www.json.org/JSON_checker/
@@ -154,6 +165,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_ArrayExtraComma_ProducesInvalidSequence()
 		{
 			// NOTE: analyzer should flag this as an error as is grammar error, not tokenization error
@@ -175,6 +187,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_ArrayDoubleExtraComma_ProducesInvalidSequence()
 		{
 			// NOTE: analyzer should flag this as an error as is grammar error, not tokenization error
@@ -197,6 +210,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_ArrayMissingValue_ProducesInvalidSequence()
 		{
 			// NOTE: analyzer should flag this as an error as is grammar error, not tokenization error
@@ -218,6 +232,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_ArrayColonInsteadOfComma_ProducesInvalidSequence()
 		{
 			// NOTE: analyzer should flag this as an error as is grammar error, not tokenization error
@@ -239,6 +254,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_ArrayBadValue_ThrowsAnalyzerException()
 		{
 			// input from fail23.json in test suite at http://www.json.org/JSON_checker/
@@ -262,6 +278,7 @@ namespace JsonFx.Json
 		#region Object Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_ObjectEmpty_ReturnsEmptyObjectTokens()
 		{
 			const string input = "{}";
@@ -278,6 +295,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_ObjectOneProperty_ReturnsSimpleObjectTokens()
 		{
 			const string input = @"{""key"":""value""}";
@@ -296,6 +314,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_ObjectNested_ReturnsNestedObjectTokens()
 		{
 			// input from pass3.json in test suite at http://www.json.org/JSON_checker/
@@ -328,6 +347,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_ObjectCommaInsteadOfColon_ProducesInvalidSequence()
 		{
 			// NOTE: analyzer should flag this as an error as is grammar error, not tokenization error
@@ -351,6 +371,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_ObjectUnterminated_ProducesInvalidSequence()
 		{
 			// NOTE: analyzer should flag this as an error as is grammar error, not tokenization error
@@ -377,6 +398,7 @@ namespace JsonFx.Json
 		#region String Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_StringEmpty_ReturnsEmptyStringToken()
 		{
 			const string input = "\"\"";
@@ -392,6 +414,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_StringSimple_ReturnsStringToken()
 		{
 			// input from fail1.json in test suite at http://www.json.org/JSON_checker/
@@ -409,6 +432,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_StringEscapedChars_ReturnsStringToken()
 		{
 			const string input = @"""\\\b\f\n\r\t\u0123\u4567\u89AB\uCDEF\uabcd\uef4A\""""";
@@ -424,6 +448,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_StringImproperlyEscapedChars_ReturnsStringTokenWithSimpleChars()
 		{
 			const string input = @"""\u\u1\u12\u123\u12345""";
@@ -439,6 +464,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_StringUnrecognizedEscapeLetter_EscapesToSimpleChar()
 		{
 			// input from fail15.json in test suite at http://www.json.org/JSON_checker/
@@ -458,6 +484,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_StringUnrecognizedEscapeNull_CharIgnored()
 		{
 			// input from fail17.json in test suite at http://www.json.org/JSON_checker/
@@ -477,6 +504,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_StringSingleQuote_ReturnsStringToken()
 		{
 			// input from fail24.json in test suite at http://www.json.org/JSON_checker/
@@ -496,6 +524,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_StringUnescapedSingleQuote_ReturnsStringToken()
 		{
 			const string input = @"""unescaped ' single quote""";
@@ -511,6 +540,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_StringUnescapedDoubleQuote_ReturnsStringToken()
 		{
 			const string input = @"'unescaped "" quote'";
@@ -527,6 +557,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_StringTabChar_ReturnsStringToken()
 		{
 			// input from fail25.json in test suite at http://www.json.org/JSON_checker/
@@ -546,6 +577,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_StringEscapedTabChar_ReturnsStringToken()
 		{
 			// input from fail26.json in test suite at http://www.json.org/JSON_checker/
@@ -565,6 +597,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_StringUnquoted_ThrowsDeserializationException()
 		{
 			// input from fail16.json in test suite at http://www.json.org/JSON_checker/
@@ -583,6 +616,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_StringLineBreak_ThrowsDeserializationException()
 		{
 			// input from fail27.json in test suite at http://www.json.org/JSON_checker/
@@ -602,6 +636,7 @@ break""]";
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_StringEscapedLineBreak_ThrowsDeserializationException()
 		{
 			// input from fail28.json in test suite at http://www.json.org/JSON_checker/
@@ -621,6 +656,7 @@ break""]";
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_StringUnterminated_ThrowsDeserializationException()
 		{
 			const string input = @"""unterminated";
@@ -642,6 +678,7 @@ break""]";
 		#region Number Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_NumberInteger_ReturnsNumberToken()
 		{
 			const string input = "123456";
@@ -657,6 +694,7 @@ break""]";
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_NumberFloat_ReturnsNumberToken()
 		{
 			const string input = "1.23456";
@@ -672,6 +710,7 @@ break""]";
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_NumberNegFloat_ReturnsNumberToken()
 		{
 			const string input = "-0.123456";
@@ -687,6 +726,7 @@ break""]";
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_NumberNoLeadingDigitFloat_ReturnsNumberToken()
 		{
 			const string input = ".123456";
@@ -702,6 +742,7 @@ break""]";
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_NumberPosNoLeadingDigitFloat_ReturnsNumberToken()
 		{
 			const string input = "+.123456";
@@ -717,6 +758,7 @@ break""]";
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_NumberNegNoLeadingDigitFloat_ReturnsNumberToken()
 		{
 			const string input = "-.123456";
@@ -732,6 +774,7 @@ break""]";
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_NumberIntegerLeadingZero_ReturnsObjectTokensWithNumberValue()
 		{
 			// input from fail13.json in test suite at http://www.json.org/JSON_checker/
@@ -752,6 +795,7 @@ break""]";
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_NumberHexValue_ThrowsDeserializationException()
 		{
 			// input from fail14.json in test suite at http://www.json.org/JSON_checker/
@@ -770,6 +814,7 @@ break""]";
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_NumberFloatMissingExp_ThrowsDeserializationException()
 		{
 			// input from fail29.json in test suite at http://www.json.org/JSON_checker/
@@ -788,6 +833,7 @@ break""]";
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_NumberFloatMissingExpDigits_ThrowsDeserializationException()
 		{
 			// input from fail30.json in test suite at http://www.json.org/JSON_checker/
@@ -806,6 +852,7 @@ break""]";
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_NumberFloatExtraExpSign_ThrowsDeserializationException()
 		{
 			// input from fail31.json in test suite at http://www.json.org/JSON_checker/
@@ -824,6 +871,7 @@ break""]";
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_NumberUnfinishedFloat_ThrowsDeserializationException()
 		{
 			const string input = @"123.";
@@ -841,6 +889,7 @@ break""]";
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_NumberFloatMissingFractional_ThrowsDeserializationException()
 		{
 			const string input = @"123.e5";
@@ -862,6 +911,7 @@ break""]";
 		#region Literal Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_LiteralNonQuotedKey_ReturnsObjectTokensWithLiteralKey()
 		{
 			// input from fail3.json in test suite at http://www.json.org/JSON_checker/
@@ -881,6 +931,7 @@ break""]";
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_LiteralNonQuotedKeyDollarSign_ReturnsObjectTokensWithLiteralKey()
 		{
 			const string input = @"{ $abcdefg0123456 : false }";
@@ -899,6 +950,7 @@ break""]";
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_LiteralNonQuotedKeyNumber_ReturnsObjectTokensWithLiteralKey()
 		{
 			const string input = @"{ _123456 : true }";
@@ -921,6 +973,7 @@ break""]";
 		#region Keyword Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_KeywordUndefined_ReturnsUndefinedToken()
 		{
 			const string input = @"undefined";
@@ -937,6 +990,7 @@ break""]";
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_KeywordNull_ReturnsNullToken()
 		{
 			const string input = @"null";
@@ -952,6 +1006,7 @@ break""]";
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_KeywordFalse_ReturnsFalseToken()
 		{
 			const string input = @"false";
@@ -967,6 +1022,7 @@ break""]";
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_KeywordTrue_ReturnsTrueToken()
 		{
 			const string input = @"true";
@@ -982,6 +1038,7 @@ break""]";
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_KeywordNan_ReturnsNanToken()
 		{
 			const string input = @"NaN";
@@ -998,6 +1055,7 @@ break""]";
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_KeywordInfinity_ReturnsPositiveInfinityToken()
 		{
 			const string input = @"Infinity";
@@ -1014,6 +1072,7 @@ break""]";
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_KeywordPosInfinity_ReturnsPositiveInfinityToken()
 		{
 			const string input = @"+Infinity";
@@ -1030,6 +1089,7 @@ break""]";
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_KeywordNegInfinity_ReturnsNegativeInfinityToken()
 		{
 			const string input = @"-Infinity";
@@ -1050,6 +1110,7 @@ break""]";
 		#region Complex Graph Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_GraphWhitespace_ReturnsGraphTokens()
 		{
 			const string input = @"
@@ -1081,6 +1142,7 @@ break""]";
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_GraphComplex_ReturnsGraphTokens()
 		{
 			// input from pass1.json in test suite at http://www.json.org/JSON_checker/
@@ -1332,6 +1394,7 @@ break""]";
 		#region Input Edge Case Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_NullInput_ReturnsEmptySequence()
 		{
 			const string input = null;
@@ -1344,6 +1407,7 @@ break""]";
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_EmptyInput_ReturnsEmptySequence()
 		{
 			const string input = "";
@@ -1360,6 +1424,7 @@ break""]";
 		#region Illegal Sequence Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_IllegalExpression_ThrowsDeserializationException()
 		{
 			// input from fail11.json in test suite at http://www.json.org/JSON_checker/
@@ -1378,6 +1443,7 @@ break""]";
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_IllegalInvocation_ThrowsDeserializationException()
 		{
 			// input from fail12.json in test suite at http://www.json.org/JSON_checker/
@@ -1396,6 +1462,7 @@ break""]";
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_IllegalStatement_ThrowsDeserializationException()
 		{
 			const string input = @"var foo = true;";
@@ -1413,6 +1480,7 @@ break""]";
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_IllegalFunction_ThrowsDeserializationException()
 		{
 			const string input = @"new function() { }";

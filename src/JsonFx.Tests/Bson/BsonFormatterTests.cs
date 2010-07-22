@@ -43,9 +43,17 @@ namespace JsonFx.Bson
 {
 	public class BsonFormatterTests
 	{
+		#region Constants
+
+		private const string TraitName = "BSON";
+		private const string TraitValue = "Serialization";
+
+		#endregion Constants
+
 		#region Object Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_HelloWorld_ReturnsDocument()
 		{
 			// input from example at http://bsonspec.org/#/specification
@@ -68,6 +76,7 @@ namespace JsonFx.Bson
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ArrayAsProperty_ReturnsDocument()
 		{
 			// input from example at http://bsonspec.org/#/specification
@@ -112,6 +121,7 @@ namespace JsonFx.Bson
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_BooleanValue_ReturnsDocument()
 		{
 			// input from example at http://codebetter.com/blogs/karlseguin/archive/2010/03/05/bson-serialization.aspx
@@ -139,6 +149,7 @@ namespace JsonFx.Bson
 		#region Namespace Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ObjectOneNamespacedProperty_CorrectlyIgnoresNamespace()
 		{
 			var input = new[]
@@ -164,6 +175,7 @@ namespace JsonFx.Bson
 		#region Input Edge Case Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_NullStream_ThrowsArgumentNullException()
 		{
 			var input = new Token<CommonTokenType>[0];
@@ -180,6 +192,7 @@ namespace JsonFx.Bson
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_NullTokens_ThrowsArgumentNullException()
 		{
 			var input = (IEnumerable<Token<CommonTokenType>>)null;
@@ -196,6 +209,7 @@ namespace JsonFx.Bson
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_EmptySequence_ReturnsEmptyByteArray()
 		{
 			var expected = new byte[0];

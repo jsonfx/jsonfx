@@ -43,9 +43,17 @@ namespace JsonFx.Xml
 {
 	public class XmlFormatterTests
 	{
+		#region Constants
+
+		private const string TraitName = "XML";
+		private const string TraitValue = "Serialization";
+
+		#endregion Constants
+
 		#region Array Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ArrayEmpty_ReturnsEmptyArray()
 		{
 			var input = new[]
@@ -63,6 +71,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ArrayEmptyPrettyPrint_ReturnsPrettyPrintedEmptyArray()
 		{
 			var input = new[]
@@ -80,6 +89,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ArrayOneItem_ReturnsExpectedArray()
 		{
 			var input = new[]
@@ -98,6 +108,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ArrayOneItemPrettyPrint_ReturnsExpectedPrettyPrintedArray()
 		{
 			var input = new[]
@@ -119,6 +130,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ArrayMultiItem_ReturnsExpectedArray()
 		{
 			var input = new[]
@@ -143,6 +155,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ArrayMultiItemPrettyPrint_ReturnsExpectedPrettyPrintedArray()
 		{
 			var input = new[]
@@ -173,6 +186,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ArrayNestedDeeply_ReturnsExpectedArray()
 		{
 			// input from pass2.json in test suite at http://www.json.org/JSON_checker/
@@ -228,6 +242,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ArrayNestedDeeplyPrettyPrint_ReturnsExpectedPrettyPrintedArray()
 		{
 			// input from pass2.json in test suite at http://www.json.org/JSON_checker/
@@ -326,6 +341,7 @@ namespace JsonFx.Xml
 		#region Object Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ObjectEmpty_RendersEmptyObject()
 		{
 			var input = new[]
@@ -343,6 +359,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ObjectEmptyPrettyPrint_RendersPrettyPrintedEmptyObject()
 		{
 			var input = new[]
@@ -360,6 +377,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ObjectOneProperty_RendersSimpleObject()
 		{
 			var input = new[]
@@ -379,6 +397,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ObjectOnePropertyPrettyPrint_RendersPrettyPrintedSimpleObject()
 		{
 			var input = new[]
@@ -401,6 +420,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ObjectNested_RendersNestedObject()
 		{
 			// input from pass3.json in test suite at http://www.json.org/JSON_checker/
@@ -428,6 +448,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ObjectNestedPrettyPrint_RendersPrettyPrintedNestedObject()
 		{
 			// input from pass3.json in test suite at http://www.json.org/JSON_checker/
@@ -465,6 +486,7 @@ namespace JsonFx.Xml
 		#region Namespace Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_NamespacedObjectOneProperty_CorrectlyEmitsNamespace()
 		{
 			var input = new[]
@@ -484,6 +506,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ObjectAndPropertyShareNamespace_CorrectlyEmitsNamespace()
 		{
 			var input = new[]
@@ -503,6 +526,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_NamespacedObjectNonNamespacedProperty_CorrectlyEmitsNamespace()
 		{
 			var input = new[]
@@ -522,6 +546,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_NamespacedObjectOneDifferentNamespaceProperty_CorrectlyEmitsNamespaces()
 		{
 			var input = new[]
@@ -541,6 +566,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ObjectAndAttributeShareNamespace_CorrectlyEmitsNamespace()
 		{
 			var input = new[]
@@ -560,6 +586,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ObjectAndAttributeDifferentNamespaces_CorrectlyEmitsNamespaces()
 		{
 			var input = new[]
@@ -579,6 +606,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_NestedObjectsSkippingNamespaces_CorrectlyEmitsNamespaces()
 		{
 			var input = new[]
@@ -608,6 +636,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_NestedObjectsAlternatingNamespaces_CorrectlyEmitsNamespaces()
 		{
 			var input = new[]
@@ -641,6 +670,7 @@ namespace JsonFx.Xml
 		#region Input Edge Case Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_EmptyInput_RendersEmptyString()
 		{
 			var input = Enumerable.Empty<Token<CommonTokenType>>();
@@ -654,6 +684,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_NullInput_ThrowsArgumentNullException()
 		{
 			var input = (IEnumerable<Token<CommonTokenType>>)null;
@@ -671,6 +702,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Ctor_NullSettings_ThrowsArgumentNullException()
 		{
 			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(

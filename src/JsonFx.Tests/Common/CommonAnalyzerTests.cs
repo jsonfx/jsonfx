@@ -41,9 +41,17 @@ namespace JsonFx.Serialization
 {
 	public class CommonAnalyzerTests
 	{
+		#region Constants
+
+		private const string TraitName = "Object Graph";
+		private const string TraitValue = "Deserialization";
+
+		#endregion Constants
+
 		#region Array Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Parse_ArrayEmpty_ReturnsEmptyArray()
 		{
 			var input = new []
@@ -61,6 +69,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Parse_ArrayOneItem_ReturnsExpectedArray()
 		{
 			var input = new[]
@@ -79,6 +88,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Parse_ArrayMultiItem_ReturnsExpectedArray()
 		{
 			var input = new[]
@@ -109,6 +119,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Parse_ArrayNestedDeeply_ReturnsExpectedArray()
 		{
 			// input from pass2.json in test suite at http://www.json.org/JSON_checker/
@@ -221,6 +232,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Parse_ArrayUnclosed_ThrowsAnalyzerException()
 		{
 			// input from fail2.json in test suite at http://www.json.org/JSON_checker/
@@ -243,6 +255,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Parse_ArrayExtraComma_ThrowsAnalyzerException()
 		{
 			// input from fail4.json in test suite at http://www.json.org/JSON_checker/
@@ -267,6 +280,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Parse_ArrayDoubleExtraComma_ThrowsAnalyzerException()
 		{
 			// input from fail5.json in test suite at http://www.json.org/JSON_checker/
@@ -292,6 +306,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Parse_ArrayMissingValue_ThrowsAnalyzerException()
 		{
 			// input from fail6.json in test suite at http://www.json.org/JSON_checker/
@@ -316,6 +331,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Parse_ArrayColonInsteadOfComma_ThrowsAnalyzerException()
 		{
 			// input from fail22.json in test suite at http://www.json.org/JSON_checker/
@@ -340,6 +356,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Parse_ArrayCloseMismatch_ThrowsAnalyzerException()
 		{
 			// input from fail33.json in test suite at http://www.json.org/JSON_checker/
@@ -367,6 +384,7 @@ namespace JsonFx.Serialization
 		#region Object Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Parse_ObjectEmpty_ReturnsEmptyObject()
 		{
 			var input = new[]
@@ -384,6 +402,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Parse_ObjectOneProperty_ReturnsSimpleObject()
 		{
 			var input = new[]
@@ -406,6 +425,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Parse_ObjectNested_ReturnsNestedObject()
 		{
 			// input from pass3.json in test suite at http://www.json.org/JSON_checker/
@@ -442,6 +462,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Parse_ObjectExtraComma_ThrowsAnalyzerException()
 		{
 			// input from fail9.json in test suite at http://www.json.org/JSON_checker/
@@ -467,6 +488,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Parse_ObjectMissingColon_ThrowsAnalyzerException()
 		{
 			// input from fail19.json in test suite at http://www.json.org/JSON_checker/
@@ -491,6 +513,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Parse_ObjectDoubleColon_ThrowsAnalyzerException()
 		{
 			// input from fail20.json in test suite at http://www.json.org/JSON_checker/
@@ -516,6 +539,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Parse_ObjectUnterminated_ThrowsAnalyzerException()
 		{
 			// input from fail21.json in test suite at http://www.json.org/JSON_checker/
@@ -541,6 +565,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Parse_ObjectCommaInsteadOfClose_ThrowsAnalyzerException()
 		{
 			// input from fail32.json in test suite at http://www.json.org/JSON_checker/
@@ -569,6 +594,7 @@ namespace JsonFx.Serialization
 		#region Complex Graph Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Parse_GraphComplex_ReturnsGraph()
 		{
 			// input from pass1.json in test suite at http://www.json.org/JSON_checker/
@@ -820,6 +846,7 @@ namespace JsonFx.Serialization
 		#region Input Edge Case Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Parse_EmptyInput_ReturnsNothing()
 		{
 			var input = Enumerable.Empty<Token<CommonTokenType>>();
@@ -829,6 +856,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Parse_NullInput_ThrowsArgumentNullException()
 		{
 			var input = (IEnumerable<Token<CommonTokenType>>)null;
@@ -846,6 +874,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Ctor_NullSettings_ThrowsArgumentNullException()
 		{
 			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(

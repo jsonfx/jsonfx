@@ -46,6 +46,13 @@ namespace JsonFx.Xml
 {
 	public class XmlWriterTests
 	{
+		#region Constants
+
+		private const string TraitName = "XML";
+		private const string TraitValue = "Serialization";
+
+		#endregion Constants
+
 		#region Test Types
 
 		public class Person
@@ -79,6 +86,7 @@ namespace JsonFx.Xml
 		#region XmlSerializer Comparison Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Serialize_ComparePersonOutputToXmlSerializer_Serializes()
 		{
 			var input = new Person
@@ -104,6 +112,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Serialize_CompareObjectOutputToXmlSerializer_Serializes()
 		{
 			var input = new
@@ -127,6 +136,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Serialize_CompareGenericDictionaryOutputToXmlSerializer_Serializes()
 		{
 			var input = new Dictionary<string, object>
@@ -150,6 +160,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Serialize_CompareDictionaryOutputToXmlSerializer_Serializes()
 		{
 			var input = new Hashtable()
@@ -207,6 +218,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Serialize_CompareStringOutputToXmlSerializer_Serializes()
 		{
 			var input = "Ordinary string";
@@ -218,6 +230,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Serialize_CompareDateTimeOutputToXmlSerializer_Serializes()
 		{
 			var input = new DateTime(2008, 2, 29, 23, 59, 59, 999, DateTimeKind.Utc);
@@ -229,6 +242,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Serialize_CompareInt16OutputToXmlSerializer_Serializes()
 		{
 			var input = (short)42;
@@ -240,6 +254,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Serialize_CompareUInt16OutputToXmlSerializer_Serializes()
 		{
 			var input = UInt16.MaxValue;
@@ -251,6 +266,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Serialize_CompareInt32OutputToXmlSerializer_Serializes()
 		{
 			var input = 42;
@@ -262,6 +278,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Serialize_CompareUInt32OutputToXmlSerializer_Serializes()
 		{
 			var input = UInt32.MaxValue;
@@ -273,6 +290,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Serialize_CompareInt64OutputToXmlSerializer_Serializes()
 		{
 			var input = Int64.MaxValue;
@@ -284,6 +302,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Serialize_CompareUInt64OutputToXmlSerializer_Serializes()
 		{
 			var input = UInt64.MaxValue;
@@ -295,6 +314,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Serialize_CompareDecimalOutputToXmlSerializer_Serializes()
 		{
 			var input = Decimal.MaxValue;
@@ -306,6 +326,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Serialize_CompareDoubleOutputToXmlSerializer_Serializes()
 		{
 			var input = 3.14;
@@ -317,6 +338,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Serialize_CompareSingleOutputToXmlSerializer_Serializes()
 		{
 			var input = 3.14f;
@@ -328,6 +350,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Serialize_CompareByteOutputToXmlSerializer_Serializes()
 		{
 			var input = (byte)0xF;
@@ -339,6 +362,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Serialize_CompareSByteOutputToXmlSerializer_Serializes()
 		{
 			var input = SByte.MaxValue;
@@ -365,6 +389,7 @@ namespace JsonFx.Xml
 		#region Namespace Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_DataContract_CorrectlySerializesNamespaces()
 		{
 			var input = new Person2

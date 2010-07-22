@@ -42,9 +42,17 @@ namespace JsonFx.Json
 {
 	public class JsonReaderTests
 	{
+		#region Constants
+
+		private const string TraitName = "JSON";
+		private const string TraitValue = "Deserialization";
+
+		#endregion Constants
+
 		#region Array Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Deserialize_OnlyDefaults_DeserializesIso8601DateTimeFormat()
 		{
 			var input = @"[ ""Normal string before"", ""2008-02-29T23:59:59.999Z"", ""2010-07-05T10:51:17.768"", ""Normal string after""]";
@@ -62,6 +70,7 @@ namespace JsonFx.Json
 		}
 
 		//[Fact]
+		[Trait(TraitName, TraitValue)]
 		//public void Deserialize_RecognizesFilters_DeserializesMultipleDateTimeFormats()
 		//{
 		//    var input = @"[ ""Normal string before"", ""2008-02-29T23:59:59.999Z"", ""\\/Date(1278327077768)\\/"", ""Normal string after""]";
@@ -84,6 +93,7 @@ namespace JsonFx.Json
 		//}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Deserialize_AllowTrailingContent_IgnoresTrailingContent()
 		{
 			var input = new StringReader(@"[""Content embedded inside other structure"", true,null, 42]</xml>");
@@ -106,6 +116,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Deserialize_ArrayCommaAfterClose_ThrowsDeserializationException()
 		{
 			// input from fail7.json in test suite at http://www.json.org/JSON_checker/
@@ -124,6 +135,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Deserialize_ArrayExtraClose_ThrowsDeserializationException()
 		{
 			// input from fail8.json in test suite at http://www.json.org/JSON_checker/
@@ -146,6 +158,7 @@ namespace JsonFx.Json
 		#region Object Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Deserialize_ObjectExtraValueAfterClose_ThrowsDeserializationException()
 		{
 			// input from fail10.json in test suite at http://www.json.org/JSON_checker/
@@ -166,6 +179,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void StreamedDeserialize_ObjectExtraValueAfterClose_DeserializesStreamOfObject()
 		{
 			// input from fail10.json in test suite at http://www.json.org/JSON_checker/

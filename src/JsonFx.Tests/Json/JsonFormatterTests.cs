@@ -43,9 +43,17 @@ namespace JsonFx.Json
 {
 	public class JsonFormatterTests
 	{
+		#region Constants
+
+		private const string TraitName = "JSON";
+		private const string TraitValue = "Serialization";
+
+		#endregion Constants
+
 		#region Array Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ArrayEmpty_ReturnsEmptyArray()
 		{
 			var input = new[]
@@ -63,6 +71,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ArrayEmptyPrettyPrint_ReturnsPrettyPrintedEmptyArray()
 		{
 			var input = new[]
@@ -80,6 +89,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ArrayOneItem_ReturnsExpectedArray()
 		{
 			var input = new[]
@@ -98,6 +108,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ArrayOneItemPrettyPrint_ReturnsExpectedPrettyPrintedArray()
 		{
 			var input = new[]
@@ -119,6 +130,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ArrayMultiItem_ReturnsExpectedArray()
 		{
 			var input = new[]
@@ -143,6 +155,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ArrayMultiItemPrettyPrint_ReturnsExpectedPrettyPrintedArray()
 		{
 			var input = new[]
@@ -173,6 +186,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ArrayNestedDeeply_ReturnsExpectedArray()
 		{
 			// input from pass2.json in test suite at http://www.json.org/JSON_checker/
@@ -228,6 +242,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ArrayNestedDeeplyPrettyPrint_ReturnsExpectedPrettyPrintedArray()
 		{
 			// input from pass2.json in test suite at http://www.json.org/JSON_checker/
@@ -326,6 +341,7 @@ namespace JsonFx.Json
 		#region Object Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ObjectEmpty_ReturnsEmptyObject()
 		{
 			var input = new[]
@@ -343,6 +359,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ObjectEmptyPrettyPrint_ReturnsPrettyPrintedEmptyObject()
 		{
 			var input = new[]
@@ -360,6 +377,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ObjectOneProperty_ReturnsSimpleObject()
 		{
 			var input = new[]
@@ -379,6 +397,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ObjectOnePropertyPrettyPrint_ReturnsPrettyPrintedSimpleObject()
 		{
 			var input = new[]
@@ -401,6 +420,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ObjectNested_ReturnsNestedObject()
 		{
 			// input from pass3.json in test suite at http://www.json.org/JSON_checker/
@@ -427,6 +447,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ObjectNestedPrettyPrint_ReturnsPrettyPrintedNestedObject()
 		{
 			// input from pass3.json in test suite at http://www.json.org/JSON_checker/
@@ -463,6 +484,7 @@ namespace JsonFx.Json
 		#region String Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_StringTokenEmpty_ReturnsEmptyString()
 		{
 			var input = new[]
@@ -479,6 +501,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_StringTokenSimple_ReturnsString()
 		{
 			// input from fail1.json in test suite at http://www.json.org/JSON_checker/
@@ -497,6 +520,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_StringTokenEscapedChars_ReturnsString()
 		{
 			var input = new[]
@@ -513,6 +537,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_StringTokenUnescapedSingleQuote_ReturnsString()
 		{
 			var input = new[]
@@ -529,6 +554,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_StringTokenTabChar_ReturnsString()
 		{
 			// input from fail25.json in test suite at http://www.json.org/JSON_checker/
@@ -553,6 +579,7 @@ namespace JsonFx.Json
 		#region Number Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_NumberTokenInteger_ReturnsNumber()
 		{
 			var input = new[]
@@ -569,6 +596,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_NumberTokenDouble_ReturnsNumber()
 		{
 			var input = new[]
@@ -585,6 +613,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_NumberTokenNegDouble_ReturnsNumber()
 		{
 			var input = new[]
@@ -601,6 +630,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_NumberTokenNoLeadingDigitDouble_ReturnsNumber()
 		{
 			var input = new[]
@@ -617,6 +647,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_NumberTokenPosNoLeadingDigitDouble_ReturnsNumber()
 		{
 			var input = new[]
@@ -633,6 +664,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_NumberTokenNegNoLeadingDigitDouble_ReturnsNumber()
 		{
 			var input = new[]
@@ -649,6 +681,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_NumberTokenNegDecimal_ReturnsNumber()
 		{
 			var input = new[]
@@ -665,6 +698,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_NumberTokenNegFloat_ReturnsNumber()
 		{
 			var input = new[]
@@ -681,6 +715,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_NumberTokenNegLong_ReturnsNumber()
 		{
 			var input = new[]
@@ -697,6 +732,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_NumberTokenOverflowLong_ReturnsString()
 		{
 			var input = new[]
@@ -713,6 +749,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_NumberTokenOverflowDecimal_ReturnsString()
 		{
 			var input = new[]
@@ -733,6 +770,7 @@ namespace JsonFx.Json
 		#region Complex Graph Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_GraphComplex_ReturnsGraph()
 		{
 			// input from pass1.json in test suite at http://www.json.org/JSON_checker/
@@ -923,6 +961,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_GraphComplexPrettyPrint_ReturnsPrettyPrintedGraph()
 		{
 			// input from pass1.json in test suite at http://www.json.org/JSON_checker/
@@ -1192,6 +1231,7 @@ namespace JsonFx.Json
 		#region Namespace Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ObjectOneNamespacedProperty_CorrectlyIgnoresNamespace()
 		{
 			var input = new[]
@@ -1215,6 +1255,7 @@ namespace JsonFx.Json
 		#region Input Edge Case Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_EmptyInput_ReturnsEmptyString()
 		{
 			var input = Enumerable.Empty<Token<CommonTokenType>>();
@@ -1228,6 +1269,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_NullInput_ThrowsArgumentNullException()
 		{
 			var input = (IEnumerable<Token<CommonTokenType>>)null;
@@ -1245,6 +1287,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Ctor_NullSettings_ThrowsArgumentNullException()
 		{
 			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(

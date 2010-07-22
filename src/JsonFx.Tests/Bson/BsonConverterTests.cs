@@ -41,9 +41,17 @@ namespace JsonFx.Bson
 {
 	public class BsonConverterTests
 	{
+		#region Constants
+
+		private const string TraitName = "BSON";
+		private const string TraitValue = "Conversion";
+
+		#endregion Constants
+
 		#region Round Trip Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void ConvertJson2Bson_HelloWorld_RoundTripsJsonToBsonAndBack()
 		{
 			// input from example at http://bsonspec.org/#/specification
@@ -76,6 +84,7 @@ namespace JsonFx.Bson
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void ConvertJson2Bson_ArrayAsProperty_RoundTripsJsonToBsonAndBack()
 		{
 			// input from example at http://bsonspec.org/#/specification
@@ -120,6 +129,7 @@ namespace JsonFx.Bson
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void ConvertJson2Bson_BooleanValue_RoundTripsJsonToBsonAndBack()
 		{
 			// input from example at http://codebetter.com/blogs/karlseguin/archive/2010/03/05/bson-serialization.aspx

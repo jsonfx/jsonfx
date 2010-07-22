@@ -40,9 +40,17 @@ namespace JsonFx.Xml.Stax
 {
 	public class StaxFormatterTests
 	{
+		#region Constants
+
+		private const string TraitName = "HTML";
+		private const string TraitValue = "Serialization";
+
+		#endregion Constants
+
 		#region Simple Single Element Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_SingleOpenCloseTag_ReturnsMarkup()
 		{
 			var input = new[]
@@ -63,6 +71,7 @@ namespace JsonFx.Xml.Stax
 		#region Namespace Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_DefaultNamespaceTag_ReturnsMarkup()
 		{
 			var input = new[]
@@ -81,6 +90,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_NamespacePrefixTag_ReturnsMarkup()
 		{
 			var input = new[]
@@ -99,6 +109,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_NamespacedChildTag_ReturnsMarkup()
 		{
 			var input = new[]
@@ -120,6 +131,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ParentAndChildShareDefaultNamespace_ReturnsMarkup()
 		{
 			var input = new[]
@@ -141,6 +153,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ParentAndChildSharePrefixedNamespace_ReturnsMarkup()
 		{
 			var input = new[]
@@ -162,6 +175,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_ParentAndChildDifferentDefaultNamespaces_ReturnsMarkup()
 		{
 			var input = new[]
@@ -185,6 +199,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_DifferentPrefixSameNamespace_ReturnsMarkup()
 		{
 			// Not sure if this is correct: http://stackoverflow.com/questions/3312390
@@ -213,6 +228,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_NestedDefaultNamespaces_ReturnsMarkup()
 		{
 			var input = new[]
@@ -245,6 +261,7 @@ namespace JsonFx.Xml.Stax
 		#region Simple Attribute Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_SingleAttribute_ReturnsMarkup()
 		{
 			var input = new[]
@@ -263,6 +280,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_SingleEmptyAttributeXmlStyle_ReturnsMarkup()
 		{
 			var input = new[]
@@ -281,6 +299,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_SingleEmptyAttributeHtmlStyle_ReturnsMarkup()
 		{
 			var input = new[]
@@ -299,6 +318,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_SingleAttributeEmptyValue_ReturnsMarkup()
 		{
 			var input = new[]
@@ -317,6 +337,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_SingleAttributeWhitespace_ReturnsMarkup()
 		{
 			var input = new[]
@@ -335,6 +356,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_MultipleAttributes_ReturnsMarkup()
 		{
 			var input = new[]
@@ -361,6 +383,7 @@ namespace JsonFx.Xml.Stax
 		#region Text Content Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_XmlEntityLt_ReturnsMarkup()
 		{
 			var input = new[]
@@ -376,6 +399,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_XmlEntityB_ReturnsMarkup()
 		{
 			var input = new[]
@@ -391,6 +415,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_XmlEntityHex_ReturnsMarkup()
 		{
 			var input = new[]
@@ -406,6 +431,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_XmlEntityHexEncodeNonAscii_ReturnsMarkup()
 		{
 			var input = new[]
@@ -421,6 +447,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_HtmlEntityEuro_ReturnsMarkup()
 		{
 			var input = new[]
@@ -436,6 +463,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_HtmlEntityEuroEncodeNonAscii_ReturnsMarkup()
 		{
 			var input = new[]
@@ -451,6 +479,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_EntityWithLeadingText_ReturnsMarkup()
 		{
 			var input = new[]
@@ -467,6 +496,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_EntityWithTrailingText_ReturnsMarkup()
 		{
 			var input = new[]
@@ -483,6 +513,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_MixedEntities_ReturnsMarkup()
 		{
 			var input = new[]
@@ -502,6 +533,7 @@ namespace JsonFx.Xml.Stax
 		#region Mixed Content Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_HtmlContent_ReturnsMarkup()
 		{
 			var input = new[]
@@ -532,6 +564,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_HtmlContentPrettyPrinted_ReturnsMarkup()
 		{
 			var input = new[]
@@ -574,6 +607,7 @@ namespace JsonFx.Xml.Stax
 		#region Error Recovery Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_UnclosedOpenTag_ReturnsMarkup()
 		{
 			var input = new[]
@@ -589,6 +623,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_UnopenedCloseTag_ReturnsMarkup()
 		{
 			var input = new []
@@ -604,6 +639,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_OverlappingTags_ReturnsMarkupAsIs()
 		{
 			var input = new[]
@@ -624,6 +660,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_OverlappingTagsAutoBalanced_ReturnsMarkup()
 		{
 			var input = new[]
@@ -644,6 +681,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_OverlappingNamespacedTagsErrorRecovery_ReturnsMarkupAsIs()
 		{
 			var input = new[]
@@ -673,6 +711,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_OverlappingNamespacedTagsErrorRecoveryAutoBalanced_ReturnsMarkupAsIs()
 		{
 			var input = new[]
@@ -709,6 +748,7 @@ namespace JsonFx.Xml.Stax
 		#region Unparsed Block Tests Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_XmlDeclaration_ReturnsUnparsed()
 		{
 			var input = new[]
@@ -724,6 +764,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_XmlComment_ReturnsUnparsed()
 		{
 			var input = new[]
@@ -739,6 +780,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_MarkupLikeText_ReturnsTextValue()
 		{
 			var input = new[]
@@ -754,6 +796,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_MathML_ReturnsMarkup()
 		{
 			var input = new[]
@@ -803,6 +846,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_XmlDocTypeExternal_ReturnsUnparsed()
 		{
 			var input = new[]
@@ -847,6 +891,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_AspNetPageDeclaration_ReturnsUnparsed()
 		{
 			var input = new[]
@@ -862,6 +907,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_PhpHelloWorld_ReturnsMarkup()
 		{
 			var input = new[]
@@ -901,6 +947,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_CodeCommentAroundMarkup_ReturnsSingleUnparsedBlock()
 		{
 			var input = new[]
@@ -934,6 +981,7 @@ namespace JsonFx.Xml.Stax
 		#region Input Edge Case Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_EmptyInput_ReturnsEmptySequence()
 		{
 			var input = new Token<StaxTokenType>[0];

@@ -38,6 +38,13 @@ namespace JsonFx.CodeGen
 {
 	public class DynamicMethodGeneratorTests
 	{
+		#region Constants
+
+		private const string TraitName = "Utilities";
+		private const string TraitValue = "DynamicMethods";
+
+		#endregion Constants
+
 		#region Test Types
 
 		private class Example
@@ -213,6 +220,7 @@ namespace JsonFx.CodeGen
 		#region GetPropertyGetter Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetPropertyGetter_PublicReferenceTypeProperty_ReturnsPropertyValue()
 		{
 			var input = new Example();
@@ -227,6 +235,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetPropertyGetter_VirtualProperty_ReturnsPropertyValue()
 		{
 			var input = new Example();
@@ -241,6 +250,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetPropertyGetter_ProtectedProperty_ReturnsPropertyValue()
 		{
 			var input = new Example();
@@ -255,6 +265,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetPropertyGetter_ValueTypeProperty_ReturnsPropertyValue()
 		{
 			var input = new Example();
@@ -269,6 +280,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetPropertyGetter_PrivateProperty_ReturnsPropertyValue()
 		{
 			var input = new Example();
@@ -283,6 +295,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetPropertyGetter_GetterOnlyProperty_ReturnsPropertyValue()
 		{
 			var input = new Example();
@@ -297,6 +310,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetPropertyGetter_SetterOnlyProperty_ReturnsPropertyValue()
 		{
 			var input = new Example();
@@ -309,6 +323,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetPropertyGetter_AutoImplementedProperty_ReturnsPropertyValue()
 		{
 			var input = new Example();
@@ -323,6 +338,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetPropertyGetter_PrivateSetterProperty_ReturnsPropertyValue()
 		{
 			var input = new Example();
@@ -337,6 +353,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetPropertyGetter_PrivateGetterProperty_ReturnsPropertyValue()
 		{
 			var input = new Example();
@@ -351,6 +368,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetPropertyGetter_AnonymousObjectProperty_ReturnsPropertyValue()
 		{
 			var input = new
@@ -376,6 +394,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetPropertyGetter_NullInput_ThrowsArgumentNullException()
 		{
 			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
@@ -388,6 +407,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetPropertyGetter_StaticProperty_ChangesFieldValue()
 		{
 			var propertyInfo = typeof(Example).GetProperty("Solo");
@@ -420,6 +440,7 @@ namespace JsonFx.CodeGen
 		#region GetPropertySetter Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetPropertySetter_PublicReferenceTypeProperty_ReturnsPropertyValue()
 		{
 			var input = new Example();
@@ -437,6 +458,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetPropertySetter_VirtualProperty_ReturnsPropertyValue()
 		{
 			var input = new Example();
@@ -453,6 +475,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetPropertySetter_ProtectedProperty_ReturnsPropertyValue()
 		{
 			var input = new Example();
@@ -472,6 +495,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetPropertySetter_ValueTypeProperty_ReturnsPropertyValue()
 		{
 			var input = new Example();
@@ -488,6 +512,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetPropertySetter_PrivateProperty_ReturnsPropertyValue()
 		{
 			var input = new Example();
@@ -507,6 +532,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetPropertySetter_GetterOnlyProperty_ReturnsPropertyValue()
 		{
 			var input = new Example();
@@ -519,6 +545,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetPropertySetter_SetterOnlyProperty_ReturnsPropertyValue()
 		{
 			var input = new Example();
@@ -535,6 +562,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetPropertySetter_AutoImplementedProperty_ReturnsPropertyValue()
 		{
 			var input = new Example();
@@ -551,6 +579,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetPropertySetter_PrivateSetterProperty_ReturnsPropertyValue()
 		{
 			var input = new Example();
@@ -567,6 +596,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetPropertySetter_PrivateGetterProperty_ReturnsPropertyValue()
 		{
 			var input = new Example();
@@ -586,6 +616,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetPropertySetter_AnonymousObjectProperty_ReturnsPropertyValue()
 		{
 			var input = new
@@ -609,6 +640,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetPropertySetter_NullInput_ThrowsArgumentNullException()
 		{
 			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
@@ -621,6 +653,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetPropertySetter_StaticProperty_ChangesFieldValue()
 		{
 			var propertyInfo = typeof(Example).GetProperty("Solo");
@@ -660,6 +693,7 @@ namespace JsonFx.CodeGen
 		#region GetFieldGetter Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetFieldGetter_PublicReferenceTypeField_ReturnsFieldValue()
 		{
 			var input = new Example();
@@ -674,6 +708,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetFieldGetter_ProtectedField_ReturnsFieldValue()
 		{
 			var input = new Example();
@@ -688,6 +723,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetFieldGetter_ValueTypeField_ReturnsFieldValue()
 		{
 			var input = new Example();
@@ -702,6 +738,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetFieldGetter_PrivateField_ReturnsFieldValue()
 		{
 			var input = new Example();
@@ -716,6 +753,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetFieldGetter_NullInput_ThrowsArgumentNullException()
 		{
 			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
@@ -728,6 +766,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetFieldGetter_StaticField_ReturnsFieldValue()
 		{
 			var fieldInfo = typeof(Example).GetField("MyStatic");
@@ -740,6 +779,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetFieldGetter_StaticReadonlyField_ReturnsFieldValue()
 		{
 			var fieldInfo = typeof(Guid).GetField("Empty");
@@ -752,6 +792,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetFieldGetter_ConstField_ReturnsFieldValue()
 		{
 			var fieldInfo = typeof(Int32).GetField("MaxValue");
@@ -783,6 +824,7 @@ namespace JsonFx.CodeGen
 		#region GetFieldSetter Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetFieldSetter_PublicReferenceTypeField_ReturnsFieldValue()
 		{
 			var input = new Example();
@@ -800,6 +842,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetFieldSetter_ProtectedField_ReturnsFieldValue()
 		{
 			var input = new Example();
@@ -816,6 +859,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetFieldSetter_ValueTypeField_ReturnsFieldValue()
 		{
 			var input = new Example();
@@ -832,6 +876,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetFieldSetter_PrivateField_ReturnsFieldValue()
 		{
 			var input = new Example();
@@ -848,6 +893,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetFieldSetter_NullInput_ThrowsArgumentNullException()
 		{
 			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
@@ -860,6 +906,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetFieldSetter_StaticField_ChangesFieldValue()
 		{
 			var fieldInfo = typeof(Example).GetField("MyStatic");
@@ -881,6 +928,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetFieldSetter_StaticReadonlyField_ReturnsNull()
 		{
 			var fieldInfo = typeof(Guid).GetField("Empty");
@@ -891,6 +939,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetFieldSetter_ConstField_ReturnsNull()
 		{
 			var fieldInfo = typeof(Int32).GetField("MaxValue");
@@ -919,6 +968,7 @@ namespace JsonFx.CodeGen
 		#region GetMethodProxy Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetMethodProxy_MethodNoArgsOneReturn_BuildsProxyAndInvokes()
 		{
 			var input = new Example();
@@ -931,6 +981,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetMethodProxy_MethodOneArgOneReturn_BuildsProxyAndInvokes()
 		{
 			var input = new Example();
@@ -944,6 +995,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetMethodProxy_MethodAssortedArgsVoidReturn_BuildsProxyAndInvokes()
 		{
 			var input = new Example();
@@ -967,6 +1019,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetMethodProxy_MethodExtraArgs_IgnoresExtraBuildsProxyAndInvokes()
 		{
 			var input = new Example();
@@ -990,6 +1043,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetMethodProxy_ArgsMissingWhenCalling_ThrowsArgumentNullException()
 		{
 			ProxyDelegate proxy = DynamicMethodGenerator.GetMethodProxy(typeof(Example).GetMethod("Reset"));
@@ -1003,6 +1057,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetMethodProxy_ArgsTypeMismatchWhenCalling_ThrowsArgumentNullException()
 		{
 			ProxyDelegate proxy = DynamicMethodGenerator.GetMethodProxy(typeof(Example).GetMethod("Reset"));
@@ -1016,6 +1071,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetMethodProxy_NullInput_ThrowsArgumentNullException()
 		{
 			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
@@ -1047,6 +1103,7 @@ namespace JsonFx.CodeGen
 		#region GetTypeFactory Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTypeFactory_CtorNoArgs_ReturnsCorrectlyInstantiatedObject()
 		{
 			var expected = new Example();
@@ -1069,6 +1126,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTypeFactory_CtorAssortedArgs_ReturnsCorrectlyInstantiatedObject()
 		{
 			var expected = new Example("alpha", "bravo", "charlie", -1, -2, -3, "deer", "sun", "myself");
@@ -1093,6 +1151,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTypeFactory_CtorExtraArgs_IgnoresAndReturnsCorrectlyInstantiatedObject()
 		{
 			var expected = new Example("alpha", "bravo", "charlie", -1, -2, -3, "deer", "sun", "myself");
@@ -1117,6 +1176,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTypeFactory_ArgsMismatchInBuilding_ReturnsNull()
 		{
 			FactoryDelegate factory = DynamicMethodGenerator.GetTypeFactory(
@@ -1126,6 +1186,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTypeFactory_ArgsMissingWhenCalling_ThrowsArgumentNullException()
 		{
 			FactoryDelegate factory = DynamicMethodGenerator.GetTypeFactory(
@@ -1141,6 +1202,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTypeFactory_ArgsTypeMismatchWhenCalling_ThrowsArgumentNullException()
 		{
 			FactoryDelegate factory = DynamicMethodGenerator.GetTypeFactory(
@@ -1156,6 +1218,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTypeFactory_NullTypeInput_ThrowsArgumentNullException()
 		{
 			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
@@ -1168,6 +1231,7 @@ namespace JsonFx.CodeGen
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTypeFactory_NullCtorInput_ThrowsArgumentNullException()
 		{
 			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(

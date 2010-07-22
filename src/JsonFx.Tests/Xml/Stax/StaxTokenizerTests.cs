@@ -41,9 +41,17 @@ namespace JsonFx.Xml.Stax
 {
 	public class StaxTokenizerTests
 	{
+		#region Constants
+
+		private const string TraitName = "HTML";
+		private const string TraitValue = "Deserialization";
+
+		#endregion Constants
+
 		#region Simple Single Element Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_SingleOpenCloseTag_ReturnsSequence()
 		{
 			const string input = @"<root></root>";
@@ -60,6 +68,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_SingleVoidTag_ReturnsSequence()
 		{
 			const string input = @"<root />";
@@ -80,6 +89,7 @@ namespace JsonFx.Xml.Stax
 		#region Namespace Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_DefaultNamespaceTag_ReturnsSequence()
 		{
 			const string input = @"<root xmlns=""http://example.com/schema""></root>";
@@ -98,6 +108,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_NamespacePrefixTag_ReturnsSequence()
 		{
 			const string input = @"<prefix:root xmlns:prefix=""http://example.com/schema""></prefix:root>";
@@ -116,6 +127,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_NamespacedChildTag_ReturnsSequence()
 		{
 			const string input = @"<foo><child xmlns=""http://example.com/schema"">value</child></foo>";
@@ -137,6 +149,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_ParentAndChildShareDefaultNamespace_ReturnsSequence()
 		{
 			const string input = @"<foo xmlns=""http://example.org""><child>value</child></foo>";
@@ -158,6 +171,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_ParentAndChildSharePrefixedNamespace_ReturnsSequence()
 		{
 			const string input = @"<bar:foo xmlns:bar=""http://example.org""><bar:child>value</bar:child></bar:foo>";
@@ -179,6 +193,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_ParentAndChildDifferentDefaultNamespaces_ReturnsSequence()
 		{
 			const string input = @"<foo xmlns=""http://json.org""><child xmlns=""http://jsonfx.net"">text value</child></foo>";
@@ -202,6 +217,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_DifferentPrefixSameNamespace_ReturnsSequence()
 		{
 			const string input = @"<foo xmlns=""http://example.org"" xmlns:blah=""http://example.org"" blah:key=""value"" />";
@@ -224,6 +240,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_NestedDefaultNamespaces_ReturnsSequence()
 		{
 			const string input = @"<outer xmlns=""http://example.org/outer""><middle-1 xmlns=""http://example.org/inner""><inner>this should be inner</inner></middle-1><middle-2>this should be outer</middle-2></outer>";
@@ -253,6 +270,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_UndeclaredPrefixesErrorRecovery_ReturnsAsDefault()
 		{
 			const string input = @"<a:one><b:two><c:three></d:three></e:two></f:one>";
@@ -278,6 +296,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_UndeclaredPrefixes_ReturnsAsDefault()
 		{
 			const string input = @"<a:one><b:two><c:three></d:three></e:two></f:one>";
@@ -302,6 +321,7 @@ namespace JsonFx.Xml.Stax
 		#region Simple Attribute Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_SingleAttribute_ReturnsSequence()
 		{
 			const string input = @"<root attrName=""attrValue""></root>";
@@ -320,6 +340,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_SingleEmptyAttributeHtmlStyle_ReturnsSequence()
 		{
 			const string input = @"<root noValue></root>";
@@ -338,6 +359,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_SingleEmptyAttributeXmlStyle_ReturnsSequence()
 		{
 			const string input = @"<root noValue=""""></root>";
@@ -356,6 +378,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_SingleAttributeEmptyValue_ReturnsSequence()
 		{
 			const string input = @"<root emptyValue=""""></root>";
@@ -374,6 +397,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_AttributeWhitespaceQuotDelims_ReturnsSequence()
 		{
 			const string input = @"<root white  =  "" extra whitespace around quote delims "" ></root>";
@@ -392,6 +416,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_WhitespaceAttributeAposDelims_ReturnsSequence()
 		{
 			const string input = @"<root white  =  ' extra whitespace around apostrophe delims ' ></root>";
@@ -410,6 +435,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_SingleAttributeWhitespace_ReturnsSequence()
 		{
 			const string input = @"<root whitespace="" this contains whitespace ""></root>";
@@ -428,6 +454,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_SingleAttributeSingleQuoted_ReturnsSequence()
 		{
 			const string input = @"<root singleQuoted='apostrophe'></root>";
@@ -446,6 +473,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_SingleAttributeSingleQuotedWhitespace_ReturnsSequence()
 		{
 			const string input = @"<root singleQuoted_whitespace=' apostrophe with whitespace '></root>";
@@ -464,6 +492,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_MultipleAttributes_ReturnsSequence()
 		{
 			const string input = @"<root no-value whitespace="" this contains whitespace "" anyQuotedText="""+"/\\\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"+@"""></root>";
@@ -490,6 +519,7 @@ namespace JsonFx.Xml.Stax
 		#region Text Content Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_XmlEntityLt_ReturnsSequence()
 		{
 			const string input = @"&lt;";
@@ -505,6 +535,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_XmlEntityB_ReturnsSequence()
 		{
 			const string input = @"&#66;";
@@ -520,6 +551,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_XmlEntityHexLowerX_ReturnsSequence()
 		{
 			const string input = @"&#x37;";
@@ -535,6 +567,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_XmlEntityHexUpperX_ReturnsSequence()
 		{
 			const string input = @"&#X38;";
@@ -550,6 +583,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_XmlEntityHexUpperCase_ReturnsSequence()
 		{
 			const string input = @"&#xABCD;";
@@ -565,6 +599,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_XmlEntityHexLowerCase_ReturnsSequence()
 		{
 			const string input = @"&#xabcd;";
@@ -580,6 +615,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_HtmlEntityEuro_ReturnsSequence()
 		{
 			const string input = @"&euro;";
@@ -595,6 +631,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_EntityWithLeadingText_ReturnsSequence()
 		{
 			const string input = @"leading&amp;";
@@ -611,6 +648,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_EntityWithTrailingText_ReturnsSequence()
 		{
 			const string input = @"&amp;trailing";
@@ -627,6 +665,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_MixedEntities_ReturnsSequence()
 		{
 			const string input = @"there should &lt;b&gt;e decoded chars &amp; inside this text";
@@ -648,6 +687,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_MixedEntitiesMalformed_ReturnsSequence()
 		{
 			const string input = @"there should &#xnot &Xltb&#gte decoded chars & inside this text";
@@ -674,6 +714,7 @@ namespace JsonFx.Xml.Stax
 		#region Mixed Content Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_HtmlContent_ReturnsSequence()
 		{
 			const string input = @"<div class=""content""><p style=""color:red""><strong>Lorem ipsum</strong> dolor sit amet, <i>consectetur</i> adipiscing elit.</p></div>";
@@ -705,6 +746,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_HtmlContentPrettyPrinted_ReturnsSequence()
 		{
 			const string input =
@@ -748,6 +790,7 @@ namespace JsonFx.Xml.Stax
 		#region Error Recovery Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_UnclosedOpenTag_ReturnsSequence()
 		{
 			const string input = @"<root>";
@@ -763,6 +806,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_UnclosedOpenTagAutoBalance_ReturnsSequence()
 		{
 			const string input = @"<root>";
@@ -779,6 +823,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_UnopenedCloseTag_ReturnsSequence()
 		{
 			const string input = @"</foo>";
@@ -794,6 +839,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_UnopenedCloseTagAutoBalance_ReturnsSequence()
 		{
 			const string input = @"</foo>";
@@ -806,6 +852,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_OverlappingTagsNoRecovery_ThrowsDeserializationException()
 		{
 			const string input = @"<odd><auto-closed><even></odd></ignored></even>";
@@ -822,6 +869,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_OverlappingTags_ReturnsSequenceAsIs()
 		{
 			const string input = @"<odd><auto-closed><even></odd></ignored></even>";
@@ -842,6 +890,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_OverlappingTagsAutoBalancing_ReturnsSequenceRebalanced()
 		{
 			const string input = @"<odd><auto-closed><even></odd></ignored></even>";
@@ -862,6 +911,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_OverlappingNamespacedTagsErrorRecovery_ReturnsSequenceAsIs()
 		{
 			const string input = @"<a:odd xmlns=""http://example.com/odd"" xmlns:a=""http://example.com/odd/a""><b:auto-closed xmlns=""http://example.com/auto-closed"" xmlns:b=""http://example.com/auto-closed/b""><c:even xmlns=""http://example.com/even"" xmlns:c=""http://example.com/even/c""></a:odd></d:ignored></c:even>";
@@ -891,6 +941,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_OverlappingNamespacedTagsErrorRecoveryAutoBalancing_ReturnsSequenceAsIs()
 		{
 			const string input = @"<a:odd xmlns=""http://example.com/odd"" xmlns:a=""http://example.com/odd/a""><b:auto-closed xmlns=""http://example.com/auto-closed"" xmlns:b=""http://example.com/auto-closed/b""><c:even xmlns=""http://example.com/even"" xmlns:c=""http://example.com/even/c""></a:odd></d:ignored></c:even>";
@@ -927,6 +978,7 @@ namespace JsonFx.Xml.Stax
 		#region Unparsed Block Tests Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_XmlDeclaration_ReturnsUnparsed()
 		{
 			const string input = @"<?xml version=""1.0""?>";
@@ -942,6 +994,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_XmlComment_ReturnsUnparsed()
 		{
 			const string input = @"<!-- a quick note -->";
@@ -957,6 +1010,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_XmlCData_ReturnsTextValue()
 		{
 			const string input = @"<![CDATA[value>""0"" && value<""10"" ?""valid"":""error""]]>";
@@ -972,6 +1026,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_XmlCDataMixed_ReturnsTextValue()
 		{
 			const string input =
@@ -1021,6 +1076,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_XmlDocTypeExternal_ReturnsUnparsed()
 		{
 			const string input =
@@ -1066,6 +1122,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_AspNetPageDeclaration_ReturnsUnparsed()
 		{
 			const string input = @"<%@ Page Language=""C#"" AutoEventWireup=""true"" CodeBehind=""Default.aspx.cs"" Inherits=""Foo._Default"" %>";
@@ -1082,6 +1139,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_PhpHelloWorld_ReturnsSequence()
 		{
 			const string input =
@@ -1122,6 +1180,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_CodeCommentAroundMarkup_ReturnsSingleUnparsedBlock()
 		{
 			const string input =
@@ -1156,6 +1215,7 @@ namespace JsonFx.Xml.Stax
 		#region Input Edge Case Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_NullInput_ReturnsEmptySequence()
 		{
 			const string input = null;
@@ -1168,6 +1228,7 @@ namespace JsonFx.Xml.Stax
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_EmptyInput_ReturnsEmptySequence()
 		{
 			const string input = "";

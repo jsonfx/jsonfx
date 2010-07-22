@@ -42,9 +42,17 @@ namespace JsonFx.Json
 {
 	public class JsonWriterTests
 	{
+		#region Constants
+
+		private const string TraitName = "JSON";
+		private const string TraitValue = "Serialization";
+
+		#endregion Constants
+
 		#region Array Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Serialize_OnlyDefaults_SerializesIso8601Dates()
 		{
 			var input = new object[]
@@ -62,6 +70,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Serialize_RecognizesMultipleDateTimeFiltersIsoFirst_SerializesIso8601Dates()
 		{
 			var input = new object[]
@@ -84,6 +93,7 @@ namespace JsonFx.Json
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Serialize_RecognizesMultipleDateTimeFiltersAjaxFirst_SerializesMSAjaxDates()
 		{
 			var input = new object[]

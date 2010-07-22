@@ -41,9 +41,17 @@ namespace JsonFx.Xml
 {
 	public class XmlConverterTests
 	{
+		#region Constants
+
+		private const string TraitName = "XML";
+		private const string TraitValue = "Conversion";
+
+		#endregion Constants
+
 		#region Round Trip Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void ConvertJson2Xml_HelloWorld_RoundTripsJsonToXmlAndBack()
 		{
 			// input from example at http://xmlspec.org/#/specification
@@ -75,6 +83,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void ConvertJson2Xml_ArrayAsProperty_RoundTripsJsonToXmlAndBack()
 		{
 			// input from example at http://xmlspec.org/#/specification
@@ -110,6 +119,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void ConvertJson2Xml_BooleanValue_RoundTripsJsonToXmlAndBack()
 		{
 			// input from example at http://codebetter.com/blogs/karlseguin/archive/2010/03/05/xml-serialization.aspx
@@ -144,6 +154,7 @@ namespace JsonFx.Xml
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void ConvertJson2Xml_ComplexGraph_RoundTripsJsonToXmlAndBack()
 		{
 			// input from pass1.json in test suite at http://www.json.org/JSON_checker/

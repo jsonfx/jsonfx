@@ -45,6 +45,13 @@ namespace JsonFx.Serialization
 {
 	public class TypeCoercionUtilityTests
 	{
+		#region Constants
+
+		private const string TraitName = "Utilities";
+		private const string TraitValue = "Type Coercion";
+
+		#endregion Constants
+
 		#region Test Types
 
 		private enum ExampleEnum
@@ -66,6 +73,7 @@ namespace JsonFx.Serialization
 		#region List Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void CoerceType_CoerceToBaseType_NoCoercionNeeded()
 		{
 			dynamic input = new ExpandoObject();
@@ -81,6 +89,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void CoerceType_ArrayToList_CoercesViaListCtor()
 		{
 			var input = new string[]
@@ -106,6 +115,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void CoerceType_ExpandoToGenericDictionary_CoercesViaGenericDictionaryCopy()
 		{
 			dynamic input = new ExpandoObject();
@@ -129,6 +139,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void CoerceType_DictionaryToExpando_CoercesViaDictionaryCopy()
 		{
 			var input = new Hashtable
@@ -158,6 +169,7 @@ namespace JsonFx.Serialization
 		// TODO: these are actually testing type coercion and resolver strategy, need to isolate and improve testability
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void JsonAnalyzerParse_EnumFromString_ReturnsEnum()
 		{
 			var input = new[]
@@ -174,6 +186,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void JsonAnalyzerParse_EnumFromJsonName_ReturnsEnum()
 		{
 			var input = new[]
@@ -190,6 +203,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void JsonAnalyzerParse_EnumFromNumber_ReturnsEnum()
 		{
 			var input = new[]
@@ -212,6 +226,7 @@ namespace JsonFx.Serialization
 		// TODO: these are actually testing type coercion and resolver strategy, need to isolate and improve testability
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void JsonFormatterFormat_EnumPocoToString_ReturnsEnum()
 		{
 			var input = new[]
@@ -228,6 +243,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void JsonFormatterFormat_EnumEmptyStringJsonNameToString_ReturnsEnum()
 		{
 			var input = new[]
@@ -244,6 +260,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void JsonFormatterFormat_EnumWithJsonName_ReturnsEnum()
 		{
 			var input = new[]
@@ -260,6 +277,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void JsonFormatterFormat_EnumNullJsonNameToString_ReturnsEnum()
 		{
 			var input = new[]
@@ -276,6 +294,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void JsonFormatterFormat_EnumFromNumber_ReturnsEnum()
 		{
 			var input = new[]

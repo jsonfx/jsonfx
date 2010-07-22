@@ -42,6 +42,13 @@ namespace JsonFx.Serialization
 {
 	public class CommonWalkerTests
 	{
+		#region Constants
+
+		private const string TraitName = "Object Graph";
+		private const string TraitValue = "Serialization";
+
+		#endregion Constants
+
 		#region Test Types
 
 		public class Person
@@ -57,6 +64,7 @@ namespace JsonFx.Serialization
 		#region Array Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_ArrayEmpty_ReturnsEmptyArrayTokens()
 		{
 			var input = new object[0];
@@ -74,6 +82,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_ListEmpty_ReturnsEmptyArrayTokens()
 		{
 			var input = new List<object>(0);
@@ -91,6 +100,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_ArraySingleItem_ReturnsSingleItemArrayTokens()
 		{
 			var input = new object[]
@@ -112,6 +122,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_ArrayMultiItem_ReturnsArrayTokens()
 		{
 			var input = new object[]
@@ -157,6 +168,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_ArrayNested_ReturnsNestedArrayTokens()
 		{
 			var input = new object[]
@@ -216,6 +228,7 @@ namespace JsonFx.Serialization
 		#region Object Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_EmptyObject_ReturnsEmptyObjectTokens()
 		{
 			var input = new object();
@@ -233,6 +246,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_EmptyDictionary_ReturnsEmptyObjectTokens()
 		{
 			var input = new Dictionary<string, object>(0);
@@ -250,6 +264,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_ObjectAnonymous_ReturnsObjectTokens()
 		{
 			var input = new
@@ -280,6 +295,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_ObjectDynamic_ReturnsObjectTokens()
 		{
 			dynamic input = new System.Dynamic.ExpandoObject();
@@ -308,6 +324,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_ObjectDictionary_ReturnsObjectTokens()
 		{
 			var input = new Dictionary<string, object>
@@ -342,6 +359,7 @@ namespace JsonFx.Serialization
 		#region Boolean Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_False_ReturnsFalseToken()
 		{
 			var input = false;
@@ -358,6 +376,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_True_ReturnsTrueToken()
 		{
 			var input = true;
@@ -378,6 +397,7 @@ namespace JsonFx.Serialization
 		#region Number Case Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_DoubleNaN_ReturnsNaNToken()
 		{
 			var input = Double.NaN;
@@ -394,6 +414,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_DoublePosInfinity_ReturnsPosInfinityToken()
 		{
 			var input = Double.PositiveInfinity;
@@ -410,6 +431,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_DoubleNegInfinity_ReturnsNegInfinityToken()
 		{
 			var input = Double.NegativeInfinity;
@@ -426,6 +448,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_SingleNaN_ReturnsNaNToken()
 		{
 			var input = Single.NaN;
@@ -442,6 +465,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_SinglePosInfinity_ReturnsPosInfinityToken()
 		{
 			var input = Single.PositiveInfinity;
@@ -458,6 +482,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_SingleNegInfinity_ReturnsNegInfinityToken()
 		{
 			var input = Single.NegativeInfinity;
@@ -478,6 +503,7 @@ namespace JsonFx.Serialization
 		#region Complex Graph Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_GraphComplex_ReturnsObjectTokens()
 		{
 			var input = new object[] {
@@ -728,6 +754,7 @@ namespace JsonFx.Serialization
 		#region Graph Cycles Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_GraphCycleTypeIgnore_ReplacesCycleStartWithNull()
 		{
 			var input = new Person
@@ -809,6 +836,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_GraphCycleTypeReferences_ThrowsGraphCycleException()
 		{
 			var input = new Person
@@ -845,6 +873,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_GraphCycleTypeMaxDepth_ThrowsGraphCycleException()
 		{
 			var input = new Person
@@ -882,6 +911,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_GraphCycleTypeMaxDepthNoMaxDepth_ThrowsArgumentException()
 		{
 			var input = new Person
@@ -919,6 +949,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_GraphCycleTypeMaxDepthFalsePositive_ThrowsGraphCycleException()
 		{
 			// input from fail18.json in test suite at http://www.json.org/JSON_checker/
@@ -1004,6 +1035,7 @@ namespace JsonFx.Serialization
 		#region Input Edge Case Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_Null_ReturnsNullToken()
 		{
 			var input = (object)null;
@@ -1020,6 +1052,7 @@ namespace JsonFx.Serialization
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Ctor_NullSettings_ThrowsArgumentNullException()
 		{
 			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(

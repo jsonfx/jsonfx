@@ -42,9 +42,17 @@ namespace JsonFx.Common.Filters
 {
 	public class MSAjaxDateFilterTests
 	{
+		#region Constants
+
+		private const string TraitName = "Filters";
+		private const string TraitValue = "DateTime";
+
+		#endregion Constants
+
 		#region TryRead Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void TryRead_StandardTimeZone_ReadsAsUtc()
 		{
 			var input = new Stream<Token<CommonTokenType>>(new[]
@@ -62,6 +70,7 @@ namespace JsonFx.Common.Filters
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void TryRead_DaylightSavingsTimeZone_ReadsAsUtc()
 		{
 			var input = new Stream<Token<CommonTokenType>>(new[]
@@ -79,6 +88,7 @@ namespace JsonFx.Common.Filters
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void TryRead_FutureTimeZone_ReadsAsUtc()
 		{
 			var input = new Stream<Token<CommonTokenType>>(new[]
@@ -96,6 +106,7 @@ namespace JsonFx.Common.Filters
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void TryRead_DateTimeMinValueUtc_ReadsAsDateTimeMinValue()
 		{
 			var expected = DateTime.MinValue;
@@ -113,6 +124,7 @@ namespace JsonFx.Common.Filters
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void TryRead_DateTimeMaxValueUtc_ReadsAsDateTimeMaxValue()
 		{
 			var input = new Stream<Token<CommonTokenType>>(new[]
@@ -134,6 +146,7 @@ namespace JsonFx.Common.Filters
 		#region TryWrite Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void TryWrite_UtcStandardTimeZone_DirectlyWritesAsUtc()
 		{
 			var input = new DateTime(2008, 2, 29, 23, 59, 59, 999, DateTimeKind.Utc);
@@ -153,6 +166,7 @@ namespace JsonFx.Common.Filters
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void TryWrite_LocalStandardTimeZone_ConvertsToUtcAndWritesAsUtc()
 		{
 			// Note: test only valid in Pacific Standard/Daylight Savings Time
@@ -173,6 +187,7 @@ namespace JsonFx.Common.Filters
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void TryWrite_UnspecifiedStandardTimeZone_DirectlyWritesAsUtc()
 		{
 			var input = new DateTime(2008, 2, 29, 23, 59, 59, 999, DateTimeKind.Unspecified);
@@ -192,6 +207,7 @@ namespace JsonFx.Common.Filters
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void TryWrite_UtcDaylightSavingsTimeZone_DirectlyWritesAsUtc()
 		{
 			var input = new DateTime(2010, 7, 5, 10, 51, 17, 768, DateTimeKind.Utc);
@@ -211,6 +227,7 @@ namespace JsonFx.Common.Filters
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void TryWrite_LocalDaylightSavingsTimeZone_ConvertsToUtcAndWritesAsUtc()
 		{
 			// Note: test only valid in Pacific Standard/Daylight Savings Time
@@ -231,6 +248,7 @@ namespace JsonFx.Common.Filters
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void TryWrite_UnspecifiedDaylightSavingsTimeZone_DirectlyWritesAsUtc()
 		{
 			var input = new DateTime(2010, 7, 5, 10, 51, 17, 768, DateTimeKind.Unspecified);
@@ -250,6 +268,7 @@ namespace JsonFx.Common.Filters
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void TryWrite_FutureUtcTimeZone_DirectlyWritesAsUtc()
 		{
 			var input = new DateTime(2099, 12, 31, 23, 59, 59, 999, DateTimeKind.Utc);
@@ -269,6 +288,7 @@ namespace JsonFx.Common.Filters
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void TryWrite_FutureLocalTimeZone_ConvertsToUtcAndWritesAsUtc()
 		{
 			// Note: test only valid in Pacific Standard/Daylight Savings Time
@@ -289,6 +309,7 @@ namespace JsonFx.Common.Filters
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void TryWrite_FutureUnspecifiedTimeZone_DirectlyWritesAsUtc()
 		{
 			var input = new DateTime(2099, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified);
@@ -308,6 +329,7 @@ namespace JsonFx.Common.Filters
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void TryWrite_DateTimeMinValue_DirectlyWritesAsUtc()
 		{
 			var input = DateTime.MinValue;
@@ -327,6 +349,7 @@ namespace JsonFx.Common.Filters
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void TryWrite_DateTimeMaxValue_DirectlyWritesAsUtc()
 		{
 			var input = DateTime.MaxValue;

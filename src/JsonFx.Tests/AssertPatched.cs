@@ -40,9 +40,17 @@ namespace JsonFx
 {
 	public class AssertPatchedTests
 	{
+		#region Constants
+
+		private const string TraitName = "Utilities";
+		private const string TraitValue = "Testing";
+
+		#endregion Constants
+
 		#region AssertPatched Tests
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Assert_ExactlyEqualNestedArrays_ThrowsEqualException()
 		{
 			Assert.Throws<EqualException>(
@@ -55,6 +63,7 @@ namespace JsonFx
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void AssertPatched_ExactlyEqualNestedArrays_Passes()
 		{
 			AssertPatched.Equal(
@@ -63,6 +72,7 @@ namespace JsonFx
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Assert_EquivalentNestedArrays_ThrowsEqualException()
 		{
 			Assert.Throws<EqualException>(
@@ -75,6 +85,7 @@ namespace JsonFx
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void AssertPatched_EquivalentStrictNestedArrays_ThrowsEqualException()
 		{
 			Assert.Throws<EqualException>(
@@ -88,6 +99,7 @@ namespace JsonFx
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void AssertPatched_EquivalentNotStrictNestedArrays_Passes()
 		{
 			AssertPatched.Equal(
@@ -97,6 +109,7 @@ namespace JsonFx
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void AssertPatched_EquivalentStrictDictionaries_ThrowsEqualException()
 		{
 			var x = new Dictionary<string, object>
@@ -115,6 +128,7 @@ namespace JsonFx
 		}
 
 		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void AssertPatched_EquivalentNotStrictDictionaries_Passes()
 		{
 			var x = new Dictionary<string, object>
