@@ -56,6 +56,7 @@ namespace JsonFx.Xml.Stax
 		private readonly PrefixScopeChain ScopeChain = new PrefixScopeChain();
 		private int nsCounter;
 		private bool encodeNonAscii = false;
+		private bool html5EmptyAttributes = false;
 
 		#endregion Fields
 
@@ -89,6 +90,18 @@ namespace JsonFx.Xml.Stax
 		{
 			get { return this.encodeNonAscii; }
 			set { this.encodeNonAscii = value; }
+		}
+
+		/// <summary>
+		/// Gets and sets a value indicating if should emit HTML-style empty attributes
+		/// </summary>
+		/// <remarks>
+		/// http://www.w3.org/TR/html5/syntax.html#attributes-0
+		/// </remarks>
+		public bool Html5EmptyAttributes
+		{
+			get { return this.html5EmptyAttributes; }
+			set { this.html5EmptyAttributes = value; }
 		}
 
 		#endregion Properties
@@ -334,8 +347,16 @@ namespace JsonFx.Xml.Stax
 				writer.Write(StaxGrammar.OperatorPrefixDelim);
 			}
 
-			// name="value"
+			// local-name
 			this.WriteLocalName(writer, localName);
+			string attrValue = value.ValueAsString();
+
+			if (this.html5EmptyAttributes && String.IsNullOrEmpty(attrValue))
+			{
+				return;
+			}
+
+			// ="value"
 			writer.Write(StaxGrammar.OperatorPairDelim);
 			writer.Write(StaxGrammar.OperatorStringDelim);
 
@@ -344,12 +365,12 @@ namespace JsonFx.Xml.Stax
 				case StaxTokenType.TextValue:
 				case StaxTokenType.Whitespace:
 				{
-					this.WriteAttributeValue(writer, value.ValueAsString());
+					this.WriteAttributeValue(writer, attrValue);
 					break;
 				}
 				case StaxTokenType.UnparsedBlock:
 				{
-					this.WriteUnparsedBlock(writer, value.Name.LocalName, value.ValueAsString());
+					this.WriteUnparsedBlock(writer, value.Name.LocalName, attrValue);
 					break;
 				}
 				default:
