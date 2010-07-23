@@ -33,7 +33,6 @@ using System.Linq;
 
 using JsonFx.Serialization;
 using JsonFx.Serialization.Resolvers;
-using JsonFx.Xml.Stax;
 using Xunit;
 
 using Assert=JsonFx.AssertPatched;
@@ -58,8 +57,8 @@ namespace JsonFx.Xml
 			const string input = @"<root></root>";
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenElementBegin(new DataName("root")),
-			        StaxGrammar.TokenElementEnd(new DataName("root"))
+			        XmlGrammar.TokenElementBegin(new DataName("root")),
+			        XmlGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
 			var tokenizer = new XmlTokenizer();
@@ -75,8 +74,8 @@ namespace JsonFx.Xml
 			const string input = @"<root />";
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenElementBegin(new DataName("root")),
-			        StaxGrammar.TokenElementEnd(new DataName("root"))
+			        XmlGrammar.TokenElementBegin(new DataName("root")),
+			        XmlGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
 			var tokenizer = new XmlTokenizer();
@@ -96,10 +95,10 @@ namespace JsonFx.Xml
 			const string input = @"<root xmlns=""http://example.com/schema""></root>";
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenPrefixBegin("", "http://example.com/schema"),
-			        StaxGrammar.TokenElementBegin(new DataName("root", "http://example.com/schema")),
-			        StaxGrammar.TokenElementEnd(new DataName("root", "http://example.com/schema")),
-			        StaxGrammar.TokenPrefixEnd("", "http://example.com/schema"),
+			        XmlGrammar.TokenPrefixBegin("", "http://example.com/schema"),
+			        XmlGrammar.TokenElementBegin(new DataName("root", "http://example.com/schema")),
+			        XmlGrammar.TokenElementEnd(new DataName("root", "http://example.com/schema")),
+			        XmlGrammar.TokenPrefixEnd("", "http://example.com/schema"),
 			    };
 
 			var tokenizer = new XmlTokenizer();
@@ -115,10 +114,10 @@ namespace JsonFx.Xml
 			const string input = @"<prefix:root xmlns:prefix=""http://example.com/schema""></prefix:root>";
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenPrefixBegin("prefix", "http://example.com/schema"),
-			        StaxGrammar.TokenElementBegin(new DataName("root", "http://example.com/schema")),
-			        StaxGrammar.TokenElementEnd(new DataName("root", "http://example.com/schema")),
-			        StaxGrammar.TokenPrefixEnd("prefix", "http://example.com/schema"),
+			        XmlGrammar.TokenPrefixBegin("prefix", "http://example.com/schema"),
+			        XmlGrammar.TokenElementBegin(new DataName("root", "http://example.com/schema")),
+			        XmlGrammar.TokenElementEnd(new DataName("root", "http://example.com/schema")),
+			        XmlGrammar.TokenPrefixEnd("prefix", "http://example.com/schema"),
 			    };
 
 			var tokenizer = new XmlTokenizer();
@@ -134,13 +133,13 @@ namespace JsonFx.Xml
 			const string input = @"<foo><child xmlns=""http://example.com/schema"">value</child></foo>";
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenElementBegin(new DataName("foo")),
-			        StaxGrammar.TokenPrefixBegin("", "http://example.com/schema"),
-			        StaxGrammar.TokenElementBegin(new DataName("child", "http://example.com/schema")),
-			        StaxGrammar.TokenText("value"),
-			        StaxGrammar.TokenElementEnd(new DataName("child", "http://example.com/schema")),
-			        StaxGrammar.TokenPrefixEnd("", "http://example.com/schema"),
-			        StaxGrammar.TokenElementEnd(new DataName("foo"))
+			        XmlGrammar.TokenElementBegin(new DataName("foo")),
+			        XmlGrammar.TokenPrefixBegin("", "http://example.com/schema"),
+			        XmlGrammar.TokenElementBegin(new DataName("child", "http://example.com/schema")),
+			        XmlGrammar.TokenText("value"),
+			        XmlGrammar.TokenElementEnd(new DataName("child", "http://example.com/schema")),
+			        XmlGrammar.TokenPrefixEnd("", "http://example.com/schema"),
+			        XmlGrammar.TokenElementEnd(new DataName("foo"))
 			    };
 
 			var tokenizer = new XmlTokenizer();
@@ -156,13 +155,13 @@ namespace JsonFx.Xml
 			const string input = @"<foo xmlns=""http://example.org""><child>value</child></foo>";
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenPrefixBegin("", "http://example.org"),
-			        StaxGrammar.TokenElementBegin(new DataName("foo", "http://example.org")),
-			        StaxGrammar.TokenElementBegin(new DataName("child", "http://example.org")),
-			        StaxGrammar.TokenText("value"),
-			        StaxGrammar.TokenElementEnd(new DataName("child", "http://example.org")),
-			        StaxGrammar.TokenElementEnd(new DataName("foo", "http://example.org")),
-			        StaxGrammar.TokenPrefixEnd("", "http://example.org")
+			        XmlGrammar.TokenPrefixBegin("", "http://example.org"),
+			        XmlGrammar.TokenElementBegin(new DataName("foo", "http://example.org")),
+			        XmlGrammar.TokenElementBegin(new DataName("child", "http://example.org")),
+			        XmlGrammar.TokenText("value"),
+			        XmlGrammar.TokenElementEnd(new DataName("child", "http://example.org")),
+			        XmlGrammar.TokenElementEnd(new DataName("foo", "http://example.org")),
+			        XmlGrammar.TokenPrefixEnd("", "http://example.org")
 			    };
 
 			var tokenizer = new XmlTokenizer();
@@ -178,13 +177,13 @@ namespace JsonFx.Xml
 			const string input = @"<bar:foo xmlns:bar=""http://example.org""><bar:child>value</bar:child></bar:foo>";
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenPrefixBegin("bar", "http://example.org"),
-			        StaxGrammar.TokenElementBegin(new DataName("foo", "http://example.org")),
-			        StaxGrammar.TokenElementBegin(new DataName("child", "http://example.org")),
-			        StaxGrammar.TokenText("value"),
-			        StaxGrammar.TokenElementEnd(new DataName("child", "http://example.org")),
-			        StaxGrammar.TokenElementEnd(new DataName("foo", "http://example.org")),
-			        StaxGrammar.TokenPrefixEnd("bar", "http://example.org")
+			        XmlGrammar.TokenPrefixBegin("bar", "http://example.org"),
+			        XmlGrammar.TokenElementBegin(new DataName("foo", "http://example.org")),
+			        XmlGrammar.TokenElementBegin(new DataName("child", "http://example.org")),
+			        XmlGrammar.TokenText("value"),
+			        XmlGrammar.TokenElementEnd(new DataName("child", "http://example.org")),
+			        XmlGrammar.TokenElementEnd(new DataName("foo", "http://example.org")),
+			        XmlGrammar.TokenPrefixEnd("bar", "http://example.org")
 			    };
 
 			var tokenizer = new XmlTokenizer();
@@ -200,15 +199,15 @@ namespace JsonFx.Xml
 			const string input = @"<foo xmlns=""http://json.org""><child xmlns=""http://jsonfx.net"">text value</child></foo>";
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenPrefixBegin("", "http://json.org"),
-			        StaxGrammar.TokenElementBegin(new DataName("foo", "http://json.org")),
-			        StaxGrammar.TokenPrefixBegin("", "http://jsonfx.net"),
-			        StaxGrammar.TokenElementBegin(new DataName("child", "http://jsonfx.net")),
-			        StaxGrammar.TokenText("text value"),
-			        StaxGrammar.TokenElementEnd(new DataName("child", "http://jsonfx.net")),
-			        StaxGrammar.TokenPrefixEnd("", "http://jsonfx.net"),
-			        StaxGrammar.TokenElementEnd(new DataName("foo", "http://json.org")),
-			        StaxGrammar.TokenPrefixEnd("", "http://json.org")
+			        XmlGrammar.TokenPrefixBegin("", "http://json.org"),
+			        XmlGrammar.TokenElementBegin(new DataName("foo", "http://json.org")),
+			        XmlGrammar.TokenPrefixBegin("", "http://jsonfx.net"),
+			        XmlGrammar.TokenElementBegin(new DataName("child", "http://jsonfx.net")),
+			        XmlGrammar.TokenText("text value"),
+			        XmlGrammar.TokenElementEnd(new DataName("child", "http://jsonfx.net")),
+			        XmlGrammar.TokenPrefixEnd("", "http://jsonfx.net"),
+			        XmlGrammar.TokenElementEnd(new DataName("foo", "http://json.org")),
+			        XmlGrammar.TokenPrefixEnd("", "http://json.org")
 			    };
 
 			var tokenizer = new XmlTokenizer();
@@ -224,14 +223,14 @@ namespace JsonFx.Xml
 			const string input = @"<foo xmlns=""http://example.org"" xmlns:blah=""http://example.org"" blah:key=""value"" />";
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenPrefixBegin("", "http://example.org"),
-			        StaxGrammar.TokenPrefixBegin("blah", "http://example.org"),
-			        StaxGrammar.TokenElementBegin(new DataName("foo", "http://example.org")),
-			        StaxGrammar.TokenAttribute(new DataName("key", "http://example.org")),
-			        StaxGrammar.TokenText("value"),
-			        StaxGrammar.TokenElementEnd(new DataName("foo", "http://example.org")),
-			        StaxGrammar.TokenPrefixEnd("", "http://example.org"),
-			        StaxGrammar.TokenPrefixEnd("blah", "http://example.org")
+			        XmlGrammar.TokenPrefixBegin("", "http://example.org"),
+			        XmlGrammar.TokenPrefixBegin("blah", "http://example.org"),
+			        XmlGrammar.TokenElementBegin(new DataName("foo", "http://example.org")),
+			        XmlGrammar.TokenAttribute(new DataName("key", "http://example.org")),
+			        XmlGrammar.TokenText("value"),
+			        XmlGrammar.TokenElementEnd(new DataName("foo", "http://example.org")),
+			        XmlGrammar.TokenPrefixEnd("", "http://example.org"),
+			        XmlGrammar.TokenPrefixEnd("blah", "http://example.org")
 			    };
 
 			var tokenizer = new XmlTokenizer();
@@ -248,20 +247,20 @@ namespace JsonFx.Xml
 
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenPrefixBegin("", "http://example.org/outer"),
-			        StaxGrammar.TokenElementBegin(new DataName("outer", "http://example.org/outer")),
-			        StaxGrammar.TokenPrefixBegin("", "http://example.org/inner"),
-			        StaxGrammar.TokenElementBegin(new DataName("middle-1", "http://example.org/inner")),
-			        StaxGrammar.TokenElementBegin(new DataName("inner", "http://example.org/inner")),
-			        StaxGrammar.TokenText("this should be inner"),
-			        StaxGrammar.TokenElementEnd(new DataName("inner", "http://example.org/inner")),
-			        StaxGrammar.TokenElementEnd(new DataName("middle-1", "http://example.org/inner")),
-			        StaxGrammar.TokenPrefixEnd("", "http://example.org/inner"),
-			        StaxGrammar.TokenElementBegin(new DataName("middle-2", "http://example.org/outer")),
-			        StaxGrammar.TokenText("this should be outer"),
-			        StaxGrammar.TokenElementEnd(new DataName("middle-2", "http://example.org/outer")),
-			        StaxGrammar.TokenElementEnd(new DataName("outer", "http://example.org/outer")),
-			        StaxGrammar.TokenPrefixEnd("", "http://example.org/outer")
+			        XmlGrammar.TokenPrefixBegin("", "http://example.org/outer"),
+			        XmlGrammar.TokenElementBegin(new DataName("outer", "http://example.org/outer")),
+			        XmlGrammar.TokenPrefixBegin("", "http://example.org/inner"),
+			        XmlGrammar.TokenElementBegin(new DataName("middle-1", "http://example.org/inner")),
+			        XmlGrammar.TokenElementBegin(new DataName("inner", "http://example.org/inner")),
+			        XmlGrammar.TokenText("this should be inner"),
+			        XmlGrammar.TokenElementEnd(new DataName("inner", "http://example.org/inner")),
+			        XmlGrammar.TokenElementEnd(new DataName("middle-1", "http://example.org/inner")),
+			        XmlGrammar.TokenPrefixEnd("", "http://example.org/inner"),
+			        XmlGrammar.TokenElementBegin(new DataName("middle-2", "http://example.org/outer")),
+			        XmlGrammar.TokenText("this should be outer"),
+			        XmlGrammar.TokenElementEnd(new DataName("middle-2", "http://example.org/outer")),
+			        XmlGrammar.TokenElementEnd(new DataName("outer", "http://example.org/outer")),
+			        XmlGrammar.TokenPrefixEnd("", "http://example.org/outer")
 			    };
 
 			var tokenizer = new XmlTokenizer();
@@ -277,12 +276,12 @@ namespace JsonFx.Xml
 			const string input = @"<a:one><b:two><c:three></d:three></e:two></f:one>";
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenElementBegin(new DataName("one")),
-			        StaxGrammar.TokenElementBegin(new DataName("two")),
-			        StaxGrammar.TokenElementBegin(new DataName("three")),
-			        StaxGrammar.TokenElementEnd(new DataName("three")),
-			        StaxGrammar.TokenElementEnd(new DataName("two")),
-			        StaxGrammar.TokenElementEnd(new DataName("one"))
+			        XmlGrammar.TokenElementBegin(new DataName("one")),
+			        XmlGrammar.TokenElementBegin(new DataName("two")),
+			        XmlGrammar.TokenElementBegin(new DataName("three")),
+			        XmlGrammar.TokenElementEnd(new DataName("three")),
+			        XmlGrammar.TokenElementEnd(new DataName("two")),
+			        XmlGrammar.TokenElementEnd(new DataName("one"))
 			    };
 
 			var tokenizer = new XmlTokenizer();
@@ -307,10 +306,10 @@ namespace JsonFx.Xml
 			const string input = @"<root attrName=""attrValue""></root>";
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenElementBegin(new DataName("root")),
-			        StaxGrammar.TokenAttribute(new DataName("attrName")),
-			        StaxGrammar.TokenText("attrValue"),
-			        StaxGrammar.TokenElementEnd(new DataName("root"))
+			        XmlGrammar.TokenElementBegin(new DataName("root")),
+			        XmlGrammar.TokenAttribute(new DataName("attrName")),
+			        XmlGrammar.TokenText("attrValue"),
+			        XmlGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
 			var tokenizer = new XmlTokenizer();
@@ -326,10 +325,10 @@ namespace JsonFx.Xml
 			const string input = @"<root noValue=""""></root>";
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenElementBegin(new DataName("root")),
-			        StaxGrammar.TokenAttribute(new DataName("noValue")),
-			        StaxGrammar.TokenText(String.Empty),
-			        StaxGrammar.TokenElementEnd(new DataName("root"))
+			        XmlGrammar.TokenElementBegin(new DataName("root")),
+			        XmlGrammar.TokenAttribute(new DataName("noValue")),
+			        XmlGrammar.TokenText(String.Empty),
+			        XmlGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
 			var tokenizer = new XmlTokenizer();
@@ -345,10 +344,10 @@ namespace JsonFx.Xml
 			const string input = @"<root emptyValue=""""></root>";
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenElementBegin(new DataName("root")),
-			        StaxGrammar.TokenAttribute(new DataName("emptyValue")),
-			        StaxGrammar.TokenText(String.Empty),
-			        StaxGrammar.TokenElementEnd(new DataName("root"))
+			        XmlGrammar.TokenElementBegin(new DataName("root")),
+			        XmlGrammar.TokenAttribute(new DataName("emptyValue")),
+			        XmlGrammar.TokenText(String.Empty),
+			        XmlGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
 			var tokenizer = new XmlTokenizer();
@@ -364,10 +363,10 @@ namespace JsonFx.Xml
 			const string input = @"<root white  =  "" extra whitespace around quote delims "" ></root>";
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenElementBegin(new DataName("root")),
-			        StaxGrammar.TokenAttribute(new DataName("white")),
-			        StaxGrammar.TokenText(" extra whitespace around quote delims "),
-			        StaxGrammar.TokenElementEnd(new DataName("root"))
+			        XmlGrammar.TokenElementBegin(new DataName("root")),
+			        XmlGrammar.TokenAttribute(new DataName("white")),
+			        XmlGrammar.TokenText(" extra whitespace around quote delims "),
+			        XmlGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
 			var tokenizer = new XmlTokenizer();
@@ -383,10 +382,10 @@ namespace JsonFx.Xml
 			const string input = @"<root whitespace="" this contains whitespace ""></root>";
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenElementBegin(new DataName("root")),
-			        StaxGrammar.TokenAttribute(new DataName("whitespace")),
-			        StaxGrammar.TokenText(" this contains whitespace "),
-			        StaxGrammar.TokenElementEnd(new DataName("root"))
+			        XmlGrammar.TokenElementBegin(new DataName("root")),
+			        XmlGrammar.TokenAttribute(new DataName("whitespace")),
+			        XmlGrammar.TokenText(" this contains whitespace "),
+			        XmlGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
 			var tokenizer = new XmlTokenizer();
@@ -402,14 +401,14 @@ namespace JsonFx.Xml
 			const string input = @"<root no-value="""" whitespace="" this contains whitespace "" anyQuotedText="""+"/\\\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\n\r\t`1~!@#$%^&amp;*()_+-=[]{}|;:',./&lt;&gt;?"+@"""></root>";
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenElementBegin(new DataName("root")),
-			        StaxGrammar.TokenAttribute(new DataName("anyQuotedText")),
-			        StaxGrammar.TokenText("/\\\uCAFE\uBABE\uAB98\uFCDE\uBCDA\uEF4A   `1~!@#$%^&*()_+-=[]{}|;:',./<>?"),
-			        StaxGrammar.TokenAttribute(new DataName("no-value")),
-			        StaxGrammar.TokenText(String.Empty),
-			        StaxGrammar.TokenAttribute(new DataName("whitespace")),
-			        StaxGrammar.TokenText(" this contains whitespace "),
-			        StaxGrammar.TokenElementEnd(new DataName("root"))
+			        XmlGrammar.TokenElementBegin(new DataName("root")),
+			        XmlGrammar.TokenAttribute(new DataName("anyQuotedText")),
+			        XmlGrammar.TokenText("/\\\uCAFE\uBABE\uAB98\uFCDE\uBCDA\uEF4A   `1~!@#$%^&*()_+-=[]{}|;:',./<>?"),
+			        XmlGrammar.TokenAttribute(new DataName("no-value")),
+			        XmlGrammar.TokenText(String.Empty),
+			        XmlGrammar.TokenAttribute(new DataName("whitespace")),
+			        XmlGrammar.TokenText(" this contains whitespace "),
+			        XmlGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
 			var tokenizer = new XmlTokenizer();
@@ -429,7 +428,7 @@ namespace JsonFx.Xml
 			const string input = @"&lt;";
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenText("<")
+			        XmlGrammar.TokenText("<")
 			    };
 
 			var tokenizer = new XmlTokenizer();
@@ -445,7 +444,7 @@ namespace JsonFx.Xml
 			const string input = @"&#66;";
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenText("B")
+			        XmlGrammar.TokenText("B")
 			    };
 
 			var tokenizer = new XmlTokenizer();
@@ -461,7 +460,7 @@ namespace JsonFx.Xml
 			const string input = @"&#x37;";
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenText("7")
+			        XmlGrammar.TokenText("7")
 			    };
 
 			var tokenizer = new XmlTokenizer();
@@ -477,7 +476,7 @@ namespace JsonFx.Xml
 			const string input = @"&#xABCD;";
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenText("\uABCD")
+			        XmlGrammar.TokenText("\uABCD")
 			    };
 
 			var tokenizer = new XmlTokenizer();
@@ -493,7 +492,7 @@ namespace JsonFx.Xml
 			const string input = @"&#xabcd;";
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenText("\uabcd")
+			        XmlGrammar.TokenText("\uabcd")
 			    };
 
 			var tokenizer = new XmlTokenizer();
@@ -509,7 +508,7 @@ namespace JsonFx.Xml
 			const string input = @"&#x20AC;";
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenText("€")
+			        XmlGrammar.TokenText("€")
 			    };
 
 			var tokenizer = new XmlTokenizer();
@@ -525,7 +524,7 @@ namespace JsonFx.Xml
 			const string input = @"leading&amp;";
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenText("leading&")
+			        XmlGrammar.TokenText("leading&")
 			    };
 
 			var tokenizer = new XmlTokenizer();
@@ -541,7 +540,7 @@ namespace JsonFx.Xml
 			const string input = @"&amp;trailing";
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenText("&trailing")
+			        XmlGrammar.TokenText("&trailing")
 			    };
 
 			var tokenizer = new XmlTokenizer();
@@ -557,7 +556,7 @@ namespace JsonFx.Xml
 			const string input = @"there should &lt;b&gt;e decoded chars &amp; inside this text";
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenText(@"there should <b>e decoded chars & inside this text")
+			        XmlGrammar.TokenText(@"there should <b>e decoded chars & inside this text")
 			    };
 
 			var tokenizer = new XmlTokenizer();
@@ -578,22 +577,22 @@ namespace JsonFx.Xml
 
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenElementBegin(new DataName("div")),
-			        StaxGrammar.TokenAttribute(new DataName("class")),
-			        StaxGrammar.TokenText("content"),
-			        StaxGrammar.TokenElementBegin(new DataName("p")),
-			        StaxGrammar.TokenAttribute(new DataName("style")),
-			        StaxGrammar.TokenText("color:red"),
-			        StaxGrammar.TokenElementBegin(new DataName("strong")),
-			        StaxGrammar.TokenText("Lorem ipsum"),
-			        StaxGrammar.TokenElementEnd(new DataName("strong")),
-			        StaxGrammar.TokenText(" dolor sit amet, "),
-			        StaxGrammar.TokenElementBegin(new DataName("i")),
-			        StaxGrammar.TokenText("consectetur"),
-			        StaxGrammar.TokenElementEnd(new DataName("i")),
-			        StaxGrammar.TokenText(" adipiscing elit."),
-			        StaxGrammar.TokenElementEnd(new DataName("p")),
-					StaxGrammar.TokenElementEnd(new DataName("div")),
+			        XmlGrammar.TokenElementBegin(new DataName("div")),
+			        XmlGrammar.TokenAttribute(new DataName("class")),
+			        XmlGrammar.TokenText("content"),
+			        XmlGrammar.TokenElementBegin(new DataName("p")),
+			        XmlGrammar.TokenAttribute(new DataName("style")),
+			        XmlGrammar.TokenText("color:red"),
+			        XmlGrammar.TokenElementBegin(new DataName("strong")),
+			        XmlGrammar.TokenText("Lorem ipsum"),
+			        XmlGrammar.TokenElementEnd(new DataName("strong")),
+			        XmlGrammar.TokenText(" dolor sit amet, "),
+			        XmlGrammar.TokenElementBegin(new DataName("i")),
+			        XmlGrammar.TokenText("consectetur"),
+			        XmlGrammar.TokenElementEnd(new DataName("i")),
+			        XmlGrammar.TokenText(" adipiscing elit."),
+			        XmlGrammar.TokenElementEnd(new DataName("p")),
+					XmlGrammar.TokenElementEnd(new DataName("div")),
 			    };
 
 			var tokenizer = new XmlTokenizer();
@@ -615,25 +614,25 @@ namespace JsonFx.Xml
 
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenElementBegin(new DataName("div")),
-			        StaxGrammar.TokenAttribute(new DataName("class")),
-			        StaxGrammar.TokenText("content"),
-			        StaxGrammar.TokenWhitespace("\n\t"),
-			        StaxGrammar.TokenElementBegin(new DataName("p")),
-			        StaxGrammar.TokenAttribute(new DataName("style")),
-			        StaxGrammar.TokenText("color:red"),
-			        StaxGrammar.TokenWhitespace("\n\t\t"),
-			        StaxGrammar.TokenElementBegin(new DataName("strong")),
-			        StaxGrammar.TokenText("Lorem ipsum"),
-			        StaxGrammar.TokenElementEnd(new DataName("strong")),
-			        StaxGrammar.TokenText(" dolor sit amet, "),
-			        StaxGrammar.TokenElementBegin(new DataName("i")),
-			        StaxGrammar.TokenText("consectetur"),
-			        StaxGrammar.TokenElementEnd(new DataName("i")),
-			        StaxGrammar.TokenText(" adipiscing elit.\n\t"),
-			        StaxGrammar.TokenElementEnd(new DataName("p")),
-			        StaxGrammar.TokenWhitespace("\n"),
-					StaxGrammar.TokenElementEnd(new DataName("div")),
+			        XmlGrammar.TokenElementBegin(new DataName("div")),
+			        XmlGrammar.TokenAttribute(new DataName("class")),
+			        XmlGrammar.TokenText("content"),
+			        XmlGrammar.TokenWhitespace("\n\t"),
+			        XmlGrammar.TokenElementBegin(new DataName("p")),
+			        XmlGrammar.TokenAttribute(new DataName("style")),
+			        XmlGrammar.TokenText("color:red"),
+			        XmlGrammar.TokenWhitespace("\n\t\t"),
+			        XmlGrammar.TokenElementBegin(new DataName("strong")),
+			        XmlGrammar.TokenText("Lorem ipsum"),
+			        XmlGrammar.TokenElementEnd(new DataName("strong")),
+			        XmlGrammar.TokenText(" dolor sit amet, "),
+			        XmlGrammar.TokenElementBegin(new DataName("i")),
+			        XmlGrammar.TokenText("consectetur"),
+			        XmlGrammar.TokenElementEnd(new DataName("i")),
+			        XmlGrammar.TokenText(" adipiscing elit.\n\t"),
+			        XmlGrammar.TokenElementEnd(new DataName("p")),
+			        XmlGrammar.TokenWhitespace("\n"),
+					XmlGrammar.TokenElementEnd(new DataName("div")),
 			    };
 
 			var tokenizer = new XmlTokenizer();
@@ -653,7 +652,7 @@ namespace JsonFx.Xml
 			const string input = @"<?xml version=""1.0""?>";
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenUnparsed("?{0}?", @"xml version=""1.0""")
+			        XmlGrammar.TokenUnparsed("?{0}?", @"xml version=""1.0""")
 			    };
 
 			var tokenizer = new XmlTokenizer();
@@ -669,7 +668,7 @@ namespace JsonFx.Xml
 			const string input = @"<!-- a quick note -->";
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenUnparsed("!--{0}--", @" a quick note ")
+			        XmlGrammar.TokenUnparsed("!--{0}--", @" a quick note ")
 			    };
 
 			var tokenizer = new XmlTokenizer();
@@ -685,7 +684,7 @@ namespace JsonFx.Xml
 			const string input = @"<![CDATA[value>""0"" && value<""10"" ?""valid"":""error""]]>";
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenText(@"value>""0"" && value<""10"" ?""valid"":""error""")
+			        XmlGrammar.TokenText(@"value>""0"" && value<""10"" ?""valid"":""error""")
 			    };
 
 			var tokenizer = new XmlTokenizer();
@@ -709,33 +708,33 @@ namespace JsonFx.Xml
 </math>";
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenElementBegin(new DataName("p")),
-			        StaxGrammar.TokenText(@"You can add a string to a number, but this stringifies the number:"),
-			        StaxGrammar.TokenElementEnd(new DataName("p")),
-			        StaxGrammar.TokenWhitespace("\n"),
-			        StaxGrammar.TokenElementBegin(new DataName("math")),
-			        StaxGrammar.TokenWhitespace("\n\t"),
-			        StaxGrammar.TokenElementBegin(new DataName("ms")),
-			        StaxGrammar.TokenText(@"x<y"),
-			        StaxGrammar.TokenElementEnd(new DataName("ms")),
-			        StaxGrammar.TokenWhitespace("\n\t"),
-			        StaxGrammar.TokenElementBegin(new DataName("mo")),
-			        StaxGrammar.TokenText(@"+"),
-			        StaxGrammar.TokenElementEnd(new DataName("mo")),
-			        StaxGrammar.TokenWhitespace("\n\t"),
-			        StaxGrammar.TokenElementBegin(new DataName("mn")),
-			        StaxGrammar.TokenText(@"3"),
-			        StaxGrammar.TokenElementEnd(new DataName("mn")),
-			        StaxGrammar.TokenWhitespace("\n\t"),
-			        StaxGrammar.TokenElementBegin(new DataName("mo")),
-			        StaxGrammar.TokenText(@"="),
-			        StaxGrammar.TokenElementEnd(new DataName("mo")),
-			        StaxGrammar.TokenWhitespace("\n\t"),
-			        StaxGrammar.TokenElementBegin(new DataName("ms")),
-			        StaxGrammar.TokenText(@"x<y3"),
-			        StaxGrammar.TokenElementEnd(new DataName("ms")),
-			        StaxGrammar.TokenWhitespace("\n"),
-			        StaxGrammar.TokenElementEnd(new DataName("math")),
+			        XmlGrammar.TokenElementBegin(new DataName("p")),
+			        XmlGrammar.TokenText(@"You can add a string to a number, but this stringifies the number:"),
+			        XmlGrammar.TokenElementEnd(new DataName("p")),
+			        XmlGrammar.TokenWhitespace("\n"),
+			        XmlGrammar.TokenElementBegin(new DataName("math")),
+			        XmlGrammar.TokenWhitespace("\n\t"),
+			        XmlGrammar.TokenElementBegin(new DataName("ms")),
+			        XmlGrammar.TokenText(@"x<y"),
+			        XmlGrammar.TokenElementEnd(new DataName("ms")),
+			        XmlGrammar.TokenWhitespace("\n\t"),
+			        XmlGrammar.TokenElementBegin(new DataName("mo")),
+			        XmlGrammar.TokenText(@"+"),
+			        XmlGrammar.TokenElementEnd(new DataName("mo")),
+			        XmlGrammar.TokenWhitespace("\n\t"),
+			        XmlGrammar.TokenElementBegin(new DataName("mn")),
+			        XmlGrammar.TokenText(@"3"),
+			        XmlGrammar.TokenElementEnd(new DataName("mn")),
+			        XmlGrammar.TokenWhitespace("\n\t"),
+			        XmlGrammar.TokenElementBegin(new DataName("mo")),
+			        XmlGrammar.TokenText(@"="),
+			        XmlGrammar.TokenElementEnd(new DataName("mo")),
+			        XmlGrammar.TokenWhitespace("\n\t"),
+			        XmlGrammar.TokenElementBegin(new DataName("ms")),
+			        XmlGrammar.TokenText(@"x<y3"),
+			        XmlGrammar.TokenElementEnd(new DataName("ms")),
+			        XmlGrammar.TokenWhitespace("\n"),
+			        XmlGrammar.TokenElementEnd(new DataName("math")),
 			    };
 
 			var tokenizer = new XmlTokenizer();
@@ -775,13 +774,13 @@ namespace JsonFx.Xml
 <root />";
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenUnparsed("!{0}",
+			        XmlGrammar.TokenUnparsed("!{0}",
 @"DOCTYPE doc [
 	<!ATTLIST normId id ID #IMPLIED>
 	<!ATTLIST normNames attr NMTOKENS #IMPLIED>
 ]"),
-					StaxGrammar.TokenElementBegin(new DataName("root")),
-					StaxGrammar.TokenElementEnd(new DataName("root"))
+					XmlGrammar.TokenElementBegin(new DataName("root")),
+					XmlGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
 			var tokenizer = new XmlTokenizer();
@@ -806,23 +805,23 @@ namespace JsonFx.Xml
 
 			var expected = new[]
 			    {
-			        StaxGrammar.TokenElementBegin(new DataName("html")),
-			        StaxGrammar.TokenWhitespace("\n\t"),
-			        StaxGrammar.TokenElementBegin(new DataName("head")),
-			        StaxGrammar.TokenWhitespace("\n\t\t"),
-			        StaxGrammar.TokenElementBegin(new DataName("title")),
-			        StaxGrammar.TokenText("PHP Test"),
-			        StaxGrammar.TokenElementEnd(new DataName("title")),
-			        StaxGrammar.TokenWhitespace("\n\t"),
-			        StaxGrammar.TokenElementEnd(new DataName("head")),
-			        StaxGrammar.TokenWhitespace("\n\t"),
-			        StaxGrammar.TokenElementBegin(new DataName("body")),
-			        StaxGrammar.TokenWhitespace("\n\t\t"),
-			        StaxGrammar.TokenUnparsed("?{0}?", @"php echo '<p>Hello World</p>'; "),
-			        StaxGrammar.TokenWhitespace("\n\t"),
-			        StaxGrammar.TokenElementEnd(new DataName("body")),
-			        StaxGrammar.TokenWhitespace("\n"),
-			        StaxGrammar.TokenElementEnd(new DataName("html")),
+			        XmlGrammar.TokenElementBegin(new DataName("html")),
+			        XmlGrammar.TokenWhitespace("\n\t"),
+			        XmlGrammar.TokenElementBegin(new DataName("head")),
+			        XmlGrammar.TokenWhitespace("\n\t\t"),
+			        XmlGrammar.TokenElementBegin(new DataName("title")),
+			        XmlGrammar.TokenText("PHP Test"),
+			        XmlGrammar.TokenElementEnd(new DataName("title")),
+			        XmlGrammar.TokenWhitespace("\n\t"),
+			        XmlGrammar.TokenElementEnd(new DataName("head")),
+			        XmlGrammar.TokenWhitespace("\n\t"),
+			        XmlGrammar.TokenElementBegin(new DataName("body")),
+			        XmlGrammar.TokenWhitespace("\n\t\t"),
+			        XmlGrammar.TokenUnparsed("?{0}?", @"php echo '<p>Hello World</p>'; "),
+			        XmlGrammar.TokenWhitespace("\n\t"),
+			        XmlGrammar.TokenElementEnd(new DataName("body")),
+			        XmlGrammar.TokenWhitespace("\n"),
+			        XmlGrammar.TokenElementEnd(new DataName("html")),
 			    };
 
 			var tokenizer = new XmlTokenizer();
@@ -840,7 +839,7 @@ namespace JsonFx.Xml
 		public void GetTokens_NullInput_ReturnsEmptySequence()
 		{
 			const string input = null;
-			var expected = new Token<StaxTokenType>[0];
+			var expected = new Token<XmlTokenType>[0];
 
 			var tokenizer = new XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
@@ -853,7 +852,7 @@ namespace JsonFx.Xml
 		public void GetTokens_EmptyInput_ReturnsEmptySequence()
 		{
 			const string input = "";
-			var expected = new Token<StaxTokenType>[0];
+			var expected = new Token<XmlTokenType>[0];
 
 			var tokenizer = new XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();

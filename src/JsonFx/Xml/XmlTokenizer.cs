@@ -35,7 +35,6 @@ using System.Xml;
 
 using JsonFx.Serialization;
 using JsonFx.Serialization.Resolvers;
-using JsonFx.Xml.Stax;
 
 namespace JsonFx.Xml
 {
@@ -45,7 +44,7 @@ namespace JsonFx.Xml
 	/// <remarks>
 	/// Implemented as an Adapter between <see cref="ITextTokenizer<StaxTokenType>"/> and <see cref="System.Xml.XmlReader"/>
 	/// </remarks>
-	public class XmlTokenizer : ITextTokenizer<StaxTokenType>
+	public class XmlTokenizer : ITextTokenizer<XmlTokenType>
 	{
 		#region Fields
 
@@ -120,7 +119,7 @@ namespace JsonFx.Xml
 		/// </summary>
 		/// <param name="text"></param>
 		/// <returns></returns>
-		public IEnumerable<Token<StaxTokenType>> GetTokens(string text)
+		public IEnumerable<Token<XmlTokenType>> GetTokens(string text)
 		{
 			return this.GetTokens(new StringReader(text ?? String.Empty));
 		}
@@ -130,7 +129,7 @@ namespace JsonFx.Xml
 		/// </summary>
 		/// <param name="reader"></param>
 		/// <returns></returns>
-		public IEnumerable<Token<StaxTokenType>> GetTokens(TextReader reader)
+		public IEnumerable<Token<XmlTokenType>> GetTokens(TextReader reader)
 		{
 			if (reader == null)
 			{
@@ -152,7 +151,7 @@ namespace JsonFx.Xml
 		/// </summary>
 		/// <param name="reader"></param>
 		/// <returns></returns>
-		public IEnumerable<Token<StaxTokenType>> GetTokens(XmlReader reader)
+		public IEnumerable<Token<XmlTokenType>> GetTokens(XmlReader reader)
 		{
 			if (reader == null)
 			{
@@ -220,25 +219,25 @@ namespace JsonFx.Xml
 
 						foreach (var xmlns in scope)
 						{
-							yield return StaxGrammar.TokenPrefixBegin(xmlns.Key, xmlns.Value);
+							yield return XmlGrammar.TokenPrefixBegin(xmlns.Key, xmlns.Value);
 						}
-						yield return StaxGrammar.TokenElementBegin(scope.TagName);
+						yield return XmlGrammar.TokenElementBegin(scope.TagName);
 
 						if (attributes != null)
 						{
 							foreach (var attribute in attributes)
 							{
-								yield return StaxGrammar.TokenAttribute(attribute.Key);
-								yield return StaxGrammar.TokenText(attribute.Value);
+								yield return XmlGrammar.TokenAttribute(attribute.Key);
+								yield return XmlGrammar.TokenText(attribute.Value);
 							}
 						}
 
 						if (isVoidTag)
 						{
-							yield return StaxGrammar.TokenElementEnd(scope.TagName);
+							yield return XmlGrammar.TokenElementEnd(scope.TagName);
 							foreach (var xmlns in scope)
 							{
-								yield return StaxGrammar.TokenPrefixEnd(xmlns.Key, xmlns.Value);
+								yield return XmlGrammar.TokenPrefixEnd(xmlns.Key, xmlns.Value);
 							}
 						}
 						break;
@@ -254,33 +253,33 @@ namespace JsonFx.Xml
 							throw new DeserializationException("Unexpected close tag", -1);
 						}
 
-						yield return StaxGrammar.TokenElementEnd(scope.TagName);
+						yield return XmlGrammar.TokenElementEnd(scope.TagName);
 						foreach (var xmlns in scope)
 						{
-							yield return StaxGrammar.TokenPrefixEnd(xmlns.Key, xmlns.Value);
+							yield return XmlGrammar.TokenPrefixEnd(xmlns.Key, xmlns.Value);
 						}
 						break;
 					}
 					case XmlNodeType.Attribute:
 					{
-						yield return StaxGrammar.TokenAttribute(new DataName(reader.Name, reader.NamespaceURI));
-						yield return StaxGrammar.TokenText(reader.Value);
+						yield return XmlGrammar.TokenAttribute(new DataName(reader.Name, reader.NamespaceURI));
+						yield return XmlGrammar.TokenText(reader.Value);
 						break;
 					}
 					case XmlNodeType.Text:
 					{
-						yield return StaxGrammar.TokenText(reader.Value);
+						yield return XmlGrammar.TokenText(reader.Value);
 						break;
 					}
 					case XmlNodeType.SignificantWhitespace:
 					case XmlNodeType.Whitespace:
 					{
-						yield return StaxGrammar.TokenWhitespace(reader.Value);
+						yield return XmlGrammar.TokenWhitespace(reader.Value);
 						break;
 					}
 					case XmlNodeType.CDATA:
 					{
-						yield return StaxGrammar.TokenText(reader.Value);
+						yield return XmlGrammar.TokenText(reader.Value);
 						break;
 					}
 					case XmlNodeType.Entity:
@@ -292,22 +291,22 @@ namespace JsonFx.Xml
 					case XmlNodeType.ProcessingInstruction:
 					case XmlNodeType.XmlDeclaration:
 					{
-						yield return StaxGrammar.TokenUnparsed("?{0}?", reader.Name+" "+reader.Value);
+						yield return XmlGrammar.TokenUnparsed("?{0}?", reader.Name+" "+reader.Value);
 						break;
 					}
 					case XmlNodeType.Comment:
 					{
-						yield return StaxGrammar.TokenUnparsed("!--{0}--", reader.Value);
+						yield return XmlGrammar.TokenUnparsed("!--{0}--", reader.Value);
 						break;
 					}
 					case XmlNodeType.DocumentType:
 					{
-						yield return StaxGrammar.TokenUnparsed("!DOCTYPE {0}", reader.Value);
+						yield return XmlGrammar.TokenUnparsed("!DOCTYPE {0}", reader.Value);
 						break;
 					}
 					case XmlNodeType.Notation:
 					{
-						yield return StaxGrammar.TokenUnparsed("!NOTATION {0}", reader.Value);
+						yield return XmlGrammar.TokenUnparsed("!NOTATION {0}", reader.Value);
 						break;
 					}
 					case XmlNodeType.None:

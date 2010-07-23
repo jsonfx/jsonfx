@@ -30,12 +30,12 @@
 
 using System;
 
-namespace JsonFx.Xml.Stax
+namespace JsonFx.Xml
 {
 	/// <summary>
 	/// StAX-like tokens
 	/// </summary>
-	public enum StaxTokenType
+	public enum XmlTokenType
 	{
 		/// <summary>
 		/// No token

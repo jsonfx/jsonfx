@@ -46,7 +46,7 @@ namespace JsonFx.Xml.Stax
 	/// Like StAX, this generates a stream of tokens
 	/// Unlike StAX, this follows a more permissive markup format with automatic recovery most similar to HTML5.
 	/// </remarks>
-	public class StaxTokenizer : ITextTokenizer<StaxTokenType>
+	public class StaxTokenizer : ITextTokenizer<XmlTokenType>
 	{
 		#region Inner Types
 
@@ -66,7 +66,7 @@ namespace JsonFx.Xml.Stax
 			{
 				return String.Concat(
 					this.Prefix,
-					StaxGrammar.OperatorPrefixDelim,
+					XmlGrammar.OperatorPrefixDelim,
 					this.Name);
 			}
 
@@ -79,7 +79,7 @@ namespace JsonFx.Xml.Stax
 
 			public StaxQName QName { get; set; }
 
-			public Token<StaxTokenType> Value { get; set; }
+			public Token<XmlTokenType> Value { get; set; }
 
 			#endregion Properties
 
@@ -89,10 +89,10 @@ namespace JsonFx.Xml.Stax
 			{
 				return String.Concat(
 					this.QName,
-					StaxGrammar.OperatorPairDelim,
-					StaxGrammar.OperatorStringDelim,
+					XmlGrammar.OperatorPairDelim,
+					XmlGrammar.OperatorStringDelim,
 					(this.Value != null) ? this.Value.ValueAsString() : String.Empty,
-					StaxGrammar.OperatorStringDelim);
+					XmlGrammar.OperatorStringDelim);
 			}
 
 			#endregion Object Overrides
@@ -159,7 +159,7 @@ namespace JsonFx.Xml.Stax
 
 		#region Scanning Methods
 
-		private void GetTokens(List<Token<StaxTokenType>> tokens, ITextStream scanner)
+		private void GetTokens(List<Token<XmlTokenType>> tokens, ITextStream scanner)
 		{
 			this.ScopeChain.Clear();
 
@@ -170,7 +170,7 @@ namespace JsonFx.Xml.Stax
 				{
 					switch (scanner.Peek())
 					{
-						case StaxGrammar.OperatorElementBegin:
+						case XmlGrammar.OperatorElementBegin:
 						{
 							// emit any leading text
 							this.EmitText(tokens, scanner.EndChunk());
@@ -182,7 +182,7 @@ namespace JsonFx.Xml.Stax
 							scanner.BeginChunk();
 							break;
 						}
-						case StaxGrammar.OperatorEntityBegin:
+						case XmlGrammar.OperatorEntityBegin:
 						{
 							// emit any leading text
 							this.EmitText(tokens, scanner.EndChunk());
@@ -222,10 +222,10 @@ namespace JsonFx.Xml.Stax
 						{
 							PrefixScopeChain.Scope scope = this.ScopeChain.Pop();
 
-							tokens.Add(StaxGrammar.TokenElementEnd(scope.TagName));
+							tokens.Add(XmlGrammar.TokenElementEnd(scope.TagName));
 							foreach (var mapping in scope)
 							{
-								tokens.Add(StaxGrammar.TokenPrefixEnd(mapping.Key, mapping.Value));
+								tokens.Add(XmlGrammar.TokenPrefixEnd(mapping.Key, mapping.Value));
 							}
 
 						}
@@ -242,9 +242,9 @@ namespace JsonFx.Xml.Stax
 			}
 		}
 
-		private void ScanTag(List<Token<StaxTokenType>> tokens, ITextStream scanner)
+		private void ScanTag(List<Token<XmlTokenType>> tokens, ITextStream scanner)
 		{
-			if (scanner.Pop() != StaxGrammar.OperatorElementBegin)
+			if (scanner.Pop() != XmlGrammar.OperatorElementBegin)
 			{
 				throw new DeserializationException("Invalid tag start char", scanner.Index, scanner.Line, scanner.Column);
 			}
@@ -256,11 +256,11 @@ namespace JsonFx.Xml.Stax
 				{
 					throw new DeserializationException("Unexpected end of file", scanner.Index, scanner.Line, scanner.Column);
 				}
-				tokens.Add(StaxGrammar.TokenText(StaxGrammar.OperatorElementBegin));
+				tokens.Add(XmlGrammar.TokenText(XmlGrammar.OperatorElementBegin));
 				return;
 			}
 
-			Token<StaxTokenType> unparsed = this.ScanUnparsedBlock(scanner);
+			Token<XmlTokenType> unparsed = this.ScanUnparsedBlock(scanner);
 			if (unparsed != null)
 			{
 				tokens.Add(unparsed);
@@ -268,10 +268,10 @@ namespace JsonFx.Xml.Stax
 			}
 
 			char ch = scanner.Peek();
-			StaxTagType tagType = StaxTagType.BeginTag;
-			if (ch == StaxGrammar.OperatorElementClose)
+			XmlTagType tagType = XmlTagType.BeginTag;
+			if (ch == XmlGrammar.OperatorElementClose)
 			{
-				tagType = StaxTagType.EndTag;
+				tagType = XmlTagType.EndTag;
 				scanner.Pop();
 				ch = scanner.Peek();
 			}
@@ -289,13 +289,13 @@ namespace JsonFx.Xml.Stax
 				}
 
 				// treat as literal text
-				string text = Char.ToString(StaxGrammar.OperatorElementBegin);
-				if (tagType == StaxTagType.EndTag)
+				string text = Char.ToString(XmlGrammar.OperatorElementBegin);
+				if (tagType == XmlTagType.EndTag)
 				{
-					text += StaxGrammar.OperatorElementClose;
+					text += XmlGrammar.OperatorElementClose;
 				}
 
-				tokens.Add(StaxGrammar.TokenText(text));
+				tokens.Add(XmlGrammar.TokenText(text));
 				return;
 			}
 
@@ -329,12 +329,12 @@ namespace JsonFx.Xml.Stax
 			this.EmitTag(tokens, tagType, tagName, attributes);
 		}
 
-		private Token<StaxTokenType> ScanUnparsedBlock(ITextStream scanner)
+		private Token<XmlTokenType> ScanUnparsedBlock(ITextStream scanner)
 		{
 			char ch = scanner.Peek();
 			switch (ch)
 			{
-				case StaxGrammar.OperatorComment:
+				case XmlGrammar.OperatorComment:
 				{
 					// consume '!'
 					scanner.Pop();
@@ -343,11 +343,11 @@ namespace JsonFx.Xml.Stax
 					{
 						case '-':									// "<!--", "-->"		XML/HTML/SGML comment
 						{
-							string value = this.ScanUnparsedValue(scanner, StaxGrammar.OperatorCommentBegin, StaxGrammar.OperatorCommentEnd);
+							string value = this.ScanUnparsedValue(scanner, XmlGrammar.OperatorCommentBegin, XmlGrammar.OperatorCommentEnd);
 							if (value != null)
 							{
 								// emit as an unparsed comment
-								return StaxGrammar.TokenUnparsed(
+								return XmlGrammar.TokenUnparsed(
 									String.Concat("!--{0}--"),
 									value);
 							}
@@ -357,11 +357,11 @@ namespace JsonFx.Xml.Stax
 						}
 						case '[':									// "<![CDATA[", "]]>"	CDATA section
 						{
-							string value = this.ScanUnparsedValue(scanner, StaxGrammar.OperatorCDataBegin, StaxGrammar.OperatorCDataEnd);
+							string value = this.ScanUnparsedValue(scanner, XmlGrammar.OperatorCDataBegin, XmlGrammar.OperatorCDataEnd);
 							if (value != null)
 							{
 								// convert CData to text
-								return StaxGrammar.TokenText(value);
+								return XmlGrammar.TokenText(value);
 							}
 
 							// process as generic declaration
@@ -369,34 +369,34 @@ namespace JsonFx.Xml.Stax
 						}
 						default:									// "<!", ">"			SGML declaration (e.g. DOCTYPE or server-side include)
 						{
-							return StaxGrammar.TokenUnparsed(
+							return XmlGrammar.TokenUnparsed(
 								"!{0}",
 								this.ScanUnparsedValue(scanner, String.Empty, String.Empty));
 						}
 					}
 				}
-				case StaxGrammar.OperatorProcessingInstruction:
+				case XmlGrammar.OperatorProcessingInstruction:
 				{
 					// consume '?'
 					scanner.Pop();
 
 					switch (scanner.Peek())
 					{
-						case StaxGrammar.OperatorCodeExpression:	// "<?=", "?>"			PHP expression code block
+						case XmlGrammar.OperatorCodeExpression:	// "<?=", "?>"			PHP expression code block
 						{
-							return StaxGrammar.TokenUnparsed(
+							return XmlGrammar.TokenUnparsed(
 								"?={0}?",
-								this.ScanUnparsedValue(scanner, StaxGrammar.OperatorPhpExpressionBegin, StaxGrammar.OperatorProcessingInstructionEnd));
+								this.ScanUnparsedValue(scanner, XmlGrammar.OperatorPhpExpressionBegin, XmlGrammar.OperatorProcessingInstructionEnd));
 						}
 						default:									// "<?", "?>"			PHP code block / XML processing instruction (e.g. XML declaration)
 						{
-							return StaxGrammar.TokenUnparsed(
+							return XmlGrammar.TokenUnparsed(
 								"?{0}?",
-								this.ScanUnparsedValue(scanner, String.Empty, StaxGrammar.OperatorProcessingInstructionEnd));
+								this.ScanUnparsedValue(scanner, String.Empty, XmlGrammar.OperatorProcessingInstructionEnd));
 						}
 					}
 				}
-				case StaxGrammar.OperatorCode:
+				case XmlGrammar.OperatorCode:
 				{
 					// consume '%'
 					scanner.Pop();
@@ -404,31 +404,31 @@ namespace JsonFx.Xml.Stax
 
 					switch (ch)
 					{
-						case StaxGrammar.OperatorCommentDelim:		// "<%--", "--%>"		ASP/PSP/JSP-style code comment
+						case XmlGrammar.OperatorCommentDelim:		// "<%--", "--%>"		ASP/PSP/JSP-style code comment
 						{
-							return StaxGrammar.TokenUnparsed(
+							return XmlGrammar.TokenUnparsed(
 								"%--{0}--%",
-								this.ScanUnparsedValue(scanner, StaxGrammar.OperatorCommentBegin, String.Concat(StaxGrammar.OperatorCommentEnd, StaxGrammar.OperatorCode)));
+								this.ScanUnparsedValue(scanner, XmlGrammar.OperatorCommentBegin, String.Concat(XmlGrammar.OperatorCommentEnd, XmlGrammar.OperatorCode)));
 						}
-						case StaxGrammar.OperatorCodeDirective:		// "<%@",  "%>"			ASP/PSP/JSP directive
-						case StaxGrammar.OperatorCodeExpression:	// "<%=",  "%>"			ASP/PSP/JSP/JBST expression
-						case StaxGrammar.OperatorCodeDeclaration:	// "<%!",  "%>"			JSP/JBST declaration
-						case StaxGrammar.OperatorCodeDataBind:		// "<%#",  "%>"			ASP.NET/JBST databind expression
-						case StaxGrammar.OperatorCodeExtension:		// "<%$",  "%>"			ASP.NET/JBST extension
+						case XmlGrammar.OperatorCodeDirective:		// "<%@",  "%>"			ASP/PSP/JSP directive
+						case XmlGrammar.OperatorCodeExpression:	// "<%=",  "%>"			ASP/PSP/JSP/JBST expression
+						case XmlGrammar.OperatorCodeDeclaration:	// "<%!",  "%>"			JSP/JBST declaration
+						case XmlGrammar.OperatorCodeDataBind:		// "<%#",  "%>"			ASP.NET/JBST databind expression
+						case XmlGrammar.OperatorCodeExtension:		// "<%$",  "%>"			ASP.NET/JBST extension
 						{
 							// consume code block type differentiating char
 							scanner.Pop();
 
-							return StaxGrammar.TokenUnparsed(
-								String.Concat(StaxGrammar.OperatorCode, ch, "{0}", StaxGrammar.OperatorCode),
-								this.ScanUnparsedValue(scanner, String.Empty, Char.ToString(StaxGrammar.OperatorCode)));
+							return XmlGrammar.TokenUnparsed(
+								String.Concat(XmlGrammar.OperatorCode, ch, "{0}", XmlGrammar.OperatorCode),
+								this.ScanUnparsedValue(scanner, String.Empty, Char.ToString(XmlGrammar.OperatorCode)));
 						}
 						default:									// "<%",   "%>"			ASP/PSP/JSP code block
 						{
 							// simple code block
-							return StaxGrammar.TokenUnparsed(
+							return XmlGrammar.TokenUnparsed(
 								"%{0}%",
-								this.ScanUnparsedValue(scanner, String.Empty, Char.ToString(StaxGrammar.OperatorCode)));
+								this.ScanUnparsedValue(scanner, String.Empty, Char.ToString(XmlGrammar.OperatorCode)));
 						}
 					}
 				}
@@ -466,7 +466,7 @@ namespace JsonFx.Xml.Stax
 					scanner.Column);
 			}
 
-			end += StaxGrammar.OperatorElementEnd;
+			end += XmlGrammar.OperatorElementEnd;
 			scanner.BeginChunk();
 
 			int endLength = end.Length;
@@ -509,21 +509,21 @@ namespace JsonFx.Xml.Stax
 				scanner.Column);
 		}
 
-		private Token<StaxTokenType> ScanAttributeValue(ITextStream scanner)
+		private Token<XmlTokenType> ScanAttributeValue(ITextStream scanner)
 		{
 			StaxTokenizer.SkipWhitespace(scanner);
 
-			if (scanner.Peek() != StaxGrammar.OperatorPairDelim)
+			if (scanner.Peek() != XmlGrammar.OperatorPairDelim)
 			{
-				return StaxGrammar.TokenText(String.Empty);
+				return XmlGrammar.TokenText(String.Empty);
 			}
 
 			scanner.Pop();
 			StaxTokenizer.SkipWhitespace(scanner);
 
 			char stringDelim = scanner.Peek();
-			if (stringDelim == StaxGrammar.OperatorStringDelim ||
-				stringDelim == StaxGrammar.OperatorStringDelimAlt)
+			if (stringDelim == XmlGrammar.OperatorStringDelim ||
+				stringDelim == XmlGrammar.OperatorStringDelimAlt)
 			{
 				scanner.Pop();
 				char ch = scanner.Peek();
@@ -531,10 +531,10 @@ namespace JsonFx.Xml.Stax
 				// start chunking
 				scanner.BeginChunk();
 
-				if (ch == StaxGrammar.OperatorElementBegin)
+				if (ch == XmlGrammar.OperatorElementBegin)
 				{
 					scanner.Pop();
-					Token<StaxTokenType> unparsed = this.ScanUnparsedBlock(scanner);
+					Token<XmlTokenType> unparsed = this.ScanUnparsedBlock(scanner);
 					if (unparsed != null)
 					{
 						ch = scanner.Peek();
@@ -589,17 +589,17 @@ namespace JsonFx.Xml.Stax
 				scanner.Pop();
 
 				// output string
-				return StaxGrammar.TokenText(value);
+				return XmlGrammar.TokenText(value);
 			}
 			else
 			{
 				// start chunking
 				scanner.BeginChunk();
 
-				if (stringDelim == StaxGrammar.OperatorElementBegin)
+				if (stringDelim == XmlGrammar.OperatorElementBegin)
 				{
 					scanner.Pop();
-					Token<StaxTokenType> unparsed = this.ScanUnparsedBlock(scanner);
+					Token<XmlTokenType> unparsed = this.ScanUnparsedBlock(scanner);
 					if (unparsed != null)
 					{
 						return unparsed;
@@ -612,8 +612,8 @@ namespace JsonFx.Xml.Stax
 
 				// check each character for ending delim
 				while (!scanner.IsCompleted &&
-					ch != StaxGrammar.OperatorElementClose &&
-					ch != StaxGrammar.OperatorElementEnd &&
+					ch != XmlGrammar.OperatorElementClose &&
+					ch != XmlGrammar.OperatorElementEnd &&
 					!StaxTokenizer.IsWhiteSpace(ch))
 				{
 					// accumulate
@@ -631,7 +631,7 @@ namespace JsonFx.Xml.Stax
 				}
 
 				// return chunk
-				return StaxGrammar.TokenText(scanner.EndChunk());
+				return XmlGrammar.TokenText(scanner.EndChunk());
 			}
 		}
 
@@ -691,7 +691,7 @@ namespace JsonFx.Xml.Stax
 
 		private bool IsTagComplete(
 			ITextStream scanner,
-			ref StaxTagType tagType)
+			ref XmlTagType tagType)
 		{
 			if (scanner.IsCompleted)
 			{
@@ -706,12 +706,12 @@ namespace JsonFx.Xml.Stax
 
 			switch (scanner.Peek())
 			{
-				case StaxGrammar.OperatorElementClose:
+				case XmlGrammar.OperatorElementClose:
 				{
 					scanner.Pop();
-					if (scanner.Peek() == StaxGrammar.OperatorElementEnd)
+					if (scanner.Peek() == XmlGrammar.OperatorElementEnd)
 					{
-						if (tagType != StaxTagType.BeginTag)
+						if (tagType != XmlTagType.BeginTag)
 						{
 							throw new DeserializationException(
 								"Malformed element tag",
@@ -721,7 +721,7 @@ namespace JsonFx.Xml.Stax
 						}
 
 						scanner.Pop();
-						tagType = StaxTagType.VoidTag;
+						tagType = XmlTagType.VoidTag;
 						return true;
 					}
 
@@ -731,7 +731,7 @@ namespace JsonFx.Xml.Stax
 						scanner.Line,
 						scanner.Column);
 				}
-				case StaxGrammar.OperatorElementEnd:
+				case XmlGrammar.OperatorElementEnd:
 				{
 					scanner.Pop();
 					return true;
@@ -743,11 +743,11 @@ namespace JsonFx.Xml.Stax
 			}
 		}
 
-		private void EmitTag(List<Token<StaxTokenType>> tokens, StaxTagType tagType, StaxQName qName, List<StaxAttribute> attributes)
+		private void EmitTag(List<Token<XmlTokenType>> tokens, XmlTagType tagType, StaxQName qName, List<StaxAttribute> attributes)
 		{
 			PrefixScopeChain.Scope scope;
 
-			if (tagType == StaxTagType.EndTag)
+			if (tagType == XmlTagType.EndTag)
 			{
 				DataName closeTagName = new DataName(qName.Name, this.ScopeChain.GetNamespace(qName.Prefix, !this.errorRecovery));
 
@@ -779,7 +779,7 @@ namespace JsonFx.Xml.Stax
 						}
 
 						// no known scope to end prefixes but can close element
-						tokens.Add(StaxGrammar.TokenElementEnd(closeTagName));
+						tokens.Add(XmlGrammar.TokenElementEnd(closeTagName));
 						return;
 					}
 
@@ -798,10 +798,10 @@ namespace JsonFx.Xml.Stax
 
 				do
 				{
-					tokens.Add(StaxGrammar.TokenElementEnd(scope.TagName));
+					tokens.Add(XmlGrammar.TokenElementEnd(scope.TagName));
 					foreach (var mapping in scope)
 					{
-						tokens.Add(StaxGrammar.TokenPrefixEnd(mapping.Key, mapping.Value));
+						tokens.Add(XmlGrammar.TokenPrefixEnd(mapping.Key, mapping.Value));
 					}
 
 				} while (scope.TagName != closeTagName &&
@@ -854,36 +854,36 @@ namespace JsonFx.Xml.Stax
 
 			foreach (var mapping in scope)
 			{
-				tokens.Add(StaxGrammar.TokenPrefixBegin(mapping.Key, mapping.Value));
+				tokens.Add(XmlGrammar.TokenPrefixBegin(mapping.Key, mapping.Value));
 			}
 
-			tokens.Add(StaxGrammar.TokenElementBegin(scope.TagName));
+			tokens.Add(XmlGrammar.TokenElementBegin(scope.TagName));
 
 			if (attributes != null)
 			{
 				foreach (var attr in attributes)
 				{
 					DataName attrName = new DataName(attr.QName.Name, this.ScopeChain.GetNamespace(attr.QName.Prefix, !this.errorRecovery));
-					tokens.Add(StaxGrammar.TokenAttribute(attrName));
+					tokens.Add(XmlGrammar.TokenAttribute(attrName));
 					tokens.Add(attr.Value);
 				}
 			}
 
-			if (tagType == StaxTagType.VoidTag)
+			if (tagType == XmlTagType.VoidTag)
 			{
 				// immediately remove from scope chain
 				this.ScopeChain.Pop();
 
-				tokens.Add(StaxGrammar.TokenElementEnd(scope.TagName));
+				tokens.Add(XmlGrammar.TokenElementEnd(scope.TagName));
 
 				foreach (var mapping in scope)
 				{
-					tokens.Add(StaxGrammar.TokenPrefixEnd(mapping.Key, mapping.Value));
+					tokens.Add(XmlGrammar.TokenPrefixEnd(mapping.Key, mapping.Value));
 				}
 			}
 		}
 
-		private void EmitText(List<Token<StaxTokenType>> tokens, string value)
+		private void EmitText(List<Token<XmlTokenType>> tokens, string value)
 		{
 			if (String.IsNullOrEmpty(value))
 			{
@@ -892,11 +892,11 @@ namespace JsonFx.Xml.Stax
 
 			if (StaxTokenizer.IsNullOrWhiteSpace(value))
 			{
-				tokens.Add(StaxGrammar.TokenWhitespace(value));
+				tokens.Add(XmlGrammar.TokenWhitespace(value));
 			}
 			else
 			{
-				tokens.Add(StaxGrammar.TokenText(value));
+				tokens.Add(XmlGrammar.TokenText(value));
 			}
 		}
 
@@ -924,7 +924,7 @@ namespace JsonFx.Xml.Stax
 		public string DecodeEntity(ITextStream scanner)
 		{
 			// consume '&'
-			if (scanner.Pop() != StaxGrammar.OperatorEntityBegin)
+			if (scanner.Pop() != XmlGrammar.OperatorEntityBegin)
 			{
 				throw new DeserializationException(
 					"Malformed entity",
@@ -938,13 +938,13 @@ namespace JsonFx.Xml.Stax
 			char ch = scanner.Peek();
 			if (scanner.IsCompleted ||
 				StaxTokenizer.IsWhiteSpace(ch) ||
-				ch == StaxGrammar.OperatorEntityBegin ||
-				ch == StaxGrammar.OperatorElementBegin)
+				ch == XmlGrammar.OperatorEntityBegin ||
+				ch == XmlGrammar.OperatorElementBegin)
 			{
-				return Char.ToString(StaxGrammar.OperatorEntityBegin);
+				return Char.ToString(XmlGrammar.OperatorEntityBegin);
 			}
 
-			if (ch == StaxGrammar.OperatorEntityNum)
+			if (ch == XmlGrammar.OperatorEntityNum)
 			{
 				// entity is Unicode Code Point
 
@@ -954,8 +954,8 @@ namespace JsonFx.Xml.Stax
 
 				bool isHex = false;
 				if (!scanner.IsCompleted &&
-					((ch == StaxGrammar.OperatorEntityHex) ||
-					(ch == StaxGrammar.OperatorEntityHexAlt)))
+					((ch == XmlGrammar.OperatorEntityHex) ||
+					(ch == XmlGrammar.OperatorEntityHexAlt)))
 				{
 					isHex = true;
 
@@ -986,7 +986,7 @@ namespace JsonFx.Xml.Stax
 					entity = Char.ConvertFromUtf32(utf16);
 
 					if (!scanner.IsCompleted &&
-						ch == StaxGrammar.OperatorEntityEnd)
+						ch == XmlGrammar.OperatorEntityEnd)
 					{
 						scanner.Pop();
 					}
@@ -996,16 +996,16 @@ namespace JsonFx.Xml.Stax
 				{
 					// NOTE this potentially changes "&#X..." to "&#x...";
 					return String.Concat(
-						StaxGrammar.OperatorEntityBegin,
-						StaxGrammar.OperatorEntityNum,
-						StaxGrammar.OperatorEntityHex,
+						XmlGrammar.OperatorEntityBegin,
+						XmlGrammar.OperatorEntityNum,
+						XmlGrammar.OperatorEntityHex,
 						chunk);
 				}
 				else
 				{
 					return String.Concat(
-						StaxGrammar.OperatorEntityBegin,
-						StaxGrammar.OperatorEntityNum,
+						XmlGrammar.OperatorEntityBegin,
+						XmlGrammar.OperatorEntityNum,
 						chunk);
 				}
 			}
@@ -1024,12 +1024,12 @@ namespace JsonFx.Xml.Stax
 			if (String.IsNullOrEmpty(entity))
 			{
 				return String.Concat(
-					StaxGrammar.OperatorEntityBegin,
+					XmlGrammar.OperatorEntityBegin,
 					chunk);
 			}
 
 			if (!scanner.IsCompleted &&
-				ch == StaxGrammar.OperatorEntityEnd)
+				ch == XmlGrammar.OperatorEntityEnd)
 			{
 				scanner.Pop();
 			}
@@ -1435,9 +1435,9 @@ namespace JsonFx.Xml.Stax
 		/// </summary>
 		/// <param name="reader"></param>
 		/// <returns></returns>
-		public IEnumerable<Token<StaxTokenType>> GetTokens(TextReader reader)
+		public IEnumerable<Token<XmlTokenType>> GetTokens(TextReader reader)
 		{
-			List<Token<StaxTokenType>> tokens = new List<Token<StaxTokenType>>();
+			List<Token<XmlTokenType>> tokens = new List<Token<XmlTokenType>>();
 
 			this.GetTokens(tokens, (this.Scanner = new TextReaderStream(reader)));
 
@@ -1449,9 +1449,9 @@ namespace JsonFx.Xml.Stax
 		/// </summary>
 		/// <param name="text"></param>
 		/// <returns></returns>
-		public IEnumerable<Token<StaxTokenType>> GetTokens(string text)
+		public IEnumerable<Token<XmlTokenType>> GetTokens(string text)
 		{
-			List<Token<StaxTokenType>> tokens = new List<Token<StaxTokenType>>();
+			List<Token<XmlTokenType>> tokens = new List<Token<XmlTokenType>>();
 
 			this.GetTokens(tokens, (this.Scanner = new StringStream(text)));
 

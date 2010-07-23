@@ -30,12 +30,12 @@
 
 using System;
 
-namespace JsonFx.Xml.Stax
+namespace JsonFx.Xml
 {
 	/// <summary>
 	/// Defines types of tags
 	/// </summary>
-	internal enum StaxTagType
+	internal enum XmlTagType
 	{
 		/// <summary>
 		/// Not set

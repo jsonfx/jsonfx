@@ -30,10 +30,13 @@
 
 using System;
 
+using JsonFx.Serialization;
+using JsonFx.Serialization.Resolvers;
+
 namespace JsonFx.Xml
 {
 	/// <summary>
-	/// Formal language of tokens and symbols for XML
+	/// Formal language of tokens and symbols for XML-like markup
 	/// </summary>
 	internal class XmlGrammar
 	{
@@ -46,19 +49,84 @@ namespace JsonFx.Xml
 		public const char OperatorPairDelim = '=';
 		public const char OperatorPrefixDelim = ':';
 
-		public const string OperatorElementEndEmpty = " />";
-		public const string OperatorElementBeginClose = "</";
-
 		public const char OperatorStringDelim = '"';
 		public const char OperatorStringDelimAlt = '\'';
-		public const char OperatorCharEscape = '&';
 
-		public const string OperatorCommentBegin = "<!--";
-		public const string OperatorCommentEnd = "-->";
+		public const char OperatorEntityBegin = '&';
+		public const char OperatorEntityNum = '#';
+		public const char OperatorEntityHex = 'x';
+		public const char OperatorEntityHexAlt = 'X';
+		public const char OperatorEntityEnd = ';';
 
-		public const string OperatorCDataStart = "<![CDATA[";
-		public const string OperatorCDataEnd = "]]>";
+		public const char OperatorComment = '!';
+		public const char OperatorCommentDelim = '-';
+		public const string OperatorCommentBegin = "--";
+		public const string OperatorCommentEnd = "--";
+		public const string OperatorCDataBegin = "[CDATA[";
+		public const string OperatorCDataEnd = "]]";
+
+		public const char OperatorProcessingInstruction = '?';
+		public const string OperatorPhpExpressionBegin = "?=";
+		public const string OperatorProcessingInstructionEnd = "?";
+
+		public const char OperatorCode = '%';
+		public const char OperatorCodeDirective = '@';
+		public const char OperatorCodeExpression = '=';
+		public const char OperatorCodeDeclaration = '!';
+		public const char OperatorCodeDataBind = '#';
+		public const char OperatorCodeExtension = '$';
 
 		#endregion Operators
+
+		#region Reusable Tokens
+
+		public static readonly Token<XmlTokenType> TokenNone = new Token<XmlTokenType>(XmlTokenType.None);
+
+		public static Token<XmlTokenType> TokenUnparsed(string name, string text)
+		{
+			return new Token<XmlTokenType>(XmlTokenType.UnparsedBlock, new DataName(name), text);
+		}
+
+		public static Token<XmlTokenType> TokenPrefixBegin(string prefix, string namespaceUri)
+		{
+			return new Token<XmlTokenType>(XmlTokenType.PrefixBegin, new DataName(prefix, namespaceUri));
+		}
+
+		public static Token<XmlTokenType> TokenPrefixEnd(string prefix, string namespaceUri)
+		{
+			return new Token<XmlTokenType>(XmlTokenType.PrefixEnd, new DataName(prefix, namespaceUri));
+		}
+
+		public static Token<XmlTokenType> TokenElementBegin(DataName name)
+		{
+			return new Token<XmlTokenType>(XmlTokenType.ElementBegin, name);
+		}
+
+		public static Token<XmlTokenType> TokenElementEnd(DataName name)
+		{
+			return new Token<XmlTokenType>(XmlTokenType.ElementEnd, name);
+		}
+
+		public static Token<XmlTokenType> TokenAttribute(DataName name)
+		{
+			return new Token<XmlTokenType>(XmlTokenType.Attribute, name);
+		}
+
+		public static Token<XmlTokenType> TokenText(char ch)
+		{
+			return new Token<XmlTokenType>(XmlTokenType.TextValue, ch);
+		}
+
+		public static Token<XmlTokenType> TokenText(string text)
+		{
+			return new Token<XmlTokenType>(XmlTokenType.TextValue, text);
+		}
+
+		public static Token<XmlTokenType> TokenWhitespace(string text)
+		{
+			return new Token<XmlTokenType>(XmlTokenType.Whitespace, text);
+		}
+
+		#endregion Reusable Tokens
 	}
 }

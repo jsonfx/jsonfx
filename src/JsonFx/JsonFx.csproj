@@ -135,11 +135,10 @@
     <Compile Include="Serialization\Token`1.cs" />
     <Compile Include="Serialization\TypeCoercionUtility.cs" />
     <Compile Include="Xml\PrefixScopeChain.cs" />
-    <Compile Include="Xml\Stax\StaxTagType.cs" />
-    <Compile Include="Xml\Stax\StaxGrammar.cs" />
     <Compile Include="Xml\Stax\StaxTokenizer.cs" />
-    <Compile Include="Xml\Stax\StaxTokenType.cs" />
     <Compile Include="Xml\Stax\StaxFormatter.cs" />
+    <Compile Include="Xml\XmlTagType.cs" />
+    <Compile Include="Xml\XmlTokenType.cs" />
     <Compile Include="Xml\XmlWriter.cs" />
     <Compile Include="Xml\XmlGrammar.cs" />
     <Compile Include="Xml\XmlFormatter.cs" />

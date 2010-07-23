@@ -466,12 +466,11 @@ namespace JsonFx.Xml
 
 				if (isVoidTag)
 				{
-					writer.Write(XmlGrammar.OperatorElementEndEmpty);
+					writer.Write(XmlGrammar.OperatorValueDelim);
+					writer.Write(XmlGrammar.OperatorElementClose);
 				}
-				else
-				{
-					writer.Write(XmlGrammar.OperatorElementEnd);
-				}
+
+				writer.Write(XmlGrammar.OperatorElementEnd);
 			}
 
 			private void WriteAttribute(TextWriter writer, string prefix, string name, string value)
@@ -504,7 +503,8 @@ namespace JsonFx.Xml
 					this.xmlns.Pop();
 				}
 
-				writer.Write(XmlGrammar.OperatorElementBeginClose);
+				writer.Write(XmlGrammar.OperatorElementBegin);
+				writer.Write(XmlGrammar.OperatorElementClose);
 				this.WriteLocalName(writer, name.LocalName);
 				writer.Write(XmlGrammar.OperatorElementEnd);
 			}
