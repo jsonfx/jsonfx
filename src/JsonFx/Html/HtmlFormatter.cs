@@ -36,13 +36,14 @@ using System.IO;
 using JsonFx.IO;
 using JsonFx.Serialization;
 using JsonFx.Serialization.Resolvers;
+using JsonFx.Xml;
 
-namespace JsonFx.Xml.Stax
+namespace JsonFx.Html
 {
 	/// <summary>
-	/// Outputs XML text from a StAX-like input stream of tokens
+	/// Outputs markup text from an input stream of tokens
 	/// </summary>
-	public class StaxFormatter : ITextFormatter<XmlTokenType>
+	public class HtmlFormatter : ITextFormatter<MarkupTokenType>
 	{
 		#region Constants
 
@@ -66,7 +67,7 @@ namespace JsonFx.Xml.Stax
 		/// Ctor
 		/// </summary>
 		/// <param name="settings"></param>
-		public StaxFormatter(DataWriterSettings settings)
+		public HtmlFormatter(DataWriterSettings settings)
 		{
 			if (settings == null)
 			{
@@ -112,7 +113,7 @@ namespace JsonFx.Xml.Stax
 		/// Formats the token sequence as a string
 		/// </summary>
 		/// <param name="tokens"></param>
-		public string Format(IEnumerable<Token<XmlTokenType>> tokens)
+		public string Format(IEnumerable<Token<MarkupTokenType>> tokens)
 		{
 			using (StringWriter writer = new StringWriter())
 			{
@@ -127,22 +128,22 @@ namespace JsonFx.Xml.Stax
 		/// </summary>
 		/// <param name="writer"></param>
 		/// <param name="tokens"></param>
-		public void Format(TextWriter writer, IEnumerable<Token<XmlTokenType>> tokens)
+		public void Format(TextWriter writer, IEnumerable<Token<MarkupTokenType>> tokens)
 		{
 			if (tokens == null)
 			{
 				throw new ArgumentNullException("tokens");
 			}
 
-			IStream<Token<XmlTokenType>> stream = new Stream<Token<XmlTokenType>>(tokens);
+			IStream<Token<MarkupTokenType>> stream = new Stream<Token<MarkupTokenType>>(tokens);
 
 			PrefixScopeChain.Scope scope = null;
 			while (!stream.IsCompleted)
 			{
-				Token<XmlTokenType> token = stream.Peek();
+				Token<MarkupTokenType> token = stream.Peek();
 				switch (token.TokenType)
 				{
-					case XmlTokenType.PrefixBegin:
+					case MarkupTokenType.PrefixBegin:
 					{
 						if (scope == null)
 						{
@@ -155,10 +156,10 @@ namespace JsonFx.Xml.Stax
 
 							stream.Pop();
 							token = stream.Peek();
-						} while (!stream.IsCompleted && token.TokenType == XmlTokenType.PrefixBegin);
+						} while (!stream.IsCompleted && token.TokenType == MarkupTokenType.PrefixBegin);
 						break;
 					}
-					case XmlTokenType.ElementBegin:
+					case MarkupTokenType.ElementBegin:
 					{
 						if (scope == null)
 						{
@@ -170,12 +171,12 @@ namespace JsonFx.Xml.Stax
 						stream.Pop();
 						token = stream.Peek();
 
-						SortedList<DataName, Token<XmlTokenType>> attributes = null;
-						while (!stream.IsCompleted && token.TokenType == XmlTokenType.Attribute)
+						SortedList<DataName, Token<MarkupTokenType>> attributes = null;
+						while (!stream.IsCompleted && token.TokenType == MarkupTokenType.Attribute)
 						{
 							if (attributes == null)
 							{
-								attributes = new SortedList<DataName, Token<XmlTokenType>>();
+								attributes = new SortedList<DataName, Token<MarkupTokenType>>();
 							}
 							DataName attrName = token.Name;
 
@@ -188,14 +189,14 @@ namespace JsonFx.Xml.Stax
 							token = stream.Peek();
 						}
 
-						this.WriteTag(writer, XmlTagType.BeginTag, scope.TagName, attributes, scope);
+						this.WriteTag(writer, MarkupTagType.BeginTag, scope.TagName, attributes, scope);
 
 						scope = null;
 						break;
 					}
-					case XmlTokenType.ElementEnd:
+					case MarkupTokenType.ElementEnd:
 					{
-						this.WriteTag(writer, XmlTagType.EndTag, token.Name, null, null);
+						this.WriteTag(writer, MarkupTagType.EndTag, token.Name, null, null);
 
 						if (this.ScopeChain.HasScope &&
 							this.ScopeChain.Peek().TagName == token.Name)
@@ -211,8 +212,8 @@ namespace JsonFx.Xml.Stax
 						token = stream.Peek();
 						break;
 					}
-					case XmlTokenType.TextValue:
-					case XmlTokenType.Whitespace:
+					case MarkupTokenType.TextValue:
+					case MarkupTokenType.Whitespace:
 					{
 						this.WriteCharData(writer, token.ValueAsString());
 
@@ -220,7 +221,7 @@ namespace JsonFx.Xml.Stax
 						token = stream.Peek();
 						break;
 					}
-					case XmlTokenType.UnparsedBlock:
+					case MarkupTokenType.UnparsedBlock:
 					{
 						this.WriteUnparsedBlock(writer, token.Name.LocalName, token.ValueAsString());
 
@@ -228,7 +229,7 @@ namespace JsonFx.Xml.Stax
 						token = stream.Peek();
 						break;
 					}
-					case XmlTokenType.PrefixEnd:
+					case MarkupTokenType.PrefixEnd:
 					{
 						stream.Pop();
 						token = stream.Peek();
@@ -238,7 +239,7 @@ namespace JsonFx.Xml.Stax
 					}
 					default:
 					{
-						throw new TokenException<XmlTokenType>(
+						throw new TokenException<MarkupTokenType>(
 							token,
 							String.Format(ErrorUnexpectedToken, token.TokenType));
 					}
@@ -252,26 +253,26 @@ namespace JsonFx.Xml.Stax
 
 		private void WriteTag(
 			TextWriter writer,
-			XmlTagType type,
+			MarkupTagType type,
 			DataName tagName,
-			IEnumerable<KeyValuePair<DataName, Token<XmlTokenType>>> attributes,
+			IEnumerable<KeyValuePair<DataName, Token<MarkupTokenType>>> attributes,
 			IEnumerable<KeyValuePair<string, string>> prefixDeclarations)
 		{
 			string tagPrefix = this.ResolvePrefix(tagName.NamespaceUri);
 
 			// "<"
-			writer.Write(XmlGrammar.OperatorElementBegin);
-			if (type == XmlTagType.EndTag)
+			writer.Write(MarkupGrammar.OperatorElementBegin);
+			if (type == MarkupTagType.EndTag)
 			{
 				// "/"
-				writer.Write(XmlGrammar.OperatorElementClose);
+				writer.Write(MarkupGrammar.OperatorElementClose);
 			}
 
 			if (!String.IsNullOrEmpty(tagPrefix))
 			{
 				// "prefix:"
 				this.WriteLocalName(writer, tagPrefix);
-				writer.Write(XmlGrammar.OperatorPrefixDelim);
+				writer.Write(MarkupGrammar.OperatorPrefixDelim);
 			}
 			// "local-name"
 			this.WriteLocalName(writer, tagName.LocalName);
@@ -307,13 +308,13 @@ namespace JsonFx.Xml.Stax
 				}
 			}
 
-			if (type == XmlTagType.VoidTag)
+			if (type == MarkupTagType.VoidTag)
 			{
 				// "/"
-				writer.Write(XmlGrammar.OperatorElementClose);
+				writer.Write(MarkupGrammar.OperatorElementClose);
 			}
 			// ">"
-			writer.Write(XmlGrammar.OperatorElementEnd);
+			writer.Write(MarkupGrammar.OperatorElementEnd);
 		}
 
 		private string ResolvePrefix(string namespaceUri)
@@ -330,33 +331,33 @@ namespace JsonFx.Xml.Stax
 		private void WriteXmlns(TextWriter writer, string prefix, string namespaceUri)
 		{
 			// " xmlns"
-			writer.Write(XmlGrammar.OperatorValueDelim);
+			writer.Write(MarkupGrammar.OperatorValueDelim);
 			this.WriteLocalName(writer, "xmlns");
 
 			if (!String.IsNullOrEmpty(prefix))
 			{
 				// ":prefix"
-				writer.Write(XmlGrammar.OperatorPrefixDelim);
+				writer.Write(MarkupGrammar.OperatorPrefixDelim);
 				this.WriteLocalName(writer, prefix);
 			}
 
 			// ="value"
-			writer.Write(XmlGrammar.OperatorPairDelim);
-			writer.Write(XmlGrammar.OperatorStringDelim);
+			writer.Write(MarkupGrammar.OperatorPairDelim);
+			writer.Write(MarkupGrammar.OperatorStringDelim);
 			this.WriteAttributeValue(writer, namespaceUri);
-			writer.Write(XmlGrammar.OperatorStringDelim);
+			writer.Write(MarkupGrammar.OperatorStringDelim);
 		}
 
-		private void WriteAttribute(TextWriter writer, string prefix, string localName, Token<XmlTokenType> value)
+		private void WriteAttribute(TextWriter writer, string prefix, string localName, Token<MarkupTokenType> value)
 		{
 			// " "
-			writer.Write(XmlGrammar.OperatorValueDelim);
+			writer.Write(MarkupGrammar.OperatorValueDelim);
 
 			if (!String.IsNullOrEmpty(prefix))
 			{
 				// "prefix:"
 				this.WriteLocalName(writer, prefix);
-				writer.Write(XmlGrammar.OperatorPrefixDelim);
+				writer.Write(MarkupGrammar.OperatorPrefixDelim);
 			}
 
 			// local-name
@@ -369,31 +370,31 @@ namespace JsonFx.Xml.Stax
 			}
 
 			// ="value"
-			writer.Write(XmlGrammar.OperatorPairDelim);
-			writer.Write(XmlGrammar.OperatorStringDelim);
+			writer.Write(MarkupGrammar.OperatorPairDelim);
+			writer.Write(MarkupGrammar.OperatorStringDelim);
 
 			switch (value.TokenType)
 			{
-				case XmlTokenType.TextValue:
-				case XmlTokenType.Whitespace:
+				case MarkupTokenType.TextValue:
+				case MarkupTokenType.Whitespace:
 				{
 					this.WriteAttributeValue(writer, attrValue);
 					break;
 				}
-				case XmlTokenType.UnparsedBlock:
+				case MarkupTokenType.UnparsedBlock:
 				{
 					this.WriteUnparsedBlock(writer, value.Name.LocalName, attrValue);
 					break;
 				}
 				default:
 				{
-					throw new TokenException<XmlTokenType>(
+					throw new TokenException<MarkupTokenType>(
 						value,
-						String.Format(StaxFormatter.ErrorUnexpectedToken, value));
+						String.Format(HtmlFormatter.ErrorUnexpectedToken, value));
 				}
 			}
 
-			writer.Write(XmlGrammar.OperatorStringDelim);
+			writer.Write(MarkupGrammar.OperatorStringDelim);
 		}
 
 		/// <summary>
@@ -668,9 +669,9 @@ namespace JsonFx.Xml.Stax
 				writer.Write(value);
 			}
 
-			writer.Write(XmlGrammar.OperatorElementBegin);
+			writer.Write(MarkupGrammar.OperatorElementBegin);
 			writer.Write(name, value);
-			writer.Write(XmlGrammar.OperatorElementEnd);
+			writer.Write(MarkupGrammar.OperatorElementEnd);
 		}
 
 		#endregion Write Methods

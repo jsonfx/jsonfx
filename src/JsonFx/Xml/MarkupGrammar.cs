@@ -36,9 +36,9 @@ using JsonFx.Serialization.Resolvers;
 namespace JsonFx.Xml
 {
 	/// <summary>
-	/// Formal language of tokens and symbols for XML-like markup
+	/// Formal language of tokens and symbols for markup
 	/// </summary>
-	internal class XmlGrammar
+	internal class MarkupGrammar
 	{
 		#region Operators
 
@@ -80,51 +80,51 @@ namespace JsonFx.Xml
 
 		#region Reusable Tokens
 
-		public static readonly Token<XmlTokenType> TokenNone = new Token<XmlTokenType>(XmlTokenType.None);
+		public static readonly Token<MarkupTokenType> TokenNone = new Token<MarkupTokenType>(MarkupTokenType.None);
 
-		public static Token<XmlTokenType> TokenUnparsed(string name, string text)
+		public static Token<MarkupTokenType> TokenUnparsed(string name, string text)
 		{
-			return new Token<XmlTokenType>(XmlTokenType.UnparsedBlock, new DataName(name), text);
+			return new Token<MarkupTokenType>(MarkupTokenType.UnparsedBlock, new DataName(name), text);
 		}
 
-		public static Token<XmlTokenType> TokenPrefixBegin(string prefix, string namespaceUri)
+		public static Token<MarkupTokenType> TokenPrefixBegin(string prefix, string namespaceUri)
 		{
-			return new Token<XmlTokenType>(XmlTokenType.PrefixBegin, new DataName(prefix, namespaceUri));
+			return new Token<MarkupTokenType>(MarkupTokenType.PrefixBegin, new DataName(prefix, namespaceUri));
 		}
 
-		public static Token<XmlTokenType> TokenPrefixEnd(string prefix, string namespaceUri)
+		public static Token<MarkupTokenType> TokenPrefixEnd(string prefix, string namespaceUri)
 		{
-			return new Token<XmlTokenType>(XmlTokenType.PrefixEnd, new DataName(prefix, namespaceUri));
+			return new Token<MarkupTokenType>(MarkupTokenType.PrefixEnd, new DataName(prefix, namespaceUri));
 		}
 
-		public static Token<XmlTokenType> TokenElementBegin(DataName name)
+		public static Token<MarkupTokenType> TokenElementBegin(DataName name)
 		{
-			return new Token<XmlTokenType>(XmlTokenType.ElementBegin, name);
+			return new Token<MarkupTokenType>(MarkupTokenType.ElementBegin, name);
 		}
 
-		public static Token<XmlTokenType> TokenElementEnd(DataName name)
+		public static Token<MarkupTokenType> TokenElementEnd(DataName name)
 		{
-			return new Token<XmlTokenType>(XmlTokenType.ElementEnd, name);
+			return new Token<MarkupTokenType>(MarkupTokenType.ElementEnd, name);
 		}
 
-		public static Token<XmlTokenType> TokenAttribute(DataName name)
+		public static Token<MarkupTokenType> TokenAttribute(DataName name)
 		{
-			return new Token<XmlTokenType>(XmlTokenType.Attribute, name);
+			return new Token<MarkupTokenType>(MarkupTokenType.Attribute, name);
 		}
 
-		public static Token<XmlTokenType> TokenText(char ch)
+		public static Token<MarkupTokenType> TokenText(char ch)
 		{
-			return new Token<XmlTokenType>(XmlTokenType.TextValue, ch);
+			return new Token<MarkupTokenType>(MarkupTokenType.TextValue, ch);
 		}
 
-		public static Token<XmlTokenType> TokenText(string text)
+		public static Token<MarkupTokenType> TokenText(string text)
 		{
-			return new Token<XmlTokenType>(XmlTokenType.TextValue, text);
+			return new Token<MarkupTokenType>(MarkupTokenType.TextValue, text);
 		}
 
-		public static Token<XmlTokenType> TokenWhitespace(string text)
+		public static Token<MarkupTokenType> TokenWhitespace(string text)
 		{
-			return new Token<XmlTokenType>(XmlTokenType.Whitespace, text);
+			return new Token<MarkupTokenType>(MarkupTokenType.Whitespace, text);
 		}
 
 		#endregion Reusable Tokens

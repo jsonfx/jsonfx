@@ -35,7 +35,7 @@ using System.IO;
 namespace JsonFx.Serialization
 {
 	/// <summary>
-	/// Generates a StAX-like sequence of tokens from a sequence of characters
+	/// Generates a sequence of tokens from a sequence of characters
 	/// </summary>
 	/// <typeparam name="T">token type</typeparam>
 	public interface ITextTokenizer<T> : IDisposable

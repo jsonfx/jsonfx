@@ -35,7 +35,7 @@ using System.Collections.Generic;
 namespace JsonFx.Serialization
 {
 	/// <summary>
-	/// Consumes a StAX-like sequence of tokens to produce a sequence of objects, optionally coerced to a given type
+	/// Consumes a sequence of tokens to produce a sequence of objects, optionally coerced to a given type
 	/// </summary>
 	/// <typeparam name="T">token type</typeparam>
 	public interface ITokenAnalyzer<T>

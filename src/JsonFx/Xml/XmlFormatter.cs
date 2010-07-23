@@ -48,7 +48,7 @@ namespace JsonFx.Xml
 		#endregion Constants
 
 		/// <summary>
-		/// Outputs XML text from a StAX-like input stream of tokens
+		/// Outputs XML text from an input stream of tokens
 		/// </summary>
 		public class XmlFormatter : ITextFormatter<CommonTokenType>
 		{
@@ -416,7 +416,7 @@ namespace JsonFx.Xml
 					this.pendingNewLine = false;
 				}
 
-				writer.Write(XmlGrammar.OperatorElementBegin);
+				writer.Write(MarkupGrammar.OperatorElementBegin);
 				this.WriteLocalName(writer, elementName.LocalName);
 
 				if ((this.xmlns.Count > 0 && this.xmlns.Peek() != elementName.NamespaceUri) ||
@@ -466,11 +466,11 @@ namespace JsonFx.Xml
 
 				if (isVoidTag)
 				{
-					writer.Write(XmlGrammar.OperatorValueDelim);
-					writer.Write(XmlGrammar.OperatorElementClose);
+					writer.Write(MarkupGrammar.OperatorValueDelim);
+					writer.Write(MarkupGrammar.OperatorElementClose);
 				}
 
-				writer.Write(XmlGrammar.OperatorElementEnd);
+				writer.Write(MarkupGrammar.OperatorElementEnd);
 			}
 
 			private void WriteAttribute(TextWriter writer, string prefix, string name, string value)
@@ -478,22 +478,22 @@ namespace JsonFx.Xml
 				if (String.IsNullOrEmpty(prefix))
 				{
 					// " "
-					writer.Write(XmlGrammar.OperatorValueDelim);
+					writer.Write(MarkupGrammar.OperatorValueDelim);
 				}
 				else
 				{
 					// " prefix:"
-					writer.Write(XmlGrammar.OperatorValueDelim);
+					writer.Write(MarkupGrammar.OperatorValueDelim);
 					this.WriteLocalName(writer, prefix);
-					writer.Write(XmlGrammar.OperatorPrefixDelim);
+					writer.Write(MarkupGrammar.OperatorPrefixDelim);
 				}
 
 				// name="value"
 				this.WriteLocalName(writer, name);
-				writer.Write(XmlGrammar.OperatorPairDelim);
-				writer.Write(XmlGrammar.OperatorStringDelim);
+				writer.Write(MarkupGrammar.OperatorPairDelim);
+				writer.Write(MarkupGrammar.OperatorStringDelim);
 				this.WriteAttributeValue(writer, value);
-				writer.Write(XmlGrammar.OperatorStringDelim);
+				writer.Write(MarkupGrammar.OperatorStringDelim);
 			}
 
 			private void WriteTagClose(TextWriter writer, DataName name)
@@ -503,10 +503,10 @@ namespace JsonFx.Xml
 					this.xmlns.Pop();
 				}
 
-				writer.Write(XmlGrammar.OperatorElementBegin);
-				writer.Write(XmlGrammar.OperatorElementClose);
+				writer.Write(MarkupGrammar.OperatorElementBegin);
+				writer.Write(MarkupGrammar.OperatorElementClose);
 				this.WriteLocalName(writer, name.LocalName);
-				writer.Write(XmlGrammar.OperatorElementEnd);
+				writer.Write(MarkupGrammar.OperatorElementEnd);
 			}
 
 			/// <summary>

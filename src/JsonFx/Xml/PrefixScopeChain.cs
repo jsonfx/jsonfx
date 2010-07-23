@@ -37,7 +37,7 @@ using JsonFx.Serialization.Resolvers;
 namespace JsonFx.Xml
 {
 	/// <summary>
-	/// Maintains scope chain for StAX prefixes
+	/// Maintains scope chain for namespace prefix mappings
 	/// </summary>
 	internal class PrefixScopeChain
 	{

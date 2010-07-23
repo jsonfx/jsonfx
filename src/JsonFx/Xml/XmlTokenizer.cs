@@ -39,12 +39,12 @@ using JsonFx.Serialization.Resolvers;
 namespace JsonFx.Xml
 {
 	/// <summary>
-	/// Generates a StAX-like sequence of tokens from XML text
+	/// Generates a sequence of tokens from XML text
 	/// </summary>
 	/// <remarks>
-	/// Implemented as an Adapter between <see cref="ITextTokenizer<StaxTokenType>"/> and <see cref="System.Xml.XmlReader"/>
+	/// Implemented as an Adapter between <see cref="ITextTokenizer<XmlTokenType>"/> and <see cref="System.Xml.XmlReader"/>
 	/// </remarks>
-	public class XmlTokenizer : ITextTokenizer<XmlTokenType>
+	public class XmlTokenizer : ITextTokenizer<MarkupTokenType>
 	{
 		#region Fields
 
@@ -119,7 +119,7 @@ namespace JsonFx.Xml
 		/// </summary>
 		/// <param name="text"></param>
 		/// <returns></returns>
-		public IEnumerable<Token<XmlTokenType>> GetTokens(string text)
+		public IEnumerable<Token<MarkupTokenType>> GetTokens(string text)
 		{
 			return this.GetTokens(new StringReader(text ?? String.Empty));
 		}
@@ -129,7 +129,7 @@ namespace JsonFx.Xml
 		/// </summary>
 		/// <param name="reader"></param>
 		/// <returns></returns>
-		public IEnumerable<Token<XmlTokenType>> GetTokens(TextReader reader)
+		public IEnumerable<Token<MarkupTokenType>> GetTokens(TextReader reader)
 		{
 			if (reader == null)
 			{
@@ -151,7 +151,7 @@ namespace JsonFx.Xml
 		/// </summary>
 		/// <param name="reader"></param>
 		/// <returns></returns>
-		public IEnumerable<Token<XmlTokenType>> GetTokens(XmlReader reader)
+		public IEnumerable<Token<MarkupTokenType>> GetTokens(XmlReader reader)
 		{
 			if (reader == null)
 			{
@@ -219,25 +219,25 @@ namespace JsonFx.Xml
 
 						foreach (var xmlns in scope)
 						{
-							yield return XmlGrammar.TokenPrefixBegin(xmlns.Key, xmlns.Value);
+							yield return MarkupGrammar.TokenPrefixBegin(xmlns.Key, xmlns.Value);
 						}
-						yield return XmlGrammar.TokenElementBegin(scope.TagName);
+						yield return MarkupGrammar.TokenElementBegin(scope.TagName);
 
 						if (attributes != null)
 						{
 							foreach (var attribute in attributes)
 							{
-								yield return XmlGrammar.TokenAttribute(attribute.Key);
-								yield return XmlGrammar.TokenText(attribute.Value);
+								yield return MarkupGrammar.TokenAttribute(attribute.Key);
+								yield return MarkupGrammar.TokenText(attribute.Value);
 							}
 						}
 
 						if (isVoidTag)
 						{
-							yield return XmlGrammar.TokenElementEnd(scope.TagName);
+							yield return MarkupGrammar.TokenElementEnd(scope.TagName);
 							foreach (var xmlns in scope)
 							{
-								yield return XmlGrammar.TokenPrefixEnd(xmlns.Key, xmlns.Value);
+								yield return MarkupGrammar.TokenPrefixEnd(xmlns.Key, xmlns.Value);
 							}
 						}
 						break;
@@ -253,33 +253,33 @@ namespace JsonFx.Xml
 							throw new DeserializationException("Unexpected close tag", -1);
 						}
 
-						yield return XmlGrammar.TokenElementEnd(scope.TagName);
+						yield return MarkupGrammar.TokenElementEnd(scope.TagName);
 						foreach (var xmlns in scope)
 						{
-							yield return XmlGrammar.TokenPrefixEnd(xmlns.Key, xmlns.Value);
+							yield return MarkupGrammar.TokenPrefixEnd(xmlns.Key, xmlns.Value);
 						}
 						break;
 					}
 					case XmlNodeType.Attribute:
 					{
-						yield return XmlGrammar.TokenAttribute(new DataName(reader.Name, reader.NamespaceURI));
-						yield return XmlGrammar.TokenText(reader.Value);
+						yield return MarkupGrammar.TokenAttribute(new DataName(reader.Name, reader.NamespaceURI));
+						yield return MarkupGrammar.TokenText(reader.Value);
 						break;
 					}
 					case XmlNodeType.Text:
 					{
-						yield return XmlGrammar.TokenText(reader.Value);
+						yield return MarkupGrammar.TokenText(reader.Value);
 						break;
 					}
 					case XmlNodeType.SignificantWhitespace:
 					case XmlNodeType.Whitespace:
 					{
-						yield return XmlGrammar.TokenWhitespace(reader.Value);
+						yield return MarkupGrammar.TokenWhitespace(reader.Value);
 						break;
 					}
 					case XmlNodeType.CDATA:
 					{
-						yield return XmlGrammar.TokenText(reader.Value);
+						yield return MarkupGrammar.TokenText(reader.Value);
 						break;
 					}
 					case XmlNodeType.Entity:
@@ -291,22 +291,22 @@ namespace JsonFx.Xml
 					case XmlNodeType.ProcessingInstruction:
 					case XmlNodeType.XmlDeclaration:
 					{
-						yield return XmlGrammar.TokenUnparsed("?{0}?", reader.Name+" "+reader.Value);
+						yield return MarkupGrammar.TokenUnparsed("?{0}?", reader.Name+" "+reader.Value);
 						break;
 					}
 					case XmlNodeType.Comment:
 					{
-						yield return XmlGrammar.TokenUnparsed("!--{0}--", reader.Value);
+						yield return MarkupGrammar.TokenUnparsed("!--{0}--", reader.Value);
 						break;
 					}
 					case XmlNodeType.DocumentType:
 					{
-						yield return XmlGrammar.TokenUnparsed("!DOCTYPE {0}", reader.Value);
+						yield return MarkupGrammar.TokenUnparsed("!DOCTYPE {0}", reader.Value);
 						break;
 					}
 					case XmlNodeType.Notation:
 					{
-						yield return XmlGrammar.TokenUnparsed("!NOTATION {0}", reader.Value);
+						yield return MarkupGrammar.TokenUnparsed("!NOTATION {0}", reader.Value);
 						break;
 					}
 					case XmlNodeType.None:

@@ -44,7 +44,7 @@ namespace JsonFx.Json
 	public partial class JsonReader
 	{
 		/// <summary>
-		/// Generates a StAX-like sequence of tokens from JSON text
+		/// Generates a sequence of tokens from JSON text
 		/// </summary>
 		public class JsonTokenizer : ITextTokenizer<CommonTokenType>
 		{

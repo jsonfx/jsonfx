@@ -33,9 +33,9 @@ using System;
 namespace JsonFx.Xml
 {
 	/// <summary>
-	/// Defines types of tags
+	/// Defines types of markup tags
 	/// </summary>
-	internal enum XmlTagType
+	internal enum MarkupTagType
 	{
 		/// <summary>
 		/// Not set

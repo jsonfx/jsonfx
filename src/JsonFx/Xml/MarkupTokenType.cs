@@ -33,9 +33,9 @@ using System;
 namespace JsonFx.Xml
 {
 	/// <summary>
-	/// StAX-like tokens
+	/// tokens
 	/// </summary>
-	public enum XmlTokenType
+	public enum MarkupTokenType
 	{
 		/// <summary>
 		/// No token
@@ -50,7 +50,7 @@ namespace JsonFx.Xml
 		/// Any of a number of unparsed tags which typically contain specialized processing instructions
 		/// </summary>
 		/// <remarks>
-		/// The name of the token is the beginning delimiter (not including the '&lt;')
+		/// The name of the token is the beginning and ending delimiters as a format string (not including the '&lt;' or '&gt;')
 		/// Includes the following types:
 		/// 
 		///		"&lt;!--", "-->"	XML/HTML/SGML comment
@@ -70,25 +70,23 @@ namespace JsonFx.Xml
 		UnparsedBlock,
 
 		/// <summary>
-		/// Begin mapping a prefix to a namespace URI
+		/// Marks the beginning of a prefix scope for a namespace URI
 		/// </summary>
 		/// <remarks>
 		/// The element <see cref="Token<CommonTokenType>.Name"/> is required.
-		/// Marks the beginning of a namespace prefix scope.
 		/// </remarks>
 		PrefixBegin,
 
 		/// <summary>
-		/// End mapping a prefix to a namespace URI
+		/// Marks the end of a prefix scope for a namespace URI
 		/// </summary>
 		/// <remarks>
 		/// The element <see cref="Token<CommonTokenType>.Name"/> is required.
-		/// Marks the end of a namespace prefix scope.
 		/// </remarks>
 		PrefixEnd,
 
 		/// <summary>
-		/// Begin element, the token contains the element Name
+		/// Marks the beginning of an element, the token contains the element Name
 		/// </summary>
 		/// <remarks>
 		/// The element <see cref="Token<CommonTokenType>.Name"/> is required.
@@ -97,17 +95,17 @@ namespace JsonFx.Xml
 		ElementBegin,
 
 		/// <summary>
-		/// End object
+		/// Marks the end of an element
 		/// </summary>
 		/// <remarks>
 		/// The token <see cref="Token<CommonTokenType>.Value"/> and <see cref="Token<CommonTokenType>.Name"/> must be left empty.
-		/// The element Name is determined by the <see cref="StaxTokenType.ElementBegin"/> token.
+		/// The element Name is determined by the <see cref="XmlTokenType.ElementBegin"/> token.
 		/// Marks the end of the last object property as well as the object itself.
 		/// </remarks>
 		ElementEnd,
 
 		/// <summary>
-		/// Begin attribute, the token contains both the attribute Name and Value
+		/// Marks the beginning of an attribute, the token contains the attribute Name. The value will be the next token.
 		/// </summary>
 		/// <remarks>
 		/// The property <see cref="Token<CommonTokenType>.Name"/> is required as all formats name their properties.
