@@ -39,7 +39,7 @@ namespace JsonFx.IO
 	{
 		#region Constants
 
-		private const string TraitName = "Text";
+		private const string TraitName = "Text Stream";
 		private const string TraitValue = "Deserialization";
 
 		#endregion Constants
