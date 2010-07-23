@@ -189,27 +189,30 @@ namespace JsonFx.Xml
 						scope.TagName = new DataName(reader.LocalName, reader.NamespaceURI);
 						bool isVoidTag = reader.IsEmptyElement;
 
-						SortedList<DataName, string> attributes = null;
-						while (reader.MoveToNextAttribute())
+						SortedList<DataName, string> attributes;
+						if (reader.HasAttributes)
 						{
-							if (String.IsNullOrEmpty(reader.Prefix) && reader.LocalName == "xmlns")
+							attributes = new SortedList<DataName, string>();
+							while (reader.MoveToNextAttribute())
 							{
-								scope[String.Empty] = reader.Value;
-								continue;
-							}
+								if (String.IsNullOrEmpty(reader.Prefix) && reader.LocalName == "xmlns")
+								{
+									scope[String.Empty] = reader.Value;
+									continue;
+								}
 
-							if (reader.Prefix == "xmlns")
-							{
-								scope[reader.LocalName] = reader.Value;
-								continue;
-							}
+								if (reader.Prefix == "xmlns")
+								{
+									scope[reader.LocalName] = reader.Value;
+									continue;
+								}
 
-							if (attributes == null)
-							{
-								attributes = new SortedList<DataName, string>();
+								attributes[new DataName(reader.LocalName, reader.NamespaceURI)] = reader.Value;
 							}
-
-							attributes[new DataName(reader.LocalName, reader.NamespaceURI)] = reader.Value;
+						}
+						else
+						{
+							attributes = null;
 						}
 
 						if (!isVoidTag)
