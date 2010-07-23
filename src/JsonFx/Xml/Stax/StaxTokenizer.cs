@@ -161,6 +161,8 @@ namespace JsonFx.Xml.Stax
 
 		private void GetTokens(List<Token<StaxTokenType>> tokens, ITextStream scanner)
 		{
+			this.ScopeChain.Clear();
+
 			try
 			{
 				scanner.BeginChunk();

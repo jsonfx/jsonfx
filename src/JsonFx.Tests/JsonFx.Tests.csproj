@@ -95,6 +95,7 @@
     <Compile Include="Json\JsonFormatterTests.cs" />
     <Compile Include="Json\JsonTokenizerTests.cs" />
     <Compile Include="Serialization\TypeCoercionUtilityTests.cs" />
+    <Compile Include="Xml\XmlTokenizerTests.cs" />
     <Compile Include="Xml\Stax\StaxFormatterTests.cs" />
     <Compile Include="Xml\Stax\StaxTokenizerTests.cs" />
     <Compile Include="Xml\XmlConverterTests.cs" />

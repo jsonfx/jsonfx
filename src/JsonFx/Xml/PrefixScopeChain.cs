@@ -34,7 +34,7 @@ using System.Collections.Generic;
 
 using JsonFx.Serialization.Resolvers;
 
-namespace JsonFx.Xml.Stax
+namespace JsonFx.Xml
 {
 	/// <summary>
 	/// Maintains scope chain for StAX prefixes
@@ -255,6 +255,16 @@ namespace JsonFx.Xml.Stax
 			return value;
 		}
 
+		public bool ContainsPrefix(string prefix)
+		{
+			return (this.Chain.FindLastIndex(item => item.ContainsPrefix(prefix)) >= 0);
+		}
+
+		public bool ContainsNamespace(string namespaceUri)
+		{
+			return (this.Chain.FindLastIndex(item => item.ContainsNamespace(namespaceUri)) >= 0);
+		}
+
 		/// <summary>
 		/// Finds the namespace URI for a given prefix within the curren scope chain
 		/// </summary>
@@ -335,6 +345,14 @@ namespace JsonFx.Xml.Stax
 		{
 			int index = this.Chain.FindLastIndex(item => item.TagName == closeTag);
 			return (index >= 0);
+		}
+
+		/// <summary>
+		/// Resets the internal state of the scope chain.
+		/// </summary>
+		public void Clear()
+		{
+			this.Chain.Clear();
 		}
 
 		#endregion Methods
