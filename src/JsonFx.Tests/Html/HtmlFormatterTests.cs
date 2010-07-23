@@ -293,7 +293,7 @@ namespace JsonFx.Html
 			    };
 			const string expected = @"<root noValue=""""></root>";
 
-			var formatter = new HtmlFormatter(new DataWriterSettings());
+			var formatter = new HtmlFormatter(new DataWriterSettings()) { XmlStyleEmptyAttributes=true };
 			var actual = formatter.Format(input);
 
 			Assert.Equal(expected, actual);
@@ -312,7 +312,7 @@ namespace JsonFx.Html
 			    };
 			const string expected = @"<root noValue></root>";
 
-			var formatter = new HtmlFormatter(new DataWriterSettings()) { Html5EmptyAttributes=true };
+			var formatter = new HtmlFormatter(new DataWriterSettings()) { XmlStyleEmptyAttributes=false };
 			var actual = formatter.Format(input);
 
 			Assert.Equal(expected, actual);
@@ -331,7 +331,7 @@ namespace JsonFx.Html
 			    };
 			const string expected = @"<root emptyValue=""""></root>";
 
-			var formatter = new HtmlFormatter(new DataWriterSettings());
+			var formatter = new HtmlFormatter(new DataWriterSettings()) { XmlStyleEmptyAttributes=true };
 			var actual = formatter.Format(input);
 
 			Assert.Equal(expected, actual);
@@ -371,7 +371,7 @@ namespace JsonFx.Html
 			        MarkupGrammar.TokenText("/\\\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"),
 			        MarkupGrammar.TokenElementEnd(new DataName("root"))
 			    };
-			const string expected = @"<root anyQuotedText=""/\"+"\uCAFE\uBABE\uAB98\uFCDE\uBCDA\uEF4A"+@"&#x8;&#xC;&#xA;&#xD;&#x9;`1~!@#$%^&amp;*()_+-=[]{}|;:',./&lt;&gt;?"" no-value="""" whitespace="" this contains whitespace ""></root>";
+			const string expected = @"<root anyQuotedText=""/\"+"\uCAFE\uBABE\uAB98\uFCDE\uBCDA\uEF4A"+@"&#x8;&#xC;&#xA;&#xD;&#x9;`1~!@#$%^&amp;*()_+-=[]{}|;:',./&lt;&gt;?"" no-value whitespace="" this contains whitespace ""></root>";
 
 			var formatter = new HtmlFormatter(new DataWriterSettings());
 			var actual = formatter.Format(input);

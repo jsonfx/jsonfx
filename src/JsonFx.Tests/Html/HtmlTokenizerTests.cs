@@ -272,32 +272,6 @@ namespace JsonFx.Html
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void GetTokens_UndeclaredPrefixesErrorRecovery_ReturnsAsDefault()
-		{
-			const string input = @"<a:one><b:two><c:three></d:three></e:two></f:one>";
-			var expected = new[]
-			    {
-			        MarkupGrammar.TokenElementBegin(new DataName("one")),
-			        MarkupGrammar.TokenElementBegin(new DataName("two")),
-			        MarkupGrammar.TokenElementBegin(new DataName("three")),
-			        MarkupGrammar.TokenElementEnd(new DataName("three")),
-			        MarkupGrammar.TokenElementEnd(new DataName("two")),
-			        MarkupGrammar.TokenElementEnd(new DataName("one"))
-			    };
-
-			var tokenizer = new HtmlTokenizer { ErrorRecovery=false };
-
-			DeserializationException ex = Assert.Throws<DeserializationException>(
-				delegate()
-				{
-					var actual = tokenizer.GetTokens(input).ToArray();
-				});
-
-			Assert.Equal(6, ex.Index);
-		}
-
-		[Fact]
-		[Trait(TraitName, TraitValue)]
 		public void GetTokens_UndeclaredPrefixes_ReturnsAsDefault()
 		{
 			const string input = @"<a:one><b:two><c:three></d:three></e:two></f:one>";
@@ -311,7 +285,7 @@ namespace JsonFx.Html
 			        MarkupGrammar.TokenElementEnd(new DataName("one"))
 			    };
 
-			var tokenizer = new HtmlTokenizer { ErrorRecovery=true };
+			var tokenizer = new HtmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -800,7 +774,7 @@ namespace JsonFx.Html
 			        MarkupGrammar.TokenElementBegin(new DataName("root"))
 			    };
 
-			var tokenizer = new HtmlTokenizer { ErrorRecovery=true };
+			var tokenizer = new HtmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -817,7 +791,7 @@ namespace JsonFx.Html
 			        MarkupGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
-			var tokenizer = new HtmlTokenizer { ErrorRecovery=true, AutoBalanceTags=true };
+			var tokenizer = new HtmlTokenizer { AutoBalanceTags=true };
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -833,7 +807,7 @@ namespace JsonFx.Html
 					MarkupGrammar.TokenElementEnd(new DataName("foo"))
 				};
 
-			var tokenizer = new HtmlTokenizer { ErrorRecovery=true };
+			var tokenizer = new HtmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -846,27 +820,10 @@ namespace JsonFx.Html
 			const string input = @"</foo>";
 			var expected = new Token<MarkupTokenType>[0];
 
-			var tokenizer = new HtmlTokenizer { ErrorRecovery=true, AutoBalanceTags=true };
+			var tokenizer = new HtmlTokenizer { AutoBalanceTags=true };
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
-		}
-
-		[Fact]
-		[Trait(TraitName, TraitValue)]
-		public void GetTokens_OverlappingTagsNoRecovery_ThrowsDeserializationException()
-		{
-			const string input = @"<odd><auto-closed><even></odd></ignored></even>";
-
-			var tokenizer = new HtmlTokenizer { ErrorRecovery=false };
-
-			DeserializationException ex = Assert.Throws<DeserializationException>(
-				delegate()
-				{
-					var actual = tokenizer.GetTokens(input).ToArray();
-				});
-
-			Assert.Equal(29, ex.Index);
 		}
 
 		[Fact]
@@ -884,7 +841,7 @@ namespace JsonFx.Html
 			        MarkupGrammar.TokenElementEnd(new DataName("even"))
 			    };
 
-			var tokenizer = new HtmlTokenizer { ErrorRecovery=true };
+			var tokenizer = new HtmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -905,7 +862,7 @@ namespace JsonFx.Html
 			        MarkupGrammar.TokenElementEnd(new DataName("odd"))
 			    };
 
-			var tokenizer = new HtmlTokenizer { ErrorRecovery=true, AutoBalanceTags=true };
+			var tokenizer = new HtmlTokenizer { AutoBalanceTags=true };
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -935,7 +892,7 @@ namespace JsonFx.Html
 			        MarkupGrammar.TokenPrefixEnd("c", "http://example.com/even/c")
 			    };
 
-			var tokenizer = new HtmlTokenizer { ErrorRecovery=true };
+			var tokenizer = new HtmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -968,7 +925,7 @@ namespace JsonFx.Html
 			        MarkupGrammar.TokenPrefixEnd("a", "http://example.com/odd/a"),
 			    };
 
-			var tokenizer = new HtmlTokenizer { ErrorRecovery=true, AutoBalanceTags=true };
+			var tokenizer = new HtmlTokenizer { AutoBalanceTags=true };
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);

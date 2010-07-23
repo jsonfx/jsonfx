@@ -55,9 +55,8 @@ namespace JsonFx.Html
 
 		private readonly DataWriterSettings Settings;
 		private readonly PrefixScopeChain ScopeChain = new PrefixScopeChain();
-		private int nsCounter;
 		private bool encodeNonAscii = false;
-		private bool html5EmptyAttributes = false;
+		private bool xmlStyleEmptyAttributes = false;
 
 		#endregion Fields
 
@@ -94,15 +93,17 @@ namespace JsonFx.Html
 		}
 
 		/// <summary>
-		/// Gets and sets a value indicating if should emit HTML-style empty attributes
+		/// Gets and sets a value indicating if should emit XML-style empty attributes (rather than HTML-style)
 		/// </summary>
 		/// <remarks>
+		/// In HTML, empty attributes do not contain a value component:
 		/// http://www.w3.org/TR/html5/syntax.html#attributes-0
+		/// In XML, an empty value must be emitted.
 		/// </remarks>
-		public bool Html5EmptyAttributes
+		public bool XmlStyleEmptyAttributes
 		{
-			get { return this.html5EmptyAttributes; }
-			set { this.html5EmptyAttributes = value; }
+			get { return this.xmlStyleEmptyAttributes; }
+			set { this.xmlStyleEmptyAttributes = value; }
 		}
 
 		#endregion Properties
@@ -322,7 +323,7 @@ namespace JsonFx.Html
 			string prefix = this.ScopeChain.GetPrefix(namespaceUri, false);
 			if (prefix == null && !String.IsNullOrEmpty(namespaceUri))
 			{
-				prefix = this.GeneratePrefix(namespaceUri);
+				prefix = this.ScopeChain.GeneratePrefix(namespaceUri);
 			}
 
 			return prefix;
@@ -364,7 +365,7 @@ namespace JsonFx.Html
 			this.WriteLocalName(writer, localName);
 			string attrValue = value.ValueAsString();
 
-			if (this.html5EmptyAttributes && String.IsNullOrEmpty(attrValue))
+			if (!this.xmlStyleEmptyAttributes && String.IsNullOrEmpty(attrValue))
 			{
 				return;
 			}
@@ -675,55 +676,5 @@ namespace JsonFx.Html
 		}
 
 		#endregion Write Methods
-
-		#region Utility Methods
-
-		protected virtual string GeneratePrefix(string namespaceUri)
-		{
-			// emit standardized prefixes
-			switch (namespaceUri)
-			{
-				case "http://www.w3.org/XML/1998/namespace":
-				{
-					// standard for XML
-					return "xml";
-				}
-				case "http://www.w3.org/2001/XMLSchema":
-				{
-					// standard for XML Schema
-					return "xs";
-				}
-				case "http://www.w3.org/2001/XMLSchema-instance":
-				{
-					// standard for XML Schema Instance
-					return "xsi";
-				}
-				case "http://www.w3.org/1999/xhtml":
-				{
-					// standard for XHTML
-					return "html";
-				}
-				case "http://www.w3.org/2005/Atom":
-				{
-					// standard for Atom 1.0
-					return "atom";
-				}
-				case "http://purl.org/dc/elements/1.1/":
-				{
-					// standard for Dublin Core
-					return "dc";
-				}
-				case "http://purl.org/syndication/thread/1.0":
-				{
-					// standard for syndicationthreading
-					return "thr";
-				}
-			}
-
-			// TODO: establish more aesthetically pleasing prefixes
-			return String.Concat('q', ++nsCounter);
-		}
-
-		#endregion Utility Methods
 	}
 }

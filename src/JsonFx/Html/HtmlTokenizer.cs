@@ -108,7 +108,6 @@ namespace JsonFx.Html
 
 		private ITextStream Scanner = TextReaderStream.Null;
 		private bool autoBalanceTags;
-		private bool errorRecovery;
 
 		#endregion Fields
 
@@ -121,15 +120,6 @@ namespace JsonFx.Html
 		{
 			get { return this.autoBalanceTags; }
 			set { this.autoBalanceTags = value; }
-		}
-
-		/// <summary>
-		/// Gets and sets a value indicating if should attempt parse error recovery
-		/// </summary>
-		public bool ErrorRecovery
-		{
-			get { return this.errorRecovery; }
-			set { this.errorRecovery = value; }
 		}
 
 		/// <summary>
@@ -208,15 +198,6 @@ namespace JsonFx.Html
 
 				if (this.ScopeChain.HasScope)
 				{
-					if (!this.errorRecovery)
-					{
-						throw new DeserializationException(
-							"Unclosed elements",
-							scanner.Index,
-							scanner.Line,
-							scanner.Column);
-					}
-
 					if (this.autoBalanceTags)
 					{
 						while (this.ScopeChain.HasScope)
@@ -252,11 +233,7 @@ namespace JsonFx.Html
 
 			if (scanner.IsCompleted)
 			{
-				// end of file
-				if (!this.errorRecovery)
-				{
-					throw new DeserializationException("Unexpected end of file", scanner.Index, scanner.Line, scanner.Column);
-				}
+				// end of file, emit as text
 				tokens.Add(MarkupGrammar.TokenText(MarkupGrammar.OperatorElementBegin));
 				return;
 			}
@@ -280,15 +257,6 @@ namespace JsonFx.Html
 			QName tagName = HtmlTokenizer.ScanQName(scanner);
 			if (tagName == null)
 			{
-				if (!this.errorRecovery)
-				{
-					throw new DeserializationException(
-						"Maltformed element name",
-						scanner.Index,
-						scanner.Line,
-						scanner.Column);
-				}
-
 				// treat as literal text
 				string text = Char.ToString(MarkupGrammar.OperatorElementBegin);
 				if (tagType == MarkupTagType.EndTag)
@@ -750,27 +718,12 @@ namespace JsonFx.Html
 
 			if (tagType == MarkupTagType.EndTag)
 			{
-				DataName closeTagName = new DataName(qName.Name, this.ScopeChain.GetNamespace(qName.Prefix, !this.errorRecovery));
+				DataName closeTagName = new DataName(qName.Name, this.ScopeChain.GetNamespace(qName.Prefix, false));
 
 				scope = this.ScopeChain.Pop();
 				if (scope == null ||
 					scope.TagName != closeTagName)
 				{
-					if (!this.errorRecovery)
-					{
-						// restore scope item
-						if (scope != null)
-						{
-							this.ScopeChain.Push(scope);
-						}
-
-						throw new DeserializationException(
-							String.Format("Element close tag ({0}) does not match open tag ({1}).", closeTagName, (scope != null) ? scope.TagName : DataName.Empty),
-							this.Index,
-							this.Line,
-							this.Column);
-					}
-
 					if (!this.autoBalanceTags)
 					{
 						// restore scope item
@@ -851,7 +804,7 @@ namespace JsonFx.Html
 
 			// add to scope chain, resolve QName, and store tag name
 			this.ScopeChain.Push(scope);
-			scope.TagName = new DataName(qName.Name, this.ScopeChain.GetNamespace(qName.Prefix, !this.errorRecovery));
+			scope.TagName = new DataName(qName.Name, this.ScopeChain.GetNamespace(qName.Prefix, false));
 
 			foreach (var mapping in scope)
 			{
@@ -864,7 +817,7 @@ namespace JsonFx.Html
 			{
 				foreach (var attr in attributes)
 				{
-					DataName attrName = new DataName(attr.QName.Name, this.ScopeChain.GetNamespace(attr.QName.Prefix, !this.errorRecovery));
+					DataName attrName = new DataName(attr.QName.Name, this.ScopeChain.GetNamespace(attr.QName.Prefix, false));
 					tokens.Add(MarkupGrammar.TokenAttribute(attrName));
 					tokens.Add(attr.Value);
 				}

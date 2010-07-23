@@ -41,17 +41,17 @@ namespace JsonFx.Xml
 {
 	public partial class XmlWriter
 	{
-		#region Constants
-
-		private const string ErrorUnexpectedToken = "Unexpected token ({0})";
-
-		#endregion Constants
-
 		/// <summary>
 		/// Outputs XML text from an input stream of tokens
 		/// </summary>
 		public class XmlFormatter : ITextFormatter<CommonTokenType>
 		{
+			#region Constants
+
+			private const string ErrorUnexpectedToken = "Unexpected token ({0})";
+
+			#endregion Constants
+
 			#region Fields
 
 			private readonly DataWriterSettings Settings;
