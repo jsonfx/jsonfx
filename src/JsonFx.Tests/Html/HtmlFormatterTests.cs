@@ -260,6 +260,25 @@ namespace JsonFx.Html
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
+		public void Format_SingleEmptyAttributeXhtmlStyle_ReturnsMarkup()
+		{
+			var input = new[]
+			    {
+			        MarkupGrammar.TokenElementBegin(new DataName("root")),
+			        MarkupGrammar.TokenAttribute(new DataName("noValue")),
+			        MarkupGrammar.TokenText(String.Empty),
+			        MarkupGrammar.TokenElementEnd(new DataName("root"))
+			    };
+			const string expected = @"<root noValue=""noValue""></root>";
+
+			var formatter = new HtmlFormatter(new DataWriterSettings()) { EmptyAttributes=HtmlFormatter.EmptyAttributeType.Xhtml };
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_SingleEmptyAttributeXmlStyle_ReturnsMarkup()
 		{
 			var input = new[]
@@ -271,7 +290,7 @@ namespace JsonFx.Html
 			    };
 			const string expected = @"<root noValue=""""></root>";
 
-			var formatter = new HtmlFormatter(new DataWriterSettings()) { XmlStyleEmptyAttributes=true };
+			var formatter = new HtmlFormatter(new DataWriterSettings()) { EmptyAttributes=HtmlFormatter.EmptyAttributeType.Xml };
 			var actual = formatter.Format(input);
 
 			Assert.Equal(expected, actual);
@@ -290,26 +309,7 @@ namespace JsonFx.Html
 			    };
 			const string expected = @"<root noValue></root>";
 
-			var formatter = new HtmlFormatter(new DataWriterSettings()) { XmlStyleEmptyAttributes=false };
-			var actual = formatter.Format(input);
-
-			Assert.Equal(expected, actual);
-		}
-
-		[Fact]
-		[Trait(TraitName, TraitValue)]
-		public void Format_SingleAttributeEmptyValue_ReturnsMarkup()
-		{
-			var input = new[]
-			    {
-			        MarkupGrammar.TokenElementBegin(new DataName("root")),
-			        MarkupGrammar.TokenAttribute(new DataName("emptyValue")),
-			        MarkupGrammar.TokenText(String.Empty),
-			        MarkupGrammar.TokenElementEnd(new DataName("root"))
-			    };
-			const string expected = @"<root emptyValue=""""></root>";
-
-			var formatter = new HtmlFormatter(new DataWriterSettings()) { XmlStyleEmptyAttributes=true };
+			var formatter = new HtmlFormatter(new DataWriterSettings()) { EmptyAttributes=HtmlFormatter.EmptyAttributeType.Html };
 			var actual = formatter.Format(input);
 
 			Assert.Equal(expected, actual);

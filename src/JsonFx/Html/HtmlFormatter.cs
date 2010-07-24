@@ -45,6 +45,38 @@ namespace JsonFx.Html
 	/// </summary>
 	public class HtmlFormatter : ITextFormatter<MarkupTokenType>
 	{
+		#region EmptyAttributeType
+
+		public enum EmptyAttributeType
+		{
+			/// <summary>
+			/// HTML-style empty attributes do not emit a quoted string
+			/// </summary>
+			/// <remarks>
+			/// http://www.w3.org/TR/html5/syntax.html#attributes-0
+			/// </remarks>
+			Html,
+
+			/// <summary>
+			/// XHTML-style empty attributes repeat the attribute name as its value
+			/// </summary>
+			/// <remarks>
+			/// http://www.w3.org/TR/xhtml1/#C_10
+			/// http://www.w3.org/TR/html5/the-xhtml-syntax.html
+			/// </remarks>
+			Xhtml,
+
+			/// <summary>
+			/// XML-style empty attributes emit an empty quoted string
+			/// </summary>
+			/// <remarks>
+			/// http://www.w3.org/TR/xml/#sec-starttags
+			/// </remarks>
+			Xml
+		}
+
+		#endregion EmptyAttributeType
+
 		#region Constants
 
 		private const string ErrorUnexpectedToken = "Unexpected token ({0})";
@@ -55,8 +87,8 @@ namespace JsonFx.Html
 
 		private readonly DataWriterSettings Settings;
 		private readonly PrefixScopeChain ScopeChain = new PrefixScopeChain();
-		private bool encodeNonAscii = false;
-		private bool xmlStyleEmptyAttributes = false;
+		private bool encodeNonAscii;
+		private EmptyAttributeType emptyAttributes;
 
 		#endregion Fields
 
@@ -93,17 +125,12 @@ namespace JsonFx.Html
 		}
 
 		/// <summary>
-		/// Gets and sets a value indicating if should emit XML-style empty attributes (rather than HTML-style)
+		/// Gets and sets a value indicating how should emit empty attributes
 		/// </summary>
-		/// <remarks>
-		/// In HTML, empty attributes do not contain a value component:
-		/// http://www.w3.org/TR/html5/syntax.html#attributes-0
-		/// In XML, an empty value must be emitted.
-		/// </remarks>
-		public bool XmlStyleEmptyAttributes
+		public EmptyAttributeType EmptyAttributes
 		{
-			get { return this.xmlStyleEmptyAttributes; }
-			set { this.xmlStyleEmptyAttributes = value; }
+			get { return this.emptyAttributes; }
+			set { this.emptyAttributes = value; }
 		}
 
 		#endregion Properties
@@ -347,9 +374,24 @@ namespace JsonFx.Html
 			this.WriteLocalName(writer, localName);
 			string attrValue = value.ValueAsString();
 
-			if (!this.xmlStyleEmptyAttributes && String.IsNullOrEmpty(attrValue))
+			if (String.IsNullOrEmpty(attrValue))
 			{
-				return;
+				switch (this.EmptyAttributes)
+				{
+					case EmptyAttributeType.Html:
+					{
+						return;
+					}
+					case EmptyAttributeType.Xhtml:
+					{
+						attrValue = localName;
+						break;
+					}
+					case EmptyAttributeType.Xml:
+					{
+						break;
+					}
+				}
 			}
 
 			// ="value"
