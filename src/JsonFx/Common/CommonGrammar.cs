@@ -82,9 +82,9 @@ namespace JsonFx.Common
 		/// <param name="name">the local name of the array</param>
 		/// <param name="namespaceUri">the namespace of the document</param>
 		/// <returns>ArrayBegin Token</returns>
-		public static Token<CommonTokenType> TokenArrayBegin(string name, string namespaceUri)
+		public static Token<CommonTokenType> TokenArrayBegin(string name, string prefix, string namespaceUri)
 		{
-			return new Token<CommonTokenType>(CommonTokenType.ArrayBegin, new DataName(name, namespaceUri));
+			return new Token<CommonTokenType>(CommonTokenType.ArrayBegin, new DataName(name, prefix, namespaceUri));
 		}
 
 		/// <summary>

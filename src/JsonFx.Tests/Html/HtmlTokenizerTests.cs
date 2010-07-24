@@ -96,10 +96,8 @@ namespace JsonFx.Html
 			const string input = @"<root xmlns=""http://example.com/schema""></root>";
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenPrefixBegin("", "http://example.com/schema"),
-			        MarkupGrammar.TokenElementBegin(new DataName("root", "http://example.com/schema")),
-			        MarkupGrammar.TokenElementEnd(new DataName("root", "http://example.com/schema")),
-			        MarkupGrammar.TokenPrefixEnd("", "http://example.com/schema"),
+			        MarkupGrammar.TokenElementBegin(new DataName("root", String.Empty, "http://example.com/schema")),
+			        MarkupGrammar.TokenElementEnd(new DataName("root", String.Empty, "http://example.com/schema")),
 			    };
 
 			var tokenizer = new HtmlTokenizer();
@@ -115,10 +113,8 @@ namespace JsonFx.Html
 			const string input = @"<prefix:root xmlns:prefix=""http://example.com/schema""></prefix:root>";
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenPrefixBegin("prefix", "http://example.com/schema"),
-			        MarkupGrammar.TokenElementBegin(new DataName("root", "http://example.com/schema")),
-			        MarkupGrammar.TokenElementEnd(new DataName("root", "http://example.com/schema")),
-			        MarkupGrammar.TokenPrefixEnd("prefix", "http://example.com/schema"),
+			        MarkupGrammar.TokenElementBegin(new DataName("root", "prefix", "http://example.com/schema")),
+			        MarkupGrammar.TokenElementEnd(new DataName("root", "prefix", "http://example.com/schema")),
 			    };
 
 			var tokenizer = new HtmlTokenizer();
@@ -135,11 +131,9 @@ namespace JsonFx.Html
 			var expected = new[]
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("foo")),
-			        MarkupGrammar.TokenPrefixBegin("", "http://example.com/schema"),
-			        MarkupGrammar.TokenElementBegin(new DataName("child", "http://example.com/schema")),
+			        MarkupGrammar.TokenElementBegin(new DataName("child", String.Empty, "http://example.com/schema")),
 			        MarkupGrammar.TokenText("value"),
-			        MarkupGrammar.TokenElementEnd(new DataName("child", "http://example.com/schema")),
-			        MarkupGrammar.TokenPrefixEnd("", "http://example.com/schema"),
+			        MarkupGrammar.TokenElementEnd(new DataName("child", String.Empty, "http://example.com/schema")),
 			        MarkupGrammar.TokenElementEnd(new DataName("foo"))
 			    };
 
@@ -156,13 +150,11 @@ namespace JsonFx.Html
 			const string input = @"<foo xmlns=""http://example.org""><child>value</child></foo>";
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenPrefixBegin("", "http://example.org"),
-			        MarkupGrammar.TokenElementBegin(new DataName("foo", "http://example.org")),
-			        MarkupGrammar.TokenElementBegin(new DataName("child", "http://example.org")),
+			        MarkupGrammar.TokenElementBegin(new DataName("foo", String.Empty, "http://example.org")),
+			        MarkupGrammar.TokenElementBegin(new DataName("child", String.Empty, "http://example.org")),
 			        MarkupGrammar.TokenText("value"),
-			        MarkupGrammar.TokenElementEnd(new DataName("child", "http://example.org")),
-			        MarkupGrammar.TokenElementEnd(new DataName("foo", "http://example.org")),
-			        MarkupGrammar.TokenPrefixEnd("", "http://example.org")
+			        MarkupGrammar.TokenElementEnd(new DataName("child", String.Empty, "http://example.org")),
+			        MarkupGrammar.TokenElementEnd(new DataName("foo", String.Empty, "http://example.org")),
 			    };
 
 			var tokenizer = new HtmlTokenizer();
@@ -178,13 +170,11 @@ namespace JsonFx.Html
 			const string input = @"<bar:foo xmlns:bar=""http://example.org""><bar:child>value</bar:child></bar:foo>";
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenPrefixBegin("bar", "http://example.org"),
-			        MarkupGrammar.TokenElementBegin(new DataName("foo", "http://example.org")),
-			        MarkupGrammar.TokenElementBegin(new DataName("child", "http://example.org")),
+			        MarkupGrammar.TokenElementBegin(new DataName("foo", "bar", "http://example.org")),
+			        MarkupGrammar.TokenElementBegin(new DataName("child", "bar", "http://example.org")),
 			        MarkupGrammar.TokenText("value"),
-			        MarkupGrammar.TokenElementEnd(new DataName("child", "http://example.org")),
-			        MarkupGrammar.TokenElementEnd(new DataName("foo", "http://example.org")),
-			        MarkupGrammar.TokenPrefixEnd("bar", "http://example.org")
+			        MarkupGrammar.TokenElementEnd(new DataName("child", "bar", "http://example.org")),
+			        MarkupGrammar.TokenElementEnd(new DataName("foo", "bar", "http://example.org")),
 			    };
 
 			var tokenizer = new HtmlTokenizer();
@@ -200,15 +190,11 @@ namespace JsonFx.Html
 			const string input = @"<foo xmlns=""http://json.org""><child xmlns=""http://jsonfx.net"">text value</child></foo>";
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenPrefixBegin("", "http://json.org"),
-			        MarkupGrammar.TokenElementBegin(new DataName("foo", "http://json.org")),
-			        MarkupGrammar.TokenPrefixBegin("", "http://jsonfx.net"),
-			        MarkupGrammar.TokenElementBegin(new DataName("child", "http://jsonfx.net")),
+			        MarkupGrammar.TokenElementBegin(new DataName("foo", String.Empty, "http://json.org")),
+			        MarkupGrammar.TokenElementBegin(new DataName("child", String.Empty, "http://jsonfx.net")),
 			        MarkupGrammar.TokenText("text value"),
-			        MarkupGrammar.TokenElementEnd(new DataName("child", "http://jsonfx.net")),
-			        MarkupGrammar.TokenPrefixEnd("", "http://jsonfx.net"),
-			        MarkupGrammar.TokenElementEnd(new DataName("foo", "http://json.org")),
-			        MarkupGrammar.TokenPrefixEnd("", "http://json.org")
+			        MarkupGrammar.TokenElementEnd(new DataName("child", String.Empty, "http://jsonfx.net")),
+			        MarkupGrammar.TokenElementEnd(new DataName("foo", String.Empty, "http://json.org"))
 			    };
 
 			var tokenizer = new HtmlTokenizer();
@@ -224,14 +210,10 @@ namespace JsonFx.Html
 			const string input = @"<foo xmlns=""http://example.org"" xmlns:blah=""http://example.org"" blah:key=""value"" />";
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenPrefixBegin("", "http://example.org"),
-			        MarkupGrammar.TokenPrefixBegin("blah", "http://example.org"),
-			        MarkupGrammar.TokenElementBegin(new DataName("foo", "http://example.org")),
-			        MarkupGrammar.TokenAttribute(new DataName("key", "http://example.org")),
+			        MarkupGrammar.TokenElementBegin(new DataName("foo", String.Empty, "http://example.org")),
+			        MarkupGrammar.TokenAttribute(new DataName("key", "blah", "http://example.org")),
 			        MarkupGrammar.TokenText("value"),
-			        MarkupGrammar.TokenElementEnd(new DataName("foo", "http://example.org")),
-			        MarkupGrammar.TokenPrefixEnd("", "http://example.org"),
-			        MarkupGrammar.TokenPrefixEnd("blah", "http://example.org")
+			        MarkupGrammar.TokenElementEnd(new DataName("foo", String.Empty, "http://example.org")),
 			    };
 
 			var tokenizer = new HtmlTokenizer();
@@ -248,20 +230,16 @@ namespace JsonFx.Html
 
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenPrefixBegin("", "http://example.org/outer"),
-			        MarkupGrammar.TokenElementBegin(new DataName("outer", "http://example.org/outer")),
-			        MarkupGrammar.TokenPrefixBegin("", "http://example.org/inner"),
-			        MarkupGrammar.TokenElementBegin(new DataName("middle-1", "http://example.org/inner")),
-			        MarkupGrammar.TokenElementBegin(new DataName("inner", "http://example.org/inner")),
+			        MarkupGrammar.TokenElementBegin(new DataName("outer", String.Empty, "http://example.org/outer")),
+			        MarkupGrammar.TokenElementBegin(new DataName("middle-1", String.Empty, "http://example.org/inner")),
+			        MarkupGrammar.TokenElementBegin(new DataName("inner", String.Empty, "http://example.org/inner")),
 			        MarkupGrammar.TokenText("this should be inner"),
-			        MarkupGrammar.TokenElementEnd(new DataName("inner", "http://example.org/inner")),
-			        MarkupGrammar.TokenElementEnd(new DataName("middle-1", "http://example.org/inner")),
-			        MarkupGrammar.TokenPrefixEnd("", "http://example.org/inner"),
-			        MarkupGrammar.TokenElementBegin(new DataName("middle-2", "http://example.org/outer")),
+			        MarkupGrammar.TokenElementEnd(new DataName("inner", String.Empty, "http://example.org/inner")),
+			        MarkupGrammar.TokenElementEnd(new DataName("middle-1", String.Empty, "http://example.org/inner")),
+			        MarkupGrammar.TokenElementBegin(new DataName("middle-2", String.Empty, "http://example.org/outer")),
 			        MarkupGrammar.TokenText("this should be outer"),
-			        MarkupGrammar.TokenElementEnd(new DataName("middle-2", "http://example.org/outer")),
-			        MarkupGrammar.TokenElementEnd(new DataName("outer", "http://example.org/outer")),
-			        MarkupGrammar.TokenPrefixEnd("", "http://example.org/outer")
+			        MarkupGrammar.TokenElementEnd(new DataName("middle-2", String.Empty, "http://example.org/outer")),
+			        MarkupGrammar.TokenElementEnd(new DataName("outer", String.Empty, "http://example.org/outer"))
 			    };
 
 			var tokenizer = new HtmlTokenizer();
@@ -272,7 +250,7 @@ namespace JsonFx.Html
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void GetTokens_UndeclaredPrefixes_ReturnsAsDefault()
+		public void GetTokens_UndeclaredPrefixes_ReturnsDefault()
 		{
 			const string input = @"<a:one><b:two><c:three></d:three></e:two></f:one>";
 			var expected = new[]
@@ -875,21 +853,13 @@ namespace JsonFx.Html
 			const string input = @"<a:odd xmlns=""http://example.com/odd"" xmlns:a=""http://example.com/odd/a""><b:auto-closed xmlns=""http://example.com/auto-closed"" xmlns:b=""http://example.com/auto-closed/b""><c:even xmlns=""http://example.com/even"" xmlns:c=""http://example.com/even/c""></a:odd></d:ignored></c:even>";
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenPrefixBegin("", "http://example.com/odd"),
-			        MarkupGrammar.TokenPrefixBegin("a", "http://example.com/odd/a"),
-			        MarkupGrammar.TokenElementBegin(new DataName("odd", "http://example.com/odd/a")),
-			        MarkupGrammar.TokenPrefixBegin("", "http://example.com/auto-closed"),
-			        MarkupGrammar.TokenPrefixBegin("b", "http://example.com/auto-closed/b"),
-			        MarkupGrammar.TokenElementBegin(new DataName("auto-closed", "http://example.com/auto-closed/b")),
-			        MarkupGrammar.TokenPrefixBegin("", "http://example.com/even"),
-			        MarkupGrammar.TokenPrefixBegin("c", "http://example.com/even/c"),
-			        MarkupGrammar.TokenElementBegin(new DataName("even", "http://example.com/even/c")),
-			        MarkupGrammar.TokenElementEnd(new DataName("odd", "http://example.com/odd/a")),
+			        MarkupGrammar.TokenElementBegin(new DataName("odd", "a", "http://example.com/odd/a")),
+			        MarkupGrammar.TokenElementBegin(new DataName("auto-closed", "b", "http://example.com/auto-closed/b")),
+			        MarkupGrammar.TokenElementBegin(new DataName("even", "c", "http://example.com/even/c")),
+			        MarkupGrammar.TokenElementEnd(new DataName("odd", "a", "http://example.com/odd/a")),
 			        // NOTE: skips prefix ending for odd because can't know odd declared them
-			        MarkupGrammar.TokenElementEnd(new DataName("ignored")),
-			        MarkupGrammar.TokenElementEnd(new DataName("even", "http://example.com/even/c")),
-			        MarkupGrammar.TokenPrefixEnd("", "http://example.com/even"),
-			        MarkupGrammar.TokenPrefixEnd("c", "http://example.com/even/c")
+			        MarkupGrammar.TokenElementEnd(new DataName("ignored", "d", String.Empty)),
+			        MarkupGrammar.TokenElementEnd(new DataName("even", "c", "http://example.com/even/c"))
 			    };
 
 			var tokenizer = new HtmlTokenizer();
@@ -905,24 +875,12 @@ namespace JsonFx.Html
 			const string input = @"<a:odd xmlns=""http://example.com/odd"" xmlns:a=""http://example.com/odd/a""><b:auto-closed xmlns=""http://example.com/auto-closed"" xmlns:b=""http://example.com/auto-closed/b""><c:even xmlns=""http://example.com/even"" xmlns:c=""http://example.com/even/c""></a:odd></d:ignored></c:even>";
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenPrefixBegin("", "http://example.com/odd"),
-			        MarkupGrammar.TokenPrefixBegin("a", "http://example.com/odd/a"),
-			        MarkupGrammar.TokenElementBegin(new DataName("odd", "http://example.com/odd/a")),
-			        MarkupGrammar.TokenPrefixBegin("", "http://example.com/auto-closed"),
-			        MarkupGrammar.TokenPrefixBegin("b", "http://example.com/auto-closed/b"),
-			        MarkupGrammar.TokenElementBegin(new DataName("auto-closed", "http://example.com/auto-closed/b")),
-			        MarkupGrammar.TokenPrefixBegin("", "http://example.com/even"),
-			        MarkupGrammar.TokenPrefixBegin("c", "http://example.com/even/c"),
-			        MarkupGrammar.TokenElementBegin(new DataName("even", "http://example.com/even/c")),
-					MarkupGrammar.TokenElementEnd(new DataName("even", "http://example.com/even/c")),
-			        MarkupGrammar.TokenPrefixEnd("", "http://example.com/even"),
-			        MarkupGrammar.TokenPrefixEnd("c", "http://example.com/even/c"),
-			        MarkupGrammar.TokenElementEnd(new DataName("auto-closed", "http://example.com/auto-closed/b")),
-			        MarkupGrammar.TokenPrefixEnd("", "http://example.com/auto-closed"),
-			        MarkupGrammar.TokenPrefixEnd("b", "http://example.com/auto-closed/b"),
-			        MarkupGrammar.TokenElementEnd(new DataName("odd", "http://example.com/odd/a")),
-					MarkupGrammar.TokenPrefixEnd("", "http://example.com/odd"),
-			        MarkupGrammar.TokenPrefixEnd("a", "http://example.com/odd/a"),
+			        MarkupGrammar.TokenElementBegin(new DataName("odd", "a", "http://example.com/odd/a")),
+			        MarkupGrammar.TokenElementBegin(new DataName("auto-closed", "b", "http://example.com/auto-closed/b")),
+			        MarkupGrammar.TokenElementBegin(new DataName("even", "c", "http://example.com/even/c")),
+					MarkupGrammar.TokenElementEnd(new DataName("even", "c", "http://example.com/even/c")),
+			        MarkupGrammar.TokenElementEnd(new DataName("auto-closed", "b", "http://example.com/auto-closed/b")),
+			        MarkupGrammar.TokenElementEnd(new DataName("odd", "a", "http://example.com/odd/a"))
 			    };
 
 			var tokenizer = new HtmlTokenizer { AutoBalanceTags=true };

@@ -144,29 +144,25 @@ namespace JsonFx.Html
 				Token<MarkupTokenType> token = stream.Peek();
 				switch (token.TokenType)
 				{
-					case MarkupTokenType.PrefixBegin:
-					{
-						if (scope == null)
-						{
-							scope = new PrefixScopeChain.Scope();
-						}
-
-						do
-						{
-							scope[token.Name.LocalName] = token.Name.NamespaceUri;
-
-							stream.Pop();
-							token = stream.Peek();
-						} while (!stream.IsCompleted && token.TokenType == MarkupTokenType.PrefixBegin);
-						break;
-					}
 					case MarkupTokenType.ElementBegin:
 					{
 						if (scope == null)
 						{
 							scope = new PrefixScopeChain.Scope();
 						}
-						scope.TagName = token.Name;
+
+						if (this.ScopeChain.ContainsNamespace(token.Name.NamespaceUri) ||
+							(String.IsNullOrEmpty(token.Name.NamespaceUri) && !this.ScopeChain.ContainsPrefix(String.Empty)))
+						{
+							string prefix = this.ScopeChain.GetPrefix(token.Name.NamespaceUri, false);
+							scope.TagName = new DataName(token.Name.LocalName, prefix, token.Name.NamespaceUri);
+						}
+						else
+						{
+							scope[token.Name.Prefix] = token.Name.NamespaceUri;
+							scope.TagName = token.Name;
+						}
+
 						this.ScopeChain.Push(scope);
 
 						stream.Pop();
@@ -180,6 +176,18 @@ namespace JsonFx.Html
 								attributes = new SortedList<DataName, Token<MarkupTokenType>>();
 							}
 							DataName attrName = token.Name;
+
+							string prefix = this.ScopeChain.EnsurePrefix(attrName.Prefix, attrName.NamespaceUri);
+							if (prefix != attrName.Prefix)
+							{
+								attrName = new DataName(attrName.LocalName, prefix, attrName.NamespaceUri, true);
+							}
+
+							if (!this.ScopeChain.ContainsNamespace(attrName.NamespaceUri) &&
+								(!String.IsNullOrEmpty(token.Name.NamespaceUri) || this.ScopeChain.ContainsPrefix(String.Empty)))
+							{
+								scope[prefix] = attrName.NamespaceUri;
+							}
 
 							stream.Pop();
 							token = stream.Peek();
@@ -230,14 +238,6 @@ namespace JsonFx.Html
 						token = stream.Peek();
 						break;
 					}
-					case MarkupTokenType.PrefixEnd:
-					{
-						stream.Pop();
-						token = stream.Peek();
-
-						// TODO: figure out if we really need to do anything
-						break;
-					}
 					default:
 					{
 						throw new TokenException<MarkupTokenType>(
@@ -259,7 +259,7 @@ namespace JsonFx.Html
 			IEnumerable<KeyValuePair<DataName, Token<MarkupTokenType>>> attributes,
 			IEnumerable<KeyValuePair<string, string>> prefixDeclarations)
 		{
-			string tagPrefix = this.ResolvePrefix(tagName.NamespaceUri);
+			string tagPrefix = this.ScopeChain.EnsurePrefix(tagName.Prefix, tagName.NamespaceUri);
 
 			// "<"
 			writer.Write(MarkupGrammar.OperatorElementBegin);
@@ -296,14 +296,7 @@ namespace JsonFx.Html
 					// "The attribute value in a default namespace declaration MAY be empty.
 					// This has the same effect, within the scope of the declaration, of there being no default namespace."
 					// http://www.w3.org/TR/xml-names/#defaulting
-
-					// an unqualified attribute has its element as the expanded name,
-					// so reversing this is easiest to unqualify if has element's namespace
-					// http://www.w3.org/TR/xml-names/#defaulting
-					string attrPrefix =
-						(attribute.Key.NamespaceUri == tagName.NamespaceUri) ?
-						null :
-						this.ResolvePrefix(attribute.Key.NamespaceUri);
+					string attrPrefix = this.ScopeChain.EnsurePrefix(attribute.Key.Prefix, attribute.Key.NamespaceUri);
 
 					this.WriteAttribute(writer, attrPrefix, attribute.Key.LocalName, attribute.Value);
 				}
@@ -316,17 +309,6 @@ namespace JsonFx.Html
 			}
 			// ">"
 			writer.Write(MarkupGrammar.OperatorElementEnd);
-		}
-
-		private string ResolvePrefix(string namespaceUri)
-		{
-			string prefix = this.ScopeChain.GetPrefix(namespaceUri, false);
-			if (prefix == null && !String.IsNullOrEmpty(namespaceUri))
-			{
-				prefix = this.ScopeChain.GeneratePrefix(namespaceUri);
-			}
-
-			return prefix;
 		}
 
 		private void WriteXmlns(TextWriter writer, string prefix, string namespaceUri)

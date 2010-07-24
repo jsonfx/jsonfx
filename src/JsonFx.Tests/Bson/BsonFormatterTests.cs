@@ -155,7 +155,7 @@ namespace JsonFx.Bson
 			var input = new[]
 			{
 				CommonGrammar.TokenObjectBeginNoName,
-				CommonGrammar.TokenProperty(new DataName("key", "http://json.org")),
+				CommonGrammar.TokenProperty(new DataName("key", null, "http://json.org")),
 				CommonGrammar.TokenValue("value"),
 				CommonGrammar.TokenObjectEnd
 			};

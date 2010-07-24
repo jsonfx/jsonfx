@@ -229,13 +229,13 @@ namespace JsonFx.Xml.Resolvers
 				XmlRootAttribute rootAttr = TypeCoercionUtility.GetAttribute<XmlRootAttribute>(member);
 				if (rootAttr != null && !String.IsNullOrEmpty(rootAttr.ElementName))
 				{
-					return new DataName(rootAttr.ElementName, rootAttr.Namespace);
+					return new DataName(rootAttr.ElementName, null, rootAttr.Namespace);
 				}
 
 				XmlTypeAttribute typeAttr = TypeCoercionUtility.GetAttribute<XmlTypeAttribute>(member);
 				if (typeAttr != null && !String.IsNullOrEmpty(typeAttr.TypeName))
 				{
-					return new DataName(typeAttr.TypeName, typeAttr.Namespace);
+					return new DataName(typeAttr.TypeName, null, typeAttr.Namespace);
 				}
 
 				return DataName.Empty;
@@ -244,13 +244,13 @@ namespace JsonFx.Xml.Resolvers
 			XmlElementAttribute elemAttr = TypeCoercionUtility.GetAttribute<XmlElementAttribute>(member);
 			if (elemAttr != null && !String.IsNullOrEmpty(elemAttr.ElementName))
 			{
-				return new DataName(elemAttr.ElementName, elemAttr.Namespace);
+				return new DataName(elemAttr.ElementName, null, elemAttr.Namespace);
 			}
 
 			XmlAttributeAttribute attrAttr = TypeCoercionUtility.GetAttribute<XmlAttributeAttribute>(member);
 			if (attrAttr != null && !String.IsNullOrEmpty(attrAttr.AttributeName))
 			{
-				return new DataName(attrAttr.AttributeName, attrAttr.Namespace, true);
+				return new DataName(attrAttr.AttributeName, null, attrAttr.Namespace, true);
 			}
 
 			XmlArrayAttribute arrayAttr = TypeCoercionUtility.GetAttribute<XmlArrayAttribute>(member);
@@ -258,7 +258,7 @@ namespace JsonFx.Xml.Resolvers
 			{
 				// TODO: figure out a way to surface XmlArrayItemAttribute name too
 
-				return new DataName(arrayAttr.ElementName, arrayAttr.Namespace);
+				return new DataName(arrayAttr.ElementName, null, arrayAttr.Namespace);
 			}
 
 			if (member is FieldInfo && ((FieldInfo)member).DeclaringType.IsEnum)

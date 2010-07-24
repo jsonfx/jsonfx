@@ -87,24 +87,19 @@ namespace JsonFx.Xml
 			return new Token<MarkupTokenType>(MarkupTokenType.UnparsedBlock, new DataName(name), text);
 		}
 
-		public static Token<MarkupTokenType> TokenPrefixBegin(string prefix, string namespaceUri)
-		{
-			return new Token<MarkupTokenType>(MarkupTokenType.PrefixBegin, new DataName(prefix, namespaceUri));
-		}
-
-		public static Token<MarkupTokenType> TokenPrefixEnd(string prefix, string namespaceUri)
-		{
-			return new Token<MarkupTokenType>(MarkupTokenType.PrefixEnd, new DataName(prefix, namespaceUri));
-		}
-
 		public static Token<MarkupTokenType> TokenElementBegin(DataName name)
 		{
-			return new Token<MarkupTokenType>(MarkupTokenType.ElementBegin, name);
+			return new Token<MarkupTokenType>(MarkupTokenType.ElementBegin, name, MarkupTagType.BeginTag);
+		}
+
+		public static Token<MarkupTokenType> TokenElementBegin(DataName name, MarkupTagType tagType)
+		{
+			return new Token<MarkupTokenType>(MarkupTokenType.ElementBegin, name, tagType);
 		}
 
 		public static Token<MarkupTokenType> TokenElementEnd(DataName name)
 		{
-			return new Token<MarkupTokenType>(MarkupTokenType.ElementEnd, name);
+			return new Token<MarkupTokenType>(MarkupTokenType.ElementEnd, name, MarkupTagType.EndTag);
 		}
 
 		public static Token<MarkupTokenType> TokenAttribute(DataName name)

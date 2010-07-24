@@ -205,11 +205,6 @@ namespace JsonFx.Html
 							PrefixScopeChain.Scope scope = this.ScopeChain.Pop();
 
 							tokens.Add(MarkupGrammar.TokenElementEnd(scope.TagName));
-							foreach (var mapping in scope)
-							{
-								tokens.Add(MarkupGrammar.TokenPrefixEnd(mapping.Key, mapping.Value));
-							}
-
 						}
 					}
 				}
@@ -718,7 +713,7 @@ namespace JsonFx.Html
 
 			if (tagType == MarkupTagType.EndTag)
 			{
-				DataName closeTagName = new DataName(qName.Name, this.ScopeChain.GetNamespace(qName.Prefix, false));
+				DataName closeTagName = new DataName(qName.Name, qName.Prefix, this.ScopeChain.GetNamespace(qName.Prefix, false));
 
 				scope = this.ScopeChain.Pop();
 				if (scope == null ||
@@ -730,6 +725,16 @@ namespace JsonFx.Html
 						if (scope != null)
 						{
 							this.ScopeChain.Push(scope);
+						}
+
+						if (!String.IsNullOrEmpty(closeTagName.Prefix) &&
+							!this.ScopeChain.ContainsPrefix(closeTagName.Prefix))
+						{
+							if (String.IsNullOrEmpty(closeTagName.NamespaceUri) &&
+								!this.ScopeChain.ContainsPrefix(String.Empty))
+							{
+								closeTagName = new DataName(closeTagName.LocalName);
+							}
 						}
 
 						// no known scope to end prefixes but can close element
@@ -753,13 +758,10 @@ namespace JsonFx.Html
 				do
 				{
 					tokens.Add(MarkupGrammar.TokenElementEnd(scope.TagName));
-					foreach (var mapping in scope)
-					{
-						tokens.Add(MarkupGrammar.TokenPrefixEnd(mapping.Key, mapping.Value));
-					}
 
 				} while (scope.TagName != closeTagName &&
 					(scope = this.ScopeChain.Pop()) != null);
+
 				return;
 			}
 
@@ -804,12 +806,21 @@ namespace JsonFx.Html
 
 			// add to scope chain, resolve QName, and store tag name
 			this.ScopeChain.Push(scope);
-			scope.TagName = new DataName(qName.Name, this.ScopeChain.GetNamespace(qName.Prefix, false));
 
-			foreach (var mapping in scope)
+			if (!String.IsNullOrEmpty(qName.Prefix) &&
+				!this.ScopeChain.ContainsPrefix(qName.Prefix))
 			{
-				tokens.Add(MarkupGrammar.TokenPrefixBegin(mapping.Key, mapping.Value));
+				if (this.ScopeChain.ContainsPrefix(String.Empty))
+				{
+					scope[qName.Prefix] = String.Empty;
+				}
+				else
+				{
+					qName.Prefix = null;
+				}
 			}
+
+			scope.TagName = new DataName(qName.Name, qName.Prefix, this.ScopeChain.GetNamespace(qName.Prefix, false));
 
 			tokens.Add(MarkupGrammar.TokenElementBegin(scope.TagName));
 
@@ -817,7 +828,7 @@ namespace JsonFx.Html
 			{
 				foreach (var attr in attributes)
 				{
-					DataName attrName = new DataName(attr.QName.Name, this.ScopeChain.GetNamespace(attr.QName.Prefix, false));
+					DataName attrName = new DataName(attr.QName.Name, attr.QName.Prefix, this.ScopeChain.GetNamespace(attr.QName.Prefix, false));
 					tokens.Add(MarkupGrammar.TokenAttribute(attrName));
 					tokens.Add(attr.Value);
 				}
@@ -829,11 +840,6 @@ namespace JsonFx.Html
 				this.ScopeChain.Pop();
 
 				tokens.Add(MarkupGrammar.TokenElementEnd(scope.TagName));
-
-				foreach (var mapping in scope)
-				{
-					tokens.Add(MarkupGrammar.TokenPrefixEnd(mapping.Key, mapping.Value));
-				}
 			}
 		}
 

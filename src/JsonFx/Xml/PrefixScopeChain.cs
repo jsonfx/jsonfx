@@ -360,6 +360,26 @@ namespace JsonFx.Xml
 
 		#region Utility Methods
 
+		public string EnsurePrefix(string preferredPrefix, string namespaceUri)
+		{
+			string storedPrefix = this.GetPrefix(namespaceUri, false);
+			if (storedPrefix == null && !String.IsNullOrEmpty(namespaceUri))
+			{
+				// TODO: either add to top scope or notify caller that prefix wasn't stored
+
+				if (String.IsNullOrEmpty(preferredPrefix))
+				{
+					storedPrefix = this.GeneratePrefix(namespaceUri);
+				}
+				else
+				{
+					storedPrefix = preferredPrefix;
+				}
+			}
+
+			return storedPrefix;
+		}
+
 		public string GeneratePrefix(string namespaceUri)
 		{
 			// emit standardized prefixes

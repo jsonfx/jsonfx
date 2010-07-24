@@ -57,17 +57,22 @@ namespace JsonFx.Serialization.Resolvers
 		#region Fields
 
 		/// <summary>
-		/// local-name of the member or type
+		/// local-name
 		/// </summary>
 		public readonly string LocalName;
 
 		/// <summary>
-		/// namespace of the member or type
+		/// alias for the namespace
+		/// </summary>
+		public readonly string Prefix;
+
+		/// <summary>
+		/// namespace
 		/// </summary>
 		public readonly string NamespaceUri;
 
 		/// <summary>
-		/// Determines if name should be an attribute name
+		/// Determines if name should be treated like an attribute
 		/// </summary>
 		public readonly bool IsAttribute;
 
@@ -95,7 +100,7 @@ namespace JsonFx.Serialization.Resolvers
 		/// This constructor implicitly delcares the namespace to be empty.
 		/// </remarks>
 		public DataName(string localName)
-			: this(localName, null, false)
+			: this(localName, null, null, false)
 		{
 		}
 
@@ -110,8 +115,8 @@ namespace JsonFx.Serialization.Resolvers
 		/// The namespace field follows XML recommendation of absolute URIs.
 		/// Relative URIs are officially deprecated for namespaces: http://www.w3.org/2000/09/xppa
 		/// </remarks>
-		public DataName(string localName, string namespaceUri)
-			: this(localName, namespaceUri, false)
+		public DataName(string localName, string prefix, string namespaceUri)
+			: this(localName, prefix, namespaceUri, false)
 		{
 		}
 
@@ -127,11 +132,16 @@ namespace JsonFx.Serialization.Resolvers
 		/// The namespace field follows XML recommendation of absolute URIs.
 		/// Relative URIs are officially deprecated for namespaces: http://www.w3.org/2000/09/xppa
 		/// </remarks>
-		public DataName(string localName, string namespaceUri, bool isAttribute)
+		public DataName(string localName, string prefix, string namespaceUri, bool isAttribute)
 		{
 			if (localName == null)
 			{
 				throw new ArgumentNullException("localName");
+			}
+
+			if (prefix == null)
+			{
+				prefix = String.Empty;
 			}
 
 			if (String.IsNullOrEmpty(namespaceUri))
@@ -144,6 +154,7 @@ namespace JsonFx.Serialization.Resolvers
 			}
 
 			this.LocalName = localName;
+			this.Prefix = prefix;
 			this.NamespaceUri = namespaceUri;
 			this.IsAttribute = isAttribute;
 		}
@@ -286,12 +297,15 @@ namespace JsonFx.Serialization.Resolvers
 
 		public override string ToString()
 		{
-			if (String.IsNullOrEmpty(this.NamespaceUri))
+			if (String.IsNullOrEmpty(this.NamespaceUri) &&
+				String.IsNullOrEmpty(this.Prefix))
 			{
 				return this.LocalName;
 			}
 
 			return String.Concat(
+				this.Prefix,
+				":",
 				"{",
 				this.NamespaceUri,
 				"}",
@@ -317,6 +331,7 @@ namespace JsonFx.Serialization.Resolvers
 
 			return
 				StringComparer.Ordinal.Equals(this.NamespaceUri, that.NamespaceUri) &&
+				StringComparer.Ordinal.Equals(this.Prefix, that.Prefix) &&
 				StringComparer.Ordinal.Equals(this.LocalName, that.LocalName);
 		}
 
@@ -325,6 +340,7 @@ namespace JsonFx.Serialization.Resolvers
 			int hash = 0x36294b26;
 
 			hash = (-1521134295 * hash) + StringComparer.Ordinal.GetHashCode(this.LocalName);
+			hash = (-1521134295 * hash) + StringComparer.Ordinal.GetHashCode(this.Prefix);
 			hash = (-1521134295 * hash) + StringComparer.Ordinal.GetHashCode(this.NamespaceUri);
 
 			return hash;

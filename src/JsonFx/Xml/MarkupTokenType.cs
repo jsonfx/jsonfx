@@ -70,22 +70,6 @@ namespace JsonFx.Xml
 		UnparsedBlock,
 
 		/// <summary>
-		/// Marks the beginning of a prefix scope for a namespace URI
-		/// </summary>
-		/// <remarks>
-		/// The element <see cref="Token<CommonTokenType>.Name"/> is required.
-		/// </remarks>
-		PrefixBegin,
-
-		/// <summary>
-		/// Marks the end of a prefix scope for a namespace URI
-		/// </summary>
-		/// <remarks>
-		/// The element <see cref="Token<CommonTokenType>.Name"/> is required.
-		/// </remarks>
-		PrefixEnd,
-
-		/// <summary>
 		/// Marks the beginning of an element, the token contains the element Name
 		/// </summary>
 		/// <remarks>

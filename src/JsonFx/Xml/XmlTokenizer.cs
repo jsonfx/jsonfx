@@ -186,7 +186,7 @@ namespace JsonFx.Xml
 					{
 						PrefixScopeChain.Scope scope = new PrefixScopeChain.Scope();
 
-						scope.TagName = new DataName(reader.LocalName, reader.NamespaceURI);
+						scope.TagName = new DataName(reader.LocalName, reader.Prefix, reader.NamespaceURI);
 						bool isVoidTag = reader.IsEmptyElement;
 
 						SortedList<DataName, string> attributes;
@@ -207,7 +207,7 @@ namespace JsonFx.Xml
 									continue;
 								}
 
-								attributes[new DataName(reader.LocalName, reader.NamespaceURI)] = reader.Value;
+								attributes[new DataName(reader.LocalName, reader.Prefix, reader.NamespaceURI)] = reader.Value;
 							}
 						}
 						else
@@ -220,10 +220,6 @@ namespace JsonFx.Xml
 							this.ScopeChain.Push(scope);
 						}
 
-						foreach (var xmlns in scope)
-						{
-							yield return MarkupGrammar.TokenPrefixBegin(xmlns.Key, xmlns.Value);
-						}
 						yield return MarkupGrammar.TokenElementBegin(scope.TagName);
 
 						if (attributes != null)
@@ -238,10 +234,6 @@ namespace JsonFx.Xml
 						if (isVoidTag)
 						{
 							yield return MarkupGrammar.TokenElementEnd(scope.TagName);
-							foreach (var xmlns in scope)
-							{
-								yield return MarkupGrammar.TokenPrefixEnd(xmlns.Key, xmlns.Value);
-							}
 						}
 						break;
 					}
@@ -257,15 +249,11 @@ namespace JsonFx.Xml
 						}
 
 						yield return MarkupGrammar.TokenElementEnd(scope.TagName);
-						foreach (var xmlns in scope)
-						{
-							yield return MarkupGrammar.TokenPrefixEnd(xmlns.Key, xmlns.Value);
-						}
 						break;
 					}
 					case XmlNodeType.Attribute:
 					{
-						yield return MarkupGrammar.TokenAttribute(new DataName(reader.Name, reader.NamespaceURI));
+						yield return MarkupGrammar.TokenAttribute(new DataName(reader.Name, reader.Prefix, reader.NamespaceURI, true));
 						yield return MarkupGrammar.TokenText(reader.Value);
 						break;
 					}
