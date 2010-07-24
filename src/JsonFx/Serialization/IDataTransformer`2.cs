@@ -47,7 +47,7 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="tokens"></param>
 		/// <returns></returns>
-		IEnumerable<Token<TOut>> Transform(IEnumerable<Token<TIn>> tokens);
+		IEnumerable<Token<TOut>> Transform(IEnumerable<Token<TIn>> input);
 
 		#endregion Methods
 	}

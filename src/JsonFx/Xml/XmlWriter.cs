@@ -137,7 +137,8 @@ namespace JsonFx.Xml
 		/// <returns></returns>
 		protected override ITextFormatter<CommonTokenType> GetFormatter()
 		{
-			return new XmlWriter.XmlFormatter(this.Settings);
+			throw new NotImplementedException();
+			//return new XmlWriter.DataToXmlTransformer(this.Settings);
 		}
 
 		#endregion DataWriter<DataTokenType> Methods
