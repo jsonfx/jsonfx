@@ -75,8 +75,7 @@ namespace JsonFx.Html
 			const string input = @"<root />";
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenElementBegin(new DataName("root")),
-			        MarkupGrammar.TokenElementEnd(new DataName("root"))
+			        MarkupGrammar.TokenElementBegin(new DataName("root"), MarkupTagType.VoidTag)
 			    };
 
 			var tokenizer = new HtmlTokenizer();
@@ -210,10 +209,9 @@ namespace JsonFx.Html
 			const string input = @"<foo xmlns=""http://example.org"" xmlns:blah=""http://example.org"" blah:key=""value"" />";
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenElementBegin(new DataName("foo", String.Empty, "http://example.org")),
+			        MarkupGrammar.TokenElementBegin(new DataName("foo", String.Empty, "http://example.org"), MarkupTagType.VoidTag),
 			        MarkupGrammar.TokenAttribute(new DataName("key", "blah", "http://example.org")),
-			        MarkupGrammar.TokenText("value"),
-			        MarkupGrammar.TokenElementEnd(new DataName("foo", String.Empty, "http://example.org")),
+			        MarkupGrammar.TokenText("value")
 			    };
 
 			var tokenizer = new HtmlTokenizer();

@@ -204,7 +204,7 @@ namespace JsonFx.Xml
 							attributes = null;
 						}
 
-						yield return MarkupGrammar.TokenElementBegin(tagName);
+						yield return MarkupGrammar.TokenElementBegin(tagName, isVoidTag ? MarkupTagType.VoidTag : MarkupTagType.BeginTag);
 
 						if (attributes != null)
 						{
@@ -213,11 +213,6 @@ namespace JsonFx.Xml
 								yield return MarkupGrammar.TokenAttribute(attribute.Key);
 								yield return MarkupGrammar.TokenText(attribute.Value);
 							}
-						}
-
-						if (isVoidTag)
-						{
-							yield return MarkupGrammar.TokenElementEnd(tagName);
 						}
 						break;
 					}

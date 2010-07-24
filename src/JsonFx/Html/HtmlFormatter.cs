@@ -61,6 +61,7 @@ namespace JsonFx.Html
 			/// XHTML-style empty attributes repeat the attribute name as its value
 			/// </summary>
 			/// <remarks>
+			/// http://www.w3.org/TR/xhtml-media-types/#C_10
 			/// http://www.w3.org/TR/xhtml1/#C_10
 			/// http://www.w3.org/TR/html5/the-xhtml-syntax.html
 			/// </remarks>
@@ -87,8 +88,10 @@ namespace JsonFx.Html
 
 		private readonly DataWriterSettings Settings;
 		private readonly PrefixScopeChain ScopeChain = new PrefixScopeChain();
-		private bool encodeNonAscii;
+
+		public bool canonicalAttributes;
 		private EmptyAttributeType emptyAttributes;
+		private bool encodeNonAscii;
 
 		#endregion Fields
 
@@ -113,15 +116,15 @@ namespace JsonFx.Html
 		#region Properties
 
 		/// <summary>
-		/// Gets and sets a value indicating if should encode text chars above the ASCII range
+		/// Gets and sets a value indicating if should canonicalize element attributes
 		/// </summary>
 		/// <remarks>
-		/// This option can help when the output is being embedded within an unknown encoding
+		/// http://www.w3.org/TR/xml-c14n#DocumentOrder
 		/// </remarks>
-		public bool EncodeNonAscii
+		public bool CanonicalAttributes
 		{
-			get { return this.encodeNonAscii; }
-			set { this.encodeNonAscii = value; }
+			get { return this.canonicalAttributes; }
+			set { this.canonicalAttributes = value; }
 		}
 
 		/// <summary>
@@ -131,6 +134,18 @@ namespace JsonFx.Html
 		{
 			get { return this.emptyAttributes; }
 			set { this.emptyAttributes = value; }
+		}
+
+		/// <summary>
+		/// Gets and sets a value indicating if should encode text chars above the ASCII range
+		/// </summary>
+		/// <remarks>
+		/// This option can help when the output is being embedded within an unknown encoding
+		/// </remarks>
+		public bool EncodeNonAscii
+		{
+			get { return this.encodeNonAscii; }
+			set { this.encodeNonAscii = value; }
 		}
 
 		#endregion Properties
@@ -192,15 +207,21 @@ namespace JsonFx.Html
 
 						this.ScopeChain.Push(scope);
 
+						MarkupTagType tagType = (token.Value is MarkupTagType) ?
+							(MarkupTagType)token.Value :
+							MarkupTagType.BeginTag;
+
 						stream.Pop();
 						token = stream.Peek();
 
-						SortedList<DataName, Token<MarkupTokenType>> attributes = null;
+						IDictionary<DataName, Token<MarkupTokenType>> attributes = null;
 						while (!stream.IsCompleted && token.TokenType == MarkupTokenType.Attribute)
 						{
 							if (attributes == null)
 							{
-								attributes = new SortedList<DataName, Token<MarkupTokenType>>();
+								attributes = this.canonicalAttributes ?
+									(IDictionary<DataName, Token<MarkupTokenType>>)new SortedList<DataName, Token<MarkupTokenType>>() :
+									(IDictionary<DataName, Token<MarkupTokenType>>)new Dictionary<DataName, Token<MarkupTokenType>>();
 							}
 							DataName attrName = token.Name;
 
@@ -225,7 +246,7 @@ namespace JsonFx.Html
 							token = stream.Peek();
 						}
 
-						this.WriteTag(writer, MarkupTagType.BeginTag, scope.TagName, attributes, scope);
+						this.WriteTag(writer, tagType, scope.TagName, attributes, scope);
 
 						scope = null;
 						break;
@@ -633,6 +654,12 @@ namespace JsonFx.Html
 					}
 					case '>':
 					{
+						if (this.canonicalAttributes)
+						{
+							// http://www.w3.org/TR/xml-c14n#ProcessingModel
+							continue;
+						}
+
 						entity = "&gt;";
 						break;
 					}
@@ -646,12 +673,17 @@ namespace JsonFx.Html
 						entity = "&quot;";
 						break;
 					}
-					// NOTE: emitting with double-quotes removes need for this escaping
-					//case '\'':
-					//{
-					//    entity = "&apos;";
-					//    break;
-					//}
+					case '\'':
+					{
+						if (!this.canonicalAttributes)
+						{
+							continue;
+						}
+
+						// http://www.w3.org/TR/xml-c14n#ProcessingModel
+					    entity = "&apos;";
+					    break;
+					}
 					default:
 					{
 						if ((ch < ' ') ||

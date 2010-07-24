@@ -41,7 +41,7 @@ using JsonFx.Xml;
 namespace JsonFx.Html
 {
 	/// <summary>
-	/// Generates a sequence of tokens from a generalized model of markup text (HTML, XML, JBST, ASPX, PHP, JSP, etc.)
+	/// Generates a sequence of tokens from a generalized model of markup text (e.g. HTML, XML, JBST, ASPX/ASCX, ASP, JSP, PHP, etc.)
 	/// </summary>
 	/// <remarks>
 	/// This generates a stream of tokens like StAX (Streaming API for XML)
@@ -822,7 +822,7 @@ namespace JsonFx.Html
 
 			scope.TagName = new DataName(qName.Name, qName.Prefix, this.ScopeChain.GetNamespace(qName.Prefix, false));
 
-			tokens.Add(MarkupGrammar.TokenElementBegin(scope.TagName));
+			tokens.Add(MarkupGrammar.TokenElementBegin(scope.TagName, tagType));
 
 			if (attributes != null)
 			{
@@ -838,8 +838,6 @@ namespace JsonFx.Html
 			{
 				// immediately remove from scope chain
 				this.ScopeChain.Pop();
-
-				tokens.Add(MarkupGrammar.TokenElementEnd(scope.TagName));
 			}
 		}
 

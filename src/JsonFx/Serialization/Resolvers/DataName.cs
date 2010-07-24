@@ -303,6 +303,15 @@ namespace JsonFx.Serialization.Resolvers
 				return this.LocalName;
 			}
 
+			if (String.IsNullOrEmpty(this.Prefix))
+			{
+				return String.Concat(
+					"{",
+					this.NamespaceUri,
+					"}",
+					this.LocalName);
+			}
+
 			return String.Concat(
 				this.Prefix,
 				":",

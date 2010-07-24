@@ -441,11 +441,6 @@ namespace JsonFx.Xml
 
 					attributes.Clear();
 				}
-
-				if (tagType == MarkupTagType.VoidTag)
-				{
-					MarkupGrammar.TokenElementEnd(elementName);
-				}
 			}
 
 			private void EmitNewLine(List<Token<MarkupTokenType>> output)
