@@ -141,6 +141,7 @@
     <Compile Include="Xml\MarkupTagType.cs" />
     <Compile Include="Xml\MarkupTokenType.cs" />
     <Compile Include="Xml\PrefixScopeChain.cs" />
+    <Compile Include="Xml\XmlFormatter.cs" />
     <Compile Include="Xml\XmlWriter.cs" />
     <Compile Include="Xml\XmlTokenizer.cs" />
     <Compile Include="Xml\Resolvers\XmlResolverStrategy.cs" />
