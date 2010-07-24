@@ -504,6 +504,17 @@ namespace JsonFx.Xml
 					return this.Settings.Resolver.LoadTypeName(type);
 				}
 
+				// due to a bug in System.Xml.XmlCharType,
+				// certain chars are not allowed that XML allows
+				// so we must use XmlConvert to encode with same bug
+
+				// XML only supports a subset of chars that DataName.LocalName does
+				string localName = System.Xml.XmlConvert.EncodeLocalName(name.LocalName);
+				if (name.LocalName != localName)
+				{
+					return new DataName(localName, name.Prefix, name.NamespaceUri, name.IsAttribute);
+				}
+
 				return name;
 			}
 

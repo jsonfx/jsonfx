@@ -109,11 +109,13 @@ namespace JsonFx.Xml
 					writer,
 					new XmlWriterSettings
 					{
+						CheckCharacters = false,
 						ConformanceLevel = System.Xml.ConformanceLevel.Auto,
 						Encoding = Encoding.UTF8,
 						Indent = this.Settings.PrettyPrint,
 						IndentChars = this.Settings.Tab,
 						NewLineChars = this.Settings.NewLine,
+						NewLineHandling = System.Xml.NewLineHandling.None,
 						OmitXmlDeclaration = true
 					}))
 				{

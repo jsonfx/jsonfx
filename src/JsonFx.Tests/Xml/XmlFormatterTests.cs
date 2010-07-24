@@ -328,7 +328,7 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenAttribute(new DataName("anyQuotedText")),
 			        MarkupGrammar.TokenText("/\\\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?")
 			    };
-			const string expected = @"<root no-value="""" whitespace="" this contains whitespace "" anyQuotedText=""/\"+"\uCAFE\uBABE\uAB98\uFCDE\uBCDA\uEF4A"+@"&#xA;&#xD;&#x9;`1~!@#$%^&amp;*()_+-=[]{}|;:',./&lt;&gt;?"" />";
+			const string expected = @"<root no-value="""" whitespace="" this contains whitespace "" anyQuotedText=""/\"+"\uCAFE\uBABE\uAB98\uFCDE\uBCDA\uEF4A\n\r\t"+@"`1~!@#$%^&amp;*()_+-=[]{}|;:',./&lt;&gt;?"" />";
 
 			var formatter = new XmlWriter.XmlFormatter(new DataWriterSettings());
 			var actual = formatter.Format(input);

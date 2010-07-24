@@ -29,9 +29,10 @@
 #endregion License
 
 using System;
-using System.Text;
 
+using JsonFx.Common;
 using JsonFx.Json;
+using JsonFx.Markup;
 using JsonFx.Serialization;
 using Xunit;
 
@@ -65,7 +66,8 @@ namespace JsonFx.Xml
 			var jsonTokenizer = new JsonReader.JsonTokenizer();
 			var tokens1 = jsonTokenizer.GetTokens(inputJson);
 
-			var xmlFormatter = new XmlWriter.XmlFormatter(new DataWriterSettings { PrettyPrint = false });
+			var settings = new DataWriterSettings { PrettyPrint = false };
+			var xmlFormatter = new TransformFormatter<CommonTokenType, MarkupTokenType>(new XmlWriter.XmlFormatter(settings), new XmlWriter.DataToXmlTransformer(settings));
 			var actualXml = xmlFormatter.Format(tokens1);
 
 			Assert.Equal(expectedXml, actualXml);
@@ -101,7 +103,8 @@ namespace JsonFx.Xml
 			var jsonTokenizer = new JsonReader.JsonTokenizer();
 			var tokens1 = jsonTokenizer.GetTokens(inputJson);
 
-			var xmlFormatter = new XmlWriter.XmlFormatter(new DataWriterSettings { PrettyPrint = false });
+			var settings = new DataWriterSettings { PrettyPrint = false };
+			var xmlFormatter = new TransformFormatter<CommonTokenType, MarkupTokenType>(new XmlWriter.XmlFormatter(settings), new XmlWriter.DataToXmlTransformer(settings));
 			var actualXml = xmlFormatter.Format(tokens1);
 
 			Assert.Equal(expectedXml, actualXml);
@@ -133,7 +136,8 @@ namespace JsonFx.Xml
 			var jsonTokenizer = new JsonReader.JsonTokenizer();
 			var tokens1 = jsonTokenizer.GetTokens(inputJson);
 
-			var xmlFormatter = new XmlWriter.XmlFormatter(new DataWriterSettings { PrettyPrint = true });
+			var settings = new DataWriterSettings { PrettyPrint = true };
+			var xmlFormatter = new TransformFormatter<CommonTokenType, MarkupTokenType>(new XmlWriter.XmlFormatter(settings), new XmlWriter.DataToXmlTransformer(settings));
 			var actualXml = xmlFormatter.Format(tokens1);
 
 			Assert.Equal(expectedXml, actualXml);
@@ -225,8 +229,8 @@ namespace JsonFx.Xml
 			<string>array with 1 element</string>
 		</object_x0020_with_x0020_1_x0020_member>
 	</object>
-	<object></object>
-	<array></array>
+	<object />
+	<array />
 	<int>-42</int>
 	<boolean>true</boolean>
 	<boolean>false</boolean>
@@ -242,7 +246,7 @@ namespace JsonFx.Xml
 		<space> </space>
 		<quote>""</quote>
 		<backslash>\</backslash>
-		<controls>"+"\b\f\n&#xD;\t"+@"</controls>
+		<controls>"+"&#x8;&#xC;\n\r\t"+@"</controls>
 		<slash>/ &amp; /</slash>
 		<alpha>abcdefghijklmnopqrstuvwyz</alpha>
 		<ALPHA>ABCDEFGHIJKLMNOPQRSTUVWYZ</ALPHA>
@@ -253,8 +257,8 @@ namespace JsonFx.Xml
 		<true>true</true>
 		<false>false</false>
 		<null />
-		<array></array>
-		<object></object>
+		<array />
+		<object />
 		<address>50 St. James Street</address>
 		<url>http://www.JSON.org/</url>
 		<comment>// /* &lt;!-- --</comment>
@@ -279,7 +283,7 @@ namespace JsonFx.Xml
 		</compact>
 		<jsontext>{""object with 1 member"":[""array with 1 element""]}</jsontext>
 		<quotes>&amp;#34; "" %22 0x22 034 &amp;#x22;</quotes>
-		<_x002F__x005C__x0022_"+"\uCAFE\uBABE\uAB98\uFCDE\uBCDA"+@"_xEF4A__x0008__x000C__x000A__x000D__x0009__x0060_1_x007E__x0021__x0040__x0023__x0024__x0025__x005E__x0026__x002A__x0028__x0029___x002B_-_x003D__x005B__x005D__x007B__x007D__x007C__x003B__x003A__x0027__x002C_._x002F__x003C__x003E__x003F_>A key can be any string</_x002F__x005C__x0022_"+"\uCAFE\uBABE\uAB98\uFCDE\uBCDA"+@"_xEF4A__x0008__x000C__x000A__x000D__x0009__x0060_1_x007E__x0021__x0040__x0023__x0024__x0025__x005E__x0026__x002A__x0028__x0029___x002B_-_x003D__x005B__x005D__x007B__x007D__x007C__x003B__x003A__x0027__x002C_._x002F__x003C__x003E__x003F_>
+		<"+"_x002F__x005C__x0022_\uCAFE\uBABE_xAB98__xFCDE_\uBCDA_xEF4A__x0008__x000C__x000A__x000D__x0009__x0060_1_x007E__x0021__x0040__x0023__x0024__x0025__x005E__x0026__x002A__x0028__x0029___x002B_-_x003D__x005B__x005D__x007B__x007D__x007C__x003B__x003A__x0027__x002C_._x002F__x003C__x003E__x003F_"+@">A key can be any string</"+"_x002F__x005C__x0022_\uCAFE\uBABE_xAB98__xFCDE_\uBCDA_xEF4A__x0008__x000C__x000A__x000D__x0009__x0060_1_x007E__x0021__x0040__x0023__x0024__x0025__x005E__x0026__x002A__x0028__x0029___x002B_-_x003D__x005B__x005D__x007B__x007D__x007C__x003B__x003A__x0027__x002C_._x002F__x003C__x003E__x003F_"+@">
 	</object>
 	<double>0.5</double>
 	<double>98.6</double>
@@ -297,7 +301,8 @@ namespace JsonFx.Xml
 			var jsonTokenizer = new JsonReader.JsonTokenizer();
 			var tokens1 = jsonTokenizer.GetTokens(inputJson);
 
-			var xmlFormatter = new XmlWriter.XmlFormatter(new DataWriterSettings { PrettyPrint = true });
+			var settings = new DataWriterSettings { PrettyPrint = true };
+			var xmlFormatter = new TransformFormatter<CommonTokenType, MarkupTokenType>(new XmlWriter.XmlFormatter(settings), new XmlWriter.DataToXmlTransformer(settings));
 			var actualXml = xmlFormatter.Format(tokens1);
 
 			Assert.Equal(expectedXml, actualXml);
