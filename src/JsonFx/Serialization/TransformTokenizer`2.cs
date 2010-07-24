@@ -35,15 +35,15 @@ using System.IO;
 namespace JsonFx.Serialization
 {
 	/// <summary>
-	/// An <see cref="ITextFormatter<T>"/> which first transforms tokens of a different type
+	/// An <see cref="ITextTokenizer<T>"/> which after transforms tokens to a different type
 	/// </summary>
 	/// <typeparam name="TIn">input token type</typeparam>
 	/// <typeparam name="TOut">output token type</typeparam>
-	internal class TransformFormatter<TIn, TOut> : ITextFormatter<TIn>
+	internal class TransformTokenizer<TIn, TOut> : ITextTokenizer<TOut>
 	{
 		#region Fields
 
-		private readonly ITextFormatter<TOut> Formatter;
+		private readonly ITextTokenizer<TIn> Tokenizer;
 		private readonly IDataTransformer<TIn, TOut> Transformer;
 
 		#endregion Fields
@@ -53,41 +53,65 @@ namespace JsonFx.Serialization
 		/// <summary>
 		/// Ctor
 		/// </summary>
-		/// <param name="formatter"></param>
+		/// <param name="tokenizer"></param>
 		/// <param name="transformer"></param>
-		public TransformFormatter(ITextFormatter<TOut> formatter, IDataTransformer<TIn, TOut> transformer)
+		public TransformTokenizer(ITextTokenizer<TIn> tokenizer, IDataTransformer<TIn, TOut> transformer)
 		{
-			if (formatter == null)
+			if (tokenizer == null)
 			{
-				new ArgumentNullException("formatter");
+				new ArgumentNullException("tokenizer");
 			}
 			if (transformer == null)
 			{
 				new ArgumentNullException("transformer");
 			}
 
-			this.Formatter = formatter;
+			this.Tokenizer = tokenizer;
 			this.Transformer = transformer;
 		}
 
 		#endregion Init
 
-		#region ITextFormatter<CommonTokenType> Members
+		#region ITextTokenizer<TOut> Members
 
-		public void Format(TextWriter writer, IEnumerable<Token<TIn>> tokens)
+		public int Column
 		{
-			IEnumerable<Token<TOut>> markup = this.Transformer.Transform(tokens);
-
-			this.Formatter.Format(writer, markup);
+			get { return this.Tokenizer.Column; }
 		}
 
-		public string Format(IEnumerable<Token<TIn>> tokens)
+		public int Line
 		{
-			IEnumerable<Token<TOut>> markup = this.Transformer.Transform(tokens);
-
-			return this.Formatter.Format(markup);
+			get { return this.Tokenizer.Line; }
 		}
 
-		#endregion ITextFormatter<CommonTokenType> Members
+		public long Index
+		{
+			get { return this.Tokenizer.Index; }
+		}
+
+		public IEnumerable<Token<TOut>> GetTokens(TextReader reader)
+		{
+			IEnumerable<Token<TIn>> tokens = this.Tokenizer.GetTokens(reader);
+
+			return this.Transformer.Transform(tokens);
+		}
+
+		public IEnumerable<Token<TOut>> GetTokens(string text)
+		{
+			IEnumerable<Token<TIn>> tokens = this.Tokenizer.GetTokens(text);
+
+			return this.Transformer.Transform(tokens);
+		}
+
+		#endregion ITextTokenizer<TOut> Members
+
+		#region IDisposable Members
+
+		public void Dispose()
+		{
+			throw new NotImplementedException();
+		}
+
+		#endregion IDisposable Members
 	}
 }

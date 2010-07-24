@@ -61,7 +61,7 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -77,7 +77,7 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenElementVoid(new DataName("root"))
 			    };
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -98,7 +98,7 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenElementEnd(new DataName("root", String.Empty, "http://example.com/schema")),
 			    };
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -115,7 +115,7 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenElementEnd(new DataName("root", "prefix", "http://example.com/schema"))
 			    };
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -135,7 +135,7 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenElementEnd(new DataName("foo"))
 			    };
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -155,7 +155,7 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenElementEnd(new DataName("foo", String.Empty, "http://example.org"))
 			    };
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -175,7 +175,7 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenElementEnd(new DataName("foo", "bar", "http://example.org"))
 			    };
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -195,7 +195,7 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenElementEnd(new DataName("foo", String.Empty, "http://json.org"))
 			    };
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -213,7 +213,7 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenText("value")
 			    };
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -239,7 +239,7 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenElementEnd(new DataName("outer", String.Empty, "http://example.org/outer"))
 			    };
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -260,7 +260,7 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenElementEnd(new DataName("one"))
 			    };
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 
 			DeserializationException ex = Assert.Throws<DeserializationException>(
 				delegate()
@@ -288,7 +288,7 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -307,7 +307,7 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -326,7 +326,7 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -345,7 +345,7 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -364,7 +364,7 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -387,7 +387,7 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -407,7 +407,7 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenText("<")
 			    };
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -423,7 +423,7 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenText("B")
 			    };
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -439,7 +439,7 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenText("7")
 			    };
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -455,7 +455,7 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenText("\uABCD")
 			    };
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -471,7 +471,7 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenText("\uabcd")
 			    };
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -487,7 +487,7 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenText("€")
 			    };
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -503,7 +503,7 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenText("leading&")
 			    };
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -519,7 +519,7 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenText("&trailing")
 			    };
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -535,7 +535,7 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenText(@"there should <b>e decoded chars & inside this text")
 			    };
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -571,7 +571,7 @@ namespace JsonFx.Xml
 					MarkupGrammar.TokenElementEnd(new DataName("div")),
 			    };
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -611,7 +611,7 @@ namespace JsonFx.Xml
 					MarkupGrammar.TokenElementEnd(new DataName("div")),
 			    };
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -631,7 +631,7 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenUnparsed("?{0}?", @"xml version=""1.0""")
 			    };
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -647,7 +647,7 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenUnparsed("!--{0}--", @" a quick note ")
 			    };
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -663,7 +663,7 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenText(@"value>""0"" && value<""10"" ?""valid"":""error""")
 			    };
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -713,7 +713,7 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenElementEnd(new DataName("math")),
 			    };
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -729,7 +729,7 @@ namespace JsonFx.Xml
 	""http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"">
 <root />";
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			DeserializationException ex = Assert.Throws<DeserializationException>(
 				delegate()
 				{
@@ -759,7 +759,7 @@ namespace JsonFx.Xml
 					MarkupGrammar.TokenElementEnd(new DataName("root"))
 			    };
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -800,7 +800,7 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenElementEnd(new DataName("html")),
 			    };
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -817,7 +817,7 @@ namespace JsonFx.Xml
 			const string input = null;
 			var expected = new Token<MarkupTokenType>[0];
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -830,7 +830,7 @@ namespace JsonFx.Xml
 			const string input = "";
 			var expected = new Token<MarkupTokenType>[0];
 
-			var tokenizer = new XmlTokenizer();
+			var tokenizer = new XmlReader.XmlTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);

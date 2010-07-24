@@ -67,12 +67,11 @@ namespace JsonFx.Xml
 			var tokens1 = jsonTokenizer.GetTokens(inputJson);
 
 			var settings = new DataWriterSettings { PrettyPrint = false };
-			var xmlFormatter = new TransformFormatter<CommonTokenType, MarkupTokenType>(new XmlWriter.XmlFormatter(settings), new XmlWriter.DataToXmlTransformer(settings));
+			var xmlFormatter = new TransformFormatter<CommonTokenType, MarkupTokenType>(new XmlWriter.XmlFormatter(settings), new XmlWriter.XmlDataWriteConverter(settings));
 			var actualXml = xmlFormatter.Format(tokens1);
 
 			Assert.Equal(expectedXml, actualXml);
 
-			// TODO: enable when ready
 			//var expectedJson = @"{""hello"":""world""}";
 
 			//var xmlTokenizer = new XmlReader.XmlTokenizer();
@@ -104,7 +103,7 @@ namespace JsonFx.Xml
 			var tokens1 = jsonTokenizer.GetTokens(inputJson);
 
 			var settings = new DataWriterSettings { PrettyPrint = false };
-			var xmlFormatter = new TransformFormatter<CommonTokenType, MarkupTokenType>(new XmlWriter.XmlFormatter(settings), new XmlWriter.DataToXmlTransformer(settings));
+			var xmlFormatter = new TransformFormatter<CommonTokenType, MarkupTokenType>(new XmlWriter.XmlFormatter(settings), new XmlWriter.XmlDataWriteConverter(settings));
 			var actualXml = xmlFormatter.Format(tokens1);
 
 			Assert.Equal(expectedXml, actualXml);
@@ -137,7 +136,7 @@ namespace JsonFx.Xml
 			var tokens1 = jsonTokenizer.GetTokens(inputJson);
 
 			var settings = new DataWriterSettings { PrettyPrint = true };
-			var xmlFormatter = new TransformFormatter<CommonTokenType, MarkupTokenType>(new XmlWriter.XmlFormatter(settings), new XmlWriter.DataToXmlTransformer(settings));
+			var xmlFormatter = new TransformFormatter<CommonTokenType, MarkupTokenType>(new XmlWriter.XmlFormatter(settings), new XmlWriter.XmlDataWriteConverter(settings));
 			var actualXml = xmlFormatter.Format(tokens1);
 
 			Assert.Equal(expectedXml, actualXml);
@@ -302,7 +301,7 @@ namespace JsonFx.Xml
 			var tokens1 = jsonTokenizer.GetTokens(inputJson);
 
 			var settings = new DataWriterSettings { PrettyPrint = true };
-			var xmlFormatter = new TransformFormatter<CommonTokenType, MarkupTokenType>(new XmlWriter.XmlFormatter(settings), new XmlWriter.DataToXmlTransformer(settings));
+			var xmlFormatter = new TransformFormatter<CommonTokenType, MarkupTokenType>(new XmlWriter.XmlFormatter(settings), new XmlWriter.XmlDataWriteConverter(settings));
 			var actualXml = xmlFormatter.Format(tokens1);
 
 			Assert.Equal(expectedXml, actualXml);

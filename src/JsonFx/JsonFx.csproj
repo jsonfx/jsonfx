@@ -89,6 +89,7 @@
     <Compile Include="Markup\MarkupGrammar.cs" />
     <Compile Include="Markup\MarkupTokenType.cs" />
     <Compile Include="Markup\PrefixScopeChain.cs" />
+    <Compile Include="Serialization\TransformTokenizer`2.cs" />
     <Compile Include="Serialization\TransformFormatter`2.cs" />
     <Compile Include="Serialization\DataName.cs" />
     <Compile Include="Serialization\Filters\DataFilter`2.cs" />
@@ -140,7 +141,9 @@
     <Compile Include="Serialization\Resolvers\ResolverCache.cs" />
     <Compile Include="Serialization\Token`1.cs" />
     <Compile Include="Serialization\TypeCoercionUtility.cs" />
-    <Compile Include="Xml\DataToXmlTransformer.cs" />
+    <Compile Include="Xml\XmlDataReadConverter.cs" />
+    <Compile Include="Xml\XmlDataWriteConverter.cs" />
+    <Compile Include="Xml\XmlReader.cs" />
     <Compile Include="Xml\XmlFormatter.cs" />
     <Compile Include="Xml\XmlWriter.cs" />
     <Compile Include="Xml\XmlTokenizer.cs" />

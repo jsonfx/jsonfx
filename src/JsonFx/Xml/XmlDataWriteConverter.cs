@@ -42,9 +42,9 @@ namespace JsonFx.Xml
 	public partial class XmlWriter
 	{
 		/// <summary>
-		/// Outputs XML text from an input stream of input
+		/// Transforms common data tokens into markup tokens using an XML-data model
 		/// </summary>
-		public class DataToXmlTransformer : IDataTransformer<CommonTokenType, MarkupTokenType>
+		public class XmlDataWriteConverter : IDataTransformer<CommonTokenType, MarkupTokenType>
 		{
 			#region Constants
 
@@ -67,7 +67,7 @@ namespace JsonFx.Xml
 			/// Ctor
 			/// </summary>
 			/// <param name="settings"></param>
-			public DataToXmlTransformer(DataWriterSettings settings)
+			public XmlDataWriteConverter(DataWriterSettings settings)
 			{
 				if (settings == null)
 				{

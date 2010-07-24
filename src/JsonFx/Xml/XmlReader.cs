@@ -30,7 +30,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 using JsonFx.Common;
 using JsonFx.Markup;
@@ -42,15 +41,15 @@ namespace JsonFx.Xml
 	/// <summary>
 	/// XML serializer
 	/// </summary>
-	public partial class XmlWriter : DataWriter<CommonTokenType>
+	public partial class XmlReader : DataReader<CommonTokenType>
 	{
 		#region Init
 
 		/// <summary>
 		/// Ctor
 		/// </summary>
-		public XmlWriter()
-			: this(new DataWriterSettings())
+		public XmlReader()
+			: this(new DataReaderSettings())
 		{
 		}
 
@@ -58,7 +57,7 @@ namespace JsonFx.Xml
 		/// Ctor
 		/// </summary>
 		/// <param name="settings"></param>
-		public XmlWriter(DataWriterSettings settings)
+		public XmlReader(DataReaderSettings settings)
 			: base(settings, null)
 		{
 		}
@@ -68,7 +67,7 @@ namespace JsonFx.Xml
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <param name="filters"></param>
-		public XmlWriter(DataWriterSettings settings, params IDataFilter<CommonTokenType>[] filters)
+		public XmlReader(DataReaderSettings settings, params IDataFilter<CommonTokenType>[] filters)
 			: base(settings, (IEnumerable<IDataFilter<CommonTokenType>>)filters)
 		{
 		}
@@ -78,7 +77,7 @@ namespace JsonFx.Xml
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <param name="filters"></param>
-		public XmlWriter(DataWriterSettings settings, IEnumerable<IDataFilter<CommonTokenType>> filters)
+		public XmlReader(DataReaderSettings settings, IEnumerable<IDataFilter<CommonTokenType>> filters)
 			: base(settings, filters)
 		{
 		}
@@ -86,14 +85,6 @@ namespace JsonFx.Xml
 		#endregion Init
 
 		#region Properties
-
-		/// <summary>
-		/// Gets the content encoding for the serialized data
-		/// </summary>
-		public override Encoding ContentEncoding
-		{
-			get { return Encoding.UTF8; }
-		}
 
 		/// <summary>
 		/// Gets the supported content type for the serialized data
@@ -109,38 +100,28 @@ namespace JsonFx.Xml
 			}
 		}
 
-		/// <summary>
-		/// Gets the supported file extension for the serialized data
-		/// </summary>
-		public override IEnumerable<string> FileExtension
-		{
-			get { yield return ".xml"; }
-		}
-
 		#endregion Properties
 
-		#region DataWriter<DataTokenType> Methods
+		#region DataReader<DataTokenType> Methods
 
 		/// <summary>
-		/// Gets a walker for XML
+		/// Gets an analyzer for XML
 		/// </summary>
-		/// <param name="settings"></param>
 		/// <returns></returns>
-		protected override IObjectWalker<CommonTokenType> GetWalker()
+		protected override ITokenAnalyzer<CommonTokenType> GetAnalyzer()
 		{
-			return new CommonWalker(this.Settings, this.Filters);
+			return new CommonAnalyzer(this.Settings, this.Filters);
 		}
 
 		/// <summary>
-		/// Gets the formatter for XML
+		/// Gets a tokenizer for XML
 		/// </summary>
-		/// <param name="settings"></param>
 		/// <returns></returns>
-		protected override ITextFormatter<CommonTokenType> GetFormatter()
+		protected override ITextTokenizer<CommonTokenType> GetTokenizer()
 		{
-			return new TransformFormatter<CommonTokenType, MarkupTokenType>(new XmlFormatter(this.Settings), new XmlDataWriteConverter(this.Settings));
+			return new TransformTokenizer<MarkupTokenType, CommonTokenType>(new XmlTokenizer(), new XmlDataReadConverter(this.Settings));
 		}
 
-		#endregion DataWriter<DataTokenType> Methods
+		#endregion DataReader<DataTokenType> Methods
 	}
 }

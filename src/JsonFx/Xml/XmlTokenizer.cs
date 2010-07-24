@@ -31,7 +31,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Xml;
 
 using JsonFx.Markup;
 using JsonFx.Serialization;
@@ -39,277 +38,283 @@ using JsonFx.Serialization;
 namespace JsonFx.Xml
 {
 	/// <summary>
-	/// Generates a sequence of tokens from XML text
+	/// XML serializer
 	/// </summary>
-	/// <remarks>
-	/// Implemented as an Adapter between <see cref="ITextTokenizer<XmlTokenType>"/> and <see cref="System.Xml.XmlReader"/>
-	/// </remarks>
-	public class XmlTokenizer : ITextTokenizer<MarkupTokenType>
+	public partial class XmlReader
 	{
-		#region Fields
-
-		private readonly XmlReaderSettings Settings;
-
-		#endregion Fields
-
-		#region Init
-
 		/// <summary>
-		/// Ctor
+		/// Generates a sequence of tokens from XML text
 		/// </summary>
-		public XmlTokenizer()
-			: this(null)
+		/// <remarks>
+		/// Implemented as an Adapter between <see cref="ITextTokenizer<XmlTokenType>"/> and <see cref="System.Xml.XmlReader"/>
+		/// </remarks>
+		public class XmlTokenizer : ITextTokenizer<MarkupTokenType>
 		{
-		}
+			#region Fields
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="settings"></param>
-		public XmlTokenizer(XmlReaderSettings settings)
-		{
-			if (settings == null)
+			private readonly System.Xml.XmlReaderSettings Settings;
+
+			#endregion Fields
+
+			#region Init
+
+			/// <summary>
+			/// Ctor
+			/// </summary>
+			public XmlTokenizer()
+				: this(null)
 			{
-				this.Settings = new XmlReaderSettings
+			}
+
+			/// <summary>
+			/// Ctor
+			/// </summary>
+			/// <param name="settings"></param>
+			public XmlTokenizer(System.Xml.XmlReaderSettings settings)
+			{
+				if (settings == null)
 				{
-					ConformanceLevel = ConformanceLevel.Auto
+					this.Settings = new System.Xml.XmlReaderSettings
+					{
+						ConformanceLevel = System.Xml.ConformanceLevel.Auto
+					};
+				}
+				else
+				{
+					this.Settings = settings;
+				}
+			}
+
+			#endregion Init
+
+			#region Properties
+
+			/// <summary>
+			/// Gets the total number of characters read from the input
+			/// </summary>
+			public int Column
+			{
+				get { return 0; }
+			}
+
+			/// <summary>
+			/// Gets the total number of lines read from the input
+			/// </summary>
+			public int Line
+			{
+				get { return 0; }
+			}
+
+			/// <summary>
+			/// Gets the current position within the input
+			/// </summary>
+			public long Index
+			{
+				get { return -1L; }
+			}
+
+			#endregion Properties
+
+			#region ITextTokenizer<DataTokenType> Members
+
+			/// <summary>
+			/// Gets a token sequence from the string
+			/// </summary>
+			/// <param name="text"></param>
+			/// <returns></returns>
+			public IEnumerable<Token<MarkupTokenType>> GetTokens(string text)
+			{
+				return this.GetTokens(new StringReader(text ?? String.Empty));
+			}
+
+			/// <summary>
+			/// Gets a token sequence from the TextReader
+			/// </summary>
+			/// <param name="reader"></param>
+			/// <returns></returns>
+			public IEnumerable<Token<MarkupTokenType>> GetTokens(TextReader reader)
+			{
+				if (reader == null)
+				{
+					throw new ArgumentNullException("reader");
+				}
+
+				var xmlReader = System.Xml.XmlReader.Create(reader, this.Settings);
+				System.Xml.XmlTextReader xmlTextReader = xmlReader as System.Xml.XmlTextReader;
+				if (xmlTextReader != null)
+				{
+					xmlTextReader.Normalization = false;
+					xmlTextReader.WhitespaceHandling = System.Xml.WhitespaceHandling.All;
+				}
+				return this.GetTokens(xmlReader);
+			}
+
+			/// <summary>
+			/// Gets a token sequence from the XmlReader
+			/// </summary>
+			/// <param name="reader"></param>
+			/// <returns></returns>
+			public IEnumerable<Token<MarkupTokenType>> GetTokens(System.Xml.XmlReader reader)
+			{
+				if (reader == null)
+				{
+					throw new ArgumentNullException("reader");
+				}
+
+				while (true)
+				{
+					// have to isolate try-catch away from yields
+					try
+					{
+						if (!reader.Read())
+						{
+							((IDisposable)reader).Dispose();
+							break;
+						}
+					}
+					catch (System.Xml.XmlException ex)
+					{
+						throw new DeserializationException(ex.Message, ex.LinePosition, ex.LineNumber, -1, ex);
+					}
+					catch (Exception ex)
+					{
+						throw new DeserializationException(ex.Message, -1, ex);
+					}
+
+					switch (reader.NodeType)
+					{
+						case System.Xml.XmlNodeType.Element:
+						{
+							DataName tagName = new DataName(reader.LocalName, reader.Prefix, reader.NamespaceURI);
+							bool isVoidTag = reader.IsEmptyElement;
+
+							SortedList<DataName, string> attributes;
+							if (reader.HasAttributes)
+							{
+								attributes = new SortedList<DataName, string>();
+								while (reader.MoveToNextAttribute())
+								{
+									if (String.IsNullOrEmpty(reader.Prefix) && reader.LocalName == "xmlns" ||
+									reader.Prefix == "xmlns")
+									{
+										continue;
+									}
+
+									attributes[new DataName(reader.LocalName, reader.Prefix, reader.NamespaceURI)] = reader.Value;
+								}
+							}
+							else
+							{
+								attributes = null;
+							}
+
+							if (isVoidTag)
+							{
+								yield return MarkupGrammar.TokenElementVoid(tagName);
+							}
+							else
+							{
+								yield return MarkupGrammar.TokenElementBegin(tagName);
+							}
+
+							if (attributes != null)
+							{
+								foreach (var attribute in attributes)
+								{
+									yield return MarkupGrammar.TokenAttribute(attribute.Key);
+									yield return MarkupGrammar.TokenText(attribute.Value);
+								}
+							}
+							break;
+						}
+						case System.Xml.XmlNodeType.EndElement:
+						{
+							yield return MarkupGrammar.TokenElementEnd(new DataName(reader.LocalName, reader.Prefix, reader.NamespaceURI));
+							break;
+						}
+						case System.Xml.XmlNodeType.Attribute:
+						{
+							yield return MarkupGrammar.TokenAttribute(new DataName(reader.Name, reader.Prefix, reader.NamespaceURI, true));
+							yield return MarkupGrammar.TokenText(reader.Value);
+							break;
+						}
+						case System.Xml.XmlNodeType.Text:
+						{
+							yield return MarkupGrammar.TokenText(reader.Value);
+							break;
+						}
+						case System.Xml.XmlNodeType.SignificantWhitespace:
+						case System.Xml.XmlNodeType.Whitespace:
+						{
+							yield return MarkupGrammar.TokenWhitespace(reader.Value);
+							break;
+						}
+						case System.Xml.XmlNodeType.CDATA:
+						{
+							yield return MarkupGrammar.TokenText(reader.Value);
+							break;
+						}
+						case System.Xml.XmlNodeType.Entity:
+						case System.Xml.XmlNodeType.EntityReference:
+						case System.Xml.XmlNodeType.EndEntity:
+						{
+							break;
+						}
+						case System.Xml.XmlNodeType.ProcessingInstruction:
+						case System.Xml.XmlNodeType.XmlDeclaration:
+						{
+							yield return MarkupGrammar.TokenUnparsed("?{0}?", reader.Name+" "+reader.Value);
+							break;
+						}
+						case System.Xml.XmlNodeType.Comment:
+						{
+							yield return MarkupGrammar.TokenUnparsed("!--{0}--", reader.Value);
+							break;
+						}
+						case System.Xml.XmlNodeType.DocumentType:
+						{
+							yield return MarkupGrammar.TokenUnparsed("!DOCTYPE {0}", reader.Value);
+							break;
+						}
+						case System.Xml.XmlNodeType.Notation:
+						{
+							yield return MarkupGrammar.TokenUnparsed("!NOTATION {0}", reader.Value);
+							break;
+						}
+						case System.Xml.XmlNodeType.None:
+						{
+							((IDisposable)reader).Dispose();
+							yield break;
+						}
+						case System.Xml.XmlNodeType.Document:
+						case System.Xml.XmlNodeType.DocumentFragment:
+						default:
+						{
+							continue;
+						}
+					}
 				};
 			}
-			else
+
+			#endregion ITextTokenizer<DataTokenType> Members
+
+			#region IDisposable Members
+
+			public void Dispose()
 			{
-				this.Settings = settings;
-			}
-		}
-
-		#endregion Init
-
-		#region Properties
-
-		/// <summary>
-		/// Gets the total number of characters read from the input
-		/// </summary>
-		public int Column
-		{
-			get { return 0; }
-		}
-
-		/// <summary>
-		/// Gets the total number of lines read from the input
-		/// </summary>
-		public int Line
-		{
-			get { return 0; }
-		}
-
-		/// <summary>
-		/// Gets the current position within the input
-		/// </summary>
-		public long Index
-		{
-			get { return -1L; }
-		}
-
-		#endregion Properties
-
-		#region ITextTokenizer<DataTokenType> Members
-
-		/// <summary>
-		/// Gets a token sequence from the string
-		/// </summary>
-		/// <param name="text"></param>
-		/// <returns></returns>
-		public IEnumerable<Token<MarkupTokenType>> GetTokens(string text)
-		{
-			return this.GetTokens(new StringReader(text ?? String.Empty));
-		}
-
-		/// <summary>
-		/// Gets a token sequence from the TextReader
-		/// </summary>
-		/// <param name="reader"></param>
-		/// <returns></returns>
-		public IEnumerable<Token<MarkupTokenType>> GetTokens(TextReader reader)
-		{
-			if (reader == null)
-			{
-				throw new ArgumentNullException("reader");
+				this.Dispose(true);
+				GC.SuppressFinalize(this);
 			}
 
-			var xmlReader = XmlReader.Create(reader, this.Settings);
-			XmlTextReader xmlTextReader = xmlReader as XmlTextReader;
-			if (xmlTextReader != null)
+			protected virtual void Dispose(bool disposing)
 			{
-				xmlTextReader.Normalization = false;
-				xmlTextReader.WhitespaceHandling = WhitespaceHandling.All;
-			}
-			return this.GetTokens(xmlReader);
-		}
-
-		/// <summary>
-		/// Gets a token sequence from the XmlReader
-		/// </summary>
-		/// <param name="reader"></param>
-		/// <returns></returns>
-		public IEnumerable<Token<MarkupTokenType>> GetTokens(XmlReader reader)
-		{
-			if (reader == null)
-			{
-				throw new ArgumentNullException("reader");
-			}
-
-			while (true)
-			{
-				// have to isolate try-catch away from yields
-				try
+				if (disposing)
 				{
-					if (!reader.Read())
-					{
-						((IDisposable)reader).Dispose();
-						break;
-					}
+					//((IDisposable)this.Scanner).Dispose();
 				}
-				catch (XmlException ex)
-				{
-					throw new DeserializationException(ex.Message, ex.LinePosition, ex.LineNumber, -1, ex);
-				}
-				catch (Exception ex)
-				{
-					throw new DeserializationException(ex.Message, -1, ex);
-				}
-
-				switch (reader.NodeType)
-				{
-					case XmlNodeType.Element:
-					{
-						DataName tagName = new DataName(reader.LocalName, reader.Prefix, reader.NamespaceURI);
-						bool isVoidTag = reader.IsEmptyElement;
-
-						SortedList<DataName, string> attributes;
-						if (reader.HasAttributes)
-						{
-							attributes = new SortedList<DataName, string>();
-							while (reader.MoveToNextAttribute())
-							{
-								if (String.IsNullOrEmpty(reader.Prefix) && reader.LocalName == "xmlns" ||
-									reader.Prefix == "xmlns")
-								{
-									continue;
-								}
-
-								attributes[new DataName(reader.LocalName, reader.Prefix, reader.NamespaceURI)] = reader.Value;
-							}
-						}
-						else
-						{
-							attributes = null;
-						}
-
-						if (isVoidTag)
-						{
-							yield return MarkupGrammar.TokenElementVoid(tagName);
-						}
-						else
-						{
-							yield return MarkupGrammar.TokenElementBegin(tagName);
-						}
-
-						if (attributes != null)
-						{
-							foreach (var attribute in attributes)
-							{
-								yield return MarkupGrammar.TokenAttribute(attribute.Key);
-								yield return MarkupGrammar.TokenText(attribute.Value);
-							}
-						}
-						break;
-					}
-					case XmlNodeType.EndElement:
-					{
-						yield return MarkupGrammar.TokenElementEnd(new DataName(reader.LocalName, reader.Prefix, reader.NamespaceURI));
-						break;
-					}
-					case XmlNodeType.Attribute:
-					{
-						yield return MarkupGrammar.TokenAttribute(new DataName(reader.Name, reader.Prefix, reader.NamespaceURI, true));
-						yield return MarkupGrammar.TokenText(reader.Value);
-						break;
-					}
-					case XmlNodeType.Text:
-					{
-						yield return MarkupGrammar.TokenText(reader.Value);
-						break;
-					}
-					case XmlNodeType.SignificantWhitespace:
-					case XmlNodeType.Whitespace:
-					{
-						yield return MarkupGrammar.TokenWhitespace(reader.Value);
-						break;
-					}
-					case XmlNodeType.CDATA:
-					{
-						yield return MarkupGrammar.TokenText(reader.Value);
-						break;
-					}
-					case XmlNodeType.Entity:
-					case XmlNodeType.EntityReference:
-					case XmlNodeType.EndEntity:
-					{
-						break;
-					}
-					case XmlNodeType.ProcessingInstruction:
-					case XmlNodeType.XmlDeclaration:
-					{
-						yield return MarkupGrammar.TokenUnparsed("?{0}?", reader.Name+" "+reader.Value);
-						break;
-					}
-					case XmlNodeType.Comment:
-					{
-						yield return MarkupGrammar.TokenUnparsed("!--{0}--", reader.Value);
-						break;
-					}
-					case XmlNodeType.DocumentType:
-					{
-						yield return MarkupGrammar.TokenUnparsed("!DOCTYPE {0}", reader.Value);
-						break;
-					}
-					case XmlNodeType.Notation:
-					{
-						yield return MarkupGrammar.TokenUnparsed("!NOTATION {0}", reader.Value);
-						break;
-					}
-					case XmlNodeType.None:
-					{
-						((IDisposable)reader).Dispose();
-						yield break;
-					}
-					case XmlNodeType.Document:
-					case XmlNodeType.DocumentFragment:
-					default:
-					{
-						continue;
-					}
-				}
-			};
-		}
-
-		#endregion ITextTokenizer<DataTokenType> Members
-
-		#region IDisposable Members
-
-		public void Dispose()
-		{
-			this.Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-
-		protected virtual void Dispose(bool disposing)
-		{
-			if (disposing)
-			{
-				//((IDisposable)this.Scanner).Dispose();
 			}
-		}
 
-		#endregion IDisposable Members
+			#endregion IDisposable Members
+		}
 	}
 }
