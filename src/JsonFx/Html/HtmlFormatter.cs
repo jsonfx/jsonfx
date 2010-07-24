@@ -363,7 +363,7 @@ namespace JsonFx.Html
 			if (this.canonicalForm &&
 				type == MarkupTagType.VoidTag)
 			{
-				// http://www.w3.org/TR/xml-c14n#ProcessingModel
+				// http://www.w3.org/TR/xml-c14n#Terminology
 				this.WriteTag(writer, MarkupTagType.EndTag, tagName, null, null);
 			}
 		}
