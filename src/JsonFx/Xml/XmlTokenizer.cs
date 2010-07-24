@@ -48,7 +48,6 @@ namespace JsonFx.Xml
 	{
 		#region Fields
 
-		private readonly PrefixScopeChain ScopeChain = new PrefixScopeChain();
 		private readonly XmlReaderSettings Settings;
 
 		#endregion Fields
@@ -158,8 +157,6 @@ namespace JsonFx.Xml
 				throw new ArgumentNullException("reader");
 			}
 
-			this.ScopeChain.Clear();
-
 			while (true)
 			{
 				// have to isolate try-catch away from yields
@@ -184,9 +181,7 @@ namespace JsonFx.Xml
 				{
 					case XmlNodeType.Element:
 					{
-						PrefixScopeChain.Scope scope = new PrefixScopeChain.Scope();
-
-						scope.TagName = new DataName(reader.LocalName, reader.Prefix, reader.NamespaceURI);
+						DataName tagName = new DataName(reader.LocalName, reader.Prefix, reader.NamespaceURI);
 						bool isVoidTag = reader.IsEmptyElement;
 
 						SortedList<DataName, string> attributes;
@@ -195,15 +190,9 @@ namespace JsonFx.Xml
 							attributes = new SortedList<DataName, string>();
 							while (reader.MoveToNextAttribute())
 							{
-								if (String.IsNullOrEmpty(reader.Prefix) && reader.LocalName == "xmlns")
+								if (String.IsNullOrEmpty(reader.Prefix) && reader.LocalName == "xmlns" ||
+									reader.Prefix == "xmlns")
 								{
-									scope[String.Empty] = reader.Value;
-									continue;
-								}
-
-								if (reader.Prefix == "xmlns")
-								{
-									scope[reader.LocalName] = reader.Value;
 									continue;
 								}
 
@@ -215,12 +204,7 @@ namespace JsonFx.Xml
 							attributes = null;
 						}
 
-						if (!isVoidTag)
-						{
-							this.ScopeChain.Push(scope);
-						}
-
-						yield return MarkupGrammar.TokenElementBegin(scope.TagName);
+						yield return MarkupGrammar.TokenElementBegin(tagName);
 
 						if (attributes != null)
 						{
@@ -233,22 +217,13 @@ namespace JsonFx.Xml
 
 						if (isVoidTag)
 						{
-							yield return MarkupGrammar.TokenElementEnd(scope.TagName);
+							yield return MarkupGrammar.TokenElementEnd(tagName);
 						}
 						break;
 					}
 					case XmlNodeType.EndElement:
 					{
-						PrefixScopeChain.Scope scope = ScopeChain.Pop();
-
-						// TODO: test scope against reader.Name and .Namespace
-						if ((scope.TagName.NamespaceUri != reader.NamespaceURI) ||
-							(scope.TagName.LocalName != reader.LocalName))
-						{
-							throw new DeserializationException("Unexpected close tag", -1);
-						}
-
-						yield return MarkupGrammar.TokenElementEnd(scope.TagName);
+						yield return MarkupGrammar.TokenElementEnd(new DataName(reader.LocalName, reader.Prefix, reader.NamespaceURI));
 						break;
 					}
 					case XmlNodeType.Attribute:
