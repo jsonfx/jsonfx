@@ -34,7 +34,7 @@ using System.Collections.Generic;
 
 using JsonFx.Serialization;
 
-namespace JsonFx.Xml
+namespace JsonFx.Markup
 {
 	/// <summary>
 	/// Maintains scope chain for namespace prefix mappings
