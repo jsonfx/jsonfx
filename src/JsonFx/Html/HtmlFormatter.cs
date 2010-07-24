@@ -89,7 +89,7 @@ namespace JsonFx.Html
 		private readonly DataWriterSettings Settings;
 		private readonly PrefixScopeChain ScopeChain = new PrefixScopeChain();
 
-		public bool canonicalAttributes;
+		public bool canonicalForm;
 		private EmptyAttributeType emptyAttributes;
 		private bool encodeNonAscii;
 
@@ -116,15 +116,15 @@ namespace JsonFx.Html
 		#region Properties
 
 		/// <summary>
-		/// Gets and sets a value indicating if should canonicalize element attributes
+		/// Gets and sets a value indicating if should emit canonical form
 		/// </summary>
 		/// <remarks>
-		/// http://www.w3.org/TR/xml-c14n#DocumentOrder
+		/// http://www.w3.org/TR/xml-c14n
 		/// </remarks>
-		public bool CanonicalAttributes
+		public bool CanonicalForm
 		{
-			get { return this.canonicalAttributes; }
-			set { this.canonicalAttributes = value; }
+			get { return this.canonicalForm; }
+			set { this.canonicalForm = value; }
 		}
 
 		/// <summary>
@@ -219,7 +219,7 @@ namespace JsonFx.Html
 						{
 							if (attributes == null)
 							{
-								attributes = this.canonicalAttributes ?
+								attributes = this.canonicalForm ?
 									(IDictionary<DataName, Token<MarkupTokenType>>)new SortedList<DataName, Token<MarkupTokenType>>() :
 									(IDictionary<DataName, Token<MarkupTokenType>>)new Dictionary<DataName, Token<MarkupTokenType>>();
 							}
@@ -350,13 +350,22 @@ namespace JsonFx.Html
 				}
 			}
 
-			if (type == MarkupTagType.VoidTag)
+			if (!this.canonicalForm &&
+				type == MarkupTagType.VoidTag)
 			{
-				// "/"
+				// " /"
+				writer.Write(MarkupGrammar.OperatorValueDelim);
 				writer.Write(MarkupGrammar.OperatorElementClose);
 			}
 			// ">"
 			writer.Write(MarkupGrammar.OperatorElementEnd);
+
+			if (this.canonicalForm &&
+				type == MarkupTagType.VoidTag)
+			{
+				// http://www.w3.org/TR/xml-c14n#ProcessingModel
+				this.WriteTag(writer, MarkupTagType.EndTag, tagName, null, null);
+			}
 		}
 
 		private void WriteXmlns(TextWriter writer, string prefix, string namespaceUri)
@@ -654,7 +663,7 @@ namespace JsonFx.Html
 					}
 					case '>':
 					{
-						if (this.canonicalAttributes)
+						if (this.canonicalForm)
 						{
 							// http://www.w3.org/TR/xml-c14n#ProcessingModel
 							continue;
@@ -675,7 +684,7 @@ namespace JsonFx.Html
 					}
 					case '\'':
 					{
-						if (!this.canonicalAttributes)
+						if (!this.canonicalForm)
 						{
 							continue;
 						}

@@ -340,18 +340,17 @@ namespace JsonFx.Html
 		{
 			var input = new[]
 			    {
-			        MarkupGrammar.TokenElementBegin(new DataName("root")),
+			        MarkupGrammar.TokenElementBegin(new DataName("root"), MarkupTagType.VoidTag),
 			        MarkupGrammar.TokenAttribute(new DataName("whitespace")),
 			        MarkupGrammar.TokenText(" this contains whitespace "),
 			        MarkupGrammar.TokenAttribute(new DataName("no-value")),
 			        MarkupGrammar.TokenText(String.Empty),
 			        MarkupGrammar.TokenAttribute(new DataName("anyQuotedText")),
 			        MarkupGrammar.TokenText("/\\\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"),
-			        MarkupGrammar.TokenElementEnd(new DataName("root"))
 			    };
-			const string expected = @"<root whitespace="" this contains whitespace "" no-value anyQuotedText=""/\"+"\uCAFE\uBABE\uAB98\uFCDE\uBCDA\uEF4A"+@"&#x8;&#xC;&#xA;&#xD;&#x9;`1~!@#$%^&amp;*()_+-=[]{}|;:',./&lt;&gt;?""></root>";
+			const string expected = @"<root whitespace="" this contains whitespace "" no-value anyQuotedText=""/\"+"\uCAFE\uBABE\uAB98\uFCDE\uBCDA\uEF4A"+@"&#x8;&#xC;&#xA;&#xD;&#x9;`1~!@#$%^&amp;*()_+-=[]{}|;:',./&lt;&gt;?"" />";
 
-			var formatter = new HtmlFormatter(new DataWriterSettings()) { CanonicalAttributes = false };
+			var formatter = new HtmlFormatter(new DataWriterSettings()) { CanonicalForm = false };
 			var actual = formatter.Format(input);
 
 			Assert.Equal(expected, actual);
@@ -359,22 +358,21 @@ namespace JsonFx.Html
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Format_MultipleAttributesCanonicalAttributes_ReturnsMarkup()
+		public void Format_MultipleAttributesCanonicalForm_ReturnsCanonicalMarkup()
 		{
 			var input = new[]
 			    {
-			        MarkupGrammar.TokenElementBegin(new DataName("root")),
+			        MarkupGrammar.TokenElementBegin(new DataName("root"), MarkupTagType.VoidTag),
 			        MarkupGrammar.TokenAttribute(new DataName("whitespace")),
 			        MarkupGrammar.TokenText(" this contains whitespace "),
 			        MarkupGrammar.TokenAttribute(new DataName("no-value")),
 			        MarkupGrammar.TokenText(String.Empty),
 			        MarkupGrammar.TokenAttribute(new DataName("anyQuotedText")),
-			        MarkupGrammar.TokenText("/\\\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"),
-			        MarkupGrammar.TokenElementEnd(new DataName("root"))
+			        MarkupGrammar.TokenText("/\\\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?")
 			    };
 			const string expected = @"<root anyQuotedText=""/\"+"\uCAFE\uBABE\uAB98\uFCDE\uBCDA\uEF4A"+@"&#x8;&#xC;&#xA;&#xD;&#x9;`1~!@#$%^&amp;*()_+-=[]{}|;:&apos;,./&lt;>?"" no-value whitespace="" this contains whitespace ""></root>";
 
-			var formatter = new HtmlFormatter(new DataWriterSettings()) { CanonicalAttributes = true };
+			var formatter = new HtmlFormatter(new DataWriterSettings()) { CanonicalForm = true };
 			var actual = formatter.Format(input);
 
 			Assert.Equal(expected, actual);
