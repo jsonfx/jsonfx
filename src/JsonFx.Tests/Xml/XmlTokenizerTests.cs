@@ -31,8 +31,8 @@
 using System;
 using System.Linq;
 
+using JsonFx.Markup;
 using JsonFx.Serialization;
-using JsonFx.Serialization.Resolvers;
 using Xunit;
 
 using Assert=JsonFx.AssertPatched;

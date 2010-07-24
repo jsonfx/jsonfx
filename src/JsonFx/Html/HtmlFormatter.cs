@@ -34,8 +34,8 @@ using System.Globalization;
 using System.IO;
 
 using JsonFx.IO;
+using JsonFx.Markup;
 using JsonFx.Serialization;
-using JsonFx.Serialization.Resolvers;
 using JsonFx.Xml;
 
 namespace JsonFx.Html

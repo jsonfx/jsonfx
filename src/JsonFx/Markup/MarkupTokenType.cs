@@ -30,7 +30,7 @@
 
 using System;
 
-namespace JsonFx.Xml
+namespace JsonFx.Markup
 {
 	/// <summary>
 	/// tokens

@@ -32,7 +32,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-using JsonFx.Serialization.Resolvers;
+using JsonFx.Serialization;
 
 namespace JsonFx.Xml
 {

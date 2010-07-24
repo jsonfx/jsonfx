@@ -35,6 +35,7 @@ using System.Text;
 using System.Xml;
 
 using JsonFx.IO;
+using JsonFx.Markup;
 using JsonFx.Serialization;
 
 namespace JsonFx.Xml

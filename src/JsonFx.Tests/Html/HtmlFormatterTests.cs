@@ -30,9 +30,8 @@
 
 using System;
 
+using JsonFx.Markup;
 using JsonFx.Serialization;
-using JsonFx.Serialization.Resolvers;
-using JsonFx.Xml;
 using Xunit;
 
 using Assert=JsonFx.AssertPatched;

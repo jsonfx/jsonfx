@@ -31,9 +31,8 @@
 using System;
 
 using JsonFx.Serialization;
-using JsonFx.Serialization.Resolvers;
 
-namespace JsonFx.Xml
+namespace JsonFx.Markup
 {
 	/// <summary>
 	/// Formal language of tokens and symbols for markup

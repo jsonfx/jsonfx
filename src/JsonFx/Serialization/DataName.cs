@@ -33,7 +33,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 
-namespace JsonFx.Serialization.Resolvers
+namespace JsonFx.Serialization
 {
 	/// <summary>
 	/// Represents a property or document name, and a corresponding namespace URI (or empty string).

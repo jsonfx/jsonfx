@@ -30,12 +30,12 @@
 
 using System;
 
-namespace JsonFx.Xml
+namespace JsonFx.Markup
 {
 	/// <summary>
 	/// Defines types of markup tags
 	/// </summary>
-	internal enum MarkupTagType
+	public enum MarkupTagType
 	{
 		/// <summary>
 		/// Not set

@@ -33,8 +33,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
-using JsonFx.Serialization.Resolvers;
-
 namespace JsonFx.Serialization
 {
 	/// <summary>

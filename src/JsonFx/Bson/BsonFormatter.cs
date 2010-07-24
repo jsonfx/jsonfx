@@ -38,7 +38,6 @@ using System.Text.RegularExpressions;
 using JsonFx.Common;
 using JsonFx.IO;
 using JsonFx.Serialization;
-using JsonFx.Serialization.Resolvers;
 
 namespace JsonFx.Bson
 {

@@ -34,7 +34,6 @@ using System.Text;
 
 using JsonFx.Common;
 using JsonFx.Serialization;
-using JsonFx.Serialization.Resolvers;
 using Xunit;
 
 using Assert=JsonFx.AssertPatched;
