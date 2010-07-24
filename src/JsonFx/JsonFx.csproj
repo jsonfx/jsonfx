@@ -87,9 +87,9 @@
     <Compile Include="IO\CharBuffer.cs" />
     <Compile Include="Json\Resolvers\JsonResolverStrategy.cs" />
     <Compile Include="Markup\MarkupGrammar.cs" />
-    <Compile Include="Markup\MarkupTagType.cs" />
     <Compile Include="Markup\MarkupTokenType.cs" />
     <Compile Include="Markup\PrefixScopeChain.cs" />
+    <Compile Include="Serialization\TransformFormatter`2.cs" />
     <Compile Include="Serialization\DataName.cs" />
     <Compile Include="Serialization\Filters\DataFilter`2.cs" />
     <Compile Include="Serialization\Filters\IDataFilter`2.cs" />

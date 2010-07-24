@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -29,32 +29,56 @@
 #endregion License
 
 using System;
+using System.Collections.Generic;
+using System.IO;
 
-namespace JsonFx.Markup
+namespace JsonFx.Serialization
 {
 	/// <summary>
-	/// Defines types of markup tags
+	/// An <see cref="ITextFormatter<T>"/> which first transforms tokens of a different type
 	/// </summary>
-	public enum MarkupTagType
+	/// <typeparam name="TIn">input token type</typeparam>
+	/// <typeparam name="TOut">output token type</typeparam>
+	internal class TransformFormatter<TIn, TOut> : ITextFormatter<TIn>
 	{
-		/// <summary>
-		/// Not set
-		/// </summary>
-		None,
+		#region Fields
+
+		private readonly ITextFormatter<TOut> Formatter;
+		private readonly IDataTransformer<TIn, TOut> Transformer;
+
+		#endregion Fields
+
+		#region Init
 
 		/// <summary>
-		/// Opening tag
+		/// Ctor
 		/// </summary>
-		BeginTag,
+		/// <param name="formatter"></param>
+		/// <param name="transformer"></param>
+		public TransformFormatter(ITextFormatter<TOut> formatter, IDataTransformer<TIn, TOut> transformer)
+		{
+			this.Formatter = formatter;
+			this.Transformer = transformer;
+		}
 
-		/// <summary>
-		/// Closing tag
-		/// </summary>
-		EndTag,
+		#endregion Init
 
-		/// <summary>
-		/// Empty tag
-		/// </summary>
-		VoidTag
+		#region ITextFormatter<CommonTokenType> Members
+
+		public void Format(TextWriter writer, IEnumerable<Token<TIn>> tokens)
+		{
+			IEnumerable<Token<TOut>> markup = this.Transformer.Transform(tokens);
+
+			this.Formatter.Format(writer, markup);
+		}
+
+		public string Format(IEnumerable<Token<TIn>> tokens)
+		{
+			IEnumerable<Token<TOut>> markup = this.Transformer.Transform(tokens);
+
+			return this.Formatter.Format(markup);
+		}
+
+		#endregion ITextFormatter<CommonTokenType> Members
 	}
 }

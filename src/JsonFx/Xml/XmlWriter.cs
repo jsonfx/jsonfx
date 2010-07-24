@@ -33,6 +33,7 @@ using System.Collections.Generic;
 using System.Text;
 
 using JsonFx.Common;
+using JsonFx.Markup;
 using JsonFx.Serialization;
 using JsonFx.Serialization.Filters;
 
@@ -137,8 +138,7 @@ namespace JsonFx.Xml
 		/// <returns></returns>
 		protected override ITextFormatter<CommonTokenType> GetFormatter()
 		{
-			throw new NotImplementedException();
-			//return new XmlWriter.DataToXmlTransformer(this.Settings);
+			return new TransformFormatter<CommonTokenType, MarkupTokenType>(new XmlFormatter(this.Settings), new DataToXmlTransformer(this.Settings));
 		}
 
 		#endregion DataWriter<DataTokenType> Methods

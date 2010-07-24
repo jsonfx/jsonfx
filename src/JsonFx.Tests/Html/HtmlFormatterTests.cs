@@ -339,7 +339,7 @@ namespace JsonFx.Html
 		{
 			var input = new[]
 			    {
-			        MarkupGrammar.TokenElementBegin(new DataName("root"), MarkupTagType.VoidTag),
+			        MarkupGrammar.TokenElementVoid(new DataName("root")),
 			        MarkupGrammar.TokenAttribute(new DataName("whitespace")),
 			        MarkupGrammar.TokenText(" this contains whitespace "),
 			        MarkupGrammar.TokenAttribute(new DataName("no-value")),
@@ -361,7 +361,7 @@ namespace JsonFx.Html
 		{
 			var input = new[]
 			    {
-			        MarkupGrammar.TokenElementBegin(new DataName("root"), MarkupTagType.VoidTag),
+			        MarkupGrammar.TokenElementVoid(new DataName("root")),
 			        MarkupGrammar.TokenAttribute(new DataName("whitespace")),
 			        MarkupGrammar.TokenText(" this contains whitespace "),
 			        MarkupGrammar.TokenAttribute(new DataName("no-value")),

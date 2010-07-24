@@ -88,17 +88,17 @@ namespace JsonFx.Markup
 
 		public static Token<MarkupTokenType> TokenElementBegin(DataName name)
 		{
-			return new Token<MarkupTokenType>(MarkupTokenType.ElementBegin, name, MarkupTagType.BeginTag);
+			return new Token<MarkupTokenType>(MarkupTokenType.ElementBegin, name);
 		}
 
-		public static Token<MarkupTokenType> TokenElementBegin(DataName name, MarkupTagType tagType)
+		public static Token<MarkupTokenType> TokenElementVoid(DataName name)
 		{
-			return new Token<MarkupTokenType>(MarkupTokenType.ElementBegin, name, tagType);
+			return new Token<MarkupTokenType>(MarkupTokenType.ElementVoid, name);
 		}
 
 		public static Token<MarkupTokenType> TokenElementEnd(DataName name)
 		{
-			return new Token<MarkupTokenType>(MarkupTokenType.ElementEnd, name, MarkupTagType.EndTag);
+			return new Token<MarkupTokenType>(MarkupTokenType.ElementEnd, name);
 		}
 
 		public static Token<MarkupTokenType> TokenAttribute(DataName name)

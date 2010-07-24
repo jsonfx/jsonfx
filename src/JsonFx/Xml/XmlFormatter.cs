@@ -156,6 +156,22 @@ namespace JsonFx.Xml
 								token = stream.Peek();
 								break;
 							}
+							case MarkupTokenType.ElementVoid:
+							{
+								writer.WriteStartElement(token.Name.Prefix, token.Name.LocalName, token.Name.NamespaceUri);
+
+								stream.Pop();
+								token = stream.Peek();
+
+								while (!stream.IsCompleted && token.TokenType == MarkupTokenType.Attribute)
+								{
+									this.FormatAttribute(writer, stream);
+									token = stream.Peek();
+								}
+
+								writer.WriteEndElement();
+								break;
+							}
 							case MarkupTokenType.ElementEnd:
 							{
 								depth--;
@@ -167,46 +183,8 @@ namespace JsonFx.Xml
 							}
 							case MarkupTokenType.Attribute:
 							{
-								writer.WriteStartAttribute(token.Name.Prefix, token.Name.LocalName, token.Name.NamespaceUri);
-
-								stream.Pop();
+								this.FormatAttribute(writer, stream);
 								token = stream.Peek();
-
-								switch (token.TokenType)
-								{
-									case MarkupTokenType.UnparsedBlock:
-									{
-										string format = token.Name.LocalName;
-										if (String.IsNullOrEmpty(format))
-										{
-											writer.WriteRaw(token.ValueAsString());
-										}
-										else
-										{
-											writer.WriteRaw(Char.ToString(MarkupGrammar.OperatorElementBegin));
-											writer.WriteRaw(String.Format(format, token.ValueAsString()));
-											writer.WriteRaw(Char.ToString(MarkupGrammar.OperatorElementEnd));
-										}
-										break;
-									}
-									case MarkupTokenType.TextValue:
-									case MarkupTokenType.Whitespace:
-									{
-										writer.WriteString(token.ValueAsString());
-										break;
-									}
-									default:
-									{
-										throw new TokenException<MarkupTokenType>(
-											token,
-											String.Format(ErrorUnexpectedToken, token));
-									}
-								}
-
-								stream.Pop();
-								token = stream.Peek();
-
-								writer.WriteEndAttribute();
 								break;
 							}
 							case MarkupTokenType.TextValue:
@@ -255,6 +233,50 @@ namespace JsonFx.Xml
 				{
 					throw new TokenException<MarkupTokenType>(token, ex.Message, ex);
 				}
+			}
+
+			private void FormatAttribute(System.Xml.XmlWriter writer, IStream<Token<MarkupTokenType>> stream)
+			{
+				Token<MarkupTokenType> token = stream.Peek();
+				writer.WriteStartAttribute(token.Name.Prefix, token.Name.LocalName, token.Name.NamespaceUri);
+
+				stream.Pop();
+				token = stream.Peek();
+
+				switch (token.TokenType)
+				{
+					case MarkupTokenType.UnparsedBlock:
+					{
+						string format = token.Name.LocalName;
+						if (String.IsNullOrEmpty(format))
+						{
+							writer.WriteRaw(token.ValueAsString());
+						}
+						else
+						{
+							writer.WriteRaw(Char.ToString(MarkupGrammar.OperatorElementBegin));
+							writer.WriteRaw(String.Format(format, token.ValueAsString()));
+							writer.WriteRaw(Char.ToString(MarkupGrammar.OperatorElementEnd));
+						}
+						break;
+					}
+					case MarkupTokenType.TextValue:
+					case MarkupTokenType.Whitespace:
+					{
+						writer.WriteString(token.ValueAsString());
+						break;
+					}
+					default:
+					{
+						throw new TokenException<MarkupTokenType>(
+							token,
+							String.Format(ErrorUnexpectedToken, token));
+					}
+				}
+
+				stream.Pop();
+
+				writer.WriteEndAttribute();
 			}
 
 			#endregion ITextFormatter<MarkupTokenType> Methods

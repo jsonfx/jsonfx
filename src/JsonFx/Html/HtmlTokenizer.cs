@@ -241,10 +241,10 @@ namespace JsonFx.Html
 			}
 
 			char ch = scanner.Peek();
-			MarkupTagType tagType = MarkupTagType.BeginTag;
+			MarkupTokenType tagType = MarkupTokenType.ElementBegin;
 			if (ch == MarkupGrammar.OperatorElementClose)
 			{
-				tagType = MarkupTagType.EndTag;
+				tagType = MarkupTokenType.ElementEnd;
 				scanner.Pop();
 				ch = scanner.Peek();
 			}
@@ -254,7 +254,7 @@ namespace JsonFx.Html
 			{
 				// treat as literal text
 				string text = Char.ToString(MarkupGrammar.OperatorElementBegin);
-				if (tagType == MarkupTagType.EndTag)
+				if (tagType == MarkupTokenType.ElementEnd)
 				{
 					text += MarkupGrammar.OperatorElementClose;
 				}
@@ -655,7 +655,7 @@ namespace JsonFx.Html
 
 		private bool IsTagComplete(
 			ITextStream scanner,
-			ref MarkupTagType tagType)
+			ref MarkupTokenType tagType)
 		{
 			if (scanner.IsCompleted)
 			{
@@ -675,7 +675,7 @@ namespace JsonFx.Html
 					scanner.Pop();
 					if (scanner.Peek() == MarkupGrammar.OperatorElementEnd)
 					{
-						if (tagType != MarkupTagType.BeginTag)
+						if (tagType != MarkupTokenType.ElementBegin)
 						{
 							throw new DeserializationException(
 								"Malformed element tag",
@@ -685,7 +685,7 @@ namespace JsonFx.Html
 						}
 
 						scanner.Pop();
-						tagType = MarkupTagType.VoidTag;
+						tagType = MarkupTokenType.ElementVoid;
 						return true;
 					}
 
@@ -707,11 +707,11 @@ namespace JsonFx.Html
 			}
 		}
 
-		private void EmitTag(List<Token<MarkupTokenType>> tokens, MarkupTagType tagType, QName qName, List<Attrib> attributes)
+		private void EmitTag(List<Token<MarkupTokenType>> tokens, MarkupTokenType tagType, QName qName, List<Attrib> attributes)
 		{
 			PrefixScopeChain.Scope scope;
 
-			if (tagType == MarkupTagType.EndTag)
+			if (tagType == MarkupTokenType.ElementEnd)
 			{
 				DataName closeTagName = new DataName(qName.Name, qName.Prefix, this.ScopeChain.GetNamespace(qName.Prefix, false));
 
@@ -822,7 +822,14 @@ namespace JsonFx.Html
 
 			scope.TagName = new DataName(qName.Name, qName.Prefix, this.ScopeChain.GetNamespace(qName.Prefix, false));
 
-			tokens.Add(MarkupGrammar.TokenElementBegin(scope.TagName, tagType));
+			if (tagType == MarkupTokenType.ElementVoid)
+			{
+				tokens.Add(MarkupGrammar.TokenElementVoid(scope.TagName));
+			}
+			else
+			{
+				tokens.Add(MarkupGrammar.TokenElementBegin(scope.TagName));
+			}
 
 			if (attributes != null)
 			{
@@ -834,7 +841,7 @@ namespace JsonFx.Html
 				}
 			}
 
-			if (tagType == MarkupTagType.VoidTag)
+			if (tagType == MarkupTokenType.ElementVoid)
 			{
 				// immediately remove from scope chain
 				this.ScopeChain.Pop();

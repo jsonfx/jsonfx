@@ -187,32 +187,29 @@ namespace JsonFx.Html
 				switch (token.TokenType)
 				{
 					case MarkupTokenType.ElementBegin:
+					case MarkupTokenType.ElementVoid:
 					{
-						if (scope == null)
-						{
-							scope = new PrefixScopeChain.Scope();
-						}
-
-						if (this.ScopeChain.ContainsNamespace(token.Name.NamespaceUri) ||
-							(String.IsNullOrEmpty(token.Name.NamespaceUri) && !this.ScopeChain.ContainsPrefix(String.Empty)))
-						{
-							string prefix = this.ScopeChain.GetPrefix(token.Name.NamespaceUri, false);
-							scope.TagName = new DataName(token.Name.LocalName, prefix, token.Name.NamespaceUri);
-						}
-						else
-						{
-							scope[token.Name.Prefix] = token.Name.NamespaceUri;
-							scope.TagName = token.Name;
-						}
-
-						this.ScopeChain.Push(scope);
-
-						MarkupTagType tagType = (token.Value is MarkupTagType) ?
-							(MarkupTagType)token.Value :
-							MarkupTagType.BeginTag;
+						DataName tagName = token.Name;
+						MarkupTokenType tagType = token.TokenType;
 
 						stream.Pop();
 						token = stream.Peek();
+
+						scope = new PrefixScopeChain.Scope();
+
+						if (this.ScopeChain.ContainsNamespace(tagName.NamespaceUri) ||
+							(String.IsNullOrEmpty(tagName.NamespaceUri) && !this.ScopeChain.ContainsPrefix(String.Empty)))
+						{
+							string prefix = this.ScopeChain.GetPrefix(tagName.NamespaceUri, false);
+							scope.TagName = new DataName(tagName.LocalName, prefix, tagName.NamespaceUri);
+						}
+						else
+						{
+							scope[tagName.Prefix] = tagName.NamespaceUri;
+							scope.TagName = tagName;
+						}
+
+						this.ScopeChain.Push(scope);
 
 						IDictionary<DataName, Token<MarkupTokenType>> attributes = null;
 						while (!stream.IsCompleted && token.TokenType == MarkupTokenType.Attribute)
@@ -232,7 +229,7 @@ namespace JsonFx.Html
 							}
 
 							if (!this.ScopeChain.ContainsNamespace(attrName.NamespaceUri) &&
-								(!String.IsNullOrEmpty(token.Name.NamespaceUri) || this.ScopeChain.ContainsPrefix(String.Empty)))
+								(!String.IsNullOrEmpty(attrName.NamespaceUri) || this.ScopeChain.ContainsPrefix(String.Empty)))
 							{
 								scope[prefix] = attrName.NamespaceUri;
 							}
@@ -246,14 +243,14 @@ namespace JsonFx.Html
 							token = stream.Peek();
 						}
 
-						this.WriteTag(writer, tagType, scope.TagName, attributes, scope);
+						this.WriteTag(writer, tagType, tagName, attributes, scope);
 
 						scope = null;
 						break;
 					}
 					case MarkupTokenType.ElementEnd:
 					{
-						this.WriteTag(writer, MarkupTagType.EndTag, token.Name, null, null);
+						this.WriteTag(writer, MarkupTokenType.ElementEnd, token.Name, null, null);
 
 						if (this.ScopeChain.HasScope &&
 							this.ScopeChain.Peek().TagName == token.Name)
@@ -302,7 +299,7 @@ namespace JsonFx.Html
 
 		private void WriteTag(
 			TextWriter writer,
-			MarkupTagType type,
+			MarkupTokenType type,
 			DataName tagName,
 			IEnumerable<KeyValuePair<DataName, Token<MarkupTokenType>>> attributes,
 			IEnumerable<KeyValuePair<string, string>> prefixDeclarations)
@@ -311,7 +308,7 @@ namespace JsonFx.Html
 
 			// "<"
 			writer.Write(MarkupGrammar.OperatorElementBegin);
-			if (type == MarkupTagType.EndTag)
+			if (type == MarkupTokenType.ElementEnd)
 			{
 				// "/"
 				writer.Write(MarkupGrammar.OperatorElementClose);
@@ -351,7 +348,7 @@ namespace JsonFx.Html
 			}
 
 			if (!this.canonicalForm &&
-				type == MarkupTagType.VoidTag)
+				type == MarkupTokenType.ElementVoid)
 			{
 				// " /"
 				writer.Write(MarkupGrammar.OperatorValueDelim);
@@ -361,10 +358,10 @@ namespace JsonFx.Html
 			writer.Write(MarkupGrammar.OperatorElementEnd);
 
 			if (this.canonicalForm &&
-				type == MarkupTagType.VoidTag)
+				type == MarkupTokenType.ElementVoid)
 			{
 				// http://www.w3.org/TR/xml-c14n#Terminology
-				this.WriteTag(writer, MarkupTagType.EndTag, tagName, null, null);
+				this.WriteTag(writer, MarkupTokenType.ElementEnd, tagName, null, null);
 			}
 		}
 

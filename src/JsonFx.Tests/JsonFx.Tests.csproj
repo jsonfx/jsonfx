@@ -99,6 +99,7 @@
     <Compile Include="Serialization\TypeCoercionUtilityTests.cs" />
     <Compile Include="Xml\XmlFormatterTests.cs" />
     <Compile Include="Xml\XmlTokenizerTests.cs" />
+    <Compile Include="Xml\XmlWriterTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\JsonFx\JsonFx.csproj">

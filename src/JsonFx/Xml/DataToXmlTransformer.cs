@@ -146,15 +146,15 @@ namespace JsonFx.Xml
 						if (String.IsNullOrEmpty(value))
 						{
 							elementName = this.EnsureName(elementName.IsEmpty ? token.Name : elementName, null);
-							this.EmitTag(output, elementName, null, MarkupTagType.VoidTag);
+							this.EmitTag(output, elementName, null, MarkupTokenType.ElementVoid);
 						}
 						else
 						{
 							elementName = this.EnsureName(elementName.IsEmpty ? token.Name : elementName, token.Value.GetType());
-	
-							this.EmitTag(output, elementName, null, MarkupTagType.BeginTag);
+
+							this.EmitTag(output, elementName, null, MarkupTokenType.ElementBegin);
 							output.Add(MarkupGrammar.TokenText(value));
-							this.EmitTag(output, elementName, null, MarkupTagType.EndTag);
+							this.EmitTag(output, elementName, null, MarkupTokenType.ElementEnd);
 						}
 						break;
 					}
@@ -177,7 +177,7 @@ namespace JsonFx.Xml
 				// TODO: figure out a way to surface XmlArrayItemAttribute name
 				DataName itemName = DataName.Empty;//new DataName("arrayItem");
 
-				this.EmitTag(output, elementName, null, MarkupTagType.BeginTag);
+				this.EmitTag(output, elementName, null, MarkupTokenType.ElementBegin);
 				this.pendingNewLine = true;
 
 				bool needsValueDelim = false;
@@ -200,7 +200,7 @@ namespace JsonFx.Xml
 								this.EmitNewLine(output);
 							}
 
-							this.EmitTag(output, elementName, null, MarkupTagType.EndTag);
+							this.EmitTag(output, elementName, null, MarkupTokenType.ElementEnd);
 							this.pendingNewLine = true;
 							return;
 						}
@@ -279,7 +279,7 @@ namespace JsonFx.Xml
 							{
 								needsEndTag = false;
 								// write out namespaces and attributes
-								this.EmitTag(output, elementName, attributes, MarkupTagType.BeginTag);
+								this.EmitTag(output, elementName, attributes, MarkupTokenType.ElementBegin);
 								this.pendingNewLine = true;
 							}
 
@@ -293,7 +293,7 @@ namespace JsonFx.Xml
 								this.EmitNewLine(output);
 							}
 
-							this.EmitTag(output, elementName, null, MarkupTagType.EndTag);
+							this.EmitTag(output, elementName, null, MarkupTokenType.ElementEnd);
 							this.pendingNewLine = true;
 							return;
 						}
@@ -346,7 +346,7 @@ namespace JsonFx.Xml
 
 									// end attributes with first non-attribute child
 									// write out namespaces and attributes
-									this.EmitTag(output, elementName, attributes, MarkupTagType.BeginTag);
+									this.EmitTag(output, elementName, attributes, MarkupTokenType.ElementBegin);
 									this.pendingNewLine = true;
 								}
 							}
@@ -397,7 +397,7 @@ namespace JsonFx.Xml
 
 			#region Emit MarkupTokenType Methods
 
-			private void EmitTag(List<Token<MarkupTokenType>> output, DataName elementName, SortedList<DataName, string> attributes, MarkupTagType tagType)
+			private void EmitTag(List<Token<MarkupTokenType>> output, DataName elementName, SortedList<DataName, string> attributes, MarkupTokenType tagType)
 			{
 				if (this.pendingNewLine)
 				{
@@ -418,7 +418,25 @@ namespace JsonFx.Xml
 				}
 				this.ScopeChain.Push(scope);
 
-				output.Add(MarkupGrammar.TokenElementBegin(elementName, tagType));
+				switch (tagType)
+				{
+					case MarkupTokenType.ElementVoid:
+					{
+						output.Add(MarkupGrammar.TokenElementVoid(elementName));
+						break;
+					}
+					case MarkupTokenType.ElementEnd:
+					{
+						output.Add(MarkupGrammar.TokenElementEnd(elementName));
+						break;
+					}
+					default:
+					case MarkupTokenType.ElementBegin:
+					{
+						output.Add(MarkupGrammar.TokenElementBegin(elementName));
+						break;
+					}
+				}
 
 				if (attributes != null)
 				{

@@ -320,7 +320,7 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			    {
-			        MarkupGrammar.TokenElementBegin(new DataName("root"), MarkupTagType.VoidTag),
+			        MarkupGrammar.TokenElementVoid(new DataName("root")),
 			        MarkupGrammar.TokenAttribute(new DataName("no-value")),
 			        MarkupGrammar.TokenText(String.Empty),
 			        MarkupGrammar.TokenAttribute(new DataName("whitespace")),

@@ -84,9 +84,18 @@ namespace JsonFx.Markup
 		/// <remarks>
 		/// The token <see cref="Token<CommonTokenType>.Value"/> and <see cref="Token<CommonTokenType>.Name"/> must be left empty.
 		/// The element Name is determined by the <see cref="XmlTokenType.ElementBegin"/> token.
-		/// Marks the end of the last object property as well as the object itself.
+		/// Marks the end of attributes/value pairs, children and the element itself.
 		/// </remarks>
 		ElementEnd,
+
+		/// <summary>
+		/// Marks an element which is self-closing, the token contains the element Name
+		/// </summary>
+		/// <remarks>
+		/// The element <see cref="Token<CommonTokenType>.Name"/> is required.
+		/// Marks an element which has no children but may have trailing attributes/value pairs.
+		/// </remarks>
+		ElementVoid,
 
 		/// <summary>
 		/// Marks the beginning of an attribute, the token contains the attribute Name. The value will be the next token.
