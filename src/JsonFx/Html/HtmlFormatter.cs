@@ -587,15 +587,21 @@ namespace JsonFx.Html
 						entity = "&amp;";
 						break;
 					}
-					//case '\r':
-					//{
-					//    // http://www.w3.org/TR/xml/#sec-line-ends
-					//    entity = "&#xD;";
-					//    break;
-					//}
+					case '\r':
+					{
+						if (!this.canonicalForm)
+						{
+							continue;
+						}
+
+						// Line breaks normalized to '\n'
+						// http://www.w3.org/TR/xml-c14n#Terminology
+						entity = String.Empty;
+						break;
+					}
 					default:
 					{
-						if (((ch < ' ') && (ch != '\n') && (ch != '\r') && (ch != '\t')) ||
+						if (((ch < ' ') && (ch != '\n') && (ch != '\t')) ||
 							(this.encodeNonAscii && (ch >= 0x7F)) ||
 							((ch >= 0x7F) && (ch <= 0x84)) ||
 							((ch >= 0x86) && (ch <= 0x9F)) ||
@@ -617,7 +623,7 @@ namespace JsonFx.Html
 				}
 				start = i+1;
 
-				// use XML named entity
+				// emit XML entity
 				writer.Write(entity);
 			}
 
