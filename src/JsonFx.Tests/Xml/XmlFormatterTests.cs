@@ -321,14 +321,13 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			    {
-			        MarkupGrammar.TokenElementBegin(new DataName("root")),
+			        MarkupGrammar.TokenElementBegin(new DataName("root"), MarkupTagType.VoidTag),
 			        MarkupGrammar.TokenAttribute(new DataName("no-value")),
 			        MarkupGrammar.TokenText(String.Empty),
 			        MarkupGrammar.TokenAttribute(new DataName("whitespace")),
 			        MarkupGrammar.TokenText(" this contains whitespace "),
 			        MarkupGrammar.TokenAttribute(new DataName("anyQuotedText")),
-			        MarkupGrammar.TokenText("/\\\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"),
-			        MarkupGrammar.TokenElementEnd(new DataName("root"))
+			        MarkupGrammar.TokenText("/\\\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?")
 			    };
 			const string expected = @"<root no-value="""" whitespace="" this contains whitespace "" anyQuotedText=""/\"+"\uCAFE\uBABE\uAB98\uFCDE\uBCDA\uEF4A"+@"&#xA;&#xD;&#x9;`1~!@#$%^&amp;*()_+-=[]{}|;:',./&lt;&gt;?"" />";
 
