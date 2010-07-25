@@ -92,6 +92,7 @@
     <Compile Include="Html\HtmlTokenizerTests.cs" />
     <Compile Include="IO\StringStreamTests.cs" />
     <Compile Include="IO\TextReaderStreamTests.cs" />
+    <Compile Include="JsonML\JsonMLReadConverterTests.cs" />
     <Compile Include="Json\JsonWriterTests.cs" />
     <Compile Include="Json\JsonReaderTests.cs" />
     <Compile Include="Json\JsonFormatterTests.cs" />

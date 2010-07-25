@@ -97,11 +97,12 @@ namespace JsonFx.JsonML
 					throw new ArgumentNullException("input");
 				}
 
-				List<Token<CommonTokenType>> output = new List<Token<CommonTokenType>>();
 				IStream<Token<MarkupTokenType>> stream = new Stream<Token<MarkupTokenType>>(input);
 
-				Token<MarkupTokenType> token = stream.Peek();
 				bool needsValueDelim = false;
+				int depth = 0;
+
+				Token<MarkupTokenType> token = stream.Peek();
 				while (!stream.IsCompleted)
 				{
 					switch (token.TokenType)
@@ -109,11 +110,15 @@ namespace JsonFx.JsonML
 						case MarkupTokenType.ElementBegin:
 						case MarkupTokenType.ElementVoid:
 						{
-							bool isVoid = (token.TokenType == MarkupTokenType.ElementVoid);
-							output.Add(CommonGrammar.TokenArrayBeginNoName);
-							output.Add(CommonGrammar.TokenValue(token.Name));
+							if (needsValueDelim)
+							{
+								yield return CommonGrammar.TokenValueDelim;
+								needsValueDelim = false;
+							}
 
-							needsValueDelim = false;
+							bool isVoid = (token.TokenType == MarkupTokenType.ElementVoid);
+							yield return CommonGrammar.TokenArrayBeginNoName;
+							yield return CommonGrammar.TokenValue(token.Name);
 
 							stream.Pop();
 							token = stream.Peek();
@@ -123,14 +128,15 @@ namespace JsonFx.JsonML
 								if (!needsValueDelim)
 								{
 									needsValueDelim = true;
-									output.Add(CommonGrammar.TokenObjectBeginNoName);
+									yield return CommonGrammar.TokenValueDelim;
+									yield return CommonGrammar.TokenObjectBeginNoName;
 								}
 								else
 								{
-									output.Add(CommonGrammar.TokenValueDelim);
+									yield return CommonGrammar.TokenValueDelim;
 								}
 
-								output.Add(CommonGrammar.TokenProperty(token.Name));
+								yield return CommonGrammar.TokenProperty(token.Name);
 
 								stream.Pop();
 								token = stream.Peek();
@@ -140,12 +146,12 @@ namespace JsonFx.JsonML
 									case MarkupTokenType.TextValue:
 									case MarkupTokenType.Whitespace:
 									{
-										output.Add(CommonGrammar.TokenValue(token.Value));
+										yield return CommonGrammar.TokenValue(token.Value);
 										break;
 									}
 									case MarkupTokenType.UnparsedBlock:
 									{
-										output.Add(new Token<CommonTokenType>(CommonTokenType.Primitive, token.Name, token.Value));
+										yield return new Token<CommonTokenType>(CommonTokenType.Primitive, token.Name, token.Value);
 										break;
 									}
 									default:
@@ -162,19 +168,35 @@ namespace JsonFx.JsonML
 
 							if (needsValueDelim)
 							{
-								output.Add(CommonGrammar.TokenObjectEnd);
+								yield return CommonGrammar.TokenObjectEnd;
+							}
+							else
+							{
+								needsValueDelim = true;
 							}
 
 							if (isVoid)
 							{
-								goto case MarkupTokenType.ElementEnd;
+								yield return CommonGrammar.TokenArrayEnd;
+								needsValueDelim = true;
+							}
+							else
+							{
+								depth++;
 							}
 							break;
 						}
 						case MarkupTokenType.ElementEnd:
 						{
-							output.Add(CommonGrammar.TokenArrayEnd);
-							needsValueDelim = true;
+							if (depth > 0)
+							{
+								yield return CommonGrammar.TokenArrayEnd;
+								needsValueDelim = true;
+							}
+							depth--;
+
+							stream.Pop();
+							token = stream.Peek();
 							break;
 						}
 						case MarkupTokenType.TextValue:
@@ -182,18 +204,39 @@ namespace JsonFx.JsonML
 						{
 							if (needsValueDelim)
 							{
-								output.Add(CommonGrammar.TokenValueDelim);
+								yield return CommonGrammar.TokenValueDelim;
 							}
-							output.Add(CommonGrammar.TokenValue(token.Value));
+
+							string value = token.ValueAsString();
+
+							stream.Pop();
+							token = stream.Peek();
+							while (!stream.IsCompleted &&
+								(token.TokenType == MarkupTokenType.TextValue ||
+								token.TokenType == MarkupTokenType.Whitespace))
+							{
+								// concatenate adjacent value nodes
+								value = String.Concat(value, token.ValueAsString());
+
+								stream.Pop();
+								token = stream.Peek();
+							}
+
+							yield return CommonGrammar.TokenValue(value);
+							needsValueDelim = true;
 							break;
 						}
 						case MarkupTokenType.UnparsedBlock:
 						{
 							if (needsValueDelim)
 							{
-								output.Add(CommonGrammar.TokenValueDelim);
+								yield return CommonGrammar.TokenValueDelim;
 							}
-							output.Add(new Token<CommonTokenType>(CommonTokenType.Primitive, token.Name, token.Value));
+							yield return new Token<CommonTokenType>(CommonTokenType.Primitive, token.Name, token.Value);
+							needsValueDelim = true;
+
+							stream.Pop();
+							token = stream.Peek();
 							break;
 						}
 						case MarkupTokenType.Attribute:
@@ -206,7 +249,11 @@ namespace JsonFx.JsonML
 					}
 				}
 
-				return output;
+				while (depth > 0)
+				{
+					depth--;
+					yield return CommonGrammar.TokenArrayEnd;
+				}
 			}
 
 			#endregion IDataTransformer<CommonTokenType, MarkupTokenType> Members
