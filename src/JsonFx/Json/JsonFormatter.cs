@@ -107,6 +107,7 @@ namespace JsonFx.Json
 
 				// allows us to keep basic context without resorting to a push-down automata
 				bool pendingNewLine = false;
+				bool needsValueDelim = false;
 				int depth = 0;
 
 				foreach (Token<CommonTokenType> token in tokens)
@@ -115,6 +116,15 @@ namespace JsonFx.Json
 					{
 						case CommonTokenType.ArrayBegin:
 						{
+							if (needsValueDelim)
+							{
+								writer.Write(JsonGrammar.OperatorValueDelim);
+								if (prettyPrint)
+								{
+									this.WriteLine(writer, depth);
+								}
+							}
+
 							if (pendingNewLine)
 							{
 								if (prettyPrint)
@@ -125,6 +135,7 @@ namespace JsonFx.Json
 							}
 							writer.Write(JsonGrammar.OperatorArrayBegin);
 							pendingNewLine = true;
+							needsValueDelim = false;
 							continue;
 						}
 						case CommonTokenType.ArrayEnd:
@@ -138,10 +149,20 @@ namespace JsonFx.Json
 								this.WriteLine(writer, --depth);
 							}
 							writer.Write(JsonGrammar.OperatorArrayEnd);
+							needsValueDelim = true;
 							continue;
 						}
 						case CommonTokenType.Primitive:
 						{
+							if (needsValueDelim)
+							{
+								writer.Write(JsonGrammar.OperatorValueDelim);
+								if (prettyPrint)
+								{
+									this.WriteLine(writer, depth);
+								}
+							}
+
 							if (pendingNewLine)
 							{
 								if (prettyPrint)
@@ -208,10 +229,20 @@ namespace JsonFx.Json
 								//    break;
 								//}
 							}
+							needsValueDelim = true;
 							continue;
 						}
 						case CommonTokenType.ObjectBegin:
 						{
+							if (needsValueDelim)
+							{
+								writer.Write(JsonGrammar.OperatorValueDelim);
+								if (prettyPrint)
+								{
+									this.WriteLine(writer, depth);
+								}
+							}
+
 							if (pendingNewLine)
 							{
 								if (prettyPrint)
@@ -222,6 +253,7 @@ namespace JsonFx.Json
 							}
 							writer.Write(JsonGrammar.OperatorObjectBegin);
 							pendingNewLine = true;
+							needsValueDelim = false;
 							continue;
 						}
 						case CommonTokenType.ObjectEnd:
@@ -235,10 +267,20 @@ namespace JsonFx.Json
 								this.WriteLine(writer, --depth);
 							}
 							writer.Write(JsonGrammar.OperatorObjectEnd);
+							needsValueDelim = true;
 							continue;
 						}
 						case CommonTokenType.Property:
 						{
+							if (needsValueDelim)
+							{
+								writer.Write(JsonGrammar.OperatorValueDelim);
+								if (prettyPrint)
+								{
+									this.WriteLine(writer, depth);
+								}
+							}
+
 							if (pendingNewLine)
 							{
 								if (prettyPrint)
@@ -262,15 +304,12 @@ namespace JsonFx.Json
 							{
 								writer.Write(JsonGrammar.OperatorPairDelim);
 							}
+							needsValueDelim = false;
 							continue;
 						}
 						case CommonTokenType.ValueDelim:
 						{
-							writer.Write(JsonGrammar.OperatorValueDelim);
-							if (prettyPrint)
-							{
-								this.WriteLine(writer, depth);
-							}
+							// ignore
 							continue;
 						}
 						case CommonTokenType.None:
