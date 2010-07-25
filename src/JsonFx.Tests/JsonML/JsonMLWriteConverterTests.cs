@@ -40,12 +40,12 @@ using Assert=JsonFx.AssertPatched;
 
 namespace JsonFx.JsonML
 {
-	public class JsonMLReadConverterTests
+	public class JsonMLWriteConverterTests
 	{
 		#region Constants
 
 		private const string TraitName = "JsonML";
-		private const string TraitValue = "Deserialization";
+		private const string TraitValue = "Serialization";
 
 		#endregion Constants
 
@@ -57,17 +57,17 @@ namespace JsonFx.JsonML
 		{
 			var input = new[]
 			    {
-			        MarkupGrammar.TokenElementBegin(new DataName("root")),
-			        MarkupGrammar.TokenElementEnd(new DataName("root"))
-			    };
-			var expected = new[]
-			    {
 			        CommonGrammar.TokenArrayBeginNoName,
 			        CommonGrammar.TokenValue(new DataName("root")),
 			        CommonGrammar.TokenArrayEnd
 			    };
+			var expected = new[]
+			    {
+			        MarkupGrammar.TokenElementBegin(new DataName("root")),
+			        MarkupGrammar.TokenElementEnd(new DataName("root"))
+			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -79,16 +79,16 @@ namespace JsonFx.JsonML
 		{
 			var input = new[]
 			    {
-			        MarkupGrammar.TokenElementVoid(new DataName("root"))
-			    };
-			var expected = new[]
-			    {
 			        CommonGrammar.TokenArrayBeginNoName,
 			        CommonGrammar.TokenValue(new DataName("root")),
 			        CommonGrammar.TokenArrayEnd
 			    };
+			var expected = new[]
+			    {
+			        MarkupGrammar.TokenElementVoid(new DataName("root"))
+			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -103,18 +103,18 @@ namespace JsonFx.JsonML
 		public void GetTokens_DefaultNamespaceTag_ReturnsSequence()
 		{
 			var input = new[]
-			    {
-			        MarkupGrammar.TokenElementBegin(new DataName("root", String.Empty, "http://example.com/schema")),
-			        MarkupGrammar.TokenElementEnd(new DataName("root", String.Empty, "http://example.com/schema")),
-			    };
-			var expected = new[]
 				{
 					CommonGrammar.TokenArrayBeginNoName,
 					CommonGrammar.TokenValue(new DataName("root", String.Empty, "http://example.com/schema")),
 					CommonGrammar.TokenArrayEnd
 				};
+			var expected = new[]
+			    {
+			        MarkupGrammar.TokenElementBegin(new DataName("root", String.Empty, "http://example.com/schema")),
+			        MarkupGrammar.TokenElementEnd(new DataName("root", String.Empty, "http://example.com/schema")),
+			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -125,18 +125,18 @@ namespace JsonFx.JsonML
 		public void GetTokens_NamespacePrefixTag_ReturnsSequence()
 		{
 			var input = new[]
-			    {
-			        MarkupGrammar.TokenElementBegin(new DataName("root", "prefix", "http://example.com/schema")),
-			        MarkupGrammar.TokenElementEnd(new DataName("root", "prefix", "http://example.com/schema")),
-			    };
-			var expected = new[]
 				{
 					CommonGrammar.TokenArrayBeginNoName,
 					CommonGrammar.TokenValue(new DataName("root", "prefix", "http://example.com/schema")),
 					CommonGrammar.TokenArrayEnd
 				};
+			var expected = new[]
+			    {
+			        MarkupGrammar.TokenElementBegin(new DataName("root", "prefix", "http://example.com/schema")),
+			        MarkupGrammar.TokenElementEnd(new DataName("root", "prefix", "http://example.com/schema")),
+			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -147,14 +147,6 @@ namespace JsonFx.JsonML
 		public void GetTokens_NamespacedChildTag_ReturnsSequence()
 		{
 			var input = new[]
-			    {
-			        MarkupGrammar.TokenElementBegin(new DataName("foo")),
-			        MarkupGrammar.TokenElementBegin(new DataName("child", String.Empty, "http://example.com/schema")),
-			        MarkupGrammar.TokenText("value"),
-			        MarkupGrammar.TokenElementEnd(new DataName("child", String.Empty, "http://example.com/schema")),
-			        MarkupGrammar.TokenElementEnd(new DataName("foo"))
-			    };
-			var expected = new[]
 				{
 					CommonGrammar.TokenArrayBeginNoName,
 					CommonGrammar.TokenValue(new DataName("foo")),
@@ -166,8 +158,16 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenArrayEnd,
 					CommonGrammar.TokenArrayEnd
 				};
+			var expected = new[]
+			    {
+			        MarkupGrammar.TokenElementBegin(new DataName("foo")),
+			        MarkupGrammar.TokenElementBegin(new DataName("child", String.Empty, "http://example.com/schema")),
+			        MarkupGrammar.TokenText("value"),
+			        MarkupGrammar.TokenElementEnd(new DataName("child", String.Empty, "http://example.com/schema")),
+			        MarkupGrammar.TokenElementEnd(new DataName("foo"))
+			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -178,14 +178,6 @@ namespace JsonFx.JsonML
 		public void GetTokens_ParentAndChildShareDefaultNamespace_ReturnsSequence()
 		{
 			var input = new[]
-			    {
-			        MarkupGrammar.TokenElementBegin(new DataName("foo", String.Empty, "http://example.org")),
-			        MarkupGrammar.TokenElementBegin(new DataName("child", String.Empty, "http://example.org")),
-			        MarkupGrammar.TokenText("value"),
-			        MarkupGrammar.TokenElementEnd(new DataName("child", String.Empty, "http://example.org")),
-			        MarkupGrammar.TokenElementEnd(new DataName("foo", String.Empty, "http://example.org")),
-			    };
-			var expected = new[]
 				{
 					CommonGrammar.TokenArrayBeginNoName,
 					CommonGrammar.TokenValue(new DataName("foo", String.Empty, "http://example.org")),
@@ -197,8 +189,16 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenArrayEnd,
 					CommonGrammar.TokenArrayEnd
 				};
+			var expected = new[]
+			    {
+			        MarkupGrammar.TokenElementBegin(new DataName("foo", String.Empty, "http://example.org")),
+			        MarkupGrammar.TokenElementBegin(new DataName("child", String.Empty, "http://example.org")),
+			        MarkupGrammar.TokenText("value"),
+			        MarkupGrammar.TokenElementEnd(new DataName("child", String.Empty, "http://example.org")),
+			        MarkupGrammar.TokenElementEnd(new DataName("foo", String.Empty, "http://example.org")),
+			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -209,14 +209,6 @@ namespace JsonFx.JsonML
 		public void GetTokens_ParentAndChildSharePrefixedNamespace_ReturnsSequence()
 		{
 			var input = new[]
-			    {
-			        MarkupGrammar.TokenElementBegin(new DataName("foo", "bar", "http://example.org")),
-			        MarkupGrammar.TokenElementBegin(new DataName("child", "bar", "http://example.org")),
-			        MarkupGrammar.TokenText("value"),
-			        MarkupGrammar.TokenElementEnd(new DataName("child", "bar", "http://example.org")),
-			        MarkupGrammar.TokenElementEnd(new DataName("foo", "bar", "http://example.org")),
-			    };
-			var expected = new[]
 				{
 					CommonGrammar.TokenArrayBeginNoName,
 					CommonGrammar.TokenValue(new DataName("foo", "bar", "http://example.org")),
@@ -228,8 +220,16 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenArrayEnd,
 					CommonGrammar.TokenArrayEnd
 				};
+			var expected = new[]
+			    {
+			        MarkupGrammar.TokenElementBegin(new DataName("foo", "bar", "http://example.org")),
+			        MarkupGrammar.TokenElementBegin(new DataName("child", "bar", "http://example.org")),
+			        MarkupGrammar.TokenText("value"),
+			        MarkupGrammar.TokenElementEnd(new DataName("child", "bar", "http://example.org")),
+			        MarkupGrammar.TokenElementEnd(new DataName("foo", "bar", "http://example.org")),
+			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -240,14 +240,6 @@ namespace JsonFx.JsonML
 		public void GetTokens_ParentAndChildDifferentDefaultNamespaces_ReturnsSequence()
 		{
 			var input = new[]
-			    {
-			        MarkupGrammar.TokenElementBegin(new DataName("foo", String.Empty, "http://json.org")),
-			        MarkupGrammar.TokenElementBegin(new DataName("child", String.Empty, "http://jsonfx.net")),
-			        MarkupGrammar.TokenText("text value"),
-			        MarkupGrammar.TokenElementEnd(new DataName("child", String.Empty, "http://jsonfx.net")),
-			        MarkupGrammar.TokenElementEnd(new DataName("foo", String.Empty, "http://json.org"))
-			    };
-			var expected = new[]
 				{
 					CommonGrammar.TokenArrayBeginNoName,
 					CommonGrammar.TokenValue(new DataName("foo", String.Empty, "http://json.org")),
@@ -259,8 +251,16 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenArrayEnd,
 					CommonGrammar.TokenArrayEnd
 				};
+			var expected = new[]
+			    {
+			        MarkupGrammar.TokenElementBegin(new DataName("foo", String.Empty, "http://json.org")),
+			        MarkupGrammar.TokenElementBegin(new DataName("child", String.Empty, "http://jsonfx.net")),
+			        MarkupGrammar.TokenText("text value"),
+			        MarkupGrammar.TokenElementEnd(new DataName("child", String.Empty, "http://jsonfx.net")),
+			        MarkupGrammar.TokenElementEnd(new DataName("foo", String.Empty, "http://json.org"))
+			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -271,12 +271,6 @@ namespace JsonFx.JsonML
 		public void GetTokens_DifferentPrefixSameNamespace_ReturnsSequence()
 		{
 			var input = new[]
-			    {
-			        MarkupGrammar.TokenElementVoid(new DataName("foo", String.Empty, "http://example.org")),
-			        MarkupGrammar.TokenAttribute(new DataName("key", "blah", "http://example.org")),
-			        MarkupGrammar.TokenText("value")
-			    };
-			var expected = new[]
 				{
 					CommonGrammar.TokenArrayBeginNoName,
 					CommonGrammar.TokenValue(new DataName("foo", String.Empty, "http://example.org")),
@@ -287,8 +281,14 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenObjectEnd,
 					CommonGrammar.TokenArrayEnd
 				};
+			var expected = new[]
+			    {
+			        MarkupGrammar.TokenElementVoid(new DataName("foo", String.Empty, "http://example.org")),
+			        MarkupGrammar.TokenAttribute(new DataName("key", "blah", "http://example.org")),
+			        MarkupGrammar.TokenText("value")
+			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -299,19 +299,6 @@ namespace JsonFx.JsonML
 		public void GetTokens_NestedDefaultNamespaces_ReturnsSequence()
 		{
 			var input = new[]
-			    {
-			        MarkupGrammar.TokenElementBegin(new DataName("outer", String.Empty, "http://example.org/outer")),
-			        MarkupGrammar.TokenElementBegin(new DataName("middle-1", String.Empty, "http://example.org/inner")),
-			        MarkupGrammar.TokenElementBegin(new DataName("inner", String.Empty, "http://example.org/inner")),
-			        MarkupGrammar.TokenText("this should be inner"),
-			        MarkupGrammar.TokenElementEnd(new DataName("inner", String.Empty, "http://example.org/inner")),
-			        MarkupGrammar.TokenElementEnd(new DataName("middle-1", String.Empty, "http://example.org/inner")),
-			        MarkupGrammar.TokenElementBegin(new DataName("middle-2", String.Empty, "http://example.org/outer")),
-			        MarkupGrammar.TokenText("this should be outer"),
-			        MarkupGrammar.TokenElementEnd(new DataName("middle-2", String.Empty, "http://example.org/outer")),
-			        MarkupGrammar.TokenElementEnd(new DataName("outer", String.Empty, "http://example.org/outer"))
-			    };
-			var expected = new[]
 				{
 					CommonGrammar.TokenArrayBeginNoName,
 					CommonGrammar.TokenValue(new DataName("outer", String.Empty, "http://example.org/outer")),
@@ -333,8 +320,21 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenArrayEnd,
 					CommonGrammar.TokenArrayEnd
 				};
+			var expected = new[]
+			    {
+			        MarkupGrammar.TokenElementBegin(new DataName("outer", String.Empty, "http://example.org/outer")),
+			        MarkupGrammar.TokenElementBegin(new DataName("middle-1", String.Empty, "http://example.org/inner")),
+			        MarkupGrammar.TokenElementBegin(new DataName("inner", String.Empty, "http://example.org/inner")),
+			        MarkupGrammar.TokenText("this should be inner"),
+			        MarkupGrammar.TokenElementEnd(new DataName("inner", String.Empty, "http://example.org/inner")),
+			        MarkupGrammar.TokenElementEnd(new DataName("middle-1", String.Empty, "http://example.org/inner")),
+			        MarkupGrammar.TokenElementBegin(new DataName("middle-2", String.Empty, "http://example.org/outer")),
+			        MarkupGrammar.TokenText("this should be outer"),
+			        MarkupGrammar.TokenElementEnd(new DataName("middle-2", String.Empty, "http://example.org/outer")),
+			        MarkupGrammar.TokenElementEnd(new DataName("outer", String.Empty, "http://example.org/outer"))
+			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -345,15 +345,6 @@ namespace JsonFx.JsonML
 		public void GetTokens_UndeclaredPrefixes_ReturnsDefault()
 		{
 			var input = new[]
-			    {
-			        MarkupGrammar.TokenElementBegin(new DataName("one")),
-			        MarkupGrammar.TokenElementBegin(new DataName("two")),
-			        MarkupGrammar.TokenElementBegin(new DataName("three")),
-			        MarkupGrammar.TokenElementEnd(new DataName("three")),
-			        MarkupGrammar.TokenElementEnd(new DataName("two")),
-			        MarkupGrammar.TokenElementEnd(new DataName("one"))
-			    };
-			var expected = new[]
 				{
 					CommonGrammar.TokenArrayBeginNoName,
 					CommonGrammar.TokenValue(new DataName("one")),
@@ -367,8 +358,17 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenArrayEnd,
 					CommonGrammar.TokenArrayEnd
 				};
+			var expected = new[]
+			    {
+			        MarkupGrammar.TokenElementBegin(new DataName("one")),
+			        MarkupGrammar.TokenElementBegin(new DataName("two")),
+			        MarkupGrammar.TokenElementBegin(new DataName("three")),
+			        MarkupGrammar.TokenElementEnd(new DataName("three")),
+			        MarkupGrammar.TokenElementEnd(new DataName("two")),
+			        MarkupGrammar.TokenElementEnd(new DataName("one"))
+			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -383,13 +383,6 @@ namespace JsonFx.JsonML
 		public void GetTokens_SingleAttribute_ReturnsSequence()
 		{
 			var input = new[]
-			    {
-			        MarkupGrammar.TokenElementBegin(new DataName("root")),
-			        MarkupGrammar.TokenAttribute(new DataName("attrName")),
-			        MarkupGrammar.TokenText("attrValue"),
-			        MarkupGrammar.TokenElementEnd(new DataName("root"))
-			    };
-			var expected = new[]
 				{
 					CommonGrammar.TokenArrayBeginNoName,
 					CommonGrammar.TokenValue(new DataName("root")),
@@ -400,8 +393,15 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenObjectEnd,
 					CommonGrammar.TokenArrayEnd
 				};
+			var expected = new[]
+			    {
+			        MarkupGrammar.TokenElementBegin(new DataName("root")),
+			        MarkupGrammar.TokenAttribute(new DataName("attrName")),
+			        MarkupGrammar.TokenText("attrValue"),
+			        MarkupGrammar.TokenElementEnd(new DataName("root"))
+			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -412,13 +412,6 @@ namespace JsonFx.JsonML
 		public void GetTokens_SingleEmptyAttributeHtmlStyle_ReturnsSequence()
 		{
 			var input = new[]
-			    {
-			        MarkupGrammar.TokenElementBegin(new DataName("root")),
-			        MarkupGrammar.TokenAttribute(new DataName("noValue")),
-			        MarkupGrammar.TokenText(String.Empty),
-			        MarkupGrammar.TokenElementEnd(new DataName("root"))
-			    };
-			var expected = new[]
 				{
 					CommonGrammar.TokenArrayBeginNoName,
 					CommonGrammar.TokenValue(new DataName("root")),
@@ -429,8 +422,15 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenObjectEnd,
 					CommonGrammar.TokenArrayEnd
 				};
+			var expected = new[]
+			    {
+			        MarkupGrammar.TokenElementBegin(new DataName("root")),
+			        MarkupGrammar.TokenAttribute(new DataName("noValue")),
+			        MarkupGrammar.TokenText(String.Empty),
+			        MarkupGrammar.TokenElementEnd(new DataName("root"))
+			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -441,13 +441,6 @@ namespace JsonFx.JsonML
 		public void GetTokens_SingleEmptyAttributeXmlStyle_ReturnsSequence()
 		{
 			var input = new[]
-			    {
-			        MarkupGrammar.TokenElementBegin(new DataName("root")),
-			        MarkupGrammar.TokenAttribute(new DataName("noValue")),
-			        MarkupGrammar.TokenText(String.Empty),
-			        MarkupGrammar.TokenElementEnd(new DataName("root"))
-			    };
-			var expected = new[]
 				{
 					CommonGrammar.TokenArrayBeginNoName,
 					CommonGrammar.TokenValue(new DataName("root")),
@@ -458,8 +451,15 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenObjectEnd,
 					CommonGrammar.TokenArrayEnd
 				};
+			var expected = new[]
+			    {
+			        MarkupGrammar.TokenElementBegin(new DataName("root")),
+			        MarkupGrammar.TokenAttribute(new DataName("noValue")),
+			        MarkupGrammar.TokenText(String.Empty),
+			        MarkupGrammar.TokenElementEnd(new DataName("root"))
+			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -470,13 +470,6 @@ namespace JsonFx.JsonML
 		public void GetTokens_SingleAttributeEmptyValue_ReturnsSequence()
 		{
 			var input = new[]
-			    {
-			        MarkupGrammar.TokenElementBegin(new DataName("root")),
-			        MarkupGrammar.TokenAttribute(new DataName("emptyValue")),
-			        MarkupGrammar.TokenText(String.Empty),
-			        MarkupGrammar.TokenElementEnd(new DataName("root"))
-			    };
-			var expected = new[]
 				{
 					CommonGrammar.TokenArrayBeginNoName,
 					CommonGrammar.TokenValue(new DataName("root")),
@@ -487,8 +480,15 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenObjectEnd,
 					CommonGrammar.TokenArrayEnd
 				};
+			var expected = new[]
+			    {
+			        MarkupGrammar.TokenElementBegin(new DataName("root")),
+			        MarkupGrammar.TokenAttribute(new DataName("emptyValue")),
+			        MarkupGrammar.TokenText(String.Empty),
+			        MarkupGrammar.TokenElementEnd(new DataName("root"))
+			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -499,13 +499,6 @@ namespace JsonFx.JsonML
 		public void GetTokens_AttributeWhitespaceQuotDelims_ReturnsSequence()
 		{
 			var input = new[]
-			    {
-			        MarkupGrammar.TokenElementBegin(new DataName("root")),
-			        MarkupGrammar.TokenAttribute(new DataName("white")),
-			        MarkupGrammar.TokenText(" extra whitespace around quote delims "),
-			        MarkupGrammar.TokenElementEnd(new DataName("root"))
-			    };
-			var expected = new[]
 				{
 					CommonGrammar.TokenArrayBeginNoName,
 					CommonGrammar.TokenValue(new DataName("root")),
@@ -516,8 +509,15 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenObjectEnd,
 					CommonGrammar.TokenArrayEnd
 				};
+			var expected = new[]
+			    {
+			        MarkupGrammar.TokenElementBegin(new DataName("root")),
+			        MarkupGrammar.TokenAttribute(new DataName("white")),
+			        MarkupGrammar.TokenText(" extra whitespace around quote delims "),
+			        MarkupGrammar.TokenElementEnd(new DataName("root"))
+			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -528,17 +528,6 @@ namespace JsonFx.JsonML
 		public void GetTokens_MultipleAttributes_ReturnsSequence()
 		{
 			var input = new[]
-			    {
-			        MarkupGrammar.TokenElementBegin(new DataName("root")),
-			        MarkupGrammar.TokenAttribute(new DataName("no-value")),
-			        MarkupGrammar.TokenText(String.Empty),
-			        MarkupGrammar.TokenAttribute(new DataName("whitespace")),
-			        MarkupGrammar.TokenText(" this contains whitespace "),
-			        MarkupGrammar.TokenAttribute(new DataName("anyQuotedText")),
-			        MarkupGrammar.TokenText("/\\\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"),
-			        MarkupGrammar.TokenElementEnd(new DataName("root"))
-			    };
-			var expected = new[]
 				{
 					CommonGrammar.TokenArrayBeginNoName,
 					CommonGrammar.TokenValue(new DataName("root")),
@@ -555,8 +544,19 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenObjectEnd,
 					CommonGrammar.TokenArrayEnd
 				};
+			var expected = new[]
+			    {
+			        MarkupGrammar.TokenElementBegin(new DataName("root")),
+			        MarkupGrammar.TokenAttribute(new DataName("no-value")),
+			        MarkupGrammar.TokenText(String.Empty),
+			        MarkupGrammar.TokenAttribute(new DataName("whitespace")),
+			        MarkupGrammar.TokenText(" this contains whitespace "),
+			        MarkupGrammar.TokenAttribute(new DataName("anyQuotedText")),
+			        MarkupGrammar.TokenText("/\\\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"),
+			        MarkupGrammar.TokenElementEnd(new DataName("root"))
+			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -571,15 +571,15 @@ namespace JsonFx.JsonML
 		public void GetTokens_XmlEntityLt_ReturnsSequence()
 		{
 			var input = new[]
-			    {
-			        MarkupGrammar.TokenText("<")
-			    };
-			var expected = new[]
 				{
 					CommonGrammar.TokenValue("<")
 				};
+			var expected = new[]
+			    {
+			        MarkupGrammar.TokenText("<")
+			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -590,16 +590,15 @@ namespace JsonFx.JsonML
 		public void GetTokens_EntityWithLeadingText_ReturnsSequence()
 		{
 			var input = new[]
-			    {
-			        MarkupGrammar.TokenText("leading"),
-			        MarkupGrammar.TokenText("&")
-			    };
-			var expected = new[]
 				{
 					CommonGrammar.TokenValue("leading&")
 				};
+			var expected = new[]
+			    {
+			        MarkupGrammar.TokenText("leading&")
+			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -610,16 +609,15 @@ namespace JsonFx.JsonML
 		public void GetTokens_EntityWithTrailingText_ReturnsSequence()
 		{
 			var input = new[]
-			    {
-			        MarkupGrammar.TokenText("&"),
-			        MarkupGrammar.TokenText("trailing")
-			    };
-			var expected = new[]
 				{
 					CommonGrammar.TokenValue("&trailing")
 				};
+			var expected = new[]
+			    {
+			        MarkupGrammar.TokenText("&trailing")
+			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -630,21 +628,15 @@ namespace JsonFx.JsonML
 		public void GetTokens_MixedEntities_ReturnsSequence()
 		{
 			var input = new[]
-			    {
-			        MarkupGrammar.TokenText(@"there should "),
-			        MarkupGrammar.TokenText(@"<"),
-			        MarkupGrammar.TokenText(@"b"),
-			        MarkupGrammar.TokenText(@">"),
-			        MarkupGrammar.TokenText(@"e decoded chars "),
-			        MarkupGrammar.TokenText(@"&"),
-			        MarkupGrammar.TokenText(@" inside this text")
-			    };
-			var expected = new[]
 				{
 			        CommonGrammar.TokenValue(@"there should <b>e decoded chars & inside this text")
 				};
+			var expected = new[]
+			    {
+			        MarkupGrammar.TokenText(@"there should <b>e decoded chars & inside this text")
+			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -659,25 +651,6 @@ namespace JsonFx.JsonML
 		public void GetTokens_HtmlContent_ReturnsSequence()
 		{
 			var input = new[]
-			    {
-			        MarkupGrammar.TokenElementBegin(new DataName("div")),
-			        MarkupGrammar.TokenAttribute(new DataName("class")),
-			        MarkupGrammar.TokenText("content"),
-			        MarkupGrammar.TokenElementBegin(new DataName("p")),
-			        MarkupGrammar.TokenAttribute(new DataName("style")),
-			        MarkupGrammar.TokenText("color:red"),
-			        MarkupGrammar.TokenElementBegin(new DataName("strong")),
-			        MarkupGrammar.TokenText("Lorem ipsum"),
-			        MarkupGrammar.TokenElementEnd(new DataName("strong")),
-			        MarkupGrammar.TokenText(" dolor sit amet, "),
-			        MarkupGrammar.TokenElementBegin(new DataName("i")),
-			        MarkupGrammar.TokenText("consectetur"),
-			        MarkupGrammar.TokenElementEnd(new DataName("i")),
-			        MarkupGrammar.TokenText(" adipiscing elit."),
-			        MarkupGrammar.TokenElementEnd(new DataName("p")),
-					MarkupGrammar.TokenElementEnd(new DataName("div")),
-			    };
-			var expected = new[]
 				{
 					CommonGrammar.TokenArrayBeginNoName,
 					CommonGrammar.TokenValue(new DataName("div")),
@@ -713,8 +686,27 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenArrayEnd,
 					CommonGrammar.TokenArrayEnd
 				};
+			var expected = new[]
+			    {
+			        MarkupGrammar.TokenElementBegin(new DataName("div")),
+			        MarkupGrammar.TokenAttribute(new DataName("class")),
+			        MarkupGrammar.TokenText("content"),
+			        MarkupGrammar.TokenElementBegin(new DataName("p")),
+			        MarkupGrammar.TokenAttribute(new DataName("style")),
+			        MarkupGrammar.TokenText("color:red"),
+			        MarkupGrammar.TokenElementBegin(new DataName("strong")),
+			        MarkupGrammar.TokenText("Lorem ipsum"),
+			        MarkupGrammar.TokenElementEnd(new DataName("strong")),
+			        MarkupGrammar.TokenText(" dolor sit amet, "),
+			        MarkupGrammar.TokenElementBegin(new DataName("i")),
+			        MarkupGrammar.TokenText("consectetur"),
+			        MarkupGrammar.TokenElementEnd(new DataName("i")),
+			        MarkupGrammar.TokenText(" adipiscing elit."),
+			        MarkupGrammar.TokenElementEnd(new DataName("p")),
+					MarkupGrammar.TokenElementEnd(new DataName("div")),
+			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -725,28 +717,6 @@ namespace JsonFx.JsonML
 		public void GetTokens_HtmlContentPrettyPrinted_ReturnsSequence()
 		{
 			var input = new[]
-			    {
-			        MarkupGrammar.TokenElementBegin(new DataName("div")),
-			        MarkupGrammar.TokenAttribute(new DataName("class")),
-			        MarkupGrammar.TokenText("content"),
-			        MarkupGrammar.TokenWhitespace("\r\n\t"),
-			        MarkupGrammar.TokenElementBegin(new DataName("p")),
-			        MarkupGrammar.TokenAttribute(new DataName("style")),
-			        MarkupGrammar.TokenText("color:red"),
-			        MarkupGrammar.TokenWhitespace("\r\n\t\t"),
-			        MarkupGrammar.TokenElementBegin(new DataName("strong")),
-			        MarkupGrammar.TokenText("Lorem ipsum"),
-			        MarkupGrammar.TokenElementEnd(new DataName("strong")),
-			        MarkupGrammar.TokenText(" dolor sit amet, "),
-			        MarkupGrammar.TokenElementBegin(new DataName("i")),
-			        MarkupGrammar.TokenText("consectetur"),
-			        MarkupGrammar.TokenElementEnd(new DataName("i")),
-			        MarkupGrammar.TokenText(" adipiscing elit.\r\n\t"),
-			        MarkupGrammar.TokenElementEnd(new DataName("p")),
-			        MarkupGrammar.TokenWhitespace("\r\n"),
-					MarkupGrammar.TokenElementEnd(new DataName("div")),
-			    };
-			var expected = new[]
 				{
 					CommonGrammar.TokenArrayBeginNoName,
 					CommonGrammar.TokenValue(new DataName("div")),
@@ -788,8 +758,30 @@ namespace JsonFx.JsonML
 			        CommonGrammar.TokenValue("\r\n"),
 					CommonGrammar.TokenArrayEnd
 				};
+			var expected = new[]
+			    {
+			        MarkupGrammar.TokenElementBegin(new DataName("div")),
+			        MarkupGrammar.TokenAttribute(new DataName("class")),
+			        MarkupGrammar.TokenText("content"),
+			        MarkupGrammar.TokenWhitespace("\r\n\t"),
+			        MarkupGrammar.TokenElementBegin(new DataName("p")),
+			        MarkupGrammar.TokenAttribute(new DataName("style")),
+			        MarkupGrammar.TokenText("color:red"),
+			        MarkupGrammar.TokenWhitespace("\r\n\t\t"),
+			        MarkupGrammar.TokenElementBegin(new DataName("strong")),
+			        MarkupGrammar.TokenText("Lorem ipsum"),
+			        MarkupGrammar.TokenElementEnd(new DataName("strong")),
+			        MarkupGrammar.TokenText(" dolor sit amet, "),
+			        MarkupGrammar.TokenElementBegin(new DataName("i")),
+			        MarkupGrammar.TokenText("consectetur"),
+			        MarkupGrammar.TokenElementEnd(new DataName("i")),
+			        MarkupGrammar.TokenText(" adipiscing elit.\r\n\t"),
+			        MarkupGrammar.TokenElementEnd(new DataName("p")),
+			        MarkupGrammar.TokenWhitespace("\r\n"),
+					MarkupGrammar.TokenElementEnd(new DataName("div")),
+			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -805,15 +797,6 @@ namespace JsonFx.JsonML
 		{
 			var input = new[]
 			    {
-			        MarkupGrammar.TokenElementBegin(new DataName("odd")),
-			        MarkupGrammar.TokenElementBegin(new DataName("auto-closed")),
-			        MarkupGrammar.TokenElementBegin(new DataName("even")),
-			        MarkupGrammar.TokenElementEnd(new DataName("odd")),
-			        MarkupGrammar.TokenElementEnd(new DataName("ignored")),
-			        MarkupGrammar.TokenElementEnd(new DataName("even"))
-			    };
-			var expected = new[]
-			    {
 			        CommonGrammar.TokenArrayBeginNoName,
 			        CommonGrammar.TokenValue(new DataName("odd")),
 					CommonGrammar.TokenValueDelim,
@@ -826,8 +809,17 @@ namespace JsonFx.JsonML
 			        CommonGrammar.TokenArrayEnd,
 			        CommonGrammar.TokenArrayEnd,
 			    };
+			var expected = new[]
+			    {
+			        MarkupGrammar.TokenElementBegin(new DataName("odd")),
+			        MarkupGrammar.TokenElementBegin(new DataName("auto-closed")),
+			        MarkupGrammar.TokenElementBegin(new DataName("even")),
+			        MarkupGrammar.TokenElementEnd(new DataName("even")),
+			        MarkupGrammar.TokenElementEnd(new DataName("auto-closed")),
+			        MarkupGrammar.TokenElementEnd(new DataName("odd")),
+			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -839,15 +831,6 @@ namespace JsonFx.JsonML
 		{
 			var input = new[]
 			    {
-			        MarkupGrammar.TokenElementBegin(new DataName("odd", "a", "http://example.com/odd/a")),
-			        MarkupGrammar.TokenElementBegin(new DataName("auto-closed", "b", "http://example.com/auto-closed/b")),
-			        MarkupGrammar.TokenElementBegin(new DataName("even", "c", "http://example.com/even/c")),
-			        MarkupGrammar.TokenElementEnd(new DataName("odd", "a", "http://example.com/odd/a")),
-			        MarkupGrammar.TokenElementEnd(new DataName("ignored", "d", String.Empty)),
-			        MarkupGrammar.TokenElementEnd(new DataName("even", "c", "http://example.com/even/c"))
-			    };
-			var expected = new[]
-			    {
 			        CommonGrammar.TokenArrayBeginNoName,
 			        CommonGrammar.TokenValue(new DataName("odd", "a", "http://example.com/odd/a")),
 					CommonGrammar.TokenValueDelim,
@@ -860,8 +843,17 @@ namespace JsonFx.JsonML
 			        CommonGrammar.TokenArrayEnd,
 			        CommonGrammar.TokenArrayEnd,
 			    };
+			var expected = new[]
+			    {
+			        MarkupGrammar.TokenElementBegin(new DataName("odd", "a", "http://example.com/odd/a")),
+			        MarkupGrammar.TokenElementBegin(new DataName("auto-closed", "b", "http://example.com/auto-closed/b")),
+			        MarkupGrammar.TokenElementBegin(new DataName("even", "c", "http://example.com/even/c")),
+			        MarkupGrammar.TokenElementEnd(new DataName("even", "c", "http://example.com/even/c")),
+			        MarkupGrammar.TokenElementEnd(new DataName("auto-closed", "b", "http://example.com/auto-closed/b")),
+			        MarkupGrammar.TokenElementEnd(new DataName("odd", "a", "http://example.com/odd/a"))
+			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -873,13 +865,6 @@ namespace JsonFx.JsonML
 		{
 			var input = new[]
 			    {
-			        MarkupGrammar.TokenElementBegin(new DataName("odd", "a", "http://example.com/odd/a")),
-			        MarkupGrammar.TokenElementBegin(new DataName("auto-closed", "b", "http://example.com/auto-closed/b")),
-					MarkupGrammar.TokenElementEnd(new DataName("auto-closed", "b", "http://example.com/auto-closed/b")),
-			        MarkupGrammar.TokenElementBegin(new DataName("even", "c", "http://example.com/even/c"))
-			    };
-			var expected = new[]
-			    {
 			        CommonGrammar.TokenArrayBeginNoName,
 			        CommonGrammar.TokenValue(new DataName("odd", "a", "http://example.com/odd/a")),
 					CommonGrammar.TokenValueDelim,
@@ -892,8 +877,17 @@ namespace JsonFx.JsonML
 			        CommonGrammar.TokenArrayEnd,
 			        CommonGrammar.TokenArrayEnd,
 			    };
+			var expected = new[]
+			    {
+			        MarkupGrammar.TokenElementBegin(new DataName("odd", "a", "http://example.com/odd/a")),
+			        MarkupGrammar.TokenElementBegin(new DataName("auto-closed", "b", "http://example.com/auto-closed/b")),
+					MarkupGrammar.TokenElementEnd(new DataName("auto-closed", "b", "http://example.com/auto-closed/b")),
+			        MarkupGrammar.TokenElementBegin(new DataName("even", "c", "http://example.com/even/c")),
+					MarkupGrammar.TokenElementEnd(new DataName("even", "c", "http://example.com/even/c")),
+					MarkupGrammar.TokenElementEnd(new DataName("odd", "a", "http://example.com/odd/a")),
+			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -909,14 +903,14 @@ namespace JsonFx.JsonML
 		{
 			var input = new[]
 			    {
-			        MarkupGrammar.TokenUnparsed("?{0}?", @"xml version=""1.0""")
+					 new Token<CommonTokenType>(CommonTokenType.Primitive, new DataName("?{0}?"), @"xml version=""1.0""")
 			    };
 			var expected = new[]
 			    {
-					 new Token<CommonTokenType>(CommonTokenType.Primitive, new DataName("?{0}?"), @"xml version=""1.0""")
+			        MarkupGrammar.TokenUnparsed("?{0}?", @"xml version=""1.0""")
 			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -928,14 +922,14 @@ namespace JsonFx.JsonML
 		{
 			var input = new[]
 			    {
-			        MarkupGrammar.TokenUnparsed("!--{0}--", @" a quick note ")
+					 new Token<CommonTokenType>(CommonTokenType.Primitive, new DataName("!--{0}--"), @" a quick note ")
 			    };
 			var expected = new[]
 			    {
-					 new Token<CommonTokenType>(CommonTokenType.Primitive, new DataName("!--{0}--"), @" a quick note ")
+			        MarkupGrammar.TokenUnparsed("!--{0}--", @" a quick note ")
 			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -947,14 +941,14 @@ namespace JsonFx.JsonML
 		{
 			var input = new[]
 			    {
-			        MarkupGrammar.TokenText(@"value>""0"" && value<""10"" ?""valid"":""error""")
+					CommonGrammar.TokenValue(@"value>""0"" && value<""10"" ?""valid"":""error""")
 			    };
 			var expected = new[]
 			    {
-					CommonGrammar.TokenValue(@"value>""0"" && value<""10"" ?""valid"":""error""")
+			        MarkupGrammar.TokenText(@"value>""0"" && value<""10"" ?""valid"":""error""")
 			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -965,36 +959,6 @@ namespace JsonFx.JsonML
 		public void GetTokens_MixedTextValues_ReturnsTextValue()
 		{
 			var input = new[]
-			    {
-			        MarkupGrammar.TokenElementBegin(new DataName("p")),
-			        MarkupGrammar.TokenText(@"You can add a string to a number, but this stringifies the number:"),
-			        MarkupGrammar.TokenElementEnd(new DataName("p")),
-			        MarkupGrammar.TokenWhitespace("\r\n"),
-			        MarkupGrammar.TokenElementBegin(new DataName("math")),
-			        MarkupGrammar.TokenWhitespace("\r\n\t"),
-			        MarkupGrammar.TokenElementBegin(new DataName("ms")),
-			        MarkupGrammar.TokenText(@"x<y"),
-			        MarkupGrammar.TokenElementEnd(new DataName("ms")),
-			        MarkupGrammar.TokenWhitespace("\r\n\t"),
-			        MarkupGrammar.TokenElementBegin(new DataName("mo")),
-			        MarkupGrammar.TokenText(@"+"),
-			        MarkupGrammar.TokenElementEnd(new DataName("mo")),
-			        MarkupGrammar.TokenWhitespace("\r\n\t"),
-			        MarkupGrammar.TokenElementBegin(new DataName("mn")),
-			        MarkupGrammar.TokenText(@"3"),
-			        MarkupGrammar.TokenElementEnd(new DataName("mn")),
-			        MarkupGrammar.TokenWhitespace("\r\n\t"),
-			        MarkupGrammar.TokenElementBegin(new DataName("mo")),
-			        MarkupGrammar.TokenText(@"="),
-			        MarkupGrammar.TokenElementEnd(new DataName("mo")),
-			        MarkupGrammar.TokenWhitespace("\r\n\t"),
-			        MarkupGrammar.TokenElementBegin(new DataName("ms")),
-			        MarkupGrammar.TokenText(@"x<y3"),
-			        MarkupGrammar.TokenElementEnd(new DataName("ms")),
-			        MarkupGrammar.TokenWhitespace("\r\n"),
-			        MarkupGrammar.TokenElementEnd(new DataName("math")),
-			    };
-			var expected = new[]
 			    {
 			        CommonGrammar.TokenArrayBeginNoName,
 			        CommonGrammar.TokenValue(new DataName("p")),
@@ -1050,8 +1014,38 @@ namespace JsonFx.JsonML
 			        CommonGrammar.TokenValue("\r\n"),
 			        CommonGrammar.TokenArrayEnd
 			    };
+			var expected = new[]
+			    {
+			        MarkupGrammar.TokenElementBegin(new DataName("p")),
+			        MarkupGrammar.TokenText(@"You can add a string to a number, but this stringifies the number:"),
+			        MarkupGrammar.TokenElementEnd(new DataName("p")),
+			        MarkupGrammar.TokenWhitespace("\r\n"),
+			        MarkupGrammar.TokenElementBegin(new DataName("math")),
+			        MarkupGrammar.TokenWhitespace("\r\n\t"),
+			        MarkupGrammar.TokenElementBegin(new DataName("ms")),
+			        MarkupGrammar.TokenText(@"x<y"),
+			        MarkupGrammar.TokenElementEnd(new DataName("ms")),
+			        MarkupGrammar.TokenWhitespace("\r\n\t"),
+			        MarkupGrammar.TokenElementBegin(new DataName("mo")),
+			        MarkupGrammar.TokenText(@"+"),
+			        MarkupGrammar.TokenElementEnd(new DataName("mo")),
+			        MarkupGrammar.TokenWhitespace("\r\n\t"),
+			        MarkupGrammar.TokenElementBegin(new DataName("mn")),
+			        MarkupGrammar.TokenText(@"3"),
+			        MarkupGrammar.TokenElementEnd(new DataName("mn")),
+			        MarkupGrammar.TokenWhitespace("\r\n\t"),
+			        MarkupGrammar.TokenElementBegin(new DataName("mo")),
+			        MarkupGrammar.TokenText(@"="),
+			        MarkupGrammar.TokenElementEnd(new DataName("mo")),
+			        MarkupGrammar.TokenWhitespace("\r\n\t"),
+			        MarkupGrammar.TokenElementBegin(new DataName("ms")),
+			        MarkupGrammar.TokenText(@"x<y3"),
+			        MarkupGrammar.TokenElementEnd(new DataName("ms")),
+			        MarkupGrammar.TokenWhitespace("\r\n"),
+			        MarkupGrammar.TokenElementEnd(new DataName("math")),
+			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -1063,20 +1057,20 @@ namespace JsonFx.JsonML
 		{
 			var input = new[]
 			    {
-			        MarkupGrammar.TokenUnparsed("!{0}",
+					new Token<CommonTokenType>(CommonTokenType.Primitive, new DataName("!{0}"),
 @"DOCTYPE html PUBLIC
 	""-//W3C//DTD XHTML 1.1//EN""
 	""http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd""")
 			    };
 			var expected = new[]
 			    {
-					new Token<CommonTokenType>(CommonTokenType.Primitive, new DataName("!{0}"),
+			        MarkupGrammar.TokenUnparsed("!{0}",
 @"DOCTYPE html PUBLIC
 	""-//W3C//DTD XHTML 1.1//EN""
 	""http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd""")
 			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -1088,14 +1082,14 @@ namespace JsonFx.JsonML
 		{
 			var input = new[]
 			    {
-			        MarkupGrammar.TokenUnparsed("%@{0}%", @" Page Language=""C#"" AutoEventWireup=""true"" CodeBehind=""Default.aspx.cs"" Inherits=""Foo._Default"" ")
+					new Token<CommonTokenType>(CommonTokenType.Primitive, new DataName("%@{0}%"), @" Page Language=""C#"" AutoEventWireup=""true"" CodeBehind=""Default.aspx.cs"" Inherits=""Foo._Default"" ")
 			    };
 			var expected = new[]
 			    {
-					new Token<CommonTokenType>(CommonTokenType.Primitive, new DataName("%@{0}%"), @" Page Language=""C#"" AutoEventWireup=""true"" CodeBehind=""Default.aspx.cs"" Inherits=""Foo._Default"" ")
+			        MarkupGrammar.TokenUnparsed("%@{0}%", @" Page Language=""C#"" AutoEventWireup=""true"" CodeBehind=""Default.aspx.cs"" Inherits=""Foo._Default"" ")
 			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -1106,26 +1100,6 @@ namespace JsonFx.JsonML
 		public void GetTokens_PhpHelloWorld_ReturnsSequence()
 		{
 			var input = new[]
-			    {
-			        MarkupGrammar.TokenElementBegin(new DataName("html")),
-			        MarkupGrammar.TokenWhitespace("\r\n\t"),
-			        MarkupGrammar.TokenElementBegin(new DataName("head")),
-			        MarkupGrammar.TokenWhitespace("\r\n\t\t"),
-			        MarkupGrammar.TokenElementBegin(new DataName("title")),
-			        MarkupGrammar.TokenText("PHP Test"),
-			        MarkupGrammar.TokenElementEnd(new DataName("title")),
-			        MarkupGrammar.TokenWhitespace("\r\n\t"),
-			        MarkupGrammar.TokenElementEnd(new DataName("head")),
-			        MarkupGrammar.TokenWhitespace("\r\n\t"),
-			        MarkupGrammar.TokenElementBegin(new DataName("body")),
-			        MarkupGrammar.TokenWhitespace("\r\n\t\t"),
-			        MarkupGrammar.TokenUnparsed("?{0}?", @"php echo '<p>Hello World</p>'; "),
-			        MarkupGrammar.TokenWhitespace("\r\n\t"),
-			        MarkupGrammar.TokenElementEnd(new DataName("body")),
-			        MarkupGrammar.TokenWhitespace("\r\n"),
-			        MarkupGrammar.TokenElementEnd(new DataName("html")),
-			    };
-			var expected = new[]
 			    {
 					CommonGrammar.TokenArrayBeginNoName,
 			        CommonGrammar.TokenValue(new DataName("html")),
@@ -1161,8 +1135,28 @@ namespace JsonFx.JsonML
 			        CommonGrammar.TokenValue("\r\n"),
 			        CommonGrammar.TokenArrayEnd,
 			    };
+			var expected = new[]
+			    {
+			        MarkupGrammar.TokenElementBegin(new DataName("html")),
+			        MarkupGrammar.TokenWhitespace("\r\n\t"),
+			        MarkupGrammar.TokenElementBegin(new DataName("head")),
+			        MarkupGrammar.TokenWhitespace("\r\n\t\t"),
+			        MarkupGrammar.TokenElementBegin(new DataName("title")),
+			        MarkupGrammar.TokenText("PHP Test"),
+			        MarkupGrammar.TokenElementEnd(new DataName("title")),
+			        MarkupGrammar.TokenWhitespace("\r\n\t"),
+			        MarkupGrammar.TokenElementEnd(new DataName("head")),
+			        MarkupGrammar.TokenWhitespace("\r\n\t"),
+			        MarkupGrammar.TokenElementBegin(new DataName("body")),
+			        MarkupGrammar.TokenWhitespace("\r\n\t\t"),
+			        MarkupGrammar.TokenUnparsed("?{0}?", @"php echo '<p>Hello World</p>'; "),
+			        MarkupGrammar.TokenWhitespace("\r\n\t"),
+			        MarkupGrammar.TokenElementEnd(new DataName("body")),
+			        MarkupGrammar.TokenWhitespace("\r\n"),
+			        MarkupGrammar.TokenElementEnd(new DataName("html")),
+			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -1174,7 +1168,7 @@ namespace JsonFx.JsonML
 		{
 			var input = new[]
 			    {
-			        MarkupGrammar.TokenUnparsed("%--{0}--%",
+					new Token<CommonTokenType>(CommonTokenType.Primitive, new DataName("%--{0}--%"),
 @"
 <html>
 	<body style=""color:lime"">
@@ -1185,7 +1179,7 @@ namespace JsonFx.JsonML
 			    };
 			var expected = new[]
 			    {
-					new Token<CommonTokenType>(CommonTokenType.Primitive, new DataName("%--{0}--%"),
+			        MarkupGrammar.TokenUnparsed("%--{0}--%",
 @"
 <html>
 	<body style=""color:lime"">
@@ -1195,7 +1189,7 @@ namespace JsonFx.JsonML
 ")
 			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -1209,10 +1203,10 @@ namespace JsonFx.JsonML
 		[Trait(TraitName, TraitValue)]
 		public void GetTokens_NullInput_ReturnsEmptySequence()
 		{
-			var input = new Token<MarkupTokenType>[0];
-			var expected = new Token<CommonTokenType>[0];
+			var input = new Token<CommonTokenType>[0];
+			var expected = new Token<MarkupTokenType>[0];
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -1222,10 +1216,10 @@ namespace JsonFx.JsonML
 		[Trait(TraitName, TraitValue)]
 		public void GetTokens_EmptyInput_ReturnsEmptySequence()
 		{
-			var input = new Token<MarkupTokenType>[0];
-			var expected = new Token<CommonTokenType>[0];
+			var input = new Token<CommonTokenType>[0];
+			var expected = new Token<MarkupTokenType>[0];
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
