@@ -85,6 +85,7 @@
     <Compile Include="Html\HtmlFormatter.cs" />
     <Compile Include="Html\HtmlTokenizer.cs" />
     <Compile Include="IO\CharBuffer.cs" />
+    <Compile Include="JsonML\JsonMLReadConverter.cs" />
     <Compile Include="Json\Resolvers\JsonResolverStrategy.cs" />
     <Compile Include="Markup\MarkupGrammar.cs" />
     <Compile Include="Markup\MarkupTokenType.cs" />
