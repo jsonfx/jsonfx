@@ -97,15 +97,27 @@ namespace JsonFx.JsonML
 								tagName = new DataName(token.ValueAsString());
 							}
 
-							yield return MarkupGrammar.TokenElementBegin(tagName);
-
 							// consume name value token
 							stream.Pop();
 							token = stream.Peek();
 
+							//if (token.TokenType == CommonTokenType.ArrayEnd)
+							//{
+							//    // consume array end token
+							//    stream.Pop();
+							//    token = stream.Peek();
+
+							//    // is a void tag
+							//    yield return MarkupGrammar.TokenElementVoid(tagName);
+							//    break;
+							//}
+
+							// TODO: evaluate if worth queuing up attributes for void tags with attribs
+							yield return MarkupGrammar.TokenElementBegin(tagName);
+
 							if (token.TokenType != CommonTokenType.ObjectBegin)
 							{
-								// no attributes
+								// no attributes, but has children
 								break;
 							}
 

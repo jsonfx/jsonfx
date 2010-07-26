@@ -85,7 +85,36 @@ namespace JsonFx.JsonML
 			    };
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenElementVoid(new DataName("root"))
+			        MarkupGrammar.TokenElementBegin(new DataName("root")),
+					MarkupGrammar.TokenElementEnd
+			    };
+
+			var converter = new JsonMLWriter.JsonMLWriteConverter();
+			var actual = converter.Transform(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void GetTokens_SingleVoidTagWithAttributes_ReturnsSequence()
+		{
+			var input = new[]
+			    {
+			        CommonGrammar.TokenArrayBeginNoName,
+			        CommonGrammar.TokenValue(new DataName("root")),
+			        CommonGrammar.TokenObjectBeginNoName,
+			        CommonGrammar.TokenProperty(new DataName("key")),
+			        CommonGrammar.TokenValue("value"),
+			        CommonGrammar.TokenObjectEnd,
+			        CommonGrammar.TokenArrayEnd
+			    };
+			var expected = new[]
+			    {
+			        MarkupGrammar.TokenElementBegin(new DataName("root")),
+			        MarkupGrammar.TokenAttribute(new DataName("key")),
+			        MarkupGrammar.TokenValue("value"),
+					MarkupGrammar.TokenElementEnd
 			    };
 
 			var converter = new JsonMLWriter.JsonMLWriteConverter();
@@ -111,7 +140,7 @@ namespace JsonFx.JsonML
 			var expected = new[]
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("root", String.Empty, "http://example.com/schema")),
-			        MarkupGrammar.TokenElementEnd,
+					MarkupGrammar.TokenElementEnd
 			    };
 
 			var converter = new JsonMLWriter.JsonMLWriteConverter();
@@ -210,6 +239,7 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenValue(new DataName("foo", "bar", "http://example.org")),
 					CommonGrammar.TokenArrayBeginNoName,
 					CommonGrammar.TokenValue(new DataName("child", "bar", "http://example.org")),
+			        CommonGrammar.TokenValue("value"),
 					CommonGrammar.TokenArrayEnd,
 					CommonGrammar.TokenArrayEnd
 				};
@@ -273,9 +303,10 @@ namespace JsonFx.JsonML
 				};
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenElementVoid(new DataName("foo", String.Empty, "http://example.org")),
+			        MarkupGrammar.TokenElementBegin(new DataName("foo", String.Empty, "http://example.org")),
 			        MarkupGrammar.TokenAttribute(new DataName("key", "blah", "http://example.org")),
-			        MarkupGrammar.TokenValue("value")
+			        MarkupGrammar.TokenValue("value"),
+					MarkupGrammar.TokenElementEnd
 			    };
 
 			var converter = new JsonMLWriter.JsonMLWriteConverter();
