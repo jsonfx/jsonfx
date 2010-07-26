@@ -43,7 +43,7 @@ namespace JsonFx
 		#region Constants
 
 		private const string TraitName = "Utilities";
-		private const string TraitValue = "Testing";
+		private const string TraitValue = "AssertPatched";
 
 		#endregion Constants
 

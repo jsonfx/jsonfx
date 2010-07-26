@@ -41,12 +41,12 @@ using Assert=JsonFx.AssertPatched;
 
 namespace JsonFx.Xml
 {
-	public class XmlDataReadConverterTests
+	public class XmlInTransformerTests
 	{
 		#region Constants
 
 		private const string TraitName = "XML";
-		private const string TraitValue = "Deserialization";
+		private const string TraitValue = "InTransformer";
 
 		#endregion Constants
 
@@ -68,7 +68,7 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementEnd
 			};
 
-			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
+			var transformer = new XmlReader.XmlInTransformer(new DataReaderSettings());
 			var actual = transformer.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -92,7 +92,7 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementEnd
 			};
 
-			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
+			var transformer = new XmlReader.XmlInTransformer(new DataReaderSettings());
 			var actual = transformer.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -128,7 +128,7 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementEnd,
 			};
 
-			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
+			var transformer = new XmlReader.XmlInTransformer(new DataReaderSettings());
 			var actual = transformer.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -229,7 +229,7 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementEnd
 			};
 
-			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
+			var transformer = new XmlReader.XmlInTransformer(new DataReaderSettings());
 			var actual = transformer.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -255,7 +255,7 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementEnd
 			};
 
-			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
+			var transformer = new XmlReader.XmlInTransformer(new DataReaderSettings());
 			var actual = transformer.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -282,7 +282,7 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementEnd,
 			};
 
-			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
+			var transformer = new XmlReader.XmlInTransformer(new DataReaderSettings());
 			var actual = transformer.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -309,7 +309,7 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementEnd,
 			};
 
-			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
+			var transformer = new XmlReader.XmlInTransformer(new DataReaderSettings());
 			var actual = transformer.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -347,7 +347,7 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementEnd,
 			};
 
-			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
+			var transformer = new XmlReader.XmlInTransformer(new DataReaderSettings());
 			var actual = transformer.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -378,7 +378,7 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementEnd,
 			};
 
-			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
+			var transformer = new XmlReader.XmlInTransformer(new DataReaderSettings());
 			var actual = transformer.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -405,7 +405,7 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementEnd,
 			};
 
-			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
+			var transformer = new XmlReader.XmlInTransformer(new DataReaderSettings());
 			var actual = transformer.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -432,7 +432,7 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementEnd,
 			};
 
-			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
+			var transformer = new XmlReader.XmlInTransformer(new DataReaderSettings());
 			var actual = transformer.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -459,7 +459,7 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementEnd,
 			};
 
-			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
+			var transformer = new XmlReader.XmlInTransformer(new DataReaderSettings());
 			var actual = transformer.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -485,7 +485,7 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementEnd,
 			};
 
-			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
+			var transformer = new XmlReader.XmlInTransformer(new DataReaderSettings());
 			var actual = transformer.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -511,7 +511,7 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementEnd,
 			};
 
-			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
+			var transformer = new XmlReader.XmlInTransformer(new DataReaderSettings());
 			var actual = transformer.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -545,7 +545,7 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementEnd,
 			};
 
-			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
+			var transformer = new XmlReader.XmlInTransformer(new DataReaderSettings());
 			var actual = transformer.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -579,7 +579,7 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementEnd,
 			};
 
-			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
+			var transformer = new XmlReader.XmlInTransformer(new DataReaderSettings());
 			var actual = transformer.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -597,7 +597,7 @@ namespace JsonFx.Xml
 
 			var input = Enumerable.Empty<Token<MarkupTokenType>>();
 
-			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
+			var transformer = new XmlReader.XmlInTransformer(new DataReaderSettings());
 			var actual = transformer.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -609,7 +609,7 @@ namespace JsonFx.Xml
 		{
 			var input = (IEnumerable<Token<MarkupTokenType>>)null;
 
-			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
+			var transformer = new XmlReader.XmlInTransformer(new DataReaderSettings());
 
 			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
 				delegate
@@ -628,7 +628,7 @@ namespace JsonFx.Xml
 			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
 				delegate
 				{
-					var transformer = new XmlReader.XmlDataReadConverter(null);
+					var transformer = new XmlReader.XmlInTransformer(null);
 				});
 
 			// verify exception is coming from expected param

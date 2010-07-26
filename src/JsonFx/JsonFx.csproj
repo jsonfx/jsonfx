@@ -85,8 +85,8 @@
     <Compile Include="Html\HtmlFormatter.cs" />
     <Compile Include="Html\HtmlTokenizer.cs" />
     <Compile Include="IO\CharBuffer.cs" />
-    <Compile Include="JsonML\JsonMLReadConverter.cs" />
-    <Compile Include="JsonML\JsonMLWriteConverter.cs" />
+    <Compile Include="JsonML\JsonMLInTransformer.cs" />
+    <Compile Include="JsonML\JsonMLOutTransformer.cs" />
     <Compile Include="Json\Resolvers\JsonResolverStrategy.cs" />
     <Compile Include="Markup\MarkupGrammar.cs" />
     <Compile Include="Markup\MarkupTokenType.cs" />
@@ -143,8 +143,8 @@
     <Compile Include="Serialization\Resolvers\ResolverCache.cs" />
     <Compile Include="Serialization\Token`1.cs" />
     <Compile Include="Serialization\TypeCoercionUtility.cs" />
-    <Compile Include="Xml\XmlDataReadConverter.cs" />
-    <Compile Include="Xml\XmlDataWriteConverter.cs" />
+    <Compile Include="Xml\XmlInTransformer.cs" />
+    <Compile Include="Xml\XmlOutTransformer.cs" />
     <Compile Include="Xml\XmlReader.cs" />
     <Compile Include="Xml\XmlFormatter.cs" />
     <Compile Include="Xml\XmlWriter.cs" />

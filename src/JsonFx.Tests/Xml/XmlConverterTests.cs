@@ -45,7 +45,7 @@ namespace JsonFx.Xml
 		#region Constants
 
 		private const string TraitName = "XML";
-		private const string TraitValue = "Conversion";
+		private const string TraitValue = "Converter";
 
 		#endregion Constants
 
@@ -67,7 +67,7 @@ namespace JsonFx.Xml
 			var tokens1 = jsonTokenizer.GetTokens(inputJson);
 
 			var settings = new DataWriterSettings { PrettyPrint = false };
-			var xmlFormatter = new TransformFormatter<CommonTokenType, MarkupTokenType>(new XmlWriter.XmlFormatter(settings), new XmlWriter.XmlDataWriteConverter(settings));
+			var xmlFormatter = new TransformFormatter<CommonTokenType, MarkupTokenType>(new XmlWriter.XmlFormatter(settings), new XmlWriter.XmlOutTransformer(settings));
 			var actualXml = xmlFormatter.Format(tokens1);
 
 			Assert.Equal(expectedXml, actualXml);
@@ -103,7 +103,7 @@ namespace JsonFx.Xml
 			var tokens1 = jsonTokenizer.GetTokens(inputJson);
 
 			var settings = new DataWriterSettings { PrettyPrint = false };
-			var xmlFormatter = new TransformFormatter<CommonTokenType, MarkupTokenType>(new XmlWriter.XmlFormatter(settings), new XmlWriter.XmlDataWriteConverter(settings));
+			var xmlFormatter = new TransformFormatter<CommonTokenType, MarkupTokenType>(new XmlWriter.XmlFormatter(settings), new XmlWriter.XmlOutTransformer(settings));
 			var actualXml = xmlFormatter.Format(tokens1);
 
 			Assert.Equal(expectedXml, actualXml);
@@ -136,7 +136,7 @@ namespace JsonFx.Xml
 			var tokens1 = jsonTokenizer.GetTokens(inputJson);
 
 			var settings = new DataWriterSettings { PrettyPrint = true };
-			var xmlFormatter = new TransformFormatter<CommonTokenType, MarkupTokenType>(new XmlWriter.XmlFormatter(settings), new XmlWriter.XmlDataWriteConverter(settings));
+			var xmlFormatter = new TransformFormatter<CommonTokenType, MarkupTokenType>(new XmlWriter.XmlFormatter(settings), new XmlWriter.XmlOutTransformer(settings));
 			var actualXml = xmlFormatter.Format(tokens1);
 
 			Assert.Equal(expectedXml, actualXml);
@@ -301,7 +301,7 @@ namespace JsonFx.Xml
 			var tokens1 = jsonTokenizer.GetTokens(inputJson);
 
 			var settings = new DataWriterSettings { PrettyPrint = true };
-			var xmlFormatter = new TransformFormatter<CommonTokenType, MarkupTokenType>(new XmlWriter.XmlFormatter(settings), new XmlWriter.XmlDataWriteConverter(settings));
+			var xmlFormatter = new TransformFormatter<CommonTokenType, MarkupTokenType>(new XmlWriter.XmlFormatter(settings), new XmlWriter.XmlOutTransformer(settings));
 			var actualXml = xmlFormatter.Format(tokens1);
 
 			Assert.Equal(expectedXml, actualXml);

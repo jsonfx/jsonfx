@@ -45,7 +45,7 @@ namespace JsonFx.Bson
 		#region Constants
 
 		private const string TraitName = "BSON";
-		private const string TraitValue = "Serialization";
+		private const string TraitValue = "Formatter";
 
 		#endregion Constants
 

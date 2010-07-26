@@ -40,12 +40,12 @@ using Assert=JsonFx.AssertPatched;
 
 namespace JsonFx.JsonML
 {
-	public class JsonMLReadConverterTests
+	public class JsonMLInTransformerTests
 	{
 		#region Constants
 
 		private const string TraitName = "JsonML";
-		private const string TraitValue = "Deserialization";
+		private const string TraitValue = "InTransformer";
 
 		#endregion Constants
 
@@ -67,7 +67,7 @@ namespace JsonFx.JsonML
 			        CommonGrammar.TokenArrayEnd
 			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -88,7 +88,7 @@ namespace JsonFx.JsonML
 			        CommonGrammar.TokenArrayEnd
 			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -114,7 +114,7 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenArrayEnd
 				};
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -136,7 +136,7 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenArrayEnd
 				};
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -165,7 +165,7 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenArrayEnd
 				};
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -194,7 +194,7 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenArrayEnd
 				};
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -223,7 +223,7 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenArrayEnd
 				};
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -252,7 +252,7 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenArrayEnd
 				};
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -279,7 +279,7 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenArrayEnd
 				};
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -320,7 +320,7 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenArrayEnd
 				};
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -352,7 +352,7 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenArrayEnd
 				};
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -384,7 +384,7 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenArrayEnd
 				};
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -412,7 +412,7 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenArrayEnd
 				};
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -440,7 +440,7 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenArrayEnd
 				};
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -468,7 +468,7 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenArrayEnd
 				};
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -496,7 +496,7 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenArrayEnd
 				};
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -532,7 +532,7 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenArrayEnd
 				};
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -555,7 +555,7 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenValue("<")
 				};
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -575,7 +575,7 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenValue("leading&")
 				};
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -595,7 +595,7 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenValue("&trailing")
 				};
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -620,7 +620,7 @@ namespace JsonFx.JsonML
 			        CommonGrammar.TokenValue(@"there should <b>e decoded chars & inside this text")
 				};
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -681,7 +681,7 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenArrayEnd
 				};
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -744,7 +744,7 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenArrayEnd
 				};
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -780,7 +780,7 @@ namespace JsonFx.JsonML
 			        CommonGrammar.TokenArrayEnd,
 			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -812,7 +812,7 @@ namespace JsonFx.JsonML
 			        CommonGrammar.TokenArrayEnd,
 			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -842,7 +842,7 @@ namespace JsonFx.JsonML
 			        CommonGrammar.TokenArrayEnd,
 			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -865,7 +865,7 @@ namespace JsonFx.JsonML
 					 new Token<CommonTokenType>(CommonTokenType.Primitive, new DataName("?{0}?"), @"xml version=""1.0""")
 			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -884,7 +884,7 @@ namespace JsonFx.JsonML
 					 new Token<CommonTokenType>(CommonTokenType.Primitive, new DataName("!--{0}--"), @" a quick note ")
 			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -903,7 +903,7 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenValue(@"value>""0"" && value<""10"" ?""valid"":""error""")
 			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -981,7 +981,7 @@ namespace JsonFx.JsonML
 			        CommonGrammar.TokenArrayEnd
 			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -1006,7 +1006,7 @@ namespace JsonFx.JsonML
 	""http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd""")
 			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -1025,7 +1025,7 @@ namespace JsonFx.JsonML
 					new Token<CommonTokenType>(CommonTokenType.Primitive, new DataName("%@{0}%"), @" Page Language=""C#"" AutoEventWireup=""true"" CodeBehind=""Default.aspx.cs"" Inherits=""Foo._Default"" ")
 			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -1080,7 +1080,7 @@ namespace JsonFx.JsonML
 			        CommonGrammar.TokenArrayEnd,
 			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -1113,7 +1113,7 @@ namespace JsonFx.JsonML
 ")
 			    };
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -1130,7 +1130,7 @@ namespace JsonFx.JsonML
 			var input = new Token<MarkupTokenType>[0];
 			var expected = new Token<CommonTokenType>[0];
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -1143,7 +1143,7 @@ namespace JsonFx.JsonML
 			var input = new Token<MarkupTokenType>[0];
 			var expected = new Token<CommonTokenType>[0];
 
-			var converter = new JsonMLReader.JsonMLReadConverter();
+			var converter = new JsonMLReader.JsonMLInTransformer();
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);

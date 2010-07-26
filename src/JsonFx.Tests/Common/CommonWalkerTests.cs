@@ -44,8 +44,8 @@ namespace JsonFx.Serialization
 	{
 		#region Constants
 
-		private const string TraitName = "Object Graph";
-		private const string TraitValue = "Serialization";
+		private const string TraitName = "Common";
+		private const string TraitValue = "Walker";
 
 		#endregion Constants
 

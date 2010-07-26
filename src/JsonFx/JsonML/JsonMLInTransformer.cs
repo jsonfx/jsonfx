@@ -43,7 +43,7 @@ namespace JsonFx.JsonML
 		/// <summary>
 		/// Transforms markup tokens into common data tokens using a JsonML model
 		/// </summary>
-		public class JsonMLReadConverter : IDataTransformer<MarkupTokenType, CommonTokenType>
+		public class JsonMLInTransformer : IDataTransformer<MarkupTokenType, CommonTokenType>
 		{
 			#region Constants
 

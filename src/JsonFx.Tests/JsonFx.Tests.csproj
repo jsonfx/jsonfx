@@ -92,17 +92,17 @@
     <Compile Include="Html\HtmlTokenizerTests.cs" />
     <Compile Include="IO\StringStreamTests.cs" />
     <Compile Include="IO\TextReaderStreamTests.cs" />
-    <Compile Include="JsonML\JsonMLReadConverterTests.cs" />
-    <Compile Include="JsonML\JsonMLWriteConverterTests.cs" />
+    <Compile Include="JsonML\JsonMLInTransformerTests.cs" />
+    <Compile Include="JsonML\JsonMLOutTransformerTests.cs" />
     <Compile Include="Json\JsonWriterTests.cs" />
     <Compile Include="Json\JsonReaderTests.cs" />
     <Compile Include="Json\JsonFormatterTests.cs" />
     <Compile Include="Json\JsonTokenizerTests.cs" />
     <Compile Include="Serialization\TypeCoercionUtilityTests.cs" />
-    <Compile Include="Xml\XmlDataReadConverterTests.cs" />
     <Compile Include="Xml\XmlConverterTests.cs" />
-    <Compile Include="Xml\XmlDataWriteConverterTests.cs" />
     <Compile Include="Xml\XmlFormatterTests.cs" />
+    <Compile Include="Xml\XmlInTransformerTests.cs" />
+    <Compile Include="Xml\XmlOutTransformerTests.cs" />
     <Compile Include="Xml\XmlTokenizerTests.cs" />
     <Compile Include="Xml\XmlWriterTests.cs" />
   </ItemGroup>

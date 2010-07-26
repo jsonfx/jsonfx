@@ -48,7 +48,7 @@ namespace JsonFx.Serialization
 		#region Constants
 
 		private const string TraitName = "Utilities";
-		private const string TraitValue = "Type Coercion";
+		private const string TraitValue = "TypeCoercionUtility";
 
 		#endregion Constants
 

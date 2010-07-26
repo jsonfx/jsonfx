@@ -45,7 +45,7 @@ namespace JsonFx.Json
 		#region Constants
 
 		private const string TraitName = "JSON";
-		private const string TraitValue = "Deserialization";
+		private const string TraitValue = "Reader";
 
 		#endregion Constants
 

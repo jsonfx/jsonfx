@@ -119,7 +119,7 @@ namespace JsonFx.Xml
 		/// <returns></returns>
 		protected override ITextTokenizer<CommonTokenType> GetTokenizer()
 		{
-			return new TransformTokenizer<MarkupTokenType, CommonTokenType>(new XmlTokenizer(), new XmlDataReadConverter(this.Settings));
+			return new TransformTokenizer<MarkupTokenType, CommonTokenType>(new XmlTokenizer(), new XmlInTransformer(this.Settings));
 		}
 
 		#endregion DataReader<DataTokenType> Methods

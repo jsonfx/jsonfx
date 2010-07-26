@@ -44,7 +44,7 @@ namespace JsonFx.Xml
 		/// <summary>
 		/// Transforms common data tokens into markup tokens using an XML-data model
 		/// </summary>
-		public class XmlDataWriteConverter : IDataTransformer<CommonTokenType, MarkupTokenType>
+		public class XmlOutTransformer : IDataTransformer<CommonTokenType, MarkupTokenType>
 		{
 			#region Constants
 
@@ -67,7 +67,7 @@ namespace JsonFx.Xml
 			/// Ctor
 			/// </summary>
 			/// <param name="settings"></param>
-			public XmlDataWriteConverter(DataWriterSettings settings)
+			public XmlOutTransformer(DataWriterSettings settings)
 			{
 				if (settings == null)
 				{
@@ -145,12 +145,12 @@ namespace JsonFx.Xml
 						string value = token.ValueAsString();
 						if (String.IsNullOrEmpty(value))
 						{
-							elementName = this.EnsureName(elementName.IsEmpty ? token.Name : elementName, null);
+							elementName = this.EncodeName(elementName.IsEmpty ? token.Name : elementName, null);
 							this.EmitTag(output, elementName, null, MarkupTokenType.ElementVoid);
 						}
 						else
 						{
-							elementName = this.EnsureName(elementName.IsEmpty ? token.Name : elementName, token.Value.GetType());
+							elementName = this.EncodeName(elementName.IsEmpty ? token.Name : elementName, token.Value.GetType());
 
 							this.EmitTag(output, elementName, null, MarkupTokenType.ElementBegin);
 							output.Add(MarkupGrammar.TokenValue(value));
@@ -172,7 +172,7 @@ namespace JsonFx.Xml
 				Token<CommonTokenType> token = input.Pop();
 
 				// ensure element has a name
-				elementName = this.EnsureName(elementName.IsEmpty ? token.Name : elementName, typeof(Array));
+				elementName = this.EncodeName(elementName.IsEmpty ? token.Name : elementName, typeof(Array));
 
 				// TODO: figure out a way to surface XmlArrayItemAttribute name
 				DataName itemName = DataName.Empty;//new DataName("arrayItem");
@@ -264,7 +264,7 @@ namespace JsonFx.Xml
 				Token<CommonTokenType> token = input.Pop();
 
 				// ensure element has a name
-				elementName = this.EnsureName(elementName.IsEmpty ? token.Name : elementName, typeof(Object));
+				elementName = this.EncodeName(elementName.IsEmpty ? token.Name : elementName, typeof(Object));
 
 				bool needsEndTag = true;
 				SortedList<DataName, string> attributes = null;
@@ -488,7 +488,7 @@ namespace JsonFx.Xml
 
 			#region Utility Methods
 
-			private DataName EnsureName(DataName name, Type type)
+			private DataName EncodeName(DataName name, Type type)
 			{
 				// String.Empty is a valid DataName.LocalName, so must replace
 				if (String.IsNullOrEmpty(name.LocalName))

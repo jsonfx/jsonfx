@@ -43,7 +43,7 @@ namespace JsonFx.JsonML
 		/// <summary>
 		/// Transforms common data tokens into markup tokens using a JsonML model
 		/// </summary>
-		public class JsonMLWriteConverter : IDataTransformer<CommonTokenType, MarkupTokenType>
+		public class JsonMLOutTransformer : IDataTransformer<CommonTokenType, MarkupTokenType>
 		{
 			#region Constants
 
@@ -83,7 +83,7 @@ namespace JsonFx.JsonML
 							{
 								throw new TokenException<CommonTokenType>(
 									token,
-									JsonMLWriteConverter.ErrorMissingTagName);
+									JsonMLOutTransformer.ErrorMissingTagName);
 							}
 
 							DataName tagName;
@@ -137,7 +137,7 @@ namespace JsonFx.JsonML
 								{
 									throw new TokenException<CommonTokenType>(
 										token,
-										String.Format(JsonMLWriteConverter.ErrorInvalidAttributeValue, token.TokenType));
+										String.Format(JsonMLOutTransformer.ErrorInvalidAttributeValue, token.TokenType));
 								}
 
 								yield return this.TransformValue(token);
@@ -151,7 +151,7 @@ namespace JsonFx.JsonML
 							{
 								throw new TokenException<CommonTokenType>(
 									token,
-									String.Format(JsonMLWriteConverter.ErrorUnterminatedAttributeBlock, token.TokenType));
+									String.Format(JsonMLOutTransformer.ErrorUnterminatedAttributeBlock, token.TokenType));
 							}
 
 							// consume object end token
@@ -180,7 +180,7 @@ namespace JsonFx.JsonML
 							// the rest are invalid outside of attribute block
 							throw new TokenException<CommonTokenType>(
 								token,
-								String.Format(JsonMLWriteConverter.ErrorUnexpectedToken, token.TokenType));
+								String.Format(JsonMLOutTransformer.ErrorUnexpectedToken, token.TokenType));
 						}
 					}
 				}

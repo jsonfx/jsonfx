@@ -41,7 +41,7 @@ namespace JsonFx.CodeGen
 		#region Constants
 
 		private const string TraitName = "Utilities";
-		private const string TraitValue = "DynamicMethods";
+		private const string TraitValue = "DynamicMethodGenerator";
 
 		#endregion Constants
 

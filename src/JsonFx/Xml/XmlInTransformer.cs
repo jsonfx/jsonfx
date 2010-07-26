@@ -43,7 +43,7 @@ namespace JsonFx.Xml
 		/// <summary>
 		/// Transforms markup tokens into common data tokens using an XML-data model
 		/// </summary>
-		public class XmlDataReadConverter : IDataTransformer<MarkupTokenType, CommonTokenType>
+		public class XmlInTransformer : IDataTransformer<MarkupTokenType, CommonTokenType>
 		{
 			#region Constants
 
@@ -64,7 +64,7 @@ namespace JsonFx.Xml
 			/// Ctor
 			/// </summary>
 			/// <param name="settings"></param>
-			public XmlDataReadConverter(DataReaderSettings settings)
+			public XmlInTransformer(DataReaderSettings settings)
 			{
 				if (settings == null)
 				{
@@ -137,6 +137,34 @@ namespace JsonFx.Xml
 			}
 
 			#endregion CommonTokenType to MarkupTokenType Transformation Methods
+
+			#region Utility Methods
+
+			private DataName DecodeName(DataName name, Type type)
+			{
+				DataName typeName = this.Settings.Resolver.LoadTypeName(type);
+
+				// String.Empty is a valid DataName.LocalName, so must replace
+				if (name == typeName)
+				{
+					return DataName.Empty;
+				}
+
+				// due to a bug in System.Xml.XmlCharType,
+				// certain chars are not allowed that XML allows
+				// so we must use XmlConvert to encode with same bug
+
+				// XML only supports a subset of chars that DataName.LocalName does
+				string localName = System.Xml.XmlConvert.EncodeLocalName(name.LocalName);
+				if (name.LocalName != localName)
+				{
+					return new DataName(localName, name.Prefix, name.NamespaceUri, name.IsAttribute);
+				}
+
+				return name;
+			}
+
+			#endregion Utility Methods
 		}
 	}
 }

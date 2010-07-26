@@ -44,7 +44,7 @@ namespace JsonFx.Html
 		#region Constants
 
 		private const string TraitName = "HTML";
-		private const string TraitValue = "Deserialization";
+		private const string TraitValue = "Tokenizer";
 
 		#endregion Constants
 

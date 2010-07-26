@@ -45,7 +45,7 @@ namespace JsonFx.Common.Filters
 		#region Constants
 
 		private const string TraitName = "Filters";
-		private const string TraitValue = "DateTime";
+		private const string TraitValue = "MSAjaxDate";
 
 		#endregion Constants
 

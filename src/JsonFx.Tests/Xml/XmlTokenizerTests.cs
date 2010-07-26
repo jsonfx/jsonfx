@@ -44,7 +44,7 @@ namespace JsonFx.Xml
 		#region Constants
 
 		private const string TraitName = "XML";
-		private const string TraitValue = "Deserialization";
+		private const string TraitValue = "Tokenizer";
 
 		#endregion Constants
 
