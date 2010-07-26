@@ -113,7 +113,7 @@ namespace JsonFx.Xml
 			/// </summary>
 			/// <param name="output"></param>
 			/// <param name="input"></param>
-			private void TransformValue(List<Token<MarkupTokenType>> output, IStream<Token<CommonTokenType>> input, DataName elementName)
+			private void TransformValue(List<Token<MarkupTokenType>> output, IStream<Token<CommonTokenType>> input, DataName propertyName)
 			{
 				if (this.pendingNewLine)
 				{
@@ -130,31 +130,35 @@ namespace JsonFx.Xml
 				{
 					case CommonTokenType.ArrayBegin:
 					{
-						this.TransformArray(output, input, elementName);
+						this.TransformArray(output, input, propertyName);
 						break;
 					}
 					case CommonTokenType.ObjectBegin:
 					{
-						this.TransformObject(output, input, elementName);
+						this.TransformObject(output, input, propertyName);
 						break;
 					}
 					case CommonTokenType.Primitive:
 					{
 						input.Pop();
 
-						string value = token.ValueAsString();
-						if (String.IsNullOrEmpty(value))
+						if (propertyName.IsEmpty)
 						{
-							elementName = this.EncodeName(elementName.IsEmpty ? token.Name : elementName, null);
-							this.EmitTag(output, elementName, null, MarkupTokenType.ElementVoid);
+							propertyName = token.Name;
+						}
+
+						if (token.Value == null)
+						{
+							propertyName = this.EncodeName(propertyName, null);
+							this.EmitTag(output, propertyName, null, MarkupTokenType.ElementVoid);
 						}
 						else
 						{
-							elementName = this.EncodeName(elementName.IsEmpty ? token.Name : elementName, token.Value.GetType());
+							propertyName = this.EncodeName(propertyName, token.Value.GetType());
 
-							this.EmitTag(output, elementName, null, MarkupTokenType.ElementBegin);
-							output.Add(MarkupGrammar.TokenValue(value));
-							this.EmitTag(output, elementName, null, MarkupTokenType.ElementEnd);
+							this.EmitTag(output, propertyName, null, MarkupTokenType.ElementBegin);
+							output.Add(token.ChangeType(MarkupTokenType.Primitive));
+							this.EmitTag(output, propertyName, null, MarkupTokenType.ElementEnd);
 						}
 						break;
 					}
@@ -167,17 +171,17 @@ namespace JsonFx.Xml
 				}
 			}
 
-			private void TransformArray(List<Token<MarkupTokenType>> output, IStream<Token<CommonTokenType>> input, DataName elementName)
+			private void TransformArray(List<Token<MarkupTokenType>> output, IStream<Token<CommonTokenType>> input, DataName propertyName)
 			{
 				Token<CommonTokenType> token = input.Pop();
 
 				// ensure element has a name
-				elementName = this.EncodeName(elementName.IsEmpty ? token.Name : elementName, typeof(Array));
+				propertyName = this.EncodeName(propertyName.IsEmpty ? token.Name : propertyName, typeof(Array));
 
 				// TODO: figure out a way to surface XmlArrayItemAttribute name
 				DataName itemName = DataName.Empty;//new DataName("arrayItem");
 
-				this.EmitTag(output, elementName, null, MarkupTokenType.ElementBegin);
+				this.EmitTag(output, propertyName, null, MarkupTokenType.ElementBegin);
 				this.pendingNewLine = true;
 
 				bool needsValueDelim = false;
@@ -200,7 +204,7 @@ namespace JsonFx.Xml
 								this.EmitNewLine(output);
 							}
 
-							this.EmitTag(output, elementName, null, MarkupTokenType.ElementEnd);
+							this.EmitTag(output, propertyName, null, MarkupTokenType.ElementEnd);
 							this.pendingNewLine = true;
 							return;
 						}
@@ -259,15 +263,15 @@ namespace JsonFx.Xml
 				}
 			}
 
-			private void TransformObject(List<Token<MarkupTokenType>> output, IStream<Token<CommonTokenType>> input, DataName elementName)
+			private void TransformObject(List<Token<MarkupTokenType>> output, IStream<Token<CommonTokenType>> input, DataName propertyName)
 			{
 				Token<CommonTokenType> token = input.Pop();
 
 				// ensure element has a name
-				elementName = this.EncodeName(elementName.IsEmpty ? token.Name : elementName, typeof(Object));
+				propertyName = this.EncodeName(propertyName.IsEmpty ? token.Name : propertyName, typeof(Object));
 
 				bool needsBeginTag = true;
-				SortedList<DataName, string> attributes = null;
+				SortedList<DataName, Token<CommonTokenType>> attributes = null;
 
 				bool needsValueDelim = false;
 				while (!input.IsCompleted)
@@ -283,7 +287,7 @@ namespace JsonFx.Xml
 							{
 								needsBeginTag = false;
 								// write out namespaces and attributes
-								this.EmitTag(output, elementName, attributes, MarkupTokenType.ElementBegin);
+								this.EmitTag(output, propertyName, attributes, MarkupTokenType.ElementBegin);
 								this.pendingNewLine = true;
 							}
 
@@ -297,7 +301,7 @@ namespace JsonFx.Xml
 								this.EmitNewLine(output);
 							}
 
-							this.EmitTag(output, elementName, null, MarkupTokenType.ElementEnd);
+							this.EmitTag(output, propertyName, null, MarkupTokenType.ElementEnd);
 							this.pendingNewLine = true;
 							return;
 						}
@@ -321,7 +325,7 @@ namespace JsonFx.Xml
 									if (attributes == null)
 									{
 										// allocate and sort attributes
-										attributes = new SortedList<DataName, string>();
+										attributes = new SortedList<DataName, Token<CommonTokenType>>();
 									}
 									DataName attrName = token.Name;
 
@@ -341,7 +345,7 @@ namespace JsonFx.Xml
 									// according to XML rules cannot duplicate attribute names
 									if (!attributes.ContainsKey(attrName))
 									{
-										attributes.Add(attrName, token.ValueAsString());
+										attributes.Add(attrName, token);
 									}
 
 									this.pendingNewLine = false;
@@ -354,7 +358,7 @@ namespace JsonFx.Xml
 
 									// end attributes with first non-attribute child
 									// write out namespaces and attributes
-									this.EmitTag(output, elementName, attributes, MarkupTokenType.ElementBegin);
+									this.EmitTag(output, propertyName, attributes, MarkupTokenType.ElementBegin);
 									this.pendingNewLine = true;
 								}
 							}
@@ -389,7 +393,7 @@ namespace JsonFx.Xml
 
 			#region Emit MarkupTokenType Methods
 
-			private void EmitTag(List<Token<MarkupTokenType>> output, DataName elementName, SortedList<DataName, string> attributes, MarkupTokenType tagType)
+			private void EmitTag(List<Token<MarkupTokenType>> output, DataName elementName, SortedList<DataName, Token<CommonTokenType>> attributes, MarkupTokenType tagType)
 			{
 				if (this.pendingNewLine)
 				{
@@ -446,7 +450,7 @@ namespace JsonFx.Xml
 							attr.Key : new DataName(attr.Key.LocalName, prefix, attr.Key.NamespaceUri, true);
 
 						output.Add(MarkupGrammar.TokenAttribute(attrName));
-						output.Add(MarkupGrammar.TokenValue(attr.Value));
+						output.Add(attr.Value.ChangeType(MarkupTokenType.Primitive));
 					}
 
 					attributes.Clear();

@@ -116,14 +116,14 @@ namespace JsonFx.Xml
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("array")),
 				MarkupGrammar.TokenElementBegin(new DataName("int")),
-				MarkupGrammar.TokenValue("0"),
+				MarkupGrammar.TokenValue(0),
 				MarkupGrammar.TokenElementEnd,
 				MarkupGrammar.TokenElementVoid(new DataName("object")),
 				MarkupGrammar.TokenElementBegin(new DataName("boolean")),
-				MarkupGrammar.TokenValue("false"),
+				MarkupGrammar.TokenValue(false),
 				MarkupGrammar.TokenElementEnd,
 				MarkupGrammar.TokenElementBegin(new DataName("boolean")),
-				MarkupGrammar.TokenValue("true"),
+				MarkupGrammar.TokenValue(true),
 				MarkupGrammar.TokenElementEnd,
 				MarkupGrammar.TokenElementEnd,
 			};

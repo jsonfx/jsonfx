@@ -102,9 +102,9 @@ namespace JsonFx.Markup
 			return new Token<MarkupTokenType>(MarkupTokenType.Attribute, name);
 		}
 
-		public static Token<MarkupTokenType> TokenValue(string text)
+		public static Token<MarkupTokenType> TokenValue(object value)
 		{
-			return new Token<MarkupTokenType>(MarkupTokenType.Primitive, text);
+			return new Token<MarkupTokenType>(MarkupTokenType.Primitive, value);
 		}
 
 		#endregion Reusable Tokens
