@@ -506,7 +506,7 @@ namespace JsonFx.Xml
 			var expected = new[]
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("foo", String.Empty, "http://json.org")),
-				MarkupGrammar.TokenAttribute(new DataName("key", "q1", "http://jsonfx.net", true)),
+				MarkupGrammar.TokenAttribute(new DataName("key", String.Empty, "http://jsonfx.net", true)),
 				MarkupGrammar.TokenValue("value"),
 				MarkupGrammar.TokenElementEnd,
 			};

@@ -186,6 +186,26 @@ namespace JsonFx.Xml
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
+		public void Format_ParentAndAttributeDifferentNamespaces_CorrectlyEmitsNamespaces()
+		{
+			var input = new[]
+			{
+				MarkupGrammar.TokenElementBegin(new DataName("foo", String.Empty, "http://json.org")),
+				MarkupGrammar.TokenAttribute(new DataName("key", String.Empty, "http://jsonfx.net", true)),
+				MarkupGrammar.TokenValue("value"),
+				MarkupGrammar.TokenElementEnd,
+			};
+			var expected = @"<foo p1:key=""value"" xmlns:p1=""http://jsonfx.net"" xmlns=""http://json.org"" />";
+
+			var formatter = new XmlWriter.XmlFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_DifferentPrefixSameNamespace_ReturnsMarkup()
 		{
 			// Not sure if this is correct: http://stackoverflow.com/questions/3312390

@@ -438,18 +438,7 @@ namespace JsonFx.Xml
 				{
 					foreach (var attr in attributes)
 					{
-						string prefix = this.ScopeChain.EnsurePrefix(attr.Key.Prefix, attr.Key.NamespaceUri);
-
-						if (!this.ScopeChain.ContainsNamespace(attr.Key.NamespaceUri))
-						{
-							scope[this.ScopeChain.EnsurePrefix(attr.Key.Prefix, attr.Key.NamespaceUri)] = elementName.NamespaceUri;
-						}
-
-						DataName attrName =
-							(prefix == attr.Key.Prefix) ?
-							attr.Key : new DataName(attr.Key.LocalName, prefix, attr.Key.NamespaceUri, true);
-
-						output.Add(MarkupGrammar.TokenAttribute(attrName));
+						output.Add(MarkupGrammar.TokenAttribute(attr.Key));
 						output.Add(attr.Value.ChangeType(MarkupTokenType.Primitive));
 					}
 
