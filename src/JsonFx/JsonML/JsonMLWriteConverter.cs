@@ -48,6 +48,9 @@ namespace JsonFx.JsonML
 			#region Constants
 
 			private const string ErrorUnexpectedToken = "Unexpected token ({0})";
+			private const string ErrorMissingTagName = "Missing JsonML tag name";
+			private const string ErrorInvalidAttributeValue = "Invalid attribute value token ({0})";
+			private const string ErrorUnterminatedAttributeBlock = "Unterminated attribute block ({0})";
 
 			#endregion Constants
 
@@ -72,8 +75,74 @@ namespace JsonFx.JsonML
 					{
 						case CommonTokenType.ArrayBegin:
 						{
-							yield return MarkupGrammar.TokenElementEnd(new DataName());
+							// consume array begin token
+							stream.Pop();
+							token = stream.Peek();
 
+							if (token.TokenType != CommonTokenType.Primitive)
+							{
+								throw new TokenException<CommonTokenType>(
+									token,
+									JsonMLWriteConverter.ErrorMissingTagName);
+							}
+
+							DataName tagName;
+							if (token.Value is DataName)
+							{
+								tagName = (DataName)token.Value;
+							}
+							else
+							{
+								// use as local-name
+								tagName = new DataName(token.ValueAsString());
+							}
+
+							yield return MarkupGrammar.TokenElementBegin(tagName);
+
+							// consume name value token
+							stream.Pop();
+							token = stream.Peek();
+
+							if (token.TokenType != CommonTokenType.ObjectBegin)
+							{
+								// no attributes
+								break;
+							}
+
+							// consume object begin token
+							stream.Pop();
+							token = stream.Peek();
+
+							while (token.TokenType == CommonTokenType.Property)
+							{
+								yield return MarkupGrammar.TokenAttribute(token.Name);
+
+								// consume attribute name token
+								stream.Pop();
+								token = stream.Peek();
+
+								if (token.TokenType != CommonTokenType.Primitive)
+								{
+									throw new TokenException<CommonTokenType>(
+										token,
+										String.Format(JsonMLWriteConverter.ErrorInvalidAttributeValue, token.TokenType));
+								}
+
+								yield return this.TransformValue(token);
+
+								// consume attribute value token
+								stream.Pop();
+								token = stream.Peek();
+							}
+
+							if (token.TokenType != CommonTokenType.ObjectEnd)
+							{
+								throw new TokenException<CommonTokenType>(
+									token,
+									String.Format(JsonMLWriteConverter.ErrorUnterminatedAttributeBlock, token.TokenType));
+							}
+
+							// consume object end token
 							stream.Pop();
 							token = stream.Peek();
 							break;
@@ -88,21 +157,28 @@ namespace JsonFx.JsonML
 						}
 						case CommonTokenType.Primitive:
 						{
+							yield return this.TransformValue(token);
+
 							stream.Pop();
 							token = stream.Peek();
 							break;
 						}
-						case CommonTokenType.ObjectBegin:
-						case CommonTokenType.ObjectEnd:
-						case CommonTokenType.Property:
 						default:
 						{
+							// the rest are invalid outside of attribute block
 							throw new TokenException<CommonTokenType>(
 								token,
-								String.Format(ErrorUnexpectedToken, token.TokenType));
+								String.Format(JsonMLWriteConverter.ErrorUnexpectedToken, token.TokenType));
 						}
 					}
 				}
+			}
+
+			private Token<MarkupTokenType> TransformValue(Token<CommonTokenType> token)
+			{
+				MarkupTokenType valueType = (token.Name.IsEmpty) ? MarkupTokenType.TextValue : MarkupTokenType.UnparsedBlock;
+
+				return new Token<MarkupTokenType>(valueType, token.Name, token.Value);
 			}
 
 			#endregion IDataTransformer<MarkupTokenType,CommonTokenType> Members
