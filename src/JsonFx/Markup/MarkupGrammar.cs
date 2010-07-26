@@ -118,6 +118,7 @@ namespace JsonFx.Markup
 
 		public static Token<MarkupTokenType> TokenWhitespace(string text)
 		{
+			// TODO: evaluate the usefullness of Whitespace vs. Text, should there just be Value?
 			return new Token<MarkupTokenType>(MarkupTokenType.Whitespace, text);
 		}
 
