@@ -307,6 +307,16 @@ namespace JsonFx.Serialization
 			return (value as string) ?? value.ToString();
 		}
 
+		/// <summary>
+		/// Converts token to a token of a different type
+		/// </summary>
+		/// <typeparam name="TOther"></typeparam>
+		/// <returns>token with same values and different type</returns>
+		public Token<TOther> ChangeType<TOther>(TOther tokenType)
+		{
+			return new Token<TOther>(tokenType, this.Name, this.Value);
+		}
+
 		#endregion Utility Methods
 	}
 }

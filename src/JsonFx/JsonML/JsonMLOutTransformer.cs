@@ -127,7 +127,7 @@ namespace JsonFx.JsonML
 
 							while (token.TokenType == CommonTokenType.Property)
 							{
-								yield return MarkupGrammar.TokenAttribute(token.Name);
+								yield return token.ChangeType(MarkupTokenType.Attribute);
 
 								// consume attribute name token
 								stream.Pop();
@@ -190,7 +190,7 @@ namespace JsonFx.JsonML
 			{
 				MarkupTokenType valueType = (token.Name.IsEmpty) ? MarkupTokenType.Primitive : MarkupTokenType.UnparsedBlock;
 
-				return new Token<MarkupTokenType>(valueType, token.Name, token.Value);
+				return token.ChangeType(valueType);
 			}
 
 			#endregion IDataTransformer<MarkupTokenType,CommonTokenType> Members

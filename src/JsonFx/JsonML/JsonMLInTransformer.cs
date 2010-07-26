@@ -126,7 +126,7 @@ namespace JsonFx.JsonML
 									yield return CommonGrammar.TokenObjectBeginNoName;
 								}
 
-								yield return CommonGrammar.TokenProperty(token.Name);
+								yield return token.ChangeType(CommonTokenType.Property);
 
 								stream.Pop();
 								token = stream.Peek();
@@ -140,7 +140,7 @@ namespace JsonFx.JsonML
 									}
 									case MarkupTokenType.UnparsedBlock:
 									{
-										yield return new Token<CommonTokenType>(CommonTokenType.Primitive, token.Name, token.Value);
+										yield return token.ChangeType(CommonTokenType.Primitive);
 										break;
 									}
 									default:
@@ -204,7 +204,7 @@ namespace JsonFx.JsonML
 						}
 						case MarkupTokenType.UnparsedBlock:
 						{
-							yield return new Token<CommonTokenType>(CommonTokenType.Primitive, token.Name, token.Value);
+							yield return token.ChangeType(CommonTokenType.Primitive);
 
 							stream.Pop();
 							token = stream.Peek();
