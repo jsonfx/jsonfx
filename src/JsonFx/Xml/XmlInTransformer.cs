@@ -147,7 +147,7 @@ namespace JsonFx.Xml
 			{
 				Token<MarkupTokenType> token = input.Peek();
 
-				DataName elementName = token.Name;
+				DataName elementName = this.DecodeName(token.Name, typeof(Object));
 				bool isVoid = (token.TokenType == MarkupTokenType.ElementVoid);
 				input.Pop();
 
@@ -205,7 +205,7 @@ namespace JsonFx.Xml
 
 						if (isStandAlone)
 						{
-							output.Add(elementName.IsEmpty ? CommonGrammar.TokenObjectBeginNoName : CommonGrammar.TokenObjectBegin(this.DecodeName(elementName, typeof(Object))));
+							output.Add(elementName.IsEmpty ? CommonGrammar.TokenObjectBeginNoName : CommonGrammar.TokenObjectBegin(elementName));
 						}
 
 						if (children != null)
@@ -216,17 +216,15 @@ namespace JsonFx.Xml
 								{
 									if (isStandAlone)
 									{
-
-
 										// if the parent is a stand alone object then child is a property
 										DataName name = this.DecodeName(property.Key, typeof(Object));
-										name = name.IsEmpty ? this.DecodeName(elementName, typeof(Object)) : name;
-										output.Add(CommonGrammar.TokenProperty(name));
+										output.Add(name.IsEmpty ? CommonGrammar.TokenProperty(elementName) : CommonGrammar.TokenProperty(name));
 									}
 									output.AddRange(property.Value[0]);
 									continue;
 								}
 
+								// wrap values in array
 								output.Add(property.Key.IsEmpty ? CommonGrammar.TokenArrayBeginNoName : CommonGrammar.TokenArrayBegin(this.DecodeName(property.Key, typeof(Array))));
 								foreach (var item in property.Value)
 								{
