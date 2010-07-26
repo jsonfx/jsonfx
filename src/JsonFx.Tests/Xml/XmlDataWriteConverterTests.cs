@@ -65,7 +65,7 @@ namespace JsonFx.Xml
 			var expected = new[]
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("array")),
-				MarkupGrammar.TokenElementEnd(new DataName("array"))
+				MarkupGrammar.TokenElementEnd
 			};
 
 			var formatter = new XmlWriter.XmlDataWriteConverter(new DataWriterSettings());
@@ -89,7 +89,7 @@ namespace JsonFx.Xml
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("array")),
 				MarkupGrammar.TokenElementVoid(new DataName("object")),
-				MarkupGrammar.TokenElementEnd(new DataName("array"))
+				MarkupGrammar.TokenElementEnd
 			};
 
 			var formatter = new XmlWriter.XmlDataWriteConverter(new DataWriterSettings());
@@ -116,16 +116,16 @@ namespace JsonFx.Xml
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("array")),
 				MarkupGrammar.TokenElementBegin(new DataName("int")),
-				MarkupGrammar.TokenText("0"),
-				MarkupGrammar.TokenElementEnd(new DataName("int")),
+				MarkupGrammar.TokenValue("0"),
+				MarkupGrammar.TokenElementEnd,
 				MarkupGrammar.TokenElementVoid(new DataName("object")),
 				MarkupGrammar.TokenElementBegin(new DataName("boolean")),
-				MarkupGrammar.TokenText("false"),
-				MarkupGrammar.TokenElementEnd(new DataName("boolean")),
+				MarkupGrammar.TokenValue("false"),
+				MarkupGrammar.TokenElementEnd,
 				MarkupGrammar.TokenElementBegin(new DataName("boolean")),
-				MarkupGrammar.TokenText("true"),
-				MarkupGrammar.TokenElementEnd(new DataName("boolean")),
-				MarkupGrammar.TokenElementEnd(new DataName("array")),
+				MarkupGrammar.TokenValue("true"),
+				MarkupGrammar.TokenElementEnd,
+				MarkupGrammar.TokenElementEnd,
 			};
 
 			var formatter = new XmlWriter.XmlDataWriteConverter(new DataWriterSettings());
@@ -205,28 +205,28 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementBegin(new DataName("array")),
 
 				MarkupGrammar.TokenElementBegin(new DataName("string")),
-				MarkupGrammar.TokenText("Not too deep"),
-				MarkupGrammar.TokenElementEnd(new DataName("string")),
+				MarkupGrammar.TokenValue("Not too deep"),
+				MarkupGrammar.TokenElementEnd,
 
-				MarkupGrammar.TokenElementEnd(new DataName("array")),
-				MarkupGrammar.TokenElementEnd(new DataName("array")),
-				MarkupGrammar.TokenElementEnd(new DataName("array")),
-				MarkupGrammar.TokenElementEnd(new DataName("array")),
-				MarkupGrammar.TokenElementEnd(new DataName("array")),
-				MarkupGrammar.TokenElementEnd(new DataName("array")),
-				MarkupGrammar.TokenElementEnd(new DataName("array")),
-				MarkupGrammar.TokenElementEnd(new DataName("array")),
-				MarkupGrammar.TokenElementEnd(new DataName("array")),
-				MarkupGrammar.TokenElementEnd(new DataName("array")),
-				MarkupGrammar.TokenElementEnd(new DataName("array")),
-				MarkupGrammar.TokenElementEnd(new DataName("array")),
-				MarkupGrammar.TokenElementEnd(new DataName("array")),
-				MarkupGrammar.TokenElementEnd(new DataName("array")),
-				MarkupGrammar.TokenElementEnd(new DataName("array")),
-				MarkupGrammar.TokenElementEnd(new DataName("array")),
-				MarkupGrammar.TokenElementEnd(new DataName("array")),
-				MarkupGrammar.TokenElementEnd(new DataName("array")),
-				MarkupGrammar.TokenElementEnd(new DataName("array"))
+				MarkupGrammar.TokenElementEnd,
+				MarkupGrammar.TokenElementEnd,
+				MarkupGrammar.TokenElementEnd,
+				MarkupGrammar.TokenElementEnd,
+				MarkupGrammar.TokenElementEnd,
+				MarkupGrammar.TokenElementEnd,
+				MarkupGrammar.TokenElementEnd,
+				MarkupGrammar.TokenElementEnd,
+				MarkupGrammar.TokenElementEnd,
+				MarkupGrammar.TokenElementEnd,
+				MarkupGrammar.TokenElementEnd,
+				MarkupGrammar.TokenElementEnd,
+				MarkupGrammar.TokenElementEnd,
+				MarkupGrammar.TokenElementEnd,
+				MarkupGrammar.TokenElementEnd,
+				MarkupGrammar.TokenElementEnd,
+				MarkupGrammar.TokenElementEnd,
+				MarkupGrammar.TokenElementEnd,
+				MarkupGrammar.TokenElementEnd
 			};
 
 			var formatter = new XmlWriter.XmlDataWriteConverter(new DataWriterSettings());
@@ -252,7 +252,7 @@ namespace JsonFx.Xml
 			var expected = new[]
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("object")),
-				MarkupGrammar.TokenElementEnd(new DataName("object"))
+				MarkupGrammar.TokenElementEnd
 			};
 
 			var formatter = new XmlWriter.XmlDataWriteConverter(new DataWriterSettings());
@@ -277,9 +277,9 @@ namespace JsonFx.Xml
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("object")),
 				MarkupGrammar.TokenElementBegin(new DataName("key")),
-				MarkupGrammar.TokenText("value"),
-				MarkupGrammar.TokenElementEnd(new DataName("key")),
-				MarkupGrammar.TokenElementEnd(new DataName("object")),
+				MarkupGrammar.TokenValue("value"),
+				MarkupGrammar.TokenElementEnd,
+				MarkupGrammar.TokenElementEnd,
 			};
 
 			var formatter = new XmlWriter.XmlDataWriteConverter(new DataWriterSettings());
@@ -304,9 +304,9 @@ namespace JsonFx.Xml
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("Yada")),
 				MarkupGrammar.TokenElementBegin(new DataName("key")),
-				MarkupGrammar.TokenText("value"),
-				MarkupGrammar.TokenElementEnd(new DataName("key")),
-				MarkupGrammar.TokenElementEnd(new DataName("Yada")),
+				MarkupGrammar.TokenValue("value"),
+				MarkupGrammar.TokenElementEnd,
+				MarkupGrammar.TokenElementEnd,
 			};
 
 			var formatter = new XmlWriter.XmlDataWriteConverter(new DataWriterSettings());
@@ -338,13 +338,13 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementBegin(new DataName("object")),
 				MarkupGrammar.TokenElementBegin(new DataName("JSON_x0020_Test_x0020_Pattern_x0020_pass3")),
 				MarkupGrammar.TokenElementBegin(new DataName("The_x0020_outermost_x0020_value")),
-				MarkupGrammar.TokenText("must be an object or array."),
-				MarkupGrammar.TokenElementEnd(new DataName("The_x0020_outermost_x0020_value")),
+				MarkupGrammar.TokenValue("must be an object or array."),
+				MarkupGrammar.TokenElementEnd,
 				MarkupGrammar.TokenElementBegin(new DataName("In_x0020_this_x0020_test")),
-				MarkupGrammar.TokenText("It is an object."),
-				MarkupGrammar.TokenElementEnd(new DataName("In_x0020_this_x0020_test")),
-				MarkupGrammar.TokenElementEnd(new DataName("JSON_x0020_Test_x0020_Pattern_x0020_pass3")),
-				MarkupGrammar.TokenElementEnd(new DataName("object")),
+				MarkupGrammar.TokenValue("It is an object."),
+				MarkupGrammar.TokenElementEnd,
+				MarkupGrammar.TokenElementEnd,
+				MarkupGrammar.TokenElementEnd,
 			};
 
 			var formatter = new XmlWriter.XmlDataWriteConverter(new DataWriterSettings());
@@ -373,9 +373,9 @@ namespace JsonFx.Xml
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("foo")),
 				MarkupGrammar.TokenElementBegin(new DataName("key", String.Empty, "http://json.org")),
-				MarkupGrammar.TokenText("value"),
-				MarkupGrammar.TokenElementEnd(new DataName("key", String.Empty, "http://json.org")),
-				MarkupGrammar.TokenElementEnd(new DataName("foo")),
+				MarkupGrammar.TokenValue("value"),
+				MarkupGrammar.TokenElementEnd,
+				MarkupGrammar.TokenElementEnd,
 			};
 
 			var formatter = new XmlWriter.XmlDataWriteConverter(new DataWriterSettings());
@@ -400,9 +400,9 @@ namespace JsonFx.Xml
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("foo", String.Empty, "http://json.org")),
 				MarkupGrammar.TokenElementBegin(new DataName("key", String.Empty, "http://json.org")),
-				MarkupGrammar.TokenText("value"),
-				MarkupGrammar.TokenElementEnd(new DataName("key", String.Empty, "http://json.org")),
-				MarkupGrammar.TokenElementEnd(new DataName("foo", String.Empty, "http://json.org")),
+				MarkupGrammar.TokenValue("value"),
+				MarkupGrammar.TokenElementEnd,
+				MarkupGrammar.TokenElementEnd,
 			};
 
 			var formatter = new XmlWriter.XmlDataWriteConverter(new DataWriterSettings());
@@ -427,9 +427,9 @@ namespace JsonFx.Xml
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("foo", String.Empty, "http://json.org")),
 				MarkupGrammar.TokenElementBegin(new DataName("key")),
-				MarkupGrammar.TokenText("value"),
-				MarkupGrammar.TokenElementEnd(new DataName("key")),
-				MarkupGrammar.TokenElementEnd(new DataName("foo", String.Empty, "http://json.org")),
+				MarkupGrammar.TokenValue("value"),
+				MarkupGrammar.TokenElementEnd,
+				MarkupGrammar.TokenElementEnd,
 			};
 
 			var formatter = new XmlWriter.XmlDataWriteConverter(new DataWriterSettings());
@@ -454,9 +454,9 @@ namespace JsonFx.Xml
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("foo", String.Empty, "http://json.org")),
 				MarkupGrammar.TokenElementBegin(new DataName("key", String.Empty, "http://jsonfx.net")),
-				MarkupGrammar.TokenText("value"),
-				MarkupGrammar.TokenElementEnd(new DataName("key", String.Empty, "http://jsonfx.net")),
-				MarkupGrammar.TokenElementEnd(new DataName("foo", String.Empty, "http://json.org")),
+				MarkupGrammar.TokenValue("value"),
+				MarkupGrammar.TokenElementEnd,
+				MarkupGrammar.TokenElementEnd,
 			};
 
 			var formatter = new XmlWriter.XmlDataWriteConverter(new DataWriterSettings());
@@ -481,8 +481,8 @@ namespace JsonFx.Xml
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("foo", String.Empty, "http://json.org")),
 				MarkupGrammar.TokenAttribute(new DataName("key", String.Empty, "http://json.org", true)),
-				MarkupGrammar.TokenText("value"),
-				MarkupGrammar.TokenElementEnd(new DataName("foo", String.Empty, "http://json.org")),
+				MarkupGrammar.TokenValue("value"),
+				MarkupGrammar.TokenElementEnd,
 			};
 
 			var formatter = new XmlWriter.XmlDataWriteConverter(new DataWriterSettings());
@@ -507,8 +507,8 @@ namespace JsonFx.Xml
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("foo", String.Empty, "http://json.org")),
 				MarkupGrammar.TokenAttribute(new DataName("key", "q1", "http://jsonfx.net", true)),
-				MarkupGrammar.TokenText("value"),
-				MarkupGrammar.TokenElementEnd(new DataName("foo", String.Empty, "http://json.org")),
+				MarkupGrammar.TokenValue("value"),
+				MarkupGrammar.TokenElementEnd,
 			};
 
 			var formatter = new XmlWriter.XmlDataWriteConverter(new DataWriterSettings());
@@ -539,10 +539,10 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementBegin(new DataName("foo1", String.Empty, "http://json.org")),
 				MarkupGrammar.TokenElementBegin(new DataName("key1", String.Empty, "http://jsonfx.net")),
 				MarkupGrammar.TokenElementBegin(new DataName("key2", String.Empty, "http://jsonfx.net")),
-				MarkupGrammar.TokenText("value"),
-				MarkupGrammar.TokenElementEnd(new DataName("key2", String.Empty, "http://jsonfx.net")),
-				MarkupGrammar.TokenElementEnd(new DataName("key1", String.Empty, "http://jsonfx.net")),
-				MarkupGrammar.TokenElementEnd(new DataName("foo1", String.Empty, "http://json.org")),
+				MarkupGrammar.TokenValue("value"),
+				MarkupGrammar.TokenElementEnd,
+				MarkupGrammar.TokenElementEnd,
+				MarkupGrammar.TokenElementEnd,
 			};
 
 			var formatter = new XmlWriter.XmlDataWriteConverter(new DataWriterSettings());
@@ -573,10 +573,10 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementBegin(new DataName("foo1", String.Empty, "http://json.org")),
 				MarkupGrammar.TokenElementBegin(new DataName("key1", String.Empty, "http://jsonfx.net")),
 				MarkupGrammar.TokenElementBegin(new DataName("key2", String.Empty, "http://json.org")),
-				MarkupGrammar.TokenText("value"),
-				MarkupGrammar.TokenElementEnd(new DataName("key2", String.Empty, "http://json.org")),
-				MarkupGrammar.TokenElementEnd(new DataName("key1", String.Empty, "http://jsonfx.net")),
-				MarkupGrammar.TokenElementEnd(new DataName("foo1", String.Empty, "http://json.org")),
+				MarkupGrammar.TokenValue("value"),
+				MarkupGrammar.TokenElementEnd,
+				MarkupGrammar.TokenElementEnd,
+				MarkupGrammar.TokenElementEnd,
 			};
 
 			var formatter = new XmlWriter.XmlDataWriteConverter(new DataWriterSettings());

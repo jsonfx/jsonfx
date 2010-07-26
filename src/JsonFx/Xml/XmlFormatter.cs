@@ -189,8 +189,7 @@ namespace JsonFx.Xml
 								token = stream.Peek();
 								break;
 							}
-							case MarkupTokenType.TextValue:
-							case MarkupTokenType.Whitespace:
+							case MarkupTokenType.Primitive:
 							{
 								writer.WriteString(token.ValueAsString());
 
@@ -262,8 +261,7 @@ namespace JsonFx.Xml
 						}
 						break;
 					}
-					case MarkupTokenType.TextValue:
-					case MarkupTokenType.Whitespace:
+					case MarkupTokenType.Primitive:
 					{
 						writer.WriteString(token.ValueAsString());
 						break;

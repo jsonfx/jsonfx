@@ -153,7 +153,7 @@ namespace JsonFx.Xml
 							elementName = this.EnsureName(elementName.IsEmpty ? token.Name : elementName, token.Value.GetType());
 
 							this.EmitTag(output, elementName, null, MarkupTokenType.ElementBegin);
-							output.Add(MarkupGrammar.TokenText(value));
+							output.Add(MarkupGrammar.TokenValue(value));
 							this.EmitTag(output, elementName, null, MarkupTokenType.ElementEnd);
 						}
 						break;
@@ -419,7 +419,7 @@ namespace JsonFx.Xml
 					}
 					case MarkupTokenType.ElementEnd:
 					{
-						output.Add(MarkupGrammar.TokenElementEnd(elementName));
+						output.Add(MarkupGrammar.TokenElementEnd);
 						break;
 					}
 					default:
@@ -446,7 +446,7 @@ namespace JsonFx.Xml
 							attr.Key : new DataName(attr.Key.LocalName, prefix, attr.Key.NamespaceUri, true);
 
 						output.Add(MarkupGrammar.TokenAttribute(attrName));
-						output.Add(MarkupGrammar.TokenText(attr.Value));
+						output.Add(MarkupGrammar.TokenValue(attr.Value));
 					}
 
 					attributes.Clear();
@@ -481,7 +481,7 @@ namespace JsonFx.Xml
 					}
 				}
 
-				output.Add(MarkupGrammar.TokenWhitespace(buffer.ToString()));
+				output.Add(MarkupGrammar.TokenValue(buffer.ToString()));
 			}
 
 			#endregion Emit MarkupTokenType Methods

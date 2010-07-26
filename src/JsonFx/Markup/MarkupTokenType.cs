@@ -116,16 +116,6 @@ namespace JsonFx.Markup
 		/// Typically <see cref="Token<CommonTokenType>.Value"/> is serialized directly as a string.
 		/// If the <see cref="Token<CommonTokenType>.Value"/> is not a CLR primitive, then the value must implement IConvertable, IFormatable or be meaningful when cast to a string.
 		/// </remarks>
-		TextValue,
-
-		/// <summary>
-		/// A block of text made entirely of whitespace, the token contains the text value
-		/// </summary>
-		/// <remarks>
-		/// The <see cref="Token<CommonTokenType>.Value"/> is optional, i.e. null and whitespace are a valid values.
-		/// Typically <see cref="Token<CommonTokenType>.Value"/> is serialized directly as a string.
-		/// If the <see cref="Token<CommonTokenType>.Value"/> is not a CLR primitive, then the value must implement IConvertable, IFormatable or be meaningful when cast to a string.
-		/// </remarks>
-		Whitespace
+		Primitive
 	}
 }

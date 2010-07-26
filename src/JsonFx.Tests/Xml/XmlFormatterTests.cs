@@ -56,7 +56,7 @@ namespace JsonFx.Xml
 			var input = new[]
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("root")),
-			        MarkupGrammar.TokenElementEnd(new DataName("root"))
+			        MarkupGrammar.TokenElementEnd
 			    };
 			const string expected = @"<root />";
 
@@ -77,7 +77,7 @@ namespace JsonFx.Xml
 			var input = new[]
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("root", String.Empty, "http://example.com/schema")),
-			        MarkupGrammar.TokenElementEnd(new DataName("root", String.Empty, "http://example.com/schema")),
+			        MarkupGrammar.TokenElementEnd,
 			    };
 			const string expected = @"<root xmlns=""http://example.com/schema"" />";
 
@@ -94,7 +94,7 @@ namespace JsonFx.Xml
 			var input = new[]
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("root", "prefix", "http://example.com/schema")),
-			        MarkupGrammar.TokenElementEnd(new DataName("root", "prefix", "http://example.com/schema")),
+			        MarkupGrammar.TokenElementEnd,
 			    };
 			const string expected = @"<prefix:root xmlns:prefix=""http://example.com/schema"" />";
 
@@ -112,9 +112,9 @@ namespace JsonFx.Xml
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("foo")),
 			        MarkupGrammar.TokenElementBegin(new DataName("child", String.Empty, "http://example.com/schema")),
-			        MarkupGrammar.TokenText("value"),
-			        MarkupGrammar.TokenElementEnd(new DataName("child", String.Empty, "http://example.com/schema")),
-			        MarkupGrammar.TokenElementEnd(new DataName("foo"))
+			        MarkupGrammar.TokenValue("value"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenElementEnd
 			    };
 			const string expected = @"<foo><child xmlns=""http://example.com/schema"">value</child></foo>";
 
@@ -132,9 +132,9 @@ namespace JsonFx.Xml
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("foo", String.Empty, "http://example.org")),
 			        MarkupGrammar.TokenElementBegin(new DataName("child", String.Empty, "http://example.org")),
-			        MarkupGrammar.TokenText("value"),
-			        MarkupGrammar.TokenElementEnd(new DataName("child", String.Empty, "http://example.org")),
-			        MarkupGrammar.TokenElementEnd(new DataName("foo", String.Empty, "http://example.org")),
+			        MarkupGrammar.TokenValue("value"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenElementEnd,
 			    };
 			const string expected = @"<foo xmlns=""http://example.org""><child>value</child></foo>";
 
@@ -152,9 +152,9 @@ namespace JsonFx.Xml
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("foo", "bar", "http://example.org")),
 			        MarkupGrammar.TokenElementBegin(new DataName("child", "bar", "http://example.org")),
-			        MarkupGrammar.TokenText("value"),
-			        MarkupGrammar.TokenElementEnd(new DataName("child", "bar", "http://example.org")),
-			        MarkupGrammar.TokenElementEnd(new DataName("foo", "bar", "http://example.org")),
+			        MarkupGrammar.TokenValue("value"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenElementEnd,
 			    };
 			const string expected = @"<bar:foo xmlns:bar=""http://example.org""><bar:child>value</bar:child></bar:foo>";
 
@@ -172,9 +172,9 @@ namespace JsonFx.Xml
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("foo", String.Empty, "http://json.org")),
 			        MarkupGrammar.TokenElementBegin(new DataName("child", String.Empty, "http://jsonfx.net")),
-			        MarkupGrammar.TokenText("text value"),
-			        MarkupGrammar.TokenElementEnd(new DataName("child", String.Empty, "http://jsonfx.net")),
-			        MarkupGrammar.TokenElementEnd(new DataName("foo", String.Empty, "http://json.org")),
+			        MarkupGrammar.TokenValue("text value"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenElementEnd,
 			    };
 			const string expected = @"<foo xmlns=""http://json.org""><child xmlns=""http://jsonfx.net"">text value</child></foo>";
 
@@ -198,8 +198,8 @@ namespace JsonFx.Xml
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("foo", String.Empty, "http://example.org")),
 			        MarkupGrammar.TokenAttribute(new DataName("key", "blah", "http://example.org")),
-			        MarkupGrammar.TokenText("value"),
-			        MarkupGrammar.TokenElementEnd(new DataName("foo", String.Empty, "http://example.org")),
+			        MarkupGrammar.TokenValue("value"),
+			        MarkupGrammar.TokenElementEnd,
 			    };
 			const string expected = @"<foo blah:key=""value"" xmlns:blah=""http://example.org"" xmlns=""http://example.org"" />";
 
@@ -218,13 +218,13 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenElementBegin(new DataName("outer", String.Empty, "http://example.org/outer")),
 			        MarkupGrammar.TokenElementBegin(new DataName("middle-1", String.Empty, "http://example.org/inner")),
 			        MarkupGrammar.TokenElementBegin(new DataName("inner", String.Empty, "http://example.org/inner")),
-			        MarkupGrammar.TokenText("this should be inner"),
-			        MarkupGrammar.TokenElementEnd(new DataName("inner", String.Empty, "http://example.org/inner")),
-			        MarkupGrammar.TokenElementEnd(new DataName("middle-1", String.Empty, "http://example.org/inner")),
+			        MarkupGrammar.TokenValue("this should be inner"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenElementEnd,
 			        MarkupGrammar.TokenElementBegin(new DataName("middle-2", String.Empty, "http://example.org/outer")),
-			        MarkupGrammar.TokenText("this should be outer"),
-			        MarkupGrammar.TokenElementEnd(new DataName("middle-2", String.Empty, "http://example.org/outer")),
-			        MarkupGrammar.TokenElementEnd(new DataName("outer", String.Empty, "http://example.org/outer")),
+			        MarkupGrammar.TokenValue("this should be outer"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenElementEnd,
 			    };
 			const string expected = @"<outer xmlns=""http://example.org/outer""><middle-1 xmlns=""http://example.org/inner""><inner>this should be inner</inner></middle-1><middle-2>this should be outer</middle-2></outer>";
 
@@ -246,8 +246,8 @@ namespace JsonFx.Xml
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("root")),
 			        MarkupGrammar.TokenAttribute(new DataName("attrName")),
-			        MarkupGrammar.TokenText("attrValue"),
-			        MarkupGrammar.TokenElementEnd(new DataName("root"))
+			        MarkupGrammar.TokenValue("attrValue"),
+			        MarkupGrammar.TokenElementEnd
 			    };
 			const string expected = @"<root attrName=""attrValue"" />";
 
@@ -265,8 +265,8 @@ namespace JsonFx.Xml
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("root")),
 			        MarkupGrammar.TokenAttribute(new DataName("noValue")),
-			        MarkupGrammar.TokenText(String.Empty),
-			        MarkupGrammar.TokenElementEnd(new DataName("root"))
+			        MarkupGrammar.TokenValue(String.Empty),
+			        MarkupGrammar.TokenElementEnd
 			    };
 			const string expected = @"<root noValue="""" />";
 
@@ -284,8 +284,8 @@ namespace JsonFx.Xml
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("root")),
 			        MarkupGrammar.TokenAttribute(new DataName("emptyValue")),
-			        MarkupGrammar.TokenText(String.Empty),
-			        MarkupGrammar.TokenElementEnd(new DataName("root"))
+			        MarkupGrammar.TokenValue(String.Empty),
+			        MarkupGrammar.TokenElementEnd
 			    };
 			const string expected = @"<root emptyValue="""" />";
 
@@ -303,8 +303,8 @@ namespace JsonFx.Xml
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("root")),
 			        MarkupGrammar.TokenAttribute(new DataName("whitespace")),
-			        MarkupGrammar.TokenText(" this contains whitespace "),
-			        MarkupGrammar.TokenElementEnd(new DataName("root"))
+			        MarkupGrammar.TokenValue(" this contains whitespace "),
+			        MarkupGrammar.TokenElementEnd
 			    };
 			const string expected = @"<root whitespace="" this contains whitespace "" />";
 
@@ -322,11 +322,11 @@ namespace JsonFx.Xml
 			    {
 			        MarkupGrammar.TokenElementVoid(new DataName("root")),
 			        MarkupGrammar.TokenAttribute(new DataName("no-value")),
-			        MarkupGrammar.TokenText(String.Empty),
+			        MarkupGrammar.TokenValue(String.Empty),
 			        MarkupGrammar.TokenAttribute(new DataName("whitespace")),
-			        MarkupGrammar.TokenText(" this contains whitespace "),
+			        MarkupGrammar.TokenValue(" this contains whitespace "),
 			        MarkupGrammar.TokenAttribute(new DataName("anyQuotedText")),
-			        MarkupGrammar.TokenText("/\\\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?")
+			        MarkupGrammar.TokenValue("/\\\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?")
 			    };
 			const string expected = @"<root no-value="""" whitespace="" this contains whitespace "" anyQuotedText=""/\"+"\uCAFE\uBABE\uAB98\uFCDE\uBCDA\uEF4A\n\r\t"+@"`1~!@#$%^&amp;*()_+-=[]{}|;:',./&lt;&gt;?"" />";
 
@@ -346,7 +346,7 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			    {
-			        MarkupGrammar.TokenText("<")
+			        MarkupGrammar.TokenValue("<")
 			    };
 			const string expected = @"&lt;";
 
@@ -362,7 +362,7 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			    {
-			        MarkupGrammar.TokenText("\uABCD")
+			        MarkupGrammar.TokenValue("\uABCD")
 			    };
 			const string expected = "\uABCD";
 
@@ -378,7 +378,7 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			    {
-			        MarkupGrammar.TokenText("€")
+			        MarkupGrammar.TokenValue("€")
 			    };
 			const string expected = "€";
 
@@ -394,8 +394,8 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			    {
-			        MarkupGrammar.TokenText("leading"),
-			        MarkupGrammar.TokenText("&")
+			        MarkupGrammar.TokenValue("leading"),
+			        MarkupGrammar.TokenValue("&")
 			    };
 			const string expected = @"leading&amp;";
 
@@ -411,8 +411,8 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			    {
-			        MarkupGrammar.TokenText("&"),
-			        MarkupGrammar.TokenText("trailing")
+			        MarkupGrammar.TokenValue("&"),
+			        MarkupGrammar.TokenValue("trailing")
 			    };
 			const string expected = @"&amp;trailing";
 
@@ -428,7 +428,7 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			    {
-			        MarkupGrammar.TokenText(@"there should <b>e decoded chars & inside this text")
+			        MarkupGrammar.TokenValue(@"there should <b>e decoded chars & inside this text")
 			    };
 			const string expected = @"there should &lt;b&gt;e decoded chars &amp; inside this text";
 
@@ -450,20 +450,20 @@ namespace JsonFx.Xml
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("div")),
 			        MarkupGrammar.TokenAttribute(new DataName("class")),
-			        MarkupGrammar.TokenText("content"),
+			        MarkupGrammar.TokenValue("content"),
 			        MarkupGrammar.TokenElementBegin(new DataName("p")),
 			        MarkupGrammar.TokenAttribute(new DataName("style")),
-			        MarkupGrammar.TokenText("color:red"),
+			        MarkupGrammar.TokenValue("color:red"),
 			        MarkupGrammar.TokenElementBegin(new DataName("strong")),
-			        MarkupGrammar.TokenText("Lorem ipsum"),
-			        MarkupGrammar.TokenElementEnd(new DataName("strong")),
-			        MarkupGrammar.TokenText(" dolor sit amet, "),
+			        MarkupGrammar.TokenValue("Lorem ipsum"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenValue(" dolor sit amet, "),
 			        MarkupGrammar.TokenElementBegin(new DataName("i")),
-			        MarkupGrammar.TokenText("consectetur"),
-			        MarkupGrammar.TokenElementEnd(new DataName("i")),
-			        MarkupGrammar.TokenText(" adipiscing elit."),
-			        MarkupGrammar.TokenElementEnd(new DataName("p")),
-					MarkupGrammar.TokenElementEnd(new DataName("div")),
+			        MarkupGrammar.TokenValue("consectetur"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenValue(" adipiscing elit."),
+			        MarkupGrammar.TokenElementEnd,
+					MarkupGrammar.TokenElementEnd,
 			    };
 			const string expected = @"<div class=""content""><p style=""color:red""><strong>Lorem ipsum</strong> dolor sit amet, <i>consectetur</i> adipiscing elit.</p></div>";
 
@@ -481,23 +481,23 @@ namespace JsonFx.Xml
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("div")),
 			        MarkupGrammar.TokenAttribute(new DataName("class")),
-			        MarkupGrammar.TokenText("content"),
-			        MarkupGrammar.TokenWhitespace("\r\n\t"),
+			        MarkupGrammar.TokenValue("content"),
+			        MarkupGrammar.TokenValue("\r\n\t"),
 			        MarkupGrammar.TokenElementBegin(new DataName("p")),
 			        MarkupGrammar.TokenAttribute(new DataName("style")),
-			        MarkupGrammar.TokenText("color:red"),
-			        MarkupGrammar.TokenWhitespace("\r\n\t\t"),
+			        MarkupGrammar.TokenValue("color:red"),
+			        MarkupGrammar.TokenValue("\r\n\t\t"),
 			        MarkupGrammar.TokenElementBegin(new DataName("strong")),
-			        MarkupGrammar.TokenText("Lorem ipsum"),
-			        MarkupGrammar.TokenElementEnd(new DataName("strong")),
-			        MarkupGrammar.TokenText(" dolor sit amet, "),
+			        MarkupGrammar.TokenValue("Lorem ipsum"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenValue(" dolor sit amet, "),
 			        MarkupGrammar.TokenElementBegin(new DataName("i")),
-			        MarkupGrammar.TokenText("consectetur"),
-			        MarkupGrammar.TokenElementEnd(new DataName("i")),
-			        MarkupGrammar.TokenText(" adipiscing elit.\r\n\t"),
-			        MarkupGrammar.TokenElementEnd(new DataName("p")),
-			        MarkupGrammar.TokenWhitespace("\r\n"),
-					MarkupGrammar.TokenElementEnd(new DataName("div")),
+			        MarkupGrammar.TokenValue("consectetur"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenValue(" adipiscing elit.\r\n\t"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenValue("\r\n"),
+					MarkupGrammar.TokenElementEnd,
 			    };
 			const string expected =
 @"<div class=""content"">
@@ -538,7 +538,7 @@ namespace JsonFx.Xml
 		{
 			var input = new []
 				{
-					MarkupGrammar.TokenElementEnd(new DataName("foo"))
+					MarkupGrammar.TokenElementEnd
 				};
 
 			var formatter = new XmlWriter.XmlFormatter(new DataWriterSettings());
@@ -560,9 +560,9 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenElementBegin(new DataName("odd")),
 			        MarkupGrammar.TokenElementBegin(new DataName("auto-closed")),
 			        MarkupGrammar.TokenElementBegin(new DataName("even")),
-			        MarkupGrammar.TokenElementEnd(new DataName("odd")),
-			        MarkupGrammar.TokenElementEnd(new DataName("ignored")),
-			        MarkupGrammar.TokenElementEnd(new DataName("even"))
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenElementEnd
 			    };
 			const string expected = @"<odd><auto-closed><even /></auto-closed></odd>";
 
@@ -581,9 +581,9 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenElementBegin(new DataName("odd", "a", "http://example.com/odd/a")),
 			        MarkupGrammar.TokenElementBegin(new DataName("auto-closed", "b", "http://example.com/auto-closed/b")),
 			        MarkupGrammar.TokenElementBegin(new DataName("even", "c", "http://example.com/even/c")),
-			        MarkupGrammar.TokenElementEnd(new DataName("odd", "a", "http://example.com/odd/a")),
-			        MarkupGrammar.TokenElementEnd(new DataName("auto-closed", "b", "http://example.com/auto-closed/b")),
-			        MarkupGrammar.TokenElementEnd(new DataName("even", "c", "http://example.com/even/c")),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenElementEnd,
 			    };
 			const string expected = @"<a:odd xmlns:a=""http://example.com/odd/a""><b:auto-closed xmlns:b=""http://example.com/auto-closed/b""><c:even xmlns:c=""http://example.com/even/c"" /></b:auto-closed></a:odd>";
 
@@ -602,9 +602,9 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenElementBegin(new DataName("odd", "a", "http://example.com/odd/a")),
 			        MarkupGrammar.TokenElementBegin(new DataName("auto-closed", "b", "http://example.com/auto-closed/b")),
 			        MarkupGrammar.TokenElementBegin(new DataName("even", "c", "http://example.com/even/c")),
-					MarkupGrammar.TokenElementEnd(new DataName("even", "c", "http://example.com/even/c")),
-			        MarkupGrammar.TokenElementEnd(new DataName("auto-closed", "b", "http://example.com/auto-closed/b")),
-			        MarkupGrammar.TokenElementEnd(new DataName("odd", "a", "http://example.com/odd/a")),
+					MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenElementEnd,
 			    };
 			const string expected = @"<a:odd xmlns:a=""http://example.com/odd/a""><b:auto-closed xmlns:b=""http://example.com/auto-closed/b""><c:even xmlns:c=""http://example.com/even/c"" /></b:auto-closed></a:odd>";
 
@@ -656,7 +656,7 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			    {
-			        MarkupGrammar.TokenText(@"value>""0"" && value<""10"" ?""valid"":""error""")
+			        MarkupGrammar.TokenValue(@"value>""0"" && value<""10"" ?""valid"":""error""")
 			    };
 			const string expected = @"value&gt;""0"" &amp;&amp; value&lt;""10"" ?""valid"":""error""";
 
@@ -673,32 +673,32 @@ namespace JsonFx.Xml
 			var input = new[]
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("p")),
-			        MarkupGrammar.TokenText(@"You can add a string to a number, but this stringifies the number:"),
-			        MarkupGrammar.TokenElementEnd(new DataName("p")),
-			        MarkupGrammar.TokenWhitespace("\r\n"),
+			        MarkupGrammar.TokenValue(@"You can add a string to a number, but this stringifies the number:"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenValue("\r\n"),
 			        MarkupGrammar.TokenElementBegin(new DataName("math")),
-			        MarkupGrammar.TokenWhitespace("\r\n\t"),
+			        MarkupGrammar.TokenValue("\r\n\t"),
 			        MarkupGrammar.TokenElementBegin(new DataName("ms")),
-			        MarkupGrammar.TokenText(@"x<y"),
-			        MarkupGrammar.TokenElementEnd(new DataName("ms")),
-			        MarkupGrammar.TokenWhitespace("\r\n\t"),
+			        MarkupGrammar.TokenValue(@"x<y"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenValue("\r\n\t"),
 			        MarkupGrammar.TokenElementBegin(new DataName("mo")),
-			        MarkupGrammar.TokenText(@"+"),
-			        MarkupGrammar.TokenElementEnd(new DataName("mo")),
-			        MarkupGrammar.TokenWhitespace("\r\n\t"),
+			        MarkupGrammar.TokenValue(@"+"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenValue("\r\n\t"),
 			        MarkupGrammar.TokenElementBegin(new DataName("mn")),
-			        MarkupGrammar.TokenText(@"3"),
-			        MarkupGrammar.TokenElementEnd(new DataName("mn")),
-			        MarkupGrammar.TokenWhitespace("\r\n\t"),
+			        MarkupGrammar.TokenValue(@"3"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenValue("\r\n\t"),
 			        MarkupGrammar.TokenElementBegin(new DataName("mo")),
-			        MarkupGrammar.TokenText(@"="),
-			        MarkupGrammar.TokenElementEnd(new DataName("mo")),
-			        MarkupGrammar.TokenWhitespace("\r\n\t"),
+			        MarkupGrammar.TokenValue(@"="),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenValue("\r\n\t"),
 			        MarkupGrammar.TokenElementBegin(new DataName("ms")),
-			        MarkupGrammar.TokenText(@"x<y3"),
-			        MarkupGrammar.TokenElementEnd(new DataName("ms")),
-			        MarkupGrammar.TokenWhitespace("\r\n"),
-			        MarkupGrammar.TokenElementEnd(new DataName("math")),
+			        MarkupGrammar.TokenValue(@"x<y3"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenValue("\r\n"),
+			        MarkupGrammar.TokenElementEnd,
 			    };
 			const string expected =
 @"<p>You can add a string to a number, but this stringifies the number:</p>
@@ -784,22 +784,22 @@ namespace JsonFx.Xml
 			var input = new[]
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("html")),
-			        MarkupGrammar.TokenWhitespace("\r\n\t"),
+			        MarkupGrammar.TokenValue("\r\n\t"),
 			        MarkupGrammar.TokenElementBegin(new DataName("head")),
-			        MarkupGrammar.TokenWhitespace("\r\n\t\t"),
+			        MarkupGrammar.TokenValue("\r\n\t\t"),
 			        MarkupGrammar.TokenElementBegin(new DataName("title")),
-			        MarkupGrammar.TokenText("PHP Test"),
-			        MarkupGrammar.TokenElementEnd(new DataName("title")),
-			        MarkupGrammar.TokenWhitespace("\r\n\t"),
-			        MarkupGrammar.TokenElementEnd(new DataName("head")),
-			        MarkupGrammar.TokenWhitespace("\r\n\t"),
+			        MarkupGrammar.TokenValue("PHP Test"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenValue("\r\n\t"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenValue("\r\n\t"),
 			        MarkupGrammar.TokenElementBegin(new DataName("body")),
-			        MarkupGrammar.TokenWhitespace("\r\n\t\t"),
+			        MarkupGrammar.TokenValue("\r\n\t\t"),
 			        MarkupGrammar.TokenUnparsed("?{0}?", @"php echo '<p>Hello World</p>'; "),
-			        MarkupGrammar.TokenWhitespace("\r\n\t"),
-			        MarkupGrammar.TokenElementEnd(new DataName("body")),
-			        MarkupGrammar.TokenWhitespace("\r\n"),
-			        MarkupGrammar.TokenElementEnd(new DataName("html")),
+			        MarkupGrammar.TokenValue("\r\n\t"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenValue("\r\n"),
+			        MarkupGrammar.TokenElementEnd,
 			    };
 			const string expected =
 @"<html>

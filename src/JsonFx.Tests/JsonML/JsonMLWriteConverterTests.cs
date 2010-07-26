@@ -64,7 +64,7 @@ namespace JsonFx.JsonML
 			var expected = new[]
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("root")),
-			        MarkupGrammar.TokenElementEnd(new DataName("root"))
+			        MarkupGrammar.TokenElementEnd
 			    };
 
 			var converter = new JsonMLWriter.JsonMLWriteConverter();
@@ -111,7 +111,7 @@ namespace JsonFx.JsonML
 			var expected = new[]
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("root", String.Empty, "http://example.com/schema")),
-			        MarkupGrammar.TokenElementEnd(new DataName("root", String.Empty, "http://example.com/schema")),
+			        MarkupGrammar.TokenElementEnd,
 			    };
 
 			var converter = new JsonMLWriter.JsonMLWriteConverter();
@@ -133,7 +133,7 @@ namespace JsonFx.JsonML
 			var expected = new[]
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("root", "prefix", "http://example.com/schema")),
-			        MarkupGrammar.TokenElementEnd(new DataName("root", "prefix", "http://example.com/schema")),
+			        MarkupGrammar.TokenElementEnd,
 			    };
 
 			var converter = new JsonMLWriter.JsonMLWriteConverter();
@@ -160,9 +160,9 @@ namespace JsonFx.JsonML
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("foo")),
 			        MarkupGrammar.TokenElementBegin(new DataName("child", String.Empty, "http://example.com/schema")),
-			        MarkupGrammar.TokenText("value"),
-			        MarkupGrammar.TokenElementEnd(new DataName("child", String.Empty, "http://example.com/schema")),
-			        MarkupGrammar.TokenElementEnd(new DataName("foo"))
+			        MarkupGrammar.TokenValue("value"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenElementEnd
 			    };
 
 			var converter = new JsonMLWriter.JsonMLWriteConverter();
@@ -189,9 +189,9 @@ namespace JsonFx.JsonML
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("foo", String.Empty, "http://example.org")),
 			        MarkupGrammar.TokenElementBegin(new DataName("child", String.Empty, "http://example.org")),
-			        MarkupGrammar.TokenText("value"),
-			        MarkupGrammar.TokenElementEnd(new DataName("child", String.Empty, "http://example.org")),
-			        MarkupGrammar.TokenElementEnd(new DataName("foo", String.Empty, "http://example.org")),
+			        MarkupGrammar.TokenValue("value"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenElementEnd,
 			    };
 
 			var converter = new JsonMLWriter.JsonMLWriteConverter();
@@ -217,9 +217,9 @@ namespace JsonFx.JsonML
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("foo", "bar", "http://example.org")),
 			        MarkupGrammar.TokenElementBegin(new DataName("child", "bar", "http://example.org")),
-			        MarkupGrammar.TokenText("value"),
-			        MarkupGrammar.TokenElementEnd(new DataName("child", "bar", "http://example.org")),
-			        MarkupGrammar.TokenElementEnd(new DataName("foo", "bar", "http://example.org")),
+			        MarkupGrammar.TokenValue("value"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenElementEnd,
 			    };
 
 			var converter = new JsonMLWriter.JsonMLWriteConverter();
@@ -246,9 +246,9 @@ namespace JsonFx.JsonML
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("foo", String.Empty, "http://json.org")),
 			        MarkupGrammar.TokenElementBegin(new DataName("child", String.Empty, "http://jsonfx.net")),
-			        MarkupGrammar.TokenText("text value"),
-			        MarkupGrammar.TokenElementEnd(new DataName("child", String.Empty, "http://jsonfx.net")),
-			        MarkupGrammar.TokenElementEnd(new DataName("foo", String.Empty, "http://json.org"))
+			        MarkupGrammar.TokenValue("text value"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenElementEnd
 			    };
 
 			var converter = new JsonMLWriter.JsonMLWriteConverter();
@@ -275,7 +275,7 @@ namespace JsonFx.JsonML
 			    {
 			        MarkupGrammar.TokenElementVoid(new DataName("foo", String.Empty, "http://example.org")),
 			        MarkupGrammar.TokenAttribute(new DataName("key", "blah", "http://example.org")),
-			        MarkupGrammar.TokenText("value")
+			        MarkupGrammar.TokenValue("value")
 			    };
 
 			var converter = new JsonMLWriter.JsonMLWriteConverter();
@@ -310,13 +310,13 @@ namespace JsonFx.JsonML
 			        MarkupGrammar.TokenElementBegin(new DataName("outer", String.Empty, "http://example.org/outer")),
 			        MarkupGrammar.TokenElementBegin(new DataName("middle-1", String.Empty, "http://example.org/inner")),
 			        MarkupGrammar.TokenElementBegin(new DataName("inner", String.Empty, "http://example.org/inner")),
-			        MarkupGrammar.TokenText("this should be inner"),
-			        MarkupGrammar.TokenElementEnd(new DataName("inner", String.Empty, "http://example.org/inner")),
-			        MarkupGrammar.TokenElementEnd(new DataName("middle-1", String.Empty, "http://example.org/inner")),
+			        MarkupGrammar.TokenValue("this should be inner"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenElementEnd,
 			        MarkupGrammar.TokenElementBegin(new DataName("middle-2", String.Empty, "http://example.org/outer")),
-			        MarkupGrammar.TokenText("this should be outer"),
-			        MarkupGrammar.TokenElementEnd(new DataName("middle-2", String.Empty, "http://example.org/outer")),
-			        MarkupGrammar.TokenElementEnd(new DataName("outer", String.Empty, "http://example.org/outer"))
+			        MarkupGrammar.TokenValue("this should be outer"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenElementEnd
 			    };
 
 			var converter = new JsonMLWriter.JsonMLWriteConverter();
@@ -346,9 +346,9 @@ namespace JsonFx.JsonML
 			        MarkupGrammar.TokenElementBegin(new DataName("one")),
 			        MarkupGrammar.TokenElementBegin(new DataName("two")),
 			        MarkupGrammar.TokenElementBegin(new DataName("three")),
-			        MarkupGrammar.TokenElementEnd(new DataName("three")),
-			        MarkupGrammar.TokenElementEnd(new DataName("two")),
-			        MarkupGrammar.TokenElementEnd(new DataName("one"))
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenElementEnd
 			    };
 
 			var converter = new JsonMLWriter.JsonMLWriteConverter();
@@ -379,8 +379,8 @@ namespace JsonFx.JsonML
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("root")),
 			        MarkupGrammar.TokenAttribute(new DataName("attrName")),
-			        MarkupGrammar.TokenText("attrValue"),
-			        MarkupGrammar.TokenElementEnd(new DataName("root"))
+			        MarkupGrammar.TokenValue("attrValue"),
+			        MarkupGrammar.TokenElementEnd
 			    };
 
 			var converter = new JsonMLWriter.JsonMLWriteConverter();
@@ -407,8 +407,8 @@ namespace JsonFx.JsonML
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("root")),
 			        MarkupGrammar.TokenAttribute(new DataName("noValue")),
-			        MarkupGrammar.TokenText(String.Empty),
-			        MarkupGrammar.TokenElementEnd(new DataName("root"))
+			        MarkupGrammar.TokenValue(String.Empty),
+			        MarkupGrammar.TokenElementEnd
 			    };
 
 			var converter = new JsonMLWriter.JsonMLWriteConverter();
@@ -435,8 +435,8 @@ namespace JsonFx.JsonML
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("root")),
 			        MarkupGrammar.TokenAttribute(new DataName("noValue")),
-			        MarkupGrammar.TokenText(String.Empty),
-			        MarkupGrammar.TokenElementEnd(new DataName("root"))
+			        MarkupGrammar.TokenValue(String.Empty),
+			        MarkupGrammar.TokenElementEnd
 			    };
 
 			var converter = new JsonMLWriter.JsonMLWriteConverter();
@@ -463,8 +463,8 @@ namespace JsonFx.JsonML
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("root")),
 			        MarkupGrammar.TokenAttribute(new DataName("emptyValue")),
-			        MarkupGrammar.TokenText(String.Empty),
-			        MarkupGrammar.TokenElementEnd(new DataName("root"))
+			        MarkupGrammar.TokenValue(String.Empty),
+			        MarkupGrammar.TokenElementEnd
 			    };
 
 			var converter = new JsonMLWriter.JsonMLWriteConverter();
@@ -491,8 +491,8 @@ namespace JsonFx.JsonML
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("root")),
 			        MarkupGrammar.TokenAttribute(new DataName("white")),
-			        MarkupGrammar.TokenText(" extra whitespace around quote delims "),
-			        MarkupGrammar.TokenElementEnd(new DataName("root"))
+			        MarkupGrammar.TokenValue(" extra whitespace around quote delims "),
+			        MarkupGrammar.TokenElementEnd
 			    };
 
 			var converter = new JsonMLWriter.JsonMLWriteConverter();
@@ -523,12 +523,12 @@ namespace JsonFx.JsonML
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("root")),
 			        MarkupGrammar.TokenAttribute(new DataName("no-value")),
-			        MarkupGrammar.TokenText(String.Empty),
+			        MarkupGrammar.TokenValue(String.Empty),
 			        MarkupGrammar.TokenAttribute(new DataName("whitespace")),
-			        MarkupGrammar.TokenText(" this contains whitespace "),
+			        MarkupGrammar.TokenValue(" this contains whitespace "),
 			        MarkupGrammar.TokenAttribute(new DataName("anyQuotedText")),
-			        MarkupGrammar.TokenText("/\\\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"),
-			        MarkupGrammar.TokenElementEnd(new DataName("root"))
+			        MarkupGrammar.TokenValue("/\\\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"),
+			        MarkupGrammar.TokenElementEnd
 			    };
 
 			var converter = new JsonMLWriter.JsonMLWriteConverter();
@@ -551,7 +551,7 @@ namespace JsonFx.JsonML
 				};
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenText("<")
+			        MarkupGrammar.TokenValue("<")
 			    };
 
 			var converter = new JsonMLWriter.JsonMLWriteConverter();
@@ -570,7 +570,7 @@ namespace JsonFx.JsonML
 				};
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenText("leading&")
+			        MarkupGrammar.TokenValue("leading&")
 			    };
 
 			var converter = new JsonMLWriter.JsonMLWriteConverter();
@@ -589,7 +589,7 @@ namespace JsonFx.JsonML
 				};
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenText("&trailing")
+			        MarkupGrammar.TokenValue("&trailing")
 			    };
 
 			var converter = new JsonMLWriter.JsonMLWriteConverter();
@@ -608,7 +608,7 @@ namespace JsonFx.JsonML
 				};
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenText(@"there should <b>e decoded chars & inside this text")
+			        MarkupGrammar.TokenValue(@"there should <b>e decoded chars & inside this text")
 			    };
 
 			var converter = new JsonMLWriter.JsonMLWriteConverter();
@@ -656,20 +656,20 @@ namespace JsonFx.JsonML
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("div")),
 			        MarkupGrammar.TokenAttribute(new DataName("class")),
-			        MarkupGrammar.TokenText("content"),
+			        MarkupGrammar.TokenValue("content"),
 			        MarkupGrammar.TokenElementBegin(new DataName("p")),
 			        MarkupGrammar.TokenAttribute(new DataName("style")),
-			        MarkupGrammar.TokenText("color:red"),
+			        MarkupGrammar.TokenValue("color:red"),
 			        MarkupGrammar.TokenElementBegin(new DataName("strong")),
-			        MarkupGrammar.TokenText("Lorem ipsum"),
-			        MarkupGrammar.TokenElementEnd(new DataName("strong")),
-			        MarkupGrammar.TokenText(" dolor sit amet, "),
+			        MarkupGrammar.TokenValue("Lorem ipsum"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenValue(" dolor sit amet, "),
 			        MarkupGrammar.TokenElementBegin(new DataName("i")),
-			        MarkupGrammar.TokenText("consectetur"),
-			        MarkupGrammar.TokenElementEnd(new DataName("i")),
-			        MarkupGrammar.TokenText(" adipiscing elit."),
-			        MarkupGrammar.TokenElementEnd(new DataName("p")),
-					MarkupGrammar.TokenElementEnd(new DataName("div")),
+			        MarkupGrammar.TokenValue("consectetur"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenValue(" adipiscing elit."),
+			        MarkupGrammar.TokenElementEnd,
+					MarkupGrammar.TokenElementEnd,
 			    };
 
 			var converter = new JsonMLWriter.JsonMLWriteConverter();
@@ -716,23 +716,23 @@ namespace JsonFx.JsonML
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("div")),
 			        MarkupGrammar.TokenAttribute(new DataName("class")),
-			        MarkupGrammar.TokenText("content"),
-			        MarkupGrammar.TokenText("\r\n\t"),
+			        MarkupGrammar.TokenValue("content"),
+			        MarkupGrammar.TokenValue("\r\n\t"),
 			        MarkupGrammar.TokenElementBegin(new DataName("p")),
 			        MarkupGrammar.TokenAttribute(new DataName("style")),
-			        MarkupGrammar.TokenText("color:red"),
-			        MarkupGrammar.TokenText("\r\n\t\t"),
+			        MarkupGrammar.TokenValue("color:red"),
+			        MarkupGrammar.TokenValue("\r\n\t\t"),
 			        MarkupGrammar.TokenElementBegin(new DataName("strong")),
-			        MarkupGrammar.TokenText("Lorem ipsum"),
-			        MarkupGrammar.TokenElementEnd(new DataName("strong")),
-			        MarkupGrammar.TokenText(" dolor sit amet, "),
+			        MarkupGrammar.TokenValue("Lorem ipsum"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenValue(" dolor sit amet, "),
 			        MarkupGrammar.TokenElementBegin(new DataName("i")),
-			        MarkupGrammar.TokenText("consectetur"),
-			        MarkupGrammar.TokenElementEnd(new DataName("i")),
-			        MarkupGrammar.TokenText(" adipiscing elit.\r\n\t"),
-			        MarkupGrammar.TokenElementEnd(new DataName("p")),
-			        MarkupGrammar.TokenText("\r\n"),
-					MarkupGrammar.TokenElementEnd(new DataName("div")),
+			        MarkupGrammar.TokenValue("consectetur"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenValue(" adipiscing elit.\r\n\t"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenValue("\r\n"),
+					MarkupGrammar.TokenElementEnd,
 			    };
 
 			var converter = new JsonMLWriter.JsonMLWriteConverter();
@@ -766,9 +766,9 @@ namespace JsonFx.JsonML
 			        MarkupGrammar.TokenElementBegin(new DataName("odd")),
 			        MarkupGrammar.TokenElementBegin(new DataName("auto-closed")),
 			        MarkupGrammar.TokenElementBegin(new DataName("even")),
-			        MarkupGrammar.TokenElementEnd(new DataName("even")),
-			        MarkupGrammar.TokenElementEnd(new DataName("auto-closed")),
-			        MarkupGrammar.TokenElementEnd(new DataName("odd")),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenElementEnd,
 			    };
 
 			var converter = new JsonMLWriter.JsonMLWriteConverter();
@@ -798,9 +798,9 @@ namespace JsonFx.JsonML
 			        MarkupGrammar.TokenElementBegin(new DataName("odd", "a", "http://example.com/odd/a")),
 			        MarkupGrammar.TokenElementBegin(new DataName("auto-closed", "b", "http://example.com/auto-closed/b")),
 			        MarkupGrammar.TokenElementBegin(new DataName("even", "c", "http://example.com/even/c")),
-			        MarkupGrammar.TokenElementEnd(new DataName("even", "c", "http://example.com/even/c")),
-			        MarkupGrammar.TokenElementEnd(new DataName("auto-closed", "b", "http://example.com/auto-closed/b")),
-			        MarkupGrammar.TokenElementEnd(new DataName("odd", "a", "http://example.com/odd/a"))
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenElementEnd
 			    };
 
 			var converter = new JsonMLWriter.JsonMLWriteConverter();
@@ -829,10 +829,10 @@ namespace JsonFx.JsonML
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("odd", "a", "http://example.com/odd/a")),
 			        MarkupGrammar.TokenElementBegin(new DataName("auto-closed", "b", "http://example.com/auto-closed/b")),
-					MarkupGrammar.TokenElementEnd(new DataName("auto-closed", "b", "http://example.com/auto-closed/b")),
+					MarkupGrammar.TokenElementEnd,
 			        MarkupGrammar.TokenElementBegin(new DataName("even", "c", "http://example.com/even/c")),
-					MarkupGrammar.TokenElementEnd(new DataName("even", "c", "http://example.com/even/c")),
-					MarkupGrammar.TokenElementEnd(new DataName("odd", "a", "http://example.com/odd/a")),
+					MarkupGrammar.TokenElementEnd,
+					MarkupGrammar.TokenElementEnd,
 			    };
 
 			var converter = new JsonMLWriter.JsonMLWriteConverter();
@@ -893,7 +893,7 @@ namespace JsonFx.JsonML
 			    };
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenText(@"value>""0"" && value<""10"" ?""valid"":""error""")
+			        MarkupGrammar.TokenValue(@"value>""0"" && value<""10"" ?""valid"":""error""")
 			    };
 
 			var converter = new JsonMLWriter.JsonMLWriteConverter();
@@ -946,32 +946,32 @@ namespace JsonFx.JsonML
 			var expected = new[]
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("p")),
-			        MarkupGrammar.TokenText(@"You can add a string to a number, but this stringifies the number:"),
-			        MarkupGrammar.TokenElementEnd(new DataName("p")),
-			        MarkupGrammar.TokenText("\r\n"),
+			        MarkupGrammar.TokenValue(@"You can add a string to a number, but this stringifies the number:"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenValue("\r\n"),
 			        MarkupGrammar.TokenElementBegin(new DataName("math")),
-			        MarkupGrammar.TokenText("\r\n\t"),
+			        MarkupGrammar.TokenValue("\r\n\t"),
 			        MarkupGrammar.TokenElementBegin(new DataName("ms")),
-			        MarkupGrammar.TokenText(@"x<y"),
-			        MarkupGrammar.TokenElementEnd(new DataName("ms")),
-			        MarkupGrammar.TokenText("\r\n\t"),
+			        MarkupGrammar.TokenValue(@"x<y"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenValue("\r\n\t"),
 			        MarkupGrammar.TokenElementBegin(new DataName("mo")),
-			        MarkupGrammar.TokenText(@"+"),
-			        MarkupGrammar.TokenElementEnd(new DataName("mo")),
-			        MarkupGrammar.TokenText("\r\n\t"),
+			        MarkupGrammar.TokenValue(@"+"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenValue("\r\n\t"),
 			        MarkupGrammar.TokenElementBegin(new DataName("mn")),
-			        MarkupGrammar.TokenText(@"3"),
-			        MarkupGrammar.TokenElementEnd(new DataName("mn")),
-			        MarkupGrammar.TokenText("\r\n\t"),
+			        MarkupGrammar.TokenValue(@"3"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenValue("\r\n\t"),
 			        MarkupGrammar.TokenElementBegin(new DataName("mo")),
-			        MarkupGrammar.TokenText(@"="),
-			        MarkupGrammar.TokenElementEnd(new DataName("mo")),
-			        MarkupGrammar.TokenText("\r\n\t"),
+			        MarkupGrammar.TokenValue(@"="),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenValue("\r\n\t"),
 			        MarkupGrammar.TokenElementBegin(new DataName("ms")),
-			        MarkupGrammar.TokenText(@"x<y3"),
-			        MarkupGrammar.TokenElementEnd(new DataName("ms")),
-			        MarkupGrammar.TokenText("\r\n"),
-			        MarkupGrammar.TokenElementEnd(new DataName("math")),
+			        MarkupGrammar.TokenValue(@"x<y3"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenValue("\r\n"),
+			        MarkupGrammar.TokenElementEnd,
 			    };
 
 			var converter = new JsonMLWriter.JsonMLWriteConverter();
@@ -1055,22 +1055,22 @@ namespace JsonFx.JsonML
 			var expected = new[]
 			    {
 			        MarkupGrammar.TokenElementBegin(new DataName("html")),
-			        MarkupGrammar.TokenText("\r\n\t"),
+			        MarkupGrammar.TokenValue("\r\n\t"),
 			        MarkupGrammar.TokenElementBegin(new DataName("head")),
-			        MarkupGrammar.TokenText("\r\n\t\t"),
+			        MarkupGrammar.TokenValue("\r\n\t\t"),
 			        MarkupGrammar.TokenElementBegin(new DataName("title")),
-			        MarkupGrammar.TokenText("PHP Test"),
-			        MarkupGrammar.TokenElementEnd(new DataName("title")),
-			        MarkupGrammar.TokenText("\r\n\t"),
-			        MarkupGrammar.TokenElementEnd(new DataName("head")),
-			        MarkupGrammar.TokenText("\r\n\t"),
+			        MarkupGrammar.TokenValue("PHP Test"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenValue("\r\n\t"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenValue("\r\n\t"),
 			        MarkupGrammar.TokenElementBegin(new DataName("body")),
-			        MarkupGrammar.TokenText("\r\n\t\t"),
+			        MarkupGrammar.TokenValue("\r\n\t\t"),
 			        MarkupGrammar.TokenUnparsed("?{0}?", @"php echo '<p>Hello World</p>'; "),
-			        MarkupGrammar.TokenText("\r\n\t"),
-			        MarkupGrammar.TokenElementEnd(new DataName("body")),
-			        MarkupGrammar.TokenText("\r\n"),
-			        MarkupGrammar.TokenElementEnd(new DataName("html")),
+			        MarkupGrammar.TokenValue("\r\n\t"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenValue("\r\n"),
+			        MarkupGrammar.TokenElementEnd,
 			    };
 
 			var converter = new JsonMLWriter.JsonMLWriteConverter();

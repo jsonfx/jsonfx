@@ -203,7 +203,7 @@ namespace JsonFx.Html
 						{
 							PrefixScopeChain.Scope scope = this.ScopeChain.Pop();
 
-							tokens.Add(MarkupGrammar.TokenElementEnd(scope.TagName));
+							tokens.Add(MarkupGrammar.TokenElementEnd);
 						}
 					}
 				}
@@ -228,7 +228,7 @@ namespace JsonFx.Html
 			if (scanner.IsCompleted)
 			{
 				// end of file, emit as text
-				tokens.Add(MarkupGrammar.TokenText(MarkupGrammar.OperatorElementBegin));
+				tokens.Add(MarkupGrammar.TokenValue(char.ToString(MarkupGrammar.OperatorElementBegin)));
 				return;
 			}
 
@@ -258,7 +258,7 @@ namespace JsonFx.Html
 					text += MarkupGrammar.OperatorElementClose;
 				}
 
-				tokens.Add(MarkupGrammar.TokenText(text));
+				tokens.Add(MarkupGrammar.TokenValue(text));
 				return;
 			}
 
@@ -324,7 +324,7 @@ namespace JsonFx.Html
 							if (value != null)
 							{
 								// convert CData to text
-								return MarkupGrammar.TokenText(value);
+								return MarkupGrammar.TokenValue(value);
 							}
 
 							// process as generic declaration
@@ -478,7 +478,7 @@ namespace JsonFx.Html
 
 			if (scanner.Peek() != MarkupGrammar.OperatorPairDelim)
 			{
-				return MarkupGrammar.TokenText(String.Empty);
+				return MarkupGrammar.TokenValue(String.Empty);
 			}
 
 			scanner.Pop();
@@ -552,7 +552,7 @@ namespace JsonFx.Html
 				scanner.Pop();
 
 				// output string
-				return MarkupGrammar.TokenText(value);
+				return MarkupGrammar.TokenValue(value);
 			}
 			else
 			{
@@ -594,7 +594,7 @@ namespace JsonFx.Html
 				}
 
 				// return chunk
-				return MarkupGrammar.TokenText(scanner.EndChunk());
+				return MarkupGrammar.TokenValue(scanner.EndChunk());
 			}
 		}
 
@@ -737,7 +737,7 @@ namespace JsonFx.Html
 						}
 
 						// no known scope to end prefixes but can close element
-						tokens.Add(MarkupGrammar.TokenElementEnd(closeTagName));
+						tokens.Add(MarkupGrammar.TokenElementEnd);
 						return;
 					}
 
@@ -756,7 +756,7 @@ namespace JsonFx.Html
 
 				do
 				{
-					tokens.Add(MarkupGrammar.TokenElementEnd(scope.TagName));
+					tokens.Add(MarkupGrammar.TokenElementEnd);
 
 				} while (scope.TagName != closeTagName &&
 					(scope = this.ScopeChain.Pop()) != null);
@@ -854,14 +854,7 @@ namespace JsonFx.Html
 				return;
 			}
 
-			if (HtmlTokenizer.IsNullOrWhiteSpace(value))
-			{
-				tokens.Add(MarkupGrammar.TokenWhitespace(value));
-			}
-			else
-			{
-				tokens.Add(MarkupGrammar.TokenText(value));
-			}
+			tokens.Add(MarkupGrammar.TokenValue(value));
 		}
 
 		#endregion Scanning Methods

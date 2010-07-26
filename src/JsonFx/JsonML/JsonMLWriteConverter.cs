@@ -149,7 +149,7 @@ namespace JsonFx.JsonML
 						}
 						case CommonTokenType.ArrayEnd:
 						{
-							yield return MarkupGrammar.TokenElementEnd(new DataName());
+							yield return MarkupGrammar.TokenElementEnd;
 
 							stream.Pop();
 							token = stream.Peek();
@@ -176,7 +176,7 @@ namespace JsonFx.JsonML
 
 			private Token<MarkupTokenType> TransformValue(Token<CommonTokenType> token)
 			{
-				MarkupTokenType valueType = (token.Name.IsEmpty) ? MarkupTokenType.TextValue : MarkupTokenType.UnparsedBlock;
+				MarkupTokenType valueType = (token.Name.IsEmpty) ? MarkupTokenType.Primitive : MarkupTokenType.UnparsedBlock;
 
 				return new Token<MarkupTokenType>(valueType, token.Name, token.Value);
 			}

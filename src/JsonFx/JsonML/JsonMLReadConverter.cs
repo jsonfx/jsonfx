@@ -133,8 +133,7 @@ namespace JsonFx.JsonML
 
 								switch (token.TokenType)
 								{
-									case MarkupTokenType.TextValue:
-									case MarkupTokenType.Whitespace:
+									case MarkupTokenType.Primitive:
 									{
 										yield return CommonGrammar.TokenValue(token.Value);
 										break;
@@ -183,16 +182,15 @@ namespace JsonFx.JsonML
 							token = stream.Peek();
 							break;
 						}
-						case MarkupTokenType.TextValue:
-						case MarkupTokenType.Whitespace:
+						case MarkupTokenType.Primitive:
 						{
 							string value = token.ValueAsString();
 
 							stream.Pop();
 							token = stream.Peek();
 							while (!stream.IsCompleted &&
-								(token.TokenType == MarkupTokenType.TextValue ||
-								token.TokenType == MarkupTokenType.Whitespace))
+								(token.TokenType == MarkupTokenType.Primitive ||
+								token.TokenType == MarkupTokenType.Primitive))
 							{
 								// concatenate adjacent value nodes
 								value = String.Concat(value, token.ValueAsString());

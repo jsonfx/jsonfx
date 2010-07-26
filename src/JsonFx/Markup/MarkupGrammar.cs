@@ -80,6 +80,7 @@ namespace JsonFx.Markup
 		#region Reusable Tokens
 
 		public static readonly Token<MarkupTokenType> TokenNone = new Token<MarkupTokenType>(MarkupTokenType.None);
+		public static readonly Token<MarkupTokenType> TokenElementEnd = new Token<MarkupTokenType>(MarkupTokenType.ElementEnd);
 
 		public static Token<MarkupTokenType> TokenUnparsed(string name, string text)
 		{
@@ -96,30 +97,14 @@ namespace JsonFx.Markup
 			return new Token<MarkupTokenType>(MarkupTokenType.ElementVoid, name);
 		}
 
-		public static Token<MarkupTokenType> TokenElementEnd(DataName name)
-		{
-			return new Token<MarkupTokenType>(MarkupTokenType.ElementEnd, name);
-		}
-
 		public static Token<MarkupTokenType> TokenAttribute(DataName name)
 		{
 			return new Token<MarkupTokenType>(MarkupTokenType.Attribute, name);
 		}
 
-		public static Token<MarkupTokenType> TokenText(char ch)
+		public static Token<MarkupTokenType> TokenValue(string text)
 		{
-			return new Token<MarkupTokenType>(MarkupTokenType.TextValue, ch);
-		}
-
-		public static Token<MarkupTokenType> TokenText(string text)
-		{
-			return new Token<MarkupTokenType>(MarkupTokenType.TextValue, text);
-		}
-
-		public static Token<MarkupTokenType> TokenWhitespace(string text)
-		{
-			// TODO: evaluate the usefullness of Whitespace vs. Text, should there just be Value?
-			return new Token<MarkupTokenType>(MarkupTokenType.Whitespace, text);
+			return new Token<MarkupTokenType>(MarkupTokenType.Primitive, text);
 		}
 
 		#endregion Reusable Tokens

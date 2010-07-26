@@ -249,24 +249,21 @@ namespace JsonFx.Html
 					}
 					case MarkupTokenType.ElementEnd:
 					{
-						this.WriteTag(writer, MarkupTokenType.ElementEnd, token.Name, null, null);
-
-						if (this.ScopeChain.HasScope &&
-							this.ScopeChain.Peek().TagName == token.Name)
+						if (this.ScopeChain.HasScope)
 						{
+							this.WriteTag(writer, MarkupTokenType.ElementEnd, this.ScopeChain.Peek().TagName, null, null);
 							this.ScopeChain.Pop();
 						}
 						else
 						{
-							// TODO: decide how to manage this
+							// TODO: decide if this is should throw an exception
 						}
 
 						stream.Pop();
 						token = stream.Peek();
 						break;
 					}
-					case MarkupTokenType.TextValue:
-					case MarkupTokenType.Whitespace:
+					case MarkupTokenType.Primitive:
 					{
 						this.WriteCharData(writer, token.ValueAsString());
 
@@ -426,8 +423,7 @@ namespace JsonFx.Html
 
 			switch (value.TokenType)
 			{
-				case MarkupTokenType.TextValue:
-				case MarkupTokenType.Whitespace:
+				case MarkupTokenType.Primitive:
 				{
 					this.WriteAttributeValue(writer, attrValue);
 					break;

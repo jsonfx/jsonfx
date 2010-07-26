@@ -119,8 +119,7 @@ namespace JsonFx.Xml
 					case MarkupTokenType.ElementBegin:
 					case MarkupTokenType.ElementEnd:
 					case MarkupTokenType.Attribute:
-					case MarkupTokenType.TextValue:
-					case MarkupTokenType.Whitespace:
+					case MarkupTokenType.Primitive:
 					{
 						input.Pop();
 						token = input.Peek();
