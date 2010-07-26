@@ -41,12 +41,12 @@ using Assert=JsonFx.AssertPatched;
 
 namespace JsonFx.Xml
 {
-	public class XmlDataWriteConverterTests
+	public class XmlDataReadConverterTests
 	{
 		#region Constants
 
 		private const string TraitName = "XML";
-		private const string TraitValue = "Serialization";
+		private const string TraitValue = "Deserialization";
 
 		#endregion Constants
 
@@ -56,19 +56,19 @@ namespace JsonFx.Xml
 		[Trait(TraitName, TraitValue)]
 		public void Format_ArrayEmpty_ReturnsEmptyArray()
 		{
-			var input = new[]
+			var expected = new[]
 			{
 				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenArrayEnd
 			};
 
-			var expected = new[]
+			var input = new[]
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("array")),
 				MarkupGrammar.TokenElementEnd
 			};
 
-			var transformer = new XmlWriter.XmlDataWriteConverter(new DataWriterSettings());
+			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
 			var actual = transformer.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -78,21 +78,21 @@ namespace JsonFx.Xml
 		[Trait(TraitName, TraitValue)]
 		public void Format_ArrayOneItem_ReturnsExpectedArray()
 		{
-			var input = new[]
+			var expected = new[]
 			{
 				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenNull,
 				CommonGrammar.TokenArrayEnd
 			};
 
-			var expected = new[]
+			var input = new[]
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("array")),
 				MarkupGrammar.TokenElementVoid(new DataName("object")),
 				MarkupGrammar.TokenElementEnd
 			};
 
-			var transformer = new XmlWriter.XmlDataWriteConverter(new DataWriterSettings());
+			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
 			var actual = transformer.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -102,7 +102,7 @@ namespace JsonFx.Xml
 		[Trait(TraitName, TraitValue)]
 		public void Format_ArrayMultiItem_ReturnsExpectedArray()
 		{
-			var input = new[]
+			var expected = new[]
 			{
 				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenValue(0),
@@ -112,7 +112,7 @@ namespace JsonFx.Xml
 				CommonGrammar.TokenArrayEnd
 			};
 
-			var expected = new[]
+			var input = new[]
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("array")),
 				MarkupGrammar.TokenElementBegin(new DataName("int")),
@@ -128,7 +128,7 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementEnd,
 			};
 
-			var transformer = new XmlWriter.XmlDataWriteConverter(new DataWriterSettings());
+			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
 			var actual = transformer.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -139,7 +139,7 @@ namespace JsonFx.Xml
 		public void Format_ArrayNestedDeeply_ReturnsExpectedArray()
 		{
 			// input from pass2.json in test suite at http://www.json.org/JSON_checker/
-			var input = new[]
+			var expected = new[]
 			{
 				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenArrayBeginNoName,
@@ -182,7 +182,7 @@ namespace JsonFx.Xml
 				CommonGrammar.TokenArrayEnd
 			};
 
-			var expected = new[]
+			var input = new[]
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("array")),
 				MarkupGrammar.TokenElementBegin(new DataName("array")),
@@ -229,7 +229,7 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementEnd
 			};
 
-			var transformer = new XmlWriter.XmlDataWriteConverter(new DataWriterSettings());
+			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
 			var actual = transformer.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -243,19 +243,19 @@ namespace JsonFx.Xml
 		[Trait(TraitName, TraitValue)]
 		public void Format_ObjectEmpty_RendersEmptyObject()
 		{
-			var input = new[]
+			var expected = new[]
 			{
 				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenObjectEnd
 			};
 
-			var expected = new[]
+			var input = new[]
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("object")),
 				MarkupGrammar.TokenElementEnd
 			};
 
-			var transformer = new XmlWriter.XmlDataWriteConverter(new DataWriterSettings());
+			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
 			var actual = transformer.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -265,7 +265,7 @@ namespace JsonFx.Xml
 		[Trait(TraitName, TraitValue)]
 		public void Format_ObjectOneProperty_RendersSimpleObject()
 		{
-			var input = new[]
+			var expected = new[]
 			{
 				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenProperty("key"),
@@ -273,7 +273,7 @@ namespace JsonFx.Xml
 				CommonGrammar.TokenObjectEnd
 			};
 
-			var expected = new[]
+			var input = new[]
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("object")),
 				MarkupGrammar.TokenElementBegin(new DataName("key")),
@@ -282,7 +282,7 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementEnd,
 			};
 
-			var transformer = new XmlWriter.XmlDataWriteConverter(new DataWriterSettings());
+			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
 			var actual = transformer.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -292,7 +292,7 @@ namespace JsonFx.Xml
 		[Trait(TraitName, TraitValue)]
 		public void Format_NamedObjectOneProperty_RendersSimpleObject()
 		{
-			var input = new[]
+			var expected = new[]
 			{
 				CommonGrammar.TokenObjectBegin("Yada"),
 				CommonGrammar.TokenProperty("key"),
@@ -300,7 +300,7 @@ namespace JsonFx.Xml
 				CommonGrammar.TokenObjectEnd
 			};
 
-			var expected = new[]
+			var input = new[]
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("Yada")),
 				MarkupGrammar.TokenElementBegin(new DataName("key")),
@@ -309,7 +309,7 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementEnd,
 			};
 
-			var transformer = new XmlWriter.XmlDataWriteConverter(new DataWriterSettings());
+			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
 			var actual = transformer.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -320,7 +320,7 @@ namespace JsonFx.Xml
 		public void Format_ObjectNested_RendersNestedObject()
 		{
 			// input from pass3.json in test suite at http://www.json.org/JSON_checker/
-			var input = new[]
+			var expected = new[]
 			{
 				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenProperty("JSON Test Pattern pass3"),
@@ -333,7 +333,7 @@ namespace JsonFx.Xml
 				CommonGrammar.TokenObjectEnd
 			};
 
-			var expected = new[]
+			var input = new[]
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("object")),
 				MarkupGrammar.TokenElementBegin(new DataName("JSON_x0020_Test_x0020_Pattern_x0020_pass3")),
@@ -347,7 +347,7 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementEnd,
 			};
 
-			var transformer = new XmlWriter.XmlDataWriteConverter(new DataWriterSettings());
+			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
 			var actual = transformer.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -361,7 +361,7 @@ namespace JsonFx.Xml
 		[Trait(TraitName, TraitValue)]
 		public void Format_NamespacedObjectOneProperty_CorrectlyEmitsNamespace()
 		{
-			var input = new[]
+			var expected = new[]
 			{
 				CommonGrammar.TokenObjectBegin("foo"),
 				CommonGrammar.TokenProperty(new DataName("key", String.Empty, "http://json.org")),
@@ -369,7 +369,7 @@ namespace JsonFx.Xml
 				CommonGrammar.TokenObjectEnd
 			};
 
-			var expected = new[]
+			var input = new[]
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("foo")),
 				MarkupGrammar.TokenElementBegin(new DataName("key", String.Empty, "http://json.org")),
@@ -378,7 +378,7 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementEnd,
 			};
 
-			var transformer = new XmlWriter.XmlDataWriteConverter(new DataWriterSettings());
+			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
 			var actual = transformer.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -388,7 +388,7 @@ namespace JsonFx.Xml
 		[Trait(TraitName, TraitValue)]
 		public void Format_ObjectAndPropertyShareNamespace_CorrectlyEmitsNamespace()
 		{
-			var input = new[]
+			var expected = new[]
 			{
 				CommonGrammar.TokenObjectBegin(new DataName("foo", String.Empty, "http://json.org")),
 				CommonGrammar.TokenProperty(new DataName("key", String.Empty, "http://json.org")),
@@ -396,7 +396,7 @@ namespace JsonFx.Xml
 				CommonGrammar.TokenObjectEnd
 			};
 
-			var expected = new[]
+			var input = new[]
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("foo", String.Empty, "http://json.org")),
 				MarkupGrammar.TokenElementBegin(new DataName("key", String.Empty, "http://json.org")),
@@ -405,7 +405,7 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementEnd,
 			};
 
-			var transformer = new XmlWriter.XmlDataWriteConverter(new DataWriterSettings());
+			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
 			var actual = transformer.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -415,7 +415,7 @@ namespace JsonFx.Xml
 		[Trait(TraitName, TraitValue)]
 		public void Format_NamespacedObjectNonNamespacedProperty_CorrectlyEmitsNamespace()
 		{
-			var input = new[]
+			var expected = new[]
 			{
 				CommonGrammar.TokenObjectBegin(new DataName("foo", String.Empty, "http://json.org")),
 				CommonGrammar.TokenProperty("key"),
@@ -423,7 +423,7 @@ namespace JsonFx.Xml
 				CommonGrammar.TokenObjectEnd
 			};
 
-			var expected = new[]
+			var input = new[]
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("foo", String.Empty, "http://json.org")),
 				MarkupGrammar.TokenElementBegin(new DataName("key")),
@@ -432,7 +432,7 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementEnd,
 			};
 
-			var transformer = new XmlWriter.XmlDataWriteConverter(new DataWriterSettings());
+			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
 			var actual = transformer.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -442,7 +442,7 @@ namespace JsonFx.Xml
 		[Trait(TraitName, TraitValue)]
 		public void Format_NamespacedObjectOneDifferentNamespaceProperty_CorrectlyEmitsNamespaces()
 		{
-			var input = new[]
+			var expected = new[]
 			{
 				CommonGrammar.TokenObjectBegin(new DataName("foo", String.Empty, "http://json.org")),
 				CommonGrammar.TokenProperty(new DataName("key", String.Empty, "http://jsonfx.net")),
@@ -450,7 +450,7 @@ namespace JsonFx.Xml
 				CommonGrammar.TokenObjectEnd
 			};
 
-			var expected = new[]
+			var input = new[]
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("foo", String.Empty, "http://json.org")),
 				MarkupGrammar.TokenElementBegin(new DataName("key", String.Empty, "http://jsonfx.net")),
@@ -459,7 +459,7 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementEnd,
 			};
 
-			var transformer = new XmlWriter.XmlDataWriteConverter(new DataWriterSettings());
+			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
 			var actual = transformer.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -469,7 +469,7 @@ namespace JsonFx.Xml
 		[Trait(TraitName, TraitValue)]
 		public void Format_ObjectAndAttributeShareNamespace_CorrectlyEmitsNamespace()
 		{
-			var input = new[]
+			var expected = new[]
 			{
 				CommonGrammar.TokenObjectBegin(new DataName("foo", String.Empty, "http://json.org")),
 				CommonGrammar.TokenProperty(new DataName("key", String.Empty, "http://json.org", true)),
@@ -477,7 +477,7 @@ namespace JsonFx.Xml
 				CommonGrammar.TokenObjectEnd
 			};
 
-			var expected = new[]
+			var input = new[]
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("foo", String.Empty, "http://json.org")),
 				MarkupGrammar.TokenAttribute(new DataName("key", String.Empty, "http://json.org", true)),
@@ -485,7 +485,7 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementEnd,
 			};
 
-			var transformer = new XmlWriter.XmlDataWriteConverter(new DataWriterSettings());
+			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
 			var actual = transformer.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -495,7 +495,7 @@ namespace JsonFx.Xml
 		[Trait(TraitName, TraitValue)]
 		public void Format_ObjectAndAttributeDifferentNamespaces_CorrectlyEmitsNamespaces()
 		{
-			var input = new[]
+			var expected = new[]
 			{
 				CommonGrammar.TokenObjectBegin(new DataName("foo", String.Empty, "http://json.org")),
 				CommonGrammar.TokenProperty(new DataName("key", String.Empty, "http://jsonfx.net", true)),
@@ -503,7 +503,7 @@ namespace JsonFx.Xml
 				CommonGrammar.TokenObjectEnd
 			};
 
-			var expected = new[]
+			var input = new[]
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("foo", String.Empty, "http://json.org")),
 				MarkupGrammar.TokenAttribute(new DataName("key", "q1", "http://jsonfx.net", true)),
@@ -511,7 +511,7 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementEnd,
 			};
 
-			var transformer = new XmlWriter.XmlDataWriteConverter(new DataWriterSettings());
+			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
 			var actual = transformer.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -521,7 +521,7 @@ namespace JsonFx.Xml
 		[Trait(TraitName, TraitValue)]
 		public void Format_NestedObjectsSkippingNamespaces_CorrectlyEmitsNamespaces()
 		{
-			var input = new[]
+			var expected = new[]
 			{
 				CommonGrammar.TokenObjectBegin(new DataName("foo1", String.Empty, "http://json.org")),
 				CommonGrammar.TokenProperty(new DataName("key1", String.Empty, "http://jsonfx.net")),
@@ -534,7 +534,7 @@ namespace JsonFx.Xml
 				CommonGrammar.TokenObjectEnd
 			};
 
-			var expected = new[]
+			var input = new[]
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("foo1", String.Empty, "http://json.org")),
 				MarkupGrammar.TokenElementBegin(new DataName("key1", String.Empty, "http://jsonfx.net")),
@@ -545,7 +545,7 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementEnd,
 			};
 
-			var transformer = new XmlWriter.XmlDataWriteConverter(new DataWriterSettings());
+			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
 			var actual = transformer.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -555,7 +555,7 @@ namespace JsonFx.Xml
 		[Trait(TraitName, TraitValue)]
 		public void Format_NestedObjectsAlternatingNamespaces_CorrectlyEmitsNamespaces()
 		{
-			var input = new[]
+			var expected = new[]
 			{
 				CommonGrammar.TokenObjectBegin(new DataName("foo1", String.Empty, "http://json.org")),
 				CommonGrammar.TokenProperty(new DataName("key1", String.Empty, "http://jsonfx.net")),
@@ -568,7 +568,7 @@ namespace JsonFx.Xml
 				CommonGrammar.TokenObjectEnd
 			};
 
-			var expected = new[]
+			var input = new[]
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("foo1", String.Empty, "http://json.org")),
 				MarkupGrammar.TokenElementBegin(new DataName("key1", String.Empty, "http://jsonfx.net")),
@@ -579,7 +579,7 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementEnd,
 			};
 
-			var transformer = new XmlWriter.XmlDataWriteConverter(new DataWriterSettings());
+			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
 			var actual = transformer.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -593,11 +593,11 @@ namespace JsonFx.Xml
 		[Trait(TraitName, TraitValue)]
 		public void Format_EmptyInput_RendersEmptyString()
 		{
-			var input = Enumerable.Empty<Token<CommonTokenType>>();
+			var expected = Enumerable.Empty<Token<CommonTokenType>>();
 
-			var expected = Enumerable.Empty<Token<MarkupTokenType>>();
+			var input = Enumerable.Empty<Token<MarkupTokenType>>();
 
-			var transformer = new XmlWriter.XmlDataWriteConverter(new DataWriterSettings());
+			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
 			var actual = transformer.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -607,9 +607,9 @@ namespace JsonFx.Xml
 		[Trait(TraitName, TraitValue)]
 		public void Format_NullInput_ThrowsArgumentNullException()
 		{
-			var input = (IEnumerable<Token<CommonTokenType>>)null;
+			var input = (IEnumerable<Token<MarkupTokenType>>)null;
 
-			var transformer = new XmlWriter.XmlDataWriteConverter(new DataWriterSettings());
+			var transformer = new XmlReader.XmlDataReadConverter(new DataReaderSettings());
 
 			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
 				delegate
@@ -628,7 +628,7 @@ namespace JsonFx.Xml
 			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
 				delegate
 				{
-					var transformer = new XmlWriter.XmlDataWriteConverter(null);
+					var transformer = new XmlReader.XmlDataReadConverter(null);
 				});
 
 			// verify exception is coming from expected param
