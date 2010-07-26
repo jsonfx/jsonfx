@@ -98,7 +98,7 @@ namespace JsonFx.Xml
 				IStream<Token<MarkupTokenType>> stream = new Stream<Token<MarkupTokenType>>(input);
 				while (!stream.IsCompleted)
 				{
-					foreach (var token in this.TransformValue(stream, false))
+					foreach (var token in this.TransformValue(stream, true))
 					{
 						yield return token;
 					}
@@ -114,7 +114,7 @@ namespace JsonFx.Xml
 			/// </summary>
 			/// <param name="output"></param>
 			/// <param name="input"></param>
-			private IList<Token<CommonTokenType>> TransformValue(IStream<Token<MarkupTokenType>> input, bool isProperty)
+			private IList<Token<CommonTokenType>> TransformValue(IStream<Token<MarkupTokenType>> input, bool isStandAlone)
 			{
 				Token<MarkupTokenType> token = input.Peek();
 				switch (token.TokenType)
@@ -132,7 +132,7 @@ namespace JsonFx.Xml
 					case MarkupTokenType.ElementBegin:
 					case MarkupTokenType.ElementVoid:
 					{
-						return this.TransformElement(input, isProperty);
+						return this.TransformElement(input, isStandAlone);
 					}
 					default:
 					{
@@ -143,7 +143,7 @@ namespace JsonFx.Xml
 				}
 			}
 
-			private IList<Token<CommonTokenType>> TransformElement(IStream<Token<MarkupTokenType>> input, bool isProperty)
+			private IList<Token<CommonTokenType>> TransformElement(IStream<Token<MarkupTokenType>> input, bool isStandAlone)
 			{
 				Token<MarkupTokenType> token = input.Peek();
 
@@ -158,30 +158,44 @@ namespace JsonFx.Xml
 					if (token.TokenType == MarkupTokenType.ElementEnd ||
 						(isVoid && token.TokenType != MarkupTokenType.Attribute))
 					{
-						input.Pop();
+						if (!isVoid)
+						{
+							input.Pop();
+						}
 
 						List<Token<CommonTokenType>> output = new List<Token<CommonTokenType>>();
 
-						if (children != null &&
-							children.Count == 1)
+						if ((children == null) ||
+							(children.Count == 1) ||
+							elementName == XmlInTransformer.DefaultArrayName)
 						{
-							KeyValuePair<DataName, IList<IList<Token<CommonTokenType>>>> items;
-							using (var enumerator = children.GetEnumerator())
+							DataName childName = DataName.Empty;
+							IList<IList<Token<CommonTokenType>>> items = null;
+							if (children != null)
 							{
-								enumerator.MoveNext();
-								items = enumerator.Current;
+								using (var enumerator = children.GetEnumerator())
+								{
+									if (enumerator.MoveNext())
+									{
+										items = enumerator.Current.Value;
+										childName = enumerator.Current.Key;
+									}
+								}
 							}
 
-							if (items.Value.Count > 1 ||
-								items.Key == XmlInTransformer.DefaultArrayName)
+							if ((items != null && items.Count > 1) ||
+								childName == XmlInTransformer.DefaultArrayName)
 							{
 								// if only child has more than one grandchild
 								// then whole element is acutally an array
-								output.Add(elementName.IsEmpty ? CommonGrammar.TokenArrayBeginNoName : CommonGrammar.TokenArrayBegin(this.DecodeName(elementName, XmlInTransformer.DefaultArrayName)));
+								output.Add(elementName.IsEmpty ? CommonGrammar.TokenArrayBeginNoName : CommonGrammar.TokenArrayBegin(this.DecodeName(elementName, typeof(Array))));
 
-								foreach (var item in items.Value)
+								if (items != null)
 								{
-									output.AddRange(item);
+									foreach (var item in items)
+									{
+										output.AddRange(item);
+									}
 								}
 
 								output.Add(CommonGrammar.TokenArrayEnd);
@@ -189,9 +203,9 @@ namespace JsonFx.Xml
 							}
 						}
 
-						if (!isProperty)
+						if (isStandAlone)
 						{
-							output.Add(elementName.IsEmpty ? CommonGrammar.TokenObjectBeginNoName : CommonGrammar.TokenObjectBegin(this.DecodeName(elementName, XmlInTransformer.DefaultObjectName)));
+							output.Add(elementName.IsEmpty ? CommonGrammar.TokenObjectBeginNoName : CommonGrammar.TokenObjectBegin(this.DecodeName(elementName, typeof(Object))));
 						}
 
 						if (children != null)
@@ -200,15 +214,20 @@ namespace JsonFx.Xml
 							{
 								if (property.Value.Count == 1)
 								{
-									if (!property.Key.IsEmpty)
+									if (isStandAlone)
 									{
-										output.Add(CommonGrammar.TokenProperty(this.DecodeName(property.Key, XmlInTransformer.DefaultObjectName)));
+
+
+										// if the parent is a stand alone object then child is a property
+										DataName name = this.DecodeName(property.Key, typeof(Object));
+										name = name.IsEmpty ? this.DecodeName(elementName, typeof(Object)) : name;
+										output.Add(CommonGrammar.TokenProperty(name));
 									}
 									output.AddRange(property.Value[0]);
 									continue;
 								}
 
-								output.Add(property.Key.IsEmpty ? CommonGrammar.TokenArrayBeginNoName : CommonGrammar.TokenArrayBegin(this.DecodeName(property.Key, XmlInTransformer.DefaultArrayName)));
+								output.Add(property.Key.IsEmpty ? CommonGrammar.TokenArrayBeginNoName : CommonGrammar.TokenArrayBegin(this.DecodeName(property.Key, typeof(Array))));
 								foreach (var item in property.Value)
 								{
 									output.AddRange(item);
@@ -216,12 +235,12 @@ namespace JsonFx.Xml
 								output.Add(CommonGrammar.TokenArrayEnd);
 							}
 						}
-						else if (isProperty)
+						else if (!isStandAlone)
 						{
 							output.Add(CommonGrammar.TokenNull);
 						}
 
-						if (!isProperty)
+						if (isStandAlone)
 						{
 							output.Add(CommonGrammar.TokenObjectEnd);
 						}
@@ -244,7 +263,7 @@ namespace JsonFx.Xml
 						children[propertyName] = new List<IList<Token<CommonTokenType>>>();
 					}
 
-					var child = this.TransformValue(input, !isProperty);
+					var child = this.TransformValue(input, !isStandAlone);
 
 					children[propertyName].Add(child);
 				}
@@ -258,8 +277,10 @@ namespace JsonFx.Xml
 
 			#region Utility Methods
 
-			private DataName DecodeName(DataName name, DataName defaultName)
+			private DataName DecodeName(DataName name, Type type)
 			{
+				DataName defaultName = this.Settings.Resolver.LoadTypeName(type);
+
 				// String.Empty is a valid DataName.LocalName, so may have been replaced
 				if (name == defaultName)
 				{
