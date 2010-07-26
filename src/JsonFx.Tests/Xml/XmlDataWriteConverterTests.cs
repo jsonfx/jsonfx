@@ -106,11 +106,8 @@ namespace JsonFx.Xml
 			{
 				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenValue(0),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenNull,
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenFalse,
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenTrue,
 				CommonGrammar.TokenArrayEnd
 			};
@@ -330,7 +327,6 @@ namespace JsonFx.Xml
 				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenProperty("The outermost value"),
 				CommonGrammar.TokenValue("must be an object or array."),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("In this test"),
 				CommonGrammar.TokenValue("It is an object."),
 				CommonGrammar.TokenObjectEnd,

@@ -99,7 +99,6 @@ namespace JsonFx.JsonML
 
 				IStream<Token<MarkupTokenType>> stream = new Stream<Token<MarkupTokenType>>(input);
 
-				bool needsValueDelim = false;
 				int depth = 0;
 
 				Token<MarkupTokenType> token = stream.Peek();
@@ -110,11 +109,7 @@ namespace JsonFx.JsonML
 						case MarkupTokenType.ElementBegin:
 						case MarkupTokenType.ElementVoid:
 						{
-							if (needsValueDelim)
-							{
-								yield return CommonGrammar.TokenValueDelim;
-								needsValueDelim = false;
-							}
+							bool hasProperties = false;
 
 							bool isVoid = (token.TokenType == MarkupTokenType.ElementVoid);
 							yield return CommonGrammar.TokenArrayBeginNoName;
@@ -125,15 +120,10 @@ namespace JsonFx.JsonML
 							while (!stream.IsCompleted &&
 								token.TokenType == MarkupTokenType.Attribute)
 							{
-								if (!needsValueDelim)
+								if (!hasProperties)
 								{
-									needsValueDelim = true;
-									yield return CommonGrammar.TokenValueDelim;
+									hasProperties = true;
 									yield return CommonGrammar.TokenObjectBeginNoName;
-								}
-								else
-								{
-									yield return CommonGrammar.TokenValueDelim;
 								}
 
 								yield return CommonGrammar.TokenProperty(token.Name);
@@ -166,19 +156,14 @@ namespace JsonFx.JsonML
 								token = stream.Peek();
 							}
 
-							if (needsValueDelim)
+							if (hasProperties)
 							{
 								yield return CommonGrammar.TokenObjectEnd;
-							}
-							else
-							{
-								needsValueDelim = true;
 							}
 
 							if (isVoid)
 							{
 								yield return CommonGrammar.TokenArrayEnd;
-								needsValueDelim = true;
 							}
 							else
 							{
@@ -191,7 +176,6 @@ namespace JsonFx.JsonML
 							if (depth > 0)
 							{
 								yield return CommonGrammar.TokenArrayEnd;
-								needsValueDelim = true;
 							}
 							depth--;
 
@@ -202,11 +186,6 @@ namespace JsonFx.JsonML
 						case MarkupTokenType.TextValue:
 						case MarkupTokenType.Whitespace:
 						{
-							if (needsValueDelim)
-							{
-								yield return CommonGrammar.TokenValueDelim;
-							}
-
 							string value = token.ValueAsString();
 
 							stream.Pop();
@@ -223,17 +202,11 @@ namespace JsonFx.JsonML
 							}
 
 							yield return CommonGrammar.TokenValue(value);
-							needsValueDelim = true;
 							break;
 						}
 						case MarkupTokenType.UnparsedBlock:
 						{
-							if (needsValueDelim)
-							{
-								yield return CommonGrammar.TokenValueDelim;
-							}
 							yield return new Token<CommonTokenType>(CommonTokenType.Primitive, token.Name, token.Value);
-							needsValueDelim = true;
 
 							stream.Pop();
 							token = stream.Peek();

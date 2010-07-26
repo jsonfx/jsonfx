@@ -47,6 +47,29 @@ namespace JsonFx.Json
 		/// </summary>
 		public class JsonTokenizer : ITextTokenizer<CommonTokenType>
 		{
+			#region NeedsValueDelim
+
+			private enum NeedsValueDelim
+			{
+				/// <summary>
+				/// It is an error for the next token to be a value delim
+				/// </summary>
+				Forbidden,
+
+				/// <summary>
+				/// Forbidden but differentiates between empty array/object and just written
+				/// </summary>
+				CurrentIsDelim,
+
+				/// <summary>
+				/// It is an error for the next token to NOT be a value delim
+				/// </summary>
+				Required,
+
+			}
+
+			#endregion NeedsValueDelim
+
 			#region Constants
 
 			// tokenizing errors
@@ -54,6 +77,8 @@ namespace JsonFx.Json
 			private const string ErrorUnterminatedComment = "Unterminated comment block";
 			private const string ErrorUnterminatedString = "Unterminated JSON string";
 			private const string ErrorIllegalNumber = "Illegal JSON number";
+			private const string ErrorMissingValueDelim = "Missing value delimiter";
+			private const string ErrorExtraValueDelim = "Extraneous value delimiter";
 
 			private const int DefaultBufferSize = 0x20;
 
@@ -96,106 +121,182 @@ namespace JsonFx.Json
 			#region Scanning Methods
 
 			/// <summary>
-			/// Returns the next JSON token in the sequence.
+			/// Gets a token sequence from the scanner stream
 			/// </summary>
+			/// <param name="scanner"></param>
 			/// <returns></returns>
-			private static Token<CommonTokenType> NextToken(ITextStream scanner)
+			protected IEnumerable<Token<CommonTokenType>> GetTokens(ITextStream scanner)
 			{
-				// skip comments and whitespace between tokens
-				JsonTokenizer.SkipCommentsAndWhitespace(scanner);
-
-				if (scanner.IsCompleted)
+				if (scanner == null)
 				{
-					scanner.Dispose();
-					return CommonGrammar.TokenNone;
+					throw new ArgumentNullException("scanner");
 				}
 
-				bool hasUnaryOp = false;
+				// store for external access to Index/Line/Column
+				this.Scanner = scanner;
 
-				char ch = scanner.Peek();
-				switch (ch)
+				int depth = 0;
+				NeedsValueDelim needsValueDelim = NeedsValueDelim.Forbidden;
+
+				while (true)
 				{
-					case JsonGrammar.OperatorArrayBegin:
-					{
-						scanner.Pop();
-						return CommonGrammar.TokenArrayBeginNoName;
-					}
-					case JsonGrammar.OperatorArrayEnd:
-					{
-						scanner.Pop();
-						return CommonGrammar.TokenArrayEnd;
-					}
-					case JsonGrammar.OperatorObjectBegin:
-					{
-						scanner.Pop();
-						return CommonGrammar.TokenObjectBeginNoName;
-					}
-					case JsonGrammar.OperatorObjectEnd:
-					{
-						scanner.Pop();
-						return CommonGrammar.TokenObjectEnd;
-					}
-					case JsonGrammar.OperatorStringDelim:
-					case JsonGrammar.OperatorStringDelimAlt:
-					{
-						string value = JsonTokenizer.ScanString(scanner);
+					// skip comments and whitespace between tokens
+					JsonTokenizer.SkipCommentsAndWhitespace(scanner);
 
-						JsonTokenizer.SkipCommentsAndWhitespace(scanner);
-						if (scanner.Peek() == JsonGrammar.OperatorPairDelim)
+					if (scanner.IsCompleted)
+					{
+						this.Scanner = StringStream.Null;
+						scanner.Dispose();
+						yield break;
+					}
+
+					bool hasUnaryOp = false;
+
+					char ch = scanner.Peek();
+					switch (ch)
+					{
+						case JsonGrammar.OperatorArrayBegin:
 						{
 							scanner.Pop();
-							return CommonGrammar.TokenProperty(new DataName(value));
+							if (needsValueDelim == NeedsValueDelim.Required)
+							{
+								throw new DeserializationException(JsonTokenizer.ErrorMissingValueDelim, scanner.Index, scanner.Line, scanner.Column);
+							}
+
+							yield return CommonGrammar.TokenArrayBeginNoName;
+							depth++;
+							needsValueDelim = NeedsValueDelim.Forbidden;
+							continue;
 						}
+						case JsonGrammar.OperatorArrayEnd:
+						{
+							scanner.Pop();
+							if (needsValueDelim == NeedsValueDelim.CurrentIsDelim)
+							{
+								throw new DeserializationException(JsonTokenizer.ErrorExtraValueDelim, scanner.Index, scanner.Line, scanner.Column);
+							}
 
-						return CommonGrammar.TokenValue(value);
+							yield return CommonGrammar.TokenArrayEnd;
+
+							// resetting at zero allows streaming mode
+							depth--;
+							needsValueDelim = (depth > 0) ? NeedsValueDelim.Required : NeedsValueDelim.Forbidden;
+							continue;
+						}
+						case JsonGrammar.OperatorObjectBegin:
+						{
+							scanner.Pop();
+							if (needsValueDelim == NeedsValueDelim.Required)
+							{
+								throw new DeserializationException(JsonTokenizer.ErrorMissingValueDelim, scanner.Index, scanner.Line, scanner.Column);
+							}
+
+							yield return CommonGrammar.TokenObjectBeginNoName;
+							depth++;
+							needsValueDelim = NeedsValueDelim.Forbidden;
+							continue;
+						}
+						case JsonGrammar.OperatorObjectEnd:
+						{
+							scanner.Pop();
+							if (needsValueDelim == NeedsValueDelim.CurrentIsDelim)
+							{
+								throw new DeserializationException(JsonTokenizer.ErrorExtraValueDelim, scanner.Index, scanner.Line, scanner.Column);
+							}
+
+							yield return CommonGrammar.TokenObjectEnd;
+
+							// resetting at zero allows streaming mode
+							depth--;
+							needsValueDelim = (depth > 0) ? NeedsValueDelim.Required : NeedsValueDelim.Forbidden;
+							continue;
+						}
+						case JsonGrammar.OperatorStringDelim:
+						case JsonGrammar.OperatorStringDelimAlt:
+						{
+							if (needsValueDelim == NeedsValueDelim.Required)
+							{
+								throw new DeserializationException(JsonTokenizer.ErrorMissingValueDelim, scanner.Index, scanner.Line, scanner.Column);
+							}
+
+							string value = JsonTokenizer.ScanString(scanner);
+
+							JsonTokenizer.SkipCommentsAndWhitespace(scanner);
+							if (scanner.Peek() == JsonGrammar.OperatorPairDelim)
+							{
+								scanner.Pop();
+								yield return CommonGrammar.TokenProperty(new DataName(value));
+								needsValueDelim = NeedsValueDelim.Forbidden;
+								continue;
+							}
+
+							yield return CommonGrammar.TokenValue(value);
+							needsValueDelim = NeedsValueDelim.Required;
+							continue;
+						}
+						case JsonGrammar.OperatorUnaryMinus:
+						case JsonGrammar.OperatorUnaryPlus:
+						{
+							hasUnaryOp = true;
+							break;
+						}
+						case JsonGrammar.OperatorValueDelim:
+						{
+							scanner.Pop();
+
+							if (needsValueDelim != NeedsValueDelim.Required)
+							{
+								throw new DeserializationException(JsonTokenizer.ErrorExtraValueDelim, scanner.Index, scanner.Line, scanner.Column);
+							}
+
+							needsValueDelim = NeedsValueDelim.CurrentIsDelim;
+							continue;
+						}
+						case JsonGrammar.OperatorPairDelim:
+						{
+							throw new DeserializationException(JsonTokenizer.ErrorUnrecognizedToken, scanner.Index+1, scanner.Line, scanner.Column);
+						}
 					}
-					case JsonGrammar.OperatorUnaryMinus:
-					case JsonGrammar.OperatorUnaryPlus:
+
+					if (needsValueDelim == NeedsValueDelim.Required)
 					{
-						hasUnaryOp = true;
-						break;
+						throw new DeserializationException(JsonTokenizer.ErrorMissingValueDelim, scanner.Index, scanner.Line, scanner.Column);
 					}
-					case JsonGrammar.OperatorValueDelim:
-					{
-						scanner.Pop();
-						return CommonGrammar.TokenValueDelim;
-					}
-					case JsonGrammar.OperatorPairDelim:
-					{
-						throw new DeserializationException(JsonTokenizer.ErrorUnrecognizedToken, scanner.Index+1, scanner.Line, scanner.Column);
-					}
-				}
 
-				// scan for numbers
-				Token<CommonTokenType> token = JsonTokenizer.ScanNumber(scanner);
-				if (token != null)
-				{
-					return token;
-				}
-
-				// hold for Infinity, clear for others
-				if (!hasUnaryOp)
-				{
-					ch = default(char);
-				}
-
-				// store for unterminated cases
-				long strPos = scanner.Index+1;
-				int strLine = scanner.Line;
-				int strCol = scanner.Column;
-
-				// scan for identifiers, then check if they are keywords
-				string ident = JsonTokenizer.ScanIdentifier(scanner);
-				if (!String.IsNullOrEmpty(ident))
-				{
-					token = JsonTokenizer.ScanKeywords(scanner, ident, ch);
+					// scan for numbers
+					Token<CommonTokenType> token = JsonTokenizer.ScanNumber(scanner);
 					if (token != null)
 					{
-						return token;
+						yield return token;
+						needsValueDelim = NeedsValueDelim.Required;
+						continue;
 					}
-				}
 
-				throw new DeserializationException(JsonTokenizer.ErrorUnrecognizedToken, strPos, strLine, strCol);
+					// hold for Infinity, clear for others
+					if (!hasUnaryOp)
+					{
+						ch = default(char);
+					}
+
+					// store for unterminated cases
+					long strPos = scanner.Index+1;
+					int strLine = scanner.Line;
+					int strCol = scanner.Column;
+
+					// scan for identifiers, then check if they are keywords
+					string ident = JsonTokenizer.ScanIdentifier(scanner);
+					if (!String.IsNullOrEmpty(ident))
+					{
+						token = JsonTokenizer.ScanKeywords(scanner, ident, ch, out needsValueDelim);
+						if (token != null)
+						{
+							yield return token;
+							continue;
+						}
+					}
+
+					throw new DeserializationException(JsonTokenizer.ErrorUnrecognizedToken, strPos, strLine, strCol);
+				}
 			}
 
 			private static void SkipCommentsAndWhitespace(ITextStream scanner)
@@ -631,8 +732,10 @@ namespace JsonFx.Json
 				}
 			}
 
-			private static Token<CommonTokenType> ScanKeywords(ITextStream scanner, string ident, char unary)
+			private static Token<CommonTokenType> ScanKeywords(ITextStream scanner, string ident, char unary, out NeedsValueDelim needsValueDelim)
 			{
+				needsValueDelim = NeedsValueDelim.Required;
+
 				switch (ident)
 				{
 					case JsonGrammar.KeywordFalse:
@@ -698,13 +801,15 @@ namespace JsonFx.Json
 
 				if (unary != default(char))
 				{
-					ident = unary.ToString()+ident;
+					ident = Char.ToString(unary)+ident;
 				}
 
 				JsonTokenizer.SkipCommentsAndWhitespace(scanner);
 				if (scanner.Peek() == JsonGrammar.OperatorPairDelim)
 				{
 					scanner.Pop();
+
+					needsValueDelim = NeedsValueDelim.Forbidden;
 					return CommonGrammar.TokenProperty(new DataName(ident));
 				}
 
@@ -772,33 +877,6 @@ namespace JsonFx.Json
 			public IEnumerable<Token<CommonTokenType>> GetTokens(string text)
 			{
 				return this.GetTokens(new StringStream(text));
-			}
-
-			/// <summary>
-			/// Gets a token sequence from the scanner
-			/// </summary>
-			/// <param name="scanner"></param>
-			/// <returns></returns>
-			protected IEnumerable<Token<CommonTokenType>> GetTokens(ITextStream scanner)
-			{
-				if (scanner == null)
-				{
-					throw new ArgumentNullException("scanner");
-				}
-
-				this.Scanner = scanner;
-
-				while (true)
-				{
-					Token<CommonTokenType> token = JsonTokenizer.NextToken(scanner);
-					if (token.TokenType == CommonTokenType.None)
-					{
-						this.Scanner = StringStream.Null;
-						scanner.Dispose();
-						yield break;
-					}
-					yield return token;
-				};
 			}
 
 			#endregion ITextTokenizer<DataTokenType> Members

@@ -95,11 +95,8 @@ namespace JsonFx.Serialization
 			{
 				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenValue(0),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenNull,
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenFalse,
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenTrue,
 				CommonGrammar.TokenArrayEnd
 			};
@@ -256,83 +253,7 @@ namespace JsonFx.Serialization
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Parse_ArrayExtraComma_ThrowsAnalyzerException()
-		{
-			// input from fail4.json in test suite at http://www.json.org/JSON_checker/
-			var input = new[]
-			{
-				CommonGrammar.TokenArrayBeginNoName,
-				CommonGrammar.TokenValue("extra comma"),
-				CommonGrammar.TokenValueDelim,
-				CommonGrammar.TokenArrayEnd
-			};
-
-			var analyzer = new CommonAnalyzer(new DataReaderSettings());
-
-			TokenException<CommonTokenType> ex = Assert.Throws<TokenException<CommonTokenType>>(
-				delegate
-				{
-					var actual = analyzer.Analyze<object>(input).Single();
-				});
-
-			// verify exception is coming from expected token
-			Assert.Equal(CommonGrammar.TokenArrayEnd, ex.Token);
-		}
-
-		[Fact]
-		[Trait(TraitName, TraitValue)]
-		public void Parse_ArrayDoubleExtraComma_ThrowsAnalyzerException()
-		{
-			// input from fail5.json in test suite at http://www.json.org/JSON_checker/
-			var input = new[]
-			{
-				CommonGrammar.TokenArrayBeginNoName,
-				CommonGrammar.TokenValue("double extra comma"),
-				CommonGrammar.TokenValueDelim,
-				CommonGrammar.TokenValueDelim,
-				CommonGrammar.TokenArrayEnd
-			};
-
-			var analyzer = new CommonAnalyzer(new DataReaderSettings());
-
-			TokenException<CommonTokenType> ex = Assert.Throws<TokenException<CommonTokenType>>(
-				delegate
-				{
-					var actual = analyzer.Analyze<object>(input).Single();
-				});
-
-			// verify exception is coming from expected token
-			Assert.Equal(CommonGrammar.TokenValueDelim, ex.Token);
-		}
-
-		[Fact]
-		[Trait(TraitName, TraitValue)]
-		public void Parse_ArrayMissingValue_ThrowsAnalyzerException()
-		{
-			// input from fail6.json in test suite at http://www.json.org/JSON_checker/
-			var input = new[]
-			{
-				CommonGrammar.TokenArrayBeginNoName,
-				CommonGrammar.TokenValueDelim,
-				CommonGrammar.TokenValue("<-- missing value"),
-				CommonGrammar.TokenArrayEnd
-			};
-
-			var analyzer = new CommonAnalyzer(new DataReaderSettings());
-
-			TokenException<CommonTokenType> ex = Assert.Throws<TokenException<CommonTokenType>>(
-				delegate
-				{
-					var actual = analyzer.Analyze<object>(input).Single();
-				});
-
-			// verify exception is coming from expected token
-			Assert.Equal(CommonGrammar.TokenValueDelim, ex.Token);
-		}
-
-		[Fact]
-		[Trait(TraitName, TraitValue)]
-		public void Parse_ArrayColonInsteadOfComma_ThrowsAnalyzerException()
+		public void Parse_PropertyInsideArray_ThrowsAnalyzerException()
 		{
 			// input from fail22.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -436,7 +357,6 @@ namespace JsonFx.Serialization
 				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenProperty("The outermost value"),
 				CommonGrammar.TokenValue("must be an object or array."),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("In this test"),
 				CommonGrammar.TokenValue("It is an object."),
 				CommonGrammar.TokenObjectEnd,
@@ -459,32 +379,6 @@ namespace JsonFx.Serialization
 			var actual = analyzer.Analyze(input).Cast<IDictionary<string, object>>().Single();
 
 			Assert.Equal(expected, actual, false);
-		}
-
-		[Fact]
-		[Trait(TraitName, TraitValue)]
-		public void Parse_ObjectExtraComma_ThrowsAnalyzerException()
-		{
-			// input from fail9.json in test suite at http://www.json.org/JSON_checker/
-			var input = new[]
-			{
-				CommonGrammar.TokenObjectBeginNoName,
-				CommonGrammar.TokenProperty("Extra comma"),
-				CommonGrammar.TokenTrue,
-				CommonGrammar.TokenValueDelim,
-				CommonGrammar.TokenObjectEnd
-			};
-
-			var analyzer = new CommonAnalyzer(new DataReaderSettings());
-
-			TokenException<CommonTokenType> ex = Assert.Throws<TokenException<CommonTokenType>>(
-				delegate
-				{
-					var actual = analyzer.Analyze<object>(input).Single();
-				});
-
-			// verify exception is coming from expected token
-			Assert.Equal(CommonGrammar.TokenObjectEnd, ex.Token);
 		}
 
 		[Fact]
@@ -540,14 +434,13 @@ namespace JsonFx.Serialization
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Parse_ObjectUnterminated_ThrowsAnalyzerException()
+		public void Parse_ValueInsteadOfProperty_ThrowsAnalyzerException()
 		{
 			// input from fail21.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
 				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenValue("Comma instead of colon"),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenNull,
 				CommonGrammar.TokenObjectEnd
 			};
@@ -566,15 +459,14 @@ namespace JsonFx.Serialization
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Parse_ObjectCommaInsteadOfClose_ThrowsAnalyzerException()
+		public void Parse_ObjectUnterminated_ThrowsAnalyzerException()
 		{
 			// input from fail32.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
 				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenProperty("Comma instead if closing brace"),
-				CommonGrammar.TokenTrue,
-				CommonGrammar.TokenValueDelim
+				CommonGrammar.TokenTrue
 			};
 
 			var analyzer = new CommonAnalyzer(new DataReaderSettings());
@@ -602,176 +494,114 @@ namespace JsonFx.Serialization
 			{
 				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenValue("JSON Test Pattern pass1"),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenProperty("object with 1 member"),
 				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenValue("array with 1 element"),
 				CommonGrammar.TokenArrayEnd,
 				CommonGrammar.TokenObjectEnd,
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenObjectEnd,
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(-42),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenTrue,
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenFalse,
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenNull,
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenProperty("integer"),
 				CommonGrammar.TokenValue(1234567890),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("real"),
 				CommonGrammar.TokenValue(-9876.543210),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("e"),
 				CommonGrammar.TokenValue(0.123456789e-12),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("E"),
 				CommonGrammar.TokenValue(1.234567890E+34),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty(""),
 				CommonGrammar.TokenValue(23456789012E66),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("zero"),
 				CommonGrammar.TokenValue(0),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("one"),
 				CommonGrammar.TokenValue(1),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("space"),
 				CommonGrammar.TokenValue(" "),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("quote"),
 				CommonGrammar.TokenValue("\""),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("backslash"),
 				CommonGrammar.TokenValue("\\"),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("controls"),
 				CommonGrammar.TokenValue("\b\f\n\r\t"),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("slash"),
 				CommonGrammar.TokenValue("/ & /"),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("alpha"),
 				CommonGrammar.TokenValue("abcdefghijklmnopqrstuvwyz"),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("ALPHA"),
 				CommonGrammar.TokenValue("ABCDEFGHIJKLMNOPQRSTUVWYZ"),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("digit"),
 				CommonGrammar.TokenValue("0123456789"),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("0123456789"),
 				CommonGrammar.TokenValue("digit"),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("special"),
 				CommonGrammar.TokenValue("`1~!@#$%^&*()_+-={':[,]}|;.</>?"),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("hex"),
 				CommonGrammar.TokenValue("\u0123\u4567\u89AB\uCDEF\uabcd\uef4A"),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("true"),
 				CommonGrammar.TokenTrue,
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("false"),
 				CommonGrammar.TokenFalse,
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("null"),
 				CommonGrammar.TokenNull,
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("array"),
 				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("object"),
 				CommonGrammar.TokenObjectBeginNoName,
 				CommonGrammar.TokenObjectEnd,
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("address"),
 				CommonGrammar.TokenValue("50 St. James Street"),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("url"),
 				CommonGrammar.TokenValue("http://www.JSON.org/"),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("comment"),
 				CommonGrammar.TokenValue("// /* <!-- --"),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("# -- --> */"),
 				CommonGrammar.TokenValue(" "),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty(" s p a c e d "),
 				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenValue(1),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(2),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(3),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(4),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(5),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(6),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(7),
 				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("compact"),
 				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenValue(1),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(2),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(3),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(4),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(5),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(6),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(7),
 				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("jsontext"),
 				CommonGrammar.TokenValue("{\"object with 1 member\":[\"array with 1 element\"]}"),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("quotes"),
 				CommonGrammar.TokenValue("&#34; \u0022 %22 0x22 034 &#x22;"),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenProperty("/\\\"\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"),
 				CommonGrammar.TokenValue("A key can be any string"),
 				CommonGrammar.TokenObjectEnd,
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(0.5),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(98.6),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(99.44),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(1066),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(10.0),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(1.0),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(0.1),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(1.0),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(2.0),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(2.0),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue("rosebud"),
 				CommonGrammar.TokenArrayEnd
 			};

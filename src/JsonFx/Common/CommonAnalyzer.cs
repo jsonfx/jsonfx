@@ -236,58 +236,9 @@ namespace JsonFx.Common
 				this.Coercion.InstantiateObject(targetType) :
 				new JsonObject();
 
-			bool needsValueDelim = false;
 			while (!tokens.IsCompleted)
 			{
 				token = tokens.Peek();
-
-				// consume value delimiter
-				switch (token.TokenType)
-				{
-					case CommonTokenType.ValueDelim:
-					{
-						if (!needsValueDelim)
-						{
-							// extraneous item delimiter
-							tokens.Pop();
-							throw new TokenException<CommonTokenType>(
-								token,
-								CommonAnalyzer.ErrorMissingObjectProperty);
-						}
-
-						// consume delim
-						tokens.Pop();
-						if (tokens.IsCompleted)
-						{
-							// end of input
-							continue;
-						}
-						token = tokens.Peek();
-						break;
-					}
-					case CommonTokenType.ObjectEnd:
-					{
-						// end of the object loop
-						tokens.Pop();
-						return this.Coercion.CoerceType(targetType, objectValue);
-					}
-					default:
-					{
-						if (needsValueDelim)
-						{
-							// these are invalid here
-							tokens.Pop();
-							throw new TokenException<CommonTokenType>(
-								token,
-								String.Format(CommonAnalyzer.ErrorExpectedObjectValueDelim, token.TokenType));
-						}
-						else
-						{
-							needsValueDelim = true;
-						}
-						break;
-					}
-				}
 
 				// consume the property key
 				string propertyName;
@@ -300,13 +251,10 @@ namespace JsonFx.Common
 						break;
 					}
 					case CommonTokenType.ObjectEnd:
-					case CommonTokenType.ValueDelim:
 					{
-						// extraneous item delimiter
+						// end of the object loop
 						tokens.Pop();
-						throw new TokenException<CommonTokenType>(
-							token,
-							CommonAnalyzer.ErrorMissingObjectProperty);
+						return this.Coercion.CoerceType(targetType, objectValue);
 					}
 					default:
 					{
@@ -371,58 +319,9 @@ namespace JsonFx.Common
 			// cannot create List<T> at runtime
 			ArrayList array = new ArrayList();
 
-			bool needsValueDelim = false;
 			while (!tokens.IsCompleted)
 			{
 				token = tokens.Peek();
-
-				// consume value delimiter
-				switch (token.TokenType)
-				{
-					case CommonTokenType.ValueDelim:
-					{
-						if (!needsValueDelim)
-						{
-							// extraneous item delimiter
-							tokens.Pop();
-							throw new TokenException<CommonTokenType>(
-								token,
-								CommonAnalyzer.ErrorMissingObjectProperty);
-						}
-
-						// consume delim
-						tokens.Pop();
-						if (tokens.IsCompleted)
-						{
-							// end of input
-							continue;
-						}
-						token = tokens.Peek();
-						break;
-					}
-					case CommonTokenType.ArrayEnd:
-					{
-						// end of the array loop
-						tokens.Pop();
-						return this.Coercion.CoerceArrayList(arrayType, itemType, array);
-					}
-					default:
-					{
-						if (needsValueDelim)
-						{
-							// these are invalid here
-							tokens.Pop();
-							throw new TokenException<CommonTokenType>(
-								token,
-								String.Format(CommonAnalyzer.ErrorExpectedArrayItemDelim, token.TokenType));
-						}
-						else
-						{
-							needsValueDelim = true;
-						}
-						break;
-					}
-				}
 
 				// consume the next item
 				object item;
@@ -433,6 +332,12 @@ namespace JsonFx.Common
 						// array item
 						item = this.ConsumeArray(tokens, isItemTypeHint ? null : itemType);
 						break;
+					}
+					case CommonTokenType.ArrayEnd:
+					{
+						// end of the array loop
+						tokens.Pop();
+						return this.Coercion.CoerceArrayList(arrayType, itemType, array);
 					}
 					case CommonTokenType.ObjectBegin:
 					{
@@ -455,15 +360,6 @@ namespace JsonFx.Common
 							item = this.Coercion.CoerceType(itemType, item);
 						}
 						break;
-					}
-					case CommonTokenType.ArrayEnd:
-					case CommonTokenType.ValueDelim:
-					{
-						// extraneous item delimiter
-						tokens.Pop();
-						throw new TokenException<CommonTokenType>(
-							token,
-							CommonAnalyzer.ErrorMissingArrayItem);
 					}
 					default:
 					{

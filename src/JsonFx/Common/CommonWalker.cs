@@ -310,19 +310,8 @@ namespace JsonFx.Common
 
 			tokens.Add(CommonGrammar.TokenArrayBegin(typeName));
 
-			bool appendDelim = false;
-
 			while (enumerator.MoveNext())
 			{
-				if (appendDelim)
-				{
-					tokens.Add(CommonGrammar.TokenValueDelim);
-				}
-				else
-				{
-					appendDelim = true;
-				}
-
 				this.GetTokens(tokens, detector, enumerator.Current);
 			}
 
@@ -333,19 +322,8 @@ namespace JsonFx.Common
 		{
 			tokens.Add(CommonGrammar.TokenObjectBegin(typeName));
 
-			bool appendDelim = false;
-
 			while (enumerator.MoveNext())
 			{
-				if (appendDelim)
-				{
-					tokens.Add(CommonGrammar.TokenValueDelim);
-				}
-				else
-				{
-					appendDelim = true;
-				}
-
 				tokens.Add(CommonGrammar.TokenProperty(enumerator.Key));
 				this.GetTokens(tokens, detector, enumerator.Value);
 			}
@@ -357,19 +335,8 @@ namespace JsonFx.Common
 		{
 			tokens.Add(CommonGrammar.TokenObjectBegin(typeName));
 
-			bool appendDelim = false;
-
 			while (enumerator.MoveNext())
 			{
-				if (appendDelim)
-				{
-					tokens.Add(CommonGrammar.TokenValueDelim);
-				}
-				else
-				{
-					appendDelim = true;
-				}
-
 				KeyValuePair<string, object> pair = enumerator.Current;
 				tokens.Add(CommonGrammar.TokenProperty(pair.Key));
 				this.GetTokens(tokens, detector, pair.Value);
@@ -391,8 +358,6 @@ namespace JsonFx.Common
 				return;
 			}
 
-			bool appendDelim = false;
-
 			// allow the resolver to optionally sort the members
 			IEnumerable<MemberMap> members = this.Settings.Resolver.SortMembers(maps.Values);
 
@@ -408,15 +373,6 @@ namespace JsonFx.Common
 					map.IsIgnored(value, propertyValue))
 				{
 					continue;
-				}
-
-				if (appendDelim)
-				{
-					tokens.Add(CommonGrammar.TokenValueDelim);
-				}
-				else
-				{
-					appendDelim = true;
 				}
 
 				tokens.Add(CommonGrammar.TokenProperty(map.DataName));

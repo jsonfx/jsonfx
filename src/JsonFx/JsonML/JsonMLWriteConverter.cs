@@ -92,13 +92,6 @@ namespace JsonFx.JsonML
 							token = stream.Peek();
 							break;
 						}
-						case CommonTokenType.ValueDelim:
-						{
-							// consume, has no counterpart in markup
-							stream.Pop();
-							token = stream.Peek();
-							break;
-						}
 						case CommonTokenType.ObjectBegin:
 						case CommonTokenType.ObjectEnd:
 						case CommonTokenType.Property:

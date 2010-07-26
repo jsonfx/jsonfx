@@ -87,18 +87,8 @@ namespace JsonFx.Bson
 
 				tokens.Add(isArray ? CommonGrammar.TokenArrayBeginNoName : CommonGrammar.TokenObjectBeginNoName);
 
-				bool needsValueDelim = false;
 				while (reader.BaseStream.Position-start < size-1)
 				{
-					if (needsValueDelim)
-					{
-						tokens.Add(CommonGrammar.TokenValueDelim);
-					}
-					else
-					{
-						needsValueDelim = true;
-					}
-
 					BsonTokenizer.ReadElement(tokens, reader, isArray);
 				}
 

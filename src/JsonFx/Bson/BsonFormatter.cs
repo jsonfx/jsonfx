@@ -181,24 +181,6 @@ namespace JsonFx.Bson
 						}
 					}
 
-					if (count > 0)
-					{
-						if (token.TokenType != CommonTokenType.ValueDelim)
-						{
-							// delimiter required
-							throw new TokenException<CommonTokenType>(token,
-								String.Format(BsonWriter.ErrorExpectedObjectValueDelim, token.TokenType));
-						}
-
-						// consume delimiter
-						tokens.Pop();
-						token = tokens.Peek();
-						if (tokens.IsCompleted || token == null)
-						{
-							throw new TokenException<CommonTokenType>(token, BsonWriter.ErrorUnterminated);
-						}
-					}
-
 					string ename;
 					if (isArray)
 					{

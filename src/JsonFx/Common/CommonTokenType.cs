@@ -103,15 +103,6 @@ namespace JsonFx.Common
 		/// Typically <see cref="Token<CommonTokenType>.Value"/> is serialized directly as a single primitive.
 		/// If the <see cref="Token<CommonTokenType>.Value"/> is not a CLR primitive, then the value must implement IConvertable, IFormatable or be meaningful when cast to a string.
 		/// </remarks>
-		Primitive,
-
-		/// <summary>
-		/// Value delimiter
-		/// </summary>
-		/// <remarks>
-		/// The <see cref="Token<CommonTokenType>.Value"/> and <see cref="Token<CommonTokenType>.Name"/> must be left empty.
-		/// Marks the end of an object property or array item
-		/// </remarks>
-		ValueDelim
+		Primitive
 	}
 }

@@ -85,9 +85,7 @@ namespace JsonFx.Bson
 				CommonGrammar.TokenProperty("BSON"),
 				CommonGrammar.TokenArrayBeginNoName,
 				CommonGrammar.TokenValue("awesome"),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(5.05),
-				CommonGrammar.TokenValueDelim,
 				CommonGrammar.TokenValue(1986),
 				CommonGrammar.TokenArrayEnd,
 				CommonGrammar.TokenObjectEnd

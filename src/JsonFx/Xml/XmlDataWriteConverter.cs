@@ -210,7 +210,11 @@ namespace JsonFx.Xml
 						{
 							if (needsValueDelim)
 							{
-								throw new TokenException<CommonTokenType>(token, "Missing value delimiter");
+								if (this.Settings.PrettyPrint)
+								{
+									this.EmitNewLine(output);
+								}
+								needsValueDelim = false;
 							}
 
 							if (this.pendingNewLine)
@@ -229,22 +233,22 @@ namespace JsonFx.Xml
 							needsValueDelim = true;
 							break;
 						}
-						case CommonTokenType.ValueDelim:
-						{
-							input.Pop();
+						//case CommonTokenType.ValueDelim:
+						//{
+						//    input.Pop();
 
-							if (!needsValueDelim)
-							{
-								throw new TokenException<CommonTokenType>(token, "Missing array item");
-							}
+						//    if (!needsValueDelim)
+						//    {
+						//        throw new TokenException<CommonTokenType>(token, "Missing array item");
+						//    }
 
-							if (this.Settings.PrettyPrint)
-							{
-								this.EmitNewLine(output);
-							}
-							needsValueDelim = false;
-							break;
-						}
+						//    if (this.Settings.PrettyPrint)
+						//    {
+						//        this.EmitNewLine(output);
+						//    }
+						//    needsValueDelim = false;
+						//    break;
+						//}
 						default:
 						{
 							throw new TokenException<CommonTokenType>(
@@ -303,7 +307,11 @@ namespace JsonFx.Xml
 
 							if (needsValueDelim)
 							{
-								throw new TokenException<CommonTokenType>(token, "Missing value delimiter");
+								if (this.Settings.PrettyPrint)
+								{
+									this.EmitNewLine(output);
+								}
+								needsValueDelim = false;
 							}
 
 							if (needsEndTag)
@@ -365,22 +373,6 @@ namespace JsonFx.Xml
 
 							this.pendingNewLine = false;
 							needsValueDelim = true;
-							break;
-						}
-						case CommonTokenType.ValueDelim:
-						{
-							input.Pop();
-
-							if (!needsValueDelim)
-							{
-								throw new TokenException<CommonTokenType>(token, "Missing object property");
-							}
-
-							if (this.Settings.PrettyPrint)
-							{
-								this.EmitNewLine(output);
-							}
-							needsValueDelim = false;
 							break;
 						}
 						default:

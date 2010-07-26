@@ -307,11 +307,6 @@ namespace JsonFx.Json
 							needsValueDelim = false;
 							continue;
 						}
-						case CommonTokenType.ValueDelim:
-						{
-							// ignore
-							continue;
-						}
 						case CommonTokenType.None:
 						default:
 						{
