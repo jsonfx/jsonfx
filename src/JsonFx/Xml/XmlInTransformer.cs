@@ -48,6 +48,11 @@ namespace JsonFx.Xml
 			#region Constants
 
 			private const string ErrorUnexpectedToken = "Unexpected token ({0})";
+			private const string ErrorUnterminatedObject = "Unterminated object";
+			private const string ErrorInvalidAttribute = "Invalid attribute value token ({0})";
+
+			private static DataName DefaultObjectName = new DataName(typeof(Object));
+			private static DataName DefaultArrayName = new DataName(typeof(Array));
 
 			#endregion Constants
 
@@ -88,17 +93,16 @@ namespace JsonFx.Xml
 					throw new ArgumentNullException("input");
 				}
 
-				List<Token<CommonTokenType>> output = new List<Token<CommonTokenType>>();
-
 				this.ScopeChain.Clear();
 
 				IStream<Token<MarkupTokenType>> stream = new Stream<Token<MarkupTokenType>>(input);
 				while (!stream.IsCompleted)
 				{
-					this.TransformValue(output, stream, DataName.Empty);
+					foreach (var token in this.TransformValue(stream, false))
+					{
+						yield return token;
+					}
 				}
-
-				return output;
 			}
 
 			#endregion IDataTransformer<CommonTokenType, MarkupTokenType> Members
@@ -110,42 +114,154 @@ namespace JsonFx.Xml
 			/// </summary>
 			/// <param name="output"></param>
 			/// <param name="input"></param>
-			private void TransformValue(List<Token<CommonTokenType>> output, IStream<Token<MarkupTokenType>> input, DataName elementName)
+			private IList<Token<CommonTokenType>> TransformValue(IStream<Token<MarkupTokenType>> input, bool isProperty)
 			{
 				Token<MarkupTokenType> token = input.Peek();
 				switch (token.TokenType)
 				{
-					case MarkupTokenType.ElementVoid:
-					case MarkupTokenType.ElementBegin:
-					case MarkupTokenType.ElementEnd:
-					case MarkupTokenType.Attribute:
 					case MarkupTokenType.Primitive:
+					case MarkupTokenType.UnparsedBlock:
 					{
 						input.Pop();
-						token = input.Peek();
-						break;
+
+						return new []
+							{
+								token.ChangeType(CommonTokenType.Primitive)
+							};
 					}
-					case MarkupTokenType.UnparsedBlock:
-					case MarkupTokenType.None:
+					case MarkupTokenType.ElementBegin:
+					case MarkupTokenType.ElementVoid:
+					{
+						return this.TransformElement(input, isProperty);
+					}
 					default:
 					{
 						throw new TokenException<MarkupTokenType>(
 							token,
-							String.Format(ErrorUnexpectedToken, token.TokenType));
+							String.Format(XmlInTransformer.ErrorUnexpectedToken, token.TokenType));
 					}
 				}
+			}
+
+			private IList<Token<CommonTokenType>> TransformElement(IStream<Token<MarkupTokenType>> input, bool isProperty)
+			{
+				Token<MarkupTokenType> token = input.Peek();
+
+				DataName elementName = token.Name;
+				bool isVoid = (token.TokenType == MarkupTokenType.ElementVoid);
+				input.Pop();
+
+				IDictionary<DataName, IList<IList<Token<CommonTokenType>>>> children = null;
+				while (!input.IsCompleted)
+				{
+					token = input.Peek();
+					if (token.TokenType == MarkupTokenType.ElementEnd ||
+						(isVoid && token.TokenType != MarkupTokenType.Attribute))
+					{
+						input.Pop();
+
+						List<Token<CommonTokenType>> output = new List<Token<CommonTokenType>>();
+
+						if (children != null &&
+							children.Count == 1)
+						{
+							KeyValuePair<DataName, IList<IList<Token<CommonTokenType>>>> items;
+							using (var enumerator = children.GetEnumerator())
+							{
+								enumerator.MoveNext();
+								items = enumerator.Current;
+							}
+
+							if (items.Value.Count > 1 ||
+								items.Key == XmlInTransformer.DefaultArrayName)
+							{
+								// if only child has more than one grandchild
+								// then whole element is acutally an array
+								output.Add(elementName.IsEmpty ? CommonGrammar.TokenArrayBeginNoName : CommonGrammar.TokenArrayBegin(this.DecodeName(elementName, XmlInTransformer.DefaultArrayName)));
+
+								foreach (var item in items.Value)
+								{
+									output.AddRange(item);
+								}
+
+								output.Add(CommonGrammar.TokenArrayEnd);
+								return output;
+							}
+						}
+
+						if (!isProperty)
+						{
+							output.Add(elementName.IsEmpty ? CommonGrammar.TokenObjectBeginNoName : CommonGrammar.TokenObjectBegin(this.DecodeName(elementName, XmlInTransformer.DefaultObjectName)));
+						}
+
+						if (children != null)
+						{
+							foreach (var property in children)
+							{
+								if (property.Value.Count == 1)
+								{
+									if (!property.Key.IsEmpty)
+									{
+										output.Add(CommonGrammar.TokenProperty(this.DecodeName(property.Key, XmlInTransformer.DefaultObjectName)));
+									}
+									output.AddRange(property.Value[0]);
+									continue;
+								}
+
+								output.Add(property.Key.IsEmpty ? CommonGrammar.TokenArrayBeginNoName : CommonGrammar.TokenArrayBegin(this.DecodeName(property.Key, XmlInTransformer.DefaultArrayName)));
+								foreach (var item in property.Value)
+								{
+									output.AddRange(item);
+								}
+								output.Add(CommonGrammar.TokenArrayEnd);
+							}
+						}
+						else if (isProperty)
+						{
+							output.Add(CommonGrammar.TokenNull);
+						}
+
+						if (!isProperty)
+						{
+							output.Add(CommonGrammar.TokenObjectEnd);
+						}
+
+						return output;
+					}
+
+					DataName propertyName = token.Name;
+					if (token.TokenType == MarkupTokenType.Attribute)
+					{
+						input.Pop();
+					}
+
+					if (children == null)
+					{
+						children = new Dictionary<DataName, IList<IList<Token<CommonTokenType>>>>();
+					}
+					if (!children.ContainsKey(propertyName))
+					{
+						children[propertyName] = new List<IList<Token<CommonTokenType>>>();
+					}
+
+					var child = this.TransformValue(input, !isProperty);
+
+					children[propertyName].Add(child);
+				}
+
+				throw new TokenException<MarkupTokenType>(
+					token,
+					XmlInTransformer.ErrorUnterminatedObject);
 			}
 
 			#endregion CommonTokenType to MarkupTokenType Transformation Methods
 
 			#region Utility Methods
 
-			private DataName DecodeName(DataName name, Type type)
+			private DataName DecodeName(DataName name, DataName defaultName)
 			{
-				DataName typeName = this.Settings.Resolver.LoadTypeName(type);
-
-				// String.Empty is a valid DataName.LocalName, so must replace
-				if (name == typeName)
+				// String.Empty is a valid DataName.LocalName, so may have been replaced
+				if (name == defaultName)
 				{
 					return DataName.Empty;
 				}
@@ -155,7 +271,7 @@ namespace JsonFx.Xml
 				// so we must use XmlConvert to encode with same bug
 
 				// XML only supports a subset of chars that DataName.LocalName does
-				string localName = System.Xml.XmlConvert.EncodeLocalName(name.LocalName);
+				string localName = System.Xml.XmlConvert.DecodeName(name.LocalName);
 				if (name.LocalName != localName)
 				{
 					return new DataName(localName, name.Prefix, name.NamespaceUri, name.IsAttribute);

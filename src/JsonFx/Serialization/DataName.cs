@@ -348,9 +348,9 @@ namespace JsonFx.Serialization
 		{
 			int hash = 0x36294b26;
 
-			hash = (-1521134295 * hash) + StringComparer.Ordinal.GetHashCode(this.LocalName);
-			hash = (-1521134295 * hash) + StringComparer.Ordinal.GetHashCode(this.Prefix);
-			hash = (-1521134295 * hash) + StringComparer.Ordinal.GetHashCode(this.NamespaceUri);
+			hash = (-1521134295 * hash) + StringComparer.Ordinal.GetHashCode(this.LocalName ?? String.Empty);
+			hash = (-1521134295 * hash) + StringComparer.Ordinal.GetHashCode(this.Prefix ?? String.Empty);
+			hash = (-1521134295 * hash) + StringComparer.Ordinal.GetHashCode(this.NamespaceUri ?? String.Empty);
 
 			return hash;
 		}
