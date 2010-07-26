@@ -137,7 +137,7 @@ namespace JsonFx.Serialization
 				throw new InvalidOperationException("Tokenizer is invalid");
 			}
 
-			return this.DeserializeInternal(tokenizer, tokenizer.GetTokens(input), targetType);
+			return this.DeserializeSingle(tokenizer, tokenizer.GetTokens(input), targetType);
 		}
 
 		/// <summary>
@@ -173,7 +173,8 @@ namespace JsonFx.Serialization
 			{
 				throw new ArgumentNullException("tokenizer");
 			}
-			return DeserializeInternal(tokenizer, tokenizer.GetTokens(input), targetType);
+
+			return this.DeserializeSingle(tokenizer, tokenizer.GetTokens(input), targetType);
 		}
 
 		/// <summary>
@@ -213,7 +214,7 @@ namespace JsonFx.Serialization
 			}
 		}
 
-		private object DeserializeInternal(ITextTokenizer<T> tokenizer, IEnumerable<Token<T>> tokens, Type targetType)
+		private object DeserializeSingle(ITextTokenizer<T> tokenizer, IEnumerable<Token<T>> tokens, Type targetType)
 		{
 			ITokenAnalyzer<T> analyzer = this.GetAnalyzer();
 			if (analyzer == null)
