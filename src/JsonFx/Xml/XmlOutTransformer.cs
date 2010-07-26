@@ -266,7 +266,7 @@ namespace JsonFx.Xml
 				// ensure element has a name
 				elementName = this.EncodeName(elementName.IsEmpty ? token.Name : elementName, typeof(Object));
 
-				bool needsEndTag = true;
+				bool needsBeginTag = true;
 				SortedList<DataName, string> attributes = null;
 
 				bool needsValueDelim = false;
@@ -279,9 +279,9 @@ namespace JsonFx.Xml
 						{
 							input.Pop();
 
-							if (needsEndTag)
+							if (needsBeginTag)
 							{
-								needsEndTag = false;
+								needsBeginTag = false;
 								// write out namespaces and attributes
 								this.EmitTag(output, elementName, attributes, MarkupTokenType.ElementBegin);
 								this.pendingNewLine = true;
@@ -314,7 +314,7 @@ namespace JsonFx.Xml
 								needsValueDelim = false;
 							}
 
-							if (needsEndTag)
+							if (needsBeginTag)
 							{
 								if (token.Name.IsAttribute)
 								{
@@ -350,7 +350,7 @@ namespace JsonFx.Xml
 								}
 								else
 								{
-									needsEndTag = false;
+									needsBeginTag = false;
 
 									// end attributes with first non-attribute child
 									// write out namespaces and attributes
