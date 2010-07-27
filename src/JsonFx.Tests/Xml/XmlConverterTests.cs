@@ -97,7 +97,7 @@ namespace JsonFx.Xml
 	]
 }";
 
-			var expectedXml = @"<object><BSON><string>awesome</string><double>5.05</double><int>1986</int></BSON></object>";
+			var expectedXml = @"<object><BSON><item>awesome</item><item>5.05</item><item>1986</item></BSON></object>";
 
 			var jsonTokenizer = new JsonReader.JsonTokenizer();
 			var tokens1 = jsonTokenizer.GetTokens(inputJson);
@@ -222,19 +222,19 @@ namespace JsonFx.Xml
 
 			var expectedXml =
 @"<array>
-	<string>JSON Test Pattern pass1</string>
-	<object>
+	<item>JSON Test Pattern pass1</item>
+	<item>
 		<object_x0020_with_x0020_1_x0020_member>
-			<string>array with 1 element</string>
+			<item>array with 1 element</item>
 		</object_x0020_with_x0020_1_x0020_member>
-	</object>
-	<object />
-	<array />
-	<int>-42</int>
-	<boolean>true</boolean>
-	<boolean>false</boolean>
-	<object />
-	<object>
+	</item>
+	<item />
+	<item />
+	<item>-42</item>
+	<item>true</item>
+	<item>false</item>
+	<item />
+	<item>
 		<integer>1234567890</integer>
 		<real>-9876.54321</real>
 		<e>1.23456789e-13</e>
@@ -263,38 +263,38 @@ namespace JsonFx.Xml
 		<comment>// /* &lt;!-- --</comment>
 		<_x0023__x0020_--_x0020_--_x003E__x0020__x002A__x002F_> </_x0023__x0020_--_x0020_--_x003E__x0020__x002A__x002F_>
 		<_x0020_s_x0020_p_x0020_a_x0020_c_x0020_e_x0020_d_x0020_>
-			<int>1</int>
-			<int>2</int>
-			<int>3</int>
-			<int>4</int>
-			<int>5</int>
-			<int>6</int>
-			<int>7</int>
+			<item>1</item>
+			<item>2</item>
+			<item>3</item>
+			<item>4</item>
+			<item>5</item>
+			<item>6</item>
+			<item>7</item>
 		</_x0020_s_x0020_p_x0020_a_x0020_c_x0020_e_x0020_d_x0020_>
 		<compact>
-			<int>1</int>
-			<int>2</int>
-			<int>3</int>
-			<int>4</int>
-			<int>5</int>
-			<int>6</int>
-			<int>7</int>
+			<item>1</item>
+			<item>2</item>
+			<item>3</item>
+			<item>4</item>
+			<item>5</item>
+			<item>6</item>
+			<item>7</item>
 		</compact>
 		<jsontext>{""object with 1 member"":[""array with 1 element""]}</jsontext>
 		<quotes>&amp;#34; "" %22 0x22 034 &amp;#x22;</quotes>
 		<"+"_x002F__x005C__x0022_\uCAFE\uBABE_xAB98__xFCDE_\uBCDA_xEF4A__x0008__x000C__x000A__x000D__x0009__x0060_1_x007E__x0021__x0040__x0023__x0024__x0025__x005E__x0026__x002A__x0028__x0029___x002B_-_x003D__x005B__x005D__x007B__x007D__x007C__x003B__x003A__x0027__x002C_._x002F__x003C__x003E__x003F_"+@">A key can be any string</"+"_x002F__x005C__x0022_\uCAFE\uBABE_xAB98__xFCDE_\uBCDA_xEF4A__x0008__x000C__x000A__x000D__x0009__x0060_1_x007E__x0021__x0040__x0023__x0024__x0025__x005E__x0026__x002A__x0028__x0029___x002B_-_x003D__x005B__x005D__x007B__x007D__x007C__x003B__x003A__x0027__x002C_._x002F__x003C__x003E__x003F_"+@">
-	</object>
-	<double>0.5</double>
-	<double>98.6</double>
-	<double>99.44</double>
-	<int>1066</int>
-	<double>10</double>
-	<double>1</double>
-	<double>0.1</double>
-	<double>1</double>
-	<double>2</double>
-	<double>2</double>
-	<string>rosebud</string>
+	</item>
+	<item>0.5</item>
+	<item>98.6</item>
+	<item>99.44</item>
+	<item>1066</item>
+	<item>10</item>
+	<item>1</item>
+	<item>0.1</item>
+	<item>1</item>
+	<item>2</item>
+	<item>2</item>
+	<item>rosebud</item>
 </array>";
 
 			var jsonTokenizer = new JsonReader.JsonTokenizer();

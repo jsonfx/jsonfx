@@ -179,7 +179,7 @@ namespace JsonFx.Xml
 				propertyName = this.EncodeName(propertyName.IsEmpty ? token.Name : propertyName, typeof(Array));
 
 				// TODO: figure out a way to surface XmlArrayItemAttribute name
-				DataName itemName = DataName.Empty;//new DataName("arrayItem");
+				DataName itemName = new DataName("item");
 
 				this.EmitTag(output, propertyName, null, MarkupTokenType.ElementBegin);
 				this.pendingNewLine = true;
