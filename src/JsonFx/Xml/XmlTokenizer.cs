@@ -76,6 +76,7 @@ namespace JsonFx.Xml
 				{
 					this.Settings = new System.Xml.XmlReaderSettings
 					{
+						CheckCharacters = false,
 						ConformanceLevel = System.Xml.ConformanceLevel.Auto
 					};
 				}

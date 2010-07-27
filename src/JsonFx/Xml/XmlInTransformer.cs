@@ -174,6 +174,7 @@ namespace JsonFx.Xml
 							IList<IList<Token<CommonTokenType>>> items = null;
 							if (children != null)
 							{
+								// grab the first
 								using (var enumerator = children.GetEnumerator())
 								{
 									if (enumerator.MoveNext())
@@ -185,6 +186,7 @@ namespace JsonFx.Xml
 							}
 
 							if ((items != null && items.Count > 1) ||
+								(items == null && elementName == XmlInTransformer.DefaultArrayName) ||
 								childName == XmlInTransformer.DefaultItemName)
 							{
 								// if only child has more than one grandchild
@@ -222,6 +224,12 @@ namespace JsonFx.Xml
 										output.Add(name.IsEmpty ? CommonGrammar.TokenProperty(elementName) : CommonGrammar.TokenProperty(name));
 									}
 									output.AddRange(property.Value[0]);
+									continue;
+								}
+
+								if (property.Key.IsEmpty)
+								{
+									// skip mixed content
 									continue;
 								}
 
@@ -263,6 +271,14 @@ namespace JsonFx.Xml
 					}
 
 					var child = this.TransformValue(input, !isStandAlone);
+					if (child.Count == 1 &&
+						child[0].TokenType == CommonTokenType.Primitive &&
+						child[0].Value != null &&
+						IsNullOrWhiteSpace(child[0].ValueAsString()))
+					{
+						// skip whitespace mixed content
+						continue;
+					}
 
 					children[propertyName].Add(child);
 				}
@@ -298,6 +314,44 @@ namespace JsonFx.Xml
 				}
 
 				return name;
+			}
+
+			/// <summary>
+			/// Checks if character is line ending, tab or space
+			/// </summary>
+			/// <param name="ch"></param>
+			/// <returns></returns>
+			private static bool IsWhiteSpace(char ch)
+			{
+				return
+					(ch == ' ') |
+				(ch == '\n') ||
+				(ch == '\r') ||
+				(ch == '\t');
+			}
+
+			/// <summary>
+			/// Checks if string is null, empty or entirely made up of whitespace
+			/// </summary>
+			/// <param name="value"></param>
+			/// <returns></returns>
+			/// <remarks>
+			/// Essentially the same as String.IsNullOrWhiteSpace from .NET 4.0
+			/// with a simpler view of whitespace.
+			/// </remarks>
+			private static bool IsNullOrWhiteSpace(string value)
+			{
+				if (value != null)
+				{
+					for (int i=0, length=value.Length; i<length; i++)
+					{
+						if (!IsWhiteSpace(value[i]))
+						{
+							return false;
+						}
+					}
+				}
+				return true;
 			}
 
 			#endregion Utility Methods
