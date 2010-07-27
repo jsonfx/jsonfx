@@ -53,6 +53,7 @@ namespace JsonFx.Xml
 
 			private static DataName DefaultObjectName = new DataName(typeof(Object));
 			private static DataName DefaultArrayName = new DataName(typeof(Array));
+			private static DataName DefaultItemName = new DataName("item");
 
 			#endregion Constants
 
@@ -166,7 +167,7 @@ namespace JsonFx.Xml
 						List<Token<CommonTokenType>> output = new List<Token<CommonTokenType>>();
 
 						if ((children == null) ||
-							(children.Count == 1) ||
+							(children.Count <= 1) ||
 							elementName == XmlInTransformer.DefaultArrayName)
 						{
 							DataName childName = DataName.Empty;
@@ -184,7 +185,7 @@ namespace JsonFx.Xml
 							}
 
 							if ((items != null && items.Count > 1) ||
-								childName == XmlInTransformer.DefaultArrayName)
+								childName == XmlInTransformer.DefaultItemName)
 							{
 								// if only child has more than one grandchild
 								// then whole element is acutally an array
