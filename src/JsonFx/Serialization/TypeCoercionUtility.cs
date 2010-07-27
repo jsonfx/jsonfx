@@ -690,8 +690,9 @@ namespace JsonFx.Serialization
 
 		internal static Type GetArrayItemType(Type targetType)
 		{
-			if (targetType == null)
+			if (targetType == null || targetType == typeof(string))
 			{
+				// not array type
 				return null;
 			}
 
