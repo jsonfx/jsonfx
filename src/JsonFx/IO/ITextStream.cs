@@ -64,36 +64,15 @@ namespace JsonFx.IO
 			get;
 		}
 
-		/// <summary>
-		/// Gets the number of characters currently chunked
-		/// </summary>
-		int ChunkSize
-		{
-			get;
-		}
-
-		/// <summary>
-		/// Gets a value indicating if the <see cref="ITextStream"/> is currently chunking
-		/// </summary>
-		bool IsChunking
-		{
-			get;
-		}
-
 		#endregion Properties
 
 		#region Methods
 
 		/// <summary>
-		/// Begins chunking at the current index
-		/// </summary>
-		void BeginChunk();
-
-		/// <summary>
 		/// Ends chunking at the current index and returns the buffered text chunk
 		/// </summary>
 		/// <returns></returns>
-		string EndChunk();
+		new string EndChunk();
 
 		/// <summary>
 		/// Ends chunking at the current index and writes the buffered text chunk into the provided StringBuilder

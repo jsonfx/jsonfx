@@ -45,6 +45,8 @@ namespace JsonFx.IO
 		private bool isCompleted;
 		private T current;
 
+		private IList<T> chunk;
+
 		#endregion Fields
 
 		#region Init
@@ -112,6 +114,56 @@ namespace JsonFx.IO
 		}
 
 		#endregion IStream<T> Methods
+
+		#region Chunking Members
+
+		public bool IsChunking
+		{
+			get { return (this.chunk != null); }
+		}
+
+		public int ChunkSize
+		{
+			get
+			{
+				if (this.chunk == null)
+				{
+					throw new InvalidOperationException("Not currently chunking.");
+				}
+
+				return this.chunk.Count;
+			}
+		}
+
+		public void BeginChunk()
+		{
+			if (this.chunk == null)
+			{
+				this.chunk = new List<T>();
+			}
+			else
+			{
+				this.chunk.Clear();
+			}
+		}
+
+		public IEnumerable<T> EndChunk()
+		{
+			if (this.chunk == null)
+			{
+				throw new InvalidOperationException("Not currently chunking.");
+			}
+
+			// build chunk value
+			IEnumerable<T> value = this.chunk;
+
+			// reset internal buffer
+			this.chunk = null;
+
+			return value;
+		}
+
+		#endregion Chunking Members
 
 		#region Methods
 

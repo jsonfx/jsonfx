@@ -29,6 +29,7 @@
 #endregion License
 
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace JsonFx.IO
@@ -36,7 +37,7 @@ namespace JsonFx.IO
 	/// <summary>
 	/// Supports a simple iteration over a string tracking line/column/position
 	/// </summary>
-	public class StringStream : IStream<char>, ITextStream
+	public class StringStream : ITextStream
 	{
 		#region Constants
 
@@ -129,6 +130,15 @@ namespace JsonFx.IO
 		public void BeginChunk()
 		{
 			this.start = this.index+1;
+		}
+
+		/// <summary>
+		/// Ends chunking at the current index and returns the buffered text chunk
+		/// </summary>
+		/// <returns></returns>
+		IEnumerable<char> IStream<char>.EndChunk()
+		{
+			return this.EndChunk();
 		}
 
 		/// <summary>

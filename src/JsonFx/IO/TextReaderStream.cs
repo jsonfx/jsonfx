@@ -29,6 +29,7 @@
 #endregion License
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -102,6 +103,10 @@ namespace JsonFx.IO
 			get { return this.index; }
 		}
 
+		#endregion ITextStream Members
+
+		#region Chunking Members
+
 		/// <summary>
 		/// Gets the number of characters currently chunked
 		/// </summary>
@@ -145,6 +150,15 @@ namespace JsonFx.IO
 		/// Ends chunking at the current index and returns the buffered text chunk
 		/// </summary>
 		/// <returns></returns>
+		IEnumerable<char> IStream<char>.EndChunk()
+		{
+			return this.EndChunk();
+		}
+
+		/// <summary>
+		/// Ends chunking at the current index and returns the buffered text chunk
+		/// </summary>
+		/// <returns></returns>
 		public string EndChunk()
 		{
 			if (this.chunk == null)
@@ -178,7 +192,7 @@ namespace JsonFx.IO
 			this.chunk = null;
 		}
 
-		#endregion ITextStream Members
+		#endregion Chunking Members
 
 		#region IStream<char> Members
 

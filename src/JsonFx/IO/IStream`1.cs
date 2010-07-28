@@ -29,6 +29,7 @@
 #endregion License
 
 using System;
+using System.Collections.Generic;
 
 namespace JsonFx.IO
 {
@@ -43,6 +44,22 @@ namespace JsonFx.IO
 		/// Determines if the sequence has completed.
 		/// </summary>
 		bool IsCompleted
+		{
+			get;
+		}
+
+		/// <summary>
+		/// Gets a value indicating if is currently capturing a sequence
+		/// </summary>
+		bool IsChunking
+		{
+			get;
+		}
+
+		/// <summary>
+		/// Gets the number of <paramref name="T"/> currently chunked
+		/// </summary>
+		int ChunkSize
 		{
 			get;
 		}
@@ -62,6 +79,17 @@ namespace JsonFx.IO
 		/// </summary>
 		/// <returns></returns>
 		T Pop();
+
+		/// <summary>
+		/// Begins chunking at the current index
+		/// </summary>
+		void BeginChunk();
+
+		/// <summary>
+		/// Ends chunking at the current index and returns the buffered sequence chunk
+		/// </summary>
+		/// <returns></returns>
+		IEnumerable<T> EndChunk();
 
 		#endregion Methods
 	}
