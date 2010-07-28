@@ -57,7 +57,7 @@ namespace JsonFx.IO
 		}
 
 		/// <summary>
-		/// Gets the number of <paramref name="T"/> currently chunked
+		/// Gets the number of items currently chunked
 		/// </summary>
 		int ChunkSize
 		{
