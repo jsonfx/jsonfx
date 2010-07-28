@@ -103,6 +103,11 @@
             Gets the version of xunit.dll used by the test assembly.
             </summary>
         </member>
+        <member name="M:Xunit.ExecutorWrapper.#cctor">
+            <summary>
+            Initializes the <see cref="T:Xunit.ExecutorWrapper"/> class.
+            </summary>
+        </member>
         <member name="M:Xunit.ExecutorWrapper.#ctor(System.String,System.String,System.Boolean)">
             <summary>
             Initializes a new instance of the <see cref="T:Xunit.ExecutorWrapper"/> class.
