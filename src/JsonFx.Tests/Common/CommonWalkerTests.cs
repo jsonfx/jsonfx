@@ -255,7 +255,13 @@ namespace JsonFx.Serialization
 			{
 				One = 1,
 				Two = 2,
-				Three = 3
+				Three = 3,
+				Four = new
+				{
+					A = 'a',
+					B = 'b',
+					C = 'c'
+				}
 			};
 
 			var expected = new[]
@@ -267,6 +273,15 @@ namespace JsonFx.Serialization
 					CommonGrammar.TokenValue(2),
 					CommonGrammar.TokenProperty("Three"),
 					CommonGrammar.TokenValue(3),
+					CommonGrammar.TokenProperty("Four"),
+					CommonGrammar.TokenObjectBegin("object"),
+					CommonGrammar.TokenProperty("A"),
+					CommonGrammar.TokenValue('a'),
+					CommonGrammar.TokenProperty("B"),
+					CommonGrammar.TokenValue('b'),
+					CommonGrammar.TokenProperty("C"),
+					CommonGrammar.TokenValue('c'),
+					CommonGrammar.TokenObjectEnd,
 					CommonGrammar.TokenObjectEnd
 				};
 

@@ -113,28 +113,28 @@ namespace JsonFx.Serialization
 			targetType = TypeCoercionUtility.ResolveInterfaceType(targetType);
 
 			FactoryMap factory = this.ResolverCache.LoadFactory(targetType);
-			if (factory == null ||
-				(factory.DefaultCtor == null && (factory.CustomCtor == null || factory.CustomCtorArgs == null || args == null)))
+			if ((factory == null) || (factory.Ctor == null))
 			{
 				throw new TypeCoercionException(String.Format(
 					TypeCoercionUtility.ErrorCtor,
 					targetType.FullName));
 			}
 
-			if (factory.DefaultCtor != null)
+			if ((factory.CtorArgs == null) || (factory.CtorArgs.Length < 1))
 			{
-				return factory.DefaultCtor();
+				// default constructor
+				return factory.Ctor();
 			}
 
-			object[] ctorArgs = new object[factory.CustomCtorArgs.Length];
+			object[] ctorArgs = new object[factory.CtorArgs.Length];
 
 			IDictionary<string, object> genericArgs = args as IDictionary<string, object>;
 			if (genericArgs != null)
 			{
 				for (int i=0, length=ctorArgs.Length; i<length; i++)
 				{
-					string name = factory.CustomCtorArgs[i].Name;
-					Type type = factory.CustomCtorArgs[i].ParameterType;
+					string name = factory.CtorArgs[i].Name;
+					Type type = factory.CtorArgs[i].ParameterType;
 
 					foreach (string key in genericArgs.Keys)
 					{
@@ -156,8 +156,8 @@ namespace JsonFx.Serialization
 			{
 				for (int i=0, length=ctorArgs.Length; i<length; i++)
 				{
-					string name = factory.CustomCtorArgs[i].Name;
-					Type type = factory.CustomCtorArgs[i].ParameterType;
+					string name = factory.CtorArgs[i].Name;
+					Type type = factory.CtorArgs[i].ParameterType;
 
 					foreach (string key in otherArgs.Keys)
 					{
@@ -174,7 +174,8 @@ namespace JsonFx.Serialization
 				}
 			}
 
-			return factory.CustomCtor(ctorArgs);
+			// use a custom constructor
+			return factory.Ctor(ctorArgs);
 		}
 
 		/// <summary>
@@ -533,14 +534,14 @@ namespace JsonFx.Serialization
 				}
 			}
 
-			if (factory.DefaultCtor == null)
+			if (factory.Ctor == null)
 			{
 				throw new TypeCoercionException(String.Format(
 					TypeCoercionUtility.ErrorCtor,
 					targetType.FullName));
 			}
 
-			object collection = factory.DefaultCtor();
+			object collection = factory.Ctor();
 
 			// attempt bulk insert first as is most efficient
 			if (factory.AddRange != null &&

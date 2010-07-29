@@ -153,9 +153,8 @@ namespace JsonFx.Serialization.Resolvers
 		#region Fields
 
 		private readonly IDictionary<Type, FactoryDelegate> CollectionCtors;
-		public readonly FactoryDelegate DefaultCtor;
-		public readonly FactoryDelegate CustomCtor;
-		public readonly ParameterInfo[] CustomCtorArgs;
+		public readonly FactoryDelegate Ctor;
+		public readonly ParameterInfo[] CtorArgs;
 		public readonly ProxyDelegate Add;
 		public readonly Type AddType;
 		public readonly ProxyDelegate AddRange;
@@ -175,7 +174,7 @@ namespace JsonFx.Serialization.Resolvers
 				throw new ArgumentNullException("type");
 			}
 
-			if (type.IsInterface || type.IsAbstract || type.IsValueType)
+			if (FactoryMap.IsInvalidType(type))
 			{
 				throw new TypeLoadException(String.Format(
 					FactoryMap.ErrorCannotInstantiate,
@@ -185,8 +184,8 @@ namespace JsonFx.Serialization.Resolvers
 			ConstructorInfo[] ctors;
 			if (!typeof(IEnumerable).IsAssignableFrom(type))
 			{
-				this.DefaultCtor = DynamicMethodGenerator.GetTypeFactory(type);
-				if (this.DefaultCtor != null)
+				this.Ctor = DynamicMethodGenerator.GetTypeFactory(type);
+				if (this.Ctor != null)
 				{
 					return;
 				}
@@ -195,8 +194,8 @@ namespace JsonFx.Serialization.Resolvers
 				if (ctors.Length == 1)
 				{
 					ConstructorInfo ctor = ctors[0];
-					this.CustomCtor = DynamicMethodGenerator.GetTypeFactory(ctor);
-					this.CustomCtorArgs = ctor.GetParameters();
+					this.Ctor = DynamicMethodGenerator.GetTypeFactory(ctor);
+					this.CtorArgs = ctor.GetParameters();
 				}
 				return;
 			}
@@ -219,7 +218,7 @@ namespace JsonFx.Serialization.Resolvers
 				if (paramList.Length == 0)
 				{
 					// save default in case cannot find closer match
-					this.DefaultCtor = DynamicMethodGenerator.GetTypeFactory(type);
+					this.Ctor = DynamicMethodGenerator.GetTypeFactory(type);
 					continue;
 				}
 
@@ -235,10 +234,10 @@ namespace JsonFx.Serialization.Resolvers
 				this.CollectionCtors[argType] = DynamicMethodGenerator.GetTypeFactory(ctor);
 			}
 
-			if (this.DefaultCtor == null)
+			if (this.Ctor == null)
 			{
 				// try to grab a private ctor if exists
-				this.DefaultCtor = DynamicMethodGenerator.GetTypeFactory(type);
+				this.Ctor = DynamicMethodGenerator.GetTypeFactory(type);
 			}
 
 			// many collection types have an AddRange method
@@ -319,6 +318,18 @@ namespace JsonFx.Serialization.Resolvers
 		}
 
 		#endregion Properties
+
+		#region Utility Methods
+
+		internal static bool IsInvalidType(Type type)
+		{
+			// this blows up for some reason with KeyValue<string, object>
+			//return (type.IsInterface || type.IsAbstract || (type.IsValueType && !type.IsSerializable));
+
+			return (type.IsInterface || type.IsAbstract || type.IsValueType);
+		}
+
+		#endregion Utility Methods
 	}
 
 	/// <summary>
@@ -326,12 +337,6 @@ namespace JsonFx.Serialization.Resolvers
 	/// </summary>
 	public sealed class ResolverCache
 	{
-		#region Constants
-
-		private const string AnonymousTypePrefix = "<>f__AnonymousType";
-
-		#endregion Constants
-
 		#region Fields
 
 #if NET20 || NET30
@@ -590,7 +595,10 @@ namespace JsonFx.Serialization.Resolvers
 			// create new mapping
 			maps = new Dictionary<string, MemberMap>();
 
-			bool isImmutableType = objectType.IsGenericType && objectType.Name.StartsWith(ResolverCache.AnonymousTypePrefix, false, CultureInfo.InvariantCulture);
+			FactoryMap factory = FactoryMap.IsInvalidType(objectType) ? null : this.LoadFactory(objectType);
+
+			// anonymous and other immutable types typically take all properties as params
+			bool isImmutableType = (factory != null) && (factory.CtorArgs != null) && (factory.CtorArgs.Length > 1);
 
 			// load properties into property map
 			foreach (PropertyInfo info in objectType.GetProperties(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic))
