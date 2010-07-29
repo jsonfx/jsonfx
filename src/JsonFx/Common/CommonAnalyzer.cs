@@ -133,7 +133,7 @@ namespace JsonFx.Common
 		}
 
 		/// <summary>
-		/// Parses the token stream coercing the result targetType
+		/// Parses the token stream coercing the result to targetType
 		/// </summary>
 		/// <param name="tokens"></param>
 		/// <param name="targetType"></param>
@@ -173,6 +173,18 @@ namespace JsonFx.Common
 				// cast each of the values accordingly
 				yield return (TResult)this.ConsumeValue(stream, resultType);
 			}
+		}
+
+		/// <summary>
+		/// Parses the token stream coercing the result to TResult (inferred from <paramref name="ignored"/>)
+		/// </summary>
+		/// <typeparam name="TResult"></typeparam>
+		/// <param name="tokens"></param>
+		/// <param name="ignored">an example value used solely for Type inference</param>
+		/// <returns></returns>
+		public IEnumerable<TResult> Analyze<TResult>(IEnumerable<Token<CommonTokenType>> tokens, TResult ignored)
+		{
+			return this.Analyze<TResult>(tokens);
 		}
 
 		#endregion ITokenAnalyzer<T> Methods
@@ -233,7 +245,7 @@ namespace JsonFx.Common
 
 			Type itemType = TypeCoercionUtility.GetDictionaryItemType(targetType);
 			object objectValue = (itemType != null) ?
-				this.Coercion.InstantiateObject(targetType) :
+				this.Coercion.InstantiateObject(targetType, null) :
 				new JsonObject();
 
 			while (!tokens.IsCompleted)

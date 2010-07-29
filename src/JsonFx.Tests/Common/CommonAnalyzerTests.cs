@@ -481,6 +481,49 @@ namespace JsonFx.Serialization
 			Assert.Equal(CommonGrammar.TokenNone, ex.Token);
 		}
 
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void Parse_AnonymousObject_ReturnsAnonymousObject()
+		{
+			// NOTE: order is important to ensure type equivalence
+
+			var input = new[]
+			{
+				CommonGrammar.TokenObjectBeginNoName,
+				CommonGrammar.TokenProperty("AString"),
+				CommonGrammar.TokenValue("Hello world!"),
+				CommonGrammar.TokenProperty("AnInt32"),
+				CommonGrammar.TokenValue(42),
+				CommonGrammar.TokenProperty("AnAnonymous"),
+				CommonGrammar.TokenObjectBeginNoName,
+				CommonGrammar.TokenProperty("AnotherString"),
+				CommonGrammar.TokenValue("Foo."),
+				CommonGrammar.TokenProperty("AnInt64"),
+				CommonGrammar.TokenValue( ((long)Int32.MaxValue) * 2L ),
+				CommonGrammar.TokenObjectEnd,
+				CommonGrammar.TokenProperty("ADouble"),
+				CommonGrammar.TokenValue(Math.PI),
+				CommonGrammar.TokenObjectEnd
+			};
+
+			var expected = new
+			{
+				AString = "Hello world!",
+				AnInt32 = 42,
+				AnAnonymous = new
+				{
+					AnotherString = "Foo.",
+					AnInt64 = ((long)Int32.MaxValue) * 2L
+				},
+				ADouble = Math.PI
+			};
+
+			var analyzer = new CommonAnalyzer(new DataReaderSettings());
+			var actual = analyzer.Analyze(input, expected).Single();
+
+			Assert.Equal(expected, actual, false);
+		}
+
 		#endregion Object Tests
 
 		#region Complex Graph Tests

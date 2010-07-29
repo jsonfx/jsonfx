@@ -66,8 +66,16 @@ namespace JsonFx.Serialization
 		/// Deserializes a single object from the given input
 		/// </summary>
 		/// <param name="input">the input reader</param>
-		/// <typeparam name="T">the expected type of the serialized data</typeparam>
-		T Deserialize<T>(TextReader input);
+		/// <param name="ignored">a value used to trigger Type inference for <typeparamref name="TResult"/> (e.g. for deserializing anonymous objects)</param>
+		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
+		TResult Deserialize<TResult>(TextReader input, TResult ignored);
+
+		/// <summary>
+		/// Deserializes a single object from the given input
+		/// </summary>
+		/// <param name="input">the input reader</param>
+		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
+		TResult Deserialize<TResult>(TextReader input);
 
 		/// <summary>
 		/// Serializes the data to the given output
@@ -86,8 +94,16 @@ namespace JsonFx.Serialization
 		/// Deserializes a single object from the given input
 		/// </summary>
 		/// <param name="input">the input text</param>
-		/// <typeparam name="T">the expected type of the serialized data</typeparam>
-		T Deserialize<T>(string input);
+		/// <param name="ignored">a value used to trigger Type inference for <typeparamref name="TResult"/> (e.g. for deserializing anonymous objects)</param>
+		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
+		TResult Deserialize<TResult>(string input, TResult ignored);
+
+		/// <summary>
+		/// Deserializes a single object from the given input
+		/// </summary>
+		/// <param name="input">the input text</param>
+		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
+		TResult Deserialize<TResult>(string input);
 
 		/// <summary>
 		/// Deserializes a single object from the given input

@@ -107,6 +107,17 @@ namespace JsonFx.Serialization
 		/// Deserializes the data from the given input
 		/// </summary>
 		/// <param name="input">the input reader</param>
+		/// <param name="ignored">a value used to trigger Type inference for <typeparamref name="TResult"/> (e.g. for deserializing anonymous objects)</param>
+		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
+		public virtual TResult Deserialize<TResult>(TextReader input, TResult ignored)
+		{
+			return this.Deserialize<TResult>(input);
+		}
+
+		/// <summary>
+		/// Deserializes the data from the given input
+		/// </summary>
+		/// <param name="input">the input reader</param>
 		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
 		public virtual TResult Deserialize<TResult>(TextReader input)
 		{
@@ -140,6 +151,17 @@ namespace JsonFx.Serialization
 			return this.DeserializeSingle(tokenizer, tokenizer.GetTokens(input), targetType);
 		}
 
+		/// <summary>
+		/// Deserializes the data from the given input
+		/// </summary>
+		/// <param name="input">the input text</param>
+		/// <param name="ignored">a value used to trigger Type inference for <typeparamref name="TResult"/> (e.g. for deserializing anonymous objects)</param>
+		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
+		public virtual TResult Deserialize<TResult>(string input, TResult ignored)
+		{
+			return this.Deserialize<TResult>(input);
+		}
+	
 		/// <summary>
 		/// Deserializes the data from the given input
 		/// </summary>

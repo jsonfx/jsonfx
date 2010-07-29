@@ -57,7 +57,7 @@ namespace JsonFx.Serialization
 		private static readonly string TypeGenericIDictionary = typeof(IDictionary<,>).FullName;
 
 		private const string ErrorNullValueType = "{0} does not accept null as a value";
-		private const string ErrorDefaultCtor = "Only objects with default constructors can be deserialized. ({0})";
+		private const string ErrorCtor = "Unable to find a suitable constructor for instantiating the target Type. ({0})";
 		private const string ErrorCannotInstantiateAsT = "Type {0} is not of Type {1}";
 
 		private const string ErrorGenericIDictionary = "Types which implement Generic IDictionary<TKey, TValue> also need to implement IDictionary to be deserialized. ({0})";
@@ -104,41 +104,77 @@ namespace JsonFx.Serialization
 		#region Object Manipulation Methods
 
 		/// <summary>
-		/// Instantiates a new instance of objectType ensuring is a sub-Type of Type T.
-		/// </summary>
-		/// <param name="objectType"></param>
-		/// <returns>objectType instance</returns>
-		public T InstantiateObject<T>(Type objectType)
-		{
-			if (!typeof(T).IsAssignableFrom(objectType))
-			{
-				throw new TypeCoercionException(String.Format(
-					TypeCoercionUtility.ErrorCannotInstantiateAsT,
-					objectType.FullName,
-					typeof(T).FullName));
-			}
-
-			return (T)this.InstantiateObject(objectType);
-		}
-
-		/// <summary>
 		/// Instantiates a new instance of objectType.
 		/// </summary>
 		/// <param name="objectType"></param>
 		/// <returns>objectType instance</returns>
-		public object InstantiateObject(Type targetType)
+		public object InstantiateObject(Type targetType, object args)
 		{
 			targetType = TypeCoercionUtility.ResolveInterfaceType(targetType);
 
 			FactoryMap factory = this.ResolverCache.LoadFactory(targetType);
-			if (factory == null || factory.DefaultCtor == null)
+			if (factory == null ||
+				(factory.DefaultCtor == null && (factory.CustomCtor == null || factory.CustomCtorArgs == null || args == null)))
 			{
 				throw new TypeCoercionException(String.Format(
-					TypeCoercionUtility.ErrorDefaultCtor,
+					TypeCoercionUtility.ErrorCtor,
 					targetType.FullName));
 			}
 
-			return factory.DefaultCtor();
+			if (factory.DefaultCtor != null)
+			{
+				return factory.DefaultCtor();
+			}
+
+			object[] ctorArgs = new object[factory.CustomCtorArgs.Length];
+
+			IDictionary<string, object> genericArgs = args as IDictionary<string, object>;
+			if (genericArgs != null)
+			{
+				for (int i=0, length=ctorArgs.Length; i<length; i++)
+				{
+					string name = factory.CustomCtorArgs[i].Name;
+					Type type = factory.CustomCtorArgs[i].ParameterType;
+
+					foreach (string key in genericArgs.Keys)
+					{
+						try
+						{
+							if (StringComparer.OrdinalIgnoreCase.Equals(key, name))
+							{
+								ctorArgs[i] = this.CoerceType(type, genericArgs[key]);
+								break;
+							}
+						}
+						catch { }
+					}
+				}
+			}
+
+			IDictionary otherArgs = args as IDictionary;
+			if (otherArgs != null)
+			{
+				for (int i=0, length=ctorArgs.Length; i<length; i++)
+				{
+					string name = factory.CustomCtorArgs[i].Name;
+					Type type = factory.CustomCtorArgs[i].ParameterType;
+
+					foreach (string key in otherArgs.Keys)
+					{
+						try
+						{
+							if (StringComparer.OrdinalIgnoreCase.Equals(key, name))
+							{
+								ctorArgs[i] = this.CoerceType(type, otherArgs[key]);
+								break;
+							}
+						}
+						catch { }
+					}
+				}
+			}
+
+			return factory.CustomCtor(ctorArgs);
 		}
 
 		/// <summary>
@@ -357,7 +393,7 @@ namespace JsonFx.Serialization
 		/// <returns></returns>
 		private object CoerceType(Type targetType, IDictionary<string, object> value)
 		{
-			object newValue = this.InstantiateObject(targetType);
+			object newValue = this.InstantiateObject(targetType, value);
 
 			IDictionary<string, MemberMap> maps = this.ResolverCache.LoadMaps(targetType);
 			if (maps == null)
@@ -410,7 +446,7 @@ namespace JsonFx.Serialization
 		/// <returns></returns>
 		private object CoerceType(Type targetType, IDictionary value)
 		{
-			object newValue = this.InstantiateObject(targetType);
+			object newValue = this.InstantiateObject(targetType, value);
 
 			IDictionary<string, MemberMap> maps = this.ResolverCache.LoadMaps(targetType);
 			if (maps == null)
@@ -476,7 +512,7 @@ namespace JsonFx.Serialization
 			if (factory == null)
 			{
 				throw new TypeCoercionException(String.Format(
-					TypeCoercionUtility.ErrorDefaultCtor,
+					TypeCoercionUtility.ErrorCtor,
 					targetType.FullName));
 			}
 
@@ -500,7 +536,7 @@ namespace JsonFx.Serialization
 			if (factory.DefaultCtor == null)
 			{
 				throw new TypeCoercionException(String.Format(
-					TypeCoercionUtility.ErrorDefaultCtor,
+					TypeCoercionUtility.ErrorCtor,
 					targetType.FullName));
 			}
 

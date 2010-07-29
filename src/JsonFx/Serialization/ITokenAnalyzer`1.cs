@@ -65,6 +65,15 @@ namespace JsonFx.Serialization
 		/// <returns></returns>
 		IEnumerable<TResult> Analyze<TResult>(IEnumerable<Token<T>> tokens);
 
+		/// <summary>
+		/// Parses the token stream coercing the result to TResult (type inferred from <paramref name="ignored"/>)
+		/// </summary>
+		/// <typeparam name="TResult"></typeparam>
+		/// <param name="tokens"></param>
+		/// <param name="ignored">an example value used solely for Type inference</param>
+		/// <returns></returns>
+		IEnumerable<TResult> Analyze<TResult>(IEnumerable<Token<T>> tokens, TResult ignored);
+
 		#endregion Methods
 	}
 }

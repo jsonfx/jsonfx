@@ -154,9 +154,11 @@ namespace JsonFx.Serialization.Resolvers
 
 		private readonly IDictionary<Type, FactoryDelegate> CollectionCtors;
 		public readonly FactoryDelegate DefaultCtor;
+		public readonly FactoryDelegate CustomCtor;
+		public readonly ParameterInfo[] CustomCtorArgs;
 		public readonly ProxyDelegate Add;
-		public readonly ProxyDelegate AddRange;
 		public readonly Type AddType;
+		public readonly ProxyDelegate AddRange;
 		public readonly Type AddRangeType;
 
 		#endregion Fields
@@ -180,16 +182,29 @@ namespace JsonFx.Serialization.Resolvers
 					type.FullName));
 			}
 
+			ConstructorInfo[] ctors;
 			if (!typeof(IEnumerable).IsAssignableFrom(type))
 			{
 				this.DefaultCtor = DynamicMethodGenerator.GetTypeFactory(type);
+				if (this.DefaultCtor != null)
+				{
+					return;
+				}
+
+				ctors = type.GetConstructors(BindingFlags.Instance|BindingFlags.Public);
+				if (ctors.Length == 1)
+				{
+					ConstructorInfo ctor = ctors[0];
+					this.CustomCtor = DynamicMethodGenerator.GetTypeFactory(ctor);
+					this.CustomCtorArgs = ctor.GetParameters();
+				}
 				return;
 			}
 
 			// many ICollection types take an IEnumerable or ICollection
 			// as a constructor argument.  look through constructors for
 			// a compatible match.
-			ConstructorInfo[] ctors = type.GetConstructors(BindingFlags.Instance|BindingFlags.Public);
+			ctors = type.GetConstructors(BindingFlags.Instance|BindingFlags.Public);
 
 			this.CollectionCtors = new Dictionary<Type, FactoryDelegate>(ctors.Length);
 
