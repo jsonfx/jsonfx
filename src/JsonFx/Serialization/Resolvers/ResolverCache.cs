@@ -181,10 +181,11 @@ namespace JsonFx.Serialization.Resolvers
 					type.FullName));
 			}
 
+			this.Ctor = DynamicMethodGenerator.GetTypeFactory(type);
+
 			ConstructorInfo[] ctors;
 			if (!typeof(IEnumerable).IsAssignableFrom(type))
 			{
-				this.Ctor = DynamicMethodGenerator.GetTypeFactory(type);
 				if (this.Ctor != null)
 				{
 					return;
@@ -210,15 +211,8 @@ namespace JsonFx.Serialization.Resolvers
 			foreach (ConstructorInfo ctor in ctors)
 			{
 				ParameterInfo[] paramList = ctor.GetParameters();
-				if (paramList.Length > 1)
+				if (paramList.Length != 1)
 				{
-					continue;
-				}
-
-				if (paramList.Length == 0)
-				{
-					// save default in case cannot find closer match
-					this.Ctor = DynamicMethodGenerator.GetTypeFactory(type);
 					continue;
 				}
 
@@ -327,6 +321,15 @@ namespace JsonFx.Serialization.Resolvers
 			//return (type.IsInterface || type.IsAbstract || (type.IsValueType && !type.IsSerializable));
 
 			return (type.IsInterface || type.IsAbstract || type.IsValueType);
+		}
+
+		internal static bool IsImmutableType(Type type)
+		{
+			// anonymous and other immutable types typically take all properties as params having no default constructor
+			return
+				!type.IsInterface &&
+				!type.IsAbstract &&
+				(type.IsValueType || (type.GetConstructor(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic, null, Type.EmptyTypes, null) == null));
 		}
 
 		#endregion Utility Methods
@@ -595,10 +598,7 @@ namespace JsonFx.Serialization.Resolvers
 			// create new mapping
 			maps = new Dictionary<string, MemberMap>();
 
-			FactoryMap factory = FactoryMap.IsInvalidType(objectType) ? null : this.LoadFactory(objectType);
-
-			// anonymous and other immutable types typically take all properties as params
-			bool isImmutableType = (factory != null) && (factory.CtorArgs != null) && (factory.CtorArgs.Length > 1);
+			bool isImmutableType = FactoryMap.IsImmutableType(objectType);
 
 			// load properties into property map
 			foreach (PropertyInfo info in objectType.GetProperties(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic))

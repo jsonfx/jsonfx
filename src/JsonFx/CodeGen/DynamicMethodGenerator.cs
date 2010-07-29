@@ -546,6 +546,30 @@ namespace JsonFx.CodeGen
 		#region Type Factory Generators
 
 		/// <summary>
+		/// Creates a default constructor delegate
+		/// </summary>
+		/// <param name="type">type to be created</param>
+		/// <returns>FactoryDelegate or null if default constructor not found</returns>
+		/// <remarks>
+		/// Note: use with caution this method will expose private and protected constructors without safety checks.
+		/// </remarks>
+		public static FactoryDelegate GetTypeFactory(Type type)
+		{
+			if (type == null)
+			{
+				throw new ArgumentNullException("type");
+			}
+
+			ConstructorInfo ctor = type.GetConstructor(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic, null, Type.EmptyTypes, null);
+			if (ctor == null)
+			{
+				return null;
+			}
+
+			return DynamicMethodGenerator.GetTypeFactory(ctor);
+		}
+
+		/// <summary>
 		/// Creates a constructor delegate accepting specified arguments
 		/// </summary>
 		/// <param name="type">type to be created</param>

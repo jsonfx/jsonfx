@@ -1127,6 +1127,29 @@ namespace JsonFx.CodeGen
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
+		public void GetTypeFactory_CtorNoArgsAlt_ReturnsCorrectlyInstantiatedObject()
+		{
+			var expected = new Example();
+
+			FactoryDelegate factory = DynamicMethodGenerator.GetTypeFactory(typeof(Example), Type.EmptyTypes);
+			Assert.NotNull(factory);
+			var actual = (Example)factory();
+
+			var getters =
+				from m in typeof(Example).GetMembers(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic)
+				let g = DynamicMethodGenerator.GetGetter(m)
+				where (g != null)
+				select g;
+
+			foreach (GetterDelegate getter in getters)
+			{
+				// assert all of the fields and properties are equal
+				Assert.Equal(getter(expected), getter(actual));
+			}
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTypeFactory_CtorAssortedArgs_ReturnsCorrectlyInstantiatedObject()
 		{
 			var expected = new Example("alpha", "bravo", "charlie", -1, -2, -3, "deer", "sun", "myself");
@@ -1224,7 +1247,20 @@ namespace JsonFx.CodeGen
 			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
 				delegate()
 				{
-					FactoryDelegate setter = DynamicMethodGenerator.GetTypeFactory((Type)null);
+					FactoryDelegate factory = DynamicMethodGenerator.GetTypeFactory((Type)null);
+				});
+
+			Assert.Equal("type", ex.ParamName);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void GetTypeFactory_NullTypeInputAlt_ThrowsArgumentNullException()
+		{
+			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
+				delegate()
+				{
+					FactoryDelegate factory = DynamicMethodGenerator.GetTypeFactory((Type)null, Type.EmptyTypes);
 				});
 
 			Assert.Equal("type", ex.ParamName);
@@ -1237,7 +1273,7 @@ namespace JsonFx.CodeGen
 			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
 				delegate()
 				{
-					FactoryDelegate setter = DynamicMethodGenerator.GetTypeFactory((ConstructorInfo)null);
+					FactoryDelegate factory = DynamicMethodGenerator.GetTypeFactory((ConstructorInfo)null);
 				});
 
 			Assert.Equal("ctor", ex.ParamName);
@@ -1247,6 +1283,17 @@ namespace JsonFx.CodeGen
 		public void GetTypeFactory_1MillionInstantiations_PerformsInAround50ms()
 		{
 			FactoryDelegate factory = DynamicMethodGenerator.GetTypeFactory(typeof(Example));
+
+			for (long i=0; i<MaxCount; i++)
+			{
+				Example instance = (Example)factory();
+			}
+		}
+
+		[Fact(Timeout=1000)]
+		public void GetTypeFactory_1MillionInstantiationsAlt_PerformsInAround50ms()
+		{
+			FactoryDelegate factory = DynamicMethodGenerator.GetTypeFactory(typeof(Example), Type.EmptyTypes);
 
 			for (long i=0; i<MaxCount; i++)
 			{
