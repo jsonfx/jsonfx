@@ -223,36 +223,6 @@ namespace JsonFx
 
 		#endregion AssertEqualityComparer<T> Entry Points
 
-		#region AssertComparer<T> Entry Points
-
-		/// <summary>
-		/// Verifies that a value is within a given range.
-		/// </summary>
-		/// <typeparam name="T">The type of the value to be compared</typeparam>
-		/// <param name="actual">The actual value to be evaluated</param>
-		/// <param name="low">The (inclusive) low value of the range</param>
-		/// <param name="high">The (inclusive) high value of the range</param>
-		/// <exception cref="InRangeException">Thrown when the value is not in the given range</exception>
-		public new static void InRange<T>(T actual, T low, T high)
-		{
-			InRange(actual, low, high, GetComparer<T>());
-		}
-
-		/// <summary>
-		/// Verifies that a value is not within a given range, using the default comparer.
-		/// </summary>
-		/// <typeparam name="T">The type of the value to be compared</typeparam>
-		/// <param name="actual">The actual value to be evaluated</param>
-		/// <param name="low">The (inclusive) low value of the range</param>
-		/// <param name="high">The (inclusive) high value of the range</param>
-		/// <exception cref="NotInRangeException">Thrown when the value is in the given range</exception>
-		public new static void NotInRange<T>(T actual, T low, T high)
-		{
-			NotInRange(actual, low, high, GetComparer<T>());
-		}
-
-		#endregion AssertComparer<T> Entry Points
-
 		#region Factory Methods
 
 		static IEqualityComparer<T> GetEqualityComparer<T>()
@@ -265,23 +235,11 @@ namespace JsonFx
 			return new AssertEqualityComparer<T>(strict);
 		}
 
-		static IComparer<T> GetComparer<T>()
-		{
-			return GetComparer<T>(true);
-		}
-
-		static IComparer<T> GetComparer<T>(bool strict)
-		{
-			return new AssertEqualityComparer<T>(strict);
-		}
-
 		#endregion Factory Methods
 
 		#region AssertEqualityComparer<T>
 
-        class AssertEqualityComparer<T> :
-			IEqualityComparer<T>,
-			IComparer<T>
+        class AssertEqualityComparer<T> : IEqualityComparer<T>
         {
 			static AssertEqualityComparer<object> innerComparer = new AssertEqualityComparer<object>(false);
 			static AssertEqualityComparer<object> innerComparerStrict = new AssertEqualityComparer<object>(true);
@@ -380,11 +338,6 @@ namespace JsonFx
             {
                 throw new NotImplementedException();
             }
-
-			public int Compare(T x, T y)
-			{
-				return this.Equals(x, y) ? 0 : 1;
-			}
 		}
 
 		#endregion AssertEqualityComparer<T>
