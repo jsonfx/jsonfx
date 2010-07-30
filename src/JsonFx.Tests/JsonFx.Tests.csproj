@@ -88,6 +88,7 @@
     <Compile Include="Common\CommonWalkerTests.cs" />
     <Compile Include="Common\Filters\Iso8601DateFilterTests.cs" />
     <Compile Include="Common\Filters\MSAjaxDateFilterTests.cs" />
+    <Compile Include="Common\CommonSubsequencerTests.cs" />
     <Compile Include="Html\HtmlFormatterTests.cs" />
     <Compile Include="Html\HtmlTokenizerTests.cs" />
     <Compile Include="IO\StringStreamTests.cs" />

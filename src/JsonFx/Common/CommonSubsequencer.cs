@@ -108,105 +108,29 @@ namespace JsonFx.Common
 		}
 
 		/// <summary>
-		/// Gets the value of the first property which satisfies the <paramref name="predicate"/>
+		/// Determines if the sequence represents a primitive
 		/// </summary>
 		/// <param name="source"></param>
-		/// <returns>all properties for the root level object</returns>
-		public static TokenSequence GetProperty(this TokenSequence source, Func<DataName, bool> predicate)
-		{
-			foreach (var property in CommonSubsequencer.GetProperties(source, predicate))
-			{
-				if (predicate == null || predicate(property.Key))
-				{
-					return property.Value;
-				}
-			}
-
-			return CommonSubsequencer.EmptySequence;
-		}
-
-		/// <summary>
-		/// Gets all the properties of the root object
-		/// </summary>
-		/// <param name="source"></param>
-		/// <returns>all properties for the root level object</returns>
-		public static IEnumerable<KeyValuePair<DataName, TokenSequence>> GetProperties(this TokenSequence source)
-		{
-			return CommonSubsequencer.GetProperties(source, null);
-		}
-
-		/// <summary>
-		/// Gets the properties of the root object which satisfies the <paramref name="predicate"/>
-		/// </summary>
-		/// <param name="source"></param>
-		/// <param name="predicate"></param>
-		/// <returns>properties for the root level object which statisfy the predicate</returns>
-		public static IEnumerable<KeyValuePair<DataName, TokenSequence>> GetProperties(this TokenSequence source, Func<DataName, bool> predicate)
+		/// <returns></returns>
+		public static bool IsPrimitive(this TokenSequence source)
 		{
 			if (source == null)
 			{
 				throw new ArgumentNullException("source");
 			}
 
-			if (!source.IsObject())
+			IList<CommonToken> tokenList = source as IList<CommonToken>;
+			if (tokenList != null)
 			{
-				yield break;
+				return (tokenList.Count > 0) && (tokenList[0].TokenType == CommonTokenType.Primitive);
 			}
 
-			int depth = -1;
-
-			IStream<CommonToken> stream = Stream<CommonToken>.Create(source);
-			while (!stream.IsCompleted)
+			foreach (var token in source)
 			{
-				CommonToken token = stream.Peek();
-				switch (token.TokenType)
-				{
-					case CommonTokenType.ArrayBegin:
-					case CommonTokenType.ObjectBegin:
-					{
-						depth++;
-						stream.Pop();
-						continue;
-					}
-					case CommonTokenType.ArrayEnd:
-					{
-						depth--;
-						stream.Pop();
-						continue;
-					}
-					case CommonTokenType.ObjectEnd:
-					{
-						if (depth != 0)
-						{
-							depth--;
-							stream.Pop();
-							continue;
-						}
-
-						// don't look beyond end of object
-						yield break;
-					}
-					case CommonTokenType.Property:
-					{
-						stream.Pop();
-
-						if (depth != 0 ||
-							(predicate != null && !predicate(token.Name)))
-						{
-							continue;
-						}
-
-						// return property value sequence
-
-						yield return new KeyValuePair<DataName, TokenSequence>(token.Name, CommonSubsequencer.SpliceNextValue(stream));
-						continue;
-					}
-					default:
-					{
-						continue;
-					}
-				}
+				return (token.TokenType == CommonTokenType.Primitive);
 			}
+
+			return false;
 		}
 
 		/// <summary>
@@ -222,14 +146,15 @@ namespace JsonFx.Common
 				throw new ArgumentNullException("source");
 			}
 
-			if (!source.IsObject())
+			IStream<CommonToken> stream = Stream<CommonToken>.Create(source);
+			if (stream.IsCompleted ||
+				stream.Pop().TokenType != CommonTokenType.ArrayBegin)
 			{
 				return false;
 			}
 
-			int depth = -1;
+			int depth = 0;
 
-			IStream<CommonToken> stream = Stream<CommonToken>.Create(source);
 			while (!stream.IsCompleted)
 			{
 				CommonToken token = stream.Peek();
@@ -284,7 +209,222 @@ namespace JsonFx.Common
 		}
 
 		/// <summary>
-		/// Splices out the next complete value
+		/// Gets the value of the any properties which satisfy the <paramref name="namePredicate"/> and <paramref name="valuePredicate"/>
+		/// </summary>
+		/// <param name="source"></param>
+		/// <returns></returns>
+		public static IEnumerable<KeyValuePair<DataName, TokenSequence>> GetProperties(this TokenSequence source, Func<DataName, bool> namePredicate, Func<TokenSequence, bool> valuePredicate)
+		{
+			foreach (var property in CommonSubsequencer.GetProperties(source, namePredicate))
+			{
+				if (valuePredicate == null || valuePredicate(property.Value))
+				{
+					yield return property;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Gets all the properties of the root object
+		/// </summary>
+		/// <param name="source"></param>
+		/// <returns>all properties for the root level object</returns>
+		public static IEnumerable<KeyValuePair<DataName, TokenSequence>> GetProperties(this TokenSequence source)
+		{
+			return CommonSubsequencer.GetProperties(source, null);
+		}
+
+		/// <summary>
+		/// Gets the properties of the root object which satisfies the <paramref name="predicate"/>
+		/// </summary>
+		/// <param name="source"></param>
+		/// <param name="predicate"></param>
+		/// <returns>properties for the root level object which statisfy the predicate</returns>
+		public static IEnumerable<KeyValuePair<DataName, TokenSequence>> GetProperties(this TokenSequence source, Func<DataName, bool> predicate)
+		{
+			if (source == null)
+			{
+				throw new ArgumentNullException("source");
+			}
+
+			IStream<CommonToken> stream = Stream<CommonToken>.Create(source);
+			if (stream.IsCompleted ||
+				stream.Pop().TokenType != CommonTokenType.ArrayBegin)
+			{
+				yield break;
+			}
+
+			int depth = 0;
+
+			while (!stream.IsCompleted)
+			{
+				CommonToken token = stream.Peek();
+				switch (token.TokenType)
+				{
+					case CommonTokenType.ArrayBegin:
+					case CommonTokenType.ObjectBegin:
+					{
+						depth++;
+						stream.Pop();
+						continue;
+					}
+					case CommonTokenType.ArrayEnd:
+					{
+						depth--;
+						stream.Pop();
+						continue;
+					}
+					case CommonTokenType.ObjectEnd:
+					{
+						if (depth != 0)
+						{
+							depth--;
+							stream.Pop();
+							continue;
+						}
+
+						// don't look beyond end of object
+						yield break;
+					}
+					case CommonTokenType.Property:
+					{
+						stream.Pop();
+
+						if (depth != 0 ||
+							(predicate != null && !predicate(token.Name)))
+						{
+							continue;
+						}
+
+						// return property value sequence
+
+						yield return new KeyValuePair<DataName, TokenSequence>(token.Name, CommonSubsequencer.SpliceNextValue(stream));
+						continue;
+					}
+					default:
+					{
+						continue;
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Gets the properties of the root object which satisfies the <paramref name="predicate"/>
+		/// </summary>
+		/// <param name="source"></param>
+		/// <param name="predicate"></param>
+		/// <returns>properties for the root level object which statisfy the predicate</returns>
+		public static IEnumerable<TokenSequence> GetArrayItem(this TokenSequence source, Func<int, bool> predicate)
+		{
+			if (source == null)
+			{
+				throw new ArgumentNullException("source");
+			}
+
+			IStream<CommonToken> stream = Stream<CommonToken>.Create(source);
+			if (stream.IsCompleted ||
+				stream.Pop().TokenType != CommonTokenType.ArrayBegin)
+			{
+				yield break;
+			}
+
+			int index = 0;
+			while (!stream.IsCompleted)
+			{
+				CommonToken token = stream.Peek();
+				if (token.TokenType == CommonTokenType.ArrayEnd)
+				{
+					break;
+				}
+
+				if (predicate == null || predicate(index))
+				{
+					yield return CommonSubsequencer.SpliceNextValue(stream);
+				}
+				else
+				{
+					CommonSubsequencer.SkipNextValue(stream);
+				}
+				index++;
+			}
+		}
+
+		/// <summary>
+		/// Gets the properties of the root object which satisfies the <paramref name="predicate"/>
+		/// </summary>
+		/// <param name="source"></param>
+		/// <param name="predicate"></param>
+		/// <returns>properties for the root level object which statisfy the predicate</returns>
+		public static IEnumerable<TokenSequence> GetArrayItems(this TokenSequence source, Func<TokenSequence, bool> predicate)
+		{
+			if (source == null)
+			{
+				throw new ArgumentNullException("source");
+			}
+
+			IStream<CommonToken> stream = Stream<CommonToken>.Create(source);
+			if (stream.IsCompleted ||
+				stream.Pop().TokenType != CommonTokenType.ArrayBegin)
+			{
+				yield break;
+			}
+
+			while (!stream.IsCompleted)
+			{
+				CommonToken token = stream.Peek();
+				if (token.TokenType == CommonTokenType.ArrayEnd)
+				{
+					break;
+				}
+
+				var item = CommonSubsequencer.SpliceNextValue(stream);
+				if (predicate == null || predicate(item))
+				{
+					yield return item;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Gets the properties of the root object which satisfies the <paramref name="predicate"/>
+		/// </summary>
+		/// <param name="source"></param>
+		/// <param name="predicate"></param>
+		/// <returns>properties for the root level object which statisfy the predicate</returns>
+		public static IEnumerable<TokenSequence> GetArrayItems(this TokenSequence source, Func<TokenSequence, int, bool> predicate)
+		{
+			if (source == null)
+			{
+				throw new ArgumentNullException("source");
+			}
+
+			IStream<CommonToken> stream = Stream<CommonToken>.Create(source);
+			if (stream.IsCompleted ||
+				stream.Pop().TokenType != CommonTokenType.ArrayBegin)
+			{
+				yield break;
+			}
+
+			int index = 0;
+			while (!stream.IsCompleted)
+			{
+				CommonToken token = stream.Peek();
+				if (token.TokenType == CommonTokenType.ArrayEnd)
+				{
+					break;
+				}
+
+				var item = CommonSubsequencer.SpliceNextValue(stream);
+				if (predicate == null || predicate(item, index++))
+				{
+					yield return item;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Splices out the sequence for the next complete value (object, array, primitive)
 		/// </summary>
 		/// <param name="stream"></param>
 		/// <returns></returns>
@@ -304,7 +444,7 @@ namespace JsonFx.Common
 
 			switch (token.TokenType)
 			{
-				case CommonTokenType.Property:
+				case CommonTokenType.Primitive:
 				{
 					return stream.EndChunk();
 				}
@@ -338,6 +478,68 @@ namespace JsonFx.Common
 							CommonSubsequencer.ErrorUnexpectedEndOfInput);
 					}
 					return stream.EndChunk();
+				}
+				default:
+				{
+					throw new TokenException<CommonTokenType>(
+						token,
+						String.Format(CommonSubsequencer.ErrorInvalidPropertyValue, token.TokenType));
+				}
+			}
+		}
+
+		/// <summary>
+		/// Skips over the next complete value (object, array, primitive)
+		/// </summary>
+		/// <param name="stream"></param>
+		/// <returns></returns>
+		private static void SkipNextValue(IStream<CommonToken> stream)
+		{
+			if (stream.IsCompleted)
+			{
+				return;
+			}
+
+			int depth = -1;
+
+			CommonToken token = stream.Pop();
+
+			switch (token.TokenType)
+			{
+				case CommonTokenType.Property:
+				{
+					return;
+				}
+				case CommonTokenType.ArrayBegin:
+				case CommonTokenType.ObjectBegin:
+				{
+					depth++;
+					while (!stream.IsCompleted && depth >= 0)
+					{
+						switch (stream.Pop().TokenType)
+						{
+							case CommonTokenType.ArrayBegin:
+							case CommonTokenType.ObjectBegin:
+							{
+								depth++;
+								break;
+							}
+							case CommonTokenType.ArrayEnd:
+							case CommonTokenType.ObjectEnd:
+							{
+								depth--;
+								break;
+							}
+						}
+					}
+
+					if (depth >= 0)
+					{
+						throw new TokenException<CommonTokenType>(
+							CommonGrammar.TokenNone,
+							CommonSubsequencer.ErrorUnexpectedEndOfInput);
+					}
+					return;
 				}
 				default:
 				{
