@@ -60,7 +60,7 @@ namespace JsonFx.Common
 				CommonGrammar.TokenArrayEnd
 			};
 
-			Assert.True(input.IsPrimitive());
+			Assert.True(input.IsArray());
 		}
 
 		[Fact]
@@ -73,7 +73,7 @@ namespace JsonFx.Common
 				CommonGrammar.TokenObjectEnd
 			};
 
-			Assert.False(input.IsPrimitive());
+			Assert.False(input.IsArray());
 		}
 
 		[Fact]
@@ -85,7 +85,7 @@ namespace JsonFx.Common
 				CommonGrammar.TokenPrimitive("Hello.")
 			};
 
-			Assert.False(input.IsPrimitive());
+			Assert.False(input.IsArray());
 		}
 
 		[Fact]
@@ -97,7 +97,7 @@ namespace JsonFx.Common
 				CommonGrammar.TokenFalse
 			};
 
-			Assert.False(input.IsPrimitive());
+			Assert.False(input.IsArray());
 		}
 
 		[Fact]
@@ -106,7 +106,7 @@ namespace JsonFx.Common
 		{
 			var input = new Token<CommonTokenType>[0];
 
-			Assert.False(input.IsPrimitive());
+			Assert.False(input.IsArray());
 		}
 
 		#endregion IsArray Tests
@@ -123,7 +123,7 @@ namespace JsonFx.Common
 				CommonGrammar.TokenObjectEnd
 			};
 
-			Assert.True(input.IsPrimitive());
+			Assert.True(input.IsObject());
 		}
 
 		[Fact]
@@ -136,7 +136,7 @@ namespace JsonFx.Common
 				CommonGrammar.TokenArrayEnd
 			};
 
-			Assert.False(input.IsPrimitive());
+			Assert.False(input.IsObject());
 		}
 
 		[Fact]
@@ -148,7 +148,7 @@ namespace JsonFx.Common
 				CommonGrammar.TokenFalse
 			};
 
-			Assert.False(input.IsPrimitive());
+			Assert.False(input.IsObject());
 		}
 
 		[Fact]
@@ -160,7 +160,7 @@ namespace JsonFx.Common
 				CommonGrammar.TokenPrimitive("Hello.")
 			};
 
-			Assert.False(input.IsPrimitive());
+			Assert.False(input.IsObject());
 		}
 
 		[Fact]
@@ -169,7 +169,7 @@ namespace JsonFx.Common
 		{
 			var input = new Token<CommonTokenType>[0];
 
-			Assert.False(input.IsPrimitive());
+			Assert.False(input.IsObject());
 		}
 
 		#endregion IsObject Tests
