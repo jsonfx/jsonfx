@@ -109,20 +109,7 @@ namespace JsonFx.IO
 			}
 
 			// build chunk value
-			T[] value = new T[(1+this.index-this.start)];
-
-			T[] source = this.Buffer as T[];
-			if (source != null)
-			{
-				Array.Copy(source, this.start, value, 0, value.Length);
-			}
-			else
-			{
-				for (int i=0, length=value.Length; i<length; i++, this.start++)
-				{
-					value[i] = this.Buffer[this.start];
-				}
-			}
+			IList<T> value = new Subsequence<T>(this.Buffer, this.start, (1+this.index-this.start));
 
 			// reset chunk start
 			this.start = -1;
