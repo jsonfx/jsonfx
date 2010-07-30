@@ -192,9 +192,9 @@ namespace JsonFx
 		/// <param name="expected">The expected value</param>
 		/// <param name="actual">The value to be compared against</param>
 		/// <exception cref="EqualException">Thrown when the objects are not equal</exception>
-		public static void Equal<T>(T expected, T actual, bool strict)
+		public static void Equal<T>(T expected, T actual, bool checkType)
 		{
-			Equal(expected, actual, GetEqualityComparer<T>(strict));
+			Equal(expected, actual, GetEqualityComparer<T>(checkType));
 		}
 
 		/// <summary>
@@ -216,9 +216,9 @@ namespace JsonFx
 		/// <param name="expected">The expected object</param>
 		/// <param name="actual">The actual object</param>
 		/// <exception cref="NotEqualException">Thrown when the objects are equal</exception>
-		public static void NotEqual<T>(T expected, T actual, bool strict)
+		public static void NotEqual<T>(T expected, T actual, bool checkType)
 		{
-			NotEqual(expected, actual, GetEqualityComparer<T>(strict));
+			NotEqual(expected, actual, GetEqualityComparer<T>(checkType));
 		}
 
 		#endregion AssertEqualityComparer<T> Entry Points
@@ -230,9 +230,9 @@ namespace JsonFx
 			return GetEqualityComparer<T>(true);
 		}
 
-		static IEqualityComparer<T> GetEqualityComparer<T>(bool strict)
+		static IEqualityComparer<T> GetEqualityComparer<T>(bool checkType)
 		{
-			return new AssertEqualityComparer<T>(strict);
+			return new AssertEqualityComparer<T>(checkType);
 		}
 
 		#endregion Factory Methods
@@ -244,11 +244,11 @@ namespace JsonFx
 			static AssertEqualityComparer<object> innerComparer = new AssertEqualityComparer<object>(false);
 			static AssertEqualityComparer<object> innerComparerStrict = new AssertEqualityComparer<object>(true);
 
-			readonly bool Strict;
+			readonly bool CheckType;
 
-			public AssertEqualityComparer(bool strict)
+			public AssertEqualityComparer(bool checkType)
 			{
-				this.Strict = strict;
+				this.CheckType = checkType;
 			}
 
 			public bool Equals(T x, T y)
@@ -266,7 +266,7 @@ namespace JsonFx
                 }
 
                 // Same type?
-                if (this.Strict && x.GetType() != y.GetType())
+                if (this.CheckType && x.GetType() != y.GetType())
                     return false;
 
                 // Implements IEquatable<T>?
@@ -299,7 +299,7 @@ namespace JsonFx
 					foreach (string key in dictionaryX.Keys)
 					{
 						if (!dictionaryY.ContainsKey(key) ||
-							!(this.Strict ? innerComparerStrict : innerComparer).Equals(dictionaryX[key], dictionaryY[key]))
+							!(this.CheckType ? innerComparerStrict : innerComparer).Equals(dictionaryX[key], dictionaryY[key]))
                             return false;
 					}
 
@@ -325,7 +325,7 @@ namespace JsonFx
                         if (!hasNextX || !hasNextY)
                             return (hasNextX == hasNextY);
 
-                        if (!(this.Strict ? innerComparerStrict : innerComparer).Equals(enumeratorX.Current, enumeratorY.Current))
+                        if (!(this.CheckType ? innerComparerStrict : innerComparer).Equals(enumeratorX.Current, enumeratorY.Current))
                             return false;
                     }
                 }
