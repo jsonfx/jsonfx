@@ -37,7 +37,7 @@ namespace JsonFx.IO
 	/// <summary>
 	/// Wrapper for an (unchanging) <see cref="IList<T>"/> defining a subsequence
 	/// </summary>
-	public class Subsequence<T> : IList<T>
+	internal class Subsequence<T> : IList<T>
 	{
 		#region Enumerator
 
