@@ -293,6 +293,7 @@ namespace JsonFx.Common
 					}
 					default:
 					{
+						stream.Pop();
 						continue;
 					}
 				}

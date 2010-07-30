@@ -60,10 +60,7 @@ namespace JsonFx.Common
 				CommonGrammar.TokenArrayEnd
 			};
 
-			var expected = true;
-			var actual = input.IsArray();
-
-			Assert.Equal(expected, actual);
+			Assert.True(input.IsPrimitive());
 		}
 
 		[Fact]
@@ -76,10 +73,7 @@ namespace JsonFx.Common
 				CommonGrammar.TokenObjectEnd
 			};
 
-			var expected = false;
-			var actual = input.IsArray();
-
-			Assert.Equal(expected, actual);
+			Assert.False(input.IsPrimitive());
 		}
 
 		[Fact]
@@ -91,10 +85,7 @@ namespace JsonFx.Common
 				CommonGrammar.TokenValue("Hello.")
 			};
 
-			var expected = false;
-			var actual = input.IsArray();
-
-			Assert.Equal(expected, actual);
+			Assert.False(input.IsPrimitive());
 		}
 
 		[Fact]
@@ -106,10 +97,7 @@ namespace JsonFx.Common
 				CommonGrammar.TokenFalse
 			};
 
-			var expected = false;
-			var actual = input.IsArray();
-
-			Assert.Equal(expected, actual);
+			Assert.False(input.IsPrimitive());
 		}
 
 		[Fact]
@@ -118,10 +106,7 @@ namespace JsonFx.Common
 		{
 			var input = new Token<CommonTokenType>[0];
 
-			var expected = false;
-			var actual = input.IsArray();
-
-			Assert.Equal(expected, actual);
+			Assert.False(input.IsPrimitive());
 		}
 
 		#endregion IsArray Tests
@@ -138,10 +123,7 @@ namespace JsonFx.Common
 				CommonGrammar.TokenObjectEnd
 			};
 
-			var expected = true;
-			var actual = input.IsObject();
-
-			Assert.Equal(expected, actual);
+			Assert.True(input.IsPrimitive());
 		}
 
 		[Fact]
@@ -154,10 +136,7 @@ namespace JsonFx.Common
 				CommonGrammar.TokenArrayEnd
 			};
 
-			var expected = false;
-			var actual = input.IsObject();
-
-			Assert.Equal(expected, actual);
+			Assert.False(input.IsPrimitive());
 		}
 
 		[Fact]
@@ -169,10 +148,7 @@ namespace JsonFx.Common
 				CommonGrammar.TokenFalse
 			};
 
-			var expected = false;
-			var actual = input.IsObject();
-
-			Assert.Equal(expected, actual);
+			Assert.False(input.IsPrimitive());
 		}
 
 		[Fact]
@@ -184,10 +160,7 @@ namespace JsonFx.Common
 				CommonGrammar.TokenValue("Hello.")
 			};
 
-			var expected = false;
-			var actual = input.IsObject();
-
-			Assert.Equal(expected, actual);
+			Assert.False(input.IsPrimitive());
 		}
 
 		[Fact]
@@ -196,10 +169,7 @@ namespace JsonFx.Common
 		{
 			var input = new Token<CommonTokenType>[0];
 
-			var expected = false;
-			var actual = input.IsObject();
-
-			Assert.Equal(expected, actual);
+			Assert.False(input.IsPrimitive());
 		}
 
 		#endregion IsObject Tests
@@ -216,10 +186,7 @@ namespace JsonFx.Common
 				CommonGrammar.TokenObjectEnd
 			};
 
-			var expected = false;
-			var actual = input.IsPrimitive();
-
-			Assert.Equal(expected, actual);
+			Assert.False(input.IsPrimitive());
 		}
 
 		[Fact]
@@ -232,11 +199,7 @@ namespace JsonFx.Common
 				CommonGrammar.TokenArrayEnd
 			};
 
-			var expected = false;
-
-			var actual = input.IsPrimitive();
-
-			Assert.Equal(expected, actual);
+			Assert.False(input.IsPrimitive());
 		}
 
 		[Fact]
@@ -248,10 +211,7 @@ namespace JsonFx.Common
 				CommonGrammar.TokenFalse
 			};
 
-			var expected = true;
-			var actual = input.IsPrimitive();
-
-			Assert.Equal(expected, actual);
+			Assert.True(input.IsPrimitive());
 		}
 
 		[Fact]
@@ -263,10 +223,7 @@ namespace JsonFx.Common
 				CommonGrammar.TokenValue("Hello.")
 			};
 
-			var expected = true;
-			var actual = input.IsPrimitive();
-
-			Assert.Equal(expected, actual);
+			Assert.True(input.IsPrimitive());
 		}
 
 		[Fact]
@@ -275,10 +232,7 @@ namespace JsonFx.Common
 		{
 			var input = new Token<CommonTokenType>[0];
 
-			var expected = false;
-			var actual = input.IsPrimitive();
-
-			Assert.Equal(expected, actual);
+			Assert.False(input.IsPrimitive());
 		}
 
 		#endregion IsPrimitive Tests
@@ -584,6 +538,54 @@ namespace JsonFx.Common
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
+		public void HasProperty_PickExisting_ReturnsTrue()
+		{
+			var input = new[]
+		    {
+		        CommonGrammar.TokenObjectBeginNoName,
+		        CommonGrammar.TokenProperty("key1"),
+		        CommonGrammar.TokenNull,
+		        CommonGrammar.TokenProperty("key2"),
+		        CommonGrammar.TokenValue("Hello!"),
+		        CommonGrammar.TokenProperty("three"),
+		        CommonGrammar.TokenValue(3),
+		        CommonGrammar.TokenProperty("4"),
+		        CommonGrammar.TokenTrue,
+		        CommonGrammar.TokenObjectEnd
+		    };
+
+			// test for a specific property
+			var actual = input.HasProperty(name => name.LocalName == "three");
+
+			Assert.True(actual);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void HasProperty_PickNonExisting_ReturnsFalse()
+		{
+			var input = new[]
+		    {
+		        CommonGrammar.TokenObjectBeginNoName,
+		        CommonGrammar.TokenProperty("key1"),
+		        CommonGrammar.TokenNull,
+		        CommonGrammar.TokenProperty("key2"),
+		        CommonGrammar.TokenValue("Hello!"),
+		        CommonGrammar.TokenProperty("three"),
+		        CommonGrammar.TokenValue(3),
+		        CommonGrammar.TokenProperty("4"),
+		        CommonGrammar.TokenTrue,
+		        CommonGrammar.TokenObjectEnd
+		    };
+
+			// test for a specific property
+			var actual = input.HasProperty(name => name.LocalName == "five");
+
+			Assert.False(actual);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetProperties_AllProperties_ReturnsSplitSequences()
 		{
 			var input = new[]
@@ -593,13 +595,19 @@ namespace JsonFx.Common
 		        CommonGrammar.TokenNull,
 		        CommonGrammar.TokenProperty("key2"),
 		        CommonGrammar.TokenValue("Hello!"),
+		        CommonGrammar.TokenProperty("three"),
+		        CommonGrammar.TokenValue(3),
+		        CommonGrammar.TokenProperty("4"),
+		        CommonGrammar.TokenTrue,
 		        CommonGrammar.TokenObjectEnd
 		    };
 
 			var expected = new Dictionary<DataName, IEnumerable<Token<CommonTokenType>>>
 			{
 				{ new DataName("key1"), new[] { CommonGrammar.TokenNull } },
-				{ new DataName("key2"), new[] { CommonGrammar.TokenValue("Hello!") } }
+				{ new DataName("key2"), new[] { CommonGrammar.TokenValue("Hello!") } },
+				{ new DataName("three"), new[] { CommonGrammar.TokenValue(3) } },
+				{ new DataName("4"), new[] { CommonGrammar.TokenTrue } }
 			};
 
 			// select all properties
@@ -608,6 +616,326 @@ namespace JsonFx.Common
 			Assert.Equal(expected, actual, false);
 		}
 
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void GetProperties_OnlyOneProperty_ReturnsSplitSequences()
+		{
+			var input = new[]
+		    {
+		        CommonGrammar.TokenObjectBeginNoName,
+		        CommonGrammar.TokenProperty("key1"),
+		        CommonGrammar.TokenNull,
+		        CommonGrammar.TokenProperty("key2"),
+		        CommonGrammar.TokenValue("Hello!"),
+		        CommonGrammar.TokenProperty("three"),
+		        CommonGrammar.TokenValue(3),
+		        CommonGrammar.TokenProperty("4"),
+		        CommonGrammar.TokenTrue,
+		        CommonGrammar.TokenObjectEnd
+		    };
+
+			var expected = new Dictionary<DataName, IEnumerable<Token<CommonTokenType>>>
+			{
+				{ new DataName("key2"), new[] { CommonGrammar.TokenValue("Hello!") } }
+			};
+
+			// select all properties
+			var actual = input.GetProperties(name => name.LocalName == "key2").ToArray();
+
+			Assert.Equal(expected, actual, false);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void GetProperties_NestedObjectPropertySkipped_ReturnsSplitSequences()
+		{
+			var input = new[]
+		    {
+		        CommonGrammar.TokenObjectBeginNoName,
+		        CommonGrammar.TokenProperty("key1"),
+		        CommonGrammar.TokenNull,
+		        CommonGrammar.TokenProperty("three"),
+		        CommonGrammar.TokenObjectBeginNoName,
+		        CommonGrammar.TokenProperty("key2"),
+		        CommonGrammar.TokenFalse,
+		        CommonGrammar.TokenObjectEnd,
+		        CommonGrammar.TokenProperty("key2"),
+		        CommonGrammar.TokenValue("Hello!"),
+		        CommonGrammar.TokenProperty("4"),
+		        CommonGrammar.TokenTrue,
+		        CommonGrammar.TokenObjectEnd
+		    };
+
+			var expected = new Dictionary<DataName, IEnumerable<Token<CommonTokenType>>>
+			{
+				{ new DataName("key2"), new[] { CommonGrammar.TokenValue("Hello!") } }
+			};
+
+			// select all properties
+			var actual = input.GetProperties(name => name.LocalName == "key2").ToArray();
+
+			Assert.Equal(expected, actual, false);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void GetProperties_NestedObjectPropertyReturned_ReturnsSplitSequences()
+		{
+			var input = new[]
+		    {
+		        CommonGrammar.TokenObjectBeginNoName,
+		        CommonGrammar.TokenProperty("key1"),
+		        CommonGrammar.TokenNull,
+		        CommonGrammar.TokenProperty("key2"),
+		        CommonGrammar.TokenObjectBeginNoName,
+		        CommonGrammar.TokenProperty("key2"),
+		        CommonGrammar.TokenFalse,
+		        CommonGrammar.TokenObjectEnd,
+		        CommonGrammar.TokenProperty("three"),
+		        CommonGrammar.TokenValue("Hello!"),
+		        CommonGrammar.TokenProperty("4"),
+		        CommonGrammar.TokenTrue,
+		        CommonGrammar.TokenObjectEnd
+		    };
+
+			var expected = new Dictionary<DataName, IEnumerable<Token<CommonTokenType>>>
+			{
+				{ new DataName("key2"), new[] {
+					CommonGrammar.TokenObjectBeginNoName,
+					CommonGrammar.TokenProperty("key2"),
+					CommonGrammar.TokenFalse,
+					CommonGrammar.TokenObjectEnd,
+				} }
+			};
+
+			// select all properties
+			var actual = input.GetProperties(name => name.LocalName == "key2").ToArray();
+
+			Assert.Equal(expected, actual, false);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void GetProperties_NestedArrayPropertySkipped_ReturnsSplitSequences()
+		{
+			var input = new[]
+		    {
+		        CommonGrammar.TokenObjectBeginNoName,
+		        CommonGrammar.TokenProperty("key1"),
+		        CommonGrammar.TokenNull,
+		        CommonGrammar.TokenProperty("three"),
+		        CommonGrammar.TokenArrayBeginNoName,
+		        CommonGrammar.TokenFalse,
+		        CommonGrammar.TokenValue(42),
+		        CommonGrammar.TokenArrayEnd,
+		        CommonGrammar.TokenProperty("key2"),
+		        CommonGrammar.TokenValue("Hello!"),
+		        CommonGrammar.TokenProperty("4"),
+		        CommonGrammar.TokenTrue,
+		        CommonGrammar.TokenObjectEnd
+		    };
+
+			var expected = new Dictionary<DataName, IEnumerable<Token<CommonTokenType>>>
+			{
+				{ new DataName("key2"), new[] { CommonGrammar.TokenValue("Hello!") } }
+			};
+
+			// select all properties
+			var actual = input.GetProperties(name => name.LocalName == "key2").ToArray();
+
+			Assert.Equal(expected, actual, false);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void GetProperties_NestedArrayPropertyReturned_ReturnsSplitSequences()
+		{
+			var input = new[]
+		    {
+		        CommonGrammar.TokenObjectBeginNoName,
+		        CommonGrammar.TokenProperty("key1"),
+		        CommonGrammar.TokenNull,
+		        CommonGrammar.TokenProperty("key2"),
+		        CommonGrammar.TokenArrayBeginNoName,
+		        CommonGrammar.TokenFalse,
+		        CommonGrammar.TokenValue(42),
+		        CommonGrammar.TokenArrayEnd,
+		        CommonGrammar.TokenProperty("three"),
+		        CommonGrammar.TokenValue("Hello!"),
+		        CommonGrammar.TokenProperty("4"),
+		        CommonGrammar.TokenTrue,
+		        CommonGrammar.TokenObjectEnd
+		    };
+
+			var expected = new Dictionary<DataName, IEnumerable<Token<CommonTokenType>>>
+			{
+				{ new DataName("key2"), new[] {
+					CommonGrammar.TokenArrayBeginNoName,
+					CommonGrammar.TokenFalse,
+					CommonGrammar.TokenValue(42),
+					CommonGrammar.TokenArrayEnd,
+				} }
+			};
+
+			// select all properties
+			var actual = input.GetProperties(name => name.LocalName == "key2").ToArray();
+
+			Assert.Equal(expected, actual, false);
+		}
+
 		#endregion GetProperty Tests
+
+		#region Complex Graph Tests
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void GetProperties_GraphComplex_ReturnsGraph()
+		{
+			// input from pass1.json in test suite at http://www.json.org/JSON_checker/
+			var input = new[]
+			{
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenValue("JSON Test Pattern pass1"),
+				CommonGrammar.TokenObjectBeginNoName,
+				CommonGrammar.TokenProperty("object with 1 member"),
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenValue("array with 1 element"),
+				CommonGrammar.TokenArrayEnd,
+				CommonGrammar.TokenObjectEnd,
+				CommonGrammar.TokenObjectBeginNoName,
+				CommonGrammar.TokenObjectEnd,
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayEnd,
+				CommonGrammar.TokenValue(-42),
+				CommonGrammar.TokenTrue,
+				CommonGrammar.TokenFalse,
+				CommonGrammar.TokenNull,
+				CommonGrammar.TokenObjectBeginNoName,
+				CommonGrammar.TokenProperty("integer"),
+				CommonGrammar.TokenValue(1234567890),
+				CommonGrammar.TokenProperty("real"),
+				CommonGrammar.TokenValue(-9876.543210),
+				CommonGrammar.TokenProperty("e"),
+				CommonGrammar.TokenValue(0.123456789e-12),
+				CommonGrammar.TokenProperty("E"),
+				CommonGrammar.TokenValue(1.234567890E+34),
+				CommonGrammar.TokenProperty(""),
+				CommonGrammar.TokenValue(23456789012E66),
+				CommonGrammar.TokenProperty("zero"),
+				CommonGrammar.TokenValue(0),
+				CommonGrammar.TokenProperty("one"),
+				CommonGrammar.TokenValue(1),
+				CommonGrammar.TokenProperty("space"),
+				CommonGrammar.TokenValue(" "),
+				CommonGrammar.TokenProperty("quote"),
+				CommonGrammar.TokenValue("\""),
+				CommonGrammar.TokenProperty("backslash"),
+				CommonGrammar.TokenValue("\\"),
+				CommonGrammar.TokenProperty("controls"),
+				CommonGrammar.TokenValue("\b\f\n\r\t"),
+				CommonGrammar.TokenProperty("slash"),
+				CommonGrammar.TokenValue("/ & /"),
+				CommonGrammar.TokenProperty("alpha"),
+				CommonGrammar.TokenValue("abcdefghijklmnopqrstuvwyz"),
+				CommonGrammar.TokenProperty("ALPHA"),
+				CommonGrammar.TokenValue("ABCDEFGHIJKLMNOPQRSTUVWYZ"),
+				CommonGrammar.TokenProperty("digit"),
+				CommonGrammar.TokenValue("0123456789"),
+				CommonGrammar.TokenProperty("0123456789"),
+				CommonGrammar.TokenValue("digit"),
+				CommonGrammar.TokenProperty("special"),
+				CommonGrammar.TokenValue("`1~!@#$%^&*()_+-={':[,]}|;.</>?"),
+				CommonGrammar.TokenProperty("hex"),
+				CommonGrammar.TokenValue("\u0123\u4567\u89AB\uCDEF\uabcd\uef4A"),
+				CommonGrammar.TokenProperty("true"),
+				CommonGrammar.TokenTrue,
+				CommonGrammar.TokenProperty("false"),
+				CommonGrammar.TokenFalse,
+				CommonGrammar.TokenProperty("null"),
+				CommonGrammar.TokenNull,
+				CommonGrammar.TokenProperty("array"),
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayEnd,
+				CommonGrammar.TokenProperty("object"),
+				CommonGrammar.TokenObjectBeginNoName,
+				CommonGrammar.TokenObjectEnd,
+				CommonGrammar.TokenProperty("address"),
+				CommonGrammar.TokenValue("50 St. James Street"),
+				CommonGrammar.TokenProperty("url"),
+				CommonGrammar.TokenValue("http://www.JSON.org/"),
+				CommonGrammar.TokenProperty("comment"),
+				CommonGrammar.TokenValue("// /* <!-- --"),
+				CommonGrammar.TokenProperty("# -- --> */"),
+				CommonGrammar.TokenValue(" "),
+				CommonGrammar.TokenProperty(" s p a c e d "),
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenValue(1),
+				CommonGrammar.TokenValue(2),
+				CommonGrammar.TokenValue(3),
+				CommonGrammar.TokenValue(4),
+				CommonGrammar.TokenValue(5),
+				CommonGrammar.TokenValue(6),
+				CommonGrammar.TokenValue(7),
+				CommonGrammar.TokenArrayEnd,
+				CommonGrammar.TokenProperty("compact"),
+				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenValue(1),
+				CommonGrammar.TokenValue(2),
+				CommonGrammar.TokenValue(3),
+				CommonGrammar.TokenValue(4),
+				CommonGrammar.TokenValue(5),
+				CommonGrammar.TokenValue(6),
+				CommonGrammar.TokenValue(7),
+				CommonGrammar.TokenArrayEnd,
+				CommonGrammar.TokenProperty("jsontext"),
+				CommonGrammar.TokenValue("{\"object with 1 member\":[\"array with 1 element\"]}"),
+				CommonGrammar.TokenProperty("quotes"),
+				CommonGrammar.TokenValue("&#34; \u0022 %22 0x22 034 &#x22;"),
+				CommonGrammar.TokenProperty("/\\\"\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"),
+				CommonGrammar.TokenValue("A key can be any string"),
+				CommonGrammar.TokenObjectEnd,
+				CommonGrammar.TokenValue(0.5),
+				CommonGrammar.TokenValue(98.6),
+				CommonGrammar.TokenValue(99.44),
+				CommonGrammar.TokenValue(1066),
+				CommonGrammar.TokenValue(10.0),
+				CommonGrammar.TokenValue(1.0),
+				CommonGrammar.TokenValue(0.1),
+				CommonGrammar.TokenValue(1.0),
+				CommonGrammar.TokenValue(2.0),
+				CommonGrammar.TokenValue(2.0),
+				CommonGrammar.TokenValue("rosebud"),
+				CommonGrammar.TokenArrayEnd
+			};
+
+			var expected = new Dictionary<DataName, IEnumerable<Token<CommonTokenType>>>
+			{
+				{ new DataName("url"), new[] { CommonGrammar.TokenValue("http://www.JSON.org/") } },
+				{ new DataName("compact"), new[] {
+					CommonGrammar.TokenArrayBeginNoName,
+					CommonGrammar.TokenValue(1),
+					CommonGrammar.TokenValue(2),
+					CommonGrammar.TokenValue(3),
+					CommonGrammar.TokenValue(4),
+					CommonGrammar.TokenValue(5),
+					CommonGrammar.TokenValue(6),
+					CommonGrammar.TokenValue(7),
+					CommonGrammar.TokenArrayEnd,
+				} }
+			};
+
+			Assert.True(input.IsArray());
+			Assert.False(input.IsObject());
+			Assert.False(input.IsPrimitive());
+
+			// cherry pick properties
+			var actual = input
+				.GetArrayIndex(index => index == 8).FirstOrDefault() // select the big object
+				.GetProperties(name => name.LocalName == "url" || name.LocalName == "compact"); // select two properties
+
+			Assert.Equal(expected, actual, false);
+		}
+
+		#endregion Complex Graph Tests
 	}
 }
