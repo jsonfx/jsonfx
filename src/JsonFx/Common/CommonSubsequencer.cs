@@ -53,59 +53,7 @@ namespace JsonFx.Common
 
 		#endregion Constants
 
-		#region Extension Methods
-
-		/// <summary>
-		/// Determines if the sequence represents an object
-		/// </summary>
-		/// <param name="source"></param>
-		/// <returns></returns>
-		public static bool IsObject(this TokenSequence source)
-		{
-			if (source == null)
-			{
-				throw new ArgumentNullException("source");
-			}
-
-			IList<CommonToken> tokenList = source as IList<CommonToken>;
-			if (tokenList != null)
-			{
-				return (tokenList.Count > 0) && (tokenList[0].TokenType == CommonTokenType.ObjectBegin);
-			}
-
-			foreach (var token in source)
-			{
-				return (token.TokenType == CommonTokenType.ObjectBegin);
-			}
-
-			return false;
-		}
-
-		/// <summary>
-		/// Determines if the sequence represents an array
-		/// </summary>
-		/// <param name="source"></param>
-		/// <returns></returns>
-		public static bool IsArray(this TokenSequence source)
-		{
-			if (source == null)
-			{
-				throw new ArgumentNullException("source");
-			}
-
-			IList<CommonToken> tokenList = source as IList<CommonToken>;
-			if (tokenList != null)
-			{
-				return (tokenList.Count > 0) && (tokenList[0].TokenType == CommonTokenType.ArrayBegin);
-			}
-
-			foreach (var token in source)
-			{
-				return (token.TokenType == CommonTokenType.ArrayBegin);
-			}
-
-			return false;
-		}
+		#region Primitive Methods
 
 		/// <summary>
 		/// Determines if the sequence represents a primitive
@@ -128,6 +76,36 @@ namespace JsonFx.Common
 			foreach (var token in source)
 			{
 				return (token.TokenType == CommonTokenType.Primitive);
+			}
+
+			return false;
+		}
+
+		#endregion Primitive Methods
+
+		#region Object Methods
+
+		/// <summary>
+		/// Determines if the sequence represents an object
+		/// </summary>
+		/// <param name="source"></param>
+		/// <returns></returns>
+		public static bool IsObject(this TokenSequence source)
+		{
+			if (source == null)
+			{
+				throw new ArgumentNullException("source");
+			}
+
+			IList<CommonToken> tokenList = source as IList<CommonToken>;
+			if (tokenList != null)
+			{
+				return (tokenList.Count > 0) && (tokenList[0].TokenType == CommonTokenType.ObjectBegin);
+			}
+
+			foreach (var token in source)
+			{
+				return (token.TokenType == CommonTokenType.ObjectBegin);
 			}
 
 			return false;
@@ -301,13 +279,53 @@ namespace JsonFx.Common
 			}
 		}
 
+		#endregion Object Methods
+
+		#region Array Methods
+
+		/// <summary>
+		/// Determines if the sequence represents an array
+		/// </summary>
+		/// <param name="source"></param>
+		/// <returns></returns>
+		public static bool IsArray(this TokenSequence source)
+		{
+			if (source == null)
+			{
+				throw new ArgumentNullException("source");
+			}
+
+			IList<CommonToken> tokenList = source as IList<CommonToken>;
+			if (tokenList != null)
+			{
+				return (tokenList.Count > 0) && (tokenList[0].TokenType == CommonTokenType.ArrayBegin);
+			}
+
+			foreach (var token in source)
+			{
+				return (token.TokenType == CommonTokenType.ArrayBegin);
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// Gets all the items of the array
+		/// </summary>
+		/// <param name="source"></param>
+		/// <returns>all items of the array</returns>
+		public static IEnumerable<TokenSequence> GetArrayItems(this TokenSequence source)
+		{
+			return CommonSubsequencer.GetArrayItems(source, null);
+		}
+
 		/// <summary>
 		/// Gets the items of the root array with indexes satisfying the <paramref name="predicate"/>
 		/// </summary>
 		/// <param name="source"></param>
 		/// <param name="predicate"></param>
 		/// <returns>items of the root array which statisfy the predicate</returns>
-		public static IEnumerable<TokenSequence> GetArrayIndex(this TokenSequence source, Func<int, bool> predicate)
+		public static IEnumerable<TokenSequence> GetArrayItems(this TokenSequence source, Func<int, bool> predicate)
 		{
 			if (source == null)
 			{
@@ -342,109 +360,9 @@ namespace JsonFx.Common
 			}
 		}
 
-		/// <summary>
-		/// Gets all the items of the array
-		/// </summary>
-		/// <param name="source"></param>
-		/// <returns>all items of the array</returns>
-		public static IEnumerable<TokenSequence> GetArrayItems(this TokenSequence source)
-		{
-			return CommonSubsequencer.GetArrayItems(source, (Func<TokenSequence, bool>)null);
-		}
+		#endregion Array Methods
 
-		/// <summary>
-		/// Gets the items of the root array with values satisfying the <paramref name="predicate"/>
-		/// </summary>
-		/// <param name="source"></param>
-		/// <param name="predicate"></param>
-		/// <returns>items of the root array which statisfy the predicate</returns>
-		public static IEnumerable<TokenSequence> GetArrayItems(this TokenSequence source, Func<TokenSequence, bool> predicate)
-		{
-			if (source == null)
-			{
-				throw new ArgumentNullException("source");
-			}
-
-			IStream<CommonToken> stream = Stream<CommonToken>.Create(source);
-			if (stream.IsCompleted ||
-				stream.Pop().TokenType != CommonTokenType.ArrayBegin)
-			{
-				yield break;
-			}
-
-			while (!stream.IsCompleted)
-			{
-				CommonToken token = stream.Peek();
-				if (token.TokenType == CommonTokenType.ArrayEnd)
-				{
-					break;
-				}
-
-				var item = CommonSubsequencer.SpliceNextValue(stream);
-				if (predicate == null || predicate(item))
-				{
-					yield return item;
-				}
-			}
-		}
-
-		/// <summary>
-		/// Gets the items of the root array with values and indexes satisfying the <paramref name="predicate"/>
-		/// </summary>
-		/// <param name="source"></param>
-		/// <param name="predicate"></param>
-		/// <returns>items of the root array which statisfy the predicate</returns>
-		public static IEnumerable<TokenSequence> GetArrayItems(this TokenSequence source, Func<TokenSequence, int, bool> predicate)
-		{
-			if (source == null)
-			{
-				throw new ArgumentNullException("source");
-			}
-
-			IStream<CommonToken> stream = Stream<CommonToken>.Create(source);
-			if (stream.IsCompleted ||
-				stream.Pop().TokenType != CommonTokenType.ArrayBegin)
-			{
-				yield break;
-			}
-
-			int index = 0;
-			while (!stream.IsCompleted)
-			{
-				CommonToken token = stream.Peek();
-				if (token.TokenType == CommonTokenType.ArrayEnd)
-				{
-					break;
-				}
-
-				var item = CommonSubsequencer.SpliceNextValue(stream);
-				if (predicate == null || predicate(item, index++))
-				{
-					yield return item;
-				}
-			}
-		}
-
-		/// <summary>
-		/// Gets all descendant values below the current root, as well as the current root
-		/// </summary>
-		/// <param name="source"></param>
-		/// <returns></returns>
-		public static IEnumerable<TokenSequence> GetDescendantsAndSelf(this TokenSequence source)
-		{
-			if (source == null)
-			{
-				throw new ArgumentNullException("source");
-			}
-
-			// and self
-			yield return source;
-
-			foreach (TokenSequence descendant in CommonSubsequencer.GetDescendants(source))
-			{
-				yield return descendant;
-			}
-		}
+		#region Descendants Methods
 
 		/// <summary>
 		/// Gets all descendant values below the current root
@@ -479,7 +397,7 @@ namespace JsonFx.Common
 
 			if (CommonSubsequencer.IsArray(source))
 			{
-				foreach (TokenSequence item in CommonSubsequencer.GetArrayItems(source, (Func<TokenSequence, bool>)null))
+				foreach (TokenSequence item in CommonSubsequencer.GetArrayItems(source, null))
 				{
 					yield return item;
 
@@ -491,6 +409,31 @@ namespace JsonFx.Common
 				yield break;
 			}
 		}
+
+		/// <summary>
+		/// Gets all descendant values below the current root, as well as the current root
+		/// </summary>
+		/// <param name="source"></param>
+		/// <returns></returns>
+		public static IEnumerable<TokenSequence> GetDescendantsAndSelf(this TokenSequence source)
+		{
+			if (source == null)
+			{
+				throw new ArgumentNullException("source");
+			}
+
+			// and self
+			yield return source;
+
+			foreach (TokenSequence descendant in CommonSubsequencer.GetDescendants(source))
+			{
+				yield return descendant;
+			}
+		}
+
+		#endregion Descendants Methods
+
+		#region Utility Methods
 
 		/// <summary>
 		/// Splices out the sequence for the next complete value (object, array, primitive)
@@ -617,6 +560,6 @@ namespace JsonFx.Common
 			}
 		}
 
-		#endregion Extension Methods
+		#endregion Utility Methods
 	}
 }

@@ -258,7 +258,7 @@ namespace JsonFx.Common
 			var expected = new IEnumerable<Token<CommonTokenType>>[0];
 
 			// select no items
-			var actual = input.GetArrayItems(item => false).ToArray();
+			var actual = input.GetArrayItems(index => false).ToArray();
 
 			Assert.Equal(expected, actual, false);
 		}
@@ -350,7 +350,7 @@ namespace JsonFx.Common
 			};
 
 			// select all items with a non-null value
-			var actual = input.GetArrayItems(item => item.All(token => token.Value != null)).ToArray();
+			var actual = input.GetArrayItems().Where(item => item.All(token => token.Value != null)).ToArray();
 
 			Assert.Equal(expected, actual, false);
 		}
@@ -402,7 +402,7 @@ namespace JsonFx.Common
 			};
 
 			// select all items
-			var actual = input.GetArrayItems(item => true).ToArray();
+			var actual = input.GetArrayItems(index => true).ToArray();
 
 			Assert.Equal(expected, actual, false);
 		}
@@ -452,7 +452,7 @@ namespace JsonFx.Common
 			};
 
 			// select all items
-			var actual = input.GetArrayItems(item => true).ToArray();
+			var actual = input.GetArrayItems(index => true).ToArray();
 
 			Assert.Equal(expected, actual, false);
 		}
@@ -489,7 +489,7 @@ namespace JsonFx.Common
 			};
 
 			// select items with odd indexes
-			var actual = input.GetArrayIndex(index => (index % 2 == 1)).ToArray();
+			var actual = input.GetArrayItems(index => (index % 2 == 1)).ToArray();
 
 			Assert.Equal(expected, actual, false);
 		}
@@ -527,7 +527,7 @@ namespace JsonFx.Common
 			};
 
 			// select all even index primitive items
-			var actual = input.GetArrayItems((tokens, index) => (index % 2 == 0) && tokens.FirstOrDefault().TokenType == CommonTokenType.Primitive).ToArray();
+			var actual = input.GetArrayItems(index => (index % 2 == 0)).Where(item => item.IsPrimitive()).ToArray();
 
 			Assert.Equal(expected, actual, false);
 		}
@@ -1274,7 +1274,7 @@ namespace JsonFx.Common
 
 			// cherry pick properties
 			var actual = input
-				.GetArrayIndex(index => index == 8).FirstOrDefault() // select the big object
+				.GetArrayItems(index => index == 8).FirstOrDefault() // select the big object
 				.GetProperties(name => name.LocalName == "url" || name.LocalName == "compact"); // select two properties
 
 			Assert.Equal(expected, actual, false);
