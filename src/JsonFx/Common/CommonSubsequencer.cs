@@ -310,12 +310,12 @@ namespace JsonFx.Common
 		}
 
 		/// <summary>
-		/// Gets the properties of the root object which satisfies the <paramref name="predicate"/>
+		/// Gets the items of the root array with indexes satisfying the <paramref name="predicate"/>
 		/// </summary>
 		/// <param name="source"></param>
 		/// <param name="predicate"></param>
-		/// <returns>properties for the root level object which statisfy the predicate</returns>
-		public static IEnumerable<TokenSequence> GetArrayItem(this TokenSequence source, Func<int, bool> predicate)
+		/// <returns>items of the root array which statisfy the predicate</returns>
+		public static IEnumerable<TokenSequence> GetArrayIndex(this TokenSequence source, Func<int, bool> predicate)
 		{
 			if (source == null)
 			{
@@ -351,11 +351,11 @@ namespace JsonFx.Common
 		}
 
 		/// <summary>
-		/// Gets the properties of the root object which satisfies the <paramref name="predicate"/>
+		/// Gets the items of the root array with values satisfying the <paramref name="predicate"/>
 		/// </summary>
 		/// <param name="source"></param>
 		/// <param name="predicate"></param>
-		/// <returns>properties for the root level object which statisfy the predicate</returns>
+		/// <returns>items of the root array which statisfy the predicate</returns>
 		public static IEnumerable<TokenSequence> GetArrayItems(this TokenSequence source, Func<TokenSequence, bool> predicate)
 		{
 			if (source == null)
@@ -387,11 +387,11 @@ namespace JsonFx.Common
 		}
 
 		/// <summary>
-		/// Gets the properties of the root object which satisfies the <paramref name="predicate"/>
+		/// Gets the items of the root array with values and indexes satisfying the <paramref name="predicate"/>
 		/// </summary>
 		/// <param name="source"></param>
 		/// <param name="predicate"></param>
-		/// <returns>properties for the root level object which statisfy the predicate</returns>
+		/// <returns>items of the root array which statisfy the predicate</returns>
 		public static IEnumerable<TokenSequence> GetArrayItems(this TokenSequence source, Func<TokenSequence, int, bool> predicate)
 		{
 			if (source == null)
@@ -506,7 +506,7 @@ namespace JsonFx.Common
 
 			switch (token.TokenType)
 			{
-				case CommonTokenType.Property:
+				case CommonTokenType.Primitive:
 				{
 					return;
 				}

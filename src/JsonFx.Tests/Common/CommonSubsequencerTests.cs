@@ -32,7 +32,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using JsonFx.Common;
 using JsonFx.Serialization;
 using Xunit;
 
@@ -304,7 +303,7 @@ namespace JsonFx.Common
 
 			var expected = new IEnumerable<Token<CommonTokenType>>[0];
 
-			// select all items with a non-null value
+			// select no items
 			var actual = input.GetArrayItems(item => false).ToArray();
 
 			Assert.Equal(expected, actual, false);
@@ -354,7 +353,7 @@ namespace JsonFx.Common
 				},
 			};
 
-			// select all items with a non-null value
+			// select all items
 			var actual = input.GetArrayItems(item => true).ToArray();
 
 			Assert.Equal(expected, actual, false);
@@ -404,7 +403,7 @@ namespace JsonFx.Common
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void GetArrayItems_NestedArrayFilterNonNull_ReturnsSplitSequences()
+		public void GetArrayItems_NestedArray_ReturnsSplitSequences()
 		{
 			var input = new[]
 		    {
@@ -448,7 +447,7 @@ namespace JsonFx.Common
 				},
 			};
 
-			// select all items with a non-null value
+			// select all items
 			var actual = input.GetArrayItems(item => true).ToArray();
 
 			Assert.Equal(expected, actual, false);
@@ -456,7 +455,7 @@ namespace JsonFx.Common
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void GetArrayItems_NestedObjectFilterNonNull_ReturnsSplitSequences()
+		public void GetArrayItems_NestedObject_ReturnsSplitSequences()
 		{
 			var input = new[]
 		    {
@@ -498,12 +497,91 @@ namespace JsonFx.Common
 				},
 			};
 
-			// select all items with a non-null value
+			// select all items
 			var actual = input.GetArrayItems(item => true).ToArray();
 
 			Assert.Equal(expected, actual, false);
 		}
 
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void GetArrayItem_IndexFilter_ReturnsSplitSequences()
+		{
+			var input = new[]
+		    {
+		        CommonGrammar.TokenArrayBeginNoName,
+		        CommonGrammar.TokenFalse,
+		        CommonGrammar.TokenValue("Pick me!"),
+		        CommonGrammar.TokenObjectBeginNoName,
+		        CommonGrammar.TokenProperty("key1"),
+		        CommonGrammar.TokenNull,
+		        CommonGrammar.TokenProperty("key2"),
+		        CommonGrammar.TokenValue("Hello!"),
+		        CommonGrammar.TokenObjectEnd,
+		        CommonGrammar.TokenValue(42),
+		        CommonGrammar.TokenArrayEnd
+		    };
+
+			var expected = new[]
+			{
+				new[]
+				{
+					CommonGrammar.TokenValue("Pick me!")
+				},
+				new[]
+				{
+					CommonGrammar.TokenValue(42)
+				}
+			};
+
+			// select items with odd indexes
+			var actual = input.GetArrayIndex(index => (index % 2 == 1)).ToArray();
+
+			Assert.Equal(expected, actual, false);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void GetArrayItems_FilteringByIndexAndValue_ReturnsSplitSequences()
+		{
+			var input = new[]
+		    {
+		        CommonGrammar.TokenArrayBeginNoName,
+		        CommonGrammar.TokenFalse,
+		        CommonGrammar.TokenValue("Hello!"),
+		        CommonGrammar.TokenObjectBeginNoName,
+		        CommonGrammar.TokenProperty("key1"),
+		        CommonGrammar.TokenNull,
+		        CommonGrammar.TokenProperty("key2"),
+		        CommonGrammar.TokenValue("Hello!"),
+		        CommonGrammar.TokenObjectEnd,
+		        CommonGrammar.TokenValue(42),
+		        CommonGrammar.TokenValue(Math.PI),
+		        CommonGrammar.TokenArrayEnd
+		    };
+
+			var expected = new[]
+			{
+				new[]
+				{
+					CommonGrammar.TokenFalse
+				},
+				new[]
+				{
+			        CommonGrammar.TokenValue(Math.PI),
+				}
+			};
+
+			// select all even index primitive items
+			var actual = input.GetArrayItems((tokens, index) => (index % 2 == 0) && tokens.FirstOrDefault().TokenType == CommonTokenType.Primitive).ToArray();
+
+			Assert.Equal(expected, actual, false);
+		}
+
 		#endregion Array Item Tests
+
+		#region GetProperty Tests
+
+		#endregion GetProperty Tests
 	}
 }
