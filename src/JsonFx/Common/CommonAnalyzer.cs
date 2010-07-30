@@ -322,7 +322,7 @@ namespace JsonFx.Common
 					String.Format(CommonAnalyzer.ErrorExpectedArray, token.TokenType));
 			}
 
-			Type itemType = TypeCoercionUtility.GetArrayItemType(arrayType);
+			Type itemType = TypeCoercionUtility.GetElementType(arrayType);
 
 			// if itemType was specified by caller, then isn't just a hint
 			bool isItemTypeHint = (itemType == null);

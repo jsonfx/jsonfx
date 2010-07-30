@@ -725,7 +725,7 @@ namespace JsonFx.Serialization
 			return genericArgs[1];
 		}
 
-		internal static Type GetArrayItemType(Type targetType)
+		internal static Type GetElementType(Type targetType)
 		{
 			if (targetType == null || targetType == typeof(string))
 			{
