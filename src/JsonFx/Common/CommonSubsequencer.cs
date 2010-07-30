@@ -112,11 +112,11 @@ namespace JsonFx.Common
 		}
 
 		/// <summary>
-		/// Determines if the root object has a property name which satisfies the <paramref name="predicate"/>
+		/// Determines if the root object has any properties which satisfies the name <paramref name="predicate"/>
 		/// </summary>
 		/// <param name="source"></param>
 		/// <param name="predicate"></param>
-		/// <returns>properties for the root level object which statisfy the predicate</returns>
+		/// <returns>true if any properties match the predicate</returns>
 		public static bool HasProperty(this TokenSequence source, Func<DataName, bool> predicate)
 		{
 			if (source == null)
@@ -188,19 +188,14 @@ namespace JsonFx.Common
 		}
 
 		/// <summary>
-		/// Gets the value of the any properties which satisfy the <paramref name="namePredicate"/> and <paramref name="valuePredicate"/>
+		/// Gets all properties of the root object
 		/// </summary>
 		/// <param name="source"></param>
-		/// <returns></returns>
-		public static IEnumerable<KeyValuePair<DataName, TokenSequence>> GetProperties(this TokenSequence source, Func<DataName, bool> namePredicate, Func<TokenSequence, bool> valuePredicate)
+		/// <param name="predicate"></param>
+		/// <returns>all properties for the object</returns>
+		public static IEnumerable<KeyValuePair<DataName, TokenSequence>> GetProperties(this TokenSequence source)
 		{
-			foreach (var property in CommonSubsequencer.GetProperties(source, namePredicate))
-			{
-				if (valuePredicate == null || valuePredicate(property.Value))
-				{
-					yield return property;
-				}
-			}
+			return CommonSubsequencer.GetProperties(source, null);
 		}
 
 		/// <summary>
@@ -208,7 +203,7 @@ namespace JsonFx.Common
 		/// </summary>
 		/// <param name="source"></param>
 		/// <param name="predicate"></param>
-		/// <returns>properties for the root level object which statisfy the predicate</returns>
+		/// <returns>matching properties for the root object</returns>
 		public static IEnumerable<KeyValuePair<DataName, TokenSequence>> GetProperties(this TokenSequence source, Func<DataName, bool> predicate)
 		{
 			if (source == null)
