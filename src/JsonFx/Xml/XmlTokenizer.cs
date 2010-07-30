@@ -223,7 +223,7 @@ namespace JsonFx.Xml
 								foreach (var attribute in attributes)
 								{
 									yield return MarkupGrammar.TokenAttribute(attribute.Key);
-									yield return MarkupGrammar.TokenValue(attribute.Value);
+									yield return MarkupGrammar.TokenPrimitive(attribute.Value);
 								}
 							}
 							break;
@@ -236,23 +236,23 @@ namespace JsonFx.Xml
 						case System.Xml.XmlNodeType.Attribute:
 						{
 							yield return MarkupGrammar.TokenAttribute(new DataName(reader.Name, reader.Prefix, reader.NamespaceURI, true));
-							yield return MarkupGrammar.TokenValue(reader.Value);
+							yield return MarkupGrammar.TokenPrimitive(reader.Value);
 							break;
 						}
 						case System.Xml.XmlNodeType.Text:
 						{
-							yield return MarkupGrammar.TokenValue(reader.Value);
+							yield return MarkupGrammar.TokenPrimitive(reader.Value);
 							break;
 						}
 						case System.Xml.XmlNodeType.SignificantWhitespace:
 						case System.Xml.XmlNodeType.Whitespace:
 						{
-							yield return MarkupGrammar.TokenValue(reader.Value);
+							yield return MarkupGrammar.TokenPrimitive(reader.Value);
 							break;
 						}
 						case System.Xml.XmlNodeType.CDATA:
 						{
-							yield return MarkupGrammar.TokenValue(reader.Value);
+							yield return MarkupGrammar.TokenPrimitive(reader.Value);
 							break;
 						}
 						case System.Xml.XmlNodeType.Entity:

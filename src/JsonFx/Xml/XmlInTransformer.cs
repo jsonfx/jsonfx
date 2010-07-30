@@ -191,7 +191,7 @@ namespace JsonFx.Xml
 							{
 								// if only child has more than one grandchild
 								// then whole element is acutally an array
-								output.Add(elementName.IsEmpty ? CommonGrammar.TokenArrayBeginNoName : CommonGrammar.TokenArrayBegin(this.DecodeName(elementName, typeof(Array))));
+								output.Add(elementName.IsEmpty ? CommonGrammar.TokenArrayBeginUnnamed : CommonGrammar.TokenArrayBegin(this.DecodeName(elementName, typeof(Array))));
 
 								if (items != null)
 								{
@@ -208,7 +208,7 @@ namespace JsonFx.Xml
 
 						if (isStandAlone)
 						{
-							output.Add(elementName.IsEmpty ? CommonGrammar.TokenObjectBeginNoName : CommonGrammar.TokenObjectBegin(elementName));
+							output.Add(elementName.IsEmpty ? CommonGrammar.TokenObjectBeginUnnamed : CommonGrammar.TokenObjectBegin(elementName));
 						}
 
 						if (children != null)
@@ -234,7 +234,7 @@ namespace JsonFx.Xml
 								}
 
 								// wrap values in array
-								output.Add(property.Key.IsEmpty ? CommonGrammar.TokenArrayBeginNoName : CommonGrammar.TokenArrayBegin(this.DecodeName(property.Key, typeof(Array))));
+								output.Add(property.Key.IsEmpty ? CommonGrammar.TokenArrayBeginUnnamed : CommonGrammar.TokenArrayBegin(this.DecodeName(property.Key, typeof(Array))));
 								foreach (var item in property.Value)
 								{
 									output.AddRange(item);

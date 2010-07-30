@@ -474,7 +474,7 @@ namespace JsonFx.Xml
 					}
 				}
 
-				output.Add(MarkupGrammar.TokenValue(buffer.ToString()));
+				output.Add(MarkupGrammar.TokenPrimitive(buffer.ToString()));
 			}
 
 			#endregion Emit MarkupTokenType Methods

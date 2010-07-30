@@ -60,7 +60,7 @@ namespace JsonFx.Bson
 			{
 				CommonGrammar.TokenObjectBegin("Object"),
 				CommonGrammar.TokenProperty("hello"),
-				CommonGrammar.TokenValue("world"),
+				CommonGrammar.TokenPrimitive("world"),
 				CommonGrammar.TokenObjectEnd
 			};
 
@@ -81,12 +81,12 @@ namespace JsonFx.Bson
 			// input from example at http://bsonspec.org/#/specification
 			var input = new[]
 		    {
-				CommonGrammar.TokenObjectBeginNoName,
+				CommonGrammar.TokenObjectBeginUnnamed,
 				CommonGrammar.TokenProperty("BSON"),
-				CommonGrammar.TokenArrayBeginNoName,
-				CommonGrammar.TokenValue("awesome"),
-				CommonGrammar.TokenValue(5.05),
-				CommonGrammar.TokenValue(1986),
+				CommonGrammar.TokenArrayBeginUnnamed,
+				CommonGrammar.TokenPrimitive("awesome"),
+				CommonGrammar.TokenPrimitive(5.05),
+				CommonGrammar.TokenPrimitive(1986),
 				CommonGrammar.TokenArrayEnd,
 				CommonGrammar.TokenObjectEnd
 		    };
@@ -151,9 +151,9 @@ namespace JsonFx.Bson
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBeginNoName,
+				CommonGrammar.TokenObjectBeginUnnamed,
 				CommonGrammar.TokenProperty(new DataName("key", null, "http://json.org")),
-				CommonGrammar.TokenValue("value"),
+				CommonGrammar.TokenPrimitive("value"),
 				CommonGrammar.TokenObjectEnd
 			};
 

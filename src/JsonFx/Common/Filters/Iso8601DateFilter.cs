@@ -160,7 +160,7 @@ namespace JsonFx.Common.Filters
 		{
 			tokens = new Token<CommonTokenType>[]
 				{
-					CommonGrammar.TokenValue(this.FormatIso8601(value))
+					CommonGrammar.TokenPrimitive(this.FormatIso8601(value))
 				};
 
 			return true;

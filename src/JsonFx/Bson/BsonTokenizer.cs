@@ -85,7 +85,7 @@ namespace JsonFx.Bson
 				long start = reader.BaseStream.Position;
 				int size = reader.ReadInt32();
 
-				tokens.Add(isArray ? CommonGrammar.TokenArrayBeginNoName : CommonGrammar.TokenObjectBeginNoName);
+				tokens.Add(isArray ? CommonGrammar.TokenArrayBeginUnnamed : CommonGrammar.TokenObjectBeginUnnamed);
 
 				while (reader.BaseStream.Position-start < size-1)
 				{
@@ -115,25 +115,25 @@ namespace JsonFx.Bson
 					case BsonElementType.Double:
 					{
 						double value = reader.ReadDouble();
-						tokens.Add(CommonGrammar.TokenValue(value));
+						tokens.Add(CommonGrammar.TokenPrimitive(value));
 						break;
 					}
 					case BsonElementType.String:
 					{
 						string value = BsonTokenizer.ReadString(reader);
-						tokens.Add(CommonGrammar.TokenValue(value));
+						tokens.Add(CommonGrammar.TokenPrimitive(value));
 						break;
 					}
 					case BsonElementType.JavaScriptCode:
 					{
 						BsonJavaScriptCode value = (BsonJavaScriptCode)BsonTokenizer.ReadString(reader);
-						tokens.Add(CommonGrammar.TokenValue(value));
+						tokens.Add(CommonGrammar.TokenPrimitive(value));
 						break;
 					}
 					case BsonElementType.Symbol:
 					{
 						BsonSymbol value = (BsonSymbol)BsonTokenizer.ReadString(reader);
-						tokens.Add(CommonGrammar.TokenValue(value));
+						tokens.Add(CommonGrammar.TokenPrimitive(value));
 						break;
 					}
 					case BsonElementType.Document:
@@ -154,7 +154,7 @@ namespace JsonFx.Bson
 					case BsonElementType.ObjectID:
 					{
 						byte[] value = reader.ReadBytes(BsonWriter.SizeOfObjectID);
-						tokens.Add(CommonGrammar.TokenValue(new BsonObjectID(value)));
+						tokens.Add(CommonGrammar.TokenPrimitive(new BsonObjectID(value)));
 						break;
 					}
 					case BsonElementType.Boolean:
@@ -166,7 +166,7 @@ namespace JsonFx.Bson
 					case BsonElementType.DateTimeUtc:
 					{
 						DateTime value = BsonWriter.UnixEpoch.AddMilliseconds(reader.ReadInt64());
-						tokens.Add(CommonGrammar.TokenValue(value));
+						tokens.Add(CommonGrammar.TokenPrimitive(value));
 						break;
 					}
 					case BsonElementType.RegExp:
@@ -203,7 +203,7 @@ namespace JsonFx.Bson
 
 						Regex regex = new Regex(pattern, options);
 
-						tokens.Add(CommonGrammar.TokenValue(regex));
+						tokens.Add(CommonGrammar.TokenPrimitive(regex));
 						break;
 					}
 					case BsonElementType.DBPointer:
@@ -212,7 +212,7 @@ namespace JsonFx.Bson
 						byte[] value2 = reader.ReadBytes(BsonWriter.SizeOfObjectID);
 
 						BsonDBPointer pointer = new BsonDBPointer { Namespace=value1, ObjectID=new BsonObjectID(value2) };
-						tokens.Add(CommonGrammar.TokenValue(pointer));
+						tokens.Add(CommonGrammar.TokenPrimitive(pointer));
 						break;
 					}
 					case BsonElementType.CodeWithScope:
@@ -220,7 +220,7 @@ namespace JsonFx.Bson
 						int size = reader.ReadInt32();
 						string value = BsonTokenizer.ReadString(reader);
 
-						tokens.Add(CommonGrammar.TokenValue(value));
+						tokens.Add(CommonGrammar.TokenPrimitive(value));
 
 						BsonTokenizer.ReadDocument(tokens, reader, false);
 						break;
@@ -228,20 +228,20 @@ namespace JsonFx.Bson
 					case BsonElementType.Int32:
 					{
 						int value = reader.ReadInt32();
-						tokens.Add(CommonGrammar.TokenValue(value));
+						tokens.Add(CommonGrammar.TokenPrimitive(value));
 						break;
 					}
 					case BsonElementType.TimeStamp:
 					{
 						long value = reader.ReadInt64();
 						// TODO: convert to TimeSpan?
-						tokens.Add(CommonGrammar.TokenValue(value));
+						tokens.Add(CommonGrammar.TokenPrimitive(value));
 						break;
 					}
 					case BsonElementType.Int64:
 					{
 						long value = reader.ReadInt64();
-						tokens.Add(CommonGrammar.TokenValue(value));
+						tokens.Add(CommonGrammar.TokenPrimitive(value));
 						break;
 					}
 					case BsonElementType.Undefined:
@@ -316,7 +316,7 @@ namespace JsonFx.Bson
 					}
 				}
 
-				tokens.Add(CommonGrammar.TokenValue(value));
+				tokens.Add(CommonGrammar.TokenPrimitive(value));
 			}
 
 			private static string ReadString(BinaryReader reader)

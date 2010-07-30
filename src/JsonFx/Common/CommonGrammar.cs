@@ -53,8 +53,8 @@ namespace JsonFx.Common
 		public static readonly Token<CommonTokenType> TokenFalse = new Token<CommonTokenType>(CommonTokenType.Primitive, false);
 		public static readonly Token<CommonTokenType> TokenTrue = new Token<CommonTokenType>(CommonTokenType.Primitive, true);
 
-		public static readonly Token<CommonTokenType> TokenArrayBeginNoName = new Token<CommonTokenType>(CommonTokenType.ArrayBegin);
-		public static readonly Token<CommonTokenType> TokenObjectBeginNoName = new Token<CommonTokenType>(CommonTokenType.ObjectBegin);
+		public static readonly Token<CommonTokenType> TokenArrayBeginUnnamed = new Token<CommonTokenType>(CommonTokenType.ArrayBegin);
+		public static readonly Token<CommonTokenType> TokenObjectBeginUnnamed = new Token<CommonTokenType>(CommonTokenType.ObjectBegin);
 
 		internal static readonly Token<CommonTokenType> TokenNaN = new Token<CommonTokenType>(CommonTokenType.Primitive, Double.NaN);
 		internal static readonly Token<CommonTokenType> TokenPositiveInfinity = new Token<CommonTokenType>(CommonTokenType.Primitive, Double.PositiveInfinity);
@@ -152,7 +152,7 @@ namespace JsonFx.Common
 		/// </summary>
 		/// <param name="value"></param>
 		/// <returns>Value Token</returns>
-		public static Token<CommonTokenType> TokenValue(object value)
+		public static Token<CommonTokenType> TokenPrimitive(object value)
 		{
 			return new Token<CommonTokenType>(CommonTokenType.Primitive, value);
 		}

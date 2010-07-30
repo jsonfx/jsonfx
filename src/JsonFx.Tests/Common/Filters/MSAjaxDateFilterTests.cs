@@ -57,7 +57,7 @@ namespace JsonFx.Common.Filters
 		{
 			var input = Stream<Token<CommonTokenType>>.Create(new[]
 				{
-					CommonGrammar.TokenValue(@"\/Date(1204329599999)\/")
+					CommonGrammar.TokenPrimitive(@"\/Date(1204329599999)\/")
 				});
 
 			var expected = new DateTime(2008, 2, 29, 23, 59, 59, 999, DateTimeKind.Utc);
@@ -75,7 +75,7 @@ namespace JsonFx.Common.Filters
 		{
 			var input = Stream<Token<CommonTokenType>>.Create(new[]
 				{
-					CommonGrammar.TokenValue(@"\/Date(1278327077768)\/")
+					CommonGrammar.TokenPrimitive(@"\/Date(1278327077768)\/")
 				});
 
 			var expected = new DateTime(2010, 7, 5, 10, 51, 17, 768, DateTimeKind.Utc);
@@ -93,7 +93,7 @@ namespace JsonFx.Common.Filters
 		{
 			var input = Stream<Token<CommonTokenType>>.Create(new[]
 				{
-					CommonGrammar.TokenValue(@"\/Date(4102444799999)\/")
+					CommonGrammar.TokenPrimitive(@"\/Date(4102444799999)\/")
 				});
 
 			var expected = new DateTime(2099, 12, 31, 23, 59, 59, 999, DateTimeKind.Utc);
@@ -113,7 +113,7 @@ namespace JsonFx.Common.Filters
 
 			var input = Stream<Token<CommonTokenType>>.Create(new[]
 				{
-					CommonGrammar.TokenValue(@"\/Date(-62135596800000)\/")
+					CommonGrammar.TokenPrimitive(@"\/Date(-62135596800000)\/")
 				});
 
 			DateTime actual;
@@ -129,7 +129,7 @@ namespace JsonFx.Common.Filters
 		{
 			var input = Stream<Token<CommonTokenType>>.Create(new[]
 				{
-					CommonGrammar.TokenValue(@"\/Date(253402300800000)\/")
+					CommonGrammar.TokenPrimitive(@"\/Date(253402300800000)\/")
 				});
 
 			var expected = DateTime.MaxValue;
@@ -153,7 +153,7 @@ namespace JsonFx.Common.Filters
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenValue(@"\/Date(1204329599999)\/")
+					CommonGrammar.TokenPrimitive(@"\/Date(1204329599999)\/")
 				};
 
 			IEnumerable<Token<CommonTokenType>> actual;
@@ -174,7 +174,7 @@ namespace JsonFx.Common.Filters
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenValue(@"\/Date(1204358399999)\/")
+					CommonGrammar.TokenPrimitive(@"\/Date(1204358399999)\/")
 				};
 
 			IEnumerable<Token<CommonTokenType>> actual;
@@ -194,7 +194,7 @@ namespace JsonFx.Common.Filters
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenValue(@"\/Date(1204329599999)\/")
+					CommonGrammar.TokenPrimitive(@"\/Date(1204329599999)\/")
 				};
 
 			IEnumerable<Token<CommonTokenType>> actual;
@@ -214,7 +214,7 @@ namespace JsonFx.Common.Filters
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenValue(@"\/Date(1278327077768)\/")
+					CommonGrammar.TokenPrimitive(@"\/Date(1278327077768)\/")
 				};
 
 			IEnumerable<Token<CommonTokenType>> actual;
@@ -235,7 +235,7 @@ namespace JsonFx.Common.Filters
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenValue(@"\/Date(1278352277768)\/")
+					CommonGrammar.TokenPrimitive(@"\/Date(1278352277768)\/")
 				};
 
 			IEnumerable<Token<CommonTokenType>> actual;
@@ -255,7 +255,7 @@ namespace JsonFx.Common.Filters
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenValue(@"\/Date(1278327077768)\/")
+					CommonGrammar.TokenPrimitive(@"\/Date(1278327077768)\/")
 				};
 
 			IEnumerable<Token<CommonTokenType>> actual;
@@ -275,7 +275,7 @@ namespace JsonFx.Common.Filters
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenValue(@"\/Date(4102444799999)\/")
+					CommonGrammar.TokenPrimitive(@"\/Date(4102444799999)\/")
 				};
 
 			IEnumerable<Token<CommonTokenType>> actual;
@@ -296,7 +296,7 @@ namespace JsonFx.Common.Filters
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenValue(@"\/Date(4102473599999)\/")
+					CommonGrammar.TokenPrimitive(@"\/Date(4102473599999)\/")
 				};
 
 			IEnumerable<Token<CommonTokenType>> actual;
@@ -316,7 +316,7 @@ namespace JsonFx.Common.Filters
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenValue(@"\/Date(4102444799999)\/")
+					CommonGrammar.TokenPrimitive(@"\/Date(4102444799999)\/")
 				};
 
 			IEnumerable<Token<CommonTokenType>> actual;
@@ -336,7 +336,7 @@ namespace JsonFx.Common.Filters
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenValue(@"\/Date(-62135596800000)\/")
+					CommonGrammar.TokenPrimitive(@"\/Date(-62135596800000)\/")
 				};
 
 			IEnumerable<Token<CommonTokenType>> actual;
@@ -356,7 +356,7 @@ namespace JsonFx.Common.Filters
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenValue(@"\/Date(253402300800000)\/")
+					CommonGrammar.TokenPrimitive(@"\/Date(253402300800000)\/")
 				};
 
 			IEnumerable<Token<CommonTokenType>> actual;

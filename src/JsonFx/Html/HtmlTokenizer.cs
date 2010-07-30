@@ -228,7 +228,7 @@ namespace JsonFx.Html
 			if (scanner.IsCompleted)
 			{
 				// end of file, emit as text
-				tokens.Add(MarkupGrammar.TokenValue(char.ToString(MarkupGrammar.OperatorElementBegin)));
+				tokens.Add(MarkupGrammar.TokenPrimitive(char.ToString(MarkupGrammar.OperatorElementBegin)));
 				return;
 			}
 
@@ -258,7 +258,7 @@ namespace JsonFx.Html
 					text += MarkupGrammar.OperatorElementClose;
 				}
 
-				tokens.Add(MarkupGrammar.TokenValue(text));
+				tokens.Add(MarkupGrammar.TokenPrimitive(text));
 				return;
 			}
 
@@ -324,7 +324,7 @@ namespace JsonFx.Html
 							if (value != null)
 							{
 								// convert CData to text
-								return MarkupGrammar.TokenValue(value);
+								return MarkupGrammar.TokenPrimitive(value);
 							}
 
 							// process as generic declaration
@@ -478,7 +478,7 @@ namespace JsonFx.Html
 
 			if (scanner.Peek() != MarkupGrammar.OperatorPairDelim)
 			{
-				return MarkupGrammar.TokenValue(String.Empty);
+				return MarkupGrammar.TokenPrimitive(String.Empty);
 			}
 
 			scanner.Pop();
@@ -552,7 +552,7 @@ namespace JsonFx.Html
 				scanner.Pop();
 
 				// output string
-				return MarkupGrammar.TokenValue(value);
+				return MarkupGrammar.TokenPrimitive(value);
 			}
 			else
 			{
@@ -594,7 +594,7 @@ namespace JsonFx.Html
 				}
 
 				// return chunk
-				return MarkupGrammar.TokenValue(scanner.EndChunk());
+				return MarkupGrammar.TokenPrimitive(scanner.EndChunk());
 			}
 		}
 
@@ -854,7 +854,7 @@ namespace JsonFx.Html
 				return;
 			}
 
-			tokens.Add(MarkupGrammar.TokenValue(value));
+			tokens.Add(MarkupGrammar.TokenPrimitive(value));
 		}
 
 		#endregion Scanning Methods

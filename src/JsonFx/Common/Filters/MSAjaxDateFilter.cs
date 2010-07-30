@@ -92,7 +92,7 @@ namespace JsonFx.Common.Filters
 		{
 			tokens = new Token<CommonTokenType>[]
 				{
-					CommonGrammar.TokenValue(this.FormatMSAjaxDate(value))
+					CommonGrammar.TokenPrimitive(this.FormatMSAjaxDate(value))
 				};
 
 			return true;

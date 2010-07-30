@@ -58,7 +58,7 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginUnnamed,
 				CommonGrammar.TokenArrayEnd
 			};
 
@@ -80,7 +80,7 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginUnnamed,
 				CommonGrammar.TokenNull,
 				CommonGrammar.TokenArrayEnd
 			};
@@ -104,8 +104,8 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBeginNoName,
-				CommonGrammar.TokenValue(0),
+				CommonGrammar.TokenArrayBeginUnnamed,
+				CommonGrammar.TokenPrimitive(0),
 				CommonGrammar.TokenNull,
 				CommonGrammar.TokenFalse,
 				CommonGrammar.TokenTrue,
@@ -116,14 +116,14 @@ namespace JsonFx.Xml
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("array")),
 				MarkupGrammar.TokenElementBegin(new DataName("item")),
-				MarkupGrammar.TokenValue(0),
+				MarkupGrammar.TokenPrimitive(0),
 				MarkupGrammar.TokenElementEnd,
 				MarkupGrammar.TokenElementVoid(new DataName("item")),
 				MarkupGrammar.TokenElementBegin(new DataName("item")),
-				MarkupGrammar.TokenValue(false),
+				MarkupGrammar.TokenPrimitive(false),
 				MarkupGrammar.TokenElementEnd,
 				MarkupGrammar.TokenElementBegin(new DataName("item")),
-				MarkupGrammar.TokenValue(true),
+				MarkupGrammar.TokenPrimitive(true),
 				MarkupGrammar.TokenElementEnd,
 				MarkupGrammar.TokenElementEnd,
 			};
@@ -141,26 +141,26 @@ namespace JsonFx.Xml
 			// input from pass2.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBeginNoName,
-				CommonGrammar.TokenArrayBeginNoName,
-				CommonGrammar.TokenArrayBeginNoName,
-				CommonGrammar.TokenArrayBeginNoName,
-				CommonGrammar.TokenArrayBeginNoName,
-				CommonGrammar.TokenArrayBeginNoName,
-				CommonGrammar.TokenArrayBeginNoName,
-				CommonGrammar.TokenArrayBeginNoName,
-				CommonGrammar.TokenArrayBeginNoName,
-				CommonGrammar.TokenArrayBeginNoName,
-				CommonGrammar.TokenArrayBeginNoName,
-				CommonGrammar.TokenArrayBeginNoName,
-				CommonGrammar.TokenArrayBeginNoName,
-				CommonGrammar.TokenArrayBeginNoName,
-				CommonGrammar.TokenArrayBeginNoName,
-				CommonGrammar.TokenArrayBeginNoName,
-				CommonGrammar.TokenArrayBeginNoName,
-				CommonGrammar.TokenArrayBeginNoName,
-				CommonGrammar.TokenArrayBeginNoName,
-				CommonGrammar.TokenValue("Not too deep"),
+				CommonGrammar.TokenArrayBeginUnnamed,
+				CommonGrammar.TokenArrayBeginUnnamed,
+				CommonGrammar.TokenArrayBeginUnnamed,
+				CommonGrammar.TokenArrayBeginUnnamed,
+				CommonGrammar.TokenArrayBeginUnnamed,
+				CommonGrammar.TokenArrayBeginUnnamed,
+				CommonGrammar.TokenArrayBeginUnnamed,
+				CommonGrammar.TokenArrayBeginUnnamed,
+				CommonGrammar.TokenArrayBeginUnnamed,
+				CommonGrammar.TokenArrayBeginUnnamed,
+				CommonGrammar.TokenArrayBeginUnnamed,
+				CommonGrammar.TokenArrayBeginUnnamed,
+				CommonGrammar.TokenArrayBeginUnnamed,
+				CommonGrammar.TokenArrayBeginUnnamed,
+				CommonGrammar.TokenArrayBeginUnnamed,
+				CommonGrammar.TokenArrayBeginUnnamed,
+				CommonGrammar.TokenArrayBeginUnnamed,
+				CommonGrammar.TokenArrayBeginUnnamed,
+				CommonGrammar.TokenArrayBeginUnnamed,
+				CommonGrammar.TokenPrimitive("Not too deep"),
 				CommonGrammar.TokenArrayEnd,
 				CommonGrammar.TokenArrayEnd,
 				CommonGrammar.TokenArrayEnd,
@@ -204,7 +204,7 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementBegin(new DataName("item")),
 				MarkupGrammar.TokenElementBegin(new DataName("item")),
 				MarkupGrammar.TokenElementBegin(new DataName("item")),
-				MarkupGrammar.TokenValue("Not too deep"),
+				MarkupGrammar.TokenPrimitive("Not too deep"),
 				MarkupGrammar.TokenElementEnd,
 				MarkupGrammar.TokenElementEnd,
 				MarkupGrammar.TokenElementEnd,
@@ -243,7 +243,7 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBeginNoName,
+				CommonGrammar.TokenObjectBeginUnnamed,
 				CommonGrammar.TokenObjectEnd
 			};
 
@@ -265,9 +265,9 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBeginNoName,
+				CommonGrammar.TokenObjectBeginUnnamed,
 				CommonGrammar.TokenProperty("key"),
-				CommonGrammar.TokenValue("value"),
+				CommonGrammar.TokenPrimitive("value"),
 				CommonGrammar.TokenObjectEnd
 			};
 
@@ -275,7 +275,7 @@ namespace JsonFx.Xml
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("object")),
 				MarkupGrammar.TokenElementBegin(new DataName("key")),
-				MarkupGrammar.TokenValue("value"),
+				MarkupGrammar.TokenPrimitive("value"),
 				MarkupGrammar.TokenElementEnd,
 				MarkupGrammar.TokenElementEnd,
 			};
@@ -294,7 +294,7 @@ namespace JsonFx.Xml
 			{
 				CommonGrammar.TokenObjectBegin("Yada"),
 				CommonGrammar.TokenProperty("key"),
-				CommonGrammar.TokenValue("value"),
+				CommonGrammar.TokenPrimitive("value"),
 				CommonGrammar.TokenObjectEnd
 			};
 
@@ -302,7 +302,7 @@ namespace JsonFx.Xml
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("Yada")),
 				MarkupGrammar.TokenElementBegin(new DataName("key")),
-				MarkupGrammar.TokenValue("value"),
+				MarkupGrammar.TokenPrimitive("value"),
 				MarkupGrammar.TokenElementEnd,
 				MarkupGrammar.TokenElementEnd,
 			};
@@ -320,13 +320,13 @@ namespace JsonFx.Xml
 			// input from pass3.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBeginNoName,
+				CommonGrammar.TokenObjectBeginUnnamed,
 				CommonGrammar.TokenProperty("JSON Test Pattern pass3"),
-				CommonGrammar.TokenObjectBeginNoName,
+				CommonGrammar.TokenObjectBeginUnnamed,
 				CommonGrammar.TokenProperty("The outermost value"),
-				CommonGrammar.TokenValue("must be an object or array."),
+				CommonGrammar.TokenPrimitive("must be an object or array."),
 				CommonGrammar.TokenProperty("In this test"),
-				CommonGrammar.TokenValue("It is an object."),
+				CommonGrammar.TokenPrimitive("It is an object."),
 				CommonGrammar.TokenObjectEnd,
 				CommonGrammar.TokenObjectEnd
 			};
@@ -336,10 +336,10 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementBegin(new DataName("object")),
 				MarkupGrammar.TokenElementBegin(new DataName("JSON_x0020_Test_x0020_Pattern_x0020_pass3")),
 				MarkupGrammar.TokenElementBegin(new DataName("The_x0020_outermost_x0020_value")),
-				MarkupGrammar.TokenValue("must be an object or array."),
+				MarkupGrammar.TokenPrimitive("must be an object or array."),
 				MarkupGrammar.TokenElementEnd,
 				MarkupGrammar.TokenElementBegin(new DataName("In_x0020_this_x0020_test")),
-				MarkupGrammar.TokenValue("It is an object."),
+				MarkupGrammar.TokenPrimitive("It is an object."),
 				MarkupGrammar.TokenElementEnd,
 				MarkupGrammar.TokenElementEnd,
 				MarkupGrammar.TokenElementEnd,
@@ -363,7 +363,7 @@ namespace JsonFx.Xml
 			{
 				CommonGrammar.TokenObjectBegin("foo"),
 				CommonGrammar.TokenProperty(new DataName("key", String.Empty, "http://json.org")),
-				CommonGrammar.TokenValue("value"),
+				CommonGrammar.TokenPrimitive("value"),
 				CommonGrammar.TokenObjectEnd
 			};
 
@@ -371,7 +371,7 @@ namespace JsonFx.Xml
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("foo")),
 				MarkupGrammar.TokenElementBegin(new DataName("key", String.Empty, "http://json.org")),
-				MarkupGrammar.TokenValue("value"),
+				MarkupGrammar.TokenPrimitive("value"),
 				MarkupGrammar.TokenElementEnd,
 				MarkupGrammar.TokenElementEnd,
 			};
@@ -390,7 +390,7 @@ namespace JsonFx.Xml
 			{
 				CommonGrammar.TokenObjectBegin(new DataName("foo", String.Empty, "http://json.org")),
 				CommonGrammar.TokenProperty(new DataName("key", String.Empty, "http://json.org")),
-				CommonGrammar.TokenValue("value"),
+				CommonGrammar.TokenPrimitive("value"),
 				CommonGrammar.TokenObjectEnd
 			};
 
@@ -398,7 +398,7 @@ namespace JsonFx.Xml
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("foo", String.Empty, "http://json.org")),
 				MarkupGrammar.TokenElementBegin(new DataName("key", String.Empty, "http://json.org")),
-				MarkupGrammar.TokenValue("value"),
+				MarkupGrammar.TokenPrimitive("value"),
 				MarkupGrammar.TokenElementEnd,
 				MarkupGrammar.TokenElementEnd,
 			};
@@ -417,7 +417,7 @@ namespace JsonFx.Xml
 			{
 				CommonGrammar.TokenObjectBegin(new DataName("foo", String.Empty, "http://json.org")),
 				CommonGrammar.TokenProperty("key"),
-				CommonGrammar.TokenValue("value"),
+				CommonGrammar.TokenPrimitive("value"),
 				CommonGrammar.TokenObjectEnd
 			};
 
@@ -425,7 +425,7 @@ namespace JsonFx.Xml
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("foo", String.Empty, "http://json.org")),
 				MarkupGrammar.TokenElementBegin(new DataName("key")),
-				MarkupGrammar.TokenValue("value"),
+				MarkupGrammar.TokenPrimitive("value"),
 				MarkupGrammar.TokenElementEnd,
 				MarkupGrammar.TokenElementEnd,
 			};
@@ -444,7 +444,7 @@ namespace JsonFx.Xml
 			{
 				CommonGrammar.TokenObjectBegin(new DataName("foo", String.Empty, "http://json.org")),
 				CommonGrammar.TokenProperty(new DataName("key", String.Empty, "http://jsonfx.net")),
-				CommonGrammar.TokenValue("value"),
+				CommonGrammar.TokenPrimitive("value"),
 				CommonGrammar.TokenObjectEnd
 			};
 
@@ -452,7 +452,7 @@ namespace JsonFx.Xml
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("foo", String.Empty, "http://json.org")),
 				MarkupGrammar.TokenElementBegin(new DataName("key", String.Empty, "http://jsonfx.net")),
-				MarkupGrammar.TokenValue("value"),
+				MarkupGrammar.TokenPrimitive("value"),
 				MarkupGrammar.TokenElementEnd,
 				MarkupGrammar.TokenElementEnd,
 			};
@@ -471,7 +471,7 @@ namespace JsonFx.Xml
 			{
 				CommonGrammar.TokenObjectBegin(new DataName("foo", String.Empty, "http://json.org")),
 				CommonGrammar.TokenProperty(new DataName("key", String.Empty, "http://json.org", true)),
-				CommonGrammar.TokenValue("value"),
+				CommonGrammar.TokenPrimitive("value"),
 				CommonGrammar.TokenObjectEnd
 			};
 
@@ -479,7 +479,7 @@ namespace JsonFx.Xml
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("foo", String.Empty, "http://json.org")),
 				MarkupGrammar.TokenAttribute(new DataName("key", String.Empty, "http://json.org", true)),
-				MarkupGrammar.TokenValue("value"),
+				MarkupGrammar.TokenPrimitive("value"),
 				MarkupGrammar.TokenElementEnd,
 			};
 
@@ -497,7 +497,7 @@ namespace JsonFx.Xml
 			{
 				CommonGrammar.TokenObjectBegin(new DataName("foo", String.Empty, "http://json.org")),
 				CommonGrammar.TokenProperty(new DataName("key", String.Empty, "http://jsonfx.net", true)),
-				CommonGrammar.TokenValue("value"),
+				CommonGrammar.TokenPrimitive("value"),
 				CommonGrammar.TokenObjectEnd
 			};
 
@@ -505,7 +505,7 @@ namespace JsonFx.Xml
 			{
 				MarkupGrammar.TokenElementBegin(new DataName("foo", String.Empty, "http://json.org")),
 				MarkupGrammar.TokenAttribute(new DataName("key", String.Empty, "http://jsonfx.net", true)),
-				MarkupGrammar.TokenValue("value"),
+				MarkupGrammar.TokenPrimitive("value"),
 				MarkupGrammar.TokenElementEnd,
 			};
 
@@ -526,7 +526,7 @@ namespace JsonFx.Xml
 
 				CommonGrammar.TokenObjectBegin(new DataName("foo2", String.Empty, "http://json.org")),
 				CommonGrammar.TokenProperty(new DataName("key2", String.Empty, "http://jsonfx.net")),
-				CommonGrammar.TokenValue("value"),
+				CommonGrammar.TokenPrimitive("value"),
 				CommonGrammar.TokenObjectEnd,
 
 				CommonGrammar.TokenObjectEnd
@@ -537,7 +537,7 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementBegin(new DataName("foo1", String.Empty, "http://json.org")),
 				MarkupGrammar.TokenElementBegin(new DataName("key1", String.Empty, "http://jsonfx.net")),
 				MarkupGrammar.TokenElementBegin(new DataName("key2", String.Empty, "http://jsonfx.net")),
-				MarkupGrammar.TokenValue("value"),
+				MarkupGrammar.TokenPrimitive("value"),
 				MarkupGrammar.TokenElementEnd,
 				MarkupGrammar.TokenElementEnd,
 				MarkupGrammar.TokenElementEnd,
@@ -560,7 +560,7 @@ namespace JsonFx.Xml
 
 				CommonGrammar.TokenObjectBegin(new DataName("foo2", String.Empty, "http://jsonfx.net")),
 				CommonGrammar.TokenProperty(new DataName("key2", String.Empty, "http://json.org")),
-				CommonGrammar.TokenValue("value"),
+				CommonGrammar.TokenPrimitive("value"),
 				CommonGrammar.TokenObjectEnd,
 
 				CommonGrammar.TokenObjectEnd
@@ -571,7 +571,7 @@ namespace JsonFx.Xml
 				MarkupGrammar.TokenElementBegin(new DataName("foo1", String.Empty, "http://json.org")),
 				MarkupGrammar.TokenElementBegin(new DataName("key1", String.Empty, "http://jsonfx.net")),
 				MarkupGrammar.TokenElementBegin(new DataName("key2", String.Empty, "http://json.org")),
-				MarkupGrammar.TokenValue("value"),
+				MarkupGrammar.TokenPrimitive("value"),
 				MarkupGrammar.TokenElementEnd,
 				MarkupGrammar.TokenElementEnd,
 				MarkupGrammar.TokenElementEnd,

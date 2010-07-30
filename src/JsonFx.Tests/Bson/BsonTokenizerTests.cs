@@ -69,13 +69,13 @@ namespace JsonFx.Bson
 
 			var expected = new[]
 		    {
-				CommonGrammar.TokenObjectBeginNoName,
+				CommonGrammar.TokenObjectBeginUnnamed,
 				CommonGrammar.TokenProperty("0"),
-				CommonGrammar.TokenValue("awesome"),
+				CommonGrammar.TokenPrimitive("awesome"),
 				CommonGrammar.TokenProperty("1"),
-				CommonGrammar.TokenValue(5.05),
+				CommonGrammar.TokenPrimitive(5.05),
 				CommonGrammar.TokenProperty("2"),
-				CommonGrammar.TokenValue(1986),
+				CommonGrammar.TokenPrimitive(1986),
 				CommonGrammar.TokenObjectEnd
 		    };
 
@@ -100,9 +100,9 @@ namespace JsonFx.Bson
 
 			var expected = new[]
 			{
-				CommonGrammar.TokenObjectBeginNoName,
+				CommonGrammar.TokenObjectBeginUnnamed,
 				CommonGrammar.TokenProperty("hello"),
-				CommonGrammar.TokenValue("world"),
+				CommonGrammar.TokenPrimitive("world"),
 				CommonGrammar.TokenObjectEnd
 			};
 
@@ -140,12 +140,12 @@ namespace JsonFx.Bson
 
 		    var expected = new[]
 		    {
-				CommonGrammar.TokenObjectBeginNoName,
+				CommonGrammar.TokenObjectBeginUnnamed,
 				CommonGrammar.TokenProperty("BSON"),
-				CommonGrammar.TokenArrayBeginNoName,
-				CommonGrammar.TokenValue("awesome"),
-				CommonGrammar.TokenValue(5.05),
-				CommonGrammar.TokenValue(1986),
+				CommonGrammar.TokenArrayBeginUnnamed,
+				CommonGrammar.TokenPrimitive("awesome"),
+				CommonGrammar.TokenPrimitive(5.05),
+				CommonGrammar.TokenPrimitive(1986),
 				CommonGrammar.TokenArrayEnd,
 				CommonGrammar.TokenObjectEnd
 		    };
@@ -168,7 +168,7 @@ namespace JsonFx.Bson
 
 			var expected = new[]
 			{
-				CommonGrammar.TokenObjectBeginNoName,
+				CommonGrammar.TokenObjectBeginUnnamed,
 				CommonGrammar.TokenProperty("valid"),
 				CommonGrammar.TokenTrue,
 				CommonGrammar.TokenObjectEnd

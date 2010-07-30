@@ -112,8 +112,8 @@ namespace JsonFx.JsonML
 							bool hasProperties = false;
 
 							bool isVoid = (token.TokenType == MarkupTokenType.ElementVoid);
-							yield return CommonGrammar.TokenArrayBeginNoName;
-							yield return CommonGrammar.TokenValue(token.Name);
+							yield return CommonGrammar.TokenArrayBeginUnnamed;
+							yield return CommonGrammar.TokenPrimitive(token.Name);
 
 							stream.Pop();
 							token = stream.Peek();
@@ -123,7 +123,7 @@ namespace JsonFx.JsonML
 								if (!hasProperties)
 								{
 									hasProperties = true;
-									yield return CommonGrammar.TokenObjectBeginNoName;
+									yield return CommonGrammar.TokenObjectBeginUnnamed;
 								}
 
 								yield return token.ChangeType(CommonTokenType.Property);
@@ -135,7 +135,7 @@ namespace JsonFx.JsonML
 								{
 									case MarkupTokenType.Primitive:
 									{
-										yield return CommonGrammar.TokenValue(token.Value);
+										yield return CommonGrammar.TokenPrimitive(token.Value);
 										break;
 									}
 									case MarkupTokenType.UnparsedBlock:
@@ -199,7 +199,7 @@ namespace JsonFx.JsonML
 								token = stream.Peek();
 							}
 
-							yield return CommonGrammar.TokenValue(value);
+							yield return CommonGrammar.TokenPrimitive(value);
 							break;
 						}
 						case MarkupTokenType.UnparsedBlock:

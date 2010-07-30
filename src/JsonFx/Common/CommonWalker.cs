@@ -177,7 +177,7 @@ namespace JsonFx.Common
 				// must test enumerations before other value types
 				if (type.IsEnum)
 				{
-					tokens.Add(CommonGrammar.TokenValue((Enum)value));
+					tokens.Add(CommonGrammar.TokenPrimitive((Enum)value));
 					return;
 				}
 
@@ -199,7 +199,7 @@ namespace JsonFx.Common
 					case TypeCode.UInt32:
 					case TypeCode.UInt64:
 					{
-						tokens.Add(CommonGrammar.TokenValue((ValueType)value));
+						tokens.Add(CommonGrammar.TokenPrimitive((ValueType)value));
 						return;
 					}
 					case TypeCode.Double:
@@ -220,7 +220,7 @@ namespace JsonFx.Common
 						}
 						else
 						{
-							tokens.Add(CommonGrammar.TokenValue(doubleVal));
+							tokens.Add(CommonGrammar.TokenPrimitive(doubleVal));
 						}
 						return;
 					}
@@ -245,7 +245,7 @@ namespace JsonFx.Common
 						}
 						else
 						{
-							tokens.Add(CommonGrammar.TokenValue(floatVal));
+							tokens.Add(CommonGrammar.TokenPrimitive(floatVal));
 						}
 						return;
 					}
@@ -253,7 +253,7 @@ namespace JsonFx.Common
 					case TypeCode.DateTime:
 					case TypeCode.String:
 					{
-						tokens.Add(CommonGrammar.TokenValue(value));
+						tokens.Add(CommonGrammar.TokenPrimitive(value));
 						return;
 					}
 					case TypeCode.DBNull:
@@ -272,13 +272,13 @@ namespace JsonFx.Common
 
 				if (value is Guid || value is Uri || value is Version)
 				{
-					tokens.Add(CommonGrammar.TokenValue(value));
+					tokens.Add(CommonGrammar.TokenPrimitive(value));
 					return;
 				}
 
 				if (value is TimeSpan)
 				{
-					tokens.Add(CommonGrammar.TokenValue((TimeSpan)value));
+					tokens.Add(CommonGrammar.TokenPrimitive((TimeSpan)value));
 					return;
 				}
 

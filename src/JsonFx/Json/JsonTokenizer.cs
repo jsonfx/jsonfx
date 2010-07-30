@@ -163,7 +163,7 @@ namespace JsonFx.Json
 								throw new DeserializationException(JsonTokenizer.ErrorMissingValueDelim, scanner.Index, scanner.Line, scanner.Column);
 							}
 
-							yield return CommonGrammar.TokenArrayBeginNoName;
+							yield return CommonGrammar.TokenArrayBeginUnnamed;
 							depth++;
 							needsValueDelim = NeedsValueDelim.Forbidden;
 							continue;
@@ -191,7 +191,7 @@ namespace JsonFx.Json
 								throw new DeserializationException(JsonTokenizer.ErrorMissingValueDelim, scanner.Index, scanner.Line, scanner.Column);
 							}
 
-							yield return CommonGrammar.TokenObjectBeginNoName;
+							yield return CommonGrammar.TokenObjectBeginUnnamed;
 							depth++;
 							needsValueDelim = NeedsValueDelim.Forbidden;
 							continue;
@@ -230,7 +230,7 @@ namespace JsonFx.Json
 								continue;
 							}
 
-							yield return CommonGrammar.TokenValue(value);
+							yield return CommonGrammar.TokenPrimitive(value);
 							needsValueDelim = NeedsValueDelim.Required;
 							continue;
 						}
@@ -538,17 +538,17 @@ namespace JsonFx.Json
 					if (number >= Int32.MinValue && number <= Int32.MaxValue)
 					{
 						// int most common
-						return CommonGrammar.TokenValue((int)number);
+						return CommonGrammar.TokenPrimitive((int)number);
 					}
 
 					if (number >= Int64.MinValue && number <= Int64.MaxValue)
 					{
 						// long more flexible
-						return CommonGrammar.TokenValue((long)number);
+						return CommonGrammar.TokenPrimitive((long)number);
 					}
 
 					// decimal most flexible
-					return CommonGrammar.TokenValue(number);
+					return CommonGrammar.TokenPrimitive(number);
 				}
 				else
 				{
@@ -564,7 +564,7 @@ namespace JsonFx.Json
 					}
 
 					// native EcmaScript number (IEEE-754)
-					return CommonGrammar.TokenValue(number);
+					return CommonGrammar.TokenPrimitive(number);
 				}
 			}
 

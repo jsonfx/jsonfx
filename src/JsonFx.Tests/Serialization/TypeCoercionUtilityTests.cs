@@ -174,7 +174,7 @@ namespace JsonFx.Serialization
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenValue("Two")
+				CommonGrammar.TokenPrimitive("Two")
 			};
 
 			var expected = ExampleEnum.Two;
@@ -191,7 +191,7 @@ namespace JsonFx.Serialization
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenValue("yellow")
+				CommonGrammar.TokenPrimitive("yellow")
 			};
 
 			var expected = ExampleEnum.Two;
@@ -208,7 +208,7 @@ namespace JsonFx.Serialization
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenValue(3)
+				CommonGrammar.TokenPrimitive(3)
 			};
 
 			var expected = ExampleEnum.Three;
@@ -231,7 +231,7 @@ namespace JsonFx.Serialization
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenValue(ExampleEnum.Zero)
+				CommonGrammar.TokenPrimitive(ExampleEnum.Zero)
 			};
 
 			var expected = @"""Zero""";
@@ -248,7 +248,7 @@ namespace JsonFx.Serialization
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenValue(ExampleEnum.One)
+				CommonGrammar.TokenPrimitive(ExampleEnum.One)
 			};
 
 			var expected = @"""One""";
@@ -265,7 +265,7 @@ namespace JsonFx.Serialization
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenValue(ExampleEnum.Two)
+				CommonGrammar.TokenPrimitive(ExampleEnum.Two)
 			};
 
 			var expected = @"""yellow""";
@@ -282,7 +282,7 @@ namespace JsonFx.Serialization
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenValue(ExampleEnum.Three)
+				CommonGrammar.TokenPrimitive(ExampleEnum.Three)
 			};
 
 			var expected = @"""Three""";
@@ -299,7 +299,7 @@ namespace JsonFx.Serialization
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenValue((int)ExampleEnum.Three)
+				CommonGrammar.TokenPrimitive((int)ExampleEnum.Three)
 			};
 
 			var expected = "3";

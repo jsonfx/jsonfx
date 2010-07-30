@@ -56,7 +56,7 @@ namespace JsonFx.Common
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginUnnamed,
 				CommonGrammar.TokenArrayEnd
 			};
 
@@ -69,7 +69,7 @@ namespace JsonFx.Common
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBeginNoName,
+				CommonGrammar.TokenObjectBeginUnnamed,
 				CommonGrammar.TokenObjectEnd
 			};
 
@@ -82,7 +82,7 @@ namespace JsonFx.Common
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenValue("Hello.")
+				CommonGrammar.TokenPrimitive("Hello.")
 			};
 
 			Assert.False(input.IsPrimitive());
@@ -119,7 +119,7 @@ namespace JsonFx.Common
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBeginNoName,
+				CommonGrammar.TokenObjectBeginUnnamed,
 				CommonGrammar.TokenObjectEnd
 			};
 
@@ -132,7 +132,7 @@ namespace JsonFx.Common
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginUnnamed,
 				CommonGrammar.TokenArrayEnd
 			};
 
@@ -157,7 +157,7 @@ namespace JsonFx.Common
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenValue("Hello.")
+				CommonGrammar.TokenPrimitive("Hello.")
 			};
 
 			Assert.False(input.IsPrimitive());
@@ -182,7 +182,7 @@ namespace JsonFx.Common
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBeginNoName,
+				CommonGrammar.TokenObjectBeginUnnamed,
 				CommonGrammar.TokenObjectEnd
 			};
 
@@ -195,7 +195,7 @@ namespace JsonFx.Common
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginUnnamed,
 				CommonGrammar.TokenArrayEnd
 			};
 
@@ -220,7 +220,7 @@ namespace JsonFx.Common
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenValue("Hello.")
+				CommonGrammar.TokenPrimitive("Hello.")
 			};
 
 			Assert.True(input.IsPrimitive());
@@ -245,13 +245,13 @@ namespace JsonFx.Common
 		{
 			var input = new[]
 		    {
-		        CommonGrammar.TokenArrayBeginNoName,
+		        CommonGrammar.TokenArrayBeginUnnamed,
 		        CommonGrammar.TokenFalse,
 		        CommonGrammar.TokenTrue,
 		        CommonGrammar.TokenNull,
-		        CommonGrammar.TokenValue("Hello!"),
+		        CommonGrammar.TokenPrimitive("Hello!"),
 		        CommonGrammar.TokenNull,
-		        CommonGrammar.TokenValue(42),
+		        CommonGrammar.TokenPrimitive(42),
 		        CommonGrammar.TokenArrayEnd
 		    };
 
@@ -269,13 +269,13 @@ namespace JsonFx.Common
 		{
 			var input = new[]
 		    {
-		        CommonGrammar.TokenArrayBeginNoName,
+		        CommonGrammar.TokenArrayBeginUnnamed,
 		        CommonGrammar.TokenFalse,
 		        CommonGrammar.TokenTrue,
 		        CommonGrammar.TokenNull,
-		        CommonGrammar.TokenValue("Hello!"),
+		        CommonGrammar.TokenPrimitive("Hello!"),
 		        CommonGrammar.TokenNull,
-		        CommonGrammar.TokenValue(42),
+		        CommonGrammar.TokenPrimitive(42),
 		        CommonGrammar.TokenArrayEnd
 		    };
 
@@ -295,7 +295,7 @@ namespace JsonFx.Common
 				},
 				new[]
 				{
-					CommonGrammar.TokenValue("Hello!")
+					CommonGrammar.TokenPrimitive("Hello!")
 				},
 				new[]
 				{
@@ -303,7 +303,7 @@ namespace JsonFx.Common
 				},
 				new[]
 				{
-					CommonGrammar.TokenValue(42)
+					CommonGrammar.TokenPrimitive(42)
 				},
 			};
 
@@ -319,13 +319,13 @@ namespace JsonFx.Common
 		{
 			var input = new[]
 		    {
-		        CommonGrammar.TokenArrayBeginNoName,
+		        CommonGrammar.TokenArrayBeginUnnamed,
 		        CommonGrammar.TokenFalse,
 		        CommonGrammar.TokenTrue,
 		        CommonGrammar.TokenNull,
-		        CommonGrammar.TokenValue("Hello!"),
+		        CommonGrammar.TokenPrimitive("Hello!"),
 		        CommonGrammar.TokenNull,
-		        CommonGrammar.TokenValue(42),
+		        CommonGrammar.TokenPrimitive(42),
 		        CommonGrammar.TokenArrayEnd
 		    };
 
@@ -341,11 +341,11 @@ namespace JsonFx.Common
 				},
 				new[]
 				{
-					CommonGrammar.TokenValue("Hello!")
+					CommonGrammar.TokenPrimitive("Hello!")
 				},
 				new[]
 				{
-					CommonGrammar.TokenValue(42)
+					CommonGrammar.TokenPrimitive(42)
 				},
 			};
 
@@ -361,17 +361,17 @@ namespace JsonFx.Common
 		{
 			var input = new[]
 		    {
-		        CommonGrammar.TokenArrayBeginNoName,
+		        CommonGrammar.TokenArrayBeginUnnamed,
 		        CommonGrammar.TokenFalse,
-		        CommonGrammar.TokenValue("Hello!"),
-		        CommonGrammar.TokenArrayBeginNoName,
+		        CommonGrammar.TokenPrimitive("Hello!"),
+		        CommonGrammar.TokenArrayBeginUnnamed,
 		        CommonGrammar.TokenFalse,
 		        CommonGrammar.TokenNull,
 		        CommonGrammar.TokenTrue,
-		        CommonGrammar.TokenValue("Hello!"),
-		        CommonGrammar.TokenValue(42),
+		        CommonGrammar.TokenPrimitive("Hello!"),
+		        CommonGrammar.TokenPrimitive(42),
 		        CommonGrammar.TokenArrayEnd,
-		        CommonGrammar.TokenValue(42),
+		        CommonGrammar.TokenPrimitive(42),
 		        CommonGrammar.TokenArrayEnd
 		    };
 
@@ -383,21 +383,21 @@ namespace JsonFx.Common
 				},
 				new[]
 				{
-					CommonGrammar.TokenValue("Hello!")
+					CommonGrammar.TokenPrimitive("Hello!")
 				},
 				new[]
 				{
-					CommonGrammar.TokenArrayBeginNoName,
+					CommonGrammar.TokenArrayBeginUnnamed,
 					CommonGrammar.TokenFalse,
 					CommonGrammar.TokenNull,
 					CommonGrammar.TokenTrue,
-					CommonGrammar.TokenValue("Hello!"),
-					CommonGrammar.TokenValue(42),
+					CommonGrammar.TokenPrimitive("Hello!"),
+					CommonGrammar.TokenPrimitive(42),
 					CommonGrammar.TokenArrayEnd,
 				},
 				new[]
 				{
-					CommonGrammar.TokenValue(42)
+					CommonGrammar.TokenPrimitive(42)
 				},
 			};
 
@@ -413,16 +413,16 @@ namespace JsonFx.Common
 		{
 			var input = new[]
 		    {
-		        CommonGrammar.TokenArrayBeginNoName,
+		        CommonGrammar.TokenArrayBeginUnnamed,
 		        CommonGrammar.TokenFalse,
-		        CommonGrammar.TokenValue("Hello!"),
-		        CommonGrammar.TokenObjectBeginNoName,
+		        CommonGrammar.TokenPrimitive("Hello!"),
+		        CommonGrammar.TokenObjectBeginUnnamed,
 		        CommonGrammar.TokenProperty("key1"),
 		        CommonGrammar.TokenNull,
 		        CommonGrammar.TokenProperty("key2"),
-		        CommonGrammar.TokenValue("Hello!"),
+		        CommonGrammar.TokenPrimitive("Hello!"),
 		        CommonGrammar.TokenObjectEnd,
-		        CommonGrammar.TokenValue(42),
+		        CommonGrammar.TokenPrimitive(42),
 		        CommonGrammar.TokenArrayEnd
 		    };
 
@@ -434,20 +434,20 @@ namespace JsonFx.Common
 				},
 				new[]
 				{
-					CommonGrammar.TokenValue("Hello!")
+					CommonGrammar.TokenPrimitive("Hello!")
 				},
 				new[]
 				{
-					CommonGrammar.TokenObjectBeginNoName,
+					CommonGrammar.TokenObjectBeginUnnamed,
 					CommonGrammar.TokenProperty("key1"),
 					CommonGrammar.TokenNull,
 					CommonGrammar.TokenProperty("key2"),
-					CommonGrammar.TokenValue("Hello!"),
+					CommonGrammar.TokenPrimitive("Hello!"),
 					CommonGrammar.TokenObjectEnd,
 				},
 				new[]
 				{
-					CommonGrammar.TokenValue(42)
+					CommonGrammar.TokenPrimitive(42)
 				},
 			};
 
@@ -463,16 +463,16 @@ namespace JsonFx.Common
 		{
 			var input = new[]
 		    {
-		        CommonGrammar.TokenArrayBeginNoName,
+		        CommonGrammar.TokenArrayBeginUnnamed,
 		        CommonGrammar.TokenFalse,
-		        CommonGrammar.TokenValue("Pick me!"),
-		        CommonGrammar.TokenObjectBeginNoName,
+		        CommonGrammar.TokenPrimitive("Pick me!"),
+		        CommonGrammar.TokenObjectBeginUnnamed,
 		        CommonGrammar.TokenProperty("key1"),
 		        CommonGrammar.TokenNull,
 		        CommonGrammar.TokenProperty("key2"),
-		        CommonGrammar.TokenValue("Hello!"),
+		        CommonGrammar.TokenPrimitive("Hello!"),
 		        CommonGrammar.TokenObjectEnd,
-		        CommonGrammar.TokenValue(42),
+		        CommonGrammar.TokenPrimitive(42),
 		        CommonGrammar.TokenArrayEnd
 		    };
 
@@ -480,11 +480,11 @@ namespace JsonFx.Common
 			{
 				new[]
 				{
-					CommonGrammar.TokenValue("Pick me!")
+					CommonGrammar.TokenPrimitive("Pick me!")
 				},
 				new[]
 				{
-					CommonGrammar.TokenValue(42)
+					CommonGrammar.TokenPrimitive(42)
 				}
 			};
 
@@ -500,17 +500,17 @@ namespace JsonFx.Common
 		{
 			var input = new[]
 		    {
-		        CommonGrammar.TokenArrayBeginNoName,
+		        CommonGrammar.TokenArrayBeginUnnamed,
 		        CommonGrammar.TokenFalse,
-		        CommonGrammar.TokenValue("Hello!"),
-		        CommonGrammar.TokenObjectBeginNoName,
+		        CommonGrammar.TokenPrimitive("Hello!"),
+		        CommonGrammar.TokenObjectBeginUnnamed,
 		        CommonGrammar.TokenProperty("key1"),
 		        CommonGrammar.TokenNull,
 		        CommonGrammar.TokenProperty("key2"),
-		        CommonGrammar.TokenValue("Hello!"),
+		        CommonGrammar.TokenPrimitive("Hello!"),
 		        CommonGrammar.TokenObjectEnd,
-		        CommonGrammar.TokenValue(42),
-		        CommonGrammar.TokenValue(Math.PI),
+		        CommonGrammar.TokenPrimitive(42),
+		        CommonGrammar.TokenPrimitive(Math.PI),
 		        CommonGrammar.TokenArrayEnd
 		    };
 
@@ -522,7 +522,7 @@ namespace JsonFx.Common
 				},
 				new[]
 				{
-			        CommonGrammar.TokenValue(Math.PI),
+			        CommonGrammar.TokenPrimitive(Math.PI),
 				}
 			};
 
@@ -542,13 +542,13 @@ namespace JsonFx.Common
 		{
 			var input = new[]
 		    {
-		        CommonGrammar.TokenObjectBeginNoName,
+		        CommonGrammar.TokenObjectBeginUnnamed,
 		        CommonGrammar.TokenProperty("key1"),
 		        CommonGrammar.TokenNull,
 		        CommonGrammar.TokenProperty("key2"),
-		        CommonGrammar.TokenValue("Hello!"),
+		        CommonGrammar.TokenPrimitive("Hello!"),
 		        CommonGrammar.TokenProperty("three"),
-		        CommonGrammar.TokenValue(3),
+		        CommonGrammar.TokenPrimitive(3),
 		        CommonGrammar.TokenProperty("4"),
 		        CommonGrammar.TokenTrue,
 		        CommonGrammar.TokenObjectEnd
@@ -566,13 +566,13 @@ namespace JsonFx.Common
 		{
 			var input = new[]
 		    {
-		        CommonGrammar.TokenObjectBeginNoName,
+		        CommonGrammar.TokenObjectBeginUnnamed,
 		        CommonGrammar.TokenProperty("key1"),
 		        CommonGrammar.TokenNull,
 		        CommonGrammar.TokenProperty("key2"),
-		        CommonGrammar.TokenValue("Hello!"),
+		        CommonGrammar.TokenPrimitive("Hello!"),
 		        CommonGrammar.TokenProperty("three"),
-		        CommonGrammar.TokenValue(3),
+		        CommonGrammar.TokenPrimitive(3),
 		        CommonGrammar.TokenProperty("4"),
 		        CommonGrammar.TokenTrue,
 		        CommonGrammar.TokenObjectEnd
@@ -590,13 +590,13 @@ namespace JsonFx.Common
 		{
 			var input = new[]
 		    {
-		        CommonGrammar.TokenObjectBeginNoName,
+		        CommonGrammar.TokenObjectBeginUnnamed,
 		        CommonGrammar.TokenProperty("key1"),
 		        CommonGrammar.TokenNull,
 		        CommonGrammar.TokenProperty("key2"),
-		        CommonGrammar.TokenValue("Hello!"),
+		        CommonGrammar.TokenPrimitive("Hello!"),
 		        CommonGrammar.TokenProperty("three"),
-		        CommonGrammar.TokenValue(3),
+		        CommonGrammar.TokenPrimitive(3),
 		        CommonGrammar.TokenProperty("4"),
 		        CommonGrammar.TokenTrue,
 		        CommonGrammar.TokenObjectEnd
@@ -605,8 +605,8 @@ namespace JsonFx.Common
 			var expected = new Dictionary<DataName, IEnumerable<Token<CommonTokenType>>>
 			{
 				{ new DataName("key1"), new[] { CommonGrammar.TokenNull } },
-				{ new DataName("key2"), new[] { CommonGrammar.TokenValue("Hello!") } },
-				{ new DataName("three"), new[] { CommonGrammar.TokenValue(3) } },
+				{ new DataName("key2"), new[] { CommonGrammar.TokenPrimitive("Hello!") } },
+				{ new DataName("three"), new[] { CommonGrammar.TokenPrimitive(3) } },
 				{ new DataName("4"), new[] { CommonGrammar.TokenTrue } }
 			};
 
@@ -622,13 +622,13 @@ namespace JsonFx.Common
 		{
 			var input = new[]
 		    {
-		        CommonGrammar.TokenObjectBeginNoName,
+		        CommonGrammar.TokenObjectBeginUnnamed,
 		        CommonGrammar.TokenProperty("key1"),
 		        CommonGrammar.TokenNull,
 		        CommonGrammar.TokenProperty("key2"),
-		        CommonGrammar.TokenValue("Hello!"),
+		        CommonGrammar.TokenPrimitive("Hello!"),
 		        CommonGrammar.TokenProperty("three"),
-		        CommonGrammar.TokenValue(3),
+		        CommonGrammar.TokenPrimitive(3),
 		        CommonGrammar.TokenProperty("4"),
 		        CommonGrammar.TokenTrue,
 		        CommonGrammar.TokenObjectEnd
@@ -636,7 +636,7 @@ namespace JsonFx.Common
 
 			var expected = new Dictionary<DataName, IEnumerable<Token<CommonTokenType>>>
 			{
-				{ new DataName("key2"), new[] { CommonGrammar.TokenValue("Hello!") } }
+				{ new DataName("key2"), new[] { CommonGrammar.TokenPrimitive("Hello!") } }
 			};
 
 			// select all properties
@@ -651,16 +651,16 @@ namespace JsonFx.Common
 		{
 			var input = new[]
 		    {
-		        CommonGrammar.TokenObjectBeginNoName,
+		        CommonGrammar.TokenObjectBeginUnnamed,
 		        CommonGrammar.TokenProperty("key1"),
 		        CommonGrammar.TokenNull,
 		        CommonGrammar.TokenProperty("three"),
-		        CommonGrammar.TokenObjectBeginNoName,
+		        CommonGrammar.TokenObjectBeginUnnamed,
 		        CommonGrammar.TokenProperty("key2"),
 		        CommonGrammar.TokenFalse,
 		        CommonGrammar.TokenObjectEnd,
 		        CommonGrammar.TokenProperty("key2"),
-		        CommonGrammar.TokenValue("Hello!"),
+		        CommonGrammar.TokenPrimitive("Hello!"),
 		        CommonGrammar.TokenProperty("4"),
 		        CommonGrammar.TokenTrue,
 		        CommonGrammar.TokenObjectEnd
@@ -668,7 +668,7 @@ namespace JsonFx.Common
 
 			var expected = new Dictionary<DataName, IEnumerable<Token<CommonTokenType>>>
 			{
-				{ new DataName("key2"), new[] { CommonGrammar.TokenValue("Hello!") } }
+				{ new DataName("key2"), new[] { CommonGrammar.TokenPrimitive("Hello!") } }
 			};
 
 			// select all properties
@@ -683,16 +683,16 @@ namespace JsonFx.Common
 		{
 			var input = new[]
 		    {
-		        CommonGrammar.TokenObjectBeginNoName,
+		        CommonGrammar.TokenObjectBeginUnnamed,
 		        CommonGrammar.TokenProperty("key1"),
 		        CommonGrammar.TokenNull,
 		        CommonGrammar.TokenProperty("key2"),
-		        CommonGrammar.TokenObjectBeginNoName,
+		        CommonGrammar.TokenObjectBeginUnnamed,
 		        CommonGrammar.TokenProperty("key2"),
 		        CommonGrammar.TokenFalse,
 		        CommonGrammar.TokenObjectEnd,
 		        CommonGrammar.TokenProperty("three"),
-		        CommonGrammar.TokenValue("Hello!"),
+		        CommonGrammar.TokenPrimitive("Hello!"),
 		        CommonGrammar.TokenProperty("4"),
 		        CommonGrammar.TokenTrue,
 		        CommonGrammar.TokenObjectEnd
@@ -701,7 +701,7 @@ namespace JsonFx.Common
 			var expected = new Dictionary<DataName, IEnumerable<Token<CommonTokenType>>>
 			{
 				{ new DataName("key2"), new[] {
-					CommonGrammar.TokenObjectBeginNoName,
+					CommonGrammar.TokenObjectBeginUnnamed,
 					CommonGrammar.TokenProperty("key2"),
 					CommonGrammar.TokenFalse,
 					CommonGrammar.TokenObjectEnd,
@@ -720,16 +720,16 @@ namespace JsonFx.Common
 		{
 			var input = new[]
 		    {
-		        CommonGrammar.TokenObjectBeginNoName,
+		        CommonGrammar.TokenObjectBeginUnnamed,
 		        CommonGrammar.TokenProperty("key1"),
 		        CommonGrammar.TokenNull,
 		        CommonGrammar.TokenProperty("three"),
-		        CommonGrammar.TokenArrayBeginNoName,
+		        CommonGrammar.TokenArrayBeginUnnamed,
 		        CommonGrammar.TokenFalse,
-		        CommonGrammar.TokenValue(42),
+		        CommonGrammar.TokenPrimitive(42),
 		        CommonGrammar.TokenArrayEnd,
 		        CommonGrammar.TokenProperty("key2"),
-		        CommonGrammar.TokenValue("Hello!"),
+		        CommonGrammar.TokenPrimitive("Hello!"),
 		        CommonGrammar.TokenProperty("4"),
 		        CommonGrammar.TokenTrue,
 		        CommonGrammar.TokenObjectEnd
@@ -737,7 +737,7 @@ namespace JsonFx.Common
 
 			var expected = new Dictionary<DataName, IEnumerable<Token<CommonTokenType>>>
 			{
-				{ new DataName("key2"), new[] { CommonGrammar.TokenValue("Hello!") } }
+				{ new DataName("key2"), new[] { CommonGrammar.TokenPrimitive("Hello!") } }
 			};
 
 			// select all properties
@@ -752,16 +752,16 @@ namespace JsonFx.Common
 		{
 			var input = new[]
 		    {
-		        CommonGrammar.TokenObjectBeginNoName,
+		        CommonGrammar.TokenObjectBeginUnnamed,
 		        CommonGrammar.TokenProperty("key1"),
 		        CommonGrammar.TokenNull,
 		        CommonGrammar.TokenProperty("key2"),
-		        CommonGrammar.TokenArrayBeginNoName,
+		        CommonGrammar.TokenArrayBeginUnnamed,
 		        CommonGrammar.TokenFalse,
-		        CommonGrammar.TokenValue(42),
+		        CommonGrammar.TokenPrimitive(42),
 		        CommonGrammar.TokenArrayEnd,
 		        CommonGrammar.TokenProperty("three"),
-		        CommonGrammar.TokenValue("Hello!"),
+		        CommonGrammar.TokenPrimitive("Hello!"),
 		        CommonGrammar.TokenProperty("4"),
 		        CommonGrammar.TokenTrue,
 		        CommonGrammar.TokenObjectEnd
@@ -770,9 +770,9 @@ namespace JsonFx.Common
 			var expected = new Dictionary<DataName, IEnumerable<Token<CommonTokenType>>>
 			{
 				{ new DataName("key2"), new[] {
-					CommonGrammar.TokenArrayBeginNoName,
+					CommonGrammar.TokenArrayBeginUnnamed,
 					CommonGrammar.TokenFalse,
-					CommonGrammar.TokenValue(42),
+					CommonGrammar.TokenPrimitive(42),
 					CommonGrammar.TokenArrayEnd,
 				} }
 			};
@@ -794,59 +794,59 @@ namespace JsonFx.Common
 			// input from pass1.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBeginNoName,
-				CommonGrammar.TokenValue("JSON Test Pattern pass1"),
-				CommonGrammar.TokenObjectBeginNoName,
+				CommonGrammar.TokenArrayBeginUnnamed,
+				CommonGrammar.TokenPrimitive("JSON Test Pattern pass1"),
+				CommonGrammar.TokenObjectBeginUnnamed,
 				CommonGrammar.TokenProperty("object with 1 member"),
-				CommonGrammar.TokenArrayBeginNoName,
-				CommonGrammar.TokenValue("array with 1 element"),
+				CommonGrammar.TokenArrayBeginUnnamed,
+				CommonGrammar.TokenPrimitive("array with 1 element"),
 				CommonGrammar.TokenArrayEnd,
 				CommonGrammar.TokenObjectEnd,
-				CommonGrammar.TokenObjectBeginNoName,
+				CommonGrammar.TokenObjectBeginUnnamed,
 				CommonGrammar.TokenObjectEnd,
-				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginUnnamed,
 				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenValue(-42),
+				CommonGrammar.TokenPrimitive(-42),
 				CommonGrammar.TokenTrue,
 				CommonGrammar.TokenFalse,
 				CommonGrammar.TokenNull,
-				CommonGrammar.TokenObjectBeginNoName,
+				CommonGrammar.TokenObjectBeginUnnamed,
 				CommonGrammar.TokenProperty("integer"),
-				CommonGrammar.TokenValue(1234567890),
+				CommonGrammar.TokenPrimitive(1234567890),
 				CommonGrammar.TokenProperty("real"),
-				CommonGrammar.TokenValue(-9876.543210),
+				CommonGrammar.TokenPrimitive(-9876.543210),
 				CommonGrammar.TokenProperty("e"),
-				CommonGrammar.TokenValue(0.123456789e-12),
+				CommonGrammar.TokenPrimitive(0.123456789e-12),
 				CommonGrammar.TokenProperty("E"),
-				CommonGrammar.TokenValue(1.234567890E+34),
+				CommonGrammar.TokenPrimitive(1.234567890E+34),
 				CommonGrammar.TokenProperty(""),
-				CommonGrammar.TokenValue(23456789012E66),
+				CommonGrammar.TokenPrimitive(23456789012E66),
 				CommonGrammar.TokenProperty("zero"),
-				CommonGrammar.TokenValue(0),
+				CommonGrammar.TokenPrimitive(0),
 				CommonGrammar.TokenProperty("one"),
-				CommonGrammar.TokenValue(1),
+				CommonGrammar.TokenPrimitive(1),
 				CommonGrammar.TokenProperty("space"),
-				CommonGrammar.TokenValue(" "),
+				CommonGrammar.TokenPrimitive(" "),
 				CommonGrammar.TokenProperty("quote"),
-				CommonGrammar.TokenValue("\""),
+				CommonGrammar.TokenPrimitive("\""),
 				CommonGrammar.TokenProperty("backslash"),
-				CommonGrammar.TokenValue("\\"),
+				CommonGrammar.TokenPrimitive("\\"),
 				CommonGrammar.TokenProperty("controls"),
-				CommonGrammar.TokenValue("\b\f\n\r\t"),
+				CommonGrammar.TokenPrimitive("\b\f\n\r\t"),
 				CommonGrammar.TokenProperty("slash"),
-				CommonGrammar.TokenValue("/ & /"),
+				CommonGrammar.TokenPrimitive("/ & /"),
 				CommonGrammar.TokenProperty("alpha"),
-				CommonGrammar.TokenValue("abcdefghijklmnopqrstuvwyz"),
+				CommonGrammar.TokenPrimitive("abcdefghijklmnopqrstuvwyz"),
 				CommonGrammar.TokenProperty("ALPHA"),
-				CommonGrammar.TokenValue("ABCDEFGHIJKLMNOPQRSTUVWYZ"),
+				CommonGrammar.TokenPrimitive("ABCDEFGHIJKLMNOPQRSTUVWYZ"),
 				CommonGrammar.TokenProperty("digit"),
-				CommonGrammar.TokenValue("0123456789"),
+				CommonGrammar.TokenPrimitive("0123456789"),
 				CommonGrammar.TokenProperty("0123456789"),
-				CommonGrammar.TokenValue("digit"),
+				CommonGrammar.TokenPrimitive("digit"),
 				CommonGrammar.TokenProperty("special"),
-				CommonGrammar.TokenValue("`1~!@#$%^&*()_+-={':[,]}|;.</>?"),
+				CommonGrammar.TokenPrimitive("`1~!@#$%^&*()_+-={':[,]}|;.</>?"),
 				CommonGrammar.TokenProperty("hex"),
-				CommonGrammar.TokenValue("\u0123\u4567\u89AB\uCDEF\uabcd\uef4A"),
+				CommonGrammar.TokenPrimitive("\u0123\u4567\u89AB\uCDEF\uabcd\uef4A"),
 				CommonGrammar.TokenProperty("true"),
 				CommonGrammar.TokenTrue,
 				CommonGrammar.TokenProperty("false"),
@@ -854,72 +854,72 @@ namespace JsonFx.Common
 				CommonGrammar.TokenProperty("null"),
 				CommonGrammar.TokenNull,
 				CommonGrammar.TokenProperty("array"),
-				CommonGrammar.TokenArrayBeginNoName,
+				CommonGrammar.TokenArrayBeginUnnamed,
 				CommonGrammar.TokenArrayEnd,
 				CommonGrammar.TokenProperty("object"),
-				CommonGrammar.TokenObjectBeginNoName,
+				CommonGrammar.TokenObjectBeginUnnamed,
 				CommonGrammar.TokenObjectEnd,
 				CommonGrammar.TokenProperty("address"),
-				CommonGrammar.TokenValue("50 St. James Street"),
+				CommonGrammar.TokenPrimitive("50 St. James Street"),
 				CommonGrammar.TokenProperty("url"),
-				CommonGrammar.TokenValue("http://www.JSON.org/"),
+				CommonGrammar.TokenPrimitive("http://www.JSON.org/"),
 				CommonGrammar.TokenProperty("comment"),
-				CommonGrammar.TokenValue("// /* <!-- --"),
+				CommonGrammar.TokenPrimitive("// /* <!-- --"),
 				CommonGrammar.TokenProperty("# -- --> */"),
-				CommonGrammar.TokenValue(" "),
+				CommonGrammar.TokenPrimitive(" "),
 				CommonGrammar.TokenProperty(" s p a c e d "),
-				CommonGrammar.TokenArrayBeginNoName,
-				CommonGrammar.TokenValue(1),
-				CommonGrammar.TokenValue(2),
-				CommonGrammar.TokenValue(3),
-				CommonGrammar.TokenValue(4),
-				CommonGrammar.TokenValue(5),
-				CommonGrammar.TokenValue(6),
-				CommonGrammar.TokenValue(7),
+				CommonGrammar.TokenArrayBeginUnnamed,
+				CommonGrammar.TokenPrimitive(1),
+				CommonGrammar.TokenPrimitive(2),
+				CommonGrammar.TokenPrimitive(3),
+				CommonGrammar.TokenPrimitive(4),
+				CommonGrammar.TokenPrimitive(5),
+				CommonGrammar.TokenPrimitive(6),
+				CommonGrammar.TokenPrimitive(7),
 				CommonGrammar.TokenArrayEnd,
 				CommonGrammar.TokenProperty("compact"),
-				CommonGrammar.TokenArrayBeginNoName,
-				CommonGrammar.TokenValue(1),
-				CommonGrammar.TokenValue(2),
-				CommonGrammar.TokenValue(3),
-				CommonGrammar.TokenValue(4),
-				CommonGrammar.TokenValue(5),
-				CommonGrammar.TokenValue(6),
-				CommonGrammar.TokenValue(7),
+				CommonGrammar.TokenArrayBeginUnnamed,
+				CommonGrammar.TokenPrimitive(1),
+				CommonGrammar.TokenPrimitive(2),
+				CommonGrammar.TokenPrimitive(3),
+				CommonGrammar.TokenPrimitive(4),
+				CommonGrammar.TokenPrimitive(5),
+				CommonGrammar.TokenPrimitive(6),
+				CommonGrammar.TokenPrimitive(7),
 				CommonGrammar.TokenArrayEnd,
 				CommonGrammar.TokenProperty("jsontext"),
-				CommonGrammar.TokenValue("{\"object with 1 member\":[\"array with 1 element\"]}"),
+				CommonGrammar.TokenPrimitive("{\"object with 1 member\":[\"array with 1 element\"]}"),
 				CommonGrammar.TokenProperty("quotes"),
-				CommonGrammar.TokenValue("&#34; \u0022 %22 0x22 034 &#x22;"),
+				CommonGrammar.TokenPrimitive("&#34; \u0022 %22 0x22 034 &#x22;"),
 				CommonGrammar.TokenProperty("/\\\"\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"),
-				CommonGrammar.TokenValue("A key can be any string"),
+				CommonGrammar.TokenPrimitive("A key can be any string"),
 				CommonGrammar.TokenObjectEnd,
-				CommonGrammar.TokenValue(0.5),
-				CommonGrammar.TokenValue(98.6),
-				CommonGrammar.TokenValue(99.44),
-				CommonGrammar.TokenValue(1066),
-				CommonGrammar.TokenValue(10.0),
-				CommonGrammar.TokenValue(1.0),
-				CommonGrammar.TokenValue(0.1),
-				CommonGrammar.TokenValue(1.0),
-				CommonGrammar.TokenValue(2.0),
-				CommonGrammar.TokenValue(2.0),
-				CommonGrammar.TokenValue("rosebud"),
+				CommonGrammar.TokenPrimitive(0.5),
+				CommonGrammar.TokenPrimitive(98.6),
+				CommonGrammar.TokenPrimitive(99.44),
+				CommonGrammar.TokenPrimitive(1066),
+				CommonGrammar.TokenPrimitive(10.0),
+				CommonGrammar.TokenPrimitive(1.0),
+				CommonGrammar.TokenPrimitive(0.1),
+				CommonGrammar.TokenPrimitive(1.0),
+				CommonGrammar.TokenPrimitive(2.0),
+				CommonGrammar.TokenPrimitive(2.0),
+				CommonGrammar.TokenPrimitive("rosebud"),
 				CommonGrammar.TokenArrayEnd
 			};
 
 			var expected = new Dictionary<DataName, IEnumerable<Token<CommonTokenType>>>
 			{
-				{ new DataName("url"), new[] { CommonGrammar.TokenValue("http://www.JSON.org/") } },
+				{ new DataName("url"), new[] { CommonGrammar.TokenPrimitive("http://www.JSON.org/") } },
 				{ new DataName("compact"), new[] {
-					CommonGrammar.TokenArrayBeginNoName,
-					CommonGrammar.TokenValue(1),
-					CommonGrammar.TokenValue(2),
-					CommonGrammar.TokenValue(3),
-					CommonGrammar.TokenValue(4),
-					CommonGrammar.TokenValue(5),
-					CommonGrammar.TokenValue(6),
-					CommonGrammar.TokenValue(7),
+					CommonGrammar.TokenArrayBeginUnnamed,
+					CommonGrammar.TokenPrimitive(1),
+					CommonGrammar.TokenPrimitive(2),
+					CommonGrammar.TokenPrimitive(3),
+					CommonGrammar.TokenPrimitive(4),
+					CommonGrammar.TokenPrimitive(5),
+					CommonGrammar.TokenPrimitive(6),
+					CommonGrammar.TokenPrimitive(7),
 					CommonGrammar.TokenArrayEnd,
 				} }
 			};

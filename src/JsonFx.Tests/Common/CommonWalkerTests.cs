@@ -144,12 +144,12 @@ namespace JsonFx.Serialization
 					CommonGrammar.TokenFalse,
 					CommonGrammar.TokenTrue,
 					CommonGrammar.TokenNull,
-					CommonGrammar.TokenValue('a'),
-					CommonGrammar.TokenValue('b'),
-					CommonGrammar.TokenValue('c'),
-					CommonGrammar.TokenValue(1),
-					CommonGrammar.TokenValue(2),
-					CommonGrammar.TokenValue(3),
+					CommonGrammar.TokenPrimitive('a'),
+					CommonGrammar.TokenPrimitive('b'),
+					CommonGrammar.TokenPrimitive('c'),
+					CommonGrammar.TokenPrimitive(1),
+					CommonGrammar.TokenPrimitive(2),
+					CommonGrammar.TokenPrimitive(3),
 					CommonGrammar.TokenArrayEnd
 				};
 
@@ -189,14 +189,14 @@ namespace JsonFx.Serialization
 					CommonGrammar.TokenTrue,
 					CommonGrammar.TokenNull,
 					CommonGrammar.TokenArrayBegin("array"),
-					CommonGrammar.TokenValue('a'),
-					CommonGrammar.TokenValue('b'),
-					CommonGrammar.TokenValue('c'),
+					CommonGrammar.TokenPrimitive('a'),
+					CommonGrammar.TokenPrimitive('b'),
+					CommonGrammar.TokenPrimitive('c'),
 					CommonGrammar.TokenArrayEnd,
 					CommonGrammar.TokenArrayBegin("array"),
-					CommonGrammar.TokenValue(1),
-					CommonGrammar.TokenValue(2),
-					CommonGrammar.TokenValue(3),
+					CommonGrammar.TokenPrimitive(1),
+					CommonGrammar.TokenPrimitive(2),
+					CommonGrammar.TokenPrimitive(3),
 					CommonGrammar.TokenArrayEnd,
 					CommonGrammar.TokenArrayEnd
 				};
@@ -268,19 +268,19 @@ namespace JsonFx.Serialization
 				{
 					CommonGrammar.TokenObjectBegin("object"),
 					CommonGrammar.TokenProperty("One"),
-					CommonGrammar.TokenValue(1),
+					CommonGrammar.TokenPrimitive(1),
 					CommonGrammar.TokenProperty("Two"),
-					CommonGrammar.TokenValue(2),
+					CommonGrammar.TokenPrimitive(2),
 					CommonGrammar.TokenProperty("Three"),
-					CommonGrammar.TokenValue(3),
+					CommonGrammar.TokenPrimitive(3),
 					CommonGrammar.TokenProperty("Four"),
 					CommonGrammar.TokenObjectBegin("object"),
 					CommonGrammar.TokenProperty("A"),
-					CommonGrammar.TokenValue('a'),
+					CommonGrammar.TokenPrimitive('a'),
 					CommonGrammar.TokenProperty("B"),
-					CommonGrammar.TokenValue('b'),
+					CommonGrammar.TokenPrimitive('b'),
 					CommonGrammar.TokenProperty("C"),
-					CommonGrammar.TokenValue('c'),
+					CommonGrammar.TokenPrimitive('c'),
 					CommonGrammar.TokenObjectEnd,
 					CommonGrammar.TokenObjectEnd
 				};
@@ -304,11 +304,11 @@ namespace JsonFx.Serialization
 				{
 					CommonGrammar.TokenObjectBegin("object"),
 					CommonGrammar.TokenProperty("One"),
-					CommonGrammar.TokenValue(1),
+					CommonGrammar.TokenPrimitive(1),
 					CommonGrammar.TokenProperty("Two"),
-					CommonGrammar.TokenValue(2),
+					CommonGrammar.TokenPrimitive(2),
 					CommonGrammar.TokenProperty("Three"),
-					CommonGrammar.TokenValue(3),
+					CommonGrammar.TokenPrimitive(3),
 					CommonGrammar.TokenObjectEnd
 				};
 
@@ -333,11 +333,11 @@ namespace JsonFx.Serialization
 				{
 					CommonGrammar.TokenObjectBegin("object"),
 					CommonGrammar.TokenProperty("One"),
-					CommonGrammar.TokenValue(1),
+					CommonGrammar.TokenPrimitive(1),
 					CommonGrammar.TokenProperty("Two"),
-					CommonGrammar.TokenValue(2),
+					CommonGrammar.TokenPrimitive(2),
 					CommonGrammar.TokenProperty("Three"),
-					CommonGrammar.TokenValue(3),
+					CommonGrammar.TokenPrimitive(3),
 					CommonGrammar.TokenObjectEnd
 				};
 
@@ -397,7 +397,7 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenValue(Double.NaN)
+					CommonGrammar.TokenPrimitive(Double.NaN)
 				};
 
 			var walker = new CommonWalker(new DataWriterSettings());
@@ -414,7 +414,7 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenValue(Double.PositiveInfinity)
+					CommonGrammar.TokenPrimitive(Double.PositiveInfinity)
 				};
 
 			var walker = new CommonWalker(new DataWriterSettings());
@@ -431,7 +431,7 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenValue(Double.NegativeInfinity)
+					CommonGrammar.TokenPrimitive(Double.NegativeInfinity)
 				};
 
 			var walker = new CommonWalker(new DataWriterSettings());
@@ -448,7 +448,7 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenValue(Double.NaN)
+					CommonGrammar.TokenPrimitive(Double.NaN)
 				};
 
 			var walker = new CommonWalker(new DataWriterSettings());
@@ -465,7 +465,7 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenValue(Double.PositiveInfinity)
+					CommonGrammar.TokenPrimitive(Double.PositiveInfinity)
 				};
 
 			var walker = new CommonWalker(new DataWriterSettings());
@@ -482,7 +482,7 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenValue(Double.NegativeInfinity)
+					CommonGrammar.TokenPrimitive(Double.NegativeInfinity)
 				};
 
 			var walker = new CommonWalker(new DataWriterSettings());
@@ -561,58 +561,58 @@ namespace JsonFx.Serialization
 			var expected = new[]
 			{
 				CommonGrammar.TokenArrayBegin("array"),
-				CommonGrammar.TokenValue("JSON Test Pattern pass1"),
+				CommonGrammar.TokenPrimitive("JSON Test Pattern pass1"),
 				CommonGrammar.TokenObjectBegin("object"),
 				CommonGrammar.TokenProperty("object with 1 member"),
 				CommonGrammar.TokenArrayBegin("array"),
-				CommonGrammar.TokenValue("array with 1 element"),
+				CommonGrammar.TokenPrimitive("array with 1 element"),
 				CommonGrammar.TokenArrayEnd,
 				CommonGrammar.TokenObjectEnd,
 				CommonGrammar.TokenObjectBegin("object"),
 				CommonGrammar.TokenObjectEnd,
 				CommonGrammar.TokenArrayBegin("array"),
 				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenValue(-42),
+				CommonGrammar.TokenPrimitive(-42),
 				CommonGrammar.TokenTrue,
 				CommonGrammar.TokenFalse,
 				CommonGrammar.TokenNull,
 				CommonGrammar.TokenObjectBegin("object"),
 				CommonGrammar.TokenProperty("integer"),
-				CommonGrammar.TokenValue(1234567890),
+				CommonGrammar.TokenPrimitive(1234567890),
 				CommonGrammar.TokenProperty("real"),
-				CommonGrammar.TokenValue(-9876.543210),
+				CommonGrammar.TokenPrimitive(-9876.543210),
 				CommonGrammar.TokenProperty("e"),
-				CommonGrammar.TokenValue(0.123456789e-12),
+				CommonGrammar.TokenPrimitive(0.123456789e-12),
 				CommonGrammar.TokenProperty("E"),
-				CommonGrammar.TokenValue(1.234567890E+34),
+				CommonGrammar.TokenPrimitive(1.234567890E+34),
 				CommonGrammar.TokenProperty(""),
-				CommonGrammar.TokenValue(23456789012E66),
+				CommonGrammar.TokenPrimitive(23456789012E66),
 				CommonGrammar.TokenProperty("zero"),
-				CommonGrammar.TokenValue(0),
+				CommonGrammar.TokenPrimitive(0),
 				CommonGrammar.TokenProperty("one"),
-				CommonGrammar.TokenValue(1),
+				CommonGrammar.TokenPrimitive(1),
 				CommonGrammar.TokenProperty("space"),
-				CommonGrammar.TokenValue(" "),
+				CommonGrammar.TokenPrimitive(" "),
 				CommonGrammar.TokenProperty("quote"),
-				CommonGrammar.TokenValue("\""),
+				CommonGrammar.TokenPrimitive("\""),
 				CommonGrammar.TokenProperty("backslash"),
-				CommonGrammar.TokenValue("\\"),
+				CommonGrammar.TokenPrimitive("\\"),
 				CommonGrammar.TokenProperty("controls"),
-				CommonGrammar.TokenValue("\b\f\n\r\t"),
+				CommonGrammar.TokenPrimitive("\b\f\n\r\t"),
 				CommonGrammar.TokenProperty("slash"),
-				CommonGrammar.TokenValue("/ & /"),
+				CommonGrammar.TokenPrimitive("/ & /"),
 				CommonGrammar.TokenProperty("alpha"),
-				CommonGrammar.TokenValue("abcdefghijklmnopqrstuvwyz"),
+				CommonGrammar.TokenPrimitive("abcdefghijklmnopqrstuvwyz"),
 				CommonGrammar.TokenProperty("ALPHA"),
-				CommonGrammar.TokenValue("ABCDEFGHIJKLMNOPQRSTUVWYZ"),
+				CommonGrammar.TokenPrimitive("ABCDEFGHIJKLMNOPQRSTUVWYZ"),
 				CommonGrammar.TokenProperty("digit"),
-				CommonGrammar.TokenValue("0123456789"),
+				CommonGrammar.TokenPrimitive("0123456789"),
 				CommonGrammar.TokenProperty("0123456789"),
-				CommonGrammar.TokenValue("digit"),
+				CommonGrammar.TokenPrimitive("digit"),
 				CommonGrammar.TokenProperty("special"),
-				CommonGrammar.TokenValue("`1~!@#$%^&*()_+-={':[,]}|;.</>?"),
+				CommonGrammar.TokenPrimitive("`1~!@#$%^&*()_+-={':[,]}|;.</>?"),
 				CommonGrammar.TokenProperty("hex"),
-				CommonGrammar.TokenValue("\u0123\u4567\u89AB\uCDEF\uabcd\uef4A"),
+				CommonGrammar.TokenPrimitive("\u0123\u4567\u89AB\uCDEF\uabcd\uef4A"),
 				CommonGrammar.TokenProperty("true"),
 				CommonGrammar.TokenTrue,
 				CommonGrammar.TokenProperty("false"),
@@ -626,51 +626,51 @@ namespace JsonFx.Serialization
 				CommonGrammar.TokenObjectBegin("object"),
 				CommonGrammar.TokenObjectEnd,
 				CommonGrammar.TokenProperty("address"),
-				CommonGrammar.TokenValue("50 St. James Street"),
+				CommonGrammar.TokenPrimitive("50 St. James Street"),
 				CommonGrammar.TokenProperty("url"),
-				CommonGrammar.TokenValue("http://www.JSON.org/"),
+				CommonGrammar.TokenPrimitive("http://www.JSON.org/"),
 				CommonGrammar.TokenProperty("comment"),
-				CommonGrammar.TokenValue("// /* <!-- --"),
+				CommonGrammar.TokenPrimitive("// /* <!-- --"),
 				CommonGrammar.TokenProperty("# -- --> */"),
-				CommonGrammar.TokenValue(" "),
+				CommonGrammar.TokenPrimitive(" "),
 				CommonGrammar.TokenProperty(" s p a c e d "),
 				CommonGrammar.TokenArrayBegin("array"),
-				CommonGrammar.TokenValue(1),
-				CommonGrammar.TokenValue(2),
-				CommonGrammar.TokenValue(3),
-				CommonGrammar.TokenValue(4),
-				CommonGrammar.TokenValue(5),
-				CommonGrammar.TokenValue(6),
-				CommonGrammar.TokenValue(7),
+				CommonGrammar.TokenPrimitive(1),
+				CommonGrammar.TokenPrimitive(2),
+				CommonGrammar.TokenPrimitive(3),
+				CommonGrammar.TokenPrimitive(4),
+				CommonGrammar.TokenPrimitive(5),
+				CommonGrammar.TokenPrimitive(6),
+				CommonGrammar.TokenPrimitive(7),
 				CommonGrammar.TokenArrayEnd,
 				CommonGrammar.TokenProperty("compact"),
 				CommonGrammar.TokenArrayBegin("array"),
-				CommonGrammar.TokenValue(1),
-				CommonGrammar.TokenValue(2),
-				CommonGrammar.TokenValue(3),
-				CommonGrammar.TokenValue(4),
-				CommonGrammar.TokenValue(5),
-				CommonGrammar.TokenValue(6),
-				CommonGrammar.TokenValue(7),
+				CommonGrammar.TokenPrimitive(1),
+				CommonGrammar.TokenPrimitive(2),
+				CommonGrammar.TokenPrimitive(3),
+				CommonGrammar.TokenPrimitive(4),
+				CommonGrammar.TokenPrimitive(5),
+				CommonGrammar.TokenPrimitive(6),
+				CommonGrammar.TokenPrimitive(7),
 				CommonGrammar.TokenArrayEnd,
 				CommonGrammar.TokenProperty("jsontext"),
-				CommonGrammar.TokenValue("{\"object with 1 member\":[\"array with 1 element\"]}"),
+				CommonGrammar.TokenPrimitive("{\"object with 1 member\":[\"array with 1 element\"]}"),
 				CommonGrammar.TokenProperty("quotes"),
-				CommonGrammar.TokenValue("&#34; \u0022 %22 0x22 034 &#x22;"),
+				CommonGrammar.TokenPrimitive("&#34; \u0022 %22 0x22 034 &#x22;"),
 				CommonGrammar.TokenProperty("/\\\"\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"),
-				CommonGrammar.TokenValue("A key can be any string"),
+				CommonGrammar.TokenPrimitive("A key can be any string"),
 				CommonGrammar.TokenObjectEnd,
-				CommonGrammar.TokenValue(0.5),
-				CommonGrammar.TokenValue(98.6),
-				CommonGrammar.TokenValue(99.44),
-				CommonGrammar.TokenValue(1066),
-				CommonGrammar.TokenValue(10.0),
-				CommonGrammar.TokenValue(1.0),
-				CommonGrammar.TokenValue(0.1),
-				CommonGrammar.TokenValue(1.0),
-				CommonGrammar.TokenValue(2.0),
-				CommonGrammar.TokenValue(2.0),
-				CommonGrammar.TokenValue("rosebud"),
+				CommonGrammar.TokenPrimitive(0.5),
+				CommonGrammar.TokenPrimitive(98.6),
+				CommonGrammar.TokenPrimitive(99.44),
+				CommonGrammar.TokenPrimitive(1066),
+				CommonGrammar.TokenPrimitive(10.0),
+				CommonGrammar.TokenPrimitive(1.0),
+				CommonGrammar.TokenPrimitive(0.1),
+				CommonGrammar.TokenPrimitive(1.0),
+				CommonGrammar.TokenPrimitive(2.0),
+				CommonGrammar.TokenPrimitive(2.0),
+				CommonGrammar.TokenPrimitive("rosebud"),
 				CommonGrammar.TokenArrayEnd
 			};
 
@@ -716,12 +716,12 @@ namespace JsonFx.Serialization
 			{
 				CommonGrammar.TokenObjectBegin("Person"),
 				CommonGrammar.TokenProperty("Name"),
-				CommonGrammar.TokenValue("John, Jr."),
+				CommonGrammar.TokenPrimitive("John, Jr."),
 
 				CommonGrammar.TokenProperty("Father"),
 				CommonGrammar.TokenObjectBegin("Person"),
 				CommonGrammar.TokenProperty("Name"),
-				CommonGrammar.TokenValue("John, Sr."),
+				CommonGrammar.TokenPrimitive("John, Sr."),
 				CommonGrammar.TokenProperty("Father"),
 				CommonGrammar.TokenNull,
 				CommonGrammar.TokenProperty("Mother"),
@@ -735,7 +735,7 @@ namespace JsonFx.Serialization
 				CommonGrammar.TokenProperty("Mother"),
 				CommonGrammar.TokenObjectBegin("Person"),
 				CommonGrammar.TokenProperty("Name"),
-				CommonGrammar.TokenValue("Sally"),
+				CommonGrammar.TokenPrimitive("Sally"),
 				CommonGrammar.TokenProperty("Father"),
 				CommonGrammar.TokenNull,
 				CommonGrammar.TokenProperty("Mother"),
