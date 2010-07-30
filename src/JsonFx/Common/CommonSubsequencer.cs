@@ -343,6 +343,16 @@ namespace JsonFx.Common
 		}
 
 		/// <summary>
+		/// Gets all the items of the array
+		/// </summary>
+		/// <param name="source"></param>
+		/// <returns>all items of the array</returns>
+		public static IEnumerable<TokenSequence> GetArrayItems(this TokenSequence source)
+		{
+			return CommonSubsequencer.GetArrayItems(source, (Func<TokenSequence, bool>)null);
+		}
+
+		/// <summary>
 		/// Gets the items of the root array with values satisfying the <paramref name="predicate"/>
 		/// </summary>
 		/// <param name="source"></param>
@@ -419,48 +429,20 @@ namespace JsonFx.Common
 		/// Gets all descendant values below the current root, as well as the current root
 		/// </summary>
 		/// <param name="source"></param>
-		/// <param name="predicate"></param>
 		/// <returns></returns>
-		public static IEnumerable<TokenSequence> GetDescendantsAndSelf(this TokenSequence source, Func<TokenSequence, bool> predicate)
+		public static IEnumerable<TokenSequence> GetDescendantsAndSelf(this TokenSequence source)
 		{
 			if (source == null)
 			{
 				throw new ArgumentNullException("source");
 			}
 
-			if (predicate == null || predicate(source))
-			{
-				// and self
-				yield return source;
-			}
+			// and self
+			yield return source;
 
-			if (CommonSubsequencer.IsPrimitive(source))
+			foreach (TokenSequence descendant in CommonSubsequencer.GetDescendants(source))
 			{
-				yield break;
-			}
-
-			if (CommonSubsequencer.IsObject(source))
-			{
-				foreach (KeyValuePair<DataName, TokenSequence> property in CommonSubsequencer.GetProperties(source, null, predicate))
-				{
-					foreach (TokenSequence child in CommonSubsequencer.GetDescendantsAndSelf(property.Value, predicate))
-					{
-						yield return child;
-					}
-				}
-				yield break;
-			}
-
-			if (CommonSubsequencer.IsArray(source))
-			{
-				foreach (TokenSequence item in CommonSubsequencer.GetArrayItems(source, predicate))
-				{
-					foreach (TokenSequence child in CommonSubsequencer.GetDescendantsAndSelf(item, predicate))
-					{
-						yield return child;
-					}
-				}
-				yield break;
+				yield return descendant;
 			}
 		}
 
@@ -468,9 +450,8 @@ namespace JsonFx.Common
 		/// Gets all descendant values below the current root
 		/// </summary>
 		/// <param name="source"></param>
-		/// <param name="predicate"></param>
 		/// <returns></returns>
-		public static IEnumerable<TokenSequence> GetDescendants(this TokenSequence source, Func<TokenSequence, bool> predicate)
+		public static IEnumerable<TokenSequence> GetDescendants(this TokenSequence source)
 		{
 			if (source == null)
 			{
@@ -484,11 +465,13 @@ namespace JsonFx.Common
 
 			if (CommonSubsequencer.IsObject(source))
 			{
-				foreach (KeyValuePair<DataName, TokenSequence> property in CommonSubsequencer.GetProperties(source, null, predicate))
+				foreach (KeyValuePair<DataName, TokenSequence> property in CommonSubsequencer.GetProperties(source, null))
 				{
-					foreach (TokenSequence child in CommonSubsequencer.GetDescendantsAndSelf(property.Value, predicate))
+					yield return property.Value;
+
+					foreach (TokenSequence descendant in CommonSubsequencer.GetDescendants(property.Value))
 					{
-						yield return child;
+						yield return descendant;
 					}
 				}
 				yield break;
@@ -496,11 +479,13 @@ namespace JsonFx.Common
 
 			if (CommonSubsequencer.IsArray(source))
 			{
-				foreach (TokenSequence item in CommonSubsequencer.GetArrayItems(source, predicate))
+				foreach (TokenSequence item in CommonSubsequencer.GetArrayItems(source, (Func<TokenSequence, bool>)null))
 				{
-					foreach (TokenSequence child in CommonSubsequencer.GetDescendantsAndSelf(item, predicate))
+					yield return item;
+
+					foreach (TokenSequence descendant in CommonSubsequencer.GetDescendants(item))
 					{
-						yield return child;
+						yield return descendant;
 					}
 				}
 				yield break;

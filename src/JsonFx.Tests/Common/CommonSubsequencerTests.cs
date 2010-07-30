@@ -265,7 +265,7 @@ namespace JsonFx.Common
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void GetArrayItems_MixedPrimitivesFilterNone_ReturnsSplitSequences()
+		public void GetArrayItems_MixedPrimitivesNoFilter_ReturnsSplitSequences()
 		{
 			var input = new[]
 		    {
@@ -308,7 +308,7 @@ namespace JsonFx.Common
 			};
 
 			// select all items
-			var actual = input.GetArrayItems(item => true).ToArray();
+			var actual = input.GetArrayItems().ToArray();
 
 			Assert.Equal(expected, actual, false);
 		}
@@ -901,8 +901,8 @@ namespace JsonFx.Common
 				}
 			};
 
-			// select all properties
-			var actual = input.GetDescendantsAndSelf(tokens => true).ToArray();
+			// select all descendants and self
+			var actual = input.GetDescendantsAndSelf().ToArray();
 
 			Assert.Equal(expected, actual, false);
 		}
@@ -994,8 +994,135 @@ namespace JsonFx.Common
 				}
 			};
 
-			// select all properties
-			var actual = input.GetDescendants(tokens => true).ToArray();
+			// select all descendants
+			var actual = input.GetDescendants().ToArray();
+
+			Assert.Equal(expected, actual, false);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void GetDescendants_NestedObjectsFindDescendantsWithProperty_ReturnsMatchingSubsequences()
+		{
+			var input = new[]
+		    {
+		        CommonGrammar.TokenObjectBeginUnnamed,
+					CommonGrammar.TokenProperty("One"),
+					CommonGrammar.TokenNull,
+
+					CommonGrammar.TokenProperty("Two"),
+					CommonGrammar.TokenArrayBeginUnnamed,
+						CommonGrammar.TokenTrue,
+						CommonGrammar.TokenPrimitive("2-B"),
+						CommonGrammar.TokenPrimitive(23),
+					CommonGrammar.TokenArrayEnd,
+
+					CommonGrammar.TokenProperty("Three"),
+					CommonGrammar.TokenObjectBeginUnnamed,
+						CommonGrammar.TokenProperty("A"),
+						CommonGrammar.TokenPrimitive("3-A"),
+						CommonGrammar.TokenProperty("B"),
+						CommonGrammar.TokenPrimitive(32),
+						CommonGrammar.TokenProperty("C"),
+						CommonGrammar.TokenPrimitive("3-C"),
+					CommonGrammar.TokenObjectEnd,
+
+					CommonGrammar.TokenProperty("Four"),
+					CommonGrammar.TokenPrimitive(4),
+		        CommonGrammar.TokenObjectEnd
+		    };
+
+			var expected = new[]
+			{
+				new[]
+				{
+					CommonGrammar.TokenObjectBeginUnnamed,
+						CommonGrammar.TokenProperty("A"),
+						CommonGrammar.TokenPrimitive("3-A"),
+						CommonGrammar.TokenProperty("B"),
+						CommonGrammar.TokenPrimitive(32),
+						CommonGrammar.TokenProperty("C"),
+						CommonGrammar.TokenPrimitive("3-C"),
+					CommonGrammar.TokenObjectEnd
+				}
+			};
+
+			// select all descendants with property named "B"
+			var actual = input.GetDescendants().Where(child => child.HasProperty(name => name.LocalName == "B")).ToArray();
+
+			Assert.Equal(expected, actual, false);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void GetDescendantsAndSelf_NestedObjectsReturnsAllPrimitives_ReturnsMatchingSubsequences()
+		{
+			var input = new[]
+		    {
+		        CommonGrammar.TokenObjectBeginUnnamed,
+					CommonGrammar.TokenProperty("One"),
+					CommonGrammar.TokenNull,
+
+					CommonGrammar.TokenProperty("Two"),
+					CommonGrammar.TokenArrayBeginUnnamed,
+						CommonGrammar.TokenTrue,
+						CommonGrammar.TokenPrimitive("2-B"),
+						CommonGrammar.TokenPrimitive(23),
+					CommonGrammar.TokenArrayEnd,
+
+					CommonGrammar.TokenProperty("Three"),
+					CommonGrammar.TokenObjectBeginUnnamed,
+						CommonGrammar.TokenProperty("A"),
+						CommonGrammar.TokenPrimitive("3-A"),
+						CommonGrammar.TokenProperty("B"),
+						CommonGrammar.TokenPrimitive(32),
+						CommonGrammar.TokenProperty("C"),
+						CommonGrammar.TokenPrimitive("3-C"),
+					CommonGrammar.TokenObjectEnd,
+
+					CommonGrammar.TokenProperty("Four"),
+					CommonGrammar.TokenPrimitive(4),
+		        CommonGrammar.TokenObjectEnd
+		    };
+
+			var expected = new[]
+			{
+				new[]
+				{
+					CommonGrammar.TokenNull
+				},
+				new[]
+				{
+					CommonGrammar.TokenTrue
+				},
+				new[]
+				{
+					CommonGrammar.TokenPrimitive("2-B")
+				},
+				new[]
+				{
+					CommonGrammar.TokenPrimitive(23)
+				},
+				new[]
+				{
+					CommonGrammar.TokenPrimitive("3-A")
+				},
+				new[]
+				{
+					CommonGrammar.TokenPrimitive(32)
+				},
+				new[]
+				{
+					CommonGrammar.TokenPrimitive("3-C")
+				},
+				new[]
+				{
+					CommonGrammar.TokenPrimitive(4),
+				}
+			};
+
+			// select all primitive values
+			var actual = input.GetDescendantsAndSelf().Where(child => child.IsPrimitive()).ToArray();
 
 			Assert.Equal(expected, actual, false);
 		}
