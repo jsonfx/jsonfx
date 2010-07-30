@@ -416,6 +416,98 @@ namespace JsonFx.Common
 		}
 
 		/// <summary>
+		/// Gets all descendant values below the current root, as well as the current root
+		/// </summary>
+		/// <param name="source"></param>
+		/// <param name="predicate"></param>
+		/// <returns></returns>
+		public static IEnumerable<TokenSequence> GetDescendantsAndSelf(this TokenSequence source, Func<TokenSequence, bool> predicate)
+		{
+			if (source == null)
+			{
+				throw new ArgumentNullException("source");
+			}
+
+			if (predicate == null || predicate(source))
+			{
+				// and self
+				yield return source;
+			}
+
+			if (CommonSubsequencer.IsPrimitive(source))
+			{
+				yield break;
+			}
+
+			if (CommonSubsequencer.IsObject(source))
+			{
+				foreach (KeyValuePair<DataName, TokenSequence> property in CommonSubsequencer.GetProperties(source, null, predicate))
+				{
+					foreach (TokenSequence child in CommonSubsequencer.GetDescendantsAndSelf(property.Value, predicate))
+					{
+						yield return child;
+					}
+				}
+				yield break;
+			}
+
+			if (CommonSubsequencer.IsArray(source))
+			{
+				foreach (TokenSequence item in CommonSubsequencer.GetArrayItems(source, predicate))
+				{
+					foreach (TokenSequence child in CommonSubsequencer.GetDescendantsAndSelf(item, predicate))
+					{
+						yield return child;
+					}
+				}
+				yield break;
+			}
+		}
+
+		/// <summary>
+		/// Gets all descendant values below the current root
+		/// </summary>
+		/// <param name="source"></param>
+		/// <param name="predicate"></param>
+		/// <returns></returns>
+		public static IEnumerable<TokenSequence> GetDescendants(this TokenSequence source, Func<TokenSequence, bool> predicate)
+		{
+			if (source == null)
+			{
+				throw new ArgumentNullException("source");
+			}
+
+			if (CommonSubsequencer.IsPrimitive(source))
+			{
+				yield break;
+			}
+
+			if (CommonSubsequencer.IsObject(source))
+			{
+				foreach (KeyValuePair<DataName, TokenSequence> property in CommonSubsequencer.GetProperties(source, null, predicate))
+				{
+					foreach (TokenSequence child in CommonSubsequencer.GetDescendantsAndSelf(property.Value, predicate))
+					{
+						yield return child;
+					}
+				}
+				yield break;
+			}
+
+			if (CommonSubsequencer.IsArray(source))
+			{
+				foreach (TokenSequence item in CommonSubsequencer.GetArrayItems(source, predicate))
+				{
+					foreach (TokenSequence child in CommonSubsequencer.GetDescendantsAndSelf(item, predicate))
+					{
+						yield return child;
+					}
+				}
+				yield break;
+			}
+		}
+
+		/// <summary>
 		/// Splices out the sequence for the next complete value (object, array, primitive)
 		/// </summary>
 		/// <param name="stream"></param>
