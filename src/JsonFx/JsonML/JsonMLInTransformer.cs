@@ -97,7 +97,7 @@ namespace JsonFx.JsonML
 					throw new ArgumentNullException("input");
 				}
 
-				IStream<Token<MarkupTokenType>> stream = new Stream<Token<MarkupTokenType>>(input);
+				IStream<Token<MarkupTokenType>> stream = Stream<Token<MarkupTokenType>>.Create(input);
 
 				int depth = 0;
 

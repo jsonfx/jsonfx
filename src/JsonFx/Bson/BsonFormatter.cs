@@ -108,7 +108,7 @@ namespace JsonFx.Bson
 
 				using (BinaryWriter writer = new BinaryWriter(stream, Encoding.UTF8))
 				{
-					IStream<Token<CommonTokenType>> tokenStream = new Stream<Token<CommonTokenType>>(tokens);
+					IStream<Token<CommonTokenType>> tokenStream = Stream<Token<CommonTokenType>>.Create(tokens);
 					if (!tokenStream.IsCompleted)
 					{
 						BsonFormatter.WriteDocument(writer, tokenStream);

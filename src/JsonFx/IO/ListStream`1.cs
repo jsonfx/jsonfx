@@ -30,32 +30,22 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace JsonFx.IO
 {
 	/// <summary>
-	/// Supports a simple iteration over a string tracking line/column/position
+	/// Supports a simple iteration over a list with ability to capture a subsequence
 	/// </summary>
-	public class StringStream : ITextStream
+	internal class ListStream<T> : Stream<T>
 	{
-		#region Constants
-
-		public static readonly StringStream Null = new StringStream(null);
-
-		#endregion Constants
-
 		#region Fields
 
 		private bool isCompleted;
 		private bool isReady;
-		private char current;
+		private T current;
 
-		private int column;
-		private int line;
+		private readonly IList<T> Buffer;
 		private int index = -1;
-
-		private readonly string Buffer;
 		private int start = -1;
 
 		#endregion Fields
@@ -66,47 +56,19 @@ namespace JsonFx.IO
 		/// Ctor
 		/// </summary>
 		/// <param name="value"></param>
-		public StringStream(string value)
+		public ListStream(IList<T> value)
 		{
-			this.Buffer = value ?? String.Empty;
+			this.Buffer = value ?? new T[0];
 		}
 
 		#endregion Init
-
-		#region ITextStream Members
-
-		/// <summary>
-		/// Gets the total number of characters read from the input
-		/// </summary>
-		public int Column
-		{
-			get { return this.column; }
-		}
-
-		/// <summary>
-		/// Gets the total number of lines read from the input
-		/// </summary>
-		public int Line
-		{
-			get { return this.line; }
-		}
-
-		/// <summary>
-		/// Gets the current position within the input
-		/// </summary>
-		public long Index
-		{
-			get { return this.index; }
-		}
-
-		#endregion ITextStream Members
 
 		#region Chunking Members
 
 		/// <summary>
 		/// Gets the number of characters currently chunked
 		/// </summary>
-		public int ChunkSize
+		public override int ChunkSize
 		{
 			get
 			{
@@ -120,9 +82,9 @@ namespace JsonFx.IO
 		}
 
 		/// <summary>
-		/// Gets a value indicating if the <see cref="StringStream"/> is currently chunking
+		/// Gets a value indicating if the <see cref="ListStream<T>"/> is currently chunking
 		/// </summary>
-		public bool IsChunking
+		public override bool IsChunking
 		{
 			get { return (this.start >= 0); }
 		}
@@ -130,25 +92,16 @@ namespace JsonFx.IO
 		/// <summary>
 		/// Begins chunking at the current index
 		/// </summary>
-		public void BeginChunk()
+		public override void BeginChunk()
 		{
 			this.start = this.index+1;
 		}
 
 		/// <summary>
-		/// Ends chunking at the current index and returns the buffered text chunk
+		/// Ends chunking at the current index and returns the buffered chunk
 		/// </summary>
 		/// <returns></returns>
-		IEnumerable<char> IStream<char>.EndChunk()
-		{
-			return this.EndChunk();
-		}
-
-		/// <summary>
-		/// Ends chunking at the current index and returns the buffered text chunk
-		/// </summary>
-		/// <returns></returns>
-		public string EndChunk()
+		public override IEnumerable<T> EndChunk()
 		{
 			if (this.start < 0)
 			{
@@ -156,7 +109,20 @@ namespace JsonFx.IO
 			}
 
 			// build chunk value
-			string value = this.Buffer.Substring(this.start, (1+this.index-this.start));
+			T[] value = new T[(1+this.index-this.start)];
+
+			T[] source = this.Buffer as T[];
+			if (source != null)
+			{
+				Array.Copy(source, this.start, value, 0, value.Length);
+			}
+			else
+			{
+				for (int i=0, length=value.Length; i<length; i++, this.start++)
+				{
+					value[i] = this.Buffer[this.start];
+				}
+			}
 
 			// reset chunk start
 			this.start = -1;
@@ -164,32 +130,14 @@ namespace JsonFx.IO
 			return value;
 		}
 
-		/// <summary>
-		/// Ends chunking at the current index and returns the buffered text chunk
-		/// </summary>
-		/// <returns></returns>
-		public void EndChunk(StringBuilder buffer)
-		{
-			if (this.start < 0)
-			{
-				throw new InvalidOperationException("Not currently chunking.");
-			}
-
-			// append chunk value
-			buffer.Append(this.Buffer, this.start, (1+this.index-this.start));
-
-			// reset chunk start
-			this.start = -1;
-		}
-
 		#endregion Chunking Members
 
-		#region IStream<char> Members
+		#region IStream<T> Members
 
 		/// <summary>
 		/// Determines if the input sequence has reached the end
 		/// </summary>
-		public virtual bool IsCompleted
+		public override bool IsCompleted
 		{
 			get
 			{
@@ -203,7 +151,7 @@ namespace JsonFx.IO
 		/// Returns but does not remove the item at the front of the sequence.
 		/// </summary>
 		/// <returns></returns>
-		public virtual char Peek()
+		public override T Peek()
 		{
 			this.EnsureReady();
 
@@ -215,7 +163,7 @@ namespace JsonFx.IO
 		/// Returns and removes the item at the front of the sequence.
 		/// </summary>
 		/// <returns></returns>
-		public virtual char Pop()
+		public override T Pop()
 		{
 			this.EnsureReady();
 
@@ -226,13 +174,12 @@ namespace JsonFx.IO
 
 			// flag as needing to be iterated, but don't execute yet
 			this.isReady = false;
-
-			this.UpdateStats();
+			this.index++;
 
 			return this.current;
 		}
 
-		#endregion IStream<char> Members
+		#endregion IStream<T> Members
 
 		#region Methods
 
@@ -250,7 +197,7 @@ namespace JsonFx.IO
 
 			// store the current item or null if complete
 			int next = this.index+1;
-			if (next < this.Buffer.Length)
+			if (next < this.Buffer.Count)
 			{
 				this.isCompleted = false;
 				this.current = this.Buffer[next];
@@ -258,48 +205,7 @@ namespace JsonFx.IO
 			else
 			{
 				this.isCompleted = true;
-				this.current = default(char);
-			}
-		}
-
-		/// <summary>
-		/// Calculates index, line, and column statistics
-		/// </summary>
-		private void UpdateStats()
-		{
-			if (this.index < 0)
-			{
-				this.line = this.column = 1;
-				this.index = 0;
-			}
-			else
-			{
-				// check for line endings
-				switch (this.current)
-				{
-					case '\n':
-					{
-						if (this.Buffer[this.index] == '\r')
-						{
-							// consider CRLF to be one line ending
-							break;
-						}
-						// fall through
-						goto case '\r';
-					}
-					case '\r':
-					{
-						this.line++;
-						this.column = 0;
-						break;
-					}
-					default:
-					{
-						this.column++;
-						break;
-					}
-				}
-				this.index++;
+				this.current = default(T);
 			}
 		}
 
@@ -307,16 +213,7 @@ namespace JsonFx.IO
 
 		#region IDisposable Members
 
-		/// <summary>
-		/// Releases all resources used
-		/// </summary>
-		public void Dispose()
-		{
-			this.Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-
-		protected virtual void Dispose(bool disposing)
+		protected override void Dispose(bool disposing)
 		{
 		}
 

@@ -96,7 +96,7 @@ namespace JsonFx.Xml
 
 				this.ScopeChain.Clear();
 
-				IStream<Token<MarkupTokenType>> stream = new Stream<Token<MarkupTokenType>>(input);
+				IStream<Token<MarkupTokenType>> stream = Stream<Token<MarkupTokenType>>.Create(input);
 				while (!stream.IsCompleted)
 				{
 					foreach (var token in this.TransformValue(stream, true))

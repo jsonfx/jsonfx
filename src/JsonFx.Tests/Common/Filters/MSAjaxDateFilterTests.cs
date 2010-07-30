@@ -55,7 +55,7 @@ namespace JsonFx.Common.Filters
 		[Trait(TraitName, TraitValue)]
 		public void TryRead_StandardTimeZone_ReadsAsUtc()
 		{
-			var input = new Stream<Token<CommonTokenType>>(new[]
+			var input = Stream<Token<CommonTokenType>>.Create(new[]
 				{
 					CommonGrammar.TokenValue(@"\/Date(1204329599999)\/")
 				});
@@ -73,7 +73,7 @@ namespace JsonFx.Common.Filters
 		[Trait(TraitName, TraitValue)]
 		public void TryRead_DaylightSavingsTimeZone_ReadsAsUtc()
 		{
-			var input = new Stream<Token<CommonTokenType>>(new[]
+			var input = Stream<Token<CommonTokenType>>.Create(new[]
 				{
 					CommonGrammar.TokenValue(@"\/Date(1278327077768)\/")
 				});
@@ -91,7 +91,7 @@ namespace JsonFx.Common.Filters
 		[Trait(TraitName, TraitValue)]
 		public void TryRead_FutureTimeZone_ReadsAsUtc()
 		{
-			var input = new Stream<Token<CommonTokenType>>(new[]
+			var input = Stream<Token<CommonTokenType>>.Create(new[]
 				{
 					CommonGrammar.TokenValue(@"\/Date(4102444799999)\/")
 				});
@@ -111,7 +111,7 @@ namespace JsonFx.Common.Filters
 		{
 			var expected = DateTime.MinValue;
 
-			var input = new Stream<Token<CommonTokenType>>(new[]
+			var input = Stream<Token<CommonTokenType>>.Create(new[]
 				{
 					CommonGrammar.TokenValue(@"\/Date(-62135596800000)\/")
 				});
@@ -127,7 +127,7 @@ namespace JsonFx.Common.Filters
 		[Trait(TraitName, TraitValue)]
 		public void TryRead_DateTimeMaxValueUtc_ReadsAsDateTimeMaxValue()
 		{
-			var input = new Stream<Token<CommonTokenType>>(new[]
+			var input = Stream<Token<CommonTokenType>>.Create(new[]
 				{
 					CommonGrammar.TokenValue(@"\/Date(253402300800000)\/")
 				});

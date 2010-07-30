@@ -36,50 +36,42 @@ namespace JsonFx.IO
 	/// <summary>
 	/// Supports forward-only iteration over an input sequence of <typeparamref name="T"/>
 	/// </summary>
-	public class Stream<T> : IStream<T>
+	public abstract class Stream<T> : IStream<T>
 	{
-		#region Fields
+		#region Constants
 
-		private readonly IEnumerator<T> Enumerator;
-		private bool isReady;
-		private bool isCompleted;
-		private T current;
+		public static readonly Stream<T> Null = new ListStream<T>(null);
 
-		private IList<T> chunk;
+		#endregion Constants
 
-		#endregion Fields
-
-		#region Init
+		#region Factory Method
 
 		/// <summary>
-		/// Ctor
+		/// Factory method for generic streams
 		/// </summary>
 		/// <param name="sequence"></param>
-		public Stream(IEnumerable<T> sequence)
+		/// <returns></returns>
+		public static IStream<T> Create(IEnumerable<T> sequence)
 		{
-			if (sequence == null)
+			IList<T> list = sequence as IList<T>;
+			if (list != null)
 			{
-				throw new ArgumentNullException("sequence");
+				return new ListStream<T>(list);
 			}
 
-			this.Enumerator = sequence.GetEnumerator();
+			return new EnumerableStream<T>(sequence);
 		}
 
-		#endregion Fields
+		#endregion Factory Method
 
 		#region IStream<T> Properties
 
 		/// <summary>
 		/// Determines if the input sequence has reached the end
 		/// </summary>
-		public virtual bool IsCompleted
+		public abstract bool IsCompleted
 		{
-			get
-			{
-				this.EnsureReady();
-
-				return this.isCompleted;
-			}
+			get;
 		}
 
 		#endregion IStream<T> Properties
@@ -90,110 +82,33 @@ namespace JsonFx.IO
 		/// Returns but does not remove the item at the front of the sequence.
 		/// </summary>
 		/// <returns></returns>
-		public virtual T Peek()
-		{
-			this.EnsureReady();
-
-			// return the current item or null if complete
-			return this.current;
-		}
+		public abstract T Peek();
 
 		/// <summary>
 		/// Returns and removes the item at the front of the sequence.
 		/// </summary>
 		/// <returns></returns>
-		public virtual T Pop()
-		{
-			this.EnsureReady();
-
-			// flag as needing to be iterated, but don't execute yet
-			this.isReady = this.isCompleted;
-
-			// return the current item
-			return this.current;
-		}
+		public abstract T Pop();
 
 		#endregion IStream<T> Methods
 
 		#region Chunking Members
 
-		public bool IsChunking
+		public abstract bool IsChunking
 		{
-			get { return (this.chunk != null); }
+			get;
 		}
 
-		public int ChunkSize
+		public abstract int ChunkSize
 		{
-			get
-			{
-				if (this.chunk == null)
-				{
-					throw new InvalidOperationException("Not currently chunking.");
-				}
-
-				return this.chunk.Count;
-			}
+			get;
 		}
 
-		public void BeginChunk()
-		{
-			if (this.chunk == null)
-			{
-				this.chunk = new List<T>();
-			}
-			else
-			{
-				this.chunk.Clear();
-			}
-		}
+		public abstract void BeginChunk();
 
-		public IEnumerable<T> EndChunk()
-		{
-			if (this.chunk == null)
-			{
-				throw new InvalidOperationException("Not currently chunking.");
-			}
-
-			// build chunk value
-			IEnumerable<T> value = this.chunk;
-
-			// reset internal buffer
-			this.chunk = null;
-
-			return value;
-		}
+		public abstract IEnumerable<T> EndChunk();
 
 		#endregion Chunking Members
-
-		#region Methods
-
-		/// <summary>
-		/// Deferred execution of iterator
-		/// </summary>
-		private void EnsureReady()
-		{
-			// only execute when requested
-			if (this.isReady)
-			{
-				return;
-			}
-			this.isReady = true;
-
-			// lazy execution of MoveNext
-			this.isCompleted = !this.Enumerator.MoveNext();
-
-			// store the current item or null if complete
-			if (this.isCompleted)
-			{
-				this.current = default(T);
-			}
-			else
-			{
-				this.current = this.Enumerator.Current;
-			}
-		}
-
-		#endregion Methods
 
 		#region IDisposable Members
 
@@ -203,13 +118,7 @@ namespace JsonFx.IO
 			GC.SuppressFinalize(this);
 		}
 
-		protected virtual void Dispose(bool disposing)
-		{
-			if (disposing)
-			{
-				((IDisposable)this.Enumerator).Dispose();
-			}
-		}
+		protected abstract void Dispose(bool disposing);
 
 		#endregion IDisposable Members
 	}

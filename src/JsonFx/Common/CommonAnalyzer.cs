@@ -145,7 +145,7 @@ namespace JsonFx.Common
 				throw new ArgumentNullException("tokens");
 			}
 
-			IStream<Token<CommonTokenType>> stream = new Stream<Token<CommonTokenType>>(tokens);
+			IStream<Token<CommonTokenType>> stream = Stream<Token<CommonTokenType>>.Create(tokens);
 			while (!stream.IsCompleted)
 			{
 				yield return this.ConsumeValue(stream, targetType);
@@ -167,7 +167,7 @@ namespace JsonFx.Common
 
 			Type resultType = typeof(TResult);
 
-			IStream<Token<CommonTokenType>> stream = new Stream<Token<CommonTokenType>>(tokens);
+			IStream<Token<CommonTokenType>> stream = Stream<Token<CommonTokenType>>.Create(tokens);
 			while (!stream.IsCompleted)
 			{
 				// cast each of the values accordingly

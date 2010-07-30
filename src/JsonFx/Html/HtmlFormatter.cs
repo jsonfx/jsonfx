@@ -177,7 +177,7 @@ namespace JsonFx.Html
 				throw new ArgumentNullException("tokens");
 			}
 
-			IStream<Token<MarkupTokenType>> stream = new Stream<Token<MarkupTokenType>>(tokens);
+			IStream<Token<MarkupTokenType>> stream = Stream<Token<MarkupTokenType>>.Create(tokens);
 
 			PrefixScopeChain.Scope scope = null;
 			while (!stream.IsCompleted)

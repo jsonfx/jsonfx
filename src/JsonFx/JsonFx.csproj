@@ -69,6 +69,12 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Core" />
   </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFrameworkVersion)' == 'v2.0' Or '$(TargetFrameworkVersion)' == 'v3.0' ">
+    <Reference Include="LinqBridge">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\LinqBridge\LinqBridge.dll</HintPath>
+    </Reference>
+  </ItemGroup>
   <ItemGroup>
     <Compile Include="About.cs" />
     <Compile Include="Bson\BsonElementType.cs" />
@@ -85,6 +91,8 @@
     <Compile Include="Html\HtmlFormatter.cs" />
     <Compile Include="Html\HtmlTokenizer.cs" />
     <Compile Include="IO\CharBuffer.cs" />
+    <Compile Include="IO\EnumerableStream`1.cs" />
+    <Compile Include="IO\ListStream`1.cs" />
     <Compile Include="JsonML\JsonMLInTransformer.cs" />
     <Compile Include="JsonML\JsonMLOutTransformer.cs" />
     <Compile Include="Json\Resolvers\JsonResolverStrategy.cs" />
@@ -152,6 +160,7 @@
     <Compile Include="Xml\Resolvers\XmlResolverStrategy.cs" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFrameworkVersion)' != 'v2.0' And '$(TargetFrameworkVersion)' != 'v3.0' ">
+    <Compile Include="Common\CommonSubsequencer.cs" />
     <Compile Include="Serialization\Resolvers\DataContractResolverStrategy.cs" />
   </ItemGroup>
   <ItemGroup>

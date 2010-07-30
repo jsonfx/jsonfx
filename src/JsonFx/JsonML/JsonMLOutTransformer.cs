@@ -66,7 +66,7 @@ namespace JsonFx.JsonML
 					throw new ArgumentNullException("input");
 				}
 
-				IStream<Token<CommonTokenType>> stream = new Stream<Token<CommonTokenType>>(input);
+				IStream<Token<CommonTokenType>> stream = Stream<Token<CommonTokenType>>.Create(input);
 
 				Token<CommonTokenType> token = stream.Peek();
 				while (!stream.IsCompleted)

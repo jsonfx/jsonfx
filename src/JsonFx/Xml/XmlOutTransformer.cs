@@ -91,7 +91,7 @@ namespace JsonFx.Xml
 					throw new ArgumentNullException("input");
 				}
 
-				IStream<Token<CommonTokenType>> stream = new Stream<Token<CommonTokenType>>(input);
+				IStream<Token<CommonTokenType>> stream = Stream<Token<CommonTokenType>>.Create(input);
 				List<Token<MarkupTokenType>> output = new List<Token<MarkupTokenType>>();
 
 				this.ScopeChain.Clear();

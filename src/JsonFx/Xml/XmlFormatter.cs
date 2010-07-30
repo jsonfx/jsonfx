@@ -141,7 +141,7 @@ namespace JsonFx.Xml
 
 				int depth = 0;
 
-				IStream<Token<MarkupTokenType>> stream = new Stream<Token<MarkupTokenType>>(tokens);
+				IStream<Token<MarkupTokenType>> stream = Stream<Token<MarkupTokenType>>.Create(tokens);
 				Token<MarkupTokenType> token = stream.Peek();
 				try
 				{
