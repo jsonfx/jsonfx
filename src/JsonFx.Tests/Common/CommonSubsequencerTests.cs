@@ -582,6 +582,32 @@ namespace JsonFx.Common
 
 		#region GetProperty Tests
 
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void GetProperties_AllProperties_ReturnsSplitSequences()
+		{
+			var input = new[]
+		    {
+		        CommonGrammar.TokenObjectBeginNoName,
+		        CommonGrammar.TokenProperty("key1"),
+		        CommonGrammar.TokenNull,
+		        CommonGrammar.TokenProperty("key2"),
+		        CommonGrammar.TokenValue("Hello!"),
+		        CommonGrammar.TokenObjectEnd
+		    };
+
+			var expected = new Dictionary<DataName, IEnumerable<Token<CommonTokenType>>>
+			{
+				{ new DataName("key1"), new[] { CommonGrammar.TokenNull } },
+				{ new DataName("key2"), new[] { CommonGrammar.TokenValue("Hello!") } }
+			};
+
+			// select all properties
+			var actual = input.GetProperties(name => true).ToArray();
+
+			Assert.Equal(expected, actual, false);
+		}
+
 		#endregion GetProperty Tests
 	}
 }

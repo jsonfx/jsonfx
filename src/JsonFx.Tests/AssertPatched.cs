@@ -198,6 +198,34 @@ namespace JsonFx
 		}
 
 		/// <summary>
+		/// Verifies that two dictionaries are equal, using a default comparer. Allows less strict comparison.
+		/// </summary>
+		/// <typeparam name="TKey">The type of the keys to be compared</typeparam>
+		/// <typeparam name="TVal">The type of the values to be compared</typeparam>
+		/// <param name="expected">The expected value</param>
+		/// <param name="actual">The value to be compared against</param>
+		/// <exception cref="EqualException">Thrown when the objects are not equal</exception>
+		public static void Equal<TKey, TVal>(IDictionary<TKey, TVal> expected, IDictionary<TKey, TVal> actual, bool checkType)
+		{
+			// equivalent dictionaries or ExpandoObjects
+			Equal(expected, actual, new AssertDictionaryComparer<TKey, TVal>(checkType));
+		}
+
+		/// <summary>
+		/// Verifies that two objects are equal, using a default comparer. Allows less strict comparison.
+		/// </summary>
+		/// <typeparam name="TKey">The type of the keys to be compared</typeparam>
+		/// <typeparam name="TVal">The type of the values to be compared</typeparam>
+		/// <param name="expected">The expected value</param>
+		/// <param name="actual">The value to be compared against</param>
+		/// <exception cref="EqualException">Thrown when the objects are not equal</exception>
+		public static void Equal<TKey, TVal>(IEnumerable<KeyValuePair<TKey, TVal>> expected, IEnumerable<KeyValuePair<TKey, TVal>> actual, bool checkType)
+		{
+			// equivalent dictionaries or ExpandoObjects
+			Equal(expected, actual, new AssertKeyValuePairEnumerableComparer<TKey, TVal>(checkType));
+		}
+
+		/// <summary>
 		/// Verifies that two objects are not equal, using a default comparer.
 		/// </summary>
 		/// <typeparam name="T">The type of the objects to be compared</typeparam>
@@ -237,7 +265,7 @@ namespace JsonFx
 
 		#endregion Factory Methods
 
-		#region AssertEqualityComparer<T>
+		#region Equality Comparers
 
         class AssertEqualityComparer<T> : IEqualityComparer<T>
         {
@@ -284,29 +312,14 @@ namespace JsonFx
                 if (comparable2 != null)
                     return comparable2.CompareTo(y) == 0;
 
-				#region IDictionary<string, object> hack
-
-				// equivalent ExpandoObjects
-
+				// hack for very common Dictionary instance
 				IDictionary<string, object> dictionaryX = x as IDictionary<string, object>;
 				IDictionary<string, object> dictionaryY = y as IDictionary<string, object>;
-
-				if (dictionaryX != null && dictionaryY != null)
+				if (dictionaryX != null &&
+					dictionaryY != null)
 				{
-					if (dictionaryX.Count != dictionaryY.Count)
-						return false;
-
-					foreach (string key in dictionaryX.Keys)
-					{
-						if (!dictionaryY.ContainsKey(key) ||
-							!(this.CheckType ? innerComparerStrict : innerComparer).Equals(dictionaryX[key], dictionaryY[key]))
-                            return false;
-					}
-
-					return true;
+					return new AssertDictionaryComparer<string, object>(this.CheckType).Equals(dictionaryX, dictionaryY);
 				}
-
-				#endregion IDictionary<string, object> hack
 
 				// Enumerable?
                 IEnumerable enumerableX = x as IEnumerable;
@@ -316,6 +329,7 @@ namespace JsonFx
                 {
                     IEnumerator enumeratorX = enumerableX.GetEnumerator();
                     IEnumerator enumeratorY = enumerableY.GetEnumerator();
+					IEqualityComparer<object> comparer = this.CheckType ? innerComparerStrict : innerComparer;
 
                     while (true)
                     {
@@ -325,7 +339,7 @@ namespace JsonFx
                         if (!hasNextX || !hasNextY)
                             return (hasNextX == hasNextY);
 
-                        if (!(this.CheckType ? innerComparerStrict : innerComparer).Equals(enumeratorX.Current, enumeratorY.Current))
+                        if (!comparer.Equals(enumeratorX.Current, enumeratorY.Current))
                             return false;
                     }
                 }
@@ -340,6 +354,118 @@ namespace JsonFx
             }
 		}
 
-		#endregion AssertEqualityComparer<T>
+		class AssertDictionaryComparer<TKey, TVal> : IEqualityComparer<IDictionary<TKey, TVal>>
+		{
+			static AssertEqualityComparer<object> innerComparer = new AssertEqualityComparer<object>(false);
+			static AssertEqualityComparer<object> innerComparerStrict = new AssertEqualityComparer<object>(true);
+			private readonly bool CheckType;
+
+			public AssertDictionaryComparer(bool checkType)
+			{
+				this.CheckType = checkType;
+			}
+
+			#region IEqualityComparer<IDictionary<TKey,TVal>> Members
+
+			public bool Equals(IDictionary<TKey, TVal> x, IDictionary<TKey, TVal> y)
+			{
+				Type type = typeof(IDictionary<TKey, TVal>);
+
+				// Null?
+				if (x == null)
+					return y == null;
+
+				if (y == null)
+					return false;
+
+				// Same type?
+				if (this.CheckType && x.GetType() != y.GetType())
+					return false;
+
+				if (x.Count != y.Count)
+					return false;
+
+				IEqualityComparer<object> comparer = this.CheckType ? innerComparerStrict : innerComparer;
+				foreach (TKey key in x.Keys)
+				{
+					if (!y.ContainsKey(key) ||
+						!comparer.Equals(x[key], y[key]))
+					{
+						return false;
+					}
+				}
+
+				return true;
+			}
+
+			public int GetHashCode(IDictionary<TKey, TVal> obj)
+			{
+				throw new NotImplementedException();
+			}
+
+			#endregion IEqualityComparer<IDictionary<TKey,TVal>> Members
+		}
+
+		class AssertKeyValuePairEnumerableComparer<TKey, TVal> : IEqualityComparer<IEnumerable<KeyValuePair<TKey, TVal>>>
+		{
+			static AssertEqualityComparer<object> innerComparer = new AssertEqualityComparer<object>(false);
+			static AssertEqualityComparer<object> innerComparerStrict = new AssertEqualityComparer<object>(true);
+			private readonly bool CheckType;
+
+			public AssertKeyValuePairEnumerableComparer(bool checkType)
+			{
+				this.CheckType = checkType;
+			}
+
+			#region IEqualityComparer<IEnumerable<KeyValuePair<TKey, TVal>>> Members
+
+			public bool Equals(IEnumerable<KeyValuePair<TKey, TVal>> x, IEnumerable<KeyValuePair<TKey, TVal>> y)
+			{
+				// Null?
+				if (x == null)
+				{
+					return (y == null);
+				}
+
+				if (y == null)
+				{
+					return false;
+				}
+
+				// Same type?
+				if (this.CheckType && x.GetType() != y.GetType())
+				{
+					return false;
+				}
+
+				IEnumerator<KeyValuePair<TKey, TVal>> enumeratorX = x.GetEnumerator();
+				IEnumerator<KeyValuePair<TKey, TVal>> enumeratorY = y.GetEnumerator();
+				IEqualityComparer<object> comparer = this.CheckType ? innerComparerStrict : innerComparer;
+
+				while (true)
+				{
+					bool hasNextX = enumeratorX.MoveNext();
+					bool hasNextY = enumeratorY.MoveNext();
+
+					if (!hasNextX || !hasNextY)
+						return (hasNextX == hasNextY);
+
+					if (!comparer.Equals(enumeratorX.Current.Key, enumeratorY.Current.Key) ||
+						!comparer.Equals(enumeratorX.Current.Value, enumeratorY.Current.Value))
+					{
+						return false;
+					}
+				}
+			}
+
+			public int GetHashCode(IEnumerable<KeyValuePair<TKey, TVal>> obj)
+			{
+				throw new NotImplementedException();
+			}
+
+			#endregion IEqualityComparer<IEnumerable<KeyValuePair<TKey, TVal>>> Members
+		}
+
+		#endregion Equality Comparers
 	}
 }

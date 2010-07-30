@@ -148,7 +148,7 @@ namespace JsonFx.Common
 
 			IStream<CommonToken> stream = Stream<CommonToken>.Create(source);
 			if (stream.IsCompleted ||
-				stream.Pop().TokenType != CommonTokenType.ArrayBegin)
+				stream.Pop().TokenType != CommonTokenType.ObjectBegin)
 			{
 				return false;
 			}
@@ -225,16 +225,6 @@ namespace JsonFx.Common
 		}
 
 		/// <summary>
-		/// Gets all the properties of the root object
-		/// </summary>
-		/// <param name="source"></param>
-		/// <returns>all properties for the root level object</returns>
-		public static IEnumerable<KeyValuePair<DataName, TokenSequence>> GetProperties(this TokenSequence source)
-		{
-			return CommonSubsequencer.GetProperties(source, null);
-		}
-
-		/// <summary>
 		/// Gets the properties of the root object which satisfies the <paramref name="predicate"/>
 		/// </summary>
 		/// <param name="source"></param>
@@ -249,7 +239,7 @@ namespace JsonFx.Common
 
 			IStream<CommonToken> stream = Stream<CommonToken>.Create(source);
 			if (stream.IsCompleted ||
-				stream.Pop().TokenType != CommonTokenType.ArrayBegin)
+				stream.Pop().TokenType != CommonTokenType.ObjectBegin)
 			{
 				yield break;
 			}
@@ -437,11 +427,10 @@ namespace JsonFx.Common
 					CommonSubsequencer.ErrorUnexpectedEndOfInput);
 			}
 
-			int depth = -1;
-
 			stream.BeginChunk();
-			CommonToken token = stream.Pop();
 
+			int depth = 0;
+			CommonToken token = stream.Pop();
 			switch (token.TokenType)
 			{
 				case CommonTokenType.Primitive:
@@ -452,7 +441,7 @@ namespace JsonFx.Common
 				case CommonTokenType.ObjectBegin:
 				{
 					depth++;
-					while (!stream.IsCompleted && depth >= 0)
+					while (!stream.IsCompleted && depth > 0)
 					{
 						switch (stream.Pop().TokenType)
 						{
@@ -471,7 +460,7 @@ namespace JsonFx.Common
 						}
 					}
 
-					if (depth >= 0)
+					if (depth > 0)
 					{
 						throw new TokenException<CommonTokenType>(
 							CommonGrammar.TokenNone,
@@ -500,10 +489,9 @@ namespace JsonFx.Common
 				return;
 			}
 
-			int depth = -1;
+			int depth = 0;
 
 			CommonToken token = stream.Pop();
-
 			switch (token.TokenType)
 			{
 				case CommonTokenType.Primitive:
@@ -514,7 +502,7 @@ namespace JsonFx.Common
 				case CommonTokenType.ObjectBegin:
 				{
 					depth++;
-					while (!stream.IsCompleted && depth >= 0)
+					while (!stream.IsCompleted && depth > 0)
 					{
 						switch (stream.Pop().TokenType)
 						{
@@ -533,7 +521,7 @@ namespace JsonFx.Common
 						}
 					}
 
-					if (depth >= 0)
+					if (depth > 0)
 					{
 						throw new TokenException<CommonTokenType>(
 							CommonGrammar.TokenNone,
