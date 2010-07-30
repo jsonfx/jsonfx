@@ -109,7 +109,7 @@ namespace JsonFx.IO
 			}
 
 			// build chunk value
-			IList<T> value = new Subsequence<T>(this.Buffer, this.start, (1+this.index-this.start));
+			IEnumerable<T> value = new Subsequence<T>(this.Buffer, this.start, (1+this.index-this.start));
 
 			// reset chunk start
 			this.start = -1;

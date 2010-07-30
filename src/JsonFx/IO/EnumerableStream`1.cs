@@ -38,6 +38,12 @@ namespace JsonFx.IO
 	/// </summary>
 	internal class EnumerableStream<T> : Stream<T>
 	{
+		#region Constants
+
+		private const int InitialChunkCapacity = 0x10;
+
+		#endregion Constants
+
 		#region Fields
 
 		private readonly IEnumerator<T> Enumerator;
@@ -139,7 +145,7 @@ namespace JsonFx.IO
 		{
 			if (this.chunk == null)
 			{
-				this.chunk = new List<T>();
+				this.chunk = new List<T>(EnumerableStream<T>.InitialChunkCapacity);
 			}
 			else
 			{
