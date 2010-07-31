@@ -55,6 +55,9 @@ namespace JsonFx.Json
 
 			private readonly DataWriterSettings Settings;
 
+			// TODO: find a way to generalize this setting
+			private readonly bool EncodeLessThan;
+
 			#endregion Fields
 
 			#region Init
@@ -64,6 +67,15 @@ namespace JsonFx.Json
 			/// </summary>
 			/// <param name="settings"></param>
 			public JsonFormatter(DataWriterSettings settings)
+				: this(settings, false)
+			{
+			}
+
+			/// <summary>
+			/// Ctor
+			/// </summary>
+			/// <param name="settings"></param>
+			public JsonFormatter(DataWriterSettings settings, bool encodeLessThan)
 			{
 				if (settings == null)
 				{
@@ -71,6 +83,7 @@ namespace JsonFx.Json
 				}
 
 				this.Settings = settings;
+				this.EncodeLessThan = encodeLessThan;
 			}
 
 			#endregion Init
@@ -431,7 +444,7 @@ namespace JsonFx.Json
 
 					if (ch <= '\u001F' ||
 						ch >= '\u007F' ||
-						ch == '<' || // improves compatibility within script blocks
+						(this.EncodeLessThan && ch == '<') || // improves compatibility within script blocks
 						ch == JsonGrammar.OperatorStringDelim ||
 						ch == JsonGrammar.OperatorCharEscape)
 					{
