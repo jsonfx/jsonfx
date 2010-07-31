@@ -99,6 +99,8 @@
     <Compile Include="Json\JsonReaderTests.cs" />
     <Compile Include="Json\JsonFormatterTests.cs" />
     <Compile Include="Json\JsonTokenizerTests.cs" />
+    <Compile Include="Json\Resolvers\JsonResolverStrategyTests.cs" />
+    <Compile Include="Serialization\Resolvers\DataContractResolverStrategyTests.cs" />
     <Compile Include="Serialization\TypeCoercionUtilityTests.cs" />
     <Compile Include="Xml\XmlConverterTests.cs" />
     <Compile Include="Xml\XmlFormatterTests.cs" />

@@ -32,11 +32,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
-using System.Linq;
 
-using JsonFx.Common;
-using JsonFx.Json;
-using JsonFx.Json.Resolvers;
 using Xunit;
 
 using Assert=JsonFx.AssertPatched;
@@ -51,24 +47,6 @@ namespace JsonFx.Serialization
 		private const string TraitValue = "TypeCoercionUtility";
 
 		#endregion Constants
-
-		#region Test Types
-
-		private enum ExampleEnum
-		{
-			Zero = 0,
-
-			[JsonName("")]
-			One = 1,
-
-			[JsonName("yellow")]
-			Two = 2,
-
-			[JsonName(null)]
-			Three = 3
-		}
-
-		#endregion Test Types
 
 		#region List Tests
 
@@ -163,153 +141,5 @@ namespace JsonFx.Serialization
 		}
 
 		#endregion Array Tests
-
-		#region Enum Tests
-
-		// TODO: these are actually testing type coercion and resolver strategy, need to isolate and improve testability
-
-		[Fact]
-		[Trait(TraitName, TraitValue)]
-		public void JsonAnalyzerParse_EnumFromString_ReturnsEnum()
-		{
-			var input = new[]
-			{
-				CommonGrammar.TokenPrimitive("Two")
-			};
-
-			var expected = ExampleEnum.Two;
-
-			var analyzer = new CommonAnalyzer(new DataReaderSettings(new JsonResolverStrategy()));
-			var actual = analyzer.Analyze<ExampleEnum>(input).Single();
-
-			Assert.Equal(expected, actual);
-		}
-
-		[Fact]
-		[Trait(TraitName, TraitValue)]
-		public void JsonAnalyzerParse_EnumFromJsonName_ReturnsEnum()
-		{
-			var input = new[]
-			{
-				CommonGrammar.TokenPrimitive("yellow")
-			};
-
-			var expected = ExampleEnum.Two;
-
-			var analyzer = new CommonAnalyzer(new DataReaderSettings(new JsonResolverStrategy()));
-			var actual = analyzer.Analyze<ExampleEnum>(input).Single();
-
-			Assert.Equal(expected, actual);
-		}
-
-		[Fact]
-		[Trait(TraitName, TraitValue)]
-		public void JsonAnalyzerParse_EnumFromNumber_ReturnsEnum()
-		{
-			var input = new[]
-			{
-				CommonGrammar.TokenPrimitive(3)
-			};
-
-			var expected = ExampleEnum.Three;
-
-			var analyzer = new CommonAnalyzer(new DataReaderSettings(new JsonResolverStrategy()));
-			var actual = analyzer.Analyze<ExampleEnum>(input).Single();
-
-			Assert.Equal(expected, actual);
-		}
-
-		#endregion Enum Tests
-
-		#region Enum Tests
-
-		// TODO: these are actually testing type coercion and resolver strategy, need to isolate and improve testability
-
-		[Fact]
-		[Trait(TraitName, TraitValue)]
-		public void JsonFormatterFormat_EnumPocoToString_ReturnsEnum()
-		{
-			var input = new[]
-			{
-				CommonGrammar.TokenPrimitive(ExampleEnum.Zero)
-			};
-
-			var expected = @"""Zero""";
-
-			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings(new JsonResolverStrategy()));
-			var actual = formatter.Format(input);
-
-			Assert.Equal(expected, actual);
-		}
-
-		[Fact]
-		[Trait(TraitName, TraitValue)]
-		public void JsonFormatterFormat_EnumEmptyStringJsonNameToString_ReturnsEnum()
-		{
-			var input = new[]
-			{
-				CommonGrammar.TokenPrimitive(ExampleEnum.One)
-			};
-
-			var expected = @"""One""";
-
-			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings(new JsonResolverStrategy()));
-			var actual = formatter.Format(input);
-
-			Assert.Equal(expected, actual);
-		}
-
-		[Fact]
-		[Trait(TraitName, TraitValue)]
-		public void JsonFormatterFormat_EnumWithJsonName_ReturnsEnum()
-		{
-			var input = new[]
-			{
-				CommonGrammar.TokenPrimitive(ExampleEnum.Two)
-			};
-
-			var expected = @"""yellow""";
-
-			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings(new JsonResolverStrategy()));
-			var actual = formatter.Format(input);
-
-			Assert.Equal(expected, actual);
-		}
-
-		[Fact]
-		[Trait(TraitName, TraitValue)]
-		public void JsonFormatterFormat_EnumNullJsonNameToString_ReturnsEnum()
-		{
-			var input = new[]
-			{
-				CommonGrammar.TokenPrimitive(ExampleEnum.Three)
-			};
-
-			var expected = @"""Three""";
-
-			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings(new JsonResolverStrategy()));
-			var actual = formatter.Format(input);
-
-			Assert.Equal(expected, actual);
-		}
-
-		[Fact]
-		[Trait(TraitName, TraitValue)]
-		public void JsonFormatterFormat_EnumFromNumber_ReturnsEnum()
-		{
-			var input = new[]
-			{
-				CommonGrammar.TokenPrimitive((int)ExampleEnum.Three)
-			};
-
-			var expected = "3";
-
-			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings(new JsonResolverStrategy()));
-			var actual = formatter.Format(input);
-
-			Assert.Equal(expected, actual);
-		}
-
-		#endregion Enum Tests
 	}
 }
