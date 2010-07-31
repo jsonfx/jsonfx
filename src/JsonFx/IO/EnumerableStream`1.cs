@@ -51,7 +51,7 @@ namespace JsonFx.IO
 		private bool isCompleted;
 		private T current;
 
-		private IList<T> chunk;
+		private List<T> chunk;
 
 		#endregion Fields
 
@@ -161,7 +161,7 @@ namespace JsonFx.IO
 			}
 
 			// build chunk value
-			IEnumerable<T> value = this.chunk;
+			IEnumerable<T> value = this.chunk.AsReadOnly();
 
 			// reset internal buffer
 			this.chunk = null;
