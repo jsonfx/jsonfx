@@ -68,8 +68,6 @@ namespace JsonFx.Json.Resolvers
 
 		#region Enum Tests
 
-		// TODO: these are actually testing type coercion and resolver strategy, need to isolate and improve testability
-
 		[Fact]
 		[Trait(TraitName, TraitValue)]
 		public void JsonAnalyzerParse_EnumFromString_ReturnsEnum()
@@ -124,8 +122,6 @@ namespace JsonFx.Json.Resolvers
 		#endregion Enum Tests
 
 		#region Enum Tests
-
-		// TODO: these are actually testing type coercion and resolver strategy, need to isolate and improve testability
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
