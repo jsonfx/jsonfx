@@ -30,7 +30,8 @@
 
 using System;
 using System.Reflection;
-using System.Runtime.Serialization;
+
+using JsonFx.CodeGen;
 
 namespace JsonFx.Serialization.Resolvers
 {
@@ -42,6 +43,56 @@ namespace JsonFx.Serialization.Resolvers
 	/// </remarks>
 	public class DataContractResolverStrategy : PocoResolverStrategy
 	{
+		#region Fields
+
+		private const string DataContractAssemblyName = "System.Runtime.Serialization";
+		private const string DataContractTypeName = "System.Runtime.Serialization.DataContractAttribute";
+		private const string DataMemberTypeName = "System.Runtime.Serialization.DataMemberAttribute";
+		private const string IgnoreDataMemberTypeName = "System.Runtime.Serialization.IgnoreDataMemberAttribute";
+
+		private static readonly Type DataContractType;
+		private static readonly Type DataMemberType;
+		private static readonly Type IgnoreDataMemberType;
+
+		private static readonly GetterDelegate DataContractNameGetter;
+		private static readonly GetterDelegate DataContractNamespaceGetter;
+		private static readonly GetterDelegate DataMemberNameGetter;
+
+		#endregion Fields
+
+		#region Init
+
+		/// <summary>
+		/// CCtor
+		/// </summary>
+		static DataContractResolverStrategy()
+		{
+			string[] assemblyName = typeof(Object).Assembly.FullName.Split(',');
+			assemblyName[0] = DataContractAssemblyName;
+
+			Assembly assembly = Assembly.Load(String.Join(",", assemblyName));
+
+			DataContractType = assembly.GetType(DataContractTypeName);
+			DataMemberType = assembly.GetType(DataMemberTypeName);
+			IgnoreDataMemberType = assembly.GetType(IgnoreDataMemberTypeName);
+
+			if (DataContractType != null)
+			{
+				PropertyInfo property = DataContractType.GetProperty("Name", BindingFlags.Public|BindingFlags.Instance);
+				DataContractNameGetter = DynamicMethodGenerator.GetPropertyGetter(property);
+				property = DataContractType.GetProperty("Namespace", BindingFlags.Public|BindingFlags.Instance);
+				DataContractNamespaceGetter = DynamicMethodGenerator.GetPropertyGetter(property);
+			}
+
+			if (DataContractResolverStrategy.DataMemberType != null)
+			{
+				PropertyInfo property = DataMemberType.GetProperty("Name", BindingFlags.Public|BindingFlags.Instance);
+				DataMemberNameGetter = DynamicMethodGenerator.GetPropertyGetter(property);
+			}
+		}
+
+		#endregion Init
+
 		#region Name Resolution Methods
 
 		/// <summary>
@@ -54,12 +105,12 @@ namespace JsonFx.Serialization.Resolvers
 		{
 			Type objType = member.ReflectedType ?? member.DeclaringType;
 
-			if (TypeCoercionUtility.HasAttribute<DataContractAttribute>(objType))
+			if (TypeCoercionUtility.HasAttribute(objType, DataContractResolverStrategy.DataContractType))
 			{
 				// use DataContract rules: member must be marked and not ignored
 				return
-					!TypeCoercionUtility.HasAttribute<DataMemberAttribute>(member) ||
-					TypeCoercionUtility.HasAttribute<IgnoreDataMemberAttribute>(member);
+					!TypeCoercionUtility.HasAttribute(member, DataContractResolverStrategy.DataMemberType) ||
+					TypeCoercionUtility.HasAttribute(member, DataContractResolverStrategy.IgnoreDataMemberType);
 			}
 
 			// use POCO rules: must be public read/write (or anonymous object)
@@ -75,12 +126,12 @@ namespace JsonFx.Serialization.Resolvers
 		{
 			Type objType = member.ReflectedType ?? member.DeclaringType;
 
-			if (TypeCoercionUtility.HasAttribute<DataContractAttribute>(objType))
+			if (TypeCoercionUtility.HasAttribute(objType, DataContractResolverStrategy.DataContractType))
 			{
 				// use DataContract rules: member must be marked and not ignored
 				return
-					!TypeCoercionUtility.HasAttribute<DataMemberAttribute>(member) ||
-					TypeCoercionUtility.HasAttribute<IgnoreDataMemberAttribute>(member);
+					!TypeCoercionUtility.HasAttribute(member, DataContractResolverStrategy.DataMemberType) ||
+					TypeCoercionUtility.HasAttribute(member, DataContractResolverStrategy.IgnoreDataMemberType);
 			}
 
 			// use POCO rules: must be public read/write
@@ -104,23 +155,40 @@ namespace JsonFx.Serialization.Resolvers
 		/// <returns></returns>
 		public override DataName GetName(MemberInfo member)
 		{
-			DataContractAttribute typeAttr;
+			string localName, ns;
+			Attribute typeAttr;
 			if (member is Type)
 			{
-				typeAttr = TypeCoercionUtility.GetAttribute<DataContractAttribute>(member);
-				return (typeAttr != null && !String.IsNullOrEmpty(typeAttr.Name)) ? new DataName(typeAttr.Name, null, typeAttr.Namespace) : DataName.Empty;
+				typeAttr = TypeCoercionUtility.GetAttribute(member, DataContractResolverStrategy.DataContractType);
+				if (typeAttr == null)
+				{
+					return DataName.Empty;
+				}
+
+				localName = (string)DataContractResolverStrategy.DataContractNameGetter(typeAttr);
+				ns = (string)DataContractResolverStrategy.DataContractNamespaceGetter(typeAttr);
+				return (!String.IsNullOrEmpty(localName)) ? new DataName(localName, null, ns) : DataName.Empty;
 			}
 
-			typeAttr = TypeCoercionUtility.GetAttribute<DataContractAttribute>(member.DeclaringType);
+			typeAttr = TypeCoercionUtility.GetAttribute(member.DeclaringType, DataContractResolverStrategy.DataContractType);
 			if (typeAttr == null)
 			{
 				return DataName.Empty;
 			}
 
-			DataMemberAttribute memberAttr = TypeCoercionUtility.GetAttribute<DataMemberAttribute>(member);
+			ns = (string)DataContractResolverStrategy.DataContractNamespaceGetter(typeAttr);
+
+			Attribute memberAttr = TypeCoercionUtility.GetAttribute(member, DataContractResolverStrategy.DataMemberType);
+			if (memberAttr == null)
+			{
+				return DataName.Empty;
+			}
+
+
+			localName = (string)DataContractResolverStrategy.DataMemberNameGetter(memberAttr);
 
 			// members inherit DataContract namespaces
-			return (memberAttr != null && !String.IsNullOrEmpty(memberAttr.Name)) ? new DataName(memberAttr.Name, null, typeAttr.Namespace) : DataName.Empty;
+			return (!String.IsNullOrEmpty(localName)) ? new DataName(localName, null, ns) : DataName.Empty;
 		}
 
 		#endregion Name Resolution Methods

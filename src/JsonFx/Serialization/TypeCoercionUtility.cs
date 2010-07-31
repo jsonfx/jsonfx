@@ -823,6 +823,16 @@ namespace JsonFx.Serialization
 		}
 
 		/// <summary>
+		/// Gets the attribute of Type <param name="type" /> for the given value.
+		/// </summary>
+		/// <param name="value"></param>
+		/// <returns>true if defined</returns>
+		public static bool HasAttribute(MemberInfo info, Type type)
+		{
+			return (info != null && type != null && Attribute.IsDefined(info, type));
+		}
+
+		/// <summary>
 		/// Gets the attribute T for the given value.
 		/// </summary>
 		/// <param name="value"></param>
@@ -836,6 +846,20 @@ namespace JsonFx.Serialization
 				return default(T);
 			}
 			return (T)Attribute.GetCustomAttribute(info, typeof(T));
+		}
+
+		/// <summary>
+		/// Gets the attribute of Type <param name="type" /> for the given value.
+		/// </summary>
+		/// <param name="value"></param>
+		/// <returns>requested attribute or not if not defined</returns>
+		public static Attribute GetAttribute(MemberInfo info, Type type)
+		{
+			if (info == null || type == null || !Attribute.IsDefined(info, type))
+			{
+				return default(Attribute);
+			}
+			return Attribute.GetCustomAttribute(info, type);
 		}
 
 		#endregion Attribute Methods

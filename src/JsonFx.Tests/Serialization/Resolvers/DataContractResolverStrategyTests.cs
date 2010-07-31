@@ -51,7 +51,7 @@ namespace JsonFx.Serialization.Resolvers
 
 		#region Test Types
 
-		[DataContract]
+		[DataContract(Namespace="http://schemas.datacontract.org/2004/07/Clr.Namespace")]
 		private enum ExampleEnum
 		{
 			Zero = 0,
