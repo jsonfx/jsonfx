@@ -64,6 +64,11 @@ namespace JsonFx.Linq
 				return null;
 			}
 
+			//if (expression.CanReduce)
+			//{
+			//    return this.Visit(expression.ReduceAndCheck());
+			//}
+
 			switch (expression.NodeType)
 			{
 				case ExpressionType.Negate:
@@ -336,6 +341,38 @@ namespace JsonFx.Linq
 		{
 			// no change
 			return p;
+		}
+
+		protected virtual IEnumerable<Expression> VisitParameterList(IList<ParameterExpression> original)
+		{
+			List<Expression> list = null;
+
+			for (int i=0, length=original.Count; i<length; i++)
+			{
+				Expression exp = this.VisitParameter(original[i]);
+				if (list != null)
+				{
+					list.Add(exp);
+				}
+				else if (exp != original[i])
+				{
+					list = new List<Expression>(length);
+					for (int j=0; j<i; j++)
+					{
+						// copy preceding values
+						list.Add(original[j]);
+					}
+					list.Add(exp);
+				}
+			}
+
+			if (list == null)
+			{
+				// no change
+				return original;
+			}
+
+			return list.AsReadOnly();
 		}
 
 		protected virtual Expression VisitMemberAccess(MemberExpression m)

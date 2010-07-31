@@ -34,585 +34,667 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 
+using JsonFx.Common;
+using JsonFx.Serialization;
+
 namespace JsonFx.Linq
 {
 	internal class ExpressionWalker :
 		ExpressionVisitor,
+		IObjectWalker<CommonTokenType>,
 		IQueryTextProvider
 	{
 		#region Fields
 
-		private readonly StringBuilder Builder = new StringBuilder();
+		private readonly ITextFormatter<CommonTokenType> Formatter;
+		private IList<Token<CommonTokenType>> tokens;
 
 		#endregion Fields
 
+		#region Init
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="formatter"></param>
+		public ExpressionWalker(ITextFormatter<CommonTokenType> formatter)
+		{
+			if (formatter == null)
+			{
+				throw new ArgumentNullException("formatter");
+			}
+
+			this.Formatter = formatter;
+		}
+
+		#endregion Init
+
 		#region Visit Methods
 
-		protected override Expression VisitUnknown(Expression exp)
+		protected override Expression Visit(Expression expression)
 		{
-			WriteOpenLabel(exp.NodeType.ToString());
-			try
+			if (expression == null)
 			{
-				return exp;
+				this.tokens.Add(CommonGrammar.TokenNull);
 			}
-			finally
-			{
-				WriteCloseLabel();
-			}
+
+			return base.Visit(expression);
 		}
 
-		protected override ElementInit VisitElementInitializer(ElementInit initializer)
+		protected override Expression VisitUnknown(Expression expression)
 		{
-			WriteOpenLabel("ElementInitializer");
-			try
-			{
-				IEnumerable<Expression> arguments = this.VisitExpressionList(initializer.Arguments);
-				if (arguments == initializer.Arguments)
-				{
-					// no change
-					return initializer;
-				}
+			this.tokens.Add(CommonGrammar.TokenPrimitive(expression.NodeType));
 
-				return Expression.ElementInit(initializer.AddMethod, arguments);
-			}
-			finally
-			{
-				WriteCloseLabel();
-			}
+			return expression;
 		}
 
-		protected override Expression VisitUnary(UnaryExpression unary)
+		protected override ElementInit VisitElementInitializer(ElementInit init)
 		{
-			WriteOpenLabel("Unary");
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			this.tokens.Add(CommonGrammar.TokenProperty("ElementInit"));
+			this.tokens.Add(CommonGrammar.TokenArrayBeginUnnamed);
+
 			try
 			{
-				Expression operand = this.Visit(unary.Operand);
-
-				WriteItem(unary.NodeType);
-
-				if (operand == unary.Operand)
-				{
-					// no change
-					return unary;
-				}
-
-				return Expression.MakeUnary(unary.NodeType, operand, unary.Type, unary.Method);
-			}
-			finally
-			{
-				WriteCloseLabel();
-			}
-		}
-
-		protected override Expression VisitBinary(BinaryExpression binary)
-		{
-			WriteOpenLabel("Binary");
-			try
-			{
-				Expression left = this.Visit(binary.Left);
-				Expression right = this.Visit(binary.Right);
-				Expression conversion = this.Visit(binary.Conversion);
-
-				if (left == binary.Left &&
-				right == binary.Right &&
-				conversion == binary.Conversion)
-				{
-					// no change
-					return binary;
-				}
-
-				if (binary.NodeType == ExpressionType.Coalesce && binary.Conversion != null)
-				{
-					return Expression.Coalesce(left, right, conversion as LambdaExpression);
-				}
-
-				return Expression.MakeBinary(binary.NodeType, left, right, binary.IsLiftedToNull, binary.Method);
-			}
-			finally
-			{
-				WriteCloseLabel();
-			}
-		}
-
-		protected override Expression VisitTypeIs(TypeBinaryExpression binary)
-		{
-			WriteOpenLabel("TypeIs");
-			try
-			{
-				Expression expr = this.Visit(binary.Expression);
-				if (expr == binary.Expression)
-				{
-					// no change
-					return binary;
-				}
-
-				return Expression.TypeIs(expr, binary.TypeOperand);
-			}
-			finally
-			{
-				WriteCloseLabel();
-			}
-		}
-
-		protected override Expression VisitConstant(ConstantExpression constant)
-		{
-			WriteOpenLabel("Constant");
-			try
-			{
-				WriteItem(constant.Type.Name);
+				this.VisitExpressionList(init.Arguments);
 
 				// no change
-				return constant;
+				return init;
 			}
 			finally
 			{
-				WriteCloseLabel();
+				this.tokens.Add(CommonGrammar.TokenArrayEnd);
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
 			}
 		}
 
-		protected override Expression VisitConditional(ConditionalExpression conditional)
+		protected override Expression VisitUnary(UnaryExpression expression)
 		{
-			WriteOpenLabel("Conditional");
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			this.tokens.Add(CommonGrammar.TokenProperty(expression.NodeType));
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+
 			try
 			{
-				Expression test = this.Visit(conditional.Test);
-				Expression ifTrue = this.Visit(conditional.IfTrue);
-				Expression ifFalse = this.Visit(conditional.IfFalse);
+				this.tokens.Add(CommonGrammar.TokenProperty("Type"));
+				this.tokens.Add(CommonGrammar.TokenPrimitive(expression.Type.Name));
 
-				if (test == conditional.Test &&
-				ifTrue == conditional.IfTrue &&
-				ifFalse == conditional.IfFalse)
-				{
-					// no change
-					return conditional;
-				}
+				this.tokens.Add(CommonGrammar.TokenProperty("Method"));
+				this.tokens.Add(CommonGrammar.TokenPrimitive(expression.Method != null ? expression.Method.Name : null));
 
-				return Expression.Condition(test, ifTrue, ifFalse);
-			}
-			finally
-			{
-				WriteCloseLabel();
-			}
-		}
-
-		protected override Expression VisitParameter(ParameterExpression p)
-		{
-			WriteOpenLabel("Parameter");
-			try
-			{
-				WriteItem(p.Name);
+				this.tokens.Add(CommonGrammar.TokenProperty("Operand"));
+				this.Visit(expression.Operand);
 
 				// no change
-				return p;
+				return expression;
 			}
 			finally
 			{
-				WriteCloseLabel();
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
 			}
 		}
 
-		protected override Expression VisitMemberAccess(MemberExpression m)
+		protected override Expression VisitBinary(BinaryExpression expression)
 		{
-			WriteOpenLabel("MemberAccess");
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			this.tokens.Add(CommonGrammar.TokenProperty(expression.NodeType));
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+
 			try
 			{
-				Expression exp = this.Visit(m.Expression);
+				this.tokens.Add(CommonGrammar.TokenProperty("Left"));
+				this.Visit(expression.Left);
 
-				if (exp == m.Expression)
-				{
-					// no change
-					return m;
-				}
+				this.tokens.Add(CommonGrammar.TokenProperty("Right"));
+				this.Visit(expression.Right);
 
-				return Expression.MakeMemberAccess(exp, m.Member);
+				this.tokens.Add(CommonGrammar.TokenProperty("Conversion"));
+				this.Visit(expression.Conversion);
+
+				this.tokens.Add(CommonGrammar.TokenProperty("IsLiftedToNull"));
+				this.tokens.Add(CommonGrammar.TokenPrimitive(expression.IsLiftedToNull));
+
+				this.tokens.Add(CommonGrammar.TokenProperty("Method"));
+				this.tokens.Add(CommonGrammar.TokenPrimitive(expression.Method != null ? expression.Method.Name : null));
+
+				// no change
+				return expression;
 			}
 			finally
 			{
-				WriteCloseLabel();
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
 			}
 		}
 
-		protected override Expression VisitMethodCall(MethodCallExpression m)
+		protected override Expression VisitTypeIs(TypeBinaryExpression expression)
 		{
-			WriteOpenLabel("MethodCall");
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			this.tokens.Add(CommonGrammar.TokenProperty(expression.NodeType));
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+
 			try
 			{
-				Expression obj = this.Visit(m.Object);
-				IEnumerable<Expression> args = this.VisitExpressionList(m.Arguments);
+				this.tokens.Add(CommonGrammar.TokenProperty("TypeOperand"));
+				this.tokens.Add(CommonGrammar.TokenPrimitive(expression.TypeOperand));
 
-				if (obj == m.Object && args == m.Arguments)
-				{
-					// no change
-					return m;
-				}
+				this.tokens.Add(CommonGrammar.TokenProperty("Expression"));
+				this.Visit(expression.Expression);
 
-				return Expression.Call(obj, m.Method, args);
+				// no change
+				return expression;
 			}
 			finally
 			{
-				WriteCloseLabel();
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
 			}
 		}
 
-		protected override IEnumerable<Expression> VisitExpressionList(IList<Expression> original)
+		protected override Expression VisitConstant(ConstantExpression expression)
 		{
-			WriteOpenLabel("ExpressionList");
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			this.tokens.Add(CommonGrammar.TokenProperty(expression.NodeType));
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+
 			try
 			{
-				List<Expression> list = null;
+				this.tokens.Add(CommonGrammar.TokenProperty("Type"));
+				this.tokens.Add(CommonGrammar.TokenPrimitive(expression.Type.Name));
 
-				for (int i=0, length=original.Count; i<length; i++)
-				{
-					Expression exp = this.Visit(original[i]);
-					if (list != null)
-					{
-						list.Add(exp);
-					}
-					else if (exp != original[i])
-					{
-						list = new List<Expression>(length);
-						for (int j=0; j<i; j++)
-						{
-							// copy preceding values
-							list.Add(original[j]);
-						}
-						list.Add(exp);
-					}
-				}
-
-				if (list == null)
-				{
-					// no change
-					return original;
-				}
-
-				return list.AsReadOnly();
+				// no change
+				return expression;
 			}
 			finally
 			{
-				WriteCloseLabel();
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
+			}
+		}
+
+		protected override Expression VisitConditional(ConditionalExpression expression)
+		{
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			this.tokens.Add(CommonGrammar.TokenProperty(expression.NodeType));
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+
+			try
+			{
+				this.tokens.Add(CommonGrammar.TokenProperty("Test"));
+				this.Visit(expression.Test);
+
+				this.tokens.Add(CommonGrammar.TokenProperty("IfTrue"));
+				this.Visit(expression.IfTrue);
+
+				this.tokens.Add(CommonGrammar.TokenProperty("IfFalse"));
+				this.Visit(expression.IfFalse);
+
+				// no change
+				return expression;
+			}
+			finally
+			{
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
+			}
+		}
+
+		protected override Expression VisitParameter(ParameterExpression expression)
+		{
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			this.tokens.Add(CommonGrammar.TokenProperty(expression.NodeType));
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+
+			try
+			{
+				this.tokens.Add(CommonGrammar.TokenProperty("Type"));
+				this.tokens.Add(CommonGrammar.TokenPrimitive(expression.Type.Name));
+
+				this.tokens.Add(CommonGrammar.TokenProperty("Name"));
+				this.tokens.Add(CommonGrammar.TokenPrimitive(expression.Name));
+
+				// no change
+				return expression;
+			}
+			finally
+			{
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
+			}
+		}
+
+		protected override IEnumerable<Expression> VisitParameterList(IList<ParameterExpression> list)
+		{
+			this.tokens.Add(CommonGrammar.TokenArrayBeginUnnamed);
+			try
+			{
+				foreach (var item in list)
+				{
+					this.VisitParameter(item);
+				}
+
+				// no change
+				return list;
+			}
+			finally
+			{
+				this.tokens.Add(CommonGrammar.TokenArrayEnd);
+			}
+		}
+
+		protected override Expression VisitMemberAccess(MemberExpression expression)
+		{
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			this.tokens.Add(CommonGrammar.TokenProperty(expression.NodeType));
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+
+			try
+			{
+				this.tokens.Add(CommonGrammar.TokenProperty("Member"));
+				this.Visit(expression.Expression);
+
+				// no change
+				return expression;
+			}
+			finally
+			{
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
+			}
+		}
+
+		protected override Expression VisitMethodCall(MethodCallExpression expression)
+		{
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			this.tokens.Add(CommonGrammar.TokenProperty(expression.NodeType));
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+
+			try
+			{
+				this.tokens.Add(CommonGrammar.TokenProperty("Object"));
+				this.Visit(expression.Object);
+
+				this.tokens.Add(CommonGrammar.TokenProperty("Method"));
+				this.tokens.Add(CommonGrammar.TokenPrimitive(expression.Method != null ? expression.Method.Name : null));
+
+				this.tokens.Add(CommonGrammar.TokenProperty("Arguments"));
+
+				this.VisitExpressionList(expression.Arguments);
+
+				// no change
+				return expression;
+			}
+			finally
+			{
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
+			}
+		}
+
+		protected override IEnumerable<Expression> VisitExpressionList(IList<Expression> list)
+		{
+			this.tokens.Add(CommonGrammar.TokenArrayBeginUnnamed);
+
+			try
+			{
+				foreach (Expression item in list)
+				{
+					this.Visit(item);
+				}
+
+				// no change
+				return list;
+			}
+			finally
+			{
+				this.tokens.Add(CommonGrammar.TokenArrayEnd);
 			}
 		}
 
 		protected override MemberAssignment VisitMemberAssignment(MemberAssignment assignment)
 		{
-			WriteOpenLabel("MemberAssignment");
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			this.tokens.Add(CommonGrammar.TokenProperty("MemberAssignment"));
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+
 			try
 			{
-				Expression exp = this.Visit(assignment.Expression);
+				this.tokens.Add(CommonGrammar.TokenProperty("Member"));
+				this.tokens.Add(CommonGrammar.TokenPrimitive(assignment.Member.Name));
 
-				if (exp == assignment.Expression)
-				{
-					// no change
-					return assignment;
-				}
+				this.tokens.Add(CommonGrammar.TokenProperty("Expression"));
+				this.Visit(assignment.Expression);
 
-				return Expression.Bind(assignment.Member, exp);
+				// no change
+				return assignment;
 			}
 			finally
 			{
-				WriteCloseLabel();
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
 			}
 		}
 
 		protected override MemberMemberBinding VisitMemberMemberBinding(MemberMemberBinding binding)
 		{
-			WriteOpenLabel("MemberMemberBinding");
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			this.tokens.Add(CommonGrammar.TokenProperty("MemberMemberBinding"));
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+
 			try
 			{
-				IEnumerable<MemberBinding> bindings = this.VisitBindingList(binding.Bindings);
+				this.tokens.Add(CommonGrammar.TokenProperty("Member"));
+				this.tokens.Add(CommonGrammar.TokenPrimitive(binding.Member.Name));
 
-				if (bindings == binding.Bindings)
-				{
-					// no change
-					return binding;
-				}
+				this.tokens.Add(CommonGrammar.TokenProperty("Bindings"));
+				this.VisitBindingList(binding.Bindings);
 
-				return Expression.MemberBind(binding.Member, bindings);
+				// no change
+				return binding;
 			}
 			finally
 			{
-				WriteCloseLabel();
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
 			}
 		}
 
 		protected override MemberListBinding VisitMemberListBinding(MemberListBinding binding)
 		{
-			WriteOpenLabel("MemberListBinding");
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			this.tokens.Add(CommonGrammar.TokenProperty("MemberListBinding"));
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+
 			try
 			{
-				IEnumerable<ElementInit> initializers = this.VisitElementInitializerList(binding.Initializers);
+				this.tokens.Add(CommonGrammar.TokenProperty("Member"));
+				this.tokens.Add(CommonGrammar.TokenPrimitive(binding.Member.Name));
 
-				if (initializers == binding.Initializers)
-				{
-					// no change
-					return binding;
-				}
+				this.tokens.Add(CommonGrammar.TokenProperty("Initializers"));
+				this.VisitElementInitializerList(binding.Initializers);
 
-				return Expression.ListBind(binding.Member, initializers);
+				// no change
+				return binding;
 			}
 			finally
 			{
-				WriteCloseLabel();
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
 			}
 		}
 
-		protected override IEnumerable<MemberBinding> VisitBindingList(IList<MemberBinding> original)
+		protected override IEnumerable<MemberBinding> VisitBindingList(IList<MemberBinding> list)
 		{
-			WriteOpenLabel("BindingList");
+			this.tokens.Add(CommonGrammar.TokenArrayBeginUnnamed);
+
 			try
 			{
-				List<MemberBinding> list = null;
-
-				for (int i=0, length=original.Count; i<length; i++)
+				foreach (var item in list)
 				{
-					MemberBinding b = this.VisitBinding(original[i]);
-					if (list != null)
-					{
-						list.Add(b);
-					}
-					else if (b != original[i])
-					{
-						list = new List<MemberBinding>(length);
-						for (int j = 0; j < i; j++)
-						{
-							// copy preceding values
-							list.Add(original[j]);
-						}
-						list.Add(b);
-					}
+					this.VisitBinding(item);
 				}
 
-				if (list == null)
-				{
-					// no change
-					return original;
-				}
-
+				// no change
 				return list;
 			}
 			finally
 			{
-				WriteCloseLabel();
+				this.tokens.Add(CommonGrammar.TokenArrayEnd);
 			}
 		}
 
-		protected override IEnumerable<ElementInit> VisitElementInitializerList(IList<ElementInit> original)
+		protected override IEnumerable<ElementInit> VisitElementInitializerList(IList<ElementInit> list)
 		{
-			WriteOpenLabel("ElementInitializerList");
+			this.tokens.Add(CommonGrammar.TokenArrayBeginUnnamed);
+
 			try
 			{
-				List<ElementInit> list = null;
-
-				for (int i=0, length=original.Count; i<length; i++)
+				foreach (var item in list)
 				{
-					ElementInit init = this.VisitElementInitializer(original[i]);
-					if (list != null)
-					{
-						list.Add(init);
-					}
-					else if (init != original[i])
-					{
-						list = new List<ElementInit>(length);
-						for (int j = 0; j < i; j++)
-						{
-							// copy preceding values
-							list.Add(original[j]);
-						}
-						list.Add(init);
-					}
+					this.VisitElementInitializer(item);
 				}
 
-				if (list == null)
-				{
-					// no change
-					return original;
-				}
-
+				// no change
 				return list;
 			}
 			finally
 			{
-				WriteCloseLabel();
+				this.tokens.Add(CommonGrammar.TokenArrayEnd);
 			}
 		}
 
-		protected override Expression VisitLambda(LambdaExpression lambda)
+		protected override Expression VisitLambda(LambdaExpression expression)
 		{
-			WriteOpenLabel("Lambda");
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			this.tokens.Add(CommonGrammar.TokenProperty(expression.NodeType));
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+
 			try
 			{
-				Expression body = this.Visit(lambda.Body);
-				if (body == lambda.Body)
-				{
-					// no change
-					return lambda;
-				}
+				this.tokens.Add(CommonGrammar.TokenProperty("Type"));
+				this.tokens.Add(CommonGrammar.TokenPrimitive(expression.Type.Name));
 
-				return Expression.Lambda(lambda.Type, body, lambda.Parameters);
+				this.tokens.Add(CommonGrammar.TokenProperty("Body"));
+				Expression body = this.Visit(expression.Body);
+
+				this.tokens.Add(CommonGrammar.TokenProperty("Parameters"));
+				this.tokens.Add(CommonGrammar.TokenArrayBeginUnnamed);
+				foreach (ParameterExpression param in expression.Parameters)
+				{
+					this.VisitParameter(param);
+				}
+				this.tokens.Add(CommonGrammar.TokenArrayEnd);
+
+				// no change
+				return expression;
 			}
 			finally
 			{
-				WriteCloseLabel();
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
 			}
 		}
 
-		protected override NewExpression VisitNew(NewExpression ctor)
+		protected override NewExpression VisitNew(NewExpression expression)
 		{
-			WriteOpenLabel("New");
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			this.tokens.Add(CommonGrammar.TokenProperty(expression.NodeType));
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+
 			try
 			{
-				IEnumerable<Expression> args = this.VisitExpressionList(ctor.Arguments);
-				if (args == ctor.Arguments)
+				this.tokens.Add(CommonGrammar.TokenProperty("Arguments"));
+				this.VisitExpressionList(expression.Arguments);
+
+				this.tokens.Add(CommonGrammar.TokenProperty("Members"));
+				if (expression.Members == null)
 				{
-					// no change
-					return ctor;
+					this.tokens.Add(CommonGrammar.TokenNull);
+				}
+				else
+				{
+					this.tokens.Add(CommonGrammar.TokenArrayBeginUnnamed);
+					foreach (var member in expression.Members)
+					{
+						this.tokens.Add(CommonGrammar.TokenPrimitive(member.Name));
+					}
+					this.tokens.Add(CommonGrammar.TokenArrayEnd);
 				}
 
-				if (ctor.Members == null)
-				{
-					return Expression.New(ctor.Constructor, args);
-				}
-
-				return Expression.New(ctor.Constructor, args, ctor.Members);
+				// no change
+				return expression;
 			}
 			finally
 			{
-				WriteCloseLabel();
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
 			}
 		}
 
-		protected override Expression VisitMemberInit(MemberInitExpression init)
+		protected override Expression VisitMemberInit(MemberInitExpression expression)
 		{
-			WriteOpenLabel("MemberInit");
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			this.tokens.Add(CommonGrammar.TokenProperty(expression.NodeType));
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+
 			try
 			{
-				NewExpression ctor = this.VisitNew(init.NewExpression);
-				IEnumerable<MemberBinding> bindings = this.VisitBindingList(init.Bindings);
+				this.tokens.Add(CommonGrammar.TokenProperty("NewExpression"));
+				this.VisitNew(expression.NewExpression);
 
-				if (ctor == init.NewExpression && bindings == init.Bindings)
-				{
-					// no change
-					return init;
-				}
+				this.tokens.Add(CommonGrammar.TokenProperty("Bindings"));
+				this.VisitBindingList(expression.Bindings);
 
-				return Expression.MemberInit(ctor, bindings);
+				// no change
+				return expression;
 			}
 			finally
 			{
-				WriteCloseLabel();
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
 			}
 		}
 
-		protected override Expression VisitListInit(ListInitExpression init)
+		protected override Expression VisitListInit(ListInitExpression expression)
 		{
-			WriteOpenLabel("ListInit");
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			this.tokens.Add(CommonGrammar.TokenProperty(expression.NodeType));
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+
 			try
 			{
-				NewExpression ctor = this.VisitNew(init.NewExpression);
-				IEnumerable<ElementInit> initializers = this.VisitElementInitializerList(init.Initializers);
+				this.tokens.Add(CommonGrammar.TokenProperty("NewExpression"));
+				NewExpression ctor = this.VisitNew(expression.NewExpression);
 
-				if (ctor == init.NewExpression && initializers == init.Initializers)
-				{
-					// no change
-					return init;
-				}
+				this.tokens.Add(CommonGrammar.TokenProperty("Initializers"));
+				this.VisitElementInitializerList(expression.Initializers);
 
-				return Expression.ListInit(ctor, initializers);
+				// no change
+				return expression;
 			}
 			finally
 			{
-				WriteCloseLabel();
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
 			}
 		}
 
-		protected override Expression VisitNewArray(NewArrayExpression ctor)
+		protected override Expression VisitNewArray(NewArrayExpression expression)
 		{
-			WriteOpenLabel("NewArray");
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			this.tokens.Add(CommonGrammar.TokenProperty(expression.NodeType));
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+
 			try
 			{
-				IEnumerable<Expression> exprs = this.VisitExpressionList(ctor.Expressions);
-				if (exprs == ctor.Expressions)
-				{
-					// no change
-					return ctor;
-				}
+				this.tokens.Add(CommonGrammar.TokenProperty("ElementType"));
+				this.tokens.Add(CommonGrammar.TokenPrimitive(expression.Type.GetElementType()));
 
-				if (ctor.NodeType == ExpressionType.NewArrayInit)
-				{
-					return Expression.NewArrayInit(ctor.Type.GetElementType(), exprs);
-				}
+				this.tokens.Add(CommonGrammar.TokenProperty("Expressions"));
+				this.VisitExpressionList(expression.Expressions);
 
-				return Expression.NewArrayBounds(ctor.Type.GetElementType(), exprs);
+				// no change
+				return expression;
 			}
 			finally
 			{
-				WriteCloseLabel();
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
 			}
 		}
 
-		protected override Expression VisitInvocation(InvocationExpression invoke)
+		protected override Expression VisitInvocation(InvocationExpression expression)
 		{
-			WriteOpenLabel("Invocation");
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			this.tokens.Add(CommonGrammar.TokenProperty(expression.NodeType));
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+
 			try
 			{
-				IEnumerable<Expression> args = this.VisitExpressionList(invoke.Arguments);
-				Expression expr = this.Visit(invoke.Expression);
+				this.tokens.Add(CommonGrammar.TokenProperty("Arguments"));
+				this.VisitExpressionList(expression.Arguments);
 
-				if (args == invoke.Arguments && expr == invoke.Expression)
-				{
-					// no change
-					return invoke;
-				}
+				this.tokens.Add(CommonGrammar.TokenProperty("Expression"));
+				Expression expr = this.Visit(expression.Expression);
 
-				return Expression.Invoke(expr, args);
+				// no change
+				return expression;
 			}
 			finally
 			{
-				WriteCloseLabel();
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
 			}
 		}
 
 #if NET40
-		protected override Expression VisitBlock(BlockExpression exp)
+		protected override Expression VisitBlock(BlockExpression expression)
 		{
-			WriteOpenLabel("Block");
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			this.tokens.Add(CommonGrammar.TokenProperty(expression.NodeType));
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+
 			try
 			{
-				// TODO: implement visitor method
-				return exp;
+				this.tokens.Add(CommonGrammar.TokenProperty("Variables"));
+				this.VisitParameterList(expression.Variables);
+
+				this.tokens.Add(CommonGrammar.TokenProperty("Expressions"));
+				this.VisitExpressionList(expression.Expressions);
+
+				// no change
+				return expression;
 			}
 			finally
 			{
-				WriteCloseLabel();
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
 			}
 		}
 
-		protected override Expression VisitDynamic(DynamicExpression exp)
+		protected override Expression VisitDynamic(DynamicExpression expression)
 		{
-			WriteOpenLabel("Dynamic");
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			this.tokens.Add(CommonGrammar.TokenProperty(expression.NodeType));
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+
 			try
 			{
-				// TODO: implement visitor method
-				return exp;
+				this.tokens.Add(CommonGrammar.TokenProperty("Arguments"));
+				this.VisitExpressionList(expression.Arguments);
+
+				this.tokens.Add(CommonGrammar.TokenProperty("Binder"));
+				this.tokens.Add(CommonGrammar.TokenPrimitive(expression.Binder != null ? expression.Binder.GetType().Name : null));
+
+				// no change
+				return expression;
 			}
 			finally
 			{
-				WriteCloseLabel();
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
 			}
 		}
 
-		protected override Expression VisitDefault(DefaultExpression exp)
+		protected override Expression VisitDefault(DefaultExpression expression)
 		{
-			WriteOpenLabel("Default");
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			this.tokens.Add(CommonGrammar.TokenProperty(expression.NodeType));
+			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+
 			try
 			{
-				// TODO: implement visitor method
-				return exp;
+				this.tokens.Add(CommonGrammar.TokenProperty("Type"));
+				this.tokens.Add(CommonGrammar.TokenPrimitive(expression.Type.Name));
+
+				// no change
+				return expression;
 			}
 			finally
 			{
-				WriteCloseLabel();
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
+				this.tokens.Add(CommonGrammar.TokenObjectEnd);
 			}
 		}
 #endif
@@ -623,94 +705,34 @@ namespace JsonFx.Linq
 
 		public string GetQueryText(Expression expression)
 		{
-			this.Builder.Length = 0;
-			this.Builder.Append('[');
-			this.depth++;
-			pendingCRLF = true;
-			pendingDelim = false;
+			var tokens = this.GetTokens(expression);
 
-			this.Visit(expression);
-
-			this.depth--;
-			this.WriteLine();
-			this.Builder.Append(']');
-			return this.Builder.ToString();
-		}
-
-		int depth;
-		bool pendingCRLF, pendingDelim;
-		private void WriteOpenLabel(string label)
-		{
-			if (pendingDelim)
-			{
-				this.Builder.Append(",");
-				pendingDelim = false;
-				pendingCRLF = true;
-			}
-			else if (this.Builder.Length > 0)
-			{
-				char last = this.Builder[this.Builder.Length-1];
-
-				if (last == '[')
-				{
-					pendingCRLF = true;
-				}
-			}
-			if (pendingCRLF)
-			{
-				pendingCRLF = false;
-				this.WriteLine();
-			}
-			this.Builder.Append(label);
-			this.Builder.Append(": [");
-
-			this.depth++;
-		}
-
-		private void WriteItem(object value)
-		{
-			if (pendingDelim)
-			{
-				this.Builder.Append(',');
-				this.WriteLine();
-			}
-			else if (pendingCRLF)
-			{
-				this.WriteLine();
-				pendingCRLF = true;
-			}
-			else
-			{
-				this.Builder.Append(' ');
-			}
-			this.Builder.Append(value);
-			pendingDelim = true;
-		}
-
-		private void WriteCloseLabel()
-		{
-			this.depth--;
-			if (pendingCRLF)
-			{
-				this.WriteLine();
-			}
-			else if (pendingDelim)
-			{
-				this.Builder.Append(' ');
-			}
-			this.Builder.Append(']');
-			pendingCRLF = pendingDelim = true;
-		}
-
-		private void WriteLine()
-		{
-			// emit CRLF
-			this.Builder.AppendLine();
-
-			// indent next line accordingly
-			this.Builder.Append(new String('\t', this.depth));
+			return this.Formatter.Format(tokens);
 		}
 
 		#endregion IQueryTextProvider Members
+
+		#region IObjectWalker<Token<CommonTokenType>> Members
+
+		IEnumerable<Token<CommonTokenType>> IObjectWalker<CommonTokenType>.GetTokens(object value)
+		{
+			return this.GetTokens(value as Expression);
+		}
+
+		public IEnumerable<Token<CommonTokenType>> GetTokens(Expression expression)
+		{
+			if (expression == null)
+			{
+				throw new InvalidOperationException("ExpressionWalker only walks expressions.");
+			}
+
+			this.tokens = new List<Token<CommonTokenType>>();
+
+			this.Visit(expression);
+
+			return this.tokens;
+		}
+
+		#endregion IObjectWalker<Token<CommonTokenType>> Members
 	}
 }
