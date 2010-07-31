@@ -337,26 +337,26 @@ namespace JsonFx.Linq
 			return Expression.Condition(test, ifTrue, ifFalse);
 		}
 
-		protected virtual Expression VisitParameter(ParameterExpression p)
+		protected virtual ParameterExpression VisitParameter(ParameterExpression p)
 		{
 			// no change
 			return p;
 		}
 
-		protected virtual IEnumerable<Expression> VisitParameterList(IList<ParameterExpression> original)
+		protected virtual IEnumerable<ParameterExpression> VisitParameterList(IList<ParameterExpression> original)
 		{
-			List<Expression> list = null;
+			List<ParameterExpression> list = null;
 
 			for (int i=0, length=original.Count; i<length; i++)
 			{
-				Expression exp = this.VisitParameter(original[i]);
+				ParameterExpression exp = this.VisitParameter(original[i]);
 				if (list != null)
 				{
 					list.Add(exp);
 				}
 				else if (exp != original[i])
 				{
-					list = new List<Expression>(length);
+					list = new List<ParameterExpression>(length);
 					for (int j=0; j<i; j++)
 					{
 						// copy preceding values

@@ -240,7 +240,7 @@ namespace JsonFx.Linq
 			}
 		}
 
-		protected override Expression VisitParameter(ParameterExpression expression)
+		protected override ParameterExpression VisitParameter(ParameterExpression expression)
 		{
 			this.tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
 			this.tokens.Add(CommonGrammar.TokenProperty(expression.NodeType));
@@ -264,7 +264,7 @@ namespace JsonFx.Linq
 			}
 		}
 
-		protected override IEnumerable<Expression> VisitParameterList(IList<ParameterExpression> list)
+		protected override IEnumerable<ParameterExpression> VisitParameterList(IList<ParameterExpression> list)
 		{
 			this.tokens.Add(CommonGrammar.TokenArrayBeginUnnamed);
 			try
