@@ -117,7 +117,7 @@ namespace JsonFx.Linq
 			try
 			{
 				this.tokens.Add(CommonGrammar.TokenProperty("Type"));
-				this.tokens.Add(CommonGrammar.TokenPrimitive(expression.Type.Name));
+				this.tokens.Add(CommonGrammar.TokenPrimitive(this.GetTypeName(expression.Type)));
 
 				this.tokens.Add(CommonGrammar.TokenProperty("Method"));
 				this.tokens.Add(CommonGrammar.TokenPrimitive(expression.Method != null ? expression.Method.Name : null));
@@ -201,7 +201,7 @@ namespace JsonFx.Linq
 			try
 			{
 				this.tokens.Add(CommonGrammar.TokenProperty("Type"));
-				this.tokens.Add(CommonGrammar.TokenPrimitive(expression.Type.Name));
+				this.tokens.Add(CommonGrammar.TokenPrimitive(this.GetTypeName(expression.Type)));
 
 				// no change
 				return expression;
@@ -249,7 +249,7 @@ namespace JsonFx.Linq
 			try
 			{
 				this.tokens.Add(CommonGrammar.TokenProperty("Type"));
-				this.tokens.Add(CommonGrammar.TokenPrimitive(expression.Type.Name));
+				this.tokens.Add(CommonGrammar.TokenPrimitive(this.GetTypeName(expression.Type)));
 
 				this.tokens.Add(CommonGrammar.TokenProperty("Name"));
 				this.tokens.Add(CommonGrammar.TokenPrimitive(expression.Name));
@@ -473,7 +473,7 @@ namespace JsonFx.Linq
 			try
 			{
 				this.tokens.Add(CommonGrammar.TokenProperty("Type"));
-				this.tokens.Add(CommonGrammar.TokenPrimitive(expression.Type.Name));
+				this.tokens.Add(CommonGrammar.TokenPrimitive(this.GetTypeName(expression.Type)));
 
 				this.tokens.Add(CommonGrammar.TokenProperty("Body"));
 				Expression body = this.Visit(expression.Body);
@@ -686,7 +686,7 @@ namespace JsonFx.Linq
 			try
 			{
 				this.tokens.Add(CommonGrammar.TokenProperty("Type"));
-				this.tokens.Add(CommonGrammar.TokenPrimitive(expression.Type.Name));
+				this.tokens.Add(CommonGrammar.TokenPrimitive(this.GetTypeName(expression.Type)));
 
 				// no change
 				return expression;
@@ -734,5 +734,33 @@ namespace JsonFx.Linq
 		}
 
 		#endregion IObjectWalker<Token<CommonTokenType>> Members
+
+		#region Utility Methods
+
+		private string GetTypeName(Type type)
+		{
+			if (!type.IsGenericType)
+			{
+				return type.Name;
+			}
+
+			StringBuilder builder = new StringBuilder(type.GetGenericTypeDefinition().Name.Split('`')[0]);
+			Type[] args = type.GetGenericArguments();
+
+			builder.Append('<');
+			for (int i=0, length=args.Length; i<length; i++)
+			{
+				if (i > 0)
+				{
+					builder.Append(", ");
+				}
+				builder.Append(this.GetTypeName(args[0]));
+			}
+			builder.Append('>');
+
+			return builder.ToString();
+		}
+
+		#endregion Utility Methods
 	}
 }
