@@ -219,6 +219,11 @@ namespace JsonFx.Serialization
 		{
 			Type type = (value == null) ? null : value.GetType();
 
+			if (type != null && type.IsEnum)
+			{
+				return ((Enum)value).ToString("F");
+			}
+
 			// explicitly control BCL primitives
 			switch (Type.GetTypeCode(type))
 			{
