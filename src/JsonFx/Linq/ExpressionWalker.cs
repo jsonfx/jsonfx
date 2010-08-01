@@ -291,6 +291,9 @@ namespace JsonFx.Linq
 			try
 			{
 				this.tokens.Add(CommonGrammar.TokenProperty("Member"));
+				this.tokens.Add(CommonGrammar.TokenPrimitive(expression.Member.Name));
+
+				this.tokens.Add(CommonGrammar.TokenProperty("Expression"));
 				this.Visit(expression.Expression);
 
 				// no change
