@@ -237,11 +237,11 @@ namespace JsonFx.Common
 
 		#endregion IsPrimitive Tests
 
-		#region Array Item Tests
+		#region ArrayItems Tests
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void GetArrayItems_MixedPrimitivesFilterAll_ReturnsSplitSequences()
+		public void ArrayItems_MixedPrimitivesFilterAll_ReturnsSplitSequences()
 		{
 			var input = new[]
 		    {
@@ -258,14 +258,14 @@ namespace JsonFx.Common
 			var expected = new IEnumerable<Token<CommonTokenType>>[0];
 
 			// select no items
-			var actual = input.GetArrayItems(index => false).ToArray();
+			var actual = input.ArrayItems(index => false).ToArray();
 
 			Assert.Equal(expected, actual, false);
 		}
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void GetArrayItems_MixedPrimitivesNoFilter_ReturnsSplitSequences()
+		public void ArrayItems_MixedPrimitivesNoFilter_ReturnsSplitSequences()
 		{
 			var input = new[]
 		    {
@@ -308,14 +308,14 @@ namespace JsonFx.Common
 			};
 
 			// select all items
-			var actual = input.GetArrayItems().ToArray();
+			var actual = input.ArrayItems().ToArray();
 
 			Assert.Equal(expected, actual, false);
 		}
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void GetArrayItems_MixedPrimitivesFilterNonNull_ReturnsSplitSequences()
+		public void ArrayItems_MixedPrimitivesFilterNonNull_ReturnsSplitSequences()
 		{
 			var input = new[]
 		    {
@@ -350,14 +350,14 @@ namespace JsonFx.Common
 			};
 
 			// select all items with a non-null value
-			var actual = input.GetArrayItems().Where(item => item.All(token => token.Value != null)).ToArray();
+			var actual = input.ArrayItems().Where(item => item.All(token => token.Value != null)).ToArray();
 
 			Assert.Equal(expected, actual, false);
 		}
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void GetArrayItems_NestedArray_ReturnsSplitSequences()
+		public void ArrayItems_NestedArray_ReturnsSplitSequences()
 		{
 			var input = new[]
 		    {
@@ -402,14 +402,14 @@ namespace JsonFx.Common
 			};
 
 			// select all items
-			var actual = input.GetArrayItems(index => true).ToArray();
+			var actual = input.ArrayItems(index => true).ToArray();
 
 			Assert.Equal(expected, actual, false);
 		}
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void GetArrayItems_NestedObject_ReturnsSplitSequences()
+		public void ArrayItems_NestedObject_ReturnsSplitSequences()
 		{
 			var input = new[]
 		    {
@@ -452,14 +452,14 @@ namespace JsonFx.Common
 			};
 
 			// select all items
-			var actual = input.GetArrayItems(index => true).ToArray();
+			var actual = input.ArrayItems(index => true).ToArray();
 
 			Assert.Equal(expected, actual, false);
 		}
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void GetArrayItem_IndexFilter_ReturnsSplitSequences()
+		public void ArrayItems_IndexFilter_ReturnsSplitSequences()
 		{
 			var input = new[]
 		    {
@@ -489,14 +489,14 @@ namespace JsonFx.Common
 			};
 
 			// select items with odd indexes
-			var actual = input.GetArrayItems(index => (index % 2 == 1)).ToArray();
+			var actual = input.ArrayItems(index => (index % 2 == 1)).ToArray();
 
 			Assert.Equal(expected, actual, false);
 		}
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void GetArrayItems_FilteringByIndexAndValue_ReturnsSplitSequences()
+		public void ArrayItems_FilteringByIndexAndValue_ReturnsSplitSequences()
 		{
 			var input = new[]
 		    {
@@ -527,14 +527,14 @@ namespace JsonFx.Common
 			};
 
 			// select all even index primitive items
-			var actual = input.GetArrayItems(index => (index % 2 == 0)).Where(item => item.IsPrimitive()).ToArray();
+			var actual = input.ArrayItems(index => (index % 2 == 0)).Where(item => item.IsPrimitive()).ToArray();
 
 			Assert.Equal(expected, actual, false);
 		}
 
-		#endregion Array Item Tests
+		#endregion ArrayItems Tests
 
-		#region GetProperty Tests
+		#region HasProperty Tests
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
@@ -584,9 +584,13 @@ namespace JsonFx.Common
 			Assert.False(actual);
 		}
 
+		#endregion HasProperty Tests
+
+		#region ObjectProperties Tests
+
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void GetProperties_AllProperties_ReturnsSplitSequences()
+		public void ObjectProperties_AllProperties_ReturnsSplitSequences()
 		{
 			var input = new[]
 		    {
@@ -611,14 +615,14 @@ namespace JsonFx.Common
 			};
 
 			// select all properties
-			var actual = input.GetProperties(name => true).ToArray();
+			var actual = input.ObjectProperties(name => true).ToArray();
 
 			Assert.Equal(expected, actual, false);
 		}
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void GetProperties_OnlyOneProperty_ReturnsSplitSequences()
+		public void ObjectProperties_OnlyOneProperty_ReturnsSplitSequences()
 		{
 			var input = new[]
 		    {
@@ -640,14 +644,14 @@ namespace JsonFx.Common
 			};
 
 			// select all properties
-			var actual = input.GetProperties(name => name.LocalName == "key2").ToArray();
+			var actual = input.ObjectProperties(name => name.LocalName == "key2").ToArray();
 
 			Assert.Equal(expected, actual, false);
 		}
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void GetProperties_NestedObjectPropertySkipped_ReturnsSplitSequences()
+		public void ObjectProperties_NestedObjectPropertySkipped_ReturnsSplitSequences()
 		{
 			var input = new[]
 		    {
@@ -672,14 +676,14 @@ namespace JsonFx.Common
 			};
 
 			// select all properties
-			var actual = input.GetProperties(name => name.LocalName == "key2").ToArray();
+			var actual = input.ObjectProperties(name => name.LocalName == "key2").ToArray();
 
 			Assert.Equal(expected, actual, false);
 		}
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void GetProperties_NestedObjectPropertyReturned_ReturnsSplitSequences()
+		public void ObjectProperties_NestedObjectPropertyReturned_ReturnsSplitSequences()
 		{
 			var input = new[]
 		    {
@@ -709,14 +713,14 @@ namespace JsonFx.Common
 			};
 
 			// select all properties
-			var actual = input.GetProperties(name => name.LocalName == "key2").ToArray();
+			var actual = input.ObjectProperties(name => name.LocalName == "key2").ToArray();
 
 			Assert.Equal(expected, actual, false);
 		}
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void GetProperties_NestedArrayPropertySkipped_ReturnsSplitSequences()
+		public void ObjectProperties_NestedArrayPropertySkipped_ReturnsSplitSequences()
 		{
 			var input = new[]
 		    {
@@ -741,14 +745,14 @@ namespace JsonFx.Common
 			};
 
 			// select all properties
-			var actual = input.GetProperties(name => name.LocalName == "key2").ToArray();
+			var actual = input.ObjectProperties(name => name.LocalName == "key2").ToArray();
 
 			Assert.Equal(expected, actual, false);
 		}
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void GetProperties_NestedArrayPropertyReturned_ReturnsSplitSequences()
+		public void ObjectProperties_NestedArrayPropertyReturned_ReturnsSplitSequences()
 		{
 			var input = new[]
 		    {
@@ -778,18 +782,18 @@ namespace JsonFx.Common
 			};
 
 			// select all properties
-			var actual = input.GetProperties(name => name.LocalName == "key2").ToArray();
+			var actual = input.ObjectProperties(name => name.LocalName == "key2").ToArray();
 
 			Assert.Equal(expected, actual, false);
 		}
 
-		#endregion GetProperty Tests
+		#endregion ObjectProperties Tests
 
 		#region Descendants Tests
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void GetDescendantsAndSelf_NestedObjects_ReturnsAllSubsequencesAndSelf()
+		public void DescendantsAndSelf_NestedObjects_ReturnsAllSubsequencesAndSelf()
 		{
 			var input = new[]
 		    {
@@ -902,14 +906,14 @@ namespace JsonFx.Common
 			};
 
 			// select all descendants and self
-			var actual = input.GetDescendantsAndSelf().ToArray();
+			var actual = input.DescendantsAndSelf().ToArray();
 
 			Assert.Equal(expected, actual, false);
 		}
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void GetDescendants_NestedObjects_ReturnsAllSubsequences()
+		public void Descendants_NestedObjects_ReturnsAllSubsequences()
 		{
 			var input = new[]
 		    {
@@ -995,14 +999,14 @@ namespace JsonFx.Common
 			};
 
 			// select all descendants
-			var actual = input.GetDescendants().ToArray();
+			var actual = input.Descendants().ToArray();
 
 			Assert.Equal(expected, actual, false);
 		}
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void GetDescendants_NestedObjectsFindDescendantsWithProperty_ReturnsMatchingSubsequences()
+		public void Descendants_NestedObjectsFindDescendantsWithProperty_ReturnsMatchingSubsequences()
 		{
 			var input = new[]
 		    {
@@ -1048,14 +1052,14 @@ namespace JsonFx.Common
 			};
 
 			// select all descendants with property named "B"
-			var actual = input.GetDescendants().Where(child => child.HasProperty(name => name.LocalName == "B")).ToArray();
+			var actual = input.Descendants().Where(child => child.HasProperty(name => name.LocalName == "B")).ToArray();
 
 			Assert.Equal(expected, actual, false);
 		}
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void GetDescendantsAndSelf_NestedObjectsReturnsAllPrimitives_ReturnsMatchingSubsequences()
+		public void DescendantsAndSelf_NestedObjectsReturnsAllPrimitives_ReturnsMatchingSubsequences()
 		{
 			var input = new[]
 		    {
@@ -1122,7 +1126,7 @@ namespace JsonFx.Common
 			};
 
 			// select all primitive values
-			var actual = input.GetDescendantsAndSelf().Where(child => child.IsPrimitive()).ToArray();
+			var actual = input.DescendantsAndSelf().Where(child => child.IsPrimitive()).ToArray();
 
 			Assert.Equal(expected, actual, false);
 		}
@@ -1133,7 +1137,7 @@ namespace JsonFx.Common
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void GetProperties_GraphComplex_ReturnsGraph()
+		public void Properties_GraphComplex_ReturnsGraph()
 		{
 			// input from pass1.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -1274,8 +1278,8 @@ namespace JsonFx.Common
 
 			// cherry pick properties
 			var actual = input
-				.GetArrayItems(index => index == 8).FirstOrDefault() // select the big object
-				.GetProperties(name => name.LocalName == "url" || name.LocalName == "compact"); // select two properties
+				.ArrayItems(index => index == 8).FirstOrDefault() // select the big object
+				.ObjectProperties(name => name.LocalName == "url" || name.LocalName == "compact"); // select two properties
 
 			Assert.Equal(expected, actual, false);
 		}

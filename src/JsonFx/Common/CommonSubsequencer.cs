@@ -193,9 +193,9 @@ namespace JsonFx.Common
 		/// <param name="source"></param>
 		/// <param name="predicate"></param>
 		/// <returns>all properties for the object</returns>
-		public static IEnumerable<KeyValuePair<DataName, TokenSequence>> GetProperties(this TokenSequence source)
+		public static IEnumerable<KeyValuePair<DataName, TokenSequence>> ObjectProperties(this TokenSequence source)
 		{
-			return CommonSubsequencer.GetProperties(source, null);
+			return CommonSubsequencer.ObjectProperties(source, null);
 		}
 
 		/// <summary>
@@ -204,7 +204,7 @@ namespace JsonFx.Common
 		/// <param name="source"></param>
 		/// <param name="predicate"></param>
 		/// <returns>matching properties for the root object</returns>
-		public static IEnumerable<KeyValuePair<DataName, TokenSequence>> GetProperties(this TokenSequence source, Func<DataName, bool> predicate)
+		public static IEnumerable<KeyValuePair<DataName, TokenSequence>> ObjectProperties(this TokenSequence source, Func<DataName, bool> predicate)
 		{
 			if (source == null)
 			{
@@ -309,9 +309,9 @@ namespace JsonFx.Common
 		/// </summary>
 		/// <param name="source"></param>
 		/// <returns>all items of the array</returns>
-		public static IEnumerable<TokenSequence> GetArrayItems(this TokenSequence source)
+		public static IEnumerable<TokenSequence> ArrayItems(this TokenSequence source)
 		{
-			return CommonSubsequencer.GetArrayItems(source, null);
+			return CommonSubsequencer.ArrayItems(source, null);
 		}
 
 		/// <summary>
@@ -320,7 +320,7 @@ namespace JsonFx.Common
 		/// <param name="source"></param>
 		/// <param name="predicate"></param>
 		/// <returns>items of the root array which statisfy the predicate</returns>
-		public static IEnumerable<TokenSequence> GetArrayItems(this TokenSequence source, Func<int, bool> predicate)
+		public static IEnumerable<TokenSequence> ArrayItems(this TokenSequence source, Func<int, bool> predicate)
 		{
 			if (source == null)
 			{
@@ -364,7 +364,7 @@ namespace JsonFx.Common
 		/// </summary>
 		/// <param name="source"></param>
 		/// <returns></returns>
-		public static IEnumerable<TokenSequence> GetDescendants(this TokenSequence source)
+		public static IEnumerable<TokenSequence> Descendants(this TokenSequence source)
 		{
 			if (source == null)
 			{
@@ -378,11 +378,11 @@ namespace JsonFx.Common
 
 			if (CommonSubsequencer.IsObject(source))
 			{
-				foreach (KeyValuePair<DataName, TokenSequence> property in CommonSubsequencer.GetProperties(source, null))
+				foreach (KeyValuePair<DataName, TokenSequence> property in CommonSubsequencer.ObjectProperties(source, null))
 				{
 					yield return property.Value;
 
-					foreach (TokenSequence descendant in CommonSubsequencer.GetDescendants(property.Value))
+					foreach (TokenSequence descendant in CommonSubsequencer.Descendants(property.Value))
 					{
 						yield return descendant;
 					}
@@ -392,11 +392,11 @@ namespace JsonFx.Common
 
 			if (CommonSubsequencer.IsArray(source))
 			{
-				foreach (TokenSequence item in CommonSubsequencer.GetArrayItems(source, null))
+				foreach (TokenSequence item in CommonSubsequencer.ArrayItems(source, null))
 				{
 					yield return item;
 
-					foreach (TokenSequence descendant in CommonSubsequencer.GetDescendants(item))
+					foreach (TokenSequence descendant in CommonSubsequencer.Descendants(item))
 					{
 						yield return descendant;
 					}
@@ -410,7 +410,7 @@ namespace JsonFx.Common
 		/// </summary>
 		/// <param name="source"></param>
 		/// <returns></returns>
-		public static IEnumerable<TokenSequence> GetDescendantsAndSelf(this TokenSequence source)
+		public static IEnumerable<TokenSequence> DescendantsAndSelf(this TokenSequence source)
 		{
 			if (source == null)
 			{
@@ -420,7 +420,7 @@ namespace JsonFx.Common
 			// and self
 			yield return source;
 
-			foreach (TokenSequence descendant in CommonSubsequencer.GetDescendants(source))
+			foreach (TokenSequence descendant in CommonSubsequencer.Descendants(source))
 			{
 				yield return descendant;
 			}
