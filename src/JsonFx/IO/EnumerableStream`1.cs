@@ -196,6 +196,10 @@ namespace JsonFx.IO
 			else
 			{
 				this.current = this.Enumerator.Current;
+				if (this.chunk != null)
+				{
+					this.chunk.Add(this.current);
+				}
 			}
 		}
 
