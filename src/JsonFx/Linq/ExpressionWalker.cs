@@ -31,6 +31,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 
 using JsonFx.Common;
@@ -119,7 +120,7 @@ namespace JsonFx.Linq
 				this.tokens.Add(CommonGrammar.TokenPrimitive(this.GetTypeName(expression.Type)));
 
 				this.tokens.Add(CommonGrammar.TokenProperty("Method"));
-				this.tokens.Add(CommonGrammar.TokenPrimitive(expression.Method != null ? expression.Method.Name : null));
+				this.tokens.Add(CommonGrammar.TokenPrimitive(this.GetMemberName(expression.Method)));
 
 				this.tokens.Add(CommonGrammar.TokenProperty("Operand"));
 				this.Visit(expression.Operand);
@@ -155,7 +156,7 @@ namespace JsonFx.Linq
 				this.tokens.Add(CommonGrammar.TokenPrimitive(expression.IsLiftedToNull));
 
 				this.tokens.Add(CommonGrammar.TokenProperty("Method"));
-				this.tokens.Add(CommonGrammar.TokenPrimitive(expression.Method != null ? expression.Method.Name : null));
+				this.tokens.Add(CommonGrammar.TokenPrimitive(this.GetMemberName(expression.Method)));
 
 				// no change
 				return expression;
@@ -291,7 +292,7 @@ namespace JsonFx.Linq
 			try
 			{
 				this.tokens.Add(CommonGrammar.TokenProperty("Member"));
-				this.tokens.Add(CommonGrammar.TokenPrimitive(expression.Member.Name));
+				this.tokens.Add(CommonGrammar.TokenPrimitive(this.GetMemberName(expression.Member)));
 
 				this.tokens.Add(CommonGrammar.TokenProperty("Expression"));
 				this.Visit(expression.Expression);
@@ -318,7 +319,7 @@ namespace JsonFx.Linq
 				this.Visit(expression.Object);
 
 				this.tokens.Add(CommonGrammar.TokenProperty("Method"));
-				this.tokens.Add(CommonGrammar.TokenPrimitive(expression.Method != null ? expression.Method.Name : null));
+				this.tokens.Add(CommonGrammar.TokenPrimitive(this.GetMemberName(expression.Method)));
 
 				this.tokens.Add(CommonGrammar.TokenProperty("Arguments"));
 
@@ -363,7 +364,7 @@ namespace JsonFx.Linq
 			try
 			{
 				this.tokens.Add(CommonGrammar.TokenProperty("Member"));
-				this.tokens.Add(CommonGrammar.TokenPrimitive(assignment.Member.Name));
+				this.tokens.Add(CommonGrammar.TokenPrimitive(this.GetMemberName(assignment.Member)));
 
 				this.tokens.Add(CommonGrammar.TokenProperty("Expression"));
 				this.Visit(assignment.Expression);
@@ -387,7 +388,7 @@ namespace JsonFx.Linq
 			try
 			{
 				this.tokens.Add(CommonGrammar.TokenProperty("Member"));
-				this.tokens.Add(CommonGrammar.TokenPrimitive(binding.Member.Name));
+				this.tokens.Add(CommonGrammar.TokenPrimitive(this.GetMemberName(binding.Member)));
 
 				this.tokens.Add(CommonGrammar.TokenProperty("Bindings"));
 				this.VisitBindingList(binding.Bindings);
@@ -411,7 +412,7 @@ namespace JsonFx.Linq
 			try
 			{
 				this.tokens.Add(CommonGrammar.TokenProperty("Member"));
-				this.tokens.Add(CommonGrammar.TokenPrimitive(binding.Member.Name));
+				this.tokens.Add(CommonGrammar.TokenPrimitive(this.GetMemberName(binding.Member)));
 
 				this.tokens.Add(CommonGrammar.TokenProperty("Initializers"));
 				this.VisitElementInitializerList(binding.Initializers);
@@ -519,7 +520,7 @@ namespace JsonFx.Linq
 					this.tokens.Add(CommonGrammar.TokenArrayBeginUnnamed);
 					foreach (var member in expression.Members)
 					{
-						this.tokens.Add(CommonGrammar.TokenPrimitive(member.Name));
+						this.tokens.Add(CommonGrammar.TokenPrimitive(this.GetMemberName(member)));
 					}
 					this.tokens.Add(CommonGrammar.TokenArrayEnd);
 				}
@@ -739,8 +740,26 @@ namespace JsonFx.Linq
 
 		#region Utility Methods
 
+		private string GetMemberName(MemberInfo member)
+		{
+			if (member == null)
+			{
+				return null;
+			}
+
+			return String.Concat(
+				GetTypeName(member.DeclaringType),
+				'.',
+				member.Name);
+		}
+
 		private string GetTypeName(Type type)
 		{
+			if (type == null)
+			{
+				return null;
+			}
+
 			if (!type.IsGenericType)
 			{
 				return type.Name;
@@ -756,7 +775,7 @@ namespace JsonFx.Linq
 				{
 					builder.Append(", ");
 				}
-				builder.Append(this.GetTypeName(args[0]));
+				builder.Append(this.GetTypeName(args[i]));
 			}
 			builder.Append('>');
 
