@@ -40,7 +40,7 @@ namespace JsonFx.IO
 		#region Constants
 
 		private const string TraitName = "IStream<T>";
-		private const string TraitValue = "String";
+		private const string TraitValue = "StringStream";
 
 		#endregion Constants
 

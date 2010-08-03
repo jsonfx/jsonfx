@@ -124,7 +124,7 @@ namespace JsonFx.Common
 				throw new ArgumentNullException("source");
 			}
 
-			IStream<CommonToken> stream = Stream<CommonToken>.Create(source);
+			IStream<CommonToken> stream = Stream<CommonToken>.Create(source, true);
 			if (stream.IsCompleted ||
 				stream.Pop().TokenType != CommonTokenType.ObjectBegin)
 			{
@@ -211,7 +211,7 @@ namespace JsonFx.Common
 				throw new ArgumentNullException("source");
 			}
 
-			IStream<CommonToken> stream = Stream<CommonToken>.Create(source);
+			IStream<CommonToken> stream = Stream<CommonToken>.Create(source, true);
 			if (stream.IsCompleted ||
 				stream.Pop().TokenType != CommonTokenType.ObjectBegin)
 			{
@@ -261,7 +261,6 @@ namespace JsonFx.Common
 						}
 
 						// return property value sequence
-
 						yield return new KeyValuePair<DataName, TokenSequence>(token.Name, CommonSubsequencer.SpliceNextValue(stream));
 						continue;
 					}
@@ -327,7 +326,7 @@ namespace JsonFx.Common
 				throw new ArgumentNullException("source");
 			}
 
-			IStream<CommonToken> stream = Stream<CommonToken>.Create(source);
+			IStream<CommonToken> stream = Stream<CommonToken>.Create(source, true);
 			if (stream.IsCompleted ||
 				stream.Pop().TokenType != CommonTokenType.ArrayBegin)
 			{
@@ -417,8 +416,14 @@ namespace JsonFx.Common
 				throw new ArgumentNullException("source");
 			}
 
+			if (!(source is IList<CommonToken>))
+			{
+				// ensure buffered
+				source = new SequenceBuffer<CommonToken>(source);
+			}
+
 			// and self
-			yield return source;
+			yield return CommonSubsequencer.SpliceNextValue(Stream<CommonToken>.Create(source));
 
 			foreach (TokenSequence descendant in CommonSubsequencer.Descendants(source))
 			{
@@ -427,6 +432,41 @@ namespace JsonFx.Common
 		}
 
 		#endregion Descendants Methods
+
+		#region Values
+
+		/// <summary>
+		/// Returns sequence of values. If is array returns array items, otherwise returns single object as sequence.
+		/// </summary>
+		/// <param name="source"></param>
+		/// <returns></returns>
+		public static IEnumerable<TokenSequence> Values(this TokenSequence source)
+		{
+			if (CommonSubsequencer.IsArray(source))
+			{
+				return CommonSubsequencer.ArrayItems(source);
+			}
+
+			using (var stream = Stream<CommonToken>.Create(source, true))
+			{
+				if (stream.IsCompleted)
+				{
+					return new TokenSequence[0];
+				}
+
+				return Values(stream);
+			}
+		}
+
+		private static IEnumerable<TokenSequence> Values(IStream<CommonToken> stream)
+		{
+			while (!stream.IsCompleted)
+			{
+				yield return CommonSubsequencer.SpliceNextValue(stream);
+			}
+		}
+
+		#endregion Values
 
 		#region Utility Methods
 

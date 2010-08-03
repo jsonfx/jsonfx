@@ -92,6 +92,7 @@
     <Compile Include="Html\HtmlFormatter.cs" />
     <Compile Include="Html\HtmlTokenizer.cs" />
     <Compile Include="IO\CharBuffer.cs" />
+    <Compile Include="IO\SequenceBuffer`1.cs" />
     <Compile Include="IO\Subsequence`1.cs" />
     <Compile Include="IO\EnumerableStream`1.cs" />
     <Compile Include="IO\ListStream`1.cs" />

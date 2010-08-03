@@ -65,7 +65,7 @@ namespace JsonFx.IO
 		{
 			if (sequence == null)
 			{
-				throw new ArgumentNullException("sequence");
+				sequence = new T[0];
 			}
 
 			this.Enumerator = sequence.GetEnumerator();

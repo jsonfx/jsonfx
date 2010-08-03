@@ -46,16 +46,27 @@ namespace JsonFx.IO
 
 		#region Factory Method
 
+		public static IStream<T> Create(IEnumerable<T> sequence)
+		{
+			return Stream<T>.Create(sequence, false);
+		}
+
 		/// <summary>
 		/// Factory method for generic streams
 		/// </summary>
 		/// <param name="sequence"></param>
+		/// <param name="buffered"></param>
 		/// <returns></returns>
-		public static IStream<T> Create(IEnumerable<T> sequence)
+		public static IStream<T> Create(IEnumerable<T> sequence, bool buffered)
 		{
 			IList<T> list = sequence as IList<T>;
 			if (list != null)
 			{
+				return new ListStream<T>(list);
+			}
+			else if (buffered)
+			{
+				list = new SequenceBuffer<T>(sequence);
 				return new ListStream<T>(list);
 			}
 

@@ -29,19 +29,18 @@
 #endregion License
 
 using System;
-using System.IO;
 using System.Text;
 
 using Xunit;
 
 namespace JsonFx.IO
 {
-	public class TextReaderStreamTests
+	public class EnumerableStreamTests
 	{
 		#region Constants
 
 		private const string TraitName = "IStream<T>";
-		private const string TraitValue = "TextReaderStream";
+		private const string TraitValue = "EnumerableStream";
 
 		#endregion Constants
 
@@ -49,9 +48,9 @@ namespace JsonFx.IO
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Peek_NullReader_ReturnsNullChar()
+		public void Peek_NullString_ReturnsNullChar()
 		{
-			using (var scanner = new TextReaderStream(TextReader.Null))
+			using (var scanner = new EnumerableStream<char>(null))
 			{
 				Assert.Equal('\0', scanner.Peek());
 			}
@@ -59,9 +58,9 @@ namespace JsonFx.IO
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Pop_NullReader_ReturnsNullChar()
+		public void Pop_NullString_ReturnsNullChar()
 		{
-			using (var scanner = new TextReaderStream(TextReader.Null))
+			using (var scanner = new EnumerableStream<char>(null))
 			{
 				Assert.Equal('\0', scanner.Pop());
 			}
@@ -69,39 +68,9 @@ namespace JsonFx.IO
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Index_StartState_ReturnsNegOne()
+		public void IsCompleted_NullString_ReturnsFalse()
 		{
-			using (var scanner = new TextReaderStream(TextReader.Null))
-			{
-				Assert.Equal(-1, scanner.Index);
-			}
-		}
-
-		[Fact]
-		[Trait(TraitName, TraitValue)]
-		public void Line_StartState_ReturnsNegOne()
-		{
-			using (var scanner = new TextReaderStream(TextReader.Null))
-			{
-				Assert.Equal(0, scanner.Line);
-			}
-		}
-
-		[Fact]
-		[Trait(TraitName, TraitValue)]
-		public void Column_StartState_ReturnsNegOne()
-		{
-			using (var scanner = new TextReaderStream(TextReader.Null))
-			{
-				Assert.Equal(0, scanner.Column);
-			}
-		}
-
-		[Fact]
-		[Trait(TraitName, TraitValue)]
-		public void IsCompleted_NullReader_ReturnsFalse()
-		{
-			using (var scanner = new TextReaderStream(TextReader.Null))
+			using (var scanner = new EnumerableStream<char>(null))
 			{
 				Assert.Equal(true, scanner.IsCompleted);
 			}
@@ -113,9 +82,9 @@ namespace JsonFx.IO
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Pop_NullReader_ReturnsEmptySequence()
+		public void Pop_NullString_ReturnsEmptySequence()
 		{
-			using (var scanner = new TextReaderStream(TextReader.Null))
+			using (var scanner = new EnumerableStream<char>(null))
 			{
 				var buffer = new StringBuilder();
 				while (!scanner.IsCompleted)
@@ -129,11 +98,11 @@ namespace JsonFx.IO
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Pop_EmptySequence_ReturnsEmptySequence()
+		public void Pop_EmptyString_ReturnsEmptySequence()
 		{
 			const string input = "";
 
-			using (var scanner = new TextReaderStream(new StringReader(input)))
+			using (var scanner = new EnumerableStream<char>(input.ToCharArray()))
 			{
 				var buffer = new StringBuilder();
 				while (!scanner.IsCompleted)
@@ -147,11 +116,11 @@ namespace JsonFx.IO
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Pop_OneCharSequence_ReturnsSameSequence()
+		public void Pop_OneCharString_ReturnsSameSequence()
 		{
 			const string input = "_";
 
-			using (var scanner = new TextReaderStream(new StringReader(input)))
+			using (var scanner = new EnumerableStream<char>(input.ToCharArray()))
 			{
 				var buffer = new StringBuilder();
 				while (!scanner.IsCompleted)
@@ -165,11 +134,11 @@ namespace JsonFx.IO
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Pop_LongSequence_ReturnsSameSequence()
+		public void Pop_LongString_ReturnsSameSequence()
 		{
 			const string input = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-			using (var scanner = new TextReaderStream(new StringReader(input)))
+			using (var scanner = new EnumerableStream<char>(input.ToCharArray()))
 			{
 				var buffer = new StringBuilder();
 				while (!scanner.IsCompleted)
@@ -187,12 +156,13 @@ namespace JsonFx.IO
 		{
 			const string input = @"""\\\b\f\n\r\t\u0123\u4567\u89AB\uCDEF\uabcd\uef4A\""""";
 
-			using (var scanner = new TextReaderStream(new StringReader(input)))
+			using (var scanner = new EnumerableStream<char>(input.ToCharArray()))
 			{
 				var buffer = new StringBuilder();
 				while (!scanner.IsCompleted)
 				{
 					buffer.Append(scanner.Pop());
+					scanner.Peek();
 				}
 
 				Assert.Equal(input, buffer.ToString());
@@ -201,11 +171,11 @@ namespace JsonFx.IO
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Pop_UnicodeSequence_ReturnsSameSequence()
+		public void Pop_UnicodeString_ReturnsSameSequence()
 		{
 			const string input = "私が日本語を話すことはありません。";
 
-			using (var scanner = new TextReaderStream(new StringReader(input)))
+			using (var scanner = new EnumerableStream<char>(input.ToCharArray()))
 			{
 				var buffer = new StringBuilder();
 				while (!scanner.IsCompleted)
@@ -227,7 +197,7 @@ namespace JsonFx.IO
 		{
 			const string input = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-			using (var scanner = new TextReaderStream(new StringReader(input)))
+			using (var scanner = new EnumerableStream<char>(input.ToCharArray()))
 			{
 				while (!scanner.IsCompleted)
 				{
@@ -240,71 +210,5 @@ namespace JsonFx.IO
 		}
 
 		#endregion Peek Tests
-
-		#region Line, Column, Index Tests
-
-		[Fact]
-		[Trait(TraitName, TraitValue)]
-		public void Line_MultilineString_CountsCorrectNumberOfLines()
-		{
-			const string input = @"Line one
-Line two
-Line three
-Line Four";
-
-			using (var scanner = new TextReaderStream(new StringReader(input)))
-			{
-				while (!scanner.IsCompleted)
-				{
-					scanner.Pop();
-				}
-
-				Assert.Equal(4, scanner.Line);
-			}
-		}
-
-		[Fact]
-		[Trait(TraitName, TraitValue)]
-		public void Column_MultilineString_CountsCorrectNumberOfColumns()
-		{
-			const string input = @"Line one
-Line two
-Line three
-Line Four";
-
-			using (var scanner = new TextReaderStream(new StringReader(input)))
-			{
-				while (!scanner.IsCompleted)
-				{
-					scanner.Pop();
-				}
-
-				Assert.Equal(9, scanner.Column);
-			}
-		}
-
-		[Fact]
-		[Trait(TraitName, TraitValue)]
-		public void Index_MultilineString_CountsCorrectNumberOfChars()
-		{
-			const string input = @"Line one
-Line two
-Line three
-Line Four";
-
-			using (var scanner = new TextReaderStream(new StringReader(input)))
-			{
-				long i;
-				for (i=0; !scanner.IsCompleted; i++)
-				{
-					scanner.Pop();
-					Assert.Equal(i, scanner.Index);
-				}
-
-				Assert.Equal(i-1, scanner.Index);
-			}
-		}
-
-		#endregion Line, Column, Index Tests
 	}
 }

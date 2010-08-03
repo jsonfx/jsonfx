@@ -176,7 +176,7 @@ namespace JsonFx.IO
 		private void EnsureReady()
 		{
 			// only execute when requested
-			if (this.isReady)
+			if (this.isReady || this.isCompleted)
 			{
 				return;
 			}
@@ -184,15 +184,32 @@ namespace JsonFx.IO
 
 			// store the current item or null if complete
 			int next = this.index+1;
-			if (next < this.Buffer.Count)
+
+			SequenceBuffer<T> sBuffer = this.Buffer as SequenceBuffer<T>;
+			if (sBuffer != null)
 			{
-				this.isCompleted = false;
-				this.current = this.Buffer[next];
+				// avoid using SequenceBuffer<T>.Count as will need to enumerate entire sequence
+				if (sBuffer.TryAdvance(next))
+				{
+					this.current = this.Buffer[next];
+				}
+				else
+				{
+					this.isCompleted = true;
+					this.current = default(T);
+				}
 			}
 			else
 			{
-				this.isCompleted = true;
-				this.current = default(T);
+				if (next < this.Buffer.Count)
+				{
+					this.current = this.Buffer[next];
+				}
+				else
+				{
+					this.isCompleted = true;
+					this.current = default(T);
+				}
 			}
 		}
 
