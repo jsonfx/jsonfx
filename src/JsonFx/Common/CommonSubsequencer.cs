@@ -423,7 +423,7 @@ namespace JsonFx.Common
 			}
 
 			// and self
-			yield return CommonSubsequencer.SpliceNextValue(Stream<CommonToken>.Create(source));
+			yield return CommonSubsequencer.SpliceNextValueLazy(Stream<CommonToken>.Create(source));
 
 			foreach (TokenSequence descendant in CommonSubsequencer.Descendants(source))
 			{
@@ -449,11 +449,6 @@ namespace JsonFx.Common
 
 			using (var stream = Stream<CommonToken>.Create(source, true))
 			{
-				if (stream.IsCompleted)
-				{
-					return new TokenSequence[0];
-				}
-
 				return Values(stream);
 			}
 		}
@@ -462,13 +457,86 @@ namespace JsonFx.Common
 		{
 			while (!stream.IsCompleted)
 			{
-				yield return CommonSubsequencer.SpliceNextValue(stream);
+				yield return CommonSubsequencer.SpliceNextValueLazy(stream);
 			}
 		}
 
 		#endregion Values
 
 		#region Utility Methods
+
+		/// <summary>
+		/// Splices out the sequence for the next complete value (object, array, primitive)
+		/// </summary>
+		/// <param name="stream"></param>
+		/// <returns></returns>
+		private static TokenSequence SpliceNextValueLazy(IStream<CommonToken> stream)
+		{
+			if (stream.IsCompleted)
+			{
+				yield break;
+			}
+
+			int depth = 0;
+			CommonToken token = stream.Pop();
+			switch (token.TokenType)
+			{
+				case CommonTokenType.Primitive:
+				{
+					yield return token;
+					yield break;
+				}
+				case CommonTokenType.ArrayBegin:
+				case CommonTokenType.ObjectBegin:
+				{
+					depth++;
+					yield return token;
+
+					while (!stream.IsCompleted && depth > 0)
+					{
+						token = stream.Pop();
+						switch (token.TokenType)
+						{
+							case CommonTokenType.ArrayBegin:
+							case CommonTokenType.ObjectBegin:
+							{
+								depth++;
+								yield return token;
+								break;
+							}
+							case CommonTokenType.ArrayEnd:
+							case CommonTokenType.ObjectEnd:
+							{
+								depth--;
+								yield return token;
+								break;
+							}
+							default:
+							{
+								// skip over all others
+								yield return token;
+								break;
+							}
+						}
+					}
+
+					if (depth > 0)
+					{
+						throw new TokenException<CommonTokenType>(
+							CommonGrammar.TokenNone,
+							CommonSubsequencer.ErrorUnexpectedEndOfInput);
+					}
+
+					yield break;
+				}
+				default:
+				{
+					throw new TokenException<CommonTokenType>(
+						token,
+						String.Format(CommonSubsequencer.ErrorInvalidPropertyValue, token.TokenType));
+				}
+			}
+		}
 
 		/// <summary>
 		/// Splices out the sequence for the next complete value (object, array, primitive)
