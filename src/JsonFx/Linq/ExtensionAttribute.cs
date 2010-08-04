@@ -28,7 +28,7 @@
 \*---------------------------------------------------------------------------------*/
 #endregion License
 
-#if NET20 || NET30
+using System;
 
 namespace System.Runtime.CompilerServices
 {
@@ -37,5 +37,3 @@ namespace System.Runtime.CompilerServices
 	{
 	}
 }
-
-#endif

@@ -107,7 +107,6 @@
     <Compile Include="JsonML\JsonMLInTransformer.cs" />
     <Compile Include="JsonML\JsonMLOutTransformer.cs" />
     <Compile Include="Json\Resolvers\JsonResolverStrategy.cs" />
-    <Compile Include="Linq\ExtensionAttribute.cs" />
     <Compile Include="Markup\MarkupGrammar.cs" />
     <Compile Include="Markup\MarkupTokenType.cs" />
     <Compile Include="Markup\PrefixScopeChain.cs" />
@@ -157,6 +156,9 @@
     <Compile Include="Xml\XmlWriter.cs" />
     <Compile Include="Xml\XmlTokenizer.cs" />
     <Compile Include="Xml\Resolvers\XmlResolverStrategy.cs" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFrameworkVersion)' == 'v2.0' Or '$(TargetFrameworkVersion)' == 'v3.0' ">
+    <Compile Include="Linq\ExtensionAttribute.cs" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFrameworkVersion)' != 'v2.0' And '$(TargetFrameworkVersion)' != 'v3.0' ">
     <Compile Include="Linq\BaseQueryProvider.cs" />
