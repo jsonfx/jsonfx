@@ -615,7 +615,7 @@ namespace JsonFx.Common
 			};
 
 			// select all properties
-			var actual = input.ObjectProperties(name => true).ToArray();
+			var actual = input.Properties(name => true).ToArray();
 
 			Assert.Equal(expected, actual, false);
 		}
@@ -644,7 +644,7 @@ namespace JsonFx.Common
 			};
 
 			// select all properties
-			var actual = input.ObjectProperties(name => name.LocalName == "key2").ToArray();
+			var actual = input.Properties(name => name.LocalName == "key2").ToArray();
 
 			Assert.Equal(expected, actual, false);
 		}
@@ -676,7 +676,7 @@ namespace JsonFx.Common
 			};
 
 			// select all properties
-			var actual = input.ObjectProperties(name => name.LocalName == "key2").ToArray();
+			var actual = input.Properties(name => name.LocalName == "key2").ToArray();
 
 			Assert.Equal(expected, actual, false);
 		}
@@ -713,7 +713,7 @@ namespace JsonFx.Common
 			};
 
 			// select all properties
-			var actual = input.ObjectProperties(name => name.LocalName == "key2").ToArray();
+			var actual = input.Properties(name => name.LocalName == "key2").ToArray();
 
 			Assert.Equal(expected, actual, false);
 		}
@@ -745,7 +745,7 @@ namespace JsonFx.Common
 			};
 
 			// select all properties
-			var actual = input.ObjectProperties(name => name.LocalName == "key2").ToArray();
+			var actual = input.Properties(name => name.LocalName == "key2").ToArray();
 
 			Assert.Equal(expected, actual, false);
 		}
@@ -782,7 +782,7 @@ namespace JsonFx.Common
 			};
 
 			// select all properties
-			var actual = input.ObjectProperties(name => name.LocalName == "key2").ToArray();
+			var actual = input.Properties(name => name.LocalName == "key2").ToArray();
 
 			Assert.Equal(expected, actual, false);
 		}
@@ -1279,7 +1279,7 @@ namespace JsonFx.Common
 			// cherry pick properties
 			var actual = input
 				.ArrayItems(index => index == 8).FirstOrDefault() // select the big object
-				.ObjectProperties(name => name.LocalName == "url" || name.LocalName == "compact"); // select two properties
+				.Properties(name => name.LocalName == "url" || name.LocalName == "compact"); // select two properties
 
 			Assert.Equal(expected, actual, false);
 		}

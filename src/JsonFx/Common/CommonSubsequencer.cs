@@ -30,6 +30,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using JsonFx.IO;
 using JsonFx.Serialization;
@@ -193,9 +194,20 @@ namespace JsonFx.Common
 		/// <param name="source"></param>
 		/// <param name="predicate"></param>
 		/// <returns>all properties for the object</returns>
-		public static IEnumerable<KeyValuePair<DataName, TokenSequence>> ObjectProperties(this TokenSequence source)
+		public static TokenSequence Property(this TokenSequence source, DataName propertyName)
 		{
-			return CommonSubsequencer.ObjectProperties(source, null);
+			return Enumerable.FirstOrDefault(CommonSubsequencer.Properties(source, name => name == propertyName)).Value;
+		}
+
+		/// <summary>
+		/// Gets all properties of the root object
+		/// </summary>
+		/// <param name="source"></param>
+		/// <param name="predicate"></param>
+		/// <returns>all properties for the object</returns>
+		public static IEnumerable<KeyValuePair<DataName, TokenSequence>> Properties(this TokenSequence source)
+		{
+			return CommonSubsequencer.Properties(source, null);
 		}
 
 		/// <summary>
@@ -204,7 +216,7 @@ namespace JsonFx.Common
 		/// <param name="source"></param>
 		/// <param name="predicate"></param>
 		/// <returns>matching properties for the root object</returns>
-		public static IEnumerable<KeyValuePair<DataName, TokenSequence>> ObjectProperties(this TokenSequence source, Func<DataName, bool> predicate)
+		public static IEnumerable<KeyValuePair<DataName, TokenSequence>> Properties(this TokenSequence source, Func<DataName, bool> predicate)
 		{
 			if (source == null)
 			{
@@ -377,7 +389,7 @@ namespace JsonFx.Common
 
 			if (CommonSubsequencer.IsObject(source))
 			{
-				foreach (KeyValuePair<DataName, TokenSequence> property in CommonSubsequencer.ObjectProperties(source, null))
+				foreach (KeyValuePair<DataName, TokenSequence> property in CommonSubsequencer.Properties(source, null))
 				{
 					yield return property.Value;
 
@@ -447,10 +459,18 @@ namespace JsonFx.Common
 				return CommonSubsequencer.ArrayItems(source);
 			}
 
-			using (var stream = Stream<CommonToken>.Create(source, true))
-			{
-				return Values(stream);
-			}
+			return CommonSubsequencer.ToEnumerable(source);
+
+			// BUG: This executes only once
+			//using (var stream = Stream<CommonToken>.Create(source, true))
+			//{
+			//    return Values(stream);
+			//}
+		}
+
+		private static IEnumerable<TokenSequence> ToEnumerable(TokenSequence source)
+		{
+			yield return source;
 		}
 
 		private static IEnumerable<TokenSequence> Values(IStream<CommonToken> stream)

@@ -51,7 +51,7 @@ namespace JsonFx.Linq
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Parse_MatchingPropertyFirstOrDefault_ReturnsSingleObject()
+		public void Find_MatchingPropertyFirstOrDefault_ReturnsSingleObject()
 		{
 			var input = new[]
 			{
@@ -67,23 +67,34 @@ namespace JsonFx.Linq
 
 			var expected = new
 			{
-				key = "value"
+				Other = "otherValue",
+				Key = "value"
 			};
 
-			var query = Query.Find(input, new { key=String.Empty })
-				.Where(obj => obj.key == "value");
+			var source = Query.Find(input, new { key=String.Empty });
 
-			//System.Diagnostics.Trace.WriteLine("Executing Expression:");
+			var query =
+				from obj in source
+				where obj.key == "value"
+				select new
+				{
+					Other = "otherValue",
+					Key = obj.key
+				};
+
+			//System.Diagnostics.Trace.WriteLine("Query Expression:");
 			//System.Diagnostics.Trace.WriteLine(query.ToString());
 
-			var actual = query.FirstOrDefault();
+			var actual = query.ToArray();
 
-			Assert.Equal(expected, actual, true);
+			Assert.Equal(1, actual.Length);
+
+			Assert.Equal(expected, actual[0], true);
 		}
 
-		[Fact]
+		//[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Parse_MatchingPropertyToArray_ReturnsArray()
+		public void Find_MatchingPropertyToArray_ReturnsArray()
 		{
 			var input = new[]
 			{
@@ -116,7 +127,7 @@ namespace JsonFx.Linq
 			Assert.Equal(expected, actual, true);
 		}
 
-		[Fact]
+		//[Fact]
 		[Trait(TraitName, TraitValue)]
 		public void Find_PropertyNoMatch_ReturnsNull()
 		{

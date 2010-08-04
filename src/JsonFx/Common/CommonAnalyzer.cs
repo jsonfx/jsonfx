@@ -120,6 +120,15 @@ namespace JsonFx.Common
 
 		#endregion Init
 
+		#region Properties
+
+		DataReaderSettings ITokenAnalyzer<CommonTokenType>.Settings
+		{
+			get { return this.Settings; }
+		}
+
+		#endregion Properties
+
 		#region ITokenAnalyzer<T> Methods
 
 		/// <summary>

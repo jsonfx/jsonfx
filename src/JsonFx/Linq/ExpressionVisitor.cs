@@ -35,7 +35,7 @@ using System.Linq.Expressions;
 
 namespace JsonFx.Linq
 {
-	internal abstract class ExpressionVisitor
+	internal abstract class ExpressionVisitor<T>
 	{
 		#region Constants
 
@@ -57,17 +57,12 @@ namespace JsonFx.Linq
 
 		#region Visit Methods
 
-		protected virtual Expression Visit(Expression expression)
+		protected virtual Expression Visit(Expression expression, T context)
 		{
 			if (expression == null)
 			{
 				return null;
 			}
-
-			//if (expression.CanReduce)
-			//{
-			//    return this.Visit(expression.ReduceAndCheck());
-			//}
 
 			switch (expression.NodeType)
 			{
@@ -94,7 +89,7 @@ namespace JsonFx.Linq
 				case ExpressionType.IsFalse:
 #endif
 				{
-					return this.VisitUnary((UnaryExpression)expression);
+					return this.VisitUnary((UnaryExpression)expression, context);
 				}
 				case ExpressionType.Add:
 				case ExpressionType.AddChecked:
@@ -138,69 +133,69 @@ namespace JsonFx.Linq
 				case ExpressionType.SubtractAssignChecked:
 #endif
 				{
-					return this.VisitBinary((BinaryExpression)expression);
+					return this.VisitBinary((BinaryExpression)expression, context);
 				}
 				case ExpressionType.TypeIs:
 				{
-					return this.VisitTypeIs((TypeBinaryExpression)expression);
+					return this.VisitTypeIs((TypeBinaryExpression)expression, context);
 				}
 				case ExpressionType.Conditional:
 				{
-					return this.VisitConditional((ConditionalExpression)expression);
+					return this.VisitConditional((ConditionalExpression)expression, context);
 				}
 				case ExpressionType.Constant:
 				{
-					return this.VisitConstant((ConstantExpression)expression);
+					return this.VisitConstant((ConstantExpression)expression, context);
 				}
 				case ExpressionType.Parameter:
 				{
-					return this.VisitParameter((ParameterExpression)expression);
+					return this.VisitParameter((ParameterExpression)expression, context);
 				}
 				case ExpressionType.MemberAccess:
 				{
-					return this.VisitMemberAccess((MemberExpression)expression);
+					return this.VisitMemberAccess((MemberExpression)expression, context);
 				}
 				case ExpressionType.Call:
 				{
-					return this.VisitMethodCall((MethodCallExpression)expression);
+					return this.VisitMethodCall((MethodCallExpression)expression, context);
 				}
 				case ExpressionType.Lambda:
 				{
-					return this.VisitLambda((LambdaExpression)expression);
+					return this.VisitLambda((LambdaExpression)expression, context);
 				}
 				case ExpressionType.New:
 				{
-					return this.VisitNew((NewExpression)expression);
+					return this.VisitNew((NewExpression)expression, context);
 				}
 				case ExpressionType.NewArrayInit:
 				case ExpressionType.NewArrayBounds:
 				{
-					return this.VisitNewArray((NewArrayExpression)expression);
+					return this.VisitNewArray((NewArrayExpression)expression, context);
 				}
 				case ExpressionType.Invoke:
 				{
-					return this.VisitInvocation((InvocationExpression)expression);
+					return this.VisitInvocation((InvocationExpression)expression, context);
 				}
 				case ExpressionType.MemberInit:
 				{
-					return this.VisitMemberInit((MemberInitExpression)expression);
+					return this.VisitMemberInit((MemberInitExpression)expression, context);
 				}
 				case ExpressionType.ListInit:
 				{
-					return this.VisitListInit((ListInitExpression)expression);
+					return this.VisitListInit((ListInitExpression)expression, context);
 				}
 #if NET40
 				case ExpressionType.Block:
 				{
-					return this.VisitBlock((BlockExpression)expression);
+					return this.VisitBlock((BlockExpression)expression, context);
 				}
 				case ExpressionType.Dynamic:
 				{
-					return this.VisitDynamic((DynamicExpression)expression);
+					return this.VisitDynamic((DynamicExpression)expression, context);
 				}
 				case ExpressionType.Default:
 				{
-					return this.VisitDefault((DefaultExpression)expression);
+					return this.VisitDefault((DefaultExpression)expression, context);
 				}
 				case ExpressionType.Goto:
 				case ExpressionType.Label:
@@ -219,46 +214,46 @@ namespace JsonFx.Linq
 #endif
 				default:
 				{
-					return this.VisitUnknown(expression);
+					return this.VisitUnknown(expression, context);
 				}
 			}
 		}
 
-		protected virtual Expression VisitUnknown(Expression exp)
+		protected virtual Expression VisitUnknown(Expression exp, T context)
 		{
 			throw new NotSupportedException(String.Format(
-				ExpressionVisitor.ErrorUnexpectedExpression,
+				ExpressionVisitor<T>.ErrorUnexpectedExpression,
 				exp.NodeType));
 		}
 
-		protected virtual MemberBinding VisitBinding(MemberBinding binding)
+		protected virtual MemberBinding VisitBinding(MemberBinding binding, T context)
 		{
 			switch (binding.BindingType)
 			{
 				case MemberBindingType.Assignment:
 				{
-					return this.VisitMemberAssignment((MemberAssignment)binding);
+					return this.VisitMemberAssignment((MemberAssignment)binding, context);
 				}
 				case MemberBindingType.MemberBinding:
 				{
-					return this.VisitMemberMemberBinding((MemberMemberBinding)binding);
+					return this.VisitMemberMemberBinding((MemberMemberBinding)binding, context);
 				}
 				case MemberBindingType.ListBinding:
 				{
-					return this.VisitMemberListBinding((MemberListBinding)binding);
+					return this.VisitMemberListBinding((MemberListBinding)binding, context);
 				}
 				default:
 				{
 					throw new NotSupportedException(String.Format(
-						ExpressionVisitor.ErrorUnexpectedMemberBinding,
+						ExpressionVisitor<T>.ErrorUnexpectedMemberBinding,
 						binding.BindingType));
 				}
 			}
 		}
 
-		protected virtual ElementInit VisitElementInitializer(ElementInit initializer)
+		protected virtual ElementInit VisitElementInitializer(ElementInit initializer, T context)
 		{
-			IEnumerable<Expression> arguments = this.VisitExpressionList(initializer.Arguments);
+			IEnumerable<Expression> arguments = this.VisitExpressionList(initializer.Arguments, context);
 			if (arguments == initializer.Arguments)
 			{
 				// no change
@@ -268,23 +263,23 @@ namespace JsonFx.Linq
 			return Expression.ElementInit(initializer.AddMethod, arguments);
 		}
 
-		protected virtual Expression VisitUnary(UnaryExpression unary)
+		protected virtual Expression VisitUnary(UnaryExpression unary, T context)
 		{
-			Expression operand = this.Visit(unary.Operand);
+			Expression operand = this.Visit(unary.Operand, context);
 			if (operand == unary.Operand)
 			{
 				// no change
 				return unary;
 			}
 
-			return Expression.MakeUnary(unary.NodeType, operand, unary.Type, unary.Method);
+			return Expression.MakeUnary(unary.NodeType, operand, operand.Type, unary.Method);
 		}
 
-		protected virtual Expression VisitBinary(BinaryExpression binary)
+		protected virtual Expression VisitBinary(BinaryExpression binary, T context)
 		{
-			Expression left = this.Visit(binary.Left);
-			Expression right = this.Visit(binary.Right);
-			Expression conversion = this.Visit(binary.Conversion);
+			Expression left = this.Visit(binary.Left, context);
+			Expression right = this.Visit(binary.Right, context);
+			Expression conversion = this.Visit(binary.Conversion, context);
 
 			if (left == binary.Left &&
 				right == binary.Right &&
@@ -302,9 +297,9 @@ namespace JsonFx.Linq
 			return Expression.MakeBinary(binary.NodeType, left, right, binary.IsLiftedToNull, binary.Method);
 		}
 
-		protected virtual Expression VisitTypeIs(TypeBinaryExpression binary)
+		protected virtual Expression VisitTypeIs(TypeBinaryExpression binary, T context)
 		{
-			Expression expr = this.Visit(binary.Expression);
+			Expression expr = this.Visit(binary.Expression, context);
 			if (expr == binary.Expression)
 			{
 				// no change
@@ -314,17 +309,17 @@ namespace JsonFx.Linq
 			return Expression.TypeIs(expr, binary.TypeOperand);
 		}
 
-		protected virtual Expression VisitConstant(ConstantExpression constant)
+		protected virtual Expression VisitConstant(ConstantExpression constant, T context)
 		{
 			// no change
 			return constant;
 		}
 
-		protected virtual Expression VisitConditional(ConditionalExpression conditional)
+		protected virtual Expression VisitConditional(ConditionalExpression conditional, T context)
 		{
-			Expression test = this.Visit(conditional.Test);
-			Expression ifTrue = this.Visit(conditional.IfTrue);
-			Expression ifFalse = this.Visit(conditional.IfFalse);
+			Expression test = this.Visit(conditional.Test, context);
+			Expression ifTrue = this.Visit(conditional.IfTrue, context);
+			Expression ifFalse = this.Visit(conditional.IfFalse, context);
 
 			if (test == conditional.Test &&
 				ifTrue == conditional.IfTrue &&
@@ -337,19 +332,19 @@ namespace JsonFx.Linq
 			return Expression.Condition(test, ifTrue, ifFalse);
 		}
 
-		protected virtual ParameterExpression VisitParameter(ParameterExpression p)
+		protected virtual ParameterExpression VisitParameter(ParameterExpression p, T context)
 		{
 			// no change
 			return p;
 		}
 
-		protected virtual IEnumerable<ParameterExpression> VisitParameterList(IList<ParameterExpression> original)
+		protected virtual IEnumerable<ParameterExpression> VisitParameterList(IList<ParameterExpression> original, T context)
 		{
 			List<ParameterExpression> list = null;
 
 			for (int i=0, length=original.Count; i<length; i++)
 			{
-				ParameterExpression exp = this.VisitParameter(original[i]);
+				ParameterExpression exp = this.VisitParameter(original[i], context);
 				if (list != null)
 				{
 					list.Add(exp);
@@ -375,9 +370,9 @@ namespace JsonFx.Linq
 			return list.AsReadOnly();
 		}
 
-		protected virtual Expression VisitMemberAccess(MemberExpression m)
+		protected virtual Expression VisitMemberAccess(MemberExpression m, T context)
 		{
-			Expression exp = this.Visit(m.Expression);
+			Expression exp = this.Visit(m.Expression, context);
 
 			if (exp == m.Expression)
 			{
@@ -388,10 +383,10 @@ namespace JsonFx.Linq
 			return Expression.MakeMemberAccess(exp, m.Member);
 		}
 
-		protected virtual Expression VisitMethodCall(MethodCallExpression m)
+		protected virtual Expression VisitMethodCall(MethodCallExpression m, T context)
 		{
-			Expression obj = this.Visit(m.Object);
-			IEnumerable<Expression> args = this.VisitExpressionList(m.Arguments);
+			Expression obj = this.Visit(m.Object, context);
+			IEnumerable<Expression> args = this.VisitExpressionList(m.Arguments, context);
 
 			if (obj == m.Object && args == m.Arguments)
 			{
@@ -402,13 +397,13 @@ namespace JsonFx.Linq
 			return Expression.Call(obj, m.Method, args);
 		}
 
-		protected virtual IEnumerable<Expression> VisitExpressionList(IList<Expression> original)
+		protected virtual IEnumerable<Expression> VisitExpressionList(IList<Expression> original, T context)
 		{
 			List<Expression> list = null;
 
 			for (int i=0, length=original.Count; i<length; i++)
 			{
-				Expression exp = this.Visit(original[i]);
+				Expression exp = this.Visit(original[i], context);
 				if (list != null)
 				{
 					list.Add(exp);
@@ -434,9 +429,9 @@ namespace JsonFx.Linq
 			return list.AsReadOnly();
 		}
 
-		protected virtual MemberAssignment VisitMemberAssignment(MemberAssignment assignment)
+		protected virtual MemberAssignment VisitMemberAssignment(MemberAssignment assignment, T context)
 		{
-			Expression exp = this.Visit(assignment.Expression);
+			Expression exp = this.Visit(assignment.Expression, context);
 
 			if (exp == assignment.Expression)
 			{
@@ -447,9 +442,9 @@ namespace JsonFx.Linq
 			return Expression.Bind(assignment.Member, exp);
 		}
 
-		protected virtual MemberMemberBinding VisitMemberMemberBinding(MemberMemberBinding binding)
+		protected virtual MemberMemberBinding VisitMemberMemberBinding(MemberMemberBinding binding, T context)
 		{
-			IEnumerable<MemberBinding> bindings = this.VisitBindingList(binding.Bindings);
+			IEnumerable<MemberBinding> bindings = this.VisitBindingList(binding.Bindings, context);
 
 			if (bindings == binding.Bindings)
 			{
@@ -460,9 +455,9 @@ namespace JsonFx.Linq
 			return Expression.MemberBind(binding.Member, bindings);
 		}
 
-		protected virtual MemberListBinding VisitMemberListBinding(MemberListBinding binding)
+		protected virtual MemberListBinding VisitMemberListBinding(MemberListBinding binding, T context)
 		{
-			IEnumerable<ElementInit> initializers = this.VisitElementInitializerList(binding.Initializers);
+			IEnumerable<ElementInit> initializers = this.VisitElementInitializerList(binding.Initializers, context);
 
 			if (initializers == binding.Initializers)
 			{
@@ -473,13 +468,13 @@ namespace JsonFx.Linq
 			return Expression.ListBind(binding.Member, initializers);
 		}
 
-		protected virtual IEnumerable<MemberBinding> VisitBindingList(IList<MemberBinding> original)
+		protected virtual IEnumerable<MemberBinding> VisitBindingList(IList<MemberBinding> original, T context)
 		{
 			List<MemberBinding> list = null;
 
 			for (int i=0, length=original.Count; i<length; i++)
 			{
-				MemberBinding b = this.VisitBinding(original[i]);
+				MemberBinding b = this.VisitBinding(original[i], context);
 				if (list != null)
 				{
 					list.Add(b);
@@ -505,13 +500,13 @@ namespace JsonFx.Linq
 			return list;
 		}
 
-		protected virtual IEnumerable<ElementInit> VisitElementInitializerList(IList<ElementInit> original)
+		protected virtual IEnumerable<ElementInit> VisitElementInitializerList(IList<ElementInit> original, T context)
 		{
 			List<ElementInit> list = null;
 
 			for (int i=0, length=original.Count; i<length; i++)
 			{
-				ElementInit init = this.VisitElementInitializer(original[i]);
+				ElementInit init = this.VisitElementInitializer(original[i], context);
 				if (list != null)
 				{
 					list.Add(init);
@@ -537,9 +532,9 @@ namespace JsonFx.Linq
 			return list;
 		}
 
-		protected virtual Expression VisitLambda(LambdaExpression lambda)
+		protected virtual Expression VisitLambda(LambdaExpression lambda, T context)
 		{
-			Expression body = this.Visit(lambda.Body);
+			Expression body = this.Visit(lambda.Body, context);
 			if (body == lambda.Body)
 			{
 				// no change
@@ -549,9 +544,9 @@ namespace JsonFx.Linq
 			return Expression.Lambda(lambda.Type, body, lambda.Parameters);
 		}
 
-		protected virtual NewExpression VisitNew(NewExpression ctor)
+		protected virtual NewExpression VisitNew(NewExpression ctor, T context)
 		{
-			IEnumerable<Expression> args = this.VisitExpressionList(ctor.Arguments);
+			IEnumerable<Expression> args = this.VisitExpressionList(ctor.Arguments, context);
 			if (args == ctor.Arguments)
 			{
 				// no change
@@ -566,10 +561,10 @@ namespace JsonFx.Linq
 			return Expression.New(ctor.Constructor, args, ctor.Members);
 		}
 
-		protected virtual Expression VisitMemberInit(MemberInitExpression init)
+		protected virtual Expression VisitMemberInit(MemberInitExpression init, T context)
 		{
-			NewExpression ctor = this.VisitNew(init.NewExpression);
-			IEnumerable<MemberBinding> bindings = this.VisitBindingList(init.Bindings);
+			NewExpression ctor = this.VisitNew(init.NewExpression, context);
+			IEnumerable<MemberBinding> bindings = this.VisitBindingList(init.Bindings, context);
 
 			if (ctor == init.NewExpression && bindings == init.Bindings)
 			{
@@ -580,10 +575,10 @@ namespace JsonFx.Linq
 			return Expression.MemberInit(ctor, bindings);
 		}
 
-		protected virtual Expression VisitListInit(ListInitExpression init)
+		protected virtual Expression VisitListInit(ListInitExpression init, T context)
 		{
-			NewExpression ctor = this.VisitNew(init.NewExpression);
-			IEnumerable<ElementInit> initializers = this.VisitElementInitializerList(init.Initializers);
+			NewExpression ctor = this.VisitNew(init.NewExpression, context);
+			IEnumerable<ElementInit> initializers = this.VisitElementInitializerList(init.Initializers, context);
 
 			if (ctor == init.NewExpression && initializers == init.Initializers)
 			{
@@ -594,9 +589,9 @@ namespace JsonFx.Linq
 			return Expression.ListInit(ctor, initializers);
 		}
 
-		protected virtual Expression VisitNewArray(NewArrayExpression ctor)
+		protected virtual Expression VisitNewArray(NewArrayExpression ctor, T context)
 		{
-			IEnumerable<Expression> exprs = this.VisitExpressionList(ctor.Expressions);
+			IEnumerable<Expression> exprs = this.VisitExpressionList(ctor.Expressions, context);
 			if (exprs == ctor.Expressions)
 			{
 				// no change
@@ -611,10 +606,10 @@ namespace JsonFx.Linq
 			return Expression.NewArrayBounds(ctor.Type.GetElementType(), exprs);
 		}
 
-		protected virtual Expression VisitInvocation(InvocationExpression invoke)
+		protected virtual Expression VisitInvocation(InvocationExpression invoke, T context)
 		{
-			IEnumerable<Expression> args = this.VisitExpressionList(invoke.Arguments);
-			Expression expr = this.Visit(invoke.Expression);
+			IEnumerable<Expression> args = this.VisitExpressionList(invoke.Arguments, context);
+			Expression expr = this.Visit(invoke.Expression, context);
 
 			if (args == invoke.Arguments && expr == invoke.Expression)
 			{
@@ -626,19 +621,19 @@ namespace JsonFx.Linq
 		}
 
 #if NET40
-		protected virtual Expression VisitBlock(BlockExpression block)
+		protected virtual Expression VisitBlock(BlockExpression block, T context)
 		{
 			// TODO: implement visitor method
 			return block;
 		}
 
-		protected virtual Expression VisitDynamic(DynamicExpression dyn)
+		protected virtual Expression VisitDynamic(DynamicExpression dyn, T context)
 		{
 			// TODO: implement visitor method
 			return dyn;
 		}
 
-		protected virtual Expression VisitDefault(DefaultExpression exp)
+		protected virtual Expression VisitDefault(DefaultExpression exp, T context)
 		{
 			// TODO: implement visitor method
 			return exp;
@@ -649,19 +644,19 @@ namespace JsonFx.Linq
 
 		#region Utility Methods
 
-		/// <summary>
-		/// Unwraps quote expressions
-		/// </summary>
-		/// <param name="exp"></param>
-		/// <returns></returns>
-		protected static Expression StripQuotes(Expression exp)
+		protected static LambdaExpression GetLambda(Expression expression)
 		{
-			while (exp.NodeType == ExpressionType.Quote)
+			while (expression.NodeType == ExpressionType.Quote)
 			{
-				exp = ((UnaryExpression)exp).Operand;
+				expression = ((UnaryExpression)expression).Operand;
 			}
 
-			return exp;
+			if (expression.NodeType == ExpressionType.Constant)
+			{
+				return ((ConstantExpression)expression).Value as LambdaExpression;
+			}
+
+			return expression as LambdaExpression;
 		}
 
 		#endregion Utility Methods

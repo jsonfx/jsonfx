@@ -35,6 +35,8 @@ using System.Linq.Expressions;
 using JsonFx.Common;
 using JsonFx.Serialization;
 
+using TokenSequence=System.Collections.Generic.IEnumerable<JsonFx.Serialization.Token<JsonFx.Common.CommonTokenType>>;
+
 namespace JsonFx.Linq
 {
 	public class QueryProvider : BaseQueryProvider
@@ -42,7 +44,7 @@ namespace JsonFx.Linq
 		#region Fields
 
 		private readonly ITokenAnalyzer<CommonTokenType> Analyzer;
-		private readonly IEnumerable<Token<CommonTokenType>> Sequence;
+		private readonly IEnumerable<TokenSequence> Values;
 
 		#endregion Fields
 
@@ -53,19 +55,19 @@ namespace JsonFx.Linq
 		/// </summary>
 		/// <param name="analyzer"></param>
 		/// <param name="sequence"></param>
-		public QueryProvider(ITokenAnalyzer<CommonTokenType> analyzer, IEnumerable<Token<CommonTokenType>> sequence)
+		public QueryProvider(ITokenAnalyzer<CommonTokenType> analyzer, IEnumerable<TokenSequence> values)
 		{
 			if (analyzer == null)
 			{
 				throw new ArgumentNullException("analyzer");
 			}
-			if (sequence == null)
+			if (values == null)
 			{
-				throw new ArgumentNullException("sequence");
+				throw new ArgumentNullException("values");
 			}
 
 			this.Analyzer = analyzer;
-			this.Sequence = sequence;
+			this.Values = values;
 		}
 
 		#endregion Init
@@ -74,7 +76,7 @@ namespace JsonFx.Linq
 
 		public override object Execute(Expression expression)
 		{
-			return new QueryEngine(this.Analyzer, this.Sequence).Execute(expression);
+			return new QueryEngine(this.Analyzer, this.Values).Execute(expression);
 		}
 
 		public override string GetQueryText(Expression expression)

@@ -40,6 +40,15 @@ namespace JsonFx.Serialization
 	/// <typeparam name="T">token type</typeparam>
 	public interface ITokenAnalyzer<T>
 	{
+		#region Properties
+
+		DataReaderSettings Settings
+		{
+			get;
+		}
+
+		#endregion Properties
+
 		#region Methods
 
 		/// <summary>

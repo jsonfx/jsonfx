@@ -31,7 +31,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Reflection;
 
 using JsonFx.CodeGen;
@@ -465,6 +464,21 @@ namespace JsonFx.Serialization.Resolvers
 
 			this.BuildMap(type, out map);
 			return map;
+		}
+
+		public MemberMap LoadMemberMap(MemberInfo member)
+		{
+			IDictionary<string, MemberMap> maps = this.LoadMaps(member.DeclaringType);
+
+			foreach (MemberMap map in maps.Values)
+			{
+				if (Object.Equals(map.MemberInfo, member))
+				{
+					return map;
+				}
+			}
+
+			return null;
 		}
 
 		public IDictionary<Enum, string> LoadEnumMaps(Type type)

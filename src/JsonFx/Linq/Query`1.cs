@@ -35,10 +35,14 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
+using JsonFx.Common;
+
+using TokenSequence=System.Collections.Generic.IEnumerable<JsonFx.Serialization.Token<JsonFx.Common.CommonTokenType>>;
+
 namespace JsonFx.Linq
 {
 	/// <summary>
-	/// Entry point into LINQ to <see cref="CommonTokenType"/> sequence
+	/// Entry point for LINQ-to-<see cref="CommonTokenType"/>-Sequence
 	/// </summary>
 	/// <remarks>
 	/// Factory for <see cref="Query<T>"/> instances.
@@ -53,9 +57,9 @@ namespace JsonFx.Linq
 		/// <typeparam name="T"></typeparam>
 		/// <param name="input"></param>
 		/// <returns></returns>
-		public static IQueryable<T> Find<T>(IEnumerable<JsonFx.Serialization.Token<JsonFx.Common.CommonTokenType>> input)
+		public static IQueryable<T> Find<T>(TokenSequence input)
 		{
-			return new Query<T>(new QueryProvider(new JsonFx.Common.CommonAnalyzer(new JsonFx.Serialization.DataReaderSettings()), input));
+			return new Query<T>(new QueryProvider(new JsonFx.Common.CommonAnalyzer(new JsonFx.Serialization.DataReaderSettings()), input.Values()));
 		}
 
 		/// <summary>
@@ -64,9 +68,9 @@ namespace JsonFx.Linq
 		/// <param name="input"></param>
 		/// <param name="exampleOfType">example anonymous object</param>
 		/// <returns></returns>
-		public static Query<T> Find<T>(IEnumerable<JsonFx.Serialization.Token<JsonFx.Common.CommonTokenType>> input, T exampleOfType)
+		public static Query<T> Find<T>(TokenSequence input, T exampleOfType)
 		{
-			return new Query<T>(new QueryProvider(new JsonFx.Common.CommonAnalyzer(new JsonFx.Serialization.DataReaderSettings()), input));
+			return new Query<T>(new QueryProvider(new JsonFx.Common.CommonAnalyzer(new JsonFx.Serialization.DataReaderSettings()), input.Values()));
 		}
 
 		/// <summary>
@@ -75,9 +79,9 @@ namespace JsonFx.Linq
 		/// <param name="input"></param>
 		/// <param name="targetType"></param>
 		/// <returns></returns>
-		public static IQueryable Find(IEnumerable<JsonFx.Serialization.Token<JsonFx.Common.CommonTokenType>> input, Type targetType)
+		public static IQueryable Find(TokenSequence input, Type targetType)
 		{
-			var provider = new QueryProvider(new JsonFx.Common.CommonAnalyzer(new JsonFx.Serialization.DataReaderSettings()), input);
+			var provider = new QueryProvider(new JsonFx.Common.CommonAnalyzer(new JsonFx.Serialization.DataReaderSettings()), input.Values());
 
 			try
 			{
