@@ -31,13 +31,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 
 using JsonFx.Serialization;
 using JsonFx.Serialization.Filters;
 
 #if !NET20 && !NET30
+using System.Linq;
+
 using JsonFx.Linq;
 #endif
 

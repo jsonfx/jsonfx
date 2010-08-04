@@ -30,7 +30,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using JsonFx.IO;
 using JsonFx.Serialization;
@@ -40,6 +39,10 @@ using TokenSequence=System.Collections.Generic.IEnumerable<JsonFx.Serialization.
 
 namespace JsonFx.Common
 {
+#if NET20 || NET30
+    public delegate TResult Func<T, TResult>(T input);
+#endif
+
 	/// <summary>
 	/// Extension methods for selecting subsequences of sequences of tokens
 	/// </summary>
@@ -196,7 +199,10 @@ namespace JsonFx.Common
 		/// <returns>all properties for the object</returns>
 		public static TokenSequence Property(this TokenSequence source, DataName propertyName)
 		{
-			return Enumerable.FirstOrDefault(CommonSubsequencer.Properties(source, name => name == propertyName)).Value;
+			using (var enumerator = CommonSubsequencer.Properties(source, name => (name == propertyName)).GetEnumerator())
+			{
+				return enumerator.MoveNext() ? enumerator.Current.Value : null;
+			}
 		}
 
 		/// <summary>
