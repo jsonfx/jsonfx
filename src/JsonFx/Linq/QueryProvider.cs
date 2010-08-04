@@ -43,8 +43,8 @@ namespace JsonFx.Linq
 	{
 		#region Fields
 
-		private readonly ITokenAnalyzer<CommonTokenType> Analyzer;
-		private readonly IEnumerable<TokenSequence> Values;
+		private readonly QueryEngine Engine;
+		private Func<object> execute;
 
 		#endregion Fields
 
@@ -55,19 +55,28 @@ namespace JsonFx.Linq
 		/// </summary>
 		/// <param name="analyzer"></param>
 		/// <param name="sequence"></param>
-		public QueryProvider(ITokenAnalyzer<CommonTokenType> analyzer, IEnumerable<TokenSequence> values)
+		public QueryProvider(ITokenAnalyzer<CommonTokenType> analyzer, TokenSequence sequence)
+			: this(analyzer, (sequence != null) ? sequence.Values() : null)
+		{
+		}
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="analyzer"></param>
+		/// <param name="sequences"></param>
+		public QueryProvider(ITokenAnalyzer<CommonTokenType> analyzer, IEnumerable<TokenSequence> sequences)
 		{
 			if (analyzer == null)
 			{
 				throw new ArgumentNullException("analyzer");
 			}
-			if (values == null)
+			if (sequences == null)
 			{
-				throw new ArgumentNullException("values");
+				throw new ArgumentNullException("sequences");
 			}
 
-			this.Analyzer = analyzer;
-			this.Values = values;
+			this.Engine = new QueryEngine(analyzer, sequences);
 		}
 
 		#endregion Init
@@ -76,7 +85,16 @@ namespace JsonFx.Linq
 
 		public override object Execute(Expression expression)
 		{
-			return new QueryEngine(this.Analyzer, this.Values).Execute(expression);
+			// TODO: evaluate if this is correct. if a different expression is passed in this will ignore
+			if (this.execute == null)
+			{
+				// create this once and store it so multiple executions are cached
+				Expression translated = this.Engine.Translate(expression);
+
+				this.execute = Expression.Lambda<Func<object>>(translated).Compile();
+			}
+
+			return this.execute();
 		}
 
 		public override string GetQueryText(Expression expression)

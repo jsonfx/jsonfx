@@ -83,6 +83,7 @@
     <Compile Include="CodeGen\DynamicMethodGenerator.cs" />
     <Compile Include="Common\CommonAnalyzer.cs" />
     <Compile Include="Common\CommonGrammar.cs" />
+    <Compile Include="Common\CommonReader.cs" />
     <Compile Include="Common\CommonSubsequencer.cs" />
     <Compile Include="Common\CommonTokenType.cs" />
     <Compile Include="Common\CommonWalker.cs" />
@@ -166,6 +167,7 @@
     <Compile Include="Linq\BaseQueryProvider.cs" />
     <Compile Include="Linq\ExpressionVisitor.cs" />
     <Compile Include="Linq\ExpressionWalker.cs" />
+    <Compile Include="Linq\IQueryableReader.cs" />
     <Compile Include="Linq\IQueryTextProvider.cs" />
     <Compile Include="Linq\QueryEngine.cs" />
     <Compile Include="Linq\QueryProvider.cs" />

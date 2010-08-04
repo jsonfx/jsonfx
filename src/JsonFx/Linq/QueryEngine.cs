@@ -68,11 +68,9 @@ namespace JsonFx.Linq
 
 		private static readonly MethodInfo MemberAccess;
 
-		private readonly DataReaderSettings Settings;
+		private readonly ResolverCache Resolver;
 		private readonly ITokenAnalyzer<CommonTokenType> Analyzer;
 		private readonly IEnumerable<TokenSequence> Source;
-
-		private Func<object> execute;
 
 		#endregion Fields
 
@@ -98,60 +96,55 @@ namespace JsonFx.Linq
 		/// </summary>
 		/// <param name="analyzer"></param>
 		/// <param name="sequence"></param>
-		public QueryEngine(ITokenAnalyzer<CommonTokenType> analyzer, IEnumerable<TokenSequence> values)
+		public QueryEngine(ITokenAnalyzer<CommonTokenType> analyzer, IEnumerable<TokenSequence> input)
 		{
 			if (analyzer == null)
 			{
 				throw new ArgumentNullException("analyzer");
 			}
-			if (values == null)
+			if (input == null)
 			{
 				throw new ArgumentNullException("values");
 			}
 
 			this.Analyzer = analyzer;
-			this.Settings = analyzer.Settings;
-			this.Source = values;
+			this.Resolver = analyzer.Settings.Resolver;
+			this.Source = input;
 		}
 
 		#endregion Init
 
 		#region IQueryEngine<CommonTokenType> Members
 
-		public object Execute(Expression expression)
+		public Expression Translate(Expression expression)
 		{
-			if (this.execute == null)
+			//var walker = new ExpressionWalker(new JsonFx.Json.JsonWriter.JsonFormatter(new DataWriterSettings { PrettyPrint=true }));
+			//System.Diagnostics.Trace.WriteLine("Query Expression:");
+			//System.Diagnostics.Trace.WriteLine(walker.GetQueryText(expression));
+
+			Expression translated = this.Visit(expression, new QueryContext { Input = this.Source });
+			if (expression != null &&
+				translated != null &&
+				expression.Type != translated.Type)
 			{
-				//var walker = new ExpressionWalker(new JsonFx.Json.JsonWriter.JsonFormatter(new DataWriterSettings { PrettyPrint=true }));
-				//System.Diagnostics.Trace.WriteLine("Query Expression:");
-				//System.Diagnostics.Trace.WriteLine(walker.GetQueryText(expression));
+				Type targetType = expression.Type;
+				bool asSingle = true;
 
-				Expression translated = this.Visit(expression, new QueryContext { Input = this.Source });
-				if (expression != null &&
-					translated != null &&
-					expression.Type != translated.Type)
+				Type queryableType = targetType.IsGenericType ? targetType.GetGenericTypeDefinition() : null;
+				if (queryableType == typeof(IQueryable<>))
 				{
-					Type targetType = expression.Type;
-					bool asSingle = true;
-
-					Type queryableType = targetType.IsGenericType ? targetType.GetGenericTypeDefinition() : null;
-					if (queryableType == typeof(IQueryable<>))
-					{
-						asSingle = false;
-						targetType = targetType.GetGenericArguments()[0];
-					}
-
-					// should just need to be analyzed
-					translated = this.CallAnalyze(targetType, translated, asSingle);
+					asSingle = false;
+					targetType = targetType.GetGenericArguments()[0];
 				}
 
-				//System.Diagnostics.Trace.WriteLine("Translated Expression");
-				//System.Diagnostics.Trace.WriteLine(walker.GetQueryText(translated));
-
-				this.execute = Expression.Lambda<Func<object>>(translated).Compile();
+				// should just need to be analyzed
+				translated = this.CallAnalyze(targetType, translated, asSingle);
 			}
 
-			return this.execute();
+			//System.Diagnostics.Trace.WriteLine("Translated Expression");
+			//System.Diagnostics.Trace.WriteLine(walker.GetQueryText(translated));
+
+			return translated;
 		}
 
 		#endregion IQueryEngine<CommonTokenType> Members
@@ -316,7 +309,7 @@ namespace JsonFx.Linq
 				targetType = null;
 			}
 
-			MemberMap map = this.Settings.Resolver.LoadMemberMap(member);
+			MemberMap map = this.Resolver.LoadMemberMap(member);
 
 			ParameterExpression p = (ParameterExpression)m.Expression;
 

@@ -31,7 +31,7 @@
 using System;
 using System.Linq;
 
-using JsonFx.Common;
+using JsonFx.Json;
 using Xunit;
 
 using Assert=JsonFx.AssertPatched;
@@ -47,25 +47,21 @@ namespace JsonFx.Linq
 
 		#endregion Constants
 
-		#region Simple Tests
+		#region Anonymous Tests
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
 		public void Find_MatchingPropertyFirstOrDefault_ReturnsSingleObject()
 		{
-			var input = new[]
-			{
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenProperty("key"),
-				CommonGrammar.TokenPrimitive("value"),
-				CommonGrammar.TokenObjectEnd,
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenProperty("key"),
-				CommonGrammar.TokenPrimitive("other-value"),
-				CommonGrammar.TokenObjectEnd,
-				CommonGrammar.TokenArrayEnd
-			};
+			var input = @"
+[
+	{
+		""key"": ""value""
+	},
+	{
+		""key"": ""other-value""
+	}
+]";
 
 			var expected =
 				new []
@@ -77,7 +73,7 @@ namespace JsonFx.Linq
 					}
 				};
 
-			var source = Query.Find(input, new { key=String.Empty });
+			var source = new JsonReader().Query(input, new { key=String.Empty });
 
 			var query =
 				from obj in source
@@ -90,8 +86,6 @@ namespace JsonFx.Linq
 
 			var actual = query.ToArray();
 
-			Assert.Equal(1, actual.Length);
-
 			Assert.Equal(expected, actual, true);
 		}
 
@@ -99,19 +93,15 @@ namespace JsonFx.Linq
 		[Trait(TraitName, TraitValue)]
 		public void Find_MatchingPropertyToArray_ReturnsArray()
 		{
-			var input = new[]
-			{
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenProperty("key"),
-				CommonGrammar.TokenPrimitive("value"),
-				CommonGrammar.TokenObjectEnd,
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenProperty("key"),
-				CommonGrammar.TokenPrimitive("other-value"),
-				CommonGrammar.TokenObjectEnd,
-				CommonGrammar.TokenArrayEnd
-			};
+			var input = @"
+[
+	{
+		""key"": ""value""
+	},
+	{
+		""key"": ""other-value""
+	}
+]";
 
 			var expected = new[]
 				{
@@ -121,10 +111,9 @@ namespace JsonFx.Linq
 					}
 				};
 
-			var query =
-				Query
-					.Find(input, new { key=String.Empty })
-					.Where(obj => obj.key == "value");
+			var source = new JsonReader().Query(input, new { key=String.Empty });
+
+			var query = source.Where(obj => obj.key == "value");
 
 			var actual = query.ToArray();
 
@@ -135,32 +124,33 @@ namespace JsonFx.Linq
 		[Trait(TraitName, TraitValue)]
 		public void Find_PropertyNoMatch_ReturnsNull()
 		{
-			var input = new[]
-			{
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenProperty("key"),
-				CommonGrammar.TokenPrimitive("value"),
-				CommonGrammar.TokenObjectEnd,
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenProperty("key"),
-				CommonGrammar.TokenPrimitive("other-value"),
-				CommonGrammar.TokenObjectEnd,
-				CommonGrammar.TokenArrayEnd
-			};
+			var input = @"
+[
+	{
+		""key"": ""value""
+	},
+	{
+		""key"": ""other-value""
+	}
+]";
 
 			var expected = (object)null;
 
-			var query =
-				Query
-					.Find(input, new { key=String.Empty })
-					.Where(obj => obj.key == "not-a-key");
+			var source = new JsonReader().Query(input, new { key=String.Empty });
+
+			var query = source.Where(obj => obj.key == "not-a-key");
 
 			var actual = query.FirstOrDefault();
 
 			Assert.Equal(expected, actual, false);
 		}
 
-		#endregion Simple Tests
+		#endregion Anonymous Tests
+
+		#region Complex Graph Tests
+
+
+
+		#endregion Complex Graph Tests
 	}
 }

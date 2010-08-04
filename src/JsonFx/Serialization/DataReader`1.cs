@@ -101,7 +101,7 @@ namespace JsonFx.Serialization
 
 		#endregion Properties
 
-		#region Methods
+		#region Deserialize Methods
 
 		/// <summary>
 		/// Deserializes the data from the given input
@@ -272,6 +272,10 @@ namespace JsonFx.Serialization
 				throw new DeserializationException(ex.Message, tokenizer.Index, tokenizer.Line, tokenizer.Column, ex);
 			}
 		}
+
+		#endregion Deserialize Methods
+
+		#region Methods
 
 		protected abstract ITextTokenizer<T> GetTokenizer();
 

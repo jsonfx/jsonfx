@@ -41,7 +41,7 @@ namespace JsonFx.Xml
 	/// <summary>
 	/// XML serializer
 	/// </summary>
-	public partial class XmlReader : DataReader<CommonTokenType>
+	public partial class XmlReader : CommonReader
 	{
 		#region Init
 
@@ -103,15 +103,6 @@ namespace JsonFx.Xml
 		#endregion Properties
 
 		#region DataReader<DataTokenType> Methods
-
-		/// <summary>
-		/// Gets an analyzer for XML
-		/// </summary>
-		/// <returns></returns>
-		protected override ITokenAnalyzer<CommonTokenType> GetAnalyzer()
-		{
-			return new CommonAnalyzer(this.Settings, this.Filters);
-		}
 
 		/// <summary>
 		/// Gets a tokenizer for XML

@@ -29,109 +29,76 @@
 #endregion License
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
-namespace JsonFx.Serialization
+using JsonFx.Serialization;
+
+namespace JsonFx.Linq
 {
 	/// <summary>
-	/// A common interface for data deserializers
+	/// A common interface for querying data readers
 	/// </summary>
-	public interface IDataReader
+	public interface IQueryableReader : IDataReader
 	{
-		#region Properties
+		#region Query Methods
 
 		/// <summary>
-		/// Gets the supported content type of the serialized data
-		/// </summary>
-		IEnumerable<string> ContentType
-		{
-			get;
-		}
-
-		/// <summary>
-		/// Gets the settings used for deserialization
-		/// </summary>
-		DataReaderSettings Settings
-		{
-			get;
-		}
-
-		#endregion Properties
-
-		#region Deserialize Methods
-
-		/// <summary>
-		/// Deserializes a single object from the given input
+		/// Begins a query of the given input
 		/// </summary>
 		/// <param name="input">the input reader</param>
 		/// <param name="ignored">a value used to trigger Type inference for <typeparamref name="TResult"/> (e.g. for deserializing anonymous objects)</param>
 		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
-		TResult Deserialize<TResult>(TextReader input, TResult ignored);
+		IQueryable<TResult> Query<TResult>(TextReader input, TResult ignored);
 
 		/// <summary>
-		/// Deserializes a single object from the given input
+		/// Begins a query of the given input
 		/// </summary>
 		/// <param name="input">the input reader</param>
 		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
-		TResult Deserialize<TResult>(TextReader input);
+		IQueryable<TResult> Query<TResult>(TextReader input);
 
 		/// <summary>
 		/// Serializes the data to the given output
 		/// </summary>
 		/// <param name="input">the input reader</param>
-		object Deserialize(TextReader input);
+		IQueryable Query(TextReader input);
 
 		/// <summary>
-		/// Deserializes a single object from the given input
+		/// Begins a query of the given input
 		/// </summary>
 		/// <param name="input">the input reader</param>
 		/// <param name="targetType">the expected type of the serialized data</param>
-		object Deserialize(TextReader input, Type targetType);
+		IQueryable Query(TextReader input, Type targetType);
 
 		/// <summary>
-		/// Deserializes a single object from the given input
+		/// Begins a query of the given input
 		/// </summary>
 		/// <param name="input">the input text</param>
 		/// <param name="ignored">a value used to trigger Type inference for <typeparamref name="TResult"/> (e.g. for deserializing anonymous objects)</param>
 		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
-		TResult Deserialize<TResult>(string input, TResult ignored);
+		IQueryable<TResult> Query<TResult>(string input, TResult ignored);
 
 		/// <summary>
-		/// Deserializes a single object from the given input
+		/// Begins a query of the given input
 		/// </summary>
 		/// <param name="input">the input text</param>
 		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
-		TResult Deserialize<TResult>(string input);
+		IQueryable<TResult> Query<TResult>(string input);
 
 		/// <summary>
-		/// Deserializes a single object from the given input
+		/// Begins a query of the given input
 		/// </summary>
 		/// <param name="input">the input text</param>
-		object Deserialize(string input);
+		IQueryable Query(string input);
 
 		/// <summary>
-		/// Deserializes a single object from the given input
+		/// Begins a query of the given input
 		/// </summary>
 		/// <param name="input">the input text</param>
 		/// <param name="targetType">the expected type of the serialized data</param>
-		object Deserialize(string input, Type targetType);
+		IQueryable Query(string input, Type targetType);
 
-		#endregion Deserialize Methods
-
-		#region StreamedDeserialize Methods
-
-		/// <summary>
-		/// Deserializes a potentially endless sequence of objects from a stream source
-		/// </summary>
-		/// <param name="input"></param>
-		/// <returns></returns>
-		/// <remarks>
-		/// character stream => token stream => object stream
-		/// </remarks>
-		IEnumerable StreamedDeserialize(TextReader input);
-
-		#endregion StreamedDeserialize Methods
+		#endregion Query Methods
 	}
 }

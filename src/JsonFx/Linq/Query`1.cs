@@ -33,70 +33,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
-
-using JsonFx.Common;
-
-using TokenSequence=System.Collections.Generic.IEnumerable<JsonFx.Serialization.Token<JsonFx.Common.CommonTokenType>>;
 
 namespace JsonFx.Linq
 {
-	/// <summary>
-	/// Entry point for LINQ-to-<see cref="CommonTokenType"/>-Sequence
-	/// </summary>
-	/// <remarks>
-	/// Factory for <see cref="Query<T>"/> instances.
-	/// </remarks>
-	public class Query
-	{
-		#region Factory Methods
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="input"></param>
-		/// <returns></returns>
-		public static IQueryable<T> Find<T>(TokenSequence input)
-		{
-			return new Query<T>(new QueryProvider(new JsonFx.Common.CommonAnalyzer(new JsonFx.Serialization.DataReaderSettings()), input.Values()));
-		}
-
-		/// <summary>
-		/// Uses type inference to get the compiler to give us a name for the anonymous object
-		/// </summary>
-		/// <param name="input"></param>
-		/// <param name="exampleOfType">example anonymous object</param>
-		/// <returns></returns>
-		public static IQueryable<T> Find<T>(TokenSequence input, T exampleOfType)
-		{
-			return new Query<T>(new QueryProvider(new JsonFx.Common.CommonAnalyzer(new JsonFx.Serialization.DataReaderSettings()), input.Values()));
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="input"></param>
-		/// <param name="targetType"></param>
-		/// <returns></returns>
-		public static IQueryable Find(TokenSequence input, Type targetType)
-		{
-			var provider = new QueryProvider(new JsonFx.Common.CommonAnalyzer(new JsonFx.Serialization.DataReaderSettings()), input.Values());
-
-			try
-			{
-				return (IQueryable)Activator.CreateInstance(typeof(Query<>).MakeGenericType(targetType), new object[] { provider });
-			}
-			catch (TargetInvocationException ex)
-			{
-				// unwrap inner exception
-				throw ex.InnerException;
-			}
-		}
-
-		#endregion Factory Methods
-	}
-
 	internal class Query<T> :
 		IQueryable<T>,
 		IQueryable,
