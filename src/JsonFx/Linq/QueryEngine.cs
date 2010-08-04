@@ -123,10 +123,9 @@ namespace JsonFx.Linq
 		{
 			if (this.execute == null)
 			{
-				var walker = new ExpressionWalker(new JsonFx.Json.JsonWriter.JsonFormatter(new DataWriterSettings { PrettyPrint=true }));
-
-				System.Diagnostics.Trace.WriteLine("Query Expression:");
-				System.Diagnostics.Trace.WriteLine(walker.GetQueryText(expression));
+				//var walker = new ExpressionWalker(new JsonFx.Json.JsonWriter.JsonFormatter(new DataWriterSettings { PrettyPrint=true }));
+				//System.Diagnostics.Trace.WriteLine("Query Expression:");
+				//System.Diagnostics.Trace.WriteLine(walker.GetQueryText(expression));
 
 				Expression translated = this.Visit(expression, new QueryContext { Input = this.Source });
 				if (expression != null &&
@@ -147,8 +146,8 @@ namespace JsonFx.Linq
 					translated = this.CallAnalyze(targetType, translated, asSingle);
 				}
 
-				System.Diagnostics.Trace.WriteLine("Translated Expression");
-				System.Diagnostics.Trace.WriteLine(walker.GetQueryText(translated));
+				//System.Diagnostics.Trace.WriteLine("Translated Expression");
+				//System.Diagnostics.Trace.WriteLine(walker.GetQueryText(translated));
 
 				this.execute = Expression.Lambda<Func<object>>(translated).Compile();
 			}
