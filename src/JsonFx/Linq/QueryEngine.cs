@@ -38,7 +38,6 @@ using JsonFx.Common;
 using JsonFx.Serialization;
 using JsonFx.Serialization.Resolvers;
 
-using CommonToken=JsonFx.Serialization.Token<JsonFx.Common.CommonTokenType>;
 using TokenSequence=System.Collections.Generic.IEnumerable<JsonFx.Serialization.Token<JsonFx.Common.CommonTokenType>>;
 
 namespace JsonFx.Linq

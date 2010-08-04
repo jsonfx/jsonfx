@@ -39,7 +39,7 @@ using TokenSequence=System.Collections.Generic.IEnumerable<JsonFx.Serialization.
 
 namespace JsonFx.Linq
 {
-	public class QueryProvider : BaseQueryProvider
+	internal class QueryProvider : BaseQueryProvider
 	{
 		#region Fields
 

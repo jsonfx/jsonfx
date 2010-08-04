@@ -40,7 +40,7 @@ namespace JsonFx.Linq
 	/// <summary>
 	/// Boiler-plate <see cref="IQueryProvider"/> implementation
 	/// </summary>
-	public abstract class BaseQueryProvider : IQueryProvider, IQueryTextProvider
+	internal abstract class BaseQueryProvider : IQueryProvider, IQueryTextProvider
 	{
 		#region Init
 

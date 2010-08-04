@@ -68,7 +68,7 @@ namespace JsonFx.Linq
 		/// <param name="input"></param>
 		/// <param name="exampleOfType">example anonymous object</param>
 		/// <returns></returns>
-		public static Query<T> Find<T>(TokenSequence input, T exampleOfType)
+		public static IQueryable<T> Find<T>(TokenSequence input, T exampleOfType)
 		{
 			return new Query<T>(new QueryProvider(new JsonFx.Common.CommonAnalyzer(new JsonFx.Serialization.DataReaderSettings()), input.Values()));
 		}
@@ -97,7 +97,7 @@ namespace JsonFx.Linq
 		#endregion Factory Methods
 	}
 
-	public class Query<T> :
+	internal class Query<T> :
 		IQueryable<T>,
 		IQueryable,
 		IEnumerable<T>,
@@ -147,7 +147,7 @@ namespace JsonFx.Linq
 
 		#endregion Init
 
-		#region Properties
+		#region IQueryable Properties
 
 		/// <summary>
 		/// Gets the query expression
@@ -173,11 +173,11 @@ namespace JsonFx.Linq
 			get { return this.Provider; }
 		}
 
-		#endregion Properties
+		#endregion IQueryable Properties
 
-		#region Methods
+		#region IEnumerable Methods
 
-		public IEnumerator<T> GetEnumerator()
+		IEnumerator<T> IEnumerable<T>.GetEnumerator()
 		{
 			return (this.Provider.Execute<IEnumerable<T>>(this.Expression)).GetEnumerator();
 		}
@@ -187,7 +187,7 @@ namespace JsonFx.Linq
 			return ((IEnumerable)this.Provider.Execute(this.Expression)).GetEnumerator();
 		}
 
-		#endregion Methods
+		#endregion IEnumerable Methods
 
 		#region Object Overrides
 
