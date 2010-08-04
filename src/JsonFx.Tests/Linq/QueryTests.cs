@@ -55,6 +55,7 @@ namespace JsonFx.Linq
 		{
 			var input = new[]
 			{
+				CommonGrammar.TokenArrayBeginUnnamed,
 				CommonGrammar.TokenObjectBeginUnnamed,
 				CommonGrammar.TokenProperty("key"),
 				CommonGrammar.TokenPrimitive("value"),
@@ -62,14 +63,19 @@ namespace JsonFx.Linq
 				CommonGrammar.TokenObjectBeginUnnamed,
 				CommonGrammar.TokenProperty("key"),
 				CommonGrammar.TokenPrimitive("other-value"),
-				CommonGrammar.TokenObjectEnd
+				CommonGrammar.TokenObjectEnd,
+				CommonGrammar.TokenArrayEnd
 			};
 
-			var expected = new
-			{
-				Other = "otherValue",
-				Key = "value"
-			};
+			var expected =
+				new []
+				{
+					new
+					{
+						Other = "otherValue",
+						Key = "value"
+					}
+				};
 
 			var source = Query.Find(input, new { key=String.Empty });
 
@@ -82,22 +88,20 @@ namespace JsonFx.Linq
 					Key = obj.key
 				};
 
-			//System.Diagnostics.Trace.WriteLine("Query Expression:");
-			//System.Diagnostics.Trace.WriteLine(query.ToString());
-
 			var actual = query.ToArray();
 
 			Assert.Equal(1, actual.Length);
 
-			Assert.Equal(expected, actual[0], true);
+			Assert.Equal(expected, actual, true);
 		}
 
-		//[Fact]
+		[Fact]
 		[Trait(TraitName, TraitValue)]
 		public void Find_MatchingPropertyToArray_ReturnsArray()
 		{
 			var input = new[]
 			{
+				CommonGrammar.TokenArrayBeginUnnamed,
 				CommonGrammar.TokenObjectBeginUnnamed,
 				CommonGrammar.TokenProperty("key"),
 				CommonGrammar.TokenPrimitive("value"),
@@ -105,7 +109,8 @@ namespace JsonFx.Linq
 				CommonGrammar.TokenObjectBeginUnnamed,
 				CommonGrammar.TokenProperty("key"),
 				CommonGrammar.TokenPrimitive("other-value"),
-				CommonGrammar.TokenObjectEnd
+				CommonGrammar.TokenObjectEnd,
+				CommonGrammar.TokenArrayEnd
 			};
 
 			var expected = new[]
@@ -116,23 +121,23 @@ namespace JsonFx.Linq
 					}
 				};
 
-			var query = Query.Find(input, new { key=String.Empty })
-				.Where(obj => obj.key == "value");
-
-			//System.Diagnostics.Trace.WriteLine("Executing Expression:");
-			//System.Diagnostics.Trace.WriteLine(query.ToString());
+			var query =
+				Query
+					.Find(input, new { key=String.Empty })
+					.Where(obj => obj.key == "value");
 
 			var actual = query.ToArray();
 
 			Assert.Equal(expected, actual, true);
 		}
 
-		//[Fact]
+		[Fact]
 		[Trait(TraitName, TraitValue)]
 		public void Find_PropertyNoMatch_ReturnsNull()
 		{
 			var input = new[]
 			{
+				CommonGrammar.TokenArrayBeginUnnamed,
 				CommonGrammar.TokenObjectBeginUnnamed,
 				CommonGrammar.TokenProperty("key"),
 				CommonGrammar.TokenPrimitive("value"),
@@ -140,13 +145,16 @@ namespace JsonFx.Linq
 				CommonGrammar.TokenObjectBeginUnnamed,
 				CommonGrammar.TokenProperty("key"),
 				CommonGrammar.TokenPrimitive("other-value"),
-				CommonGrammar.TokenObjectEnd
+				CommonGrammar.TokenObjectEnd,
+				CommonGrammar.TokenArrayEnd
 			};
 
 			var expected = (object)null;
 
-			var query = Query.Find(input, new { key=String.Empty })
-				.Where(obj => obj.key == "not-a-key");
+			var query =
+				Query
+					.Find(input, new { key=String.Empty })
+					.Where(obj => obj.key == "not-a-key");
 
 			var actual = query.FirstOrDefault();
 

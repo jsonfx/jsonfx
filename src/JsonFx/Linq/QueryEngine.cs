@@ -38,6 +38,7 @@ using JsonFx.Common;
 using JsonFx.Serialization;
 using JsonFx.Serialization.Resolvers;
 
+using CommonToken=JsonFx.Serialization.Token<JsonFx.Common.CommonTokenType>;
 using TokenSequence=System.Collections.Generic.IEnumerable<JsonFx.Serialization.Token<JsonFx.Common.CommonTokenType>>;
 
 namespace JsonFx.Linq
@@ -67,10 +68,6 @@ namespace JsonFx.Linq
 		#region Fields
 
 		private static readonly MethodInfo MemberAccess;
-		private static readonly MethodInfo WhereTokenSequence;
-		private static readonly MethodInfo SelectTokenSequence;
-		private static readonly MethodInfo FirstOrDefaultGeneric;
-		private static readonly MethodInfo AnalyzeMethod;
 
 		private readonly DataReaderSettings Settings;
 		private readonly ITokenAnalyzer<CommonTokenType> Analyzer;
@@ -87,98 +84,14 @@ namespace JsonFx.Linq
 		/// </summary>
 		static QueryEngine()
 		{
+			// look this one up since doesn't change
+
 			QueryEngine.MemberAccess = typeof(CommonSubsequencer).GetMethod(
 				"Property",
 				BindingFlags.Public|BindingFlags.Static,
 				null,
 				new[] { typeof(TokenSequence), typeof(DataName) },
 				null);
-
-			MethodInfo[] methods = typeof(Queryable).GetMethods(BindingFlags.Public|BindingFlags.Static);
-
-			// TODO: figure out how to grab generic versions directly
-			// I think there are Expression.Call overrides for this
-
-			foreach (MethodInfo method in methods)
-			{
-				if (!method.IsGenericMethod)
-				{
-					continue;
-				}
-
-				ParameterInfo[] paramTypes = method.GetParameters();
-				if (paramTypes.Length != 2)
-				{
-					continue;
-				}
-
-				Type exprType = paramTypes[1].ParameterType;
-				if (!exprType.IsGenericType ||
-					!exprType.GetGenericArguments()[0].IsGenericType ||
-					exprType.GetGenericArguments()[0].GetGenericTypeDefinition() != typeof(Func<,>))
-				{
-					continue;
-				}
-
-				switch (method.Name)
-				{
-					case "Where":
-					{
-						QueryEngine.WhereTokenSequence = method.MakeGenericMethod(typeof(TokenSequence));
-
-						if (QueryEngine.SelectTokenSequence == null)
-						{
-							// keep searching
-							continue;
-						}
-						break;
-					}
-					case "Select":
-					{
-						QueryEngine.SelectTokenSequence = method;
-
-						if (QueryEngine.WhereTokenSequence == null)
-						{
-							// keep searching
-							continue;
-						}
-						break;
-					}
-					default:
-					{
-						continue;
-					}
-				}
-
-				// exit loop
-				break;
-			}
-
-			methods = typeof(Enumerable).GetMethods(BindingFlags.Public|BindingFlags.Static);
-
-			foreach (MethodInfo method in methods)
-			{
-				if (method.IsGenericMethod &&
-					method.Name == "FirstOrDefault" &&
-					method.GetParameters().Length == 1)
-				{
-					QueryEngine.FirstOrDefaultGeneric = method;
-					break;
-				}
-			}
-
-			methods = typeof(ITokenAnalyzer<CommonTokenType>).GetMethods(BindingFlags.Public|BindingFlags.Instance);
-
-			foreach (MethodInfo method in methods)
-			{
-				if (method.IsGenericMethod &&
-					method.Name == "Analyze" &&
-					method.GetParameters().Length == 1)
-				{
-					QueryEngine.AnalyzeMethod = method;
-					break;
-				}
-			}
 		}
 
 		/// <summary>
@@ -210,12 +123,34 @@ namespace JsonFx.Linq
 		{
 			if (this.execute == null)
 			{
-				expression = this.Visit(expression, new QueryContext { Input = this.Source });
+				var walker = new ExpressionWalker(new JsonFx.Json.JsonWriter.JsonFormatter(new DataWriterSettings { PrettyPrint=true }));
 
-				//System.Diagnostics.Trace.WriteLine("Translated Expression");
-				//System.Diagnostics.Trace.WriteLine(new ExpressionWalker(new JsonFx.Json.JsonWriter.JsonFormatter(new DataWriterSettings { PrettyPrint=true })).GetQueryText(expression));
+				System.Diagnostics.Trace.WriteLine("Query Expression:");
+				System.Diagnostics.Trace.WriteLine(walker.GetQueryText(expression));
 
-				this.execute = Expression.Lambda<Func<object>>(expression).Compile();
+				Expression translated = this.Visit(expression, new QueryContext { Input = this.Source });
+				if (expression != null &&
+					translated != null &&
+					expression.Type != translated.Type)
+				{
+					Type targetType = expression.Type;
+					bool asSingle = true;
+
+					Type queryableType = targetType.IsGenericType ? targetType.GetGenericTypeDefinition() : null;
+					if (queryableType == typeof(IQueryable<>))
+					{
+						asSingle = false;
+						targetType = targetType.GetGenericArguments()[0];
+					}
+
+					// should just need to be analyzed
+					translated = this.CallAnalyze(targetType, translated, asSingle);
+				}
+
+				System.Diagnostics.Trace.WriteLine("Translated Expression");
+				System.Diagnostics.Trace.WriteLine(walker.GetQueryText(translated));
+
+				this.execute = Expression.Lambda<Func<object>>(translated).Compile();
 			}
 
 			return this.execute();
@@ -263,7 +198,7 @@ namespace JsonFx.Linq
 
 						Expression predicate = this.Visit(m.Arguments[1], nextContext);
 
-						return Expression.Call(QueryEngine.WhereTokenSequence, source, predicate);
+						return Expression.Call(typeof(Queryable), "Where", new [] { typeof(TokenSequence) }, source, predicate);
 					}
 					case "Select":
 					{
@@ -280,7 +215,34 @@ namespace JsonFx.Linq
 
 						Expression selector = this.Visit(m.Arguments[1], nextContext);
 
-						return Expression.Call(QueryEngine.SelectTokenSequence.MakeGenericMethod(typeof(TokenSequence), nextContext.OutputType), source, selector);
+						return Expression.Call(typeof(Queryable), "Select", new[] { typeof(TokenSequence), nextContext.OutputType }, source, selector);
+					}
+					default:
+					{
+						IEnumerable<Expression> args = this.VisitExpressionList(m.Arguments, context);
+						if (args == m.Arguments)
+						{
+							// no change
+							return m;
+						}
+
+						Expression[] argArray = args.ToArray();
+						Expression source = argArray[0];
+						if (source != null &&
+							source.Type != m.Type)
+						{
+							Type targetType = m.Type;
+							Type queryableType = targetType.IsGenericType ? targetType.GetGenericTypeDefinition() : null;
+							if (queryableType == typeof(IQueryable<>))
+							{
+								targetType = targetType.GetGenericArguments()[0];
+							}
+
+							// should just need to be analyzed
+							argArray[0] = this.CallAnalyze(targetType, source, false);
+						}
+
+						return Expression.Call(m.Method, argArray);
 					}
 				}
 			}
@@ -365,16 +327,32 @@ namespace JsonFx.Linq
 	
 			var memberAccess = Expression.Call(QueryEngine.MemberAccess, context.Parameters[p.Name], Expression.Constant(map.DataName));
 
-			return this.CallAnalyze(memberAccess, targetType, true);
+			return this.CallAnalyze(targetType, memberAccess, true);
 		}
 
-		private Expression CallAnalyze(Expression sequence, Type targetType, bool asSingle)
+		private Expression CallAnalyze(Type targetType, Expression sequence, bool asSingle)
 		{
-			var analyze = Expression.Call(Expression.Constant(this.Analyzer), QueryEngine.AnalyzeMethod.MakeGenericMethod(targetType), sequence);
+			Expression analyze;
+
+			if (sequence.Type == typeof(IQueryable<TokenSequence>))
+			{
+				// lambda to analyze each sequence stream
+				ParameterExpression p = Expression.Parameter(typeof(TokenSequence), "sequence");
+				analyze = Expression.Lambda(Expression.Call(Expression.Constant(this.Analyzer), "Analyze", new[] { targetType }, p), p);
+
+				// combine sequence of analyzed results
+				analyze = Expression.Call(typeof(Queryable), "SelectMany", new[] { typeof(TokenSequence), targetType }, sequence, analyze);
+			}
+			else
+			{
+				// analyze sequence stream
+				analyze = Expression.Call(Expression.Constant(this.Analyzer), "Analyze", new[] { targetType }, sequence);
+			}
 
 			if (asSingle)
 			{
-				analyze = Expression.Call(QueryEngine.FirstOrDefaultGeneric.MakeGenericMethod(targetType), analyze);
+				// reduce to only first value
+				analyze = Expression.Call(typeof(Enumerable), "FirstOrDefault", new[] { targetType }, analyze);
 			}
 
 			return analyze;
