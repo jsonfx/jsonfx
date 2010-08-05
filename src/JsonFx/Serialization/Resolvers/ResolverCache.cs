@@ -100,11 +100,27 @@ namespace JsonFx.Serialization.Resolvers
 		/// <summary>
 		/// Ctor
 		/// </summary>
+		/// <param name="map">MemberMap to clone</param>
+		/// <param name="dataName">alternate name</param>
+		public MemberMap(MemberMap map, DataName dataName)
+		{
+			this.MemberInfo = map.MemberInfo;
+			this.Type = map.Type;
+			this.Getter = map.Getter;
+			this.Setter = map.Setter;
+			this.IsIgnored = map.IsIgnored;
+
+			this.DataName = dataName;
+			this.IsAlternate = true;
+		}
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
 		/// <param name="propertyInfo"></param>
 		/// <param name="dataName"></param>
 		/// <param name="isIgnored"></param>
-		/// <param name="isAlternate">determines if map is an alternate name</param>
-		public MemberMap(PropertyInfo propertyInfo, DataName dataName, ValueIgnoredDelegate isIgnored, bool isAlternate)
+		public MemberMap(PropertyInfo propertyInfo, DataName dataName, ValueIgnoredDelegate isIgnored)
 		{
 			if (propertyInfo == null)
 			{
@@ -118,7 +134,6 @@ namespace JsonFx.Serialization.Resolvers
 			this.Getter = DynamicMethodGenerator.GetPropertyGetter(propertyInfo);
 			this.Setter = DynamicMethodGenerator.GetPropertySetter(propertyInfo);
 			this.IsIgnored = isIgnored;
-			this.IsAlternate = isAlternate;
 		}
 
 		/// <summary>
@@ -127,8 +142,7 @@ namespace JsonFx.Serialization.Resolvers
 		/// <param name="fieldInfo"></param>
 		/// <param name="dataName"></param>
 		/// <param name="isIgnored"></param>
-		/// <param name="isAlternate">determines if map is an alternate name</param>
-		public MemberMap(FieldInfo fieldInfo, DataName dataName, ValueIgnoredDelegate isIgnored, bool isAlternate)
+		public MemberMap(FieldInfo fieldInfo, DataName dataName, ValueIgnoredDelegate isIgnored)
 		{
 			if (fieldInfo == null)
 			{
@@ -142,7 +156,6 @@ namespace JsonFx.Serialization.Resolvers
 			this.Getter = DynamicMethodGenerator.GetFieldGetter(fieldInfo);
 			this.Setter = DynamicMethodGenerator.GetFieldSetter(fieldInfo);
 			this.IsIgnored = isIgnored;
-			this.IsAlternate = isAlternate;
 		}
 
 		#endregion Init
@@ -660,7 +673,7 @@ namespace JsonFx.Serialization.Resolvers
 				}
 
 				ValueIgnoredDelegate isIgnored = this.Strategy.GetValueIgnoredCallback(info);
-				bool isAlternate = false;
+				MemberMap map = null;
 
 				foreach (DataName name in names)
 				{
@@ -669,11 +682,13 @@ namespace JsonFx.Serialization.Resolvers
 						continue;
 					}
 
-					maps[name.LocalName] = new MemberMap(info, name, isIgnored, isAlternate);
-
-					if (!isAlternate)
+					if (map == null)
 					{
-						isAlternate = true;
+						maps[name.LocalName] = map = new MemberMap(info, name, isIgnored);
+					}
+					else
+					{
+						maps[name.LocalName] = new MemberMap(map, name);
 					}
 				}
 			}
@@ -705,7 +720,7 @@ namespace JsonFx.Serialization.Resolvers
 				}
 
 				ValueIgnoredDelegate isIgnored = this.Strategy.GetValueIgnoredCallback(info);
-				bool isAlternate = false;
+				MemberMap map = null;
 
 				foreach (DataName name in names)
 				{
@@ -714,11 +729,13 @@ namespace JsonFx.Serialization.Resolvers
 						continue;
 					}
 
-					maps[name.LocalName] = new MemberMap(info, name, isIgnored, isAlternate);
-
-					if (!isAlternate)
+					if (map == null)
 					{
-						isAlternate = true;
+						maps[name.LocalName] = map = new MemberMap(info, name, isIgnored);
+					}
+					else
+					{
+						maps[name.LocalName] = new MemberMap(map, name);
 					}
 				}
 			}
@@ -798,7 +815,7 @@ namespace JsonFx.Serialization.Resolvers
 					names = new[] { new DataName(info.Name) };
 				}
 
-				bool isAlternate = false;
+				MemberMap map = null;
 
 				foreach (DataName name in names)
 				{
@@ -807,13 +824,14 @@ namespace JsonFx.Serialization.Resolvers
 						continue;
 					}
 
-					MemberMap enumMap;
-					maps[name.LocalName] = enumMap = new MemberMap(info, name, null, isAlternate);
-
-					if (!isAlternate)
+					if (map == null)
 					{
-						enumMaps[(Enum)enumMap.Getter(null)] = name.LocalName;
-						isAlternate = true;
+						maps[name.LocalName] = map = new MemberMap(info, name, null);
+						enumMaps[(Enum)map.Getter(null)] = name.LocalName;
+					}
+					else
+					{
+						maps[name.LocalName] = new MemberMap(map, name);
 					}
 				}
 			}
