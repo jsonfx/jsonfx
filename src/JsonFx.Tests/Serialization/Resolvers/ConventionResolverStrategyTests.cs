@@ -493,18 +493,18 @@ namespace JsonFx.Serialization.Resolvers
 
 			var expected = new[]
 			{
-				new DataName("LittleBITOfEverything123456789MixedIn"),
+				new DataName("Little BIT Of Everything 123456789 Mixed In"),
+				new DataName("LittleBitOfEverything123456789MixedIn"),
 				new DataName("littleBitOfEverything123456789MixedIn"),
 				new DataName("little-bit-of-everything-123456789-mixed-in"),
-				new DataName("little_bit_of_everything_123456789_mixed_in"),
 				new DataName("LITTLE_BIT_OF_EVERYTHING_123456789_MIXED_IN")
 			};
 
 			var resolver = new CombinedResolverStrategy(
-				new ConventionResolverStrategy("", ConventionResolverStrategy.WordCasing.NoChange),
+				new ConventionResolverStrategy(" ", ConventionResolverStrategy.WordCasing.NoChange),
+				new ConventionResolverStrategy("", ConventionResolverStrategy.WordCasing.PascalCase),
 				new ConventionResolverStrategy("", ConventionResolverStrategy.WordCasing.CamelCase),
 				new ConventionResolverStrategy("-", ConventionResolverStrategy.WordCasing.Lowercase),
-				new ConventionResolverStrategy("_", ConventionResolverStrategy.WordCasing.Lowercase),
 				new ConventionResolverStrategy("_", ConventionResolverStrategy.WordCasing.Uppercase));
 			var actual = resolver.GetName(input);
 
