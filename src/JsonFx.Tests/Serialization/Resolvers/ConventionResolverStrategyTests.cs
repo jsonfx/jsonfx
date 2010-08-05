@@ -422,7 +422,7 @@ namespace JsonFx.Serialization.Resolvers
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void GetName_XmlStyle_ReturnsCorrectCasing()
+		public void GetName_XmlStyle_ReturnsCorrectDataName()
 		{
 			var input = typeof(NamingTest).GetProperty("Little_BITOfEverything123456789MixedIn");
 			Assert.NotNull(input);
@@ -437,7 +437,7 @@ namespace JsonFx.Serialization.Resolvers
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void GetName_JavaStyle_ReturnsCorrectCasing()
+		public void GetName_JavaStyle_ReturnsCorrectDataName()
 		{
 			var input = typeof(NamingTest).GetProperty("Little_BITOfEverything123456789MixedIn");
 			Assert.NotNull(input);
@@ -452,7 +452,7 @@ namespace JsonFx.Serialization.Resolvers
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void GetName_DotNetPropertyStyle_ReturnsCorrectCasing()
+		public void GetName_DotNetPropertyStyle_ReturnsCorrectDataName()
 		{
 			var input = typeof(NamingTest).GetProperty("Little_BITOfEverything123456789MixedIn");
 			Assert.NotNull(input);
@@ -467,7 +467,7 @@ namespace JsonFx.Serialization.Resolvers
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void GetName_KnrCConstantStyle_ReturnsCorrectCasing()
+		public void GetName_KnrCConstantStyle_ReturnsCorrectDataName()
 		{
 			var input = typeof(NamingTest).GetProperty("Little_BITOfEverything123456789MixedIn");
 			Assert.NotNull(input);
@@ -481,5 +481,36 @@ namespace JsonFx.Serialization.Resolvers
 		}
 
 		#endregion Classic Tests
+
+		#region Combo Tests
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void GetName_MultipleConventions_ReturnsListDataNames()
+		{
+			var input = typeof(NamingTest).GetProperty("Little_BITOfEverything123456789MixedIn");
+			Assert.NotNull(input);
+
+			var expected = new[]
+			{
+				new DataName("LittleBITOfEverything123456789MixedIn"),
+				new DataName("littleBitOfEverything123456789MixedIn"),
+				new DataName("little-bit-of-everything-123456789-mixed-in"),
+				new DataName("little_bit_of_everything_123456789_mixed_in"),
+				new DataName("LITTLE_BIT_OF_EVERYTHING_123456789_MIXED_IN")
+			};
+
+			var resolver = new CombinedResolverStrategy(
+				new ConventionResolverStrategy("", ConventionResolverStrategy.WordCasing.NoChange),
+				new ConventionResolverStrategy("", ConventionResolverStrategy.WordCasing.CamelCase),
+				new ConventionResolverStrategy("-", ConventionResolverStrategy.WordCasing.Lowercase),
+				new ConventionResolverStrategy("_", ConventionResolverStrategy.WordCasing.Lowercase),
+				new ConventionResolverStrategy("_", ConventionResolverStrategy.WordCasing.Uppercase));
+			var actual = resolver.GetName(input);
+
+			Assert.Equal(expected, actual, false);
+		}
+
+		#endregion Combo Tests
 	}
 }
