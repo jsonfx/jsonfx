@@ -481,36 +481,5 @@ namespace JsonFx.Serialization.Resolvers
 		}
 
 		#endregion Classic Tests
-
-		#region Combo Tests
-
-		[Fact]
-		[Trait(TraitName, TraitValue)]
-		public void GetName_MultipleConventions_ReturnsListDataNames()
-		{
-			var input = typeof(NamingTest).GetProperty("Little_BITOfEverything123456789MixedIn");
-			Assert.NotNull(input);
-
-			var expected = new[]
-			{
-				new DataName("Little BIT Of Everything 123456789 Mixed In"),
-				new DataName("LittleBitOfEverything123456789MixedIn"),
-				new DataName("littleBitOfEverything123456789MixedIn"),
-				new DataName("little-bit-of-everything-123456789-mixed-in"),
-				new DataName("LITTLE_BIT_OF_EVERYTHING_123456789_MIXED_IN")
-			};
-
-			var resolver = new CombinedResolverStrategy(
-				new ConventionResolverStrategy(" ", ConventionResolverStrategy.WordCasing.NoChange),
-				new ConventionResolverStrategy("", ConventionResolverStrategy.WordCasing.PascalCase),
-				new ConventionResolverStrategy("", ConventionResolverStrategy.WordCasing.CamelCase),
-				new ConventionResolverStrategy("-", ConventionResolverStrategy.WordCasing.Lowercase),
-				new ConventionResolverStrategy("_", ConventionResolverStrategy.WordCasing.Uppercase));
-			var actual = resolver.GetName(input);
-
-			Assert.Equal(expected, actual, false);
-		}
-
-		#endregion Combo Tests
 	}
 }

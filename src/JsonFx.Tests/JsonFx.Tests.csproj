@@ -105,6 +105,7 @@
     <Compile Include="Json\Resolvers\JsonResolverStrategyTests.cs" />
     <Compile Include="Linq\QueryTests.cs" />
     <Compile Include="Serialization\Resolvers\ConventionResolverStrategyTests.cs" />
+    <Compile Include="Serialization\Resolvers\CombinedResolverStrategyTests.cs" />
     <Compile Include="Serialization\Resolvers\DataContractResolverStrategyTests.cs" />
     <Compile Include="Serialization\TypeCoercionUtilityTests.cs" />
     <Compile Include="Xml\XmlConverterTests.cs" />

@@ -363,7 +363,8 @@ namespace JsonFx.Common
 
 			foreach (var map in members)
 			{
-				if (map.Getter == null)
+				if (map.IsAlternate ||
+					map.Getter == null)
 				{
 					continue;
 				}

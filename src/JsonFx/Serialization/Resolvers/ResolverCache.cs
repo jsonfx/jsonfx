@@ -88,6 +88,11 @@ namespace JsonFx.Serialization.Resolvers
 		/// </summary>
 		public readonly ValueIgnoredDelegate IsIgnored;
 
+		/// <summary>
+		/// Determines if map name is alternate (i.e. only used for deserialization)
+		/// </summary>
+		public readonly bool IsAlternate;
+
 		#endregion Fields
 
 		#region Init
@@ -98,8 +103,8 @@ namespace JsonFx.Serialization.Resolvers
 		/// <param name="propertyInfo"></param>
 		/// <param name="dataName"></param>
 		/// <param name="isIgnored"></param>
-		/// <param name="isAttribute"></param>
-		public MemberMap(PropertyInfo propertyInfo, DataName dataName, ValueIgnoredDelegate isIgnored)
+		/// <param name="isAlternate">determines if map is an alternate name</param>
+		public MemberMap(PropertyInfo propertyInfo, DataName dataName, ValueIgnoredDelegate isIgnored, bool isAlternate)
 		{
 			if (propertyInfo == null)
 			{
@@ -113,6 +118,7 @@ namespace JsonFx.Serialization.Resolvers
 			this.Getter = DynamicMethodGenerator.GetPropertyGetter(propertyInfo);
 			this.Setter = DynamicMethodGenerator.GetPropertySetter(propertyInfo);
 			this.IsIgnored = isIgnored;
+			this.IsAlternate = isAlternate;
 		}
 
 		/// <summary>
@@ -121,8 +127,8 @@ namespace JsonFx.Serialization.Resolvers
 		/// <param name="fieldInfo"></param>
 		/// <param name="dataName"></param>
 		/// <param name="isIgnored"></param>
-		/// <param name="isAttribute"></param>
-		public MemberMap(FieldInfo fieldInfo, DataName dataName, ValueIgnoredDelegate isIgnored)
+		/// <param name="isAlternate">determines if map is an alternate name</param>
+		public MemberMap(FieldInfo fieldInfo, DataName dataName, ValueIgnoredDelegate isIgnored, bool isAlternate)
 		{
 			if (fieldInfo == null)
 			{
@@ -136,6 +142,7 @@ namespace JsonFx.Serialization.Resolvers
 			this.Getter = DynamicMethodGenerator.GetFieldGetter(fieldInfo);
 			this.Setter = DynamicMethodGenerator.GetFieldSetter(fieldInfo);
 			this.IsIgnored = isIgnored;
+			this.IsAlternate = isAlternate;
 		}
 
 		#endregion Init
@@ -653,6 +660,7 @@ namespace JsonFx.Serialization.Resolvers
 				}
 
 				ValueIgnoredDelegate isIgnored = this.Strategy.GetValueIgnoredCallback(info);
+				bool isAlternate = false;
 
 				foreach (DataName name in names)
 				{
@@ -661,7 +669,12 @@ namespace JsonFx.Serialization.Resolvers
 						continue;
 					}
 
-					maps[name.LocalName] = new MemberMap(info, name, isIgnored);
+					maps[name.LocalName] = new MemberMap(info, name, isIgnored, isAlternate);
+
+					if (!isAlternate)
+					{
+						isAlternate = true;
+					}
 				}
 			}
 
@@ -692,6 +705,7 @@ namespace JsonFx.Serialization.Resolvers
 				}
 
 				ValueIgnoredDelegate isIgnored = this.Strategy.GetValueIgnoredCallback(info);
+				bool isAlternate = false;
 
 				foreach (DataName name in names)
 				{
@@ -700,7 +714,12 @@ namespace JsonFx.Serialization.Resolvers
 						continue;
 					}
 
-					maps[name.LocalName] = new MemberMap(info, name, isIgnored);
+					maps[name.LocalName] = new MemberMap(info, name, isIgnored, isAlternate);
+
+					if (!isAlternate)
+					{
+						isAlternate = true;
+					}
 				}
 			}
 
@@ -779,6 +798,8 @@ namespace JsonFx.Serialization.Resolvers
 					names = new[] { new DataName(info.Name) };
 				}
 
+				bool isAlternate = false;
+
 				foreach (DataName name in names)
 				{
 					if (name.IsEmpty)
@@ -787,8 +808,13 @@ namespace JsonFx.Serialization.Resolvers
 					}
 
 					MemberMap enumMap;
-					maps[name.LocalName] = enumMap = new MemberMap(info, name, null);
-					enumMaps[(Enum)enumMap.Getter(null)] = name.LocalName;
+					maps[name.LocalName] = enumMap = new MemberMap(info, name, null, isAlternate);
+
+					if (!isAlternate)
+					{
+						enumMaps[(Enum)enumMap.Getter(null)] = name.LocalName;
+						isAlternate = true;
+					}
 				}
 			}
 
