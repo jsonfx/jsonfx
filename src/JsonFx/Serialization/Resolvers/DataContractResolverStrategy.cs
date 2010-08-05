@@ -78,15 +78,15 @@ namespace JsonFx.Serialization.Resolvers
 
 			if (DataContractType != null)
 			{
-				PropertyInfo property = DataContractType.GetProperty("Name", BindingFlags.Public|BindingFlags.Instance);
+				PropertyInfo property = DataContractType.GetProperty("Name", BindingFlags.Public|BindingFlags.Instance|BindingFlags.FlattenHierarchy);
 				DataContractNameGetter = DynamicMethodGenerator.GetPropertyGetter(property);
-				property = DataContractType.GetProperty("Namespace", BindingFlags.Public|BindingFlags.Instance);
+				property = DataContractType.GetProperty("Namespace", BindingFlags.Public|BindingFlags.Instance|BindingFlags.FlattenHierarchy);
 				DataContractNamespaceGetter = DynamicMethodGenerator.GetPropertyGetter(property);
 			}
 
 			if (DataContractResolverStrategy.DataMemberType != null)
 			{
-				PropertyInfo property = DataMemberType.GetProperty("Name", BindingFlags.Public|BindingFlags.Instance);
+				PropertyInfo property = DataMemberType.GetProperty("Name", BindingFlags.Public|BindingFlags.Instance|BindingFlags.FlattenHierarchy);
 				DataMemberNameGetter = DynamicMethodGenerator.GetPropertyGetter(property);
 			}
 		}

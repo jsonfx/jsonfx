@@ -190,7 +190,7 @@ namespace JsonFx.Serialization.Resolvers
 					return;
 				}
 
-				ctors = type.GetConstructors(BindingFlags.Instance|BindingFlags.Public);
+				ctors = type.GetConstructors(BindingFlags.Instance|BindingFlags.Public|BindingFlags.FlattenHierarchy);
 				if (ctors.Length == 1)
 				{
 					ConstructorInfo ctor = ctors[0];
@@ -203,7 +203,7 @@ namespace JsonFx.Serialization.Resolvers
 			// many ICollection types take an IEnumerable or ICollection
 			// as a constructor argument.  look through constructors for
 			// a compatible match.
-			ctors = type.GetConstructors(BindingFlags.Instance|BindingFlags.Public);
+			ctors = type.GetConstructors(BindingFlags.Instance|BindingFlags.Public|BindingFlags.FlattenHierarchy);
 
 			this.CollectionCtors = new Dictionary<Type, FactoryDelegate>(ctors.Length);
 
@@ -328,7 +328,7 @@ namespace JsonFx.Serialization.Resolvers
 			return
 				!type.IsInterface &&
 				!type.IsAbstract &&
-				(type.IsValueType || (type.GetConstructor(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic, null, Type.EmptyTypes, null) == null));
+				(type.IsValueType || (type.GetConstructor(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.FlattenHierarchy, null, Type.EmptyTypes, null) == null));
 		}
 
 		#endregion Utility Methods
@@ -615,7 +615,7 @@ namespace JsonFx.Serialization.Resolvers
 			bool isImmutableType = FactoryMap.IsImmutableType(objectType);
 
 			// load properties into property map
-			foreach (PropertyInfo info in objectType.GetProperties(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic))
+			foreach (PropertyInfo info in objectType.GetProperties(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.FlattenHierarchy))
 			{
 				if (this.Strategy.IsPropertyIgnored(info, isImmutableType))
 				{
@@ -634,7 +634,7 @@ namespace JsonFx.Serialization.Resolvers
 			}
 
 			// load fields into property map
-			foreach (FieldInfo info in objectType.GetFields(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic))
+			foreach (FieldInfo info in objectType.GetFields(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.FlattenHierarchy))
 			{
 				if (this.Strategy.IsFieldIgnored(info))
 				{
@@ -695,7 +695,7 @@ namespace JsonFx.Serialization.Resolvers
 			IDictionary<string, MemberMap> maps = new Dictionary<string, MemberMap>();
 			enumMaps = new Dictionary<Enum, string>();
 
-			foreach (FieldInfo info in enumType.GetFields(BindingFlags.Static|BindingFlags.Public))
+			foreach (FieldInfo info in enumType.GetFields(BindingFlags.Static|BindingFlags.Public|BindingFlags.FlattenHierarchy))
 			{
 				DataName name = this.Strategy.GetName(info);
 				if (name.IsEmpty)

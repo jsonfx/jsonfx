@@ -94,7 +94,7 @@ namespace JsonFx.Json.Resolvers
 			GetterDelegate specifiedPropertyGetter = null;
 			if (specifiedPropertyAttr != null && !String.IsNullOrEmpty(specifiedPropertyAttr.SpecifiedProperty))
 			{
-				PropertyInfo specProp = objType.GetProperty(specifiedPropertyAttr.SpecifiedProperty, BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic);
+				PropertyInfo specProp = objType.GetProperty(specifiedPropertyAttr.SpecifiedProperty, BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.FlattenHierarchy);
 
 				// ensure is correct return type
 				if (specProp != null && specProp.PropertyType == typeof(bool))

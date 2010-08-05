@@ -104,7 +104,7 @@ namespace JsonFx.Xml.Resolvers
 
 			// look up specified property to see if exists
 			GetterDelegate specifiedPropertyGetter = null;
-			PropertyInfo specProp = objType.GetProperty(member.Name+SpecifiedSuffix, BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic);
+			PropertyInfo specProp = objType.GetProperty(member.Name+SpecifiedSuffix, BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.FlattenHierarchy);
 
 			// ensure is correct return type
 			if (specProp != null && specProp.PropertyType == typeof(bool))
@@ -114,7 +114,7 @@ namespace JsonFx.Xml.Resolvers
 
 			// look up specified property to see if exists
 			ProxyDelegate shouldSerializeProxy = null;
-			MethodInfo shouldSerialize = objType.GetMethod(ShouldSerializePrefix+member.Name, BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic);
+			MethodInfo shouldSerialize = objType.GetMethod(ShouldSerializePrefix+member.Name, BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.FlattenHierarchy);
 
 			// ensure is correct return type
 			if (shouldSerialize != null && shouldSerialize.ReturnType == typeof(bool) && shouldSerialize.GetParameters().Length == 0)

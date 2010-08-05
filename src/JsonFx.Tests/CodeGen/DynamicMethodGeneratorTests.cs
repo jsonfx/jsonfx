@@ -255,7 +255,7 @@ namespace JsonFx.CodeGen
 		{
 			var input = new Example();
 
-			var propertyInfo = input.GetType().GetProperty("C", BindingFlags.NonPublic|BindingFlags.Instance);
+			var propertyInfo = input.GetType().GetProperty("C", BindingFlags.NonPublic|BindingFlags.Instance|BindingFlags.FlattenHierarchy);
 			Assert.NotNull(propertyInfo);
 
 			GetterDelegate getter = DynamicMethodGenerator.GetPropertyGetter(propertyInfo);
@@ -285,7 +285,7 @@ namespace JsonFx.CodeGen
 		{
 			var input = new Example();
 
-			var propertyInfo = input.GetType().GetProperty("Two", BindingFlags.NonPublic|BindingFlags.Instance);
+			var propertyInfo = input.GetType().GetProperty("Two", BindingFlags.NonPublic|BindingFlags.Instance|BindingFlags.FlattenHierarchy);
 			Assert.NotNull(propertyInfo);
 
 			GetterDelegate getter = DynamicMethodGenerator.GetPropertyGetter(propertyInfo);
@@ -424,7 +424,7 @@ namespace JsonFx.CodeGen
 		public void GetPropertyGetter_1MillionPropertyGets_PerformsInAround10ms()
 		{
 			Example instance = new Example();
-			PropertyInfo propertyInfo = typeof(Example).GetProperty("A", BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic);
+			PropertyInfo propertyInfo = typeof(Example).GetProperty("A", BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.FlattenHierarchy);
 
 			GetterDelegate getter = DynamicMethodGenerator.GetPropertyGetter(propertyInfo);
 
@@ -481,7 +481,7 @@ namespace JsonFx.CodeGen
 			var input = new Example();
 			var expected = "charlie";
 
-			var propertyInfo = input.GetType().GetProperty("C", BindingFlags.NonPublic|BindingFlags.Instance);
+			var propertyInfo = input.GetType().GetProperty("C", BindingFlags.NonPublic|BindingFlags.Instance|BindingFlags.FlattenHierarchy);
 			Assert.NotNull(propertyInfo);
 
 			SetterDelegate setter = DynamicMethodGenerator.GetPropertySetter(propertyInfo);
@@ -518,7 +518,7 @@ namespace JsonFx.CodeGen
 			var input = new Example();
 			var expected = -2;
 
-			var propertyInfo = input.GetType().GetProperty("Two", BindingFlags.NonPublic|BindingFlags.Instance);
+			var propertyInfo = input.GetType().GetProperty("Two", BindingFlags.NonPublic|BindingFlags.Instance|BindingFlags.FlattenHierarchy);
 			Assert.NotNull(propertyInfo);
 
 			SetterDelegate setter = DynamicMethodGenerator.GetPropertySetter(propertyInfo);
@@ -678,7 +678,7 @@ namespace JsonFx.CodeGen
 		public void GetPropertySetter_1MillionPropertySets_PerformsInAround10ms()
 		{
 			Example instance = new Example();
-			PropertyInfo propertyInfo = typeof(Example).GetProperty("A", BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic);
+			PropertyInfo propertyInfo = typeof(Example).GetProperty("A", BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.FlattenHierarchy);
 
 			SetterDelegate setter = DynamicMethodGenerator.GetPropertySetter(propertyInfo);
 
@@ -713,7 +713,7 @@ namespace JsonFx.CodeGen
 		{
 			var input = new Example();
 
-			var fieldInfo = input.GetType().GetField("c", BindingFlags.NonPublic|BindingFlags.Instance);
+			var fieldInfo = input.GetType().GetField("c", BindingFlags.NonPublic|BindingFlags.Instance|BindingFlags.FlattenHierarchy);
 			Assert.NotNull(fieldInfo);
 
 			GetterDelegate getter = DynamicMethodGenerator.GetFieldGetter(fieldInfo);
@@ -743,7 +743,7 @@ namespace JsonFx.CodeGen
 		{
 			var input = new Example();
 
-			var fieldInfo = input.GetType().GetField("two", BindingFlags.NonPublic|BindingFlags.Instance);
+			var fieldInfo = input.GetType().GetField("two", BindingFlags.NonPublic|BindingFlags.Instance|BindingFlags.FlattenHierarchy);
 			Assert.NotNull(fieldInfo);
 
 			GetterDelegate getter = DynamicMethodGenerator.GetFieldGetter(fieldInfo);
@@ -808,7 +808,7 @@ namespace JsonFx.CodeGen
 		public void GetFieldGetter_1MillionFieldGets_PerformsInAround10ms()
 		{
 			Example instance = new Example();
-			FieldInfo fieldInfo = typeof(Example).GetField("a", BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic);
+			FieldInfo fieldInfo = typeof(Example).GetField("a", BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.FlattenHierarchy);
 
 			GetterDelegate getter = DynamicMethodGenerator.GetFieldGetter(fieldInfo);
 
@@ -848,7 +848,7 @@ namespace JsonFx.CodeGen
 			var input = new Example();
 			var expected = "charlie";
 
-			var fieldInfo = input.GetType().GetField("c", BindingFlags.NonPublic|BindingFlags.Instance);
+			var fieldInfo = input.GetType().GetField("c", BindingFlags.NonPublic|BindingFlags.Instance|BindingFlags.FlattenHierarchy);
 			Assert.NotNull(fieldInfo);
 
 			SetterDelegate setter = DynamicMethodGenerator.GetFieldSetter(fieldInfo);
@@ -882,7 +882,7 @@ namespace JsonFx.CodeGen
 			var input = new Example();
 			var expected = -2;
 
-			var fieldInfo = input.GetType().GetField("two", BindingFlags.NonPublic|BindingFlags.Instance);
+			var fieldInfo = input.GetType().GetField("two", BindingFlags.NonPublic|BindingFlags.Instance|BindingFlags.FlattenHierarchy);
 			Assert.NotNull(fieldInfo);
 
 			SetterDelegate setter = DynamicMethodGenerator.GetFieldSetter(fieldInfo);
@@ -953,7 +953,7 @@ namespace JsonFx.CodeGen
 		public void GetFieldSetter_1MillionFieldSets_PerformsInAround10ms()
 		{
 			Example instance = new Example();
-			FieldInfo fieldInfo = typeof(Example).GetField("a", BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic);
+			FieldInfo fieldInfo = typeof(Example).GetField("a", BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.FlattenHierarchy);
 
 			SetterDelegate setter = DynamicMethodGenerator.GetFieldSetter(fieldInfo);
 
@@ -1006,7 +1006,7 @@ namespace JsonFx.CodeGen
 			proxy(input, "alpha", "bravo", "charlie", -1, -2, -3, "deer", "sun", "myself");
 
 			var getters =
-				from m in typeof(Example).GetMembers(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic)
+				from m in typeof(Example).GetMembers(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.FlattenHierarchy)
 				let g = DynamicMethodGenerator.GetGetter(m)
 				where (g != null)
 				select g;
@@ -1030,7 +1030,7 @@ namespace JsonFx.CodeGen
 			proxy(input, "alpha", "bravo", "charlie", -1, -2, -3, "deer", "sun", "myself", 4, 5, 6, "extra", false);
 
 			var getters =
-				from m in typeof(Example).GetMembers(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic)
+				from m in typeof(Example).GetMembers(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.FlattenHierarchy)
 				let g = DynamicMethodGenerator.GetGetter(m)
 				where (g != null)
 				select g;
@@ -1087,7 +1087,7 @@ namespace JsonFx.CodeGen
 		public void GetMethodProxy_1MillionMethodCalls_PerformsInAround50ms()
 		{
 			Example instance = new Example();
-			MethodInfo methodInfo = typeof(Example).GetMethod("GetMi", BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic);
+			MethodInfo methodInfo = typeof(Example).GetMethod("GetMi", BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.FlattenHierarchy);
 
 			ProxyDelegate proxy = DynamicMethodGenerator.GetMethodProxy(methodInfo);
 
@@ -1113,7 +1113,7 @@ namespace JsonFx.CodeGen
 			var actual = (Example)factory();
 
 			var getters =
-				from m in typeof(Example).GetMembers(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic)
+				from m in typeof(Example).GetMembers(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.FlattenHierarchy)
 				let g = DynamicMethodGenerator.GetGetter(m)
 				where (g != null)
 				select g;
@@ -1136,7 +1136,7 @@ namespace JsonFx.CodeGen
 			var actual = (Example)factory();
 
 			var getters =
-				from m in typeof(Example).GetMembers(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic)
+				from m in typeof(Example).GetMembers(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.FlattenHierarchy)
 				let g = DynamicMethodGenerator.GetGetter(m)
 				where (g != null)
 				select g;
@@ -1161,7 +1161,7 @@ namespace JsonFx.CodeGen
 			var actual = (Example)factory("alpha", "bravo", "charlie", -1, -2, -3, "deer", "sun", "myself");
 
 			var getters =
-				from m in typeof(Example).GetMembers(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic)
+				from m in typeof(Example).GetMembers(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.FlattenHierarchy)
 				let g = DynamicMethodGenerator.GetGetter(m)
 				where (g != null)
 				select g;
@@ -1186,7 +1186,7 @@ namespace JsonFx.CodeGen
 			var actual = (Example)factory("alpha", "bravo", "charlie", -1, -2, -3, "deer", "sun", "myself", 4, 5, 6, "extra", false);
 
 			var getters =
-				from m in typeof(Example).GetMembers(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic)
+				from m in typeof(Example).GetMembers(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.FlattenHierarchy)
 				let g = DynamicMethodGenerator.GetGetter(m)
 				where (g != null)
 				select g;

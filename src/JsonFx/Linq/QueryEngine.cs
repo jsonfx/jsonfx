@@ -85,7 +85,7 @@ namespace JsonFx.Linq
 
 			QueryEngine.MemberAccess = typeof(CommonSubsequencer).GetMethod(
 				"Property",
-				BindingFlags.Public|BindingFlags.Static,
+				BindingFlags.Public|BindingFlags.Static|BindingFlags.FlattenHierarchy,
 				null,
 				new[] { typeof(TokenSequence), typeof(DataName) },
 				null);

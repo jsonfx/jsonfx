@@ -560,7 +560,7 @@ namespace JsonFx.CodeGen
 				throw new ArgumentNullException("type");
 			}
 
-			ConstructorInfo ctor = type.GetConstructor(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic, null, Type.EmptyTypes, null);
+			ConstructorInfo ctor = type.GetConstructor(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.FlattenHierarchy, null, Type.EmptyTypes, null);
 			if (ctor == null)
 			{
 				return null;
@@ -585,7 +585,7 @@ namespace JsonFx.CodeGen
 				throw new ArgumentNullException("type");
 			}
 
-			ConstructorInfo ctor = type.GetConstructor(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic, null, args, null);
+			ConstructorInfo ctor = type.GetConstructor(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.FlattenHierarchy, null, args, null);
 			if (ctor == null)
 			{
 				return null;
