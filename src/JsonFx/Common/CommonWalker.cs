@@ -293,7 +293,7 @@ namespace JsonFx.Common
 
 		private void GetArrayTokens(List<Token<CommonTokenType>> tokens, ICycleDetector detector, IEnumerable value)
 		{
-			DataName typeName = this.Settings.Resolver.LoadTypeName((value != null) ? value.GetType() : null);
+			DataName typeName = this.GetTypeName(value);
 			IEnumerator enumerator = value.GetEnumerator();
 
 			if (enumerator is IEnumerator<KeyValuePair<string, object>>)
@@ -347,8 +347,8 @@ namespace JsonFx.Common
 
 		private void GetObjectTokens(List<Token<CommonTokenType>> tokens, ICycleDetector detector, Type type, object value)
 		{
-			DataName name = this.Settings.Resolver.LoadTypeName((value != null) ? value.GetType() : null);
-			tokens.Add(CommonGrammar.TokenObjectBegin(name));
+			DataName typeName = this.GetTypeName(value);
+			tokens.Add(CommonGrammar.TokenObjectBegin(typeName));
 
 			IDictionary<string, MemberMap> maps = this.Settings.Resolver.LoadMaps(type);
 			if (maps == null)
@@ -383,5 +383,27 @@ namespace JsonFx.Common
 		}
 
 		#endregion Walker Methods
+
+		#region Utility Methods
+
+		private DataName GetTypeName(object value)
+		{
+			IEnumerable<DataName> typeNames = this.Settings.Resolver.LoadTypeName((value != null) ? value.GetType() : null);
+
+			if (typeNames != null)
+			{
+				foreach (DataName n in typeNames)
+				{
+					if (!n.IsEmpty)
+					{
+						return n;
+					}
+				}
+			}
+
+			return DataName.Empty;
+		}
+
+		#endregion Utility Methods
 	}
 }

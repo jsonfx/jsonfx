@@ -222,35 +222,35 @@ namespace JsonFx.Xml.Resolvers
 		/// </summary>
 		/// <param name="member"></param>
 		/// <returns></returns>
-		public override DataName GetName(MemberInfo member)
+		public override IEnumerable<DataName> GetName(MemberInfo member)
 		{
 			if (member is Type)
 			{
 				XmlRootAttribute rootAttr = TypeCoercionUtility.GetAttribute<XmlRootAttribute>(member);
 				if (rootAttr != null && !String.IsNullOrEmpty(rootAttr.ElementName))
 				{
-					return new DataName(rootAttr.ElementName, null, rootAttr.Namespace);
+					yield return new DataName(rootAttr.ElementName, null, rootAttr.Namespace);
 				}
 
 				XmlTypeAttribute typeAttr = TypeCoercionUtility.GetAttribute<XmlTypeAttribute>(member);
 				if (typeAttr != null && !String.IsNullOrEmpty(typeAttr.TypeName))
 				{
-					return new DataName(typeAttr.TypeName, null, typeAttr.Namespace);
+					yield return new DataName(typeAttr.TypeName, null, typeAttr.Namespace);
 				}
 
-				return DataName.Empty;
+				yield break;
 			}
 
 			XmlElementAttribute elemAttr = TypeCoercionUtility.GetAttribute<XmlElementAttribute>(member);
 			if (elemAttr != null && !String.IsNullOrEmpty(elemAttr.ElementName))
 			{
-				return new DataName(elemAttr.ElementName, null, elemAttr.Namespace);
+				yield return new DataName(elemAttr.ElementName, null, elemAttr.Namespace);
 			}
 
 			XmlAttributeAttribute attrAttr = TypeCoercionUtility.GetAttribute<XmlAttributeAttribute>(member);
 			if (attrAttr != null && !String.IsNullOrEmpty(attrAttr.AttributeName))
 			{
-				return new DataName(attrAttr.AttributeName, null, attrAttr.Namespace, true);
+				yield return new DataName(attrAttr.AttributeName, null, attrAttr.Namespace, true);
 			}
 
 			XmlArrayAttribute arrayAttr = TypeCoercionUtility.GetAttribute<XmlArrayAttribute>(member);
@@ -258,7 +258,7 @@ namespace JsonFx.Xml.Resolvers
 			{
 				// TODO: figure out a way to surface XmlArrayItemAttribute name too
 
-				return new DataName(arrayAttr.ElementName, null, arrayAttr.Namespace);
+				yield return new DataName(arrayAttr.ElementName, null, arrayAttr.Namespace);
 			}
 
 			if (member is FieldInfo && ((FieldInfo)member).DeclaringType.IsEnum)
@@ -266,11 +266,9 @@ namespace JsonFx.Xml.Resolvers
 				XmlEnumAttribute enumAttr = TypeCoercionUtility.GetAttribute<XmlEnumAttribute>(member);
 				if (enumAttr != null && !String.IsNullOrEmpty(enumAttr.Name))
 				{
-					return new DataName(enumAttr.Name);
+					yield return new DataName(enumAttr.Name);
 				}
 			}
-
-			return DataName.Empty;
 		}
 
 		/// <summary>

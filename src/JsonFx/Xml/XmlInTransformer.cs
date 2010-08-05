@@ -294,12 +294,17 @@ namespace JsonFx.Xml
 
 			private DataName DecodeName(DataName name, Type type)
 			{
-				DataName defaultName = this.Settings.Resolver.LoadTypeName(type);
-
-				// String.Empty is a valid DataName.LocalName, so may have been replaced
-				if (name == defaultName)
+				IEnumerable<DataName> defaultNames = this.Settings.Resolver.LoadTypeName(type);
+				if (defaultNames != null)
 				{
-					return DataName.Empty;
+					foreach (DataName defaultName in defaultNames)
+					{
+						// String.Empty is a valid DataName.LocalName, so may have been replaced by type name
+						if (name == defaultName)
+						{
+							return DataName.Empty;
+						}
+					}
 				}
 
 				// due to a bug in System.Xml.XmlCharType,
@@ -308,12 +313,12 @@ namespace JsonFx.Xml
 
 				// XML only supports a subset of chars that DataName.LocalName does
 				string localName = System.Xml.XmlConvert.DecodeName(name.LocalName);
-				if (name.LocalName != localName)
+				if (name.LocalName == localName)
 				{
-					return new DataName(localName, name.Prefix, name.NamespaceUri, name.IsAttribute);
+					return name;
 				}
 
-				return name;
+				return new DataName(localName, name.Prefix, name.NamespaceUri, name.IsAttribute);
 			}
 
 			/// <summary>

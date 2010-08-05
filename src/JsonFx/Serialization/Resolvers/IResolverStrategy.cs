@@ -80,7 +80,7 @@ namespace JsonFx.Serialization.Resolvers
 		/// </summary>
 		/// <param name="value"></param>
 		/// <returns></returns>
-		DataName GetName(MemberInfo member);
+		IEnumerable<DataName> GetName(MemberInfo member);
 
 		/// <summary>
 		/// Allows a strategy to perform a custom sort order to outputted members

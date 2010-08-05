@@ -29,6 +29,7 @@
 #endregion License
 
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 using JsonFx.CodeGen;
@@ -153,7 +154,7 @@ namespace JsonFx.Serialization.Resolvers
 		/// </summary>
 		/// <param name="member"></param>
 		/// <returns></returns>
-		public override DataName GetName(MemberInfo member)
+		public override IEnumerable<DataName> GetName(MemberInfo member)
 		{
 			string localName, ns;
 			Attribute typeAttr;
@@ -162,18 +163,23 @@ namespace JsonFx.Serialization.Resolvers
 				typeAttr = TypeCoercionUtility.GetAttribute(member, DataContractResolverStrategy.DataContractType);
 				if (typeAttr == null)
 				{
-					return DataName.Empty;
+					yield break;
 				}
 
 				localName = (string)DataContractResolverStrategy.DataContractNameGetter(typeAttr);
 				ns = (string)DataContractResolverStrategy.DataContractNamespaceGetter(typeAttr);
-				return (!String.IsNullOrEmpty(localName)) ? new DataName(localName, null, ns) : DataName.Empty;
+
+				if (!String.IsNullOrEmpty(localName))
+				{
+					yield return new DataName(localName, null, ns);
+				}
+				yield break;
 			}
 
 			typeAttr = TypeCoercionUtility.GetAttribute(member.DeclaringType, DataContractResolverStrategy.DataContractType);
 			if (typeAttr == null)
 			{
-				return DataName.Empty;
+				yield break;
 			}
 
 			ns = (string)DataContractResolverStrategy.DataContractNamespaceGetter(typeAttr);
@@ -181,14 +187,16 @@ namespace JsonFx.Serialization.Resolvers
 			Attribute memberAttr = TypeCoercionUtility.GetAttribute(member, DataContractResolverStrategy.DataMemberType);
 			if (memberAttr == null)
 			{
-				return DataName.Empty;
+				yield break;
 			}
-
 
 			localName = (string)DataContractResolverStrategy.DataMemberNameGetter(memberAttr);
 
-			// members inherit DataContract namespaces
-			return (!String.IsNullOrEmpty(localName)) ? new DataName(localName, null, ns) : DataName.Empty;
+			if (!String.IsNullOrEmpty(localName))
+			{
+				// members inherit DataContract namespaces
+				yield return new DataName(localName, null, ns);
+			}
 		}
 
 		#endregion Name Resolution Methods

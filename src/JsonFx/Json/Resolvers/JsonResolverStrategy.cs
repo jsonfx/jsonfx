@@ -29,6 +29,7 @@
 #endregion License
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
 
@@ -145,12 +146,17 @@ namespace JsonFx.Json.Resolvers
 		/// </summary>
 		/// <param name="member"></param>
 		/// <returns></returns>
-		public override DataName GetName(MemberInfo member)
+		public override IEnumerable<DataName> GetName(MemberInfo member)
 		{
 			JsonNameAttribute attr = TypeCoercionUtility.GetAttribute<JsonNameAttribute>(member);
 
 			// NOTE: JSON allows String.Empty as a valid property name
-			return ((attr != null) && (attr.Name != null)) ? new DataName(attr.Name) : DataName.Empty;
+			if ((attr == null) || (attr.Name == null))
+			{
+				yield break;
+			}
+
+			yield return new DataName(attr.Name);
 		}
 
 		#endregion Name Resolution Methods

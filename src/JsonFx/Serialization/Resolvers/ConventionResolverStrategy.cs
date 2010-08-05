@@ -82,7 +82,7 @@ namespace JsonFx.Serialization.Resolvers
 		/// </summary>
 		/// <param name="member"></param>
 		/// <returns></returns>
-		public override DataName GetName(MemberInfo member)
+		public override IEnumerable<DataName> GetName(MemberInfo member)
 		{
 			string[] words = this.SplitWords(member.Name);
 
@@ -136,7 +136,7 @@ namespace JsonFx.Serialization.Resolvers
 				}
 			}
 
-			return new DataName(String.Join(this.WordSeparator, words));
+			yield return new DataName(String.Join(this.WordSeparator, words));
 		}
 
 		#endregion Name Resolution Methods

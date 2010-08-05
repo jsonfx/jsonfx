@@ -483,10 +483,18 @@ namespace JsonFx.Xml
 
 			private DataName EncodeName(DataName name, Type type)
 			{
-				// String.Empty is a valid DataName.LocalName, so must replace
+				// String.Empty is a valid DataName.LocalName, so must replace with type name
 				if (String.IsNullOrEmpty(name.LocalName))
 				{
-					return this.Settings.Resolver.LoadTypeName(type);
+					foreach (DataName typeName in this.Settings.Resolver.LoadTypeName(type))
+					{
+						if (typeName.IsEmpty)
+						{
+							continue;
+						}
+
+						return typeName;
+					}
 				}
 
 				// due to a bug in System.Xml.XmlCharType,
@@ -495,12 +503,12 @@ namespace JsonFx.Xml
 
 				// XML only supports a subset of chars that DataName.LocalName does
 				string localName = System.Xml.XmlConvert.EncodeLocalName(name.LocalName);
-				if (name.LocalName != localName)
+				if (name.LocalName == localName)
 				{
-					return new DataName(localName, name.Prefix, name.NamespaceUri, name.IsAttribute);
+					return name;
 				}
 
-				return name;
+				return new DataName(localName, name.Prefix, name.NamespaceUri, name.IsAttribute);
 			}
 
 			#endregion Utility Methods

@@ -89,9 +89,9 @@ namespace JsonFx.Serialization.Resolvers
 		/// </summary>
 		/// <param name="member"></param>
 		/// <returns></returns>
-		public virtual DataName GetName(MemberInfo member)
+		public virtual IEnumerable<DataName> GetName(MemberInfo member)
 		{
-			return DataName.Empty;
+			return null;
 		}
 
 		/// <summary>
