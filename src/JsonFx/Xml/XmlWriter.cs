@@ -30,7 +30,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 using JsonFx.Common;
 using JsonFx.Markup;
@@ -42,7 +41,7 @@ namespace JsonFx.Xml
 	/// <summary>
 	/// XML serializer
 	/// </summary>
-	public partial class XmlWriter : DataWriter<CommonTokenType>
+	public partial class XmlWriter : CommonWriter
 	{
 		#region Init
 
@@ -88,14 +87,6 @@ namespace JsonFx.Xml
 		#region Properties
 
 		/// <summary>
-		/// Gets the content encoding for the serialized data
-		/// </summary>
-		public override Encoding ContentEncoding
-		{
-			get { return Encoding.UTF8; }
-		}
-
-		/// <summary>
 		/// Gets the supported content type for the serialized data
 		/// </summary>
 		public override IEnumerable<string> ContentType
@@ -120,16 +111,6 @@ namespace JsonFx.Xml
 		#endregion Properties
 
 		#region DataWriter<DataTokenType> Methods
-
-		/// <summary>
-		/// Gets a walker for XML
-		/// </summary>
-		/// <param name="settings"></param>
-		/// <returns></returns>
-		protected override IObjectWalker<CommonTokenType> GetWalker()
-		{
-			return new CommonWalker(this.Settings, this.Filters);
-		}
 
 		/// <summary>
 		/// Gets the formatter for XML

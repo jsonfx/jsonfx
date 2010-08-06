@@ -51,7 +51,7 @@ namespace JsonFx.Linq
 
 		public class QueryContext
 		{
-			internal IEnumerable<TokenSequence> Input { get; set; }
+			internal IQueryable<TokenSequence> Input { get; set; }
 
 			internal Type InputType { get; set; }
 
@@ -70,7 +70,7 @@ namespace JsonFx.Linq
 
 		private readonly ResolverCache Resolver;
 		private readonly ITokenAnalyzer<CommonTokenType> Analyzer;
-		private readonly IEnumerable<TokenSequence> Source;
+		private readonly IQueryable<TokenSequence> Source;
 
 		#endregion Fields
 
@@ -96,7 +96,7 @@ namespace JsonFx.Linq
 		/// </summary>
 		/// <param name="analyzer"></param>
 		/// <param name="sequence"></param>
-		public QueryEngine(ITokenAnalyzer<CommonTokenType> analyzer, IEnumerable<TokenSequence> input)
+		public QueryEngine(ITokenAnalyzer<CommonTokenType> analyzer, IQueryable<TokenSequence> input)
 		{
 			if (analyzer == null)
 			{
@@ -161,7 +161,7 @@ namespace JsonFx.Linq
 
 				// seed of transforming the expression
 				// all other changes will ripple from this point
-				return Expression.Constant(context.Input.AsQueryable());
+				return Expression.Constant(context.Input);
 			}
 
 			return base.VisitConstant(constant, context);

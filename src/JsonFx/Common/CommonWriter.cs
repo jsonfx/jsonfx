@@ -30,25 +30,24 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text;
 
-using JsonFx.Common;
-using JsonFx.Common.Filters;
 using JsonFx.Serialization;
 using JsonFx.Serialization.Filters;
 
-namespace JsonFx.Json
+namespace JsonFx.Common
 {
 	/// <summary>
-	/// JSON serializer
+	/// Provides base implementation for standard serializers
 	/// </summary>
-	public partial class JsonWriter : CommonWriter
+	public abstract partial class CommonWriter : DataWriter<CommonTokenType>
 	{
 		#region Init
 
 		/// <summary>
 		/// Ctor
 		/// </summary>
-		public JsonWriter()
+		public CommonWriter()
 			: this(new DataWriterSettings())
 		{
 		}
@@ -57,8 +56,8 @@ namespace JsonFx.Json
 		/// Ctor
 		/// </summary>
 		/// <param name="settings"></param>
-		public JsonWriter(DataWriterSettings settings)
-			: base(settings, new IDataFilter<CommonTokenType>[] { new Iso8601DateFilter() })
+		public CommonWriter(DataWriterSettings settings)
+			: base(settings, null)
 		{
 		}
 
@@ -67,7 +66,7 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <param name="filters"></param>
-		public JsonWriter(DataWriterSettings settings, params IDataFilter<CommonTokenType>[] filters)
+		public CommonWriter(DataWriterSettings settings, params IDataFilter<CommonTokenType>[] filters)
 			: base(settings, (IEnumerable<IDataFilter<CommonTokenType>>)filters)
 		{
 		}
@@ -77,7 +76,7 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <param name="filters"></param>
-		public JsonWriter(DataWriterSettings settings, IEnumerable<IDataFilter<CommonTokenType>> filters)
+		public CommonWriter(DataWriterSettings settings, IEnumerable<IDataFilter<CommonTokenType>> filters)
 			: base(settings, filters)
 		{
 		}
@@ -87,24 +86,11 @@ namespace JsonFx.Json
 		#region Properties
 
 		/// <summary>
-		/// Gets the supported content type for the serialized data
+		/// Gets the content encoding for the serialized data
 		/// </summary>
-		public override IEnumerable<string> ContentType
+		public override Encoding ContentEncoding
 		{
-			get
-			{
-				yield return "application/json";
-				yield return "text/json";
-				yield return "text/x-json";
-			}
-		}
-
-		/// <summary>
-		/// Gets the supported file extension for the serialized data
-		/// </summary>
-		public override IEnumerable<string> FileExtension
-		{
-			get { yield return ".json"; }
+			get { return Encoding.UTF8; }
 		}
 
 		#endregion Properties
@@ -112,13 +98,13 @@ namespace JsonFx.Json
 		#region DataWriter<DataTokenType> Methods
 
 		/// <summary>
-		/// Gets the formatter for JSON
+		/// Gets a walker for JSON
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <returns></returns>
-		protected override ITextFormatter<CommonTokenType> GetFormatter()
+		protected override IObjectWalker<CommonTokenType> GetWalker()
 		{
-			return new JsonWriter.JsonFormatter(this.Settings);
+			return new CommonWalker(this.Settings, this.Filters);
 		}
 
 		#endregion DataWriter<DataTokenType> Methods

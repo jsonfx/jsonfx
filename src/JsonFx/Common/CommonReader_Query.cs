@@ -70,7 +70,7 @@ namespace JsonFx.Common
 
 			var source = tokenizer.GetTokens(input);
 
-			return new Query<TResult>(new QueryProvider(this.GetAnalyzer(), source.Values()));
+			return new Query<TResult>(new QueryProvider(this.GetAnalyzer(), source.Values().AsQueryable()));
 		}
 
 		/// <summary>
@@ -87,7 +87,7 @@ namespace JsonFx.Common
 
 			var source = tokenizer.GetTokens(input);
 
-			return new Query<object>(new QueryProvider(this.GetAnalyzer(), source.Values()));
+			return new Query<object>(new QueryProvider(this.GetAnalyzer(), source.Values().AsQueryable()));
 		}
 
 		/// <summary>
@@ -105,7 +105,7 @@ namespace JsonFx.Common
 
 			var source = tokenizer.GetTokens(input);
 
-			var provider = new QueryProvider(this.GetAnalyzer(), source.Values());
+			var provider = new QueryProvider(this.GetAnalyzer(), source.Values().AsQueryable());
 
 			try
 			{
@@ -144,7 +144,7 @@ namespace JsonFx.Common
 
 			var source = tokenizer.GetTokens(input);
 
-			return new Query<TResult>(new QueryProvider(this.GetAnalyzer(), source.Values()));
+			return new Query<TResult>(new QueryProvider(this.GetAnalyzer(), source.Values().AsQueryable()));
 		}
 
 		/// <summary>
@@ -161,7 +161,7 @@ namespace JsonFx.Common
 
 			var source = tokenizer.GetTokens(input);
 
-			return new Query<object>(new QueryProvider(this.GetAnalyzer(), source.Values()));
+			return new Query<object>(new QueryProvider(this.GetAnalyzer(), source.Values().AsQueryable()));
 		}
 
 		/// <summary>
@@ -179,7 +179,7 @@ namespace JsonFx.Common
 
 			var source = tokenizer.GetTokens(input);
 
-			var provider = new QueryProvider(this.GetAnalyzer(), source.Values());
+			var provider = new QueryProvider(this.GetAnalyzer(), source.Values().AsQueryable());
 
 			try
 			{
@@ -222,7 +222,7 @@ namespace JsonFx.Common
 
 			var source = tokenizer.GetTokens(input);
 
-			return new Query<TResult>(new QueryProvider(this.GetAnalyzer(), source.Descendants()));
+			return new Query<TResult>(new QueryProvider(this.GetAnalyzer(), source.Descendants().AsQueryable()));
 		}
 
 		/// <summary>
@@ -239,7 +239,7 @@ namespace JsonFx.Common
 
 			var source = tokenizer.GetTokens(input);
 
-			return new Query<object>(new QueryProvider(this.GetAnalyzer(), source.Descendants()));
+			return new Query<object>(new QueryProvider(this.GetAnalyzer(), source.Descendants().AsQueryable()));
 		}
 
 		/// <summary>
@@ -257,7 +257,7 @@ namespace JsonFx.Common
 
 			var source = tokenizer.GetTokens(input);
 
-			var provider = new QueryProvider(this.GetAnalyzer(), source.Descendants());
+			var provider = new QueryProvider(this.GetAnalyzer(), source.Descendants().AsQueryable());
 
 			try
 			{
@@ -296,7 +296,7 @@ namespace JsonFx.Common
 
 			var source = tokenizer.GetTokens(input);
 
-			return new Query<TResult>(new QueryProvider(this.GetAnalyzer(), source.Descendants()));
+			return new Query<TResult>(new QueryProvider(this.GetAnalyzer(), source.Descendants().AsQueryable()));
 		}
 
 		/// <summary>
@@ -313,7 +313,7 @@ namespace JsonFx.Common
 
 			var source = tokenizer.GetTokens(input);
 
-			return new Query<object>(new QueryProvider(this.GetAnalyzer(), source.Descendants()));
+			return new Query<object>(new QueryProvider(this.GetAnalyzer(), source.Descendants().AsQueryable()));
 		}
 
 		/// <summary>
@@ -331,7 +331,7 @@ namespace JsonFx.Common
 
 			var source = tokenizer.GetTokens(input);
 
-			var provider = new QueryProvider(this.GetAnalyzer(), source.Descendants());
+			var provider = new QueryProvider(this.GetAnalyzer(), source.Descendants().AsQueryable());
 
 			try
 			{

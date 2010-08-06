@@ -29,7 +29,7 @@
 #endregion License
 
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 
 using JsonFx.Common;
@@ -55,7 +55,7 @@ namespace JsonFx.Linq
 		/// </summary>
 		/// <param name="analyzer"></param>
 		/// <param name="sequences"></param>
-		public QueryProvider(ITokenAnalyzer<CommonTokenType> analyzer, IEnumerable<TokenSequence> sequences)
+		public QueryProvider(ITokenAnalyzer<CommonTokenType> analyzer, IQueryable<TokenSequence> sequences)
 		{
 			if (analyzer == null)
 			{
