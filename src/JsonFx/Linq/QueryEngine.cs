@@ -238,13 +238,14 @@ namespace JsonFx.Linq
 							}
 						}
 
+						Expression[] argArray = args.ToArray();
+
 						if (argTypesSame)
 						{
 							// no change
-							return Expression.Call(m.Method, args);
+							return Expression.Call(m.Method, argArray);
 						}
 
-						Expression[] argArray = args.ToArray();
 						Expression source = argArray[0];
 						if (source != null &&
 							source.Type != m.Type)
