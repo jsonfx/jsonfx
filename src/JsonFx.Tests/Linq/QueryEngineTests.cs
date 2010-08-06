@@ -38,12 +38,12 @@ using Assert=JsonFx.AssertPatched;
 
 namespace JsonFx.Linq
 {
-	public class QueryTests
+	public class QueryEngineTests
 	{
 		#region Constants
 
 		private const string TraitName = "LINQ";
-		private const string TraitValue = "Query";
+		private const string TraitValue = "QueryEngine";
 
 		#endregion Constants
 

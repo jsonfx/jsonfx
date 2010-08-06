@@ -103,7 +103,7 @@
     <Compile Include="Json\JsonFormatterTests.cs" />
     <Compile Include="Json\JsonTokenizerTests.cs" />
     <Compile Include="Json\Resolvers\JsonResolverStrategyTests.cs" />
-    <Compile Include="Linq\QueryTests.cs" />
+    <Compile Include="Linq\QueryEngineTests.cs" />
     <Compile Include="Serialization\Resolvers\ConventionResolverStrategyTests.cs" />
     <Compile Include="Serialization\Resolvers\CombinedResolverStrategyTests.cs" />
     <Compile Include="Serialization\Resolvers\DataContractResolverStrategyTests.cs" />
