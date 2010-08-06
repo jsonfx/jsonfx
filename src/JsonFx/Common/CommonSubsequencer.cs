@@ -201,6 +201,7 @@ namespace JsonFx.Common
 		{
 			using (var enumerator = CommonSubsequencer.Properties(source, name => (name == propertyName)).GetEnumerator())
 			{
+				// effectively FirstOrDefault()
 				return enumerator.MoveNext() ? enumerator.Current.Value : null;
 			}
 		}
@@ -229,6 +230,23 @@ namespace JsonFx.Common
 				throw new ArgumentNullException("source");
 			}
 
+			if (!(source is IList<CommonToken>))
+			{
+				// ensure buffered
+				source = new SequenceBuffer<CommonToken>(source);
+			}
+
+			return CommonSubsequencer.PropertiesIterator(source, predicate);
+		}
+
+		/// <summary>
+		/// Gets the properties of the root object which satisfies the <paramref name="predicate"/>
+		/// </summary>
+		/// <param name="source"></param>
+		/// <param name="predicate"></param>
+		/// <returns>matching properties for the root object</returns>
+		private static IEnumerable<KeyValuePair<DataName, TokenSequence>> PropertiesIterator(TokenSequence source, Func<DataName, bool> predicate)
+		{
 			IStream<CommonToken> stream = Stream<CommonToken>.Create(source);
 			if (stream.IsCompleted ||
 				stream.Pop().TokenType != CommonTokenType.ObjectBegin)
@@ -344,10 +362,32 @@ namespace JsonFx.Common
 				throw new ArgumentNullException("source");
 			}
 
-			IStream<CommonToken> stream = Stream<CommonToken>.Create(source);
-			if (stream.IsCompleted ||
-				stream.Pop().TokenType != CommonTokenType.ArrayBegin)
+			if (!(source is IList<CommonToken>))
 			{
+				// ensure buffered
+				source = new SequenceBuffer<CommonToken>(source);
+			}
+
+			return CommonSubsequencer.ArrayItemsIterator(source, predicate);
+		}
+
+		/// <summary>
+		/// ArrayItems iterator
+		/// </summary>
+		/// <param name="source"></param>
+		/// <param name="predicate"></param>
+		/// <returns></returns>
+		private static IEnumerable<TokenSequence> ArrayItemsIterator(TokenSequence source, Func<int, bool> predicate)
+		{
+			IStream<CommonToken> stream = Stream<CommonToken>.Create(source);
+			if (stream.IsCompleted)
+			{
+				yield break;
+			}
+
+			if (stream.Pop().TokenType != CommonTokenType.ArrayBegin)
+			{
+				yield return source;
 				yield break;
 			}
 
@@ -388,6 +428,22 @@ namespace JsonFx.Common
 				throw new ArgumentNullException("source");
 			}
 
+			if (!(source is IList<CommonToken>))
+			{
+				// ensure buffered
+				source = new SequenceBuffer<CommonToken>(source);
+			}
+
+			return CommonSubsequencer.DescendantsIterator(source);
+		}
+
+		/// <summary>
+		/// Descendants iterator
+		/// </summary>
+		/// <param name="source"></param>
+		/// <returns></returns>
+		private static IEnumerable<TokenSequence> DescendantsIterator(TokenSequence source)
+		{
 			if (CommonSubsequencer.IsPrimitive(source))
 			{
 				yield break;
@@ -440,10 +496,20 @@ namespace JsonFx.Common
 				source = new SequenceBuffer<CommonToken>(source);
 			}
 
-			// and self
-			yield return CommonSubsequencer.SpliceNextValueLazy(Stream<CommonToken>.Create(source));
+			return CommonSubsequencer.DescendantsAndSelfIterator(source);
+		}
 
-			foreach (TokenSequence descendant in CommonSubsequencer.Descendants(source))
+		/// <summary>
+		/// DescendantsAndSelf iterator
+		/// </summary>
+		/// <param name="source"></param>
+		/// <returns></returns>
+		private static IEnumerable<TokenSequence> DescendantsAndSelfIterator(TokenSequence source)
+		{
+			// and self
+			yield return source;
+
+			foreach (TokenSequence descendant in CommonSubsequencer.DescendantsIterator(source))
 			{
 				yield return descendant;
 			}
@@ -451,50 +517,46 @@ namespace JsonFx.Common
 
 		#endregion Descendants Methods
 
-		#region Values
+		#region Utility Methods
 
 		/// <summary>
-		/// Returns sequence of values. If is array returns array items, otherwise returns single object as sequence.
+		/// Covers the sitation where a stream of sequences may be back to back
 		/// </summary>
 		/// <param name="source"></param>
 		/// <returns></returns>
-		public static IEnumerable<TokenSequence> Values(this TokenSequence source)
+		internal static IEnumerable<TokenSequence> SplitValues(this TokenSequence source)
 		{
-			if (CommonSubsequencer.IsArray(source))
+			if (source == null)
 			{
-				return CommonSubsequencer.ArrayItems(source);
+				return new TokenSequence[0];
 			}
 
-			return CommonSubsequencer.ToEnumerable(source);
+			if (!(source is IList<CommonToken>))
+			{
+				// ensure buffered
+				source = new SequenceBuffer<CommonToken>(source);
+			}
 
-			//return CommonSubsequencer.Values(source);
+			return CommonSubsequencer.SplitValuesIterator(source);
 		}
 
-		private static IEnumerable<TokenSequence> ToEnumerable(TokenSequence source)
+		private static IEnumerable<TokenSequence> SplitValuesIterator(TokenSequence source)
 		{
-			yield return source;
-		}
-
-		private static IEnumerable<TokenSequence> SplitValues(TokenSequence source)
-		{
-			using (var stream = Stream<CommonToken>.Create(source, true))
+			using (var stream = Stream<CommonToken>.Create(source))
 			{
 				while (!stream.IsCompleted)
 				{
-					yield return CommonSubsequencer.SpliceNextValueLazy(stream);
+					yield return CommonSubsequencer.SpliceNextValue(stream);
 				}
 			}
 		}
-
-		#endregion Values
-
-		#region Utility Methods
 
 		/// <summary>
 		/// Splices out the sequence for the next complete value (object, array, primitive)
 		/// </summary>
 		/// <param name="stream"></param>
 		/// <returns></returns>
+		[Obsolete("TODO: Lazy does not mix well with shared IStream<T>.", true)]
 		private static TokenSequence SpliceNextValueLazy(IStream<CommonToken> stream)
 		{
 			if (stream.IsCompleted)

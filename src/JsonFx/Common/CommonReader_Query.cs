@@ -40,27 +40,72 @@ namespace JsonFx.Common
 	/// <summary>
 	/// Provides base implementation for standard deserializers
 	/// </summary>
+	/// <remarks>
+	/// This partial class adds LINQ capabilities to the reader.
+	/// </remarks>
 	public abstract partial class CommonReader : IQueryableReader
 	{
-		#region Query Methods
+		#region IQueryableReader Methods
 
 		/// <summary>
 		/// Begins a query of the given input
 		/// </summary>
 		/// <param name="input">the input reader</param>
-		/// <param name="ignored">a value used to trigger Type inference for <typeparamref name="TResult"/> (e.g. for deserializing anonymous objects)</param>
-		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
-		public IQueryable<TResult> Query<TResult>(TextReader input, TResult ignored)
+		/// <param name="ignored">a value used to trigger Type inference for <typeparamref name="T"/> (e.g. for deserializing anonymous objects)</param>
+		/// <typeparam name="T">the expected type of the serialized data</typeparam>
+		IQueryable<T> IQueryableReader.Query<T>(TextReader input, T ignored)
 		{
-			return this.Query<TResult>(input);
+			return this.Query<T>(input);
 		}
 
 		/// <summary>
 		/// Begins a query of the given input
 		/// </summary>
 		/// <param name="input">the input reader</param>
-		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
-		public IQueryable<TResult> Query<TResult>(TextReader input)
+		/// <typeparam name="T">the expected type of the serialized data</typeparam>
+		IQueryable<T> IQueryableReader.Query<T>(TextReader input)
+		{
+			return this.Query<T>(input);
+		}
+
+		/// <summary>
+		/// Begins a query of the given input
+		/// </summary>
+		/// <param name="input">the input text</param>
+		/// <param name="ignored">a value used to trigger Type inference for <typeparamref name="T"/> (e.g. for deserializing anonymous objects)</param>
+		/// <typeparam name="T">the expected type of the serialized data</typeparam>
+		IQueryable<T> IQueryableReader.Query<T>(string input, T ignored)
+		{
+			return this.Query<T>(input);
+		}
+
+		/// <summary>
+		/// Begins a query of the given input
+		/// </summary>
+		/// <param name="input">the input text</param>
+		/// <typeparam name="T">the expected type of the serialized data</typeparam>
+		IQueryable<T> IQueryableReader.Query<T>(string input)
+		{
+			return this.Query<T>(input);
+		}
+
+		/// <summary>
+		/// Begins a query of the given input
+		/// </summary>
+		/// <param name="input">the input reader</param>
+		/// <param name="ignored">a value used to trigger Type inference for <typeparamref name="T"/> (e.g. for deserializing anonymous objects)</param>
+		/// <typeparam name="T">the expected type of the serialized data</typeparam>
+		public Query<T> Query<T>(TextReader input, T ignored)
+		{
+			return this.Query<T>(input);
+		}
+
+		/// <summary>
+		/// Begins a query of the given input
+		/// </summary>
+		/// <param name="input">the input reader</param>
+		/// <typeparam name="T">the expected type of the serialized data</typeparam>
+		public Query<T> Query<T>(TextReader input)
 		{
 			var tokenizer = this.GetTokenizer();
 			if (tokenizer == null)
@@ -70,7 +115,7 @@ namespace JsonFx.Common
 
 			var source = tokenizer.GetTokens(input);
 
-			return new Query<TResult>(new QueryProvider(this.GetAnalyzer(), source.Values().AsQueryable()));
+			return new Query<T>(this.GetAnalyzer(), source);
 		}
 
 		/// <summary>
@@ -87,7 +132,7 @@ namespace JsonFx.Common
 
 			var source = tokenizer.GetTokens(input);
 
-			return new Query<object>(new QueryProvider(this.GetAnalyzer(), source.Values().AsQueryable()));
+			return new Query<object>(this.GetAnalyzer(), source);
 		}
 
 		/// <summary>
@@ -105,11 +150,9 @@ namespace JsonFx.Common
 
 			var source = tokenizer.GetTokens(input);
 
-			var provider = new QueryProvider(this.GetAnalyzer(), source.Values().AsQueryable());
-
 			try
 			{
-				return (IQueryable)Activator.CreateInstance(typeof(Query<>).MakeGenericType(targetType), new object[] { provider });
+				return (IQueryable)Activator.CreateInstance(typeof(Query<>).MakeGenericType(targetType), new object[] { this.GetAnalyzer(), source });
 			}
 			catch (TargetInvocationException ex)
 			{
@@ -122,19 +165,19 @@ namespace JsonFx.Common
 		/// Begins a query of the given input
 		/// </summary>
 		/// <param name="input">the input text</param>
-		/// <param name="ignored">a value used to trigger Type inference for <typeparamref name="TResult"/> (e.g. for deserializing anonymous objects)</param>
-		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
-		public IQueryable<TResult> Query<TResult>(string input, TResult ignored)
+		/// <param name="ignored">a value used to trigger Type inference for <typeparamref name="T"/> (e.g. for deserializing anonymous objects)</param>
+		/// <typeparam name="T">the expected type of the serialized data</typeparam>
+		public Query<T> Query<T>(string input, T ignored)
 		{
-			return this.Query<TResult>(input);
+			return this.Query<T>(input);
 		}
 
 		/// <summary>
 		/// Begins a query of the given input
 		/// </summary>
 		/// <param name="input">the input text</param>
-		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
-		public IQueryable<TResult> Query<TResult>(string input)
+		/// <typeparam name="T">the expected type of the serialized data</typeparam>
+		public Query<T> Query<T>(string input)
 		{
 			var tokenizer = this.GetTokenizer();
 			if (tokenizer == null)
@@ -144,7 +187,7 @@ namespace JsonFx.Common
 
 			var source = tokenizer.GetTokens(input);
 
-			return new Query<TResult>(new QueryProvider(this.GetAnalyzer(), source.Values().AsQueryable()));
+			return new Query<T>(this.GetAnalyzer(), source);
 		}
 
 		/// <summary>
@@ -161,7 +204,7 @@ namespace JsonFx.Common
 
 			var source = tokenizer.GetTokens(input);
 
-			return new Query<object>(new QueryProvider(this.GetAnalyzer(), source.Values().AsQueryable()));
+			return new Query<object>(this.GetAnalyzer(), source);
 		}
 
 		/// <summary>
@@ -179,11 +222,9 @@ namespace JsonFx.Common
 
 			var source = tokenizer.GetTokens(input);
 
-			var provider = new QueryProvider(this.GetAnalyzer(), source.Values().AsQueryable());
-
 			try
 			{
-				return (IQueryable)Activator.CreateInstance(typeof(Query<>).MakeGenericType(targetType), new object[] { provider });
+				return (IQueryable)Activator.CreateInstance(typeof(Query<>).MakeGenericType(targetType), new object[] { this.GetAnalyzer(), source });
 			}
 			catch (TargetInvocationException ex)
 			{
@@ -192,158 +233,6 @@ namespace JsonFx.Common
 			}
 		}
 
-		#endregion Query Methods
-
-		#region Descendants Methods
-
-		/// <summary>
-		/// Begins a query of the given input
-		/// </summary>
-		/// <param name="input">the input reader</param>
-		/// <param name="ignored">a value used to trigger Type inference for <typeparamref name="TResult"/> (e.g. for deserializing anonymous objects)</param>
-		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
-		public IQueryable<TResult> Descendants<TResult>(TextReader input, TResult ignored)
-		{
-			return this.Descendants<TResult>(input);
-		}
-
-		/// <summary>
-		/// Begins a query of the given input
-		/// </summary>
-		/// <param name="input">the input reader</param>
-		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
-		public IQueryable<TResult> Descendants<TResult>(TextReader input)
-		{
-			var tokenizer = this.GetTokenizer();
-			if (tokenizer == null)
-			{
-				throw new InvalidOperationException("Tokenizer is invalid");
-			}
-
-			var source = tokenizer.GetTokens(input);
-
-			return new Query<TResult>(new QueryProvider(this.GetAnalyzer(), source.Descendants().AsQueryable()));
-		}
-
-		/// <summary>
-		/// Serializes the data to the given output
-		/// </summary>
-		/// <param name="input">the input reader</param>
-		public IQueryable Descendants(TextReader input)
-		{
-			var tokenizer = this.GetTokenizer();
-			if (tokenizer == null)
-			{
-				throw new InvalidOperationException("Tokenizer is invalid");
-			}
-
-			var source = tokenizer.GetTokens(input);
-
-			return new Query<object>(new QueryProvider(this.GetAnalyzer(), source.Descendants().AsQueryable()));
-		}
-
-		/// <summary>
-		/// Begins a query of the given input
-		/// </summary>
-		/// <param name="input">the input reader</param>
-		/// <param name="targetType">the expected type of the serialized data</param>
-		public IQueryable Descendants(TextReader input, Type targetType)
-		{
-			var tokenizer = this.GetTokenizer();
-			if (tokenizer == null)
-			{
-				throw new InvalidOperationException("Tokenizer is invalid");
-			}
-
-			var source = tokenizer.GetTokens(input);
-
-			var provider = new QueryProvider(this.GetAnalyzer(), source.Descendants().AsQueryable());
-
-			try
-			{
-				return (IQueryable)Activator.CreateInstance(typeof(Query<>).MakeGenericType(targetType), new object[] { provider });
-			}
-			catch (TargetInvocationException ex)
-			{
-				// unwrap inner exception
-				throw ex.InnerException;
-			}
-		}
-
-		/// <summary>
-		/// Begins a query of the given input
-		/// </summary>
-		/// <param name="input">the input text</param>
-		/// <param name="ignored">a value used to trigger Type inference for <typeparamref name="TResult"/> (e.g. for deserializing anonymous objects)</param>
-		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
-		public IQueryable<TResult> Descendants<TResult>(string input, TResult ignored)
-		{
-			return this.Descendants<TResult>(input);
-		}
-
-		/// <summary>
-		/// Begins a query of the given input
-		/// </summary>
-		/// <param name="input">the input text</param>
-		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
-		public IQueryable<TResult> Descendants<TResult>(string input)
-		{
-			var tokenizer = this.GetTokenizer();
-			if (tokenizer == null)
-			{
-				throw new InvalidOperationException("Tokenizer is invalid");
-			}
-
-			var source = tokenizer.GetTokens(input);
-
-			return new Query<TResult>(new QueryProvider(this.GetAnalyzer(), source.Descendants().AsQueryable()));
-		}
-
-		/// <summary>
-		/// Begins a query of the given input
-		/// </summary>
-		/// <param name="input">the input text</param>
-		public IQueryable Descendants(string input)
-		{
-			var tokenizer = this.GetTokenizer();
-			if (tokenizer == null)
-			{
-				throw new InvalidOperationException("Tokenizer is invalid");
-			}
-
-			var source = tokenizer.GetTokens(input);
-
-			return new Query<object>(new QueryProvider(this.GetAnalyzer(), source.Descendants().AsQueryable()));
-		}
-
-		/// <summary>
-		/// Begins a query of the given input
-		/// </summary>
-		/// <param name="input">the input text</param>
-		/// <param name="targetType">the expected type of the serialized data</param>
-		public IQueryable Descendants(string input, Type targetType)
-		{
-			var tokenizer = this.GetTokenizer();
-			if (tokenizer == null)
-			{
-				throw new InvalidOperationException("Tokenizer is invalid");
-			}
-
-			var source = tokenizer.GetTokens(input);
-
-			var provider = new QueryProvider(this.GetAnalyzer(), source.Descendants().AsQueryable());
-
-			try
-			{
-				return (IQueryable)Activator.CreateInstance(typeof(Query<>).MakeGenericType(targetType), new object[] { provider });
-			}
-			catch (TargetInvocationException ex)
-			{
-				// unwrap inner exception
-				throw ex.InnerException;
-			}
-		}
-
-		#endregion Query Methods
+		#endregion IQueryableReader Methods
 	}
 }

@@ -36,7 +36,7 @@ using System.Linq.Expressions;
 
 namespace JsonFx.Linq
 {
-	internal class Query<T> :
+	public class Query<T> :
 		IQueryable<T>,
 		IQueryable,
 		IEnumerable<T>,

@@ -240,7 +240,7 @@ namespace JsonFx.Linq
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Query_MatchingPropertyToArray_ReturnsSingleObject()
+		public void QueryArrayItems_MatchingPropertyToArray_ReturnsSingleObject()
 		{
 			var input = @"
 [
@@ -265,7 +265,7 @@ namespace JsonFx.Linq
 			var source = new JsonReader().Query(input, new { key=String.Empty });
 
 			var query =
-				from obj in source
+				from obj in source.ArrayItems()
 				where obj.key == "value"
 				select new
 				{
@@ -312,7 +312,7 @@ namespace JsonFx.Linq
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Query_MatchingPropertyToArray_ReturnsArray()
+		public void QueryArrayItems_MatchingPropertyToArray_ReturnsArray()
 		{
 			var input = @"
 [
@@ -334,7 +334,7 @@ namespace JsonFx.Linq
 
 			var source = new JsonReader().Query(input, new { key=String.Empty });
 
-			var query = source.Where(obj => obj.key == "value");
+			var query = source.ArrayItems().Where(obj => obj.key == "value");
 
 			var actual = query.ToArray();
 
@@ -368,11 +368,252 @@ namespace JsonFx.Linq
 
 		#endregion Anonymous Tests
 
+		#region Nested Object Tests
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void QueryDescendants_MatchingPropertyToArray_ReturnsArray()
+		{
+			var input = @"
+{
+	""name"" : ""Root Object"",
+	""matchThis"" : ""find me."",
+	""children"" : [
+		{
+			""name"" : ""Skipped Child"",
+			""matchThis"": ""skip me."",
+			""children"" : [
+				{
+					""name"" : ""Skipped Grandchild 1"",
+					""matchThis"": ""skip me.""
+				},
+				{
+					""name"" : ""Matching Grandchild 1"",
+					""matchThis"": ""find me.""
+				}
+			]
+		},
+		{
+			""name"" : ""Matching Child"",
+			""matchThis"": ""find me."",
+			""children"" : [
+				{
+					""name"" : ""Matching Grandchild 2"",
+					""matchThis"": ""find me.""
+				},
+				{
+					""name"" : ""Skipped Grandchild 2"",
+					""matchThis"": ""skip me.""
+				}
+			]
+		}
+	]
+}";
+
+			// returns in document order
+			var expected = new[]
+				{
+					new
+					{
+						Name = "Matching Grandchild 1"
+					},
+					new
+					{
+						Name = "Matching Child"
+					},
+					new
+					{
+						Name = "Matching Grandchild 2"
+					}
+				};
+
+			// define an anonymous object which contains only the fields we want to retrieve
+			var template = new { name=String.Empty, matchThis=String.Empty };
+
+			var source = new JsonReader().Query(input, template);
+
+			var query =
+				from descendant in source.Descendants()
+				where (descendant.matchThis == "find me.")
+				select new
+				{
+					Name = descendant.name
+				};
+
+			var actual = query.ToArray();
+
+			Assert.Equal(expected, actual, true);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void QueryDescendantsAndSelf_MatchingPropertyToArray_ReturnsArray()
+		{
+			var input = @"
+{
+	""name"" : ""Root Object"",
+	""matchThis"" : ""find me."",
+	""children"" : [
+		{
+			""name"" : ""Skipped Child"",
+			""matchThis"": ""skip me."",
+			""children"" : [
+				{
+					""name"" : ""Skipped Grandchild 1"",
+					""matchThis"": ""skip me.""
+				},
+				{
+					""name"" : ""Matching Grandchild 1"",
+					""matchThis"": ""find me.""
+				}
+			]
+		},
+		{
+			""name"" : ""Matching Child"",
+			""matchThis"": ""find me."",
+			""children"" : [
+				{
+					""name"" : ""Matching Grandchild 2"",
+					""matchThis"": ""find me.""
+				},
+				{
+					""name"" : ""Skipped Grandchild 2"",
+					""matchThis"": ""skip me.""
+				}
+			]
+		}
+	]
+}";
+
+			// returns in document order
+			var expected = new[]
+				{
+					new
+					{
+						Name = "Root Object"
+					},
+					new
+					{
+						Name = "Matching Grandchild 1"
+					},
+					new
+					{
+						Name = "Matching Child"
+					},
+					new
+					{
+						Name = "Matching Grandchild 2"
+					}
+				};
+
+			// define an anonymous object which contains only the fields we want to retrieve
+			var template = new { name=String.Empty, matchThis=String.Empty };
+
+			var source = new JsonReader().Query(input, template);
+
+			var query =
+				from descendant in source.DescendantsAndSelf()
+				where (descendant.matchThis == "find me.")
+				select new
+				{
+					Name = descendant.name
+				};
+
+			var actual = query.ToArray();
+
+			Assert.Equal(expected, actual, true);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void QueryDescendantsAndSelf_ExecuteTwice_ReturnsArrayTwice()
+		{
+			var input = @"
+{
+	""name"" : ""Root Object"",
+	""matchThis"" : ""find me."",
+	""children"" : [
+		{
+			""name"" : ""Skipped Child"",
+			""matchThis"": ""skip me."",
+			""children"" : [
+				{
+					""name"" : ""Skipped Grandchild 1"",
+					""matchThis"": ""skip me.""
+				},
+				{
+					""name"" : ""Matching Grandchild 1"",
+					""matchThis"": ""find me.""
+				}
+			]
+		},
+		{
+			""name"" : ""Matching Child"",
+			""matchThis"": ""find me."",
+			""children"" : [
+				{
+					""name"" : ""Matching Grandchild 2"",
+					""matchThis"": ""find me.""
+				},
+				{
+					""name"" : ""Skipped Grandchild 2"",
+					""matchThis"": ""skip me.""
+				}
+			]
+		}
+	]
+}";
+
+			// returns in document order
+			var expected = new[]
+				{
+					new
+					{
+						Name = "Root Object"
+					},
+					new
+					{
+						Name = "Matching Grandchild 1"
+					},
+					new
+					{
+						Name = "Matching Child"
+					},
+					new
+					{
+						Name = "Matching Grandchild 2"
+					}
+				};
+
+			// define an anonymous object which contains only the fields we want to retrieve
+			var template = new { name=String.Empty, matchThis=String.Empty };
+
+			var source = new JsonReader().Query(input, template);
+
+			var query =
+				from descendant in source.DescendantsAndSelf()
+				where (descendant.matchThis == "find me.")
+				select new
+				{
+					Name = descendant.name
+				};
+
+			var actual = query.ToArray();
+
+			Assert.Equal(expected, actual, true);
+
+			var actual2 = query.ToArray();
+
+			Assert.Equal(expected, actual2, true);
+		}
+
+		#endregion Nested Object Tests
+
 		#region Complex Graph Tests
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Descendants_Foo_Returns()
+		public void QueryDescendants_MatchingPropertyValue_ReturnsStronglyTypedObject()
 		{
 			// input from pass1.json in test suite at http://www.json.org/JSON_checker/
 			const string input = @"[
@@ -470,10 +711,11 @@ namespace JsonFx.Linq
 				A_key_can_be_any_string = "A key can be any string"
 			};
 
-			var source = new JsonReader(new DataReaderSettings(new JsonResolverStrategy())).Query<ComplexType>(input);
+			var reader = new JsonReader(new DataReaderSettings(new JsonResolverStrategy()));
+			var source = reader.Query<ComplexType>(input);
 
 			var query =
-				from foo in source
+				from foo in source.Descendants()
 				where foo.url == new Uri("http://www.JSON.org/")
 				select foo;
 

@@ -154,10 +154,14 @@ namespace JsonFx.Linq
 		protected override Expression VisitConstant(ConstantExpression constant, QueryContext context)
 		{
 			Type type = constant.Type;
+			Type[] genericArgs = type.IsGenericType ? type.GetGenericArguments() : null;
+			Type queryType = typeof(JsonFx.Linq.Query<>);
 
-			if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(JsonFx.Linq.Query<>))
+			if (genericArgs != null &&
+				genericArgs.Length == 1 &&
+				queryType.MakeGenericType(genericArgs).IsAssignableFrom(type))
 			{
-				context.InputType = type.GetGenericArguments()[0];
+				context.InputType = genericArgs[0];
 
 				// seed of transforming the expression
 				// all other changes will ripple from this point
