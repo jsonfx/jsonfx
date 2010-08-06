@@ -76,22 +76,22 @@ namespace JsonFx.Serialization
 
 		#endregion Properties
 
-		#region Methods
+		#region Write Methods
 
 		/// <summary>
 		/// Serializes the data to the given output
 		/// </summary>
 		/// <param name="output">the output writer</param>
 		/// <param name="data">the data to be serialized</param>
-		void Serialize(TextWriter output, object data);
+		void Write(TextWriter output, object data);
 
 		/// <summary>
 		/// Serializes the data to the given output
 		/// </summary>
 		/// <param name="data">the data to be serialized</param>
 		/// <returns>the serialized data</returns>
-		string Serialize(object data);
+		string Write(object data);
 
-		#endregion Methods
+		#endregion Write Methods
 	}
 }

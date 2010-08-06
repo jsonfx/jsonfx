@@ -343,7 +343,7 @@ namespace JsonFx.Linq
 
 			// expression gets translated to:
 			//		this.Analyzer.Analyze<targetType>(CommonSubsequencer.Property(value, map.DataName).FirstOrDefault();
-	
+
 			var memberAccess = Expression.Call(QueryEngine.MemberAccess, context.Parameters[p.Name], Expression.Constant(map.DataName));
 
 			return this.CallAnalyze(targetType, memberAccess, true);

@@ -87,7 +87,7 @@ namespace JsonFx.Xml
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Serialize_ComparePersonOutputToXmlSerializer_Serializes()
+		public void Write_ComparePersonOutputToXmlSerializer_Serializes()
 		{
 			var input = new Person
 			{
@@ -106,14 +106,14 @@ namespace JsonFx.Xml
 			};
 
 			var expected = SystemXmlWriter(input, CreateSettings(false));
-			var actual = new XmlWriter(new DataWriterSettings(new XmlResolverStrategy())).Serialize(input);
+			var actual = new XmlWriter(new DataWriterSettings(new XmlResolverStrategy())).Write(input);
 
 			Assert.Equal(expected.ToString(), actual);
 		}
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Serialize_CompareObjectOutputToXmlSerializer_Serializes()
+		public void Write_CompareObjectOutputToXmlSerializer_Serializes()
 		{
 			var input = new
 			{
@@ -137,7 +137,7 @@ namespace JsonFx.Xml
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Serialize_CompareGenericDictionaryOutputToXmlSerializer_Serializes()
+		public void Write_CompareGenericDictionaryOutputToXmlSerializer_Serializes()
 		{
 			var input = new Dictionary<string, object>
 			{
@@ -161,7 +161,7 @@ namespace JsonFx.Xml
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Serialize_CompareDictionaryOutputToXmlSerializer_Serializes()
+		public void Write_CompareDictionaryOutputToXmlSerializer_Serializes()
 		{
 			var input = new Hashtable()
 			{
@@ -184,7 +184,7 @@ namespace JsonFx.Xml
 		}
 
 		//[Fact(Skip="System.Xml.XmlSerializer array output is worthless.")]
-		public void Serialize_CompareArrayListOutputToXmlSerializer_Serializes()
+		public void Write_CompareArrayListOutputToXmlSerializer_Serializes()
 		{
 			var input = new ArrayList
 				{
@@ -195,13 +195,13 @@ namespace JsonFx.Xml
 				};
 
 			var expected = SystemXmlWriter(input, CreateSettings(false));
-			var actual = new XmlWriter(new DataWriterSettings(new XmlResolverStrategy())).Serialize(input);
+			var actual = new XmlWriter(new DataWriterSettings(new XmlResolverStrategy())).Write(input);
 
 			Assert.Equal(expected.ToString(), actual);
 		}
 
 		//[Fact(Skip="System.Xml.XmlSerializer array output is worthless.")]
-		public void Serialize_CompareArrayOutputToXmlSerializer_Serializes()
+		public void Write_CompareArrayOutputToXmlSerializer_Serializes()
 		{
 			var input = new object[]
 				{
@@ -212,174 +212,174 @@ namespace JsonFx.Xml
 				};
 
 			var expected = SystemXmlWriter(input, CreateSettings(false));
-			var actual = new XmlWriter(new DataWriterSettings(new XmlResolverStrategy())).Serialize(input);
+			var actual = new XmlWriter(new DataWriterSettings(new XmlResolverStrategy())).Write(input);
 
 			Assert.Equal(expected.ToString(), actual);
 		}
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Serialize_CompareStringOutputToXmlSerializer_Serializes()
+		public void Write_CompareStringOutputToXmlSerializer_Serializes()
 		{
 			var input = "Ordinary string";
 
 			var expected = SystemXmlWriter(input, CreateSettings(false));
-			var actual = new XmlWriter(new DataWriterSettings(new XmlResolverStrategy())).Serialize(input);
+			var actual = new XmlWriter(new DataWriterSettings(new XmlResolverStrategy())).Write(input);
 
 			Assert.Equal(expected.ToString(), actual);
 		}
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Serialize_CompareDateTimeOutputToXmlSerializer_Serializes()
+		public void Write_CompareDateTimeOutputToXmlSerializer_Serializes()
 		{
 			var input = new DateTime(2008, 2, 29, 23, 59, 59, 999, DateTimeKind.Utc);
 
 			var expected = SystemXmlWriter(input, CreateSettings(false));
-			var actual = new XmlWriter(new DataWriterSettings(new XmlResolverStrategy())).Serialize(input);
+			var actual = new XmlWriter(new DataWriterSettings(new XmlResolverStrategy())).Write(input);
 
 			Assert.Equal(expected.ToString(), actual);
 		}
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Serialize_CompareInt16OutputToXmlSerializer_Serializes()
+		public void Write_CompareInt16OutputToXmlSerializer_Serializes()
 		{
 			var input = (short)42;
 
 			var expected = SystemXmlWriter(input, CreateSettings(false));
-			var actual = new XmlWriter(new DataWriterSettings(new XmlResolverStrategy())).Serialize(input);
+			var actual = new XmlWriter(new DataWriterSettings(new XmlResolverStrategy())).Write(input);
 
 			Assert.Equal(expected.ToString(), actual);
 		}
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Serialize_CompareUInt16OutputToXmlSerializer_Serializes()
+		public void Write_CompareUInt16OutputToXmlSerializer_Serializes()
 		{
 			var input = UInt16.MaxValue;
 
 			var expected = SystemXmlWriter(input, CreateSettings(false));
-			var actual = new XmlWriter(new DataWriterSettings(new XmlResolverStrategy())).Serialize(input);
+			var actual = new XmlWriter(new DataWriterSettings(new XmlResolverStrategy())).Write(input);
 
 			Assert.Equal(expected.ToString(), actual);
 		}
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Serialize_CompareInt32OutputToXmlSerializer_Serializes()
+		public void Write_CompareInt32OutputToXmlSerializer_Serializes()
 		{
 			var input = 42;
 
 			var expected = SystemXmlWriter(input, CreateSettings(false));
-			var actual = new XmlWriter(new DataWriterSettings(new XmlResolverStrategy())).Serialize(input);
+			var actual = new XmlWriter(new DataWriterSettings(new XmlResolverStrategy())).Write(input);
 
 			Assert.Equal(expected.ToString(), actual);
 		}
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Serialize_CompareUInt32OutputToXmlSerializer_Serializes()
+		public void Write_CompareUInt32OutputToXmlSerializer_Serializes()
 		{
 			var input = UInt32.MaxValue;
 
 			var expected = SystemXmlWriter(input, CreateSettings(false));
-			var actual = new XmlWriter(new DataWriterSettings(new XmlResolverStrategy())).Serialize(input);
+			var actual = new XmlWriter(new DataWriterSettings(new XmlResolverStrategy())).Write(input);
 
 			Assert.Equal(expected.ToString(), actual);
 		}
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Serialize_CompareInt64OutputToXmlSerializer_Serializes()
+		public void Write_CompareInt64OutputToXmlSerializer_Serializes()
 		{
 			var input = Int64.MaxValue;
 
 			var expected = SystemXmlWriter(input, CreateSettings(false));
-			var actual = new XmlWriter(new DataWriterSettings(new XmlResolverStrategy())).Serialize(input);
+			var actual = new XmlWriter(new DataWriterSettings(new XmlResolverStrategy())).Write(input);
 
 			Assert.Equal(expected.ToString(), actual);
 		}
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Serialize_CompareUInt64OutputToXmlSerializer_Serializes()
+		public void Write_CompareUInt64OutputToXmlSerializer_Serializes()
 		{
 			var input = UInt64.MaxValue;
 
 			var expected = SystemXmlWriter(input, CreateSettings(false));
-			var actual = new XmlWriter(new DataWriterSettings(new XmlResolverStrategy())).Serialize(input);
+			var actual = new XmlWriter(new DataWriterSettings(new XmlResolverStrategy())).Write(input);
 
 			Assert.Equal(expected.ToString(), actual);
 		}
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Serialize_CompareDecimalOutputToXmlSerializer_Serializes()
+		public void Write_CompareDecimalOutputToXmlSerializer_Serializes()
 		{
 			var input = Decimal.MaxValue;
 
 			var expected = SystemXmlWriter(input, CreateSettings(false));
-			var actual = new XmlWriter(new DataWriterSettings(new XmlResolverStrategy())).Serialize(input);
+			var actual = new XmlWriter(new DataWriterSettings(new XmlResolverStrategy())).Write(input);
 
 			Assert.Equal(expected.ToString(), actual);
 		}
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Serialize_CompareDoubleOutputToXmlSerializer_Serializes()
+		public void Write_CompareDoubleOutputToXmlSerializer_Serializes()
 		{
 			var input = 3.14;
 
 			var expected = SystemXmlWriter(input, CreateSettings(false));
-			var actual = new XmlWriter(new DataWriterSettings(new XmlResolverStrategy())).Serialize(input);
+			var actual = new XmlWriter(new DataWriterSettings(new XmlResolverStrategy())).Write(input);
 
 			Assert.Equal(expected.ToString(), actual);
 		}
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Serialize_CompareSingleOutputToXmlSerializer_Serializes()
+		public void Write_CompareSingleOutputToXmlSerializer_Serializes()
 		{
 			var input = 3.14f;
 
 			var expected = SystemXmlWriter(input, CreateSettings(false));
-			var actual = new XmlWriter(new DataWriterSettings(new XmlResolverStrategy())).Serialize(input);
+			var actual = new XmlWriter(new DataWriterSettings(new XmlResolverStrategy())).Write(input);
 
 			Assert.Equal(expected.ToString(), actual);
 		}
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Serialize_CompareByteOutputToXmlSerializer_Serializes()
+		public void Write_CompareByteOutputToXmlSerializer_Serializes()
 		{
 			var input = (byte)0xF;
 
 			var expected = SystemXmlWriter(input, CreateSettings(false));
-			var actual = new XmlWriter(new DataWriterSettings(new XmlResolverStrategy())).Serialize(input);
+			var actual = new XmlWriter(new DataWriterSettings(new XmlResolverStrategy())).Write(input);
 
 			Assert.Equal(expected.ToString(), actual);
 		}
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Serialize_CompareSByteOutputToXmlSerializer_Serializes()
+		public void Write_CompareSByteOutputToXmlSerializer_Serializes()
 		{
 			var input = SByte.MaxValue;
 
 			var expected = SystemXmlWriter(input, CreateSettings(false));
-			var actual = new XmlWriter(new DataWriterSettings(new XmlResolverStrategy())).Serialize(input);
+			var actual = new XmlWriter(new DataWriterSettings(new XmlResolverStrategy())).Write(input);
 
 			Assert.Equal(expected.ToString(), actual);
 		}
 
 		//[Fact(Skip="System.Xml.XmlSerializer outputs the ordinal value of chars.")]
-		public void Serialize_CompareCharOutputToXmlSerializer_Serializes()
+		public void Write_CompareCharOutputToXmlSerializer_Serializes()
 		{
 			var input = 'a';
 
 			var expected = SystemXmlWriter(input, CreateSettings(false));
-			var actual = new XmlWriter(new DataWriterSettings(new XmlResolverStrategy())).Serialize(input);
+			var actual = new XmlWriter(new DataWriterSettings(new XmlResolverStrategy())).Write(input);
 
 			Assert.Equal(expected.ToString(), actual);
 		}
@@ -408,7 +408,7 @@ namespace JsonFx.Xml
 </PersonContract>";
 
 			var writer = new XmlWriter(new DataWriterSettings(new DataContractResolverStrategy()) { PrettyPrint=true });
-			var actual = writer.Serialize(input);
+			var actual = writer.Write(input);
 
 			Assert.Equal(expected, actual);
 		}

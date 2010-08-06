@@ -60,7 +60,7 @@ namespace JsonFx.Serialization
 
 		#endregion Properties
 
-		#region Deserialize Methods
+		#region Read Methods
 
 		/// <summary>
 		/// Deserializes a single object from the given input
@@ -68,27 +68,27 @@ namespace JsonFx.Serialization
 		/// <param name="input">the input reader</param>
 		/// <param name="ignored">a value used to trigger Type inference for <typeparamref name="TResult"/> (e.g. for deserializing anonymous objects)</param>
 		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
-		TResult Deserialize<TResult>(TextReader input, TResult ignored);
+		TResult Read<TResult>(TextReader input, TResult ignored);
 
 		/// <summary>
 		/// Deserializes a single object from the given input
 		/// </summary>
 		/// <param name="input">the input reader</param>
 		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
-		TResult Deserialize<TResult>(TextReader input);
+		TResult Read<TResult>(TextReader input);
 
 		/// <summary>
 		/// Serializes the data to the given output
 		/// </summary>
 		/// <param name="input">the input reader</param>
-		object Deserialize(TextReader input);
+		object Read(TextReader input);
 
 		/// <summary>
 		/// Deserializes a single object from the given input
 		/// </summary>
 		/// <param name="input">the input reader</param>
 		/// <param name="targetType">the expected type of the serialized data</param>
-		object Deserialize(TextReader input, Type targetType);
+		object Read(TextReader input, Type targetType);
 
 		/// <summary>
 		/// Deserializes a single object from the given input
@@ -96,31 +96,31 @@ namespace JsonFx.Serialization
 		/// <param name="input">the input text</param>
 		/// <param name="ignored">a value used to trigger Type inference for <typeparamref name="TResult"/> (e.g. for deserializing anonymous objects)</param>
 		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
-		TResult Deserialize<TResult>(string input, TResult ignored);
+		TResult Read<TResult>(string input, TResult ignored);
 
 		/// <summary>
 		/// Deserializes a single object from the given input
 		/// </summary>
 		/// <param name="input">the input text</param>
 		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
-		TResult Deserialize<TResult>(string input);
+		TResult Read<TResult>(string input);
 
 		/// <summary>
 		/// Deserializes a single object from the given input
 		/// </summary>
 		/// <param name="input">the input text</param>
-		object Deserialize(string input);
+		object Read(string input);
 
 		/// <summary>
 		/// Deserializes a single object from the given input
 		/// </summary>
 		/// <param name="input">the input text</param>
 		/// <param name="targetType">the expected type of the serialized data</param>
-		object Deserialize(string input, Type targetType);
+		object Read(string input, Type targetType);
 
-		#endregion Deserialize Methods
+		#endregion Read Methods
 
-		#region StreamedDeserialize Methods
+		#region ReadMany Methods
 
 		/// <summary>
 		/// Deserializes a potentially endless sequence of objects from a stream source
@@ -130,8 +130,8 @@ namespace JsonFx.Serialization
 		/// <remarks>
 		/// character stream => token stream => object stream
 		/// </remarks>
-		IEnumerable StreamedDeserialize(TextReader input);
+		IEnumerable ReadMany(TextReader input);
 
-		#endregion StreamedDeserialize Methods
+		#endregion ReadMany Methods
 	}
 }

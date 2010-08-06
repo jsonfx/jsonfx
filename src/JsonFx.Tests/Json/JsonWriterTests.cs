@@ -53,7 +53,7 @@ namespace JsonFx.Json
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Serialize_OnlyDefaults_SerializesIso8601Dates()
+		public void Write_OnlyDefaults_SerializesIso8601Dates()
 		{
 			var input = new object[]
 				{
@@ -64,14 +64,14 @@ namespace JsonFx.Json
 				};
 			var expected = @"[""Normal string before"",""2008-02-29T23:59:59.999Z"",""2010-07-05T10:51:17.768"",""Normal string after""]";
 
-			var actual = new JsonWriter().Serialize(input);
+			var actual = new JsonWriter().Write(input);
 
 			Assert.Equal(expected, actual);
 		}
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Serialize_RecognizesMultipleDateTimeFiltersIsoFirst_SerializesIso8601Dates()
+		public void Write_RecognizesMultipleDateTimeFiltersIsoFirst_SerializesIso8601Dates()
 		{
 			var input = new object[]
 				{
@@ -87,14 +87,14 @@ namespace JsonFx.Json
 				new Iso8601DateFilter(),
 				new MSAjaxDateFilter());
 
-			var actual = writer.Serialize(input);
+			var actual = writer.Write(input);
 
 			Assert.Equal(expected, actual);
 		}
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Serialize_RecognizesMultipleDateTimeFiltersAjaxFirst_SerializesMSAjaxDates()
+		public void Write_RecognizesMultipleDateTimeFiltersAjaxFirst_SerializesMSAjaxDates()
 		{
 			var input = new object[]
 				{
@@ -110,7 +110,7 @@ namespace JsonFx.Json
 				new MSAjaxDateFilter(),
 				new Iso8601DateFilter());
 
-			var actual = writer.Serialize(input);
+			var actual = writer.Write(input);
 
 			Assert.Equal(expected, actual);
 		}

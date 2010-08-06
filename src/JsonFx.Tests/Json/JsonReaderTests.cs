@@ -53,7 +53,7 @@ namespace JsonFx.Json
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Deserialize_OnlyDefaults_DeserializesIso8601DateTimeFormat()
+		public void Read_OnlyDefaults_DeserializesIso8601DateTimeFormat()
 		{
 			var input = @"[ ""Normal string before"", ""2008-02-29T23:59:59.999Z"", ""2010-07-05T10:51:17.768"", ""Normal string after""]";
 			var expected = new object[]
@@ -64,14 +64,14 @@ namespace JsonFx.Json
 					"Normal string after"
 				};
 
-			var actual = new JsonReader().Deserialize(input);
+			var actual = new JsonReader().Read(input);
 
 			Assert.Equal(expected, actual);
 		}
 
 		//[Fact]
 		[Trait(TraitName, TraitValue)]
-		//public void Deserialize_RecognizesFilters_DeserializesMultipleDateTimeFormats()
+		//public void Read_RecognizesFilters_DeserializesMultipleDateTimeFormats()
 		//{
 		//    var input = @"[ ""Normal string before"", ""2008-02-29T23:59:59.999Z"", ""\\/Date(1278327077768)\\/"", ""Normal string after""]";
 		//    var expected = new object[]
@@ -87,14 +87,14 @@ namespace JsonFx.Json
 		//        new Iso8601DateFilter { Format=Iso8601DateFilter.Precision.Ticks },
 		//        new MSAjaxDateFilter());
 
-		//    var actual = reader.Deserialize(input);
+		//    var actual = reader.Read(input);
 
 		//    Assert.Equal(expected, actual);
 		//}
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Deserialize_AllowTrailingContent_IgnoresTrailingContent()
+		public void Read_AllowTrailingContent_IgnoresTrailingContent()
 		{
 			var input = new StringReader(@"[""Content embedded inside other structure"", true,null, 42]</xml>");
 			var expected = new object[]
@@ -107,7 +107,7 @@ namespace JsonFx.Json
 
 			var reader = new JsonReader(new DataReaderSettings { AllowTrailingContent = true });
 
-			var actual = reader.Deserialize(input);
+			var actual = reader.Read(input);
 
 			Assert.Equal(expected, actual);
 
@@ -117,7 +117,7 @@ namespace JsonFx.Json
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Deserialize_ArrayCommaAfterClose_ThrowsDeserializationException()
+		public void Read_ArrayCommaAfterClose_ThrowsDeserializationException()
 		{
 			// input from fail7.json in test suite at http://www.json.org/JSON_checker/
 			var input = @"[""Comma after the close""],";
@@ -127,7 +127,7 @@ namespace JsonFx.Json
 			DeserializationException ex = Assert.Throws<DeserializationException>(
 				delegate
 				{
-					var actual = reader.Deserialize(input);
+					var actual = reader.Read(input);
 				});
 
 			// verify exception is coming from expected position
@@ -136,7 +136,7 @@ namespace JsonFx.Json
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Deserialize_ArrayExtraClose_ThrowsDeserializationException()
+		public void Read_ArrayExtraClose_ThrowsDeserializationException()
 		{
 			// input from fail8.json in test suite at http://www.json.org/JSON_checker/
 			var input = @"[""Extra close""]]";
@@ -146,7 +146,7 @@ namespace JsonFx.Json
 			DeserializationException ex = Assert.Throws<DeserializationException>(
 				delegate
 				{
-					var actual = reader.Deserialize(input);
+					var actual = reader.Read(input);
 				});
 
 			// verify exception is coming from expected position
@@ -159,7 +159,7 @@ namespace JsonFx.Json
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Deserialize_ObjectExtraValueAfterClose_ThrowsDeserializationException()
+		public void Read_ObjectExtraValueAfterClose_ThrowsDeserializationException()
 		{
 			// input from fail10.json in test suite at http://www.json.org/JSON_checker/
 			var input = @"{""Extra value after close"": true} ""misplaced quoted value""";
@@ -169,7 +169,7 @@ namespace JsonFx.Json
 			DeserializationException ex = Assert.Throws<DeserializationException>(
 				delegate
 				{
-					var actual = reader.Deserialize(input);
+					var actual = reader.Read(input);
 				});
 
 			// verify exception is coming from expected position
@@ -180,14 +180,14 @@ namespace JsonFx.Json
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void StreamedDeserialize_ObjectExtraValueAfterClose_DeserializesStreamOfObject()
+		public void ReadMany_ObjectExtraValueAfterClose_DeserializesStreamOfObject()
 		{
 			// input from fail10.json in test suite at http://www.json.org/JSON_checker/
 			var input = new StringReader(@"{""Extra value after close"": true} ""misplaced quoted value""");
 
 			var reader = new JsonReader(new DataReaderSettings());
 
-			var enumerator = reader.StreamedDeserialize(input).GetEnumerator();
+			var enumerator = reader.ReadMany(input).GetEnumerator();
 
 			Assert.True(enumerator.MoveNext());
 			Assert.Equal(new Dictionary<string, object>

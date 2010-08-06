@@ -101,7 +101,7 @@ namespace JsonFx.Serialization
 
 		#endregion Properties
 
-		#region Deserialize Methods
+		#region Read Methods
 
 		/// <summary>
 		/// Deserializes the data from the given input
@@ -109,9 +109,9 @@ namespace JsonFx.Serialization
 		/// <param name="input">the input reader</param>
 		/// <param name="ignored">a value used to trigger Type inference for <typeparamref name="TResult"/> (e.g. for deserializing anonymous objects)</param>
 		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
-		public virtual TResult Deserialize<TResult>(TextReader input, TResult ignored)
+		public virtual TResult Read<TResult>(TextReader input, TResult ignored)
 		{
-			return this.Deserialize<TResult>(input);
+			return this.Read<TResult>(input);
 		}
 
 		/// <summary>
@@ -119,9 +119,9 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="input">the input reader</param>
 		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
-		public virtual TResult Deserialize<TResult>(TextReader input)
+		public virtual TResult Read<TResult>(TextReader input)
 		{
-			object value = this.Deserialize(input, typeof(TResult));
+			object value = this.Read(input, typeof(TResult));
 
 			return (value is TResult) ? (TResult)value : default(TResult);
 		}
@@ -130,9 +130,9 @@ namespace JsonFx.Serialization
 		/// Deserializes the data from the given input
 		/// </summary>
 		/// <param name="input">the input reader</param>
-		public virtual object Deserialize(TextReader input)
+		public virtual object Read(TextReader input)
 		{
-			return this.Deserialize(input, null);
+			return this.Read(input, null);
 		}
 
 		/// <summary>
@@ -140,7 +140,7 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="input">the input reader</param>
 		/// <param name="targetType">the expected type of the serialized data</param>
-		public virtual object Deserialize(TextReader input, Type targetType)
+		public virtual object Read(TextReader input, Type targetType)
 		{
 			ITextTokenizer<T> tokenizer = this.GetTokenizer();
 			if (tokenizer == null)
@@ -148,7 +148,7 @@ namespace JsonFx.Serialization
 				throw new InvalidOperationException("Tokenizer is invalid");
 			}
 
-			return this.DeserializeSingle(tokenizer, tokenizer.GetTokens(input), targetType);
+			return this.ReadSingle(tokenizer, tokenizer.GetTokens(input), targetType);
 		}
 
 		/// <summary>
@@ -157,9 +157,9 @@ namespace JsonFx.Serialization
 		/// <param name="input">the input text</param>
 		/// <param name="ignored">a value used to trigger Type inference for <typeparamref name="TResult"/> (e.g. for deserializing anonymous objects)</param>
 		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
-		public virtual TResult Deserialize<TResult>(string input, TResult ignored)
+		public virtual TResult Read<TResult>(string input, TResult ignored)
 		{
-			return this.Deserialize<TResult>(input);
+			return this.Read<TResult>(input);
 		}
 	
 		/// <summary>
@@ -167,9 +167,9 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="input">the input text</param>
 		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
-		public virtual TResult Deserialize<TResult>(string input)
+		public virtual TResult Read<TResult>(string input)
 		{
-			object value = this.Deserialize(input, typeof(TResult));
+			object value = this.Read(input, typeof(TResult));
 
 			return (value is TResult) ? (TResult)value : default(TResult);
 		}
@@ -178,9 +178,9 @@ namespace JsonFx.Serialization
 		/// Deserializes the data from the given input
 		/// </summary>
 		/// <param name="input">the input text</param>
-		public virtual object Deserialize(string input)
+		public virtual object Read(string input)
 		{
-			return this.Deserialize(input, null);
+			return this.Read(input, null);
 		}
 
 		/// <summary>
@@ -188,7 +188,7 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="input">the input text</param>
 		/// <param name="targetType">the expected type of the serialized data</param>
-		public virtual object Deserialize(string input, Type targetType)
+		public virtual object Read(string input, Type targetType)
 		{
 			ITextTokenizer<T> tokenizer = this.GetTokenizer();
 			if (tokenizer == null)
@@ -196,7 +196,7 @@ namespace JsonFx.Serialization
 				throw new ArgumentNullException("tokenizer");
 			}
 
-			return this.DeserializeSingle(tokenizer, tokenizer.GetTokens(input), targetType);
+			return this.ReadSingle(tokenizer, tokenizer.GetTokens(input), targetType);
 		}
 
 		/// <summary>
@@ -207,7 +207,7 @@ namespace JsonFx.Serialization
 		/// <remarks>
 		/// character stream => token stream => object stream
 		/// </remarks>
-		public IEnumerable StreamedDeserialize(TextReader input)
+		public IEnumerable ReadMany(TextReader input)
 		{
 			ITextTokenizer<T> tokenizer = this.GetTokenizer();
 			if (tokenizer == null)
@@ -236,7 +236,7 @@ namespace JsonFx.Serialization
 			}
 		}
 
-		private object DeserializeSingle(ITextTokenizer<T> tokenizer, IEnumerable<Token<T>> tokens, Type targetType)
+		private object ReadSingle(ITextTokenizer<T> tokenizer, IEnumerable<Token<T>> tokens, Type targetType)
 		{
 			ITokenAnalyzer<T> analyzer = this.GetAnalyzer();
 			if (analyzer == null)
@@ -273,7 +273,7 @@ namespace JsonFx.Serialization
 			}
 		}
 
-		#endregion Deserialize Methods
+		#endregion Read Methods
 
 		#region Methods
 

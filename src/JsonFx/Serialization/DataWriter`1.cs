@@ -123,7 +123,7 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="output">the output writer</param>
 		/// <param name="data">the data to be serialized</param>
-		public virtual void Serialize(TextWriter output, object data)
+		public virtual void Write(TextWriter output, object data)
 		{
 			IObjectWalker<T> walker = this.GetWalker();
 			if (walker == null)
@@ -157,7 +157,7 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="data">the data to be serialized</param>
 		/// <returns>the serialized data</returns>
-		public virtual string Serialize(object data)
+		public virtual string Write(object data)
 		{
 			IObjectWalker<T> walker = this.GetWalker();
 			if (walker == null)
