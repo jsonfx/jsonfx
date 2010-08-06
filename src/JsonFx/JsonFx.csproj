@@ -162,6 +162,7 @@
     <Compile Include="Linq\ExtensionAttribute.cs" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFrameworkVersion)' != 'v2.0' And '$(TargetFrameworkVersion)' != 'v3.0' ">
+    <Compile Include="Common\CommonReader_Query.cs" />
     <Compile Include="Linq\BaseQueryProvider.cs" />
     <Compile Include="Linq\ExpressionVisitor.cs" />
     <Compile Include="Linq\ExpressionWalker.cs" />

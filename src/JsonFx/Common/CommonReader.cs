@@ -30,27 +30,16 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
 
 using JsonFx.Serialization;
 using JsonFx.Serialization.Filters;
-
-#if !NET20 && !NET30
-using System.Linq;
-
-using JsonFx.Linq;
-#endif
 
 namespace JsonFx.Common
 {
 	/// <summary>
 	/// Provides base implementation for standard deserializers
 	/// </summary>
-	public abstract class CommonReader : DataReader<CommonTokenType>
-#if !NET20 && !NET30
-		, IQueryableReader
-#endif
+	public abstract partial class CommonReader : DataReader<CommonTokenType>
 	{
 		#region Init
 
@@ -74,160 +63,6 @@ namespace JsonFx.Common
 		}
 
 		#endregion Init
-
-		#region Query Methods
-#if !NET20 && !NET30
-
-		/// <summary>
-		/// Begins a query of the given input
-		/// </summary>
-		/// <param name="input">the input reader</param>
-		/// <param name="ignored">a value used to trigger Type inference for <typeparamref name="TResult"/> (e.g. for deserializing anonymous objects)</param>
-		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
-		public IQueryable<TResult> Query<TResult>(TextReader input, TResult ignored)
-		{
-			return this.Query<TResult>(input);
-		}
-
-		/// <summary>
-		/// Begins a query of the given input
-		/// </summary>
-		/// <param name="input">the input reader</param>
-		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
-		public IQueryable<TResult> Query<TResult>(TextReader input)
-		{
-			var tokenizer = this.GetTokenizer();
-			if (tokenizer == null)
-			{
-				throw new InvalidOperationException("Tokenizer is invalid");
-			}
-
-			var source = tokenizer.GetTokens(input);
-
-			return new Query<TResult>(new QueryProvider(this.GetAnalyzer(), source));
-		}
-
-		/// <summary>
-		/// Serializes the data to the given output
-		/// </summary>
-		/// <param name="input">the input reader</param>
-		public IQueryable Query(TextReader input)
-		{
-			var tokenizer = this.GetTokenizer();
-			if (tokenizer == null)
-			{
-				throw new InvalidOperationException("Tokenizer is invalid");
-			}
-
-			var source = tokenizer.GetTokens(input);
-
-			return new Query<object>(new QueryProvider(this.GetAnalyzer(), source));
-		}
-
-		/// <summary>
-		/// Begins a query of the given input
-		/// </summary>
-		/// <param name="input">the input reader</param>
-		/// <param name="targetType">the expected type of the serialized data</param>
-		public IQueryable Query(TextReader input, Type targetType)
-		{
-			var tokenizer = this.GetTokenizer();
-			if (tokenizer == null)
-			{
-				throw new InvalidOperationException("Tokenizer is invalid");
-			}
-
-			var source = tokenizer.GetTokens(input);
-
-			var provider = new QueryProvider(this.GetAnalyzer(), source);
-
-			try
-			{
-				return (IQueryable)Activator.CreateInstance(typeof(Query<>).MakeGenericType(targetType), new object[] { provider });
-			}
-			catch (TargetInvocationException ex)
-			{
-				// unwrap inner exception
-				throw ex.InnerException;
-			}
-		}
-
-		/// <summary>
-		/// Begins a query of the given input
-		/// </summary>
-		/// <param name="input">the input text</param>
-		/// <param name="ignored">a value used to trigger Type inference for <typeparamref name="TResult"/> (e.g. for deserializing anonymous objects)</param>
-		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
-		public IQueryable<TResult> Query<TResult>(string input, TResult ignored)
-		{
-			return this.Query<TResult>(input);
-		}
-
-		/// <summary>
-		/// Begins a query of the given input
-		/// </summary>
-		/// <param name="input">the input text</param>
-		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
-		public IQueryable<TResult> Query<TResult>(string input)
-		{
-			var tokenizer = this.GetTokenizer();
-			if (tokenizer == null)
-			{
-				throw new InvalidOperationException("Tokenizer is invalid");
-			}
-
-			var source = tokenizer.GetTokens(input);
-
-			return new Query<TResult>(new QueryProvider(this.GetAnalyzer(), source));
-		}
-
-		/// <summary>
-		/// Begins a query of the given input
-		/// </summary>
-		/// <param name="input">the input text</param>
-		public IQueryable Query(string input)
-		{
-			var tokenizer = this.GetTokenizer();
-			if (tokenizer == null)
-			{
-				throw new InvalidOperationException("Tokenizer is invalid");
-			}
-
-			var source = tokenizer.GetTokens(input);
-
-			return new Query<object>(new QueryProvider(this.GetAnalyzer(), source));
-		}
-
-		/// <summary>
-		/// Begins a query of the given input
-		/// </summary>
-		/// <param name="input">the input text</param>
-		/// <param name="targetType">the expected type of the serialized data</param>
-		public IQueryable Query(string input, Type targetType)
-		{
-			var tokenizer = this.GetTokenizer();
-			if (tokenizer == null)
-			{
-				throw new InvalidOperationException("Tokenizer is invalid");
-			}
-
-			var source = tokenizer.GetTokens(input);
-
-			var provider = new QueryProvider(this.GetAnalyzer(), source);
-
-			try
-			{
-				return (IQueryable)Activator.CreateInstance(typeof(Query<>).MakeGenericType(targetType), new object[] { provider });
-			}
-			catch (TargetInvocationException ex)
-			{
-				// unwrap inner exception
-				throw ex.InnerException;
-			}
-		}
-
-#endif
-		#endregion Query Methods
 
 		#region IDataReader Methods
 
