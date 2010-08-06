@@ -217,6 +217,33 @@ namespace JsonFx.Linq
 							return m;
 						}
 
+						IEnumerator<Expression> oldEnumerator = m.Arguments.GetEnumerator();
+						IEnumerator<Expression> newEnumerator = args.GetEnumerator();
+						bool argTypesSame = true;
+						while (true)
+						{
+							bool hasNextX = oldEnumerator.MoveNext();
+							bool hasNextY = newEnumerator.MoveNext();
+
+							if (!hasNextX || !hasNextY)
+							{
+								argTypesSame = (hasNextX == hasNextY);
+								break;
+							}
+
+							if (oldEnumerator.Current.Type != newEnumerator.Current.Type)
+							{
+								argTypesSame = false;
+								break;
+							}
+						}
+
+						if (argTypesSame)
+						{
+							// no change
+							return Expression.Call(m.Method, args);
+						}
+
 						Expression[] argArray = args.ToArray();
 						Expression source = argArray[0];
 						if (source != null &&
@@ -324,6 +351,11 @@ namespace JsonFx.Linq
 		private Expression CallAnalyze(Type targetType, Expression sequence, bool asSingle)
 		{
 			Expression analyze;
+
+			if (sequence.Type == typeof(IEnumerable<TokenSequence>))
+			{
+				sequence = Expression.Call(typeof(Enumerable), "AsQueryable", new[] { typeof(TokenSequence) }, sequence);
+			}
 
 			if (sequence.Type == typeof(IQueryable<TokenSequence>))
 			{

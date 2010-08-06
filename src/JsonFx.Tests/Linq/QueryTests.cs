@@ -51,7 +51,7 @@ namespace JsonFx.Linq
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Find_MatchingPropertyFirstOrDefault_ReturnsSingleObject()
+		public void Find_MatchingPropertyToArray_ReturnsSingleObject()
 		{
 			var input = @"
 [
@@ -91,6 +91,38 @@ namespace JsonFx.Linq
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
+		public void Find_MatchingPropertyFirstOrDefault_ReturnsSingleObject()
+		{
+			var input = @"
+{
+	""key"": ""value""
+}";
+
+			var expected =
+				new
+				{
+					Other = "otherValue",
+					Key = "value"
+				};
+
+			var source = new JsonReader().Query(input, new { key=String.Empty });
+
+			var query =
+				from obj in source
+				where obj.key == "value"
+				select new
+				{
+					Other = "otherValue",
+					Key = obj.key
+				};
+
+			var actual = query.FirstOrDefault();
+
+			Assert.Equal(expected, actual, true);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Find_MatchingPropertyToArray_ReturnsArray()
 		{
 			var input = @"
@@ -122,7 +154,7 @@ namespace JsonFx.Linq
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Find_PropertyNoMatch_ReturnsNull()
+		public void Find_PropertyNoMatchFirstOrDefault_ReturnsNull()
 		{
 			var input = @"
 [
