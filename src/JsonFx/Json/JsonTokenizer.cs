@@ -866,7 +866,9 @@ namespace JsonFx.Json
 			/// <returns></returns>
 			public IEnumerable<Token<CommonTokenType>> GetTokens(TextReader reader)
 			{
-				return this.GetTokens(new TextReaderStream(reader));
+				// buffer the output so multiple passes over the results can access it
+				// otherwise second pass would result in empty list since stream is used up
+				return new SequenceBuffer<Token<CommonTokenType>>(this.GetTokens(new TextReaderStream(reader)));
 			}
 
 			/// <summary>
@@ -876,7 +878,9 @@ namespace JsonFx.Json
 			/// <returns></returns>
 			public IEnumerable<Token<CommonTokenType>> GetTokens(string text)
 			{
-				return this.GetTokens(new StringStream(text));
+				// buffer the output so multiple passes over the results can access it
+				// otherwise second pass would result in empty list since stream is used up
+				return new SequenceBuffer<Token<CommonTokenType>>(this.GetTokens(new StringStream(text)));
 			}
 
 			#endregion ITextTokenizer<DataTokenType> Members

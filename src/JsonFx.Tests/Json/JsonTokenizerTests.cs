@@ -326,7 +326,7 @@ namespace JsonFx.Json
 			var tokenizer = new JsonReader.JsonTokenizer();
 			var actual = tokenizer.GetTokens(input).ToArray();
 
-			Assert.Equal(expected, actual);
+			Assert.Equal(expected, actual, false);
 		}
 
 		[Fact]
@@ -1431,5 +1431,43 @@ break""]";
 		}
 
 		#endregion Illegal Sequence Tests
+
+		#region Multiple Pass Tests
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void GetTokens_MultiplePassesOverOutput_ReturnsNestedObjectTokensTwice()
+		{
+			// input from pass3.json in test suite at http://www.json.org/JSON_checker/
+			const string input = @"{
+    ""JSON Test Pattern pass3"": {
+        ""The outermost value"": ""must be an object or array."",
+        ""In this test"": ""It is an object.""
+    }
+}
+";
+
+			var expected = new[]
+			{
+				CommonGrammar.TokenObjectBeginUnnamed,
+				CommonGrammar.TokenProperty("JSON Test Pattern pass3"),
+				CommonGrammar.TokenObjectBeginUnnamed,
+				CommonGrammar.TokenProperty("The outermost value"),
+				CommonGrammar.TokenPrimitive("must be an object or array."),
+				CommonGrammar.TokenProperty("In this test"),
+				CommonGrammar.TokenPrimitive("It is an object."),
+				CommonGrammar.TokenObjectEnd,
+				CommonGrammar.TokenObjectEnd
+			};
+
+			var tokenizer = new JsonReader.JsonTokenizer();
+			var actual = tokenizer.GetTokens(input);
+
+			Assert.Equal(expected, actual.ToArray(), false);
+
+			Assert.Equal(expected, actual.ToArray(), false);
+		}
+
+		#endregion Multiple Pass Tests
 	}
 }

@@ -128,7 +128,7 @@ namespace JsonFx.Common
 				throw new ArgumentNullException("source");
 			}
 
-			IStream<CommonToken> stream = Stream<CommonToken>.Create(source, true);
+			IStream<CommonToken> stream = Stream<CommonToken>.Create(source);
 			if (stream.IsCompleted ||
 				stream.Pop().TokenType != CommonTokenType.ObjectBegin)
 			{
@@ -229,7 +229,7 @@ namespace JsonFx.Common
 				throw new ArgumentNullException("source");
 			}
 
-			IStream<CommonToken> stream = Stream<CommonToken>.Create(source, true);
+			IStream<CommonToken> stream = Stream<CommonToken>.Create(source);
 			if (stream.IsCompleted ||
 				stream.Pop().TokenType != CommonTokenType.ObjectBegin)
 			{
@@ -344,7 +344,7 @@ namespace JsonFx.Common
 				throw new ArgumentNullException("source");
 			}
 
-			IStream<CommonToken> stream = Stream<CommonToken>.Create(source, true);
+			IStream<CommonToken> stream = Stream<CommonToken>.Create(source);
 			if (stream.IsCompleted ||
 				stream.Pop().TokenType != CommonTokenType.ArrayBegin)
 			{
@@ -467,11 +467,7 @@ namespace JsonFx.Common
 
 			return CommonSubsequencer.ToEnumerable(source);
 
-			// BUG: This executes only once
-			//using (var stream = Stream<CommonToken>.Create(source, true))
-			//{
-			//    return Values(stream);
-			//}
+			//return CommonSubsequencer.Values(source);
 		}
 
 		private static IEnumerable<TokenSequence> ToEnumerable(TokenSequence source)
@@ -479,11 +475,14 @@ namespace JsonFx.Common
 			yield return source;
 		}
 
-		private static IEnumerable<TokenSequence> Values(IStream<CommonToken> stream)
+		private static IEnumerable<TokenSequence> SplitValues(TokenSequence source)
 		{
-			while (!stream.IsCompleted)
+			using (var stream = Stream<CommonToken>.Create(source, true))
 			{
-				yield return CommonSubsequencer.SpliceNextValueLazy(stream);
+				while (!stream.IsCompleted)
+				{
+					yield return CommonSubsequencer.SpliceNextValueLazy(stream);
+				}
 			}
 		}
 

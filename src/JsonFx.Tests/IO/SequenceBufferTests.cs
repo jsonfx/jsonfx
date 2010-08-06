@@ -31,6 +31,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 using Xunit;
 
@@ -47,20 +48,9 @@ namespace JsonFx.IO
 
 		#region Enumerable Tests
 
-		private IEnumerable<T> EnsureEnumerable<T>(IEnumerable<T> sequence)
-		{
-			if (sequence != null)
-			{
-				foreach (T item in sequence)
-				{
-					yield return item;
-				}
-			}
-		}
-
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Enumerate_NullString_ReturnsEmptySequence()
+		public void WrapInput_NullString_ReturnsEmptySequence()
 		{
 			var buffer = new SequenceBuffer<char>(null);
 
@@ -69,7 +59,7 @@ namespace JsonFx.IO
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Enumerate_EmptyString_ReturnsEmptySequence()
+		public void WrapInput_EmptyString_ReturnsEmptySequence()
 		{
 			var input = "".ToCharArray();
 
@@ -80,7 +70,7 @@ namespace JsonFx.IO
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Enumerate_OneCharString_ReturnsSameSequence()
+		public void WrapInput_OneCharString_ReturnsSameSequence()
 		{
 			char[] input = "_".ToCharArray();
 
@@ -91,7 +81,7 @@ namespace JsonFx.IO
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Enumerate_LongString_ReturnsSameSequence()
+		public void WrapInput_LongString_ReturnsSameSequence()
 		{
 			char[] input = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
 
@@ -102,7 +92,7 @@ namespace JsonFx.IO
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Enumerate_EscapedSequence_ReturnsSameSequence()
+		public void WrapInput_EscapedSequence_ReturnsSameSequence()
 		{
 			char[] input = @"""\\\b\f\n\r\t\u0123\u4567\u89AB\uCDEF\uabcd\uef4A\""""".ToCharArray();
 
@@ -113,7 +103,7 @@ namespace JsonFx.IO
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Enumerate_UnicodeString_ReturnsSameSequence()
+		public void WrapInput_UnicodeString_ReturnsSameSequence()
 		{
 			char[] input = "私が日本語を話すことはありません。".ToCharArray();
 
@@ -124,7 +114,7 @@ namespace JsonFx.IO
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Enumerate_LongStringTwice_ReturnsSameSequence()
+		public void WrapInput_LongStringTwice_ReturnsSameSequence()
 		{
 			char[] input = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
 
@@ -139,6 +129,84 @@ namespace JsonFx.IO
 			Assert.Equal(expected, actual);
 		}
 
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void NonWrapedResult_LongStringTwice_Fails()
+		{
+			const string input = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+			var sequence = this.GetSequence(new StringStream(input));
+
+			var buffer = new StringBuilder();
+			foreach (char ch in sequence)
+			{
+				buffer.Append(ch);
+			}
+
+			Assert.Equal(input, buffer.ToString());
+
+			buffer.Clear();
+			foreach (char ch in sequence)
+			{
+				buffer.Append(ch);
+			}
+
+			// Fails to iterate a second time
+			Assert.Equal("", buffer.ToString());
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void WrapResult_LongStringTwice_ReturnsSameSequence()
+		{
+			const string input = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+			var sequence = new SequenceBuffer<char>(this.GetSequence(new StringStream(input)));
+
+			var buffer = new StringBuilder();
+			foreach (char ch in sequence)
+			{
+				buffer.Append(ch);
+			}
+
+			Assert.Equal(input, buffer.ToString());
+
+			buffer.Clear();
+			foreach (char ch in sequence)
+			{
+				buffer.Append(ch);
+			}
+
+			// wrapped version iterates multiple times
+			Assert.Equal(input, buffer.ToString());
+		}
+
 		#endregion Enumerable Tests
+
+		#region Methods
+
+		private IEnumerable<T> EnsureEnumerable<T>(IEnumerable<T> sequence)
+		{
+			if (sequence != null)
+			{
+				foreach (T item in sequence)
+				{
+					yield return item;
+				}
+			}
+		}
+
+		public IEnumerable<char> GetSequence(ITextStream stream)
+		{
+			using (stream)
+			{
+				while (!stream.IsCompleted)
+				{
+					yield return stream.Pop();
+				}
+			}
+		}
+
+		#endregion Methods
 	}
 }

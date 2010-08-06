@@ -102,8 +102,7 @@ namespace JsonFx.Common
 				throw new InvalidOperationException("Tokenizer is invalid");
 			}
 
-			// TODO: fix CommonSubsequencer with true enumerables
-			var source = tokenizer.GetTokens(input).ToArray();
+			var source = tokenizer.GetTokens(input);
 
 			return new Query<TResult>(new QueryProvider(this.GetAnalyzer(), source));
 		}
@@ -120,8 +119,7 @@ namespace JsonFx.Common
 				throw new InvalidOperationException("Tokenizer is invalid");
 			}
 
-			// TODO: fix CommonSubsequencer with true enumerables
-			var source = tokenizer.GetTokens(input).ToArray();
+			var source = tokenizer.GetTokens(input);
 
 			return new Query<object>(new QueryProvider(this.GetAnalyzer(), source));
 		}
@@ -139,8 +137,7 @@ namespace JsonFx.Common
 				throw new InvalidOperationException("Tokenizer is invalid");
 			}
 
-			// TODO: fix CommonSubsequencer with true enumerables
-			var source = tokenizer.GetTokens(input).ToArray();
+			var source = tokenizer.GetTokens(input);
 
 			var provider = new QueryProvider(this.GetAnalyzer(), source);
 
@@ -179,8 +176,7 @@ namespace JsonFx.Common
 				throw new InvalidOperationException("Tokenizer is invalid");
 			}
 
-			// TODO: fix CommonSubsequencer with true enumerables
-			var source = tokenizer.GetTokens(input).ToArray();
+			var source = tokenizer.GetTokens(input);
 
 			return new Query<TResult>(new QueryProvider(this.GetAnalyzer(), source));
 		}
@@ -197,8 +193,7 @@ namespace JsonFx.Common
 				throw new InvalidOperationException("Tokenizer is invalid");
 			}
 
-			// TODO: fix CommonSubsequencer with true enumerables
-			var source = tokenizer.GetTokens(input).ToArray();
+			var source = tokenizer.GetTokens(input);
 
 			return new Query<object>(new QueryProvider(this.GetAnalyzer(), source));
 		}
@@ -216,8 +211,7 @@ namespace JsonFx.Common
 				throw new InvalidOperationException("Tokenizer is invalid");
 			}
 
-			// TODO: fix CommonSubsequencer with true enumerables
-			var source = tokenizer.GetTokens(input).ToArray();
+			var source = tokenizer.GetTokens(input);
 
 			var provider = new QueryProvider(this.GetAnalyzer(), source);
 
