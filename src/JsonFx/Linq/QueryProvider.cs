@@ -54,16 +54,6 @@ namespace JsonFx.Linq
 		/// Ctor
 		/// </summary>
 		/// <param name="analyzer"></param>
-		/// <param name="sequence"></param>
-		public QueryProvider(ITokenAnalyzer<CommonTokenType> analyzer, TokenSequence sequence)
-			: this(analyzer, (sequence != null) ? sequence.Values() : null)
-		{
-		}
-
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="analyzer"></param>
 		/// <param name="sequences"></param>
 		public QueryProvider(ITokenAnalyzer<CommonTokenType> analyzer, IEnumerable<TokenSequence> sequences)
 		{

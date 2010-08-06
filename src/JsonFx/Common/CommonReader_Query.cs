@@ -70,7 +70,7 @@ namespace JsonFx.Common
 
 			var source = tokenizer.GetTokens(input);
 
-			return new Query<TResult>(new QueryProvider(this.GetAnalyzer(), source));
+			return new Query<TResult>(new QueryProvider(this.GetAnalyzer(), source.Values()));
 		}
 
 		/// <summary>
@@ -87,7 +87,7 @@ namespace JsonFx.Common
 
 			var source = tokenizer.GetTokens(input);
 
-			return new Query<object>(new QueryProvider(this.GetAnalyzer(), source));
+			return new Query<object>(new QueryProvider(this.GetAnalyzer(), source.Values()));
 		}
 
 		/// <summary>
@@ -105,7 +105,7 @@ namespace JsonFx.Common
 
 			var source = tokenizer.GetTokens(input);
 
-			var provider = new QueryProvider(this.GetAnalyzer(), source);
+			var provider = new QueryProvider(this.GetAnalyzer(), source.Values());
 
 			try
 			{
@@ -144,7 +144,7 @@ namespace JsonFx.Common
 
 			var source = tokenizer.GetTokens(input);
 
-			return new Query<TResult>(new QueryProvider(this.GetAnalyzer(), source));
+			return new Query<TResult>(new QueryProvider(this.GetAnalyzer(), source.Values()));
 		}
 
 		/// <summary>
@@ -161,7 +161,7 @@ namespace JsonFx.Common
 
 			var source = tokenizer.GetTokens(input);
 
-			return new Query<object>(new QueryProvider(this.GetAnalyzer(), source));
+			return new Query<object>(new QueryProvider(this.GetAnalyzer(), source.Values()));
 		}
 
 		/// <summary>
@@ -179,7 +179,159 @@ namespace JsonFx.Common
 
 			var source = tokenizer.GetTokens(input);
 
-			var provider = new QueryProvider(this.GetAnalyzer(), source);
+			var provider = new QueryProvider(this.GetAnalyzer(), source.Values());
+
+			try
+			{
+				return (IQueryable)Activator.CreateInstance(typeof(Query<>).MakeGenericType(targetType), new object[] { provider });
+			}
+			catch (TargetInvocationException ex)
+			{
+				// unwrap inner exception
+				throw ex.InnerException;
+			}
+		}
+
+		#endregion Query Methods
+
+		#region Descendants Methods
+
+		/// <summary>
+		/// Begins a query of the given input
+		/// </summary>
+		/// <param name="input">the input reader</param>
+		/// <param name="ignored">a value used to trigger Type inference for <typeparamref name="TResult"/> (e.g. for deserializing anonymous objects)</param>
+		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
+		public IQueryable<TResult> Descendants<TResult>(TextReader input, TResult ignored)
+		{
+			return this.Descendants<TResult>(input);
+		}
+
+		/// <summary>
+		/// Begins a query of the given input
+		/// </summary>
+		/// <param name="input">the input reader</param>
+		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
+		public IQueryable<TResult> Descendants<TResult>(TextReader input)
+		{
+			var tokenizer = this.GetTokenizer();
+			if (tokenizer == null)
+			{
+				throw new InvalidOperationException("Tokenizer is invalid");
+			}
+
+			var source = tokenizer.GetTokens(input);
+
+			return new Query<TResult>(new QueryProvider(this.GetAnalyzer(), source.Descendants()));
+		}
+
+		/// <summary>
+		/// Serializes the data to the given output
+		/// </summary>
+		/// <param name="input">the input reader</param>
+		public IQueryable Descendants(TextReader input)
+		{
+			var tokenizer = this.GetTokenizer();
+			if (tokenizer == null)
+			{
+				throw new InvalidOperationException("Tokenizer is invalid");
+			}
+
+			var source = tokenizer.GetTokens(input);
+
+			return new Query<object>(new QueryProvider(this.GetAnalyzer(), source.Descendants()));
+		}
+
+		/// <summary>
+		/// Begins a query of the given input
+		/// </summary>
+		/// <param name="input">the input reader</param>
+		/// <param name="targetType">the expected type of the serialized data</param>
+		public IQueryable Descendants(TextReader input, Type targetType)
+		{
+			var tokenizer = this.GetTokenizer();
+			if (tokenizer == null)
+			{
+				throw new InvalidOperationException("Tokenizer is invalid");
+			}
+
+			var source = tokenizer.GetTokens(input);
+
+			var provider = new QueryProvider(this.GetAnalyzer(), source.Descendants());
+
+			try
+			{
+				return (IQueryable)Activator.CreateInstance(typeof(Query<>).MakeGenericType(targetType), new object[] { provider });
+			}
+			catch (TargetInvocationException ex)
+			{
+				// unwrap inner exception
+				throw ex.InnerException;
+			}
+		}
+
+		/// <summary>
+		/// Begins a query of the given input
+		/// </summary>
+		/// <param name="input">the input text</param>
+		/// <param name="ignored">a value used to trigger Type inference for <typeparamref name="TResult"/> (e.g. for deserializing anonymous objects)</param>
+		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
+		public IQueryable<TResult> Descendants<TResult>(string input, TResult ignored)
+		{
+			return this.Descendants<TResult>(input);
+		}
+
+		/// <summary>
+		/// Begins a query of the given input
+		/// </summary>
+		/// <param name="input">the input text</param>
+		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
+		public IQueryable<TResult> Descendants<TResult>(string input)
+		{
+			var tokenizer = this.GetTokenizer();
+			if (tokenizer == null)
+			{
+				throw new InvalidOperationException("Tokenizer is invalid");
+			}
+
+			var source = tokenizer.GetTokens(input);
+
+			return new Query<TResult>(new QueryProvider(this.GetAnalyzer(), source.Descendants()));
+		}
+
+		/// <summary>
+		/// Begins a query of the given input
+		/// </summary>
+		/// <param name="input">the input text</param>
+		public IQueryable Descendants(string input)
+		{
+			var tokenizer = this.GetTokenizer();
+			if (tokenizer == null)
+			{
+				throw new InvalidOperationException("Tokenizer is invalid");
+			}
+
+			var source = tokenizer.GetTokens(input);
+
+			return new Query<object>(new QueryProvider(this.GetAnalyzer(), source.Descendants()));
+		}
+
+		/// <summary>
+		/// Begins a query of the given input
+		/// </summary>
+		/// <param name="input">the input text</param>
+		/// <param name="targetType">the expected type of the serialized data</param>
+		public IQueryable Descendants(string input, Type targetType)
+		{
+			var tokenizer = this.GetTokenizer();
+			if (tokenizer == null)
+			{
+				throw new InvalidOperationException("Tokenizer is invalid");
+			}
+
+			var source = tokenizer.GetTokens(input);
+
+			var provider = new QueryProvider(this.GetAnalyzer(), source.Descendants());
 
 			try
 			{

@@ -355,11 +355,13 @@ namespace JsonFx.Linq
 
 			if (sequence.Type == typeof(IEnumerable<TokenSequence>))
 			{
-				sequence = Expression.Call(typeof(Enumerable), "AsQueryable", new[] { typeof(TokenSequence) }, sequence);
+				sequence = Expression.Call(typeof(Queryable), "AsQueryable", new[] { typeof(TokenSequence) }, sequence);
 			}
 
 			if (sequence.Type == typeof(IQueryable<TokenSequence>))
 			{
+				sequence = Expression.Call(typeof(Queryable), "DefaultIfEmpty", new[] { typeof(TokenSequence) }, sequence, Expression.Call(typeof(Enumerable), "Empty", new[] { typeof(Token<CommonTokenType>) }));
+
 				// lambda to analyze each sequence stream
 				ParameterExpression p = Expression.Parameter(typeof(TokenSequence), "sequence");
 				analyze = Expression.Lambda(Expression.Call(Expression.Constant(this.Analyzer), "Analyze", new[] { targetType }, p), p);
@@ -369,6 +371,8 @@ namespace JsonFx.Linq
 			}
 			else
 			{
+				sequence = Expression.Coalesce(sequence, Expression.Call(typeof(Enumerable), "Empty", new[] { typeof(Token<CommonTokenType>) }));
+
 				// analyze sequence stream
 				analyze = Expression.Call(Expression.Constant(this.Analyzer), "Analyze", new[] { targetType }, sequence);
 			}
