@@ -30,6 +30,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 
 using JsonFx.Common;
@@ -338,6 +339,41 @@ namespace JsonFx.Serialization
 					CommonGrammar.TokenPrimitive(2),
 					CommonGrammar.TokenProperty("Three"),
 					CommonGrammar.TokenPrimitive(3),
+					CommonGrammar.TokenObjectEnd
+				};
+
+			var walker = new CommonWalker(new DataWriterSettings());
+			var actual = walker.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void GetTokens_ObjectExpando_ReturnsObjectTokens()
+		{
+			dynamic input = new ExpandoObject();
+
+			input.foo = true;
+			input.array = new object[]
+			{
+				false, 1, 2, Math.PI, null, "hello world."
+			};
+
+			var expected = new[]
+				{
+					CommonGrammar.TokenObjectBegin("object"),
+					CommonGrammar.TokenProperty("foo"),
+					CommonGrammar.TokenPrimitive(true),
+					CommonGrammar.TokenProperty("array"),
+					CommonGrammar.TokenArrayBegin("array"),
+					CommonGrammar.TokenPrimitive(false),
+					CommonGrammar.TokenPrimitive(1),
+					CommonGrammar.TokenPrimitive(2),
+					CommonGrammar.TokenPrimitive(Math.PI),
+					CommonGrammar.TokenPrimitive(null),
+					CommonGrammar.TokenPrimitive("hello world."),
+					CommonGrammar.TokenArrayEnd,
 					CommonGrammar.TokenObjectEnd
 				};
 
