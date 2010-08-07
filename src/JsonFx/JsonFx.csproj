@@ -174,9 +174,6 @@
     <Compile Include="Linq\QueryProvider.cs" />
     <Compile Include="Linq\Query`1.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="Readme.txt" />
-  </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
