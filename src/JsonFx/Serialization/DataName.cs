@@ -47,9 +47,6 @@ namespace JsonFx.Serialization
 	{
 		#region Constants
 
-		private const string AnonymousTypePrefix = "<>f__AnonymousType";
-		private static readonly string TypeGenericIDictionary = typeof(IDictionary<,>).FullName;
-
 		public static readonly DataName Empty = new DataName();
 
 		#endregion Constants
@@ -261,7 +258,7 @@ namespace JsonFx.Serialization
 				}
 			}
 
-			if (typeof(IDictionary).IsAssignableFrom(type) || type.GetInterface(DataName.TypeGenericIDictionary) != null)
+			if (typeof(IDictionary).IsAssignableFrom(type) || type.GetInterface(TypeCoercionUtility.TypeGenericIDictionary, false) != null)
 			{
 				// generic IDictionary or IDictionary<,>
 				return "object";
@@ -275,7 +272,12 @@ namespace JsonFx.Serialization
 
 			bool isGeneric = type.IsGenericType;
 
-			if ((isGeneric && type.Name.StartsWith(DataName.AnonymousTypePrefix, false, CultureInfo.InvariantCulture)))
+			if ((isGeneric &&
+#if SILVERLIGHT
+				type.Name.StartsWith(TypeCoercionUtility.AnonymousTypePrefix, StringComparison.InvariantCulture)))
+#else
+				type.Name.StartsWith(TypeCoercionUtility.AnonymousTypePrefix, false, CultureInfo.InvariantCulture)))
+#endif
 			{
 				return "object";
 			}

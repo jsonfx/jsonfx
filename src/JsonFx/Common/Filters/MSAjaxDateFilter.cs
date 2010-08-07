@@ -49,19 +49,23 @@ namespace JsonFx.Common.Filters
 	/// </remarks>
 	public class MSAjaxDateFilter : CommonFilter<DateTime>
 	{
-		#region Constant
+		#region Constants
 
 		private static readonly DateTime EcmaScriptEpoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
 		private static readonly long MinValueMilliseconds = -62135596800000L;
 		private static readonly long MaxValueMilliseconds = 253402300800000L;
 
 		private const string MSAjaxDatePattern = @"^\\/Date\(([+\-]?\d+?)\)\\/$";
-		private static readonly Regex MSAjaxDateRegex = new Regex(MSAjaxDatePattern, RegexOptions.Compiled|RegexOptions.CultureInvariant|RegexOptions.ECMAScript);
+		private static readonly Regex MSAjaxDateRegex = new Regex(MSAjaxDatePattern,
+#if !SILVERLIGHT
+			RegexOptions.Compiled|
+#endif
+			RegexOptions.CultureInvariant|RegexOptions.ECMAScript);
 
 		private const string MSAjaxDatePrefix = @"\/Date(";
 		private const string MSAjaxDateSuffix = @")\/";
 
-		#endregion Constant
+		#endregion Constants
 
 		#region IDataFilter<DataTokenType,DateTime> Members
 

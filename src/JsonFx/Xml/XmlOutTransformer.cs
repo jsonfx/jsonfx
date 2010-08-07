@@ -37,6 +37,12 @@ using JsonFx.IO;
 using JsonFx.Markup;
 using JsonFx.Serialization;
 
+#if SILVERLIGHT
+using CanonicalList=System.Collections.Generic.Dictionary<JsonFx.Serialization.DataName, JsonFx.Serialization.Token<JsonFx.Common.CommonTokenType>>;
+#else
+using CanonicalList=System.Collections.Generic.SortedList<JsonFx.Serialization.DataName, JsonFx.Serialization.Token<JsonFx.Common.CommonTokenType>>;
+#endif
+
 namespace JsonFx.Xml
 {
 	public partial class XmlWriter
@@ -271,7 +277,7 @@ namespace JsonFx.Xml
 				propertyName = this.EncodeName(propertyName.IsEmpty ? token.Name : propertyName, typeof(Object));
 
 				bool needsBeginTag = true;
-				SortedList<DataName, Token<CommonTokenType>> attributes = null;
+				IDictionary<DataName, Token<CommonTokenType>> attributes = null;
 
 				bool needsValueDelim = false;
 				while (!input.IsCompleted)
@@ -325,7 +331,7 @@ namespace JsonFx.Xml
 									if (attributes == null)
 									{
 										// allocate and sort attributes
-										attributes = new SortedList<DataName, Token<CommonTokenType>>();
+										attributes = new CanonicalList();
 									}
 									DataName attrName = token.Name;
 
@@ -393,7 +399,7 @@ namespace JsonFx.Xml
 
 			#region Emit MarkupTokenType Methods
 
-			private void EmitTag(List<Token<MarkupTokenType>> output, DataName elementName, SortedList<DataName, Token<CommonTokenType>> attributes, MarkupTokenType tagType)
+			private void EmitTag(List<Token<MarkupTokenType>> output, DataName elementName, IDictionary<DataName, Token<CommonTokenType>> attributes, MarkupTokenType tagType)
 			{
 				if (this.pendingNewLine)
 				{

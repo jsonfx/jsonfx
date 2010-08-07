@@ -53,8 +53,11 @@ namespace JsonFx.Serialization
 	{
 		#region Constants
 
-		private static readonly string TypeGenericIEnumerable = typeof(IEnumerable<>).FullName;
-		private static readonly string TypeGenericIDictionary = typeof(IDictionary<,>).FullName;
+		internal const string AnonymousTypePrefix = "<>f__AnonymousType";
+
+		internal static readonly string TypeGenericIEnumerable = typeof(IEnumerable<>).FullName;
+		internal static readonly string TypeGenericICollection = typeof(ICollection<>).FullName;
+		internal static readonly string TypeGenericIDictionary = typeof(IDictionary<,>).FullName;
 
 		private const string ErrorNullValueType = "{0} does not accept null as a value";
 		private const string ErrorCtor = "Unable to find a suitable constructor for instantiating the target Type. ({0})";
@@ -202,7 +205,7 @@ namespace JsonFx.Serialization
 			{
 				((IDictionary)target)[memberName] = memberValue;
 			}
-			else if (targetType != null && targetType.GetInterface(TypeCoercionUtility.TypeGenericIDictionary) != null)
+			else if (targetType != null && targetType.GetInterface(TypeCoercionUtility.TypeGenericIDictionary, false) != null)
 			{
 				throw new TypeCoercionException(String.Format(
 					TypeCoercionUtility.ErrorGenericIDictionary,
@@ -278,7 +281,7 @@ namespace JsonFx.Serialization
 						}
 					}
 
-					return Enum.Parse(targetType, (string)value);
+					return Enum.Parse(targetType, (string)value, false);
 				}
 				else
 				{
@@ -358,6 +361,7 @@ namespace JsonFx.Serialization
 				return new TimeSpan((long)this.CoerceType(typeof(Int64), value));
 			}
 
+#if !SILVERLIGHT
 			TypeConverter converter = TypeDescriptor.GetConverter(targetType);
 			if (converter.CanConvertFrom(actualType))
 			{
@@ -369,11 +373,12 @@ namespace JsonFx.Serialization
 			{
 				return converter.ConvertTo(value, targetType);
 			}
+#endif
 
 			try
 			{
 				// fall back to basics
-				return Convert.ChangeType(value, targetType);
+				return Convert.ChangeType(value, targetType, CultureInfo.InvariantCulture);
 			}
 			catch (Exception ex)
 			{
@@ -541,20 +546,21 @@ namespace JsonFx.Serialization
 					targetType.FullName));
 			}
 
-			object collection = factory.Ctor();
-
 			// attempt bulk insert first as is most efficient
 			if (factory.AddRange != null &&
 				factory.AddRangeType != null &&
 				factory.AddRangeType.IsAssignableFrom(valueType))
 			{
+				object collection = factory.Ctor();
 				factory.AddRange(collection, value);
+				return collection;
 			}
 
 			// attempt sequence of single inserts next
 			if (factory.Add != null &&
 				factory.AddType != null)
 			{
+				object collection = factory.Ctor();
 				Type addType = factory.AddType;
 
 				// loop through adding items to collection
@@ -562,12 +568,13 @@ namespace JsonFx.Serialization
 				{
 					factory.Add(collection, this.CoerceType(addType, item));
 				}
+				return collection;
 			}
 
 			try
 			{
 				// finally fall back to basics
-				return Convert.ChangeType(value, targetType);
+				return Convert.ChangeType(value, targetType, CultureInfo.InvariantCulture);
 			}
 			catch (Exception ex)
 			{
@@ -580,22 +587,18 @@ namespace JsonFx.Serialization
 			}
 		}
 
-		internal object CoerceArrayList(Type targetType, Type itemType, ArrayList value)
+		internal object CoerceCollection(Type targetType, Type itemType, ICollection value)
 		{
 			if (targetType != null && targetType != typeof(object))
 			{
-				// convert to requested array type
-				return this.CoerceList(targetType, typeof(ArrayList), value);
+				// convert to requested type
+				return this.CoerceList(targetType, value.GetType(), value);
 			}
 
-			if (itemType != null && itemType != typeof(object))
-			{
-				// if all items are of same type then convert to array of that type
-				return value.ToArray(itemType);
-			}
-
-			// convert to an object array for consistency
-			return value.ToArray();
+			// if all items are of same type then convert to array of that type
+			Array array = Array.CreateInstance(itemType ?? typeof(object), value.Count);
+			value.CopyTo(array, 0);
+			return array;
 		}
 
 		/// <summary>
@@ -606,30 +609,24 @@ namespace JsonFx.Serialization
 		/// <returns></returns>
 		private Array CoerceArray(Type itemType, IEnumerable value)
 		{
-			ArrayList target = value as ArrayList;
-
-			if (target == null)
+			ICollection collection = value as ICollection;
+			if (collection == null)
 			{
-				// attempt to ensure enough room
-				target = (value is ICollection) ?
-					new ArrayList(((ICollection)value).Count) :
-					new ArrayList();
+				List<object> list = new List<object>();
 
 				foreach (object item in value)
 				{
 					// convert each as is added
-					target.Add(this.CoerceType(itemType, item));
+					list.Add(this.CoerceType(itemType, item));
 				}
+
+				collection = list;
 			}
 
-			if (itemType != null && itemType != typeof(object))
-			{
-				// if all items are of same type then convert to array of that type
-				return target.ToArray(itemType);
-			}
-
-			// convert to an object array for consistency
-			return target.ToArray();
+			// if all items are of same type then convert to array of that type
+			Array array = Array.CreateInstance(itemType ?? typeof(object), collection.Count);
+			collection.CopyTo(array, 0);
+			return array;
 		}
 
 		#endregion Coercion Methods
@@ -699,7 +696,7 @@ namespace JsonFx.Serialization
 				return null;
 			}
 
-			Type dictionaryType = targetType.GetInterface(TypeCoercionUtility.TypeGenericIDictionary);
+			Type dictionaryType = targetType.GetInterface(TypeCoercionUtility.TypeGenericIDictionary, false);
 			if (dictionaryType == null)
 			{
 				// not an IDictionary<TKey, TVal>
@@ -739,7 +736,7 @@ namespace JsonFx.Serialization
 				return targetType.GetElementType();
 			}
 
-			Type arrayType = targetType.GetInterface(TypeCoercionUtility.TypeGenericIEnumerable);
+			Type arrayType = targetType.GetInterface(TypeCoercionUtility.TypeGenericIEnumerable, false);
 			if (arrayType == null)
 			{
 				// not an IEnumerable<T>

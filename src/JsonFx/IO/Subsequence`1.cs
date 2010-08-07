@@ -41,7 +41,7 @@ namespace JsonFx.IO
 	{
 		#region Enumerator
 
-		private sealed class Enumerator : IEnumerator<T>, ICloneable
+		private sealed class Enumerator : IEnumerator<T>
 		{
 			#region Fields
 
@@ -116,15 +116,6 @@ namespace JsonFx.IO
 
 			#endregion IEnumerator Members
 
-			#region ICloneable Members
-
-			public object Clone()
-			{
-				return base.MemberwiseClone();
-			}
-
-			#endregion ICloneable Members
-
 			#region IDisposable Members
 
 			void IDisposable.Dispose()
@@ -186,6 +177,7 @@ namespace JsonFx.IO
 
 		public int IndexOf(T item)
 		{
+#if !SILVERLIGHT
 			T[] array = this.Items as T[];
 			if (array != null)
 			{
@@ -204,6 +196,7 @@ namespace JsonFx.IO
 					this.Size,
 					n => Object.Equals(n, item));
 			}
+#endif
 
 			int endIndex = this.Start + this.Size;
 			for (int i = this.Start; i < endIndex; i++)

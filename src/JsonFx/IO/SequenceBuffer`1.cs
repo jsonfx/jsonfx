@@ -41,7 +41,7 @@ namespace JsonFx.IO
 	{
 		#region Enumerator
 
-		private sealed class Enumerator : IEnumerator<T>, ICloneable
+		private sealed class Enumerator : IEnumerator<T>
 		{
 			#region Fields
 
@@ -110,15 +110,6 @@ namespace JsonFx.IO
 			}
 
 			#endregion IEnumerator Members
-
-			#region ICloneable Members
-
-			public object Clone()
-			{
-				return base.MemberwiseClone();
-			}
-
-			#endregion ICloneable Members
 
 			#region IDisposable Members
 

@@ -37,7 +37,7 @@ using JsonFx.CodeGen;
 
 namespace JsonFx.Serialization.Resolvers
 {
-#if NET40
+#if NET40 && !SILVERLIGHT
 	using EnumCacheDictionary=System.Collections.Concurrent.ConcurrentDictionary<Type, IDictionary<Enum, string>>;
 	using FactoriesDictionary=System.Collections.Concurrent.ConcurrentDictionary<Type, FactoryMap>;
 	using MemberCacheDictionary=System.Collections.Concurrent.ConcurrentDictionary<Type, IDictionary<string, MemberMap>>;
@@ -237,8 +237,8 @@ namespace JsonFx.Serialization.Resolvers
 
 				Type argType = paramList[0].ParameterType;
 				if ((argType == typeof(string)) ||
-					((argType.GetInterface(typeof(IEnumerable<>).FullName) == null) &&
-					(argType.GetInterface(typeof(IEnumerable).FullName) == null)))
+					((argType.GetInterface(TypeCoercionUtility.TypeGenericIEnumerable, false) == null) &&
+					(typeof(IEnumerable).IsAssignableFrom(argType))))
 				{
 					continue;
 				}
@@ -268,7 +268,7 @@ namespace JsonFx.Serialization.Resolvers
 
 			// many collection types have an Add method
 			// which adds items one at a time
-			Type collectionType = type.GetInterface(typeof(ICollection<>).FullName);
+			Type collectionType = type.GetInterface(TypeCoercionUtility.TypeGenericICollection, false);
 			if (collectionType != null)
 			{
 				methodInfo = collectionType.GetMethod("Add");

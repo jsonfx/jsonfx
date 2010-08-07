@@ -431,6 +431,38 @@ namespace JsonFx.CodeGen
 
 		#region Method Generators
 
+		public static ProxyDelegate GetMethodProxy(Type declaringType, string methodName, params Type[] argTypes)
+		{
+			if (declaringType == null)
+			{
+				throw new ArgumentNullException("declaringType");
+			}
+			if (String.IsNullOrEmpty(methodName))
+			{
+				throw new ArgumentNullException("methodName");
+			}
+
+
+			MethodInfo methodInfo;
+			if (argTypes.Length > 0)
+			{
+				methodInfo = declaringType.GetMethod(
+					methodName,
+					BindingFlags.Instance|BindingFlags.Static|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.FlattenHierarchy,
+					null,
+					argTypes,
+					null);
+			}
+			else
+			{
+				methodInfo = declaringType.GetMethod(
+					methodName,
+					BindingFlags.Instance|BindingFlags.Static|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.FlattenHierarchy);
+			}
+
+			return DynamicMethodGenerator.GetMethodProxy(methodInfo);
+		}
+
 		/// <summary>
 		/// Creates a proxy delegate accepting a target instance and corresponding arguments
 		/// </summary>

@@ -39,12 +39,20 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCompany("http://jsonfx.net")]
 
 [assembly: AssemblyConfiguration(
+#if SILVERLIGHT
+"Silverlight "+
+#else
+".NET "+
+#endif
+
 #if NET40
-".NET 4.0 "+
+"4.0 "+
 #elif NET35
-".NET 3.5 "+
+"3.5 "+
+#elif NET30
+"3.0 "+
 #elif NET20
-".NET 2.0 "+
+"2.0 "+
 #endif
 
 #if DEBUG

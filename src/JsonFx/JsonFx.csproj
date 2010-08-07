@@ -7,15 +7,26 @@
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{3082284B-B579-4808-A4A4-D88DDA4025CB}</ProjectGuid>
+    <ProjectTypeGuids Condition=" '$(TargetFrameworkIdentifier)' == 'Silverlight' ">{A1591282-1198-4647-A2B1-27E5FF5F6F3B};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>JsonFx</RootNamespace>
     <AssemblyName>JsonFx</AssemblyName>
-    <OutputPath>..\..\build\$(Configuration)_$(TargetFrameworkVersion)</OutputPath>
-    <DocumentationFile>..\..\build\$(Configuration)_$(TargetFrameworkVersion)\JsonFx.XML</DocumentationFile>
+    <OutputPath>..\..\build\$(TargetFrameworkIdentifier)$(Configuration)_$(TargetFrameworkVersion)</OutputPath>
+    <DocumentationFile>..\..\build\$(TargetFrameworkIdentifier)$(Configuration)_$(TargetFrameworkVersion)\JsonFx.XML</DocumentationFile>
     <MapFileExtensions>true</MapFileExtensions>
     <UseApplicationTrust>false</UseApplicationTrust>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkProfile Condition=" '$(TargetFrameworkIdentifier)' != 'Silverlight' ">Client</TargetFrameworkProfile>
+    <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
+    <SilverlightApplication>false</SilverlightApplication>
+    <ValidateXaml>true</ValidateXaml>
+    <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
+  </PropertyGroup>
+  <!-- This property group is only here to support building this project using the 
+       MSBuild 3.5 toolset. In order to work correctly with this older toolset, it needs 
+       to set the TargetFrameworkVersion to v3.5 -->
+  <PropertyGroup Condition="'$(MSBuildToolsVersion)' == '3.5'">
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -61,6 +72,14 @@
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFrameworkIdentifier)' == 'Silverlight' ">
+    <DefineConstants>$(DefineConstants);SILVERLIGHT</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+  </PropertyGroup>
+  <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == 'Silverlight' ">
+    <Reference Include="mscorlib" />
+  </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.XML" />
@@ -175,5 +194,6 @@
     <Compile Include="Linq\Query`1.cs" />
   </ItemGroup>
   <ItemGroup />
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Condition=" '$(TargetFrameworkIdentifier)' != 'Silverlight' " Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Condition=" '$(TargetFrameworkIdentifier)' == 'Silverlight' " Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
 </Project>

@@ -35,7 +35,6 @@ namespace JsonFx.Serialization.GraphCycles
 	/// <summary>
 	/// Indicates a graph cycle was detected during serialization
 	/// </summary>
-	[Serializable]
 	public class GraphCycleException : SerializationException
 	{
 		#region Fields
@@ -74,6 +73,7 @@ namespace JsonFx.Serialization.GraphCycles
 			this.GraphCycleType = cycleType;
 		}
 
+#if !SILVERLIGHT
 		/// <summary>
 		/// Ctor
 		/// </summary>
@@ -85,7 +85,7 @@ namespace JsonFx.Serialization.GraphCycles
 			: base(info, context)
 		{
 		}
-
+#endif
 		#endregion Init
 
 		#region Properties

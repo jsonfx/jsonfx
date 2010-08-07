@@ -34,6 +34,12 @@ using System.Collections.Generic;
 
 using JsonFx.Serialization;
 
+#if SILVERLIGHT
+using CanonicalList=System.Collections.Generic.Dictionary<string, string>;
+#else
+using CanonicalList=System.Collections.Generic.SortedList<string, string>;
+#endif
+
 namespace JsonFx.Markup
 {
 	/// <summary>
@@ -50,7 +56,7 @@ namespace JsonFx.Markup
 		{
 			#region Fields
 
-			private SortedList<string, string> prefixes;
+			private CanonicalList prefixes;
 
 			#endregion Fields
 
@@ -86,7 +92,7 @@ namespace JsonFx.Markup
 				{
 					if (this.prefixes == null)
 					{
-						this.prefixes = new SortedList<string, string>(StringComparer.Ordinal);
+						this.prefixes = new CanonicalList(StringComparer.Ordinal);
 					}
 
 					this.prefixes[prefix] = value;
@@ -145,6 +151,22 @@ namespace JsonFx.Markup
 				{
 					return false;
 				}
+
+#if SILVERLIGHT
+				if (!this.prefixes.ContainsValue(namespaceUri))
+				{
+					return false;
+				}
+
+				foreach (var pair in this.prefixes)
+				{
+					if (pair.Value == namespaceUri)
+					{
+						prefix = pair.Key;
+						break;
+					}
+				}
+#else
 				int index = this.prefixes.IndexOfValue(namespaceUri);
 				if (index < 0)
 				{
@@ -152,6 +174,7 @@ namespace JsonFx.Markup
 				}
 
 				prefix = this.prefixes.Keys[index];
+#endif
 				return true;
 			}
 
@@ -258,12 +281,36 @@ namespace JsonFx.Markup
 
 		public bool ContainsPrefix(string prefix)
 		{
+#if SILVERLIGHT
+			foreach (var item in this.Chain)
+			{
+				if (item.ContainsPrefix(prefix))
+				{
+					return true;
+				}
+			}
+			return false;
+#else
+			// internal find is more efficient
 			return (this.Chain.FindLastIndex(item => item.ContainsPrefix(prefix)) >= 0);
+#endif
 		}
 
 		public bool ContainsNamespace(string namespaceUri)
 		{
+#if SILVERLIGHT
+			foreach (var item in this.Chain)
+			{
+				if (item.ContainsNamespace(namespaceUri))
+				{
+					return true;
+				}
+			}
+			return false;
+#else
+			// internal find is more efficient
 			return (this.Chain.FindLastIndex(item => item.ContainsNamespace(namespaceUri)) >= 0);
+#endif
 		}
 
 		/// <summary>
@@ -279,7 +326,21 @@ namespace JsonFx.Markup
 			}
 
 			// find the last scope in chain that resolves prefix
+#if SILVERLIGHT
+			Scope scope = null;
+			for (int i=this.Chain.Count-1; i >= 0; i--)
+			{
+				var item = this.Chain[i];
+				if (item.ContainsPrefix(prefix))
+				{
+					scope = item;
+					break;
+				}
+			}
+#else
+			// internal find is more efficient
 			Scope scope = this.Chain.FindLast(item => item.ContainsPrefix(prefix));
+#endif
 			if (scope == null &&
 				!String.IsNullOrEmpty(prefix))
 			{
@@ -289,7 +350,19 @@ namespace JsonFx.Markup
 						String.Format("Unknown scope prefix ({0})", prefix));
 				}
 
+#if SILVERLIGHT
+				foreach (var item in this.Chain)
+				{
+					if (item.ContainsPrefix(String.Empty))
+					{
+						scope = item;
+						break;
+					}
+				}
+#else
+				// internal find is more efficient
 				scope = this.Chain.FindLast(item => item.ContainsPrefix(String.Empty));
+#endif
 			}
 
 			string namespaceUri;
@@ -315,7 +388,21 @@ namespace JsonFx.Markup
 			}
 
 			// find the last scope in chain that resolves prefix
+#if SILVERLIGHT
+			Scope scope = null;
+			for (int i=this.Chain.Count-1; i>=0; i--)
+			{
+				var item = this.Chain[i];
+				if (item.ContainsNamespace(namespaceUri))
+				{
+					scope = item;
+					break;
+				}
+			}
+#else
+			// internal find is more efficient
 			Scope scope = this.Chain.FindLast(item => item.ContainsNamespace(namespaceUri));
+#endif
 			if (scope == null &&
 				!String.IsNullOrEmpty(namespaceUri))
 			{
@@ -325,7 +412,19 @@ namespace JsonFx.Markup
 						String.Format("Unknown scope prefix ({0})", namespaceUri));
 				}
 
+#if SILVERLIGHT
+				foreach (var item in this.Chain)
+				{
+					if (item.ContainsNamespace(String.Empty))
+					{
+						scope = item;
+						break;
+					}
+				}
+#else
+				// internal find is more efficient
 				scope = this.Chain.FindLast(item => item.ContainsNamespace(String.Empty));
+#endif
 			}
 
 			string prefix;
@@ -344,8 +443,20 @@ namespace JsonFx.Markup
 		/// <returns></returns>
 		public bool ContainsTag(DataName closeTag)
 		{
+#if SILVERLIGHT
+			foreach (var item in this.Chain)
+			{
+				if (item.TagName == closeTag)
+				{
+					return true;
+				}
+			}
+			return false;
+#else
+			// internal find is more efficient
 			int index = this.Chain.FindLastIndex(item => item.TagName == closeTag);
 			return (index >= 0);
+#endif
 		}
 
 		/// <summary>

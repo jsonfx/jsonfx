@@ -35,6 +35,12 @@ using System.IO;
 using JsonFx.Markup;
 using JsonFx.Serialization;
 
+#if SILVERLIGHT
+using CanonicalList=System.Collections.Generic.Dictionary<JsonFx.Serialization.DataName, string>;
+#else
+using CanonicalList=System.Collections.Generic.SortedList<JsonFx.Serialization.DataName, string>;
+#endif
+
 namespace JsonFx.Xml
 {
 	/// <summary>
@@ -141,12 +147,14 @@ namespace JsonFx.Xml
 				}
 
 				var xmlReader = System.Xml.XmlReader.Create(reader, this.Settings);
+#if !SILVERLIGHT
 				System.Xml.XmlTextReader xmlTextReader = xmlReader as System.Xml.XmlTextReader;
 				if (xmlTextReader != null)
 				{
 					xmlTextReader.Normalization = false;
 					xmlTextReader.WhitespaceHandling = System.Xml.WhitespaceHandling.All;
 				}
+#endif
 				return this.GetTokens(xmlReader);
 			}
 
@@ -189,10 +197,10 @@ namespace JsonFx.Xml
 							DataName tagName = new DataName(reader.LocalName, reader.Prefix, reader.NamespaceURI);
 							bool isVoidTag = reader.IsEmptyElement;
 
-							SortedList<DataName, string> attributes;
+							IDictionary<DataName, string> attributes;
 							if (reader.HasAttributes)
 							{
-								attributes = new SortedList<DataName, string>();
+								attributes = new CanonicalList();
 								while (reader.MoveToNextAttribute())
 								{
 									if (String.IsNullOrEmpty(reader.Prefix) && reader.LocalName == "xmlns" ||

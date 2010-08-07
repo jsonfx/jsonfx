@@ -336,10 +336,7 @@ namespace JsonFx.Common
 			// if itemType was specified by caller, then isn't just a hint
 			bool isItemTypeHint = (itemType == null);
 
-			// using ArrayList since has .ToArray(Type) method
-			// cannot create List<T> at runtime
-			ArrayList array = new ArrayList();
-
+			IList array = new List<object>();
 			while (!tokens.IsCompleted)
 			{
 				token = tokens.Peek();
@@ -358,7 +355,7 @@ namespace JsonFx.Common
 					{
 						// end of the array loop
 						tokens.Pop();
-						return this.Coercion.CoerceArrayList(arrayType, itemType, array);
+						return this.Coercion.CoerceCollection(arrayType, itemType, array);
 					}
 					case CommonTokenType.ObjectBegin:
 					{

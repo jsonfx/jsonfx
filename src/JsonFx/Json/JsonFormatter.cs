@@ -51,6 +51,14 @@ namespace JsonFx.Json
 		/// </summary>
 		public class JsonFormatter : ITextFormatter<CommonTokenType>
 		{
+			#region Constants
+
+#if SILVERLIGHT
+			private static readonly JsonFx.CodeGen.ProxyDelegate EnumGetValues = JsonFx.CodeGen.DynamicMethodGenerator.GetMethodProxy(typeof(Enum), "InternalGetValues");
+#endif
+
+			#endregion Constants
+
 			#region Fields
 
 			private readonly DataWriterSettings Settings;
@@ -491,7 +499,7 @@ namespace JsonFx.Json
 							default:
 							{
 								writer.Write("\\u");
-								writer.Write(Char.ConvertToUtf32(value, i).ToString("X4"));
+								writer.Write(ConvertToUtf32(value, i).ToString("X4"));
 								continue;
 							}
 						}
@@ -589,7 +597,11 @@ namespace JsonFx.Json
 			private static Enum[] GetFlagList(Type enumType, object value)
 			{
 				ulong longVal = Convert.ToUInt64(value);
+#if SILVERLIGHT
+				ulong[] enumValues = (ulong[])JsonFormatter.EnumGetValues(enumType);
+#else
 				Array enumValues = Enum.GetValues(enumType);
+#endif
 
 				List<Enum> enums = new List<Enum>(enumValues.Length);
 
@@ -597,7 +609,7 @@ namespace JsonFx.Json
 				if (longVal == 0L)
 				{
 					// Return the value of empty, or zero if none exists
-					enums.Add((Enum)Convert.ChangeType(value, enumType));
+					enums.Add((Enum)Convert.ChangeType(value, enumType, CultureInfo.InvariantCulture));
 					return enums.ToArray();
 				}
 
@@ -655,5 +667,18 @@ namespace JsonFx.Json
 
 			#endregion Number Methods
 		}
+
+		#region Utility Methods
+
+		private static int ConvertToUtf32(string value, int i)
+		{
+#if SILVERLIGHT
+			return (int)value[i];
+#else
+			return Char.ConvertToUtf32(value, i);
+#endif
+		}
+
+		#endregion Utility Methods
 	}
 }

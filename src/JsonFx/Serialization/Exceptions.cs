@@ -35,7 +35,6 @@ namespace JsonFx.Serialization
 	/// <summary>
 	/// Indicates an error occurred during serialization
 	/// </summary>
-	[Serializable]
 	public class SerializationException : InvalidOperationException
 	{
 		#region Init
@@ -58,6 +57,7 @@ namespace JsonFx.Serialization
 		/// <param name="innerException"></param>
 		public SerializationException(string message, Exception innerException) : base(message, innerException) { }
 
+#if !SILVERLIGHT
 		/// <summary>
 		/// Ctor
 		/// </summary>
@@ -69,14 +69,13 @@ namespace JsonFx.Serialization
 			: base(info, context)
 		{
 		}
-
+#endif
 		#endregion Init
 	}
 
 	/// <summary>
 	/// Indicates an error occurred during deserialization
 	/// </summary>
-	[Serializable]
 	public class DeserializationException : SerializationException
 	{
 		#region Fields
@@ -139,6 +138,7 @@ namespace JsonFx.Serialization
 			this.index = index;
 		}
 
+#if !SILVERLIGHT
 		/// <summary>
 		/// Ctor
 		/// </summary>
@@ -150,7 +150,7 @@ namespace JsonFx.Serialization
 			: base(info, context)
 		{
 		}
-
+#endif
 		#endregion Init
 
 		#region Properties
@@ -222,7 +222,6 @@ namespace JsonFx.Serialization
 	/// Indicates an error occurred during token consumption
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	[Serializable]
 	public class TokenException<T> : SerializationException
 	{
 		#region Fields
@@ -263,6 +262,7 @@ namespace JsonFx.Serialization
 			this.token = token;
 		}
 
+#if !SILVERLIGHT
 		/// <summary>
 		/// Ctor
 		/// </summary>
@@ -274,7 +274,7 @@ namespace JsonFx.Serialization
 			: base(info, context)
 		{
 		}
-
+#endif
 		#endregion Init
 
 		#region Properties
@@ -293,7 +293,6 @@ namespace JsonFx.Serialization
 	/// <summary>
 	/// Indicates an error occurred during type coercion
 	/// </summary>
-	[Serializable]
 	public class TypeCoercionException : ArgumentException
 	{
 		#region Init
@@ -316,6 +315,7 @@ namespace JsonFx.Serialization
 		/// <param name="innerException"></param>
 		public TypeCoercionException(string message, Exception innerException) : base(message, innerException) { }
 
+#if !SILVERLIGHT
 		/// <summary>
 		/// Ctor
 		/// </summary>
@@ -327,7 +327,7 @@ namespace JsonFx.Serialization
 			: base(info, context)
 		{
 		}
-
+#endif
 		#endregion Init
 	}
 }

@@ -705,7 +705,7 @@ namespace JsonFx.Json
 									NumberFormatInfo.InvariantInfo,
 									out utf16))
 							{
-								buffer.Append(Char.ConvertFromUtf32(utf16));
+								buffer.Append(ConvertFromUtf32(utf16));
 							}
 							else
 							{
@@ -941,6 +941,27 @@ namespace JsonFx.Json
 				return
 					(ch <= '\u001F') ||
 				    ((ch >= '\u007F') && (ch <= '\u009F'));
+			}
+
+			private static string ConvertFromUtf32(int utf32)
+			{
+#if SILVERLIGHT
+				if (utf32 <= 0xFFFF)
+				{
+					return new string((char)utf32, 1);
+				}
+
+				utf32 -= 0x10000;
+
+				return new string(
+					new char[]
+				{
+					(char)((utf32 / 0x400) + 0xD800),
+					(char)((utf32 % 0x400) + 0xDC00)
+				});
+#else
+			return Char.ConvertFromUtf32(utf32);
+#endif
 			}
 
 			#endregion Utility Methods

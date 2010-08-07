@@ -37,6 +37,12 @@ using JsonFx.IO;
 using JsonFx.Markup;
 using JsonFx.Serialization;
 
+#if SILVERLIGHT
+using CanonicalList=System.Collections.Generic.Dictionary<JsonFx.Serialization.DataName, JsonFx.Serialization.Token<JsonFx.Markup.MarkupTokenType>>;
+#else
+using CanonicalList=System.Collections.Generic.SortedList<JsonFx.Serialization.DataName, JsonFx.Serialization.Token<JsonFx.Markup.MarkupTokenType>>;
+#endif
+
 namespace JsonFx.Html
 {
 	/// <summary>
@@ -216,7 +222,7 @@ namespace JsonFx.Html
 							if (attributes == null)
 							{
 								attributes = this.canonicalForm ?
-									(IDictionary<DataName, Token<MarkupTokenType>>)new SortedList<DataName, Token<MarkupTokenType>>() :
+									(IDictionary<DataName, Token<MarkupTokenType>>)new CanonicalList() :
 									(IDictionary<DataName, Token<MarkupTokenType>>)new Dictionary<DataName, Token<MarkupTokenType>>();
 							}
 							DataName attrName = token.Name;
@@ -527,7 +533,7 @@ namespace JsonFx.Html
 
 				// use XmlSerializer-hex-style encoding of UTF-16
 				writer.Write("_x");
-				writer.Write(Char.ConvertToUtf32(value, i).ToString("X4"));
+				writer.Write(ConvertToUtf32(value, i).ToString("X4"));
 				writer.Write("_");
 			}
 
@@ -600,7 +606,7 @@ namespace JsonFx.Html
 							((ch >= 0xFDD0) && (ch <= 0xFDEF)))
 						{
 							// encode all control chars except CRLF/Tab: http://www.w3.org/TR/xml/#charsets
-							int utf16 = Char.ConvertToUtf32(value, i);
+							int utf16 = ConvertToUtf32(value, i);
 							entity = String.Concat("&#x", utf16.ToString("X", CultureInfo.InvariantCulture), ';');
 							break;
 						}
@@ -700,7 +706,7 @@ namespace JsonFx.Html
 							((ch >= 0xFDD0) && (ch <= 0xFDEF)))
 						{
 							// encode all control chars: http://www.w3.org/TR/xml/#charsets
-							int utf16 = Char.ConvertToUtf32(value, i);
+							int utf16 = ConvertToUtf32(value, i);
 							entity = String.Concat("&#x", utf16.ToString("X", CultureInfo.InvariantCulture), ';');
 							break;
 						}
@@ -739,5 +745,18 @@ namespace JsonFx.Html
 		}
 
 		#endregion Write Methods
+
+		#region Utility Methods
+
+		private static int ConvertToUtf32(string value, int i)
+		{
+#if SILVERLIGHT
+			return (int)value[i];
+#else
+			return Char.ConvertToUtf32(value, i);
+#endif
+		}
+
+		#endregion Utility Methods
 	}
 }
