@@ -367,8 +367,8 @@ namespace JsonFx.Serialization.Resolvers
 		private readonly System.Threading.ReaderWriterLock MapLock = new System.Threading.ReaderWriterLock();
 		private readonly System.Threading.ReaderWriterLock FactoryLock = new System.Threading.ReaderWriterLock();
 #elif NET35
-		private readonly System.Threading.ReaderWriterLockSlim MapLock = new System.Threading.ReaderWriterLockSlim(System.Threading.LockRecursionPolicy.NoRecursion);
-		private readonly System.Threading.ReaderWriterLockSlim FactoryLock = new System.Threading.ReaderWriterLockSlim(System.Threading.LockRecursionPolicy.NoRecursion);
+		private readonly System.Threading.ReaderWriterLockSlim MapLock = new System.Threading.ReaderWriterLockSlim();
+		private readonly System.Threading.ReaderWriterLockSlim FactoryLock = new System.Threading.ReaderWriterLockSlim();
 #endif
 
 		private readonly IDictionary<Type, IDictionary<string, MemberMap>> MemberCache = new MemberCacheDictionary();
