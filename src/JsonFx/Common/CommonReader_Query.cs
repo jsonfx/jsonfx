@@ -152,6 +152,7 @@ namespace JsonFx.Common
 
 			try
 			{
+				// TODO: replace with DynamicMethodGenerator.GetTypeFactory?
 				return (IQueryable)Activator.CreateInstance(typeof(Query<>).MakeGenericType(targetType), new object[] { this.GetAnalyzer(), source });
 			}
 			catch (TargetInvocationException ex)
@@ -224,6 +225,7 @@ namespace JsonFx.Common
 
 			try
 			{
+				// TODO: replace with DynamicMethodGenerator.GetTypeFactory?
 				return (IQueryable)Activator.CreateInstance(typeof(Query<>).MakeGenericType(targetType), new object[] { this.GetAnalyzer(), source });
 			}
 			catch (TargetInvocationException ex)

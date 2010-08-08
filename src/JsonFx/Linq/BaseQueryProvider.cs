@@ -66,6 +66,7 @@ namespace JsonFx.Linq
 
 			try
 			{
+				// TODO: replace with DynamicMethodGenerator.GetTypeFactory?
 				return (IQueryable)Activator.CreateInstance(typeof(Query<>).MakeGenericType(elementType), new object[] { this, expression });
 			}
 			catch (TargetInvocationException ex)
