@@ -31,12 +31,17 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Security;
 
 [assembly: AssemblyTitle("JsonFx")]
 [assembly: AssemblyDescription("JsonFx Serialization Framework")]
 [assembly: AssemblyProduct("JsonFx v2")]
 [assembly: AssemblyCopyright("Copyright © 2006-2010 Stephen M. McKamey. All rights reserved.")]
 [assembly: AssemblyCompany("http://jsonfx.net")]
+
+#if !SILVERLIGHT
+[assembly: AllowPartiallyTrustedCallers]
+#endif
 
 [assembly: AssemblyConfiguration(
 #if SILVERLIGHT
@@ -64,7 +69,6 @@ using System.Runtime.InteropServices;
 #endif
 )]
 
-[assembly: ComVisible(false)]
 [assembly: Guid("D98A5EF8-4709-4FF8-B162-8EA04B281400")]
 #if !STRONG
 [assembly: InternalsVisibleTo("JsonFx.Tests")]

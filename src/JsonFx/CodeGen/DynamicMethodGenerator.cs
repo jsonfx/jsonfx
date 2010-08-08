@@ -31,9 +31,12 @@
 using System;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Security;
 
 namespace JsonFx.CodeGen
 {
+	#region Delegates
+
 	/// <summary>
 	/// Generalized delegate for invoking a constructor
 	/// </summary>
@@ -63,9 +66,17 @@ namespace JsonFx.CodeGen
 	/// <param name="value"></param>
 	public delegate void SetterDelegate(object target, object value);
 
+	#endregion Delegates
+
 	/// <summary>
 	/// Generates delegates for getting/setting properties and field and invoking constructors
 	/// </summary>
+#if NET20
+	[SecurityTreatAsSafe]
+	[SecurityCritical]
+#else
+	[SecuritySafeCritical]
+#endif
 	internal static class DynamicMethodGenerator
 	{
 		#region Getter / Setter Generators
@@ -141,13 +152,15 @@ namespace JsonFx.CodeGen
 			}
 
 			// Create a dynamic method with a return type of object, and one parameter taking the instance.
-			// Create the method in the module that owns the instance type
 			DynamicMethod dynamicMethod = new DynamicMethod(
 				"",//propertyInfo.DeclaringType.FullName+".get_"+propertyInfo.Name,
 				typeof(object),
-				new Type[] { typeof(object) },
-				propertyInfo.DeclaringType.Module,
-				true);
+				new Type[] { typeof(object) }
+#if !SILVERLIGHT
+				, propertyInfo.DeclaringType,
+				true
+#endif
+				);
 
 			// Get an ILGenerator and emit a body for the dynamic method,
 			// using a stream size larger than the IL that will be emitted.
@@ -199,13 +212,15 @@ namespace JsonFx.CodeGen
 			}
 
 			// Create a dynamic method with a return type of void, one parameter taking the instance and the other taking the new value.
-			// Create the method in the module that owns the instance type
 			DynamicMethod dynamicMethod = new DynamicMethod(
 				"",//propertyInfo.DeclaringType.FullName+".set_"+propertyInfo.Name,
 				null,
-				new Type[] { typeof(object), typeof(object) },
-				propertyInfo.DeclaringType.Module,
-				true);
+				new Type[] { typeof(object), typeof(object) }
+#if !SILVERLIGHT
+				, propertyInfo.DeclaringType,
+				true
+#endif
+				);
 
 			// Get an ILGenerator and emit a body for the dynamic method,
 			// using a stream size larger than the IL that will be emitted.
@@ -253,13 +268,15 @@ namespace JsonFx.CodeGen
 			}
 
 			// Create a dynamic method with a return type of object, one parameter taking the instance.
-			// Create the method in the module that owns the instance type
 			DynamicMethod dynamicMethod = new DynamicMethod(
 				"",//fieldInfo.DeclaringType.FullName+".get_"+fieldInfo.Name,
 				typeof(object),
-				new Type[] { typeof(object) },
-				fieldInfo.DeclaringType.Module,
-				true);
+				new Type[] { typeof(object) }
+#if !SILVERLIGHT
+				, fieldInfo.DeclaringType,
+				true
+#endif
+				);
 
 			// Get an ILGenerator and emit a body for the dynamic method,
 			// using a stream size larger than the IL that will be emitted.
@@ -385,9 +402,12 @@ namespace JsonFx.CodeGen
 			DynamicMethod dynamicMethod = new DynamicMethod(
 				"",//fieldInfo.DeclaringType.FullName+".set_"+fieldInfo.Name,
 				null,
-				new Type[] { typeof(object), typeof(object) },
-				fieldInfo.DeclaringType.Module,
-				true);
+				new Type[] { typeof(object), typeof(object) }
+#if !SILVERLIGHT
+				, fieldInfo.DeclaringType,
+				true
+#endif
+				);
 
 			// Get an ILGenerator and emit a body for the dynamic method,
 			// using a stream size larger than the IL that will be emitted.
@@ -488,9 +508,12 @@ namespace JsonFx.CodeGen
 			DynamicMethod dynamicMethod = new DynamicMethod(
 				"",//methodInfo.DeclaringType.FullName+"."+methodInfo.Name,,
 				typeof(object),
-				new Type[] { typeof(object), typeof(object[]) },
-				methodInfo.DeclaringType.Module,
-				true);
+				new Type[] { typeof(object), typeof(object[]) }
+#if !SILVERLIGHT
+				, methodInfo.DeclaringType,
+				true
+#endif
+				);
 
 			ParameterInfo[] args = methodInfo.GetParameters();
 
@@ -646,13 +669,15 @@ namespace JsonFx.CodeGen
 			ParameterInfo[] args = ctor.GetParameters();
 
 			// Create a dynamic method with a return type of object and one parameter for each argument.
-			// Create the method in the module that owns the instance type
 			DynamicMethod dynamicMethod = new DynamicMethod(
 				"",//type.FullName+".ctor_"+args.Length,
 				typeof(object),
-				new Type[] { typeof(object[]) },
-				type.Module,
-				true);
+				new Type[] { typeof(object[]) }
+#if !SILVERLIGHT
+				, type,
+				true
+#endif
+				);
 
 			// Get an ILGenerator and emit a body for the dynamic method,
 			// using a stream size larger than the IL that will be emitted.

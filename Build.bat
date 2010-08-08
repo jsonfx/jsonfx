@@ -25,14 +25,19 @@ ECHO.
 ECHO Building specific releases for .NET Framework v2.0, v3.5 and v4.0...
 FOR %%i IN (v2.0 v3.5 v4.0) DO "%MSBuild%" src/JsonFx/JsonFx.csproj /target:rebuild /property:TargetFrameworkVersion=%%i;Configuration=%Configuration%
 
-ECHO.
-ECHO Building specific release for Silverlight v4.0...
-IF EXIST "%SystemRoot%\Program Files\MSBuild\Microsoft\Silverlight\v4.0\Microsoft.Silverlight.CSharp.targets" (
-	"%MSBuild%" src/JsonFx/JsonFx.csproj /target:rebuild /property:TargetFrameworkVersion=v4.0;TargetFrameworkIdentifier=Silverlight;Configuration=%Configuration%
+IF EXIST "%ProgramFiles%\MSBuild\Microsoft\Silverlight\v4.0\Microsoft.Silverlight.CSharp.targets" (
+	SET SilverlightVer=%SilverlightVer% v4.0
 )
-REM IF EXIST "%SystemRoot%\Program Files (x86)\MSBuild\Microsoft\Silverlight\v4.0\Microsoft.Silverlight.CSharp.targets" (
-	"%MSBuild%" src/JsonFx/JsonFx.csproj /target:rebuild /property:TargetFrameworkVersion=v4.0;TargetFrameworkIdentifier=Silverlight;Configuration=%Configuration%
-REM )
+IF EXIST "%ProgramFiles(x86)%\MSBuild\Microsoft\Silverlight\v4.0\Microsoft.Silverlight.CSharp.targets" (
+	SET SilverlightVer=%SilverlightVer% v4.0
+)
+
+ECHO.
+ECHO Building specific releases for Silverlight%SilverlightVer%...
+
+FOR %%i IN (%SilverlightVer%) DO "%MSBuild%" src/JsonFx/JsonFx.csproj /target:rebuild /property:TargetFrameworkVersion=%%i;TargetFrameworkIdentifier=Silverlight;Configuration=%Configuration%
+
+REM FOR %%i IN (%SilverlightVer%) DO "%MSBuild%" src/JsonFx/JsonFx.csproj /target:rebuild /property:TargetFrameworkVersion=%%i;TargetFrameworkIdentifier=Silverlight;Configuration=Debug
 
 :END
 POPD
