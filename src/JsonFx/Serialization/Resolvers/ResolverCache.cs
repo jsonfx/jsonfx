@@ -361,7 +361,9 @@ namespace JsonFx.Serialization.Resolvers
 	{
 		#region Fields
 
-#if NET20 || NET30
+#if SILVERLIGHT && (NET20 || NET30 || NET35)
+		// no reader-writer lock implementation
+#elif NET20 || NET30
 		private const int LockTimeout = 250;
 
 		private readonly System.Threading.ReaderWriterLock MapLock = new System.Threading.ReaderWriterLock();
@@ -422,7 +424,9 @@ namespace JsonFx.Serialization.Resolvers
 
 			IEnumerable<DataName> name;
 
-#if NET20 || NET30
+#if SILVERLIGHT && (NET20 || NET30 || NET35)
+			lock (this.NameCache)
+#elif NET20 || NET30
 			this.MapLock.AcquireReaderLock(ResolverCache.LockTimeout);
 #elif NET35
 			this.MapLock.EnterReadLock();
@@ -436,7 +440,9 @@ namespace JsonFx.Serialization.Resolvers
 			}
 			finally
 			{
-#if NET20 || NET30
+#if SILVERLIGHT && (NET20 || NET30 || NET35)
+				// noop
+#elif NET20 || NET30
 				this.MapLock.ReleaseReaderLock();
 #elif NET35
 				this.MapLock.ExitReadLock();
@@ -457,7 +463,9 @@ namespace JsonFx.Serialization.Resolvers
 
 			IDictionary<string, MemberMap> map;
 
-#if NET20 || NET30
+#if SILVERLIGHT && (NET20 || NET30 || NET35)
+			lock (this.MemberCache)
+#elif NET20 || NET30
 			this.MapLock.AcquireReaderLock(ResolverCache.LockTimeout);
 #elif NET35
 			this.MapLock.EnterReadLock();
@@ -475,7 +483,9 @@ namespace JsonFx.Serialization.Resolvers
 			finally
 #endif
 			{
-#if NET20 || NET30
+#if SILVERLIGHT && (NET20 || NET30 || NET35)
+				// noop
+#elif NET20 || NET30
 				this.MapLock.ReleaseReaderLock();
 #elif NET35
 				this.MapLock.ExitReadLock();
@@ -510,7 +520,9 @@ namespace JsonFx.Serialization.Resolvers
 
 			IDictionary<Enum, string> map;
 
-#if NET20 || NET30
+#if SILVERLIGHT && (NET20 || NET30 || NET35)
+			lock (this.EnumCache)
+#elif NET20 || NET30
 			this.MapLock.AcquireReaderLock(ResolverCache.LockTimeout);
 #elif NET35
 			this.MapLock.EnterReadLock();
@@ -528,7 +540,9 @@ namespace JsonFx.Serialization.Resolvers
 			finally
 #endif
 			{
-#if NET20 || NET30
+#if SILVERLIGHT && (NET20 || NET30 || NET35)
+				// noop
+#elif NET20 || NET30
 				this.MapLock.ReleaseReaderLock();
 #elif NET35
 				this.MapLock.ExitReadLock();
@@ -544,14 +558,16 @@ namespace JsonFx.Serialization.Resolvers
 		/// </summary>
 		public void Clear()
 		{
-#if NET20 || NET30
+#if SILVERLIGHT && (NET20 || NET30 || NET35)
+			lock (this.NameCache)
+			lock (this.MemberCache)
+			lock (this.EnumCache)
+			lock (this.Factories)
+#elif NET20 || NET30
 			this.MapLock.AcquireWriterLock(ResolverCache.LockTimeout);
-#elif NET35
-			this.MapLock.EnterWriteLock();
-#endif
-#if NET20 || NET30
 			this.FactoryLock.AcquireWriterLock(ResolverCache.LockTimeout);
 #elif NET35
+			this.MapLock.EnterWriteLock();
 			this.FactoryLock.EnterWriteLock();
 #endif
 #if !NET40
@@ -567,14 +583,13 @@ namespace JsonFx.Serialization.Resolvers
 			finally
 #endif
 			{
-#if NET20 || NET30
+#if SILVERLIGHT && (NET20 || NET30 || NET35)
+				// noop
+#elif NET20 || NET30
 				this.FactoryLock.ReleaseWriterLock();
-#elif NET35
-				this.FactoryLock.ExitWriteLock();
-#endif
-#if NET20 || NET30
 				this.MapLock.ReleaseWriterLock();
 #elif NET35
+				this.FactoryLock.ExitWriteLock();
 				this.MapLock.ExitWriteLock();
 #endif
 			}
@@ -616,7 +631,10 @@ namespace JsonFx.Serialization.Resolvers
 			if (typeof(IDictionary<string, object>).IsAssignableFrom(objectType) ||
 				typeof(IDictionary).IsAssignableFrom(objectType))
 			{
-#if NET20 || NET30
+#if SILVERLIGHT && (NET20 || NET30 || NET35)
+				lock (this.MemberCache)
+				lock (this.NameCache)
+#elif NET20 || NET30
 				this.MapLock.AcquireWriterLock(ResolverCache.LockTimeout);
 #elif NET35
 				this.MapLock.EnterWriteLock();
@@ -633,7 +651,9 @@ namespace JsonFx.Serialization.Resolvers
 				finally
 #endif
 				{
-#if NET20 || NET30
+#if SILVERLIGHT && (NET20 || NET30 || NET35)
+					// noop
+#elif NET20 || NET30
 					this.MapLock.ReleaseWriterLock();
 #elif NET35
 					this.MapLock.ExitWriteLock();
@@ -740,7 +760,10 @@ namespace JsonFx.Serialization.Resolvers
 				}
 			}
 
-#if NET20 || NET30
+#if SILVERLIGHT && (NET20 || NET30 || NET35)
+			lock (this.MemberCache)
+			lock (this.NameCache)
+#elif NET20 || NET30
 			this.MapLock.AcquireWriterLock(ResolverCache.LockTimeout);
 #elif NET35
 			this.MapLock.EnterWriteLock();
@@ -757,7 +780,9 @@ namespace JsonFx.Serialization.Resolvers
 			finally
 #endif
 			{
-#if NET20 || NET30
+#if SILVERLIGHT && (NET20 || NET30 || NET35)
+				// noop
+#elif NET20 || NET30
 				this.MapLock.ReleaseWriterLock();
 #elif NET35
 				this.MapLock.ExitWriteLock();
@@ -836,7 +861,11 @@ namespace JsonFx.Serialization.Resolvers
 				}
 			}
 
-#if NET20 || NET30
+#if SILVERLIGHT && (NET20 || NET30 || NET35)
+			lock(this.NameCache)
+			lock(this.EnumCache)
+			lock(this.MemberCache)
+#elif NET20 || NET30
 			this.MapLock.AcquireWriterLock(ResolverCache.LockTimeout);
 #elif NET35
 			this.MapLock.EnterWriteLock();
@@ -854,7 +883,9 @@ namespace JsonFx.Serialization.Resolvers
 			finally
 #endif
 			{
-#if NET20 || NET30
+#if SILVERLIGHT && (NET20 || NET30 || NET35)
+				// noop
+#elif NET20 || NET30
 				this.MapLock.ReleaseWriterLock();
 #elif NET35
 				this.MapLock.ExitWriteLock();
@@ -875,7 +906,9 @@ namespace JsonFx.Serialization.Resolvers
 
 			FactoryMap map;
 
-#if NET20 || NET30
+#if SILVERLIGHT && (NET20 || NET30 || NET35)
+			lock (this.Factories)
+#elif NET20 || NET30
 			this.FactoryLock.AcquireReaderLock(ResolverCache.LockTimeout);
 #elif NET35
 			this.FactoryLock.EnterReadLock();
@@ -893,7 +926,9 @@ namespace JsonFx.Serialization.Resolvers
 			finally
 #endif
 			{
-#if NET20 || NET30
+#if SILVERLIGHT && (NET20 || NET30 || NET35)
+				// noop
+#elif NET20 || NET30
 				this.FactoryLock.ReleaseReaderLock();
 #elif NET35
 				this.FactoryLock.ExitReadLock();
@@ -902,7 +937,9 @@ namespace JsonFx.Serialization.Resolvers
 
 			map = new FactoryMap(type);
 
-#if NET20 || NET30
+#if SILVERLIGHT && (NET20 || NET30 || NET35)
+			lock (this.Factories)
+#elif NET20 || NET30
 			this.FactoryLock.AcquireWriterLock(ResolverCache.LockTimeout);
 #elif NET35
 			this.FactoryLock.EnterWriteLock();
@@ -918,7 +955,9 @@ namespace JsonFx.Serialization.Resolvers
 			finally
 #endif
 			{
-#if NET20 || NET30
+#if SILVERLIGHT && (NET20 || NET30 || NET35)
+				// noop
+#elif NET20 || NET30
 				this.FactoryLock.ReleaseWriterLock();
 #elif NET35
 				this.FactoryLock.ExitWriteLock();

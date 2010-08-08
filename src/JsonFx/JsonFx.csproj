@@ -8,12 +8,16 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{3082284B-B579-4808-A4A4-D88DDA4025CB}</ProjectGuid>
     <ProjectTypeGuids Condition=" '$(TargetFrameworkIdentifier)' == 'Silverlight' ">{A1591282-1198-4647-A2B1-27E5FF5F6F3B};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <ProjectTypeGuids Condition=" '$(TargetFrameworkProfile)' == 'WindowsPhone' ">{C089C8C0-30E0-4E22-80C0-CE093F111A43};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>JsonFx</RootNamespace>
     <AssemblyName>JsonFx</AssemblyName>
-    <OutputPath>..\..\build\$(TargetFrameworkIdentifier)$(Configuration)_$(TargetFrameworkVersion)</OutputPath>
-    <DocumentationFile>..\..\build\$(TargetFrameworkIdentifier)$(Configuration)_$(TargetFrameworkVersion)\JsonFx.XML</DocumentationFile>
+    <OutputAssemblyLabel>$(Configuration)_$(TargetFrameworkVersion)</OutputAssemblyLabel>
+    <OutputAssemblyLabel Condition=" '$(TargetFrameworkIdentifier)' != '' ">$(Configuration)_$(TargetFrameworkVersion)_$(TargetFrameworkIdentifier)</OutputAssemblyLabel>
+    <OutputAssemblyLabel Condition=" '$(TargetFrameworkProfile)' == 'WindowsPhone' ">$(Configuration)_$(TargetFrameworkVersion)_$(TargetFrameworkProfile)</OutputAssemblyLabel>
+    <OutputPath>..\..\build\$(OutputAssemblyLabel)</OutputPath>
+    <DocumentationFile>$(OutputPath)\JsonFx.XML</DocumentationFile>
     <MapFileExtensions>true</MapFileExtensions>
     <UseApplicationTrust>false</UseApplicationTrust>
     <TargetFrameworkProfile Condition=" '$(TargetFrameworkIdentifier)' != 'Silverlight' ">Client</TargetFrameworkProfile>
@@ -77,6 +81,9 @@
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFrameworkProfile)' == 'WindowsPhone' ">
+    <DefineConstants>$(DefineConstants);WINDOWS_PHONE</DefineConstants>
+  </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == 'Silverlight' ">
     <Reference Include="mscorlib" />
   </ItemGroup>
@@ -93,7 +100,7 @@
     <Compile Include="Bson\BsonFormatter.cs" />
     <Compile Include="Bson\BsonTokenizer.cs" />
     <Compile Include="Bson\BsonTypes.cs" />
-    <Compile Include="CodeGen\DynamicMethodGenerator.cs" />
+    <Compile Include="CodeGen\Delegates.cs" />
     <Compile Include="Common\CommonAnalyzer.cs" />
     <Compile Include="Common\CommonGrammar.cs" />
     <Compile Include="Common\CommonReader.cs" />
@@ -181,7 +188,13 @@
   <ItemGroup Condition=" '$(TargetFrameworkVersion)' == 'v2.0' Or '$(TargetFrameworkVersion)' == 'v3.0' ">
     <Compile Include="Linq\ExtensionAttribute.cs" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFrameworkVersion)' != 'v2.0' And '$(TargetFrameworkVersion)' != 'v3.0' ">
+  <ItemGroup Condition=" '$(TargetFrameworkProfile)' == 'WindowsPhone' ">
+    <Compile Include="CodeGen\DynamicMethodGenerator_NoEmit.cs" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFrameworkProfile)' != 'WindowsPhone' ">
+    <Compile Include="CodeGen\DynamicMethodGenerator.cs" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFrameworkVersion)' != 'v2.0' And '$(TargetFrameworkVersion)' != 'v3.0' And '$(TargetFrameworkProfile)' != 'WindowsPhone' ">
     <Compile Include="Common\CommonReader_Query.cs" />
     <Compile Include="Common\Query`1.cs" />
     <Compile Include="Linq\BaseQueryProvider.cs" />
@@ -195,5 +208,8 @@
   </ItemGroup>
   <ItemGroup />
   <Import Condition=" '$(TargetFrameworkIdentifier)' != 'Silverlight' " Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <Import Condition=" '$(TargetFrameworkIdentifier)' == 'Silverlight' " Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
+  <Import Condition=" '$(TargetFrameworkIdentifier)' == 'Silverlight' And '$(TargetFrameworkProfile)' != 'WindowsPhone' And '$(TargetFrameworkVersion)' == 'v3.5' " Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\v3.0\Microsoft.Silverlight.CSharp.targets" />
+  <Import Condition=" '$(TargetFrameworkIdentifier)' == 'Silverlight' And '$(TargetFrameworkProfile)' != 'WindowsPhone' And '$(TargetFrameworkVersion)' != 'v3.5' " Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(TargetFrameworkVersion)\Microsoft.Silverlight.CSharp.targets" />
+  <Import Condition=" '$(TargetFrameworkProfile)' == 'WindowsPhone' " Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />
+  <Import Condition=" '$(TargetFrameworkProfile)' == 'WindowsPhone' " Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.CSharp.targets" />
 </Project>

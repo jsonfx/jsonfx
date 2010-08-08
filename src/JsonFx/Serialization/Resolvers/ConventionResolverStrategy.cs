@@ -97,11 +97,19 @@ namespace JsonFx.Serialization.Resolvers
 							string word = words[i];
 							if (word.Length <= 1)
 							{
+#if SILVERLIGHT && (NET20 || NET30 || NET35)
+								words[i] = word.ToUpper();
+#else
 								words[i] = word.ToUpperInvariant();
+#endif
 							}
 							else
 							{
+#if SILVERLIGHT && (NET20 || NET30 || NET35)
+								words[i] = Char.ToUpper(word[0])+word.Substring(1).ToLower();
+#else
 								words[i] = Char.ToUpperInvariant(word[0])+word.Substring(1).ToLowerInvariant();
+#endif
 							}
 							break;
 						}
@@ -110,26 +118,46 @@ namespace JsonFx.Serialization.Resolvers
 							string word = words[i];
 							if (i == 0)
 							{
+#if SILVERLIGHT && (NET20 || NET30 || NET35)
+								words[i] = word.ToLower();
+#else
 								words[i] = word.ToLowerInvariant();
+#endif
 							}
 							else if (word.Length <= 1)
 							{
+#if SILVERLIGHT && (NET20 || NET30 || NET35)
+								words[i] = word.ToUpper();
+#else
 								words[i] = word.ToUpperInvariant();
+#endif
 							}
 							else
 							{
+#if SILVERLIGHT && (NET20 || NET30 || NET35)
+								words[i] = Char.ToUpper(word[0])+word.Substring(1).ToLower();
+#else
 								words[i] = Char.ToUpperInvariant(word[0])+word.Substring(1).ToLowerInvariant();
+#endif
 							}
 							break;
 						}
 						case WordCasing.Lowercase:
 						{
+#if SILVERLIGHT && (NET20 || NET30 || NET35)
+							words[i] = words[i].ToLower();
+#else
 							words[i] = words[i].ToLowerInvariant();
+#endif
 							break;
 						}
 						case WordCasing.Uppercase:
 						{
+#if SILVERLIGHT && (NET20 || NET30 || NET35)
+							words[i] = words[i].ToUpper();
+#else
 							words[i] = words[i].ToUpperInvariant();
+#endif
 							break;
 						}
 					}

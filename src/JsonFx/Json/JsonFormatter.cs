@@ -53,7 +53,9 @@ namespace JsonFx.Json
 		{
 			#region Constants
 
-#if SILVERLIGHT
+#if WINDOWS_PHONE
+			private static readonly JsonFx.CodeGen.ProxyDelegate EnumGetValues = JsonFx.CodeGen.DynamicMethodGenerator.GetMethodProxy(typeof(Enum), "GetValues");
+#elif SILVERLIGHT
 			private static readonly JsonFx.CodeGen.ProxyDelegate EnumGetValues = JsonFx.CodeGen.DynamicMethodGenerator.GetMethodProxy(typeof(Enum), "InternalGetValues");
 #endif
 

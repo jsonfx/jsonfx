@@ -35,39 +35,6 @@ using System.Security;
 
 namespace JsonFx.CodeGen
 {
-	#region Delegates
-
-	/// <summary>
-	/// Generalized delegate for invoking a constructor
-	/// </summary>
-	/// <param name="args"></param>
-	/// <returns></returns>
-	public delegate object FactoryDelegate(params object[] args);
-
-	/// <summary>
-	/// Generalized delegate for invoking a method
-	/// </summary>
-	/// <param name="target">the instance object</param>
-	/// <param name="args">the method parameters</param>
-	/// <returns></returns>
-	public delegate object ProxyDelegate(object target, params object[] args);
-
-	/// <summary>
-	/// Generalized delegate for getting a field or property value
-	/// </summary>
-	/// <param name="target"></param>
-	/// <returns></returns>
-	public delegate object GetterDelegate(object target);
-
-	/// <summary>
-	/// Generalized delegate for setting a field or property value
-	/// </summary>
-	/// <param name="target"></param>
-	/// <param name="value"></param>
-	public delegate void SetterDelegate(object target, object value);
-
-	#endregion Delegates
-
 	/// <summary>
 	/// Generates delegates for getting/setting properties and field and invoking constructors
 	/// </summary>
@@ -462,7 +429,6 @@ namespace JsonFx.CodeGen
 				throw new ArgumentNullException("methodName");
 			}
 
-
 			MethodInfo methodInfo;
 			if (argTypes.Length > 0)
 			{
@@ -478,6 +444,11 @@ namespace JsonFx.CodeGen
 				methodInfo = declaringType.GetMethod(
 					methodName,
 					BindingFlags.Instance|BindingFlags.Static|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.FlattenHierarchy);
+			}
+
+			if (methodInfo == null)
+			{
+				return null;
 			}
 
 			return DynamicMethodGenerator.GetMethodProxy(methodInfo);

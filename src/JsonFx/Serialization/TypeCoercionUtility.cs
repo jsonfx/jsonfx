@@ -37,7 +37,7 @@ using System.Reflection;
 
 using JsonFx.Serialization.Resolvers;
 
-#if NET40
+#if NET40 && !WINDOWS_PHONE
 using JsonObject=System.Dynamic.ExpandoObject;
 #else
 using JsonObject=System.Collections.Generic.Dictionary<string, object>;
