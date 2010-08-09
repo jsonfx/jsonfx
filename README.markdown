@@ -66,11 +66,11 @@
 	var writer = new JsonWriter(new DataWriterSettings(new ConventionResolverStrategy("-", ConventionResolverStrategy.WordCasing.Lowercase)));
 
 	string input =
-@"[
-	{ ""id"": 1, ""first"": ""Foo"", ""last"": ""Bar"" },
-	{ ""id"": 2, ""first"": ""etc."", ""last"": ""et al."" },
-	{ ""id"": 3, ""first"": ""Blah"", ""last"": ""Yada"" }
-]";
+	@"[
+		{ ""id"": 1, ""first"": ""Foo"", ""last"": ""Bar"" },
+		{ ""id"": 2, ""first"": ""etc."", ""last"": ""et al."" },
+		{ ""id"": 3, ""first"": ""Blah"", ""last"": ""Yada"" }
+	]";
 
 	var people = reader.Query<Person>(input);
 	var query =
