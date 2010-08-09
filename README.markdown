@@ -52,10 +52,18 @@
 
 #### serialze to/from LINQ queries
 
+	[DataContract]
+	public class Person
+	{
+		[DataMember(Name="id")] public long PersonID { get; set; }
+		[DataMember(Name="first")] public string FirstName { get; set; }
+		[DataMember(Name="last")] public string LastName { get; set; }
+	}
+
 	var reader = new JsonReader(new DataReaderSettings(new DataContractResolverStrategy()));
 	var writer = new JsonWriter(new DataWriterSettings(new ConventionResolverStrategy("-", ConventionResolverStrategy.WordCasing.Lowercase)));
 
-	string input = @"[ { ""personId"": 1, ""firstName"": ""Foo"", ""lastName"": ""Bar"" },  { ""personId"": 2, ""firstName"": ""etc."", ""lastName"": ""et al."" }, { ""personId"": 3, ""firstName"": ""Blah"", ""lastName"": ""Yada"" } ]";
+	string input = @"[ { ""id"": 1, ""first"": ""Foo"", ""last"": ""Bar"" },  { ""id"": 2, ""first"": ""etc."", ""last"": ""et al."" }, { ""id"": 3, ""first"": ""Blah"", ""last"": ""Yada"" } ]";
 
 	var people = reader.Query<Person>(input);
 	var query =
