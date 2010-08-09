@@ -151,7 +151,7 @@ namespace JsonFx.Serialization.Resolvers
 
 			var expected = new[] { new DataName("Pascal-Case-Property") };
 
-			var resolver = new ConventionResolverStrategy("-", ConventionResolverStrategy.WordCasing.NoChange);
+			var resolver = new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.NoChange, "-");
 			var actual = resolver.GetName(input);
 
 			Assert.Equal(expected, actual, false);
@@ -166,7 +166,7 @@ namespace JsonFx.Serialization.Resolvers
 
 			var expected = new[] { new DataName("camel-Case-Property") };
 
-			var resolver = new ConventionResolverStrategy("-", ConventionResolverStrategy.WordCasing.NoChange);
+			var resolver = new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.NoChange, "-");
 			var actual = resolver.GetName(input);
 
 			Assert.Equal(expected, actual, false);
@@ -181,7 +181,7 @@ namespace JsonFx.Serialization.Resolvers
 
 			var expected = new[] { new DataName("lowercase") };
 
-			var resolver = new ConventionResolverStrategy("-", ConventionResolverStrategy.WordCasing.NoChange);
+			var resolver = new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.NoChange, "-");
 			var actual = resolver.GetName(input);
 
 			Assert.Equal(expected, actual, false);
@@ -196,7 +196,7 @@ namespace JsonFx.Serialization.Resolvers
 
 			var expected = new[] { new DataName("UPPERCASE") };
 
-			var resolver = new ConventionResolverStrategy("-", ConventionResolverStrategy.WordCasing.NoChange);
+			var resolver = new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.NoChange, "-");
 			var actual = resolver.GetName(input);
 
 			Assert.Equal(expected, actual, false);
@@ -211,7 +211,7 @@ namespace JsonFx.Serialization.Resolvers
 
 			var expected = new[] { new DataName("UI-Leading-Acronym") };
 
-			var resolver = new ConventionResolverStrategy("-", ConventionResolverStrategy.WordCasing.NoChange);
+			var resolver = new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.NoChange, "-");
 			var actual = resolver.GetName(input);
 
 			Assert.Equal(expected, actual, false);
@@ -226,7 +226,7 @@ namespace JsonFx.Serialization.Resolvers
 
 			var expected = new[] { new DataName("Trailing-Acronym-IO") };
 
-			var resolver = new ConventionResolverStrategy("-", ConventionResolverStrategy.WordCasing.NoChange);
+			var resolver = new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.NoChange, "-");
 			var actual = resolver.GetName(input);
 
 			Assert.Equal(expected, actual, false);
@@ -241,7 +241,7 @@ namespace JsonFx.Serialization.Resolvers
 
 			var expected = new[] { new DataName("Acronym-IO-Middle") };
 
-			var resolver = new ConventionResolverStrategy("-", ConventionResolverStrategy.WordCasing.NoChange);
+			var resolver = new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.NoChange, "-");
 			var actual = resolver.GetName(input);
 
 			Assert.Equal(expected, actual, false);
@@ -256,7 +256,7 @@ namespace JsonFx.Serialization.Resolvers
 
 			var expected = new[] { new DataName("Leading-Underscore") };
 
-			var resolver = new ConventionResolverStrategy("-", ConventionResolverStrategy.WordCasing.NoChange);
+			var resolver = new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.NoChange, "-");
 			var actual = resolver.GetName(input);
 
 			Assert.Equal(expected, actual, false);
@@ -271,7 +271,7 @@ namespace JsonFx.Serialization.Resolvers
 
 			var expected = new[] { new DataName("Trailing-Underscore") };
 
-			var resolver = new ConventionResolverStrategy("-", ConventionResolverStrategy.WordCasing.NoChange);
+			var resolver = new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.NoChange, "-");
 			var actual = resolver.GetName(input);
 
 			Assert.Equal(expected, actual, false);
@@ -286,7 +286,7 @@ namespace JsonFx.Serialization.Resolvers
 
 			var expected = new[] { new DataName("Multi-Word-Underscores") };
 
-			var resolver = new ConventionResolverStrategy("-", ConventionResolverStrategy.WordCasing.NoChange);
+			var resolver = new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.NoChange, "-");
 			var actual = resolver.GetName(input);
 
 			Assert.Equal(expected, actual, false);
@@ -301,7 +301,7 @@ namespace JsonFx.Serialization.Resolvers
 
 			var expected = new[] { new DataName("Multi-Word-Double-Underscores") };
 
-			var resolver = new ConventionResolverStrategy("-", ConventionResolverStrategy.WordCasing.NoChange);
+			var resolver = new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.NoChange, "-");
 			var actual = resolver.GetName(input);
 
 			Assert.Equal(expected, actual, false);
@@ -316,7 +316,7 @@ namespace JsonFx.Serialization.Resolvers
 
 			var expected = new[] { new DataName("Numbers-123456789-Middle") };
 
-			var resolver = new ConventionResolverStrategy("-", ConventionResolverStrategy.WordCasing.NoChange);
+			var resolver = new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.NoChange, "-");
 			var actual = resolver.GetName(input);
 
 			Assert.Equal(expected, actual, false);
@@ -331,7 +331,7 @@ namespace JsonFx.Serialization.Resolvers
 
 			var expected = new[] { new DataName("Numbers-Trailing-123456789") };
 
-			var resolver = new ConventionResolverStrategy("-", ConventionResolverStrategy.WordCasing.NoChange);
+			var resolver = new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.NoChange, "-");
 			var actual = resolver.GetName(input);
 
 			Assert.Equal(expected, actual, false);
@@ -350,7 +350,7 @@ namespace JsonFx.Serialization.Resolvers
 
 			var expected = new [] { new DataName("LittleBITOfEverything123456789MixedIn") };
 
-			var resolver = new ConventionResolverStrategy("", ConventionResolverStrategy.WordCasing.NoChange);
+			var resolver = new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.NoChange);
 			var actual = resolver.GetName(input);
 
 			Assert.Equal(expected, actual, false);
@@ -365,7 +365,7 @@ namespace JsonFx.Serialization.Resolvers
 
 			var expected = new [] { new DataName("LittleBitOfEverything123456789MixedIn") };
 
-			var resolver = new ConventionResolverStrategy("", ConventionResolverStrategy.WordCasing.PascalCase);
+			var resolver = new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.PascalCase);
 			var actual = resolver.GetName(input);
 
 			Assert.Equal(expected, actual, false);
@@ -380,7 +380,7 @@ namespace JsonFx.Serialization.Resolvers
 
 			var expected = new [] { new DataName("littleBitOfEverything123456789MixedIn") };
 
-			var resolver = new ConventionResolverStrategy("", ConventionResolverStrategy.WordCasing.CamelCase);
+			var resolver = new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.CamelCase);
 			var actual = resolver.GetName(input);
 
 			Assert.Equal(expected, actual, false);
@@ -395,7 +395,7 @@ namespace JsonFx.Serialization.Resolvers
 
 			var expected = new [] { new DataName("littlebitofeverything123456789mixedin") };
 
-			var resolver = new ConventionResolverStrategy("", ConventionResolverStrategy.WordCasing.Lowercase);
+			var resolver = new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.Lowercase);
 			var actual = resolver.GetName(input);
 
 			Assert.Equal(expected, actual, false);
@@ -410,7 +410,7 @@ namespace JsonFx.Serialization.Resolvers
 
 			var expected = new [] { new DataName("LITTLEBITOFEVERYTHING123456789MIXEDIN") };
 
-			var resolver = new ConventionResolverStrategy("", ConventionResolverStrategy.WordCasing.Uppercase);
+			var resolver = new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.Uppercase);
 			var actual = resolver.GetName(input);
 
 			Assert.Equal(expected, actual, false);
@@ -429,7 +429,7 @@ namespace JsonFx.Serialization.Resolvers
 
 			var expected = new[] { new DataName("little-bit-of-everything-123456789-mixed-in") };
 
-			var resolver = new ConventionResolverStrategy("-", ConventionResolverStrategy.WordCasing.Lowercase);
+			var resolver = new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.Lowercase, "-");
 			var actual = resolver.GetName(input);
 
 			Assert.Equal(expected, actual, false);
@@ -444,7 +444,7 @@ namespace JsonFx.Serialization.Resolvers
 
 			var expected = new[] { new DataName("littleBitOfEverything123456789MixedIn") };
 
-			var resolver = new ConventionResolverStrategy("", ConventionResolverStrategy.WordCasing.CamelCase);
+			var resolver = new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.CamelCase);
 			var actual = resolver.GetName(input);
 
 			Assert.Equal(expected, actual, false);
@@ -459,7 +459,7 @@ namespace JsonFx.Serialization.Resolvers
 
 			var expected = new[] { new DataName("LittleBitOfEverything123456789MixedIn") };
 
-			var resolver = new ConventionResolverStrategy("", ConventionResolverStrategy.WordCasing.PascalCase);
+			var resolver = new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.PascalCase);
 			var actual = resolver.GetName(input);
 
 			Assert.Equal(expected, actual, false);
@@ -474,7 +474,7 @@ namespace JsonFx.Serialization.Resolvers
 
 			var expected = new[] { new DataName("LITTLE_BIT_OF_EVERYTHING_123456789_MIXED_IN") };
 
-			var resolver = new ConventionResolverStrategy("_", ConventionResolverStrategy.WordCasing.Uppercase);
+			var resolver = new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.Uppercase, "_");
 			var actual = resolver.GetName(input);
 
 			Assert.Equal(expected, actual, false);

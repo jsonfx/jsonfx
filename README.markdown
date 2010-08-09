@@ -63,7 +63,7 @@
 	// respect DataContracts on the way in
 	var reader = new JsonReader(new DataReaderSettings(new DataContractResolverStrategy()));
 	// use convention over configuration on the way out
-	var writer = new JsonWriter(new DataWriterSettings(new ConventionResolverStrategy("-", ConventionResolverStrategy.WordCasing.Lowercase)));
+	var writer = new JsonWriter(new DataWriterSettings(new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.Lowercase, "-")));
 
 	string input =
 	@"[

@@ -67,7 +67,21 @@ namespace JsonFx.Serialization.Resolvers
 
 		#region Init
 
-		public ConventionResolverStrategy(string wordSeparator, WordCasing casing)
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="casing"></param>
+		public ConventionResolverStrategy(WordCasing casing)
+			: this(casing, null)
+		{
+		}
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="casing"></param>
+		/// <param name="wordSeparator"></param>
+		public ConventionResolverStrategy(WordCasing casing, string wordSeparator)
 		{
 			this.WordSeparator = wordSeparator ?? String.Empty;
 			this.Casing = casing;

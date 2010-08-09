@@ -83,11 +83,11 @@ namespace JsonFx.Serialization.Resolvers
 			};
 
 			var resolver = new CombinedResolverStrategy(
-				new ConventionResolverStrategy(" ", ConventionResolverStrategy.WordCasing.NoChange),
-				new ConventionResolverStrategy("", ConventionResolverStrategy.WordCasing.PascalCase),
-				new ConventionResolverStrategy("", ConventionResolverStrategy.WordCasing.CamelCase),
-				new ConventionResolverStrategy("-", ConventionResolverStrategy.WordCasing.Lowercase),
-				new ConventionResolverStrategy("_", ConventionResolverStrategy.WordCasing.Uppercase));
+				new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.NoChange, " "),
+				new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.PascalCase),
+				new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.CamelCase),
+				new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.Lowercase, "-"),
+				new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.Uppercase, "_"));
 			var actual = resolver.GetName(input);
 
 			Assert.Equal(expected, actual, false);
@@ -111,11 +111,11 @@ namespace JsonFx.Serialization.Resolvers
 			};
 
 			var resolver = new CombinedResolverStrategy(
-				new ConventionResolverStrategy(" ", ConventionResolverStrategy.WordCasing.NoChange),
-				new ConventionResolverStrategy("", ConventionResolverStrategy.WordCasing.PascalCase),
-				new ConventionResolverStrategy("", ConventionResolverStrategy.WordCasing.CamelCase),
-				new ConventionResolverStrategy("-", ConventionResolverStrategy.WordCasing.Lowercase),
-				new ConventionResolverStrategy("_", ConventionResolverStrategy.WordCasing.Uppercase));
+				new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.NoChange, " "),
+				new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.PascalCase),
+				new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.CamelCase),
+				new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.Lowercase, "-"),
+				new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.Uppercase, "_"));
 
 			var actual = new CommonWalker(new DataWriterSettings(resolver)).GetTokens(input).ToArray();
 
