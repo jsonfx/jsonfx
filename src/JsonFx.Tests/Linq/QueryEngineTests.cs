@@ -31,10 +31,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 
 using JsonFx.Json;
 using JsonFx.Json.Resolvers;
 using JsonFx.Serialization;
+using JsonFx.Serialization.Resolvers;
 using Xunit;
 
 using Assert=JsonFx.AssertPatched;
@@ -232,6 +234,19 @@ namespace JsonFx.Linq
 			}
 
 			#endregion Object Overrides
+		}
+
+		[DataContract]
+		public class Person
+		{
+			[DataMember(Name="personId")]
+			public long PersonID { get; set; }
+
+			[DataMember(Name="firstName")]
+			public string FirstName { get; set; }
+
+			[DataMember(Name="lastName")]
+			public string LastName { get; set; }
 		}
 
 		#endregion Test Types
@@ -608,6 +623,35 @@ namespace JsonFx.Linq
 		}
 
 		#endregion Nested Object Tests
+
+		#region OrderBy Tests
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void QueryDescendants_OrderBy_ReturnsMultipleObjects()
+		{
+			var reader = new JsonReader(new DataReaderSettings(new DataContractResolverStrategy()));
+			var writer = new JsonWriter(new DataWriterSettings(new ConventionResolverStrategy("-", ConventionResolverStrategy.WordCasing.Lowercase)));
+
+			string input = @"[ { ""personId"": 1, ""firstName"": ""Foo"", ""lastName"": ""Bar"" },  { ""personId"": 2, ""firstName"": ""etc."", ""lastName"": ""et al."" }, { ""personId"": 3, ""firstName"": ""Blah"", ""lastName"": ""Yada"" } ]";
+
+			var people = reader.Query<Person>(input);
+			var query =
+				from person in people.ArrayItems()
+				where person.PersonID == 1 || person.FirstName == "Blah"
+				orderby person.PersonID
+				select person;
+
+			Assert.Equal(query.Last().LastName, "Yada");
+
+			const string expected = @"[{""person-id"":1,""first-name"":""Foo"",""last-name"":""Bar""},{""person-id"":3,""first-name"":""Blah"",""last-name"":""Yada""}]";
+
+			string actual = writer.Write(query);
+
+			Assert.Equal(expected, actual);
+		}
+
+		#endregion OrderBy Tests
 
 		#region Complex Graph Tests
 

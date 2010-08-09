@@ -37,6 +37,10 @@ using System.Reflection;
 
 using JsonFx.Serialization.Resolvers;
 
+#if !NET20 && !NET30 && !WINDOWS_PHONE
+using System.Linq;
+#endif
+
 #if NET40 && !WINDOWS_PHONE
 using JsonObject=System.Dynamic.ExpandoObject;
 #else
@@ -648,6 +652,10 @@ namespace JsonFx.Serialization
 
 					if (genericType == typeof(IList<>) ||
 						genericType == typeof(IEnumerable<>) ||
+#if !NET20 && !NET30 && !WINDOWS_PHONE
+						genericType == typeof(IQueryable<>) ||
+						genericType == typeof(IOrderedQueryable<>) ||
+#endif
 						genericType == typeof(ICollection<>))
 					{
 						Type[] genericArgs = targetType.GetGenericArguments();
@@ -671,6 +679,10 @@ namespace JsonFx.Serialization
 				}
 				else if (targetType == typeof(IList) ||
 					targetType == typeof(IEnumerable) ||
+#if !NET20 && !NET30 && !WINDOWS_PHONE
+					targetType == typeof(IQueryable) ||
+					targetType == typeof(IOrderedQueryable) ||
+#endif
 					targetType == typeof(ICollection))
 				{
 					targetType = typeof(object[]);

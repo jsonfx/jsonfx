@@ -131,7 +131,8 @@ namespace JsonFx.Linq
 				bool asSingle = true;
 
 				Type queryableType = targetType.IsGenericType ? targetType.GetGenericTypeDefinition() : null;
-				if (queryableType == typeof(IQueryable<>))
+				if (queryableType == typeof(IQueryable<>) ||
+					queryableType == typeof(IOrderedQueryable<>))
 				{
 					asSingle = false;
 					targetType = targetType.GetGenericArguments()[0];
@@ -176,8 +177,8 @@ namespace JsonFx.Linq
 			if (m.Method.DeclaringType == typeof(Queryable) || m.Method.DeclaringType == typeof(Enumerable))
 			{
 				// TODO: determine invalid situations to transform
-
-				switch (m.Method.Name)
+				string methodName = m.Method.Name;
+				switch (methodName)
 				{
 					case "Where":
 					{
@@ -190,10 +191,9 @@ namespace JsonFx.Linq
 						};
 
 						Expression source = this.Visit(m.Arguments[0], nextContext);
-
 						Expression predicate = this.Visit(m.Arguments[1], nextContext);
 
-						return Expression.Call(typeof(Queryable), "Where", new [] { typeof(TokenSequence) }, source, predicate);
+						return Expression.Call(typeof(Queryable), methodName, new[] { typeof(TokenSequence) }, source, predicate);
 					}
 					case "Select":
 					{
@@ -207,10 +207,30 @@ namespace JsonFx.Linq
 						};
 
 						Expression source = this.Visit(m.Arguments[0], nextContext);
-
 						Expression selector = this.Visit(m.Arguments[1], nextContext);
 
-						return Expression.Call(typeof(Queryable), "Select", new[] { typeof(TokenSequence), nextContext.OutputType }, source, selector);
+						return Expression.Call(typeof(Queryable), methodName, new[] { typeof(TokenSequence), nextContext.OutputType }, source, selector);
+					}
+					case "OrderBy":
+					case "OrderByDescending":
+					{
+						Type[] methodArgs = m.Method.GetGenericArguments();
+						var nextContext = new QueryContext
+						{
+							Input = context.Input,
+							InputType = methodArgs[0],
+							Transforming = true
+						};
+
+						Expression source = this.Visit(m.Arguments[0], nextContext);
+						Expression keySelector = this.Visit(m.Arguments[1], nextContext);
+
+						if (m.Arguments.Count == 3)
+						{
+							return Expression.Call(typeof(Queryable), methodName, new[] { typeof(TokenSequence), methodArgs[1] }, source, keySelector, m.Arguments[2]);
+						}
+
+						return Expression.Call(typeof(Queryable), methodName, new[] { typeof(TokenSequence), methodArgs[1] }, source, keySelector);
 					}
 					default:
 					{
@@ -362,7 +382,8 @@ namespace JsonFx.Linq
 				sequence = Expression.Call(typeof(Queryable), "AsQueryable", new[] { typeof(TokenSequence) }, sequence);
 			}
 
-			if (sequence.Type == typeof(IQueryable<TokenSequence>))
+			if (sequence.Type == typeof(IQueryable<TokenSequence>) ||
+				sequence.Type == typeof(IOrderedQueryable<TokenSequence>))
 			{
 				sequence = Expression.Call(typeof(Queryable), "DefaultIfEmpty", new[] { typeof(TokenSequence) }, sequence, Expression.Call(typeof(Enumerable), "Empty", new[] { typeof(Token<CommonTokenType>) }));
 

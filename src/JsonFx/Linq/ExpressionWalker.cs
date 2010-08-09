@@ -30,6 +30,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
@@ -207,7 +208,7 @@ namespace JsonFx.Linq
 				{
 					tokens.Add(CommonGrammar.TokenNull);
 				}
-				else if (expression.Type.IsGenericType && expression.Type.GetGenericTypeDefinition() == typeof(JsonFx.Linq.Query<>))
+				else if (typeof(IQueryable).IsAssignableFrom(expression.Type))
 				{
 					// prevent recursively walking Query<T>
 					tokens.Add(CommonGrammar.TokenPrimitive("[ ... ]"));
@@ -724,9 +725,19 @@ namespace JsonFx.Linq
 
 		public string GetQueryText(Expression expression)
 		{
-			var tokens = this.GetTokens(expression);
+			try
+			{
+				var tokens = this.GetTokens(expression);
 
-			return this.Formatter.Format(tokens);
+				return this.Formatter.Format(tokens);
+			}
+			catch (Exception ex)
+			{
+				return String.Concat(
+					"Error: [ ",
+					ex.Message,
+					" ]");
+			}
 		}
 
 		#endregion IQueryTextProvider Members
@@ -776,9 +787,11 @@ namespace JsonFx.Linq
 				}
 
 				return String.Concat(
-					GetTypeName(member.DeclaringType),
+					GetTypeName(method.ReturnType),
+					" ",
+					GetTypeName(method.DeclaringType),
 					'.',
-					member.Name,
+					method.Name,
 					'<',
 					String.Join(", ", types),
 					'>');

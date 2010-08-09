@@ -48,6 +48,8 @@ namespace JsonFx.Linq
 
 		private readonly IQueryProvider Provider;
 		private readonly Expression Expression;
+		private object result;
+		private bool hasResult;
 
 		#endregion Fields
 
@@ -118,12 +120,24 @@ namespace JsonFx.Linq
 
 		IEnumerator<T> IEnumerable<T>.GetEnumerator()
 		{
-			return (this.Provider.Execute<IEnumerable<T>>(this.Expression)).GetEnumerator();
+			if (!this.hasResult)
+			{
+				this.result = this.Provider.Execute<IEnumerable<T>>(this.Expression);
+				this.hasResult = true;
+			}
+
+			return ((IEnumerable<T>)this.result).GetEnumerator();
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return ((IEnumerable)this.Provider.Execute(this.Expression)).GetEnumerator();
+			if (!this.hasResult)
+			{
+				this.result = this.Provider.Execute(this.Expression);
+				this.hasResult = true;
+			}
+
+			return ((IEnumerable)this.result).GetEnumerator();
 		}
 
 		#endregion IEnumerable Methods

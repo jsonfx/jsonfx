@@ -44,7 +44,6 @@ namespace JsonFx.Linq
 		#region Fields
 
 		private readonly QueryEngine Engine;
-		private Func<object> execute;
 
 		#endregion Fields
 
@@ -75,16 +74,12 @@ namespace JsonFx.Linq
 
 		public override object Execute(Expression expression)
 		{
-			// TODO: evaluate if this is correct. if a different expression is passed in this will ignore
-			if (this.execute == null)
-			{
-				// create this once and store it so multiple executions are cached
-				Expression translated = this.Engine.Translate(expression);
+			// create this once and store it so multiple executions are cached
+			Expression translated = this.Engine.Translate(expression);
 
-				this.execute = Expression.Lambda<Func<object>>(translated).Compile();
-			}
+			Func<object> compiled = Expression.Lambda<Func<object>>(translated).Compile();
 
-			return this.execute();
+			return compiled();
 		}
 
 		public override string GetQueryText(Expression expression)
