@@ -628,7 +628,7 @@ namespace JsonFx.Linq
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void QueryDescendants_OrderBy_ReturnsMultipleObjects()
+		public void QueryDescendants_WhereOrderByLast_ReturnsMultipleObjects()
 		{
 			// respect DataContracts on the way in
 			var reader = new JsonReader(new DataReaderSettings(new DataContractResolverStrategy()));
@@ -644,14 +644,52 @@ namespace JsonFx.Linq
 
 			var people = reader.Query<Person>(input);
 			var query =
-				from person in people.ArrayItems()
+				from person in people.Descendants()
 				where person.PersonID == 1 || person.FirstName == "Blah"
 				orderby person.PersonID
 				select person;
 
-			Assert.Equal(query.Last().LastName, "Yada");
+			Assert.Equal("Yada", query.Last().LastName);
 
 			const string expected = @"[{""person-id"":1,""first-name"":""Foo"",""last-name"":""Bar""},{""person-id"":3,""first-name"":""Blah"",""last-name"":""Yada""}]";
+
+			string actual = writer.Write(query);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void QueryArrayItems_OrderByThenByLast_ReturnsMultipleObjects()
+		{
+			// use convention over configuration on the way out
+			var reader = new JsonReader(new DataReaderSettings(new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.CamelCase)));
+			// use POCO on the way out
+			var writer = new JsonWriter(new DataWriterSettings() { PrettyPrint=true });
+
+			string input =
+@"[
+	{ ""personId"": 1, ""firstName"": ""Sally"", ""lastName"": ""Smith"" },
+	{ ""personId"": 2, ""firstName"": ""Bob"", ""lastName"": ""Smith"" },
+	{ ""personId"": 3, ""firstName"": ""John"", ""lastName"": ""Jones"" },
+	{ ""personId"": 4, ""firstName"": ""Suzie"", ""lastName"": ""Jones"" }
+]";
+
+			var people = reader.Query<Person>(input);
+			var query =
+				from person in people.ArrayItems()
+				orderby person.LastName, person.FirstName
+				select person.PersonID;
+
+			Assert.Equal(1, query.Last());
+
+			const string expected =
+@"[
+	3,
+	4,
+	2,
+	1
+]";
 
 			string actual = writer.Write(query);
 

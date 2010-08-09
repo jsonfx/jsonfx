@@ -29,6 +29,7 @@
 #endregion License
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -54,10 +55,6 @@ namespace JsonFx.Linq
 			internal IQueryable<TokenSequence> Input { get; set; }
 
 			internal Type InputType { get; set; }
-
-			internal Type OutputType { get; set; }
-
-			internal bool Transforming { get; set; }
 
 			internal IDictionary<string, ParameterExpression> Parameters { get; set; }
 		}
@@ -130,9 +127,9 @@ namespace JsonFx.Linq
 				Type targetType = expression.Type;
 				bool asSingle = true;
 
-				Type queryableType = targetType.IsGenericType ? targetType.GetGenericTypeDefinition() : null;
-				if (queryableType == typeof(IQueryable<>) ||
-					queryableType == typeof(IOrderedQueryable<>))
+				if (targetType.IsGenericType &&
+					(typeof(IQueryable).IsAssignableFrom(targetType)) ||
+					(typeof(IEnumerable).IsAssignableFrom(targetType)))
 				{
 					asSingle = false;
 					targetType = targetType.GetGenericArguments()[0];
@@ -174,132 +171,39 @@ namespace JsonFx.Linq
 
 		protected override Expression VisitMethodCall(MethodCallExpression m, QueryContext context)
 		{
-			if (m.Method.DeclaringType == typeof(Queryable) || m.Method.DeclaringType == typeof(Enumerable))
+			if (m.Method.DeclaringType != typeof(Queryable) && m.Method.DeclaringType != typeof(Enumerable))
 			{
-				// TODO: determine invalid situations to transform
-				string methodName = m.Method.Name;
-				switch (methodName)
-				{
-					case "Where":
-					{
-						Type[] methodArgs = m.Method.GetGenericArguments();
-						var nextContext = new QueryContext
-						{
-							Input = context.Input,
-							InputType = methodArgs[0],
-							Transforming = true
-						};
-
-						Expression source = this.Visit(m.Arguments[0], nextContext);
-						Expression predicate = this.Visit(m.Arguments[1], nextContext);
-
-						return Expression.Call(typeof(Queryable), methodName, new[] { typeof(TokenSequence) }, source, predicate);
-					}
-					case "Select":
-					{
-						Type[] methodArgs = m.Method.GetGenericArguments();
-						var nextContext = new QueryContext
-						{
-							Input = context.Input,
-							InputType = methodArgs[0],
-							OutputType = methodArgs[1],
-							Transforming = true
-						};
-
-						Expression source = this.Visit(m.Arguments[0], nextContext);
-						Expression selector = this.Visit(m.Arguments[1], nextContext);
-
-						return Expression.Call(typeof(Queryable), methodName, new[] { typeof(TokenSequence), nextContext.OutputType }, source, selector);
-					}
-					case "OrderBy":
-					case "OrderByDescending":
-					{
-						Type[] methodArgs = m.Method.GetGenericArguments();
-						var nextContext = new QueryContext
-						{
-							Input = context.Input,
-							InputType = methodArgs[0],
-							Transforming = true
-						};
-
-						Expression source = this.Visit(m.Arguments[0], nextContext);
-						Expression keySelector = this.Visit(m.Arguments[1], nextContext);
-
-						if (m.Arguments.Count == 3)
-						{
-							return Expression.Call(typeof(Queryable), methodName, new[] { typeof(TokenSequence), methodArgs[1] }, source, keySelector, m.Arguments[2]);
-						}
-
-						return Expression.Call(typeof(Queryable), methodName, new[] { typeof(TokenSequence), methodArgs[1] }, source, keySelector);
-					}
-					default:
-					{
-						IEnumerable<Expression> args = this.VisitExpressionList(m.Arguments, context);
-						if (args == m.Arguments)
-						{
-							// no change
-							return m;
-						}
-
-						IEnumerator<Expression> oldEnumerator = m.Arguments.GetEnumerator();
-						IEnumerator<Expression> newEnumerator = args.GetEnumerator();
-						bool argTypesSame = true;
-						while (true)
-						{
-							bool hasNextX = oldEnumerator.MoveNext();
-							bool hasNextY = newEnumerator.MoveNext();
-
-							if (!hasNextX || !hasNextY)
-							{
-								argTypesSame = (hasNextX == hasNextY);
-								break;
-							}
-
-							if (oldEnumerator.Current.Type != newEnumerator.Current.Type)
-							{
-								argTypesSame = false;
-								break;
-							}
-						}
-
-						Expression[] argArray = args.ToArray();
-
-						if (argTypesSame)
-						{
-							// no change
-							return Expression.Call(m.Method, argArray);
-						}
-
-						Expression source = argArray[0];
-						if (source != null &&
-							source.Type != m.Type)
-						{
-							Type targetType = m.Type;
-							Type queryableType = targetType.IsGenericType ? targetType.GetGenericTypeDefinition() : null;
-							if (queryableType == typeof(IQueryable<>))
-							{
-								targetType = targetType.GetGenericArguments()[0];
-							}
-
-							// should just need to be analyzed
-							argArray[0] = this.CallAnalyze(targetType, source, false);
-						}
-
-						return Expression.Call(m.Method, argArray);
-					}
-				}
+				// only intercept Queryable & Enumerable calls
+				return base.VisitMethodCall(m, context);
 			}
 
-			return base.VisitMethodCall(m, context);
+			Type[] methodArgs = m.Method.IsGenericMethod ? m.Method.GetGenericArguments() : Type.EmptyTypes;
+			var nextContext = new QueryContext
+			{
+				Input = context.Input,
+				InputType = (methodArgs.Length > 0) ? methodArgs[0] : null
+			};
+
+			Expression[] args = this.VisitExpressionList(m.Arguments, nextContext).ToArray();
+
+			Expression source = args[0];
+			if (source != null &&
+						source.Type != m.Arguments[0].Type)
+			{
+				Type sourceType = source.Type;
+				if (sourceType.IsGenericType && typeof(IQueryable).IsAssignableFrom(sourceType))
+				{
+					sourceType = sourceType.GetGenericArguments()[0];
+				}
+
+				methodArgs[0] = sourceType;
+			}
+
+			return Expression.Call(m.Method.DeclaringType, m.Method.Name, methodArgs, args);
 		}
 
 		protected override Expression VisitLambda(LambdaExpression lambda, QueryContext context)
 		{
-			if (!context.Transforming)
-			{
-				base.VisitLambda(lambda, context);
-			}
-
 			int length = lambda.Parameters.Count;
 
 			IDictionary<string, ParameterExpression> oldParams = context.Parameters;
@@ -341,12 +245,8 @@ namespace JsonFx.Linq
 
 		protected override Expression VisitMemberAccess(MemberExpression m, QueryContext context)
 		{
-			if (!context.Transforming)
-			{
-				return base.VisitMemberAccess(m, context);
-			}
-
 			MemberInfo member = m.Member;
+
 			Type targetType;
 			if (member is PropertyInfo)
 			{
@@ -365,8 +265,8 @@ namespace JsonFx.Linq
 
 			ParameterExpression p = (ParameterExpression)m.Expression;
 
-			// expression gets translated to:
-			//		this.Analyzer.Analyze<targetType>(CommonSubsequencer.Property(value, map.DataName).FirstOrDefault();
+			// expression is loosely translated to:
+			//		this.Analyzer.Analyze<targetType>(CommonSubsequencer.Property(value, map.DataName).FirstOrDefault());
 
 			var memberAccess = Expression.Call(QueryEngine.MemberAccess, context.Parameters[p.Name], Expression.Constant(map.DataName));
 

@@ -77,6 +77,12 @@ namespace JsonFx.Linq
 			// create this once and store it so multiple executions are cached
 			Expression translated = this.Engine.Translate(expression);
 
+			if (translated.Type.IsValueType)
+			{
+				// must obey boxing rules or variance breaks
+				translated = Expression.Convert(translated, typeof(object));
+			}
+
 			Func<object> compiled = Expression.Lambda<Func<object>>(translated).Compile();
 
 			return compiled();
