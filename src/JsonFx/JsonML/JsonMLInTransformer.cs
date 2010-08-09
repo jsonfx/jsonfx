@@ -135,11 +135,6 @@ namespace JsonFx.JsonML
 								{
 									case MarkupTokenType.Primitive:
 									{
-										yield return CommonGrammar.TokenPrimitive(token.Value);
-										break;
-									}
-									case MarkupTokenType.UnparsedBlock:
-									{
 										yield return token.ChangeType(CommonTokenType.Primitive);
 										break;
 									}
@@ -184,13 +179,22 @@ namespace JsonFx.JsonML
 						}
 						case MarkupTokenType.Primitive:
 						{
+							if (token.Value is IMarkupFormattable)
+							{
+								yield return CommonGrammar.TokenPrimitive(token.Value);
+
+								stream.Pop();
+								token = stream.Peek();
+								break;
+							}
+
 							string value = token.ValueAsString();
 
 							stream.Pop();
 							token = stream.Peek();
 							while (!stream.IsCompleted &&
-								(token.TokenType == MarkupTokenType.Primitive ||
-								token.TokenType == MarkupTokenType.Primitive))
+								(token.TokenType == MarkupTokenType.Primitive) &&
+								!(token.Value is IMarkupFormattable))
 							{
 								// concatenate adjacent value nodes
 								value = String.Concat(value, token.ValueAsString());
@@ -200,14 +204,6 @@ namespace JsonFx.JsonML
 							}
 
 							yield return CommonGrammar.TokenPrimitive(value);
-							break;
-						}
-						case MarkupTokenType.UnparsedBlock:
-						{
-							yield return token.ChangeType(CommonTokenType.Primitive);
-
-							stream.Pop();
-							token = stream.Peek();
 							break;
 						}
 						case MarkupTokenType.Attribute:

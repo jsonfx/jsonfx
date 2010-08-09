@@ -47,29 +47,6 @@ namespace JsonFx.Markup
 		None,
 
 		/// <summary>
-		/// Any of a number of unparsed tags which typically contain specialized processing instructions
-		/// </summary>
-		/// <remarks>
-		/// The name of the token is the beginning and ending delimiters as a format string (not including the '&lt;' or '&gt;')
-		/// Includes the following types:
-		/// 
-		///		"&lt;!--", "-->"	XML/HTML/SGML comment
-		///		"&lt;!", ">"		XML/SGML declaration (e.g. DOCTYPE or server-side includes)
-		/// 
-		///		"&lt;?=", "?>"		PHP expression
-		///		"&lt;?", "?>"		PHP code block /XML processing instruction (e.g. the XML declaration)
-		/// 
-		///		"&lt;%--", "--%>"	ASP/PSP/JSP-style code comment
-		///		"&lt;%@",  "%>"		ASP/PSP/JSP directive
-		///		"&lt;%=",  "%>"		ASP/PSP/JSP/JBST expression
-		///		"&lt;%!",  "%>"		JSP/JBST declaration
-		///		"&lt;%#",  "%>"		ASP.NET/JBST databind expression
-		///		"&lt;%$",  "%>"		ASP.NET/JBST extension
-		///		"&lt;%",   "%>"		ASP code block / JSP scriptlet / PSP code block
-		/// </remarks>
-		UnparsedBlock,
-
-		/// <summary>
 		/// Marks the beginning of an element, the token contains the element Name
 		/// </summary>
 		/// <remarks>

@@ -271,15 +271,15 @@ namespace JsonFx.Html
 					}
 					case MarkupTokenType.Primitive:
 					{
-						this.WriteCharData(writer, token.ValueAsString());
-
-						stream.Pop();
-						token = stream.Peek();
-						break;
-					}
-					case MarkupTokenType.UnparsedBlock:
-					{
-						this.WriteUnparsedBlock(writer, token.Name.LocalName, token.ValueAsString());
+						IMarkupFormattable formattable = token.Value as IMarkupFormattable;
+						if (formattable != null)
+						{
+							formattable.Format(this, writer);
+						}
+						else
+						{
+							this.WriteCharData(writer, token.ValueAsString());
+						}
 
 						stream.Pop();
 						token = stream.Peek();
@@ -401,9 +401,12 @@ namespace JsonFx.Html
 
 			// local-name
 			this.WriteLocalName(writer, localName);
-			string attrValue = value.ValueAsString();
 
-			if (String.IsNullOrEmpty(attrValue))
+			IMarkupFormattable formattable = value.Value as IMarkupFormattable;
+			string attrValue = (formattable == null) ? value.ValueAsString() : null;
+
+			if ((formattable == null) &&
+				String.IsNullOrEmpty(attrValue))
 			{
 				switch (this.EmptyAttributes)
 				{
@@ -431,12 +434,14 @@ namespace JsonFx.Html
 			{
 				case MarkupTokenType.Primitive:
 				{
-					this.WriteAttributeValue(writer, attrValue);
-					break;
-				}
-				case MarkupTokenType.UnparsedBlock:
-				{
-					this.WriteUnparsedBlock(writer, value.Name.LocalName, attrValue);
+					if (formattable != null)
+					{
+						formattable.Format(this, writer);
+					}
+					else
+					{
+						this.WriteAttributeValue(writer, attrValue);
+					}
 					break;
 				}
 				default:
@@ -730,18 +735,6 @@ namespace JsonFx.Html
 				// copy any trailing unescaped chunk
 				writer.Write(value.Substring(start, length-start));
 			}
-		}
-
-		private void WriteUnparsedBlock(TextWriter writer, string name, string value)
-		{
-			if (name == null)
-			{
-				writer.Write(value);
-			}
-
-			writer.Write(MarkupGrammar.OperatorElementBegin);
-			writer.Write(name, value);
-			writer.Write(MarkupGrammar.OperatorElementEnd);
 		}
 
 		#endregion Write Methods

@@ -47,6 +47,82 @@ namespace JsonFx.Xml
 		/// </summary>
 		public class XmlFormatter : ITextFormatter<MarkupTokenType>
 		{
+			#region XmlWriterAdapter
+
+			/// <summary>
+			/// Wraps an XmlWriter as a TextWriter
+			/// </summary>
+			private class XmlWriterAdapter : TextWriter
+			{
+				#region Init
+
+				/// <summary>
+				/// Ctor
+				/// </summary>
+				/// <param name="writer"></param>
+				public XmlWriterAdapter(System.Xml.XmlWriter writer)
+				{
+					this.Writer = writer;
+				}
+
+				#endregion Init
+
+				#region Properties
+
+				/// <summary>
+				/// Gets the underlying XmlWriter
+				/// </summary>
+				public System.Xml.XmlWriter Writer
+				{
+					get;
+					private set;
+				}
+
+				#endregion Properties
+
+				#region Methods
+
+				public override void Write(char value)
+				{
+					this.Writer.WriteRaw(Char.ToString(value));
+				}
+
+				public override void Write(char[] buffer)
+				{
+					if (buffer != null)
+					{
+						this.Writer.WriteRaw(buffer, 0, buffer.Length);
+					}
+				}
+
+				public override void Write(char[] buffer, int index, int count)
+				{
+					if (buffer != null)
+					{
+						this.Writer.WriteRaw(buffer, index, count);
+					}
+				}
+
+				public override void Write(string value)
+				{
+					this.Writer.WriteRaw(value);
+				}
+
+				public override void Flush()
+				{
+					this.Writer.Flush();
+				}
+
+				public override Encoding Encoding
+				{
+					get { return this.Writer.Settings.Encoding; }
+				}
+
+				#endregion Methods
+			}
+
+			#endregion XmlWriterAdapter
+
 			#region Constants
 
 			private const string ErrorUnexpectedToken = "Unexpected token ({0})";
@@ -103,6 +179,13 @@ namespace JsonFx.Xml
 				if (writer == null)
 				{
 					throw new ArgumentNullException("writer");
+				}
+
+				XmlWriterAdapter adapter = writer as XmlWriterAdapter;
+				if (adapter != null)
+				{
+					this.Format(adapter.Writer, tokens);
+					return;
 				}
 
 				using (System.Xml.XmlWriter xmlWriter = System.Xml.XmlWriter.Create(
@@ -191,24 +274,14 @@ namespace JsonFx.Xml
 							}
 							case MarkupTokenType.Primitive:
 							{
-								writer.WriteString(token.ValueAsString());
-
-								stream.Pop();
-								token = stream.Peek();
-								break;
-							}
-							case MarkupTokenType.UnparsedBlock:
-							{
-								string format = token.Name.LocalName;
-								if (String.IsNullOrEmpty(format))
+								IMarkupFormattable formattable = token.Value as IMarkupFormattable;
+								if (formattable != null)
 								{
-									writer.WriteRaw(token.ValueAsString());
+									formattable.Format(this, new XmlWriterAdapter(writer));
 								}
 								else
 								{
-									writer.WriteRaw(Char.ToString(MarkupGrammar.OperatorElementBegin));
-									writer.WriteRaw(String.Format(format, token.ValueAsString()));
-									writer.WriteRaw(Char.ToString(MarkupGrammar.OperatorElementEnd));
+									writer.WriteString(token.ValueAsString());
 								}
 
 								stream.Pop();
@@ -246,24 +319,17 @@ namespace JsonFx.Xml
 
 				switch (token.TokenType)
 				{
-					case MarkupTokenType.UnparsedBlock:
+					case MarkupTokenType.Primitive:
 					{
-						string format = token.Name.LocalName;
-						if (String.IsNullOrEmpty(format))
+						IMarkupFormattable formattable = token.Value as IMarkupFormattable;
+						if (formattable != null)
 						{
-							writer.WriteRaw(token.ValueAsString());
+							formattable.Format(this, new XmlWriterAdapter(writer));
 						}
 						else
 						{
-							writer.WriteRaw(Char.ToString(MarkupGrammar.OperatorElementBegin));
-							writer.WriteRaw(String.Format(format, token.ValueAsString()));
-							writer.WriteRaw(Char.ToString(MarkupGrammar.OperatorElementEnd));
+							writer.WriteString(token.ValueAsString());
 						}
-						break;
-					}
-					case MarkupTokenType.Primitive:
-					{
-						writer.WriteString(token.ValueAsString());
 						break;
 					}
 					default:

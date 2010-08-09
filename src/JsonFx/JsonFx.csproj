@@ -100,6 +100,7 @@
     <Compile Include="Bson\BsonFormatter.cs" />
     <Compile Include="Bson\BsonTokenizer.cs" />
     <Compile Include="Bson\BsonTypes.cs" />
+    <Compile Include="Bson\IBsonFormattable.cs" />
     <Compile Include="CodeGen\Delegates.cs" />
     <Compile Include="Common\CommonAnalyzer.cs" />
     <Compile Include="Common\CommonGrammar.cs" />
@@ -123,6 +124,7 @@
     <Compile Include="IO\Stream`1.cs" />
     <Compile Include="IO\StringStream.cs" />
     <Compile Include="IO\TextReaderStream.cs" />
+    <Compile Include="Json\IJsonFormattable.cs" />
     <Compile Include="Json\JsonFormatter.cs" />
     <Compile Include="Json\JsonGrammar.cs" />
     <Compile Include="Json\JsonIgnoreAttribute.cs" />
@@ -134,6 +136,8 @@
     <Compile Include="JsonML\JsonMLInTransformer.cs" />
     <Compile Include="JsonML\JsonMLOutTransformer.cs" />
     <Compile Include="Json\Resolvers\JsonResolverStrategy.cs" />
+    <Compile Include="Markup\UnparsedBlock.cs" />
+    <Compile Include="Markup\IMarkupFormattable.cs" />
     <Compile Include="Markup\MarkupGrammar.cs" />
     <Compile Include="Markup\MarkupTokenType.cs" />
     <Compile Include="Markup\PrefixScopeChain.cs" />

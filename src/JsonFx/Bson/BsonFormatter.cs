@@ -111,7 +111,7 @@ namespace JsonFx.Bson
 					IStream<Token<CommonTokenType>> tokenStream = Stream<Token<CommonTokenType>>.Create(tokens);
 					if (!tokenStream.IsCompleted)
 					{
-						BsonFormatter.WriteDocument(writer, tokenStream);
+						this.WriteDocument(writer, tokenStream);
 					}
 				}
 			}
@@ -126,7 +126,7 @@ namespace JsonFx.Bson
 			/// <param name="writer"></param>
 			/// <param name="tokens"></param>
 			/// <returns>number of bytes written</returns>
-			private static int WriteDocument(BinaryWriter writer, IStream<Token<CommonTokenType>> tokens)
+			private int WriteDocument(BinaryWriter writer, IStream<Token<CommonTokenType>> tokens)
 			{
 				Token<CommonTokenType> token = tokens.Peek();
 				if (tokens.IsCompleted || token == null)
@@ -200,7 +200,7 @@ namespace JsonFx.Bson
 						tokens.Pop();
 					}
 
-					total += BsonFormatter.WriteElement(writer, tokens, ename);
+					total += this.WriteElement(writer, tokens, ename);
 					token = tokens.Peek();
 					count++;
 				}
@@ -226,7 +226,7 @@ namespace JsonFx.Bson
 			/// <param name="tokens"></param>
 			/// <param name="ename"></param>
 			/// <returns>number of bytes written</returns>
-			private static int WriteElement(BinaryWriter writer, IStream<Token<CommonTokenType>> tokens, string ename)
+			private int WriteElement(BinaryWriter writer, IStream<Token<CommonTokenType>> tokens, string ename)
 			{
 				Token<CommonTokenType> token = tokens.Peek();
 				if (tokens.IsCompleted || token == null)
@@ -244,7 +244,7 @@ namespace JsonFx.Bson
 					}
 					case CommonTokenType.ObjectBegin:
 					{
-						elemType = BsonElementType.Array;
+						elemType = BsonElementType.Document;
 						break;
 					}
 					case CommonTokenType.Primitive:
@@ -267,195 +267,211 @@ namespace JsonFx.Bson
 				// write EName
 				total += BsonFormatter.WriteString(writer, ename, true);
 
-				switch (elemType)
+				IBsonFormattable formattable = token.Value as IBsonFormattable;
+				if (formattable != null)
 				{
-					case BsonElementType.Double:
+					total += formattable.Format(this, writer);
+				}
+				else
+				{
+					switch (elemType)
 					{
-						// consume token value
-						tokens.Pop();
-
-						// write double data
-						writer.Write((double)token.Value);
-						total += BsonWriter.SizeOfDouble;
-						break;
-					}
-					case BsonElementType.String:
-					case BsonElementType.JavaScriptCode:
-					case BsonElementType.Symbol:
-					{
-						// consume token value
-						tokens.Pop();
-
-						// write as string data
-						total += BsonFormatter.WriteString(writer, token.ValueAsString(), false);
-						break;
-					}
-					case BsonElementType.Document:
-					case BsonElementType.Array:
-					{
-						// delegate property to sub-document
-						total += BsonFormatter.WriteDocument(writer, tokens);
-						break;
-					}
-					case BsonElementType.Binary:
-					{
-						// consume token value
-						tokens.Pop();
-
-						total += BsonFormatter.WriteBinary(writer, token);
-						break;
-					}
-					case BsonElementType.ObjectID:
-					{
-						// consume token value
-						tokens.Pop();
-
-						// write ObjectID data
-						writer.Write((byte[])token.Value);
-						total += BsonWriter.SizeOfObjectID;
-						break;
-					}
-					case BsonElementType.Boolean:
-					{
-						// consume token value
-						tokens.Pop();
-
-						// write bool data
-						bool value = true.Equals(token.Value);
-						writer.Write(value ? BsonWriter.TrueByte : BsonWriter.FalseByte);
-						total += BsonWriter.SizeOfByte;
-						break;
-					}
-					case BsonElementType.DateTimeUtc:
-					{
-						// consume token value
-						tokens.Pop();
-
-						DateTime value = (DateTime)token.Value;
-						if (value.Kind == DateTimeKind.Local)
+						case BsonElementType.Double:
 						{
-							// convert server-local to UTC
-							value = value.ToUniversalTime();
+							// consume token value
+							tokens.Pop();
+
+							// write double data
+							writer.Write((double)token.Value);
+							total += BsonWriter.SizeOfDouble;
+							break;
 						}
-
-						// find the duration since Jan 1, 1970
-						TimeSpan duration = value.Subtract(BsonWriter.UnixEpoch);
-
-						// get the total milliseconds
-						long ticks = (long)duration.TotalMilliseconds;
-
-						// write long data
-						writer.Write((long)ticks);
-						total += BsonWriter.SizeOfInt64;
-						break;
-					}
-					case BsonElementType.RegExp:
-					{
-						// consume token value
-						tokens.Pop();
-
-						Regex regex = token.Value as Regex;
-						if (regex == null)
+						case BsonElementType.String:
+						case BsonElementType.JavaScriptCode:
+						case BsonElementType.Symbol:
 						{
-							goto default;
+							// consume token value
+							tokens.Pop();
+
+							// write as string data
+							total += BsonFormatter.WriteString(writer, token.ValueAsString(), false);
+							break;
 						}
-
-						// default implementation is to simply return the pattern string
-						string pattern = regex.ToString();
-
-						// write cstring data
-						total += BsonFormatter.WriteString(writer, pattern, true);
-
-						string options = "";
-						//if ((regex.Options & RegexOptions.) != 0)
-						//{
-						//    options += 'g';
-						//}
-						if ((regex.Options & RegexOptions.IgnoreCase) != 0)
+						case BsonElementType.Document:
+						case BsonElementType.Array:
 						{
-							options += 'i';
+							// delegate property to sub-document
+							total += this.WriteDocument(writer, tokens);
+							break;
 						}
-						if ((regex.Options & RegexOptions.Multiline) != 0)
+						case BsonElementType.Binary:
 						{
-							options += 'm';
+							// consume token value
+							tokens.Pop();
+
+							total += BsonFormatter.WriteBinary(writer, token);
+							break;
 						}
-
-						// write cstring data
-						total += BsonFormatter.WriteString(writer, options, true);
-						break;
-					}
-					case BsonElementType.DBPointer:
-					{
-						// consume token value
-						tokens.Pop();
-
-						BsonDBPointer pointer = token.Value as BsonDBPointer;
-						if (pointer == null)
+						case BsonElementType.ObjectID:
 						{
-							goto default;
+							// consume token value
+							tokens.Pop();
+
+							// write ObjectID data
+							writer.Write((byte[])token.Value);
+							total += BsonWriter.SizeOfObjectID;
+							break;
 						}
-
-						// write string data
-						total += BsonFormatter.WriteString(writer, pointer.Namespace, false);
-
-						// write bytes
-						writer.Write((byte[])pointer.ObjectID);
-						total += BsonWriter.SizeOfObjectID;
-						break;
-					}
-					case BsonElementType.CodeWithScope:
-					{
-						// consume token value
-						tokens.Pop();
-
-						BsonCodeWithScope codews = token.Value as BsonCodeWithScope;
-						if (codews == null)
+						case BsonElementType.Boolean:
 						{
-							goto default;
+							// consume token value
+							tokens.Pop();
+
+							// write bool data
+							bool value = true.Equals(token.Value);
+							writer.Write(value ? BsonWriter.TrueByte : BsonWriter.FalseByte);
+							total += BsonWriter.SizeOfByte;
+							break;
 						}
+						case BsonElementType.DateTimeUtc:
+						{
+							// consume token value
+							tokens.Pop();
 
-						total += BsonFormatter.WriteCodeWithScope(writer, codews);
-						break;
-					}
-					case BsonElementType.Int32:
-					{
-						// consume token value
-						tokens.Pop();
+							DateTime value = (DateTime)token.Value;
+							if (value.Kind == DateTimeKind.Local)
+							{
+								// convert server-local to UTC
+								value = value.ToUniversalTime();
+							}
 
-						// write int data
-						writer.Write((int)token.Value);
-						total += BsonWriter.SizeOfInt32;
-						break;
-					}
-					case BsonElementType.TimeStamp:
-					case BsonElementType.Int64:
-					{
-						// consume token value
-						tokens.Pop();
+							// find the duration since Jan 1, 1970
+							TimeSpan duration = value.Subtract(BsonWriter.UnixEpoch);
 
-						// TODO: determine how to convert TimeStamp
+							// get the total milliseconds
+							long ticks = (long)duration.TotalMilliseconds;
 
-						// write long data
-						writer.Write((long)token.Value);
-						total += BsonWriter.SizeOfInt64;
-						break;
-					}
-					case BsonElementType.Undefined:
-					case BsonElementType.Null:
-					case BsonElementType.MinKey:
-					case BsonElementType.MaxKey:
-					{
-						// consume token value
-						tokens.Pop();
+							// write long data
+							writer.Write((long)ticks);
+							total += BsonWriter.SizeOfInt64;
+							break;
+						}
+						case BsonElementType.RegExp:
+						{
+							// consume token value
+							tokens.Pop();
 
-						// no data emitted for these
-						break;
-					}
-					default:
-					{
-						// the rest are invalid states
-						throw new TokenException<CommonTokenType>(token,
-							String.Format(BsonWriter.ErrorUnexpectedToken, token.TokenType));
+							Regex regex = token.Value as Regex;
+							if (regex == null)
+							{
+								goto default;
+							}
+
+							// default implementation is to simply return the pattern string
+							string pattern = regex.ToString();
+
+							// write cstring data
+							total += BsonFormatter.WriteString(writer, pattern, true);
+
+							bool isGlobal = false; // nothing to switch on
+
+							string options = isGlobal ? "g" : "";
+							switch (regex.Options & (RegexOptions.IgnoreCase|RegexOptions.Multiline))
+							{
+								case RegexOptions.IgnoreCase:
+								{
+									options += "i";
+									break;
+								}
+								case RegexOptions.Multiline:
+								{
+									options += "m";
+									break;
+								}
+								case RegexOptions.IgnoreCase|RegexOptions.Multiline:
+								{
+									options += "im";
+									break;
+								}
+							}
+
+							// write cstring data
+							total += BsonFormatter.WriteString(writer, options, true);
+							break;
+						}
+						case BsonElementType.DBPointer:
+						{
+							// consume token value
+							tokens.Pop();
+
+							BsonDBPointer pointer = token.Value as BsonDBPointer;
+							if (pointer == null)
+							{
+								goto default;
+							}
+
+							// write string data
+							total += BsonFormatter.WriteString(writer, pointer.Namespace, false);
+
+							// write bytes
+							writer.Write((byte[])pointer.ObjectID);
+							total += BsonWriter.SizeOfObjectID;
+							break;
+						}
+						case BsonElementType.CodeWithScope:
+						{
+							// consume token value
+							tokens.Pop();
+
+							BsonCodeWithScope codews = token.Value as BsonCodeWithScope;
+							if (codews == null)
+							{
+								goto default;
+							}
+
+							total += this.WriteCodeWithScope(writer, codews);
+							break;
+						}
+						case BsonElementType.Int32:
+						{
+							// consume token value
+							tokens.Pop();
+
+							// write int data
+							writer.Write((int)token.Value);
+							total += BsonWriter.SizeOfInt32;
+							break;
+						}
+						case BsonElementType.TimeStamp:
+						case BsonElementType.Int64:
+						{
+							// consume token value
+							tokens.Pop();
+
+							// TODO: determine how to convert TimeStamp
+
+							// write long data
+							writer.Write((long)token.Value);
+							total += BsonWriter.SizeOfInt64;
+							break;
+						}
+						case BsonElementType.Undefined:
+						case BsonElementType.Null:
+						case BsonElementType.MinKey:
+						case BsonElementType.MaxKey:
+						{
+							// consume token value
+							tokens.Pop();
+
+							// no data emitted for these
+							break;
+						}
+						default:
+						{
+							// the rest are invalid states
+							throw new TokenException<CommonTokenType>(token,
+								String.Format(BsonWriter.ErrorUnexpectedToken, token.TokenType));
+						}
 					}
 				}
 
@@ -519,7 +535,7 @@ namespace JsonFx.Bson
 			/// <param name="writer"></param>
 			/// <param name="tokens"></param>
 			/// <returns>number of bytes written</returns>
-			private static int WriteCodeWithScope(BinaryWriter writer, BsonCodeWithScope value)
+			private int WriteCodeWithScope(BinaryWriter writer, BsonCodeWithScope value)
 			{
 				long start = writer.BaseStream.Position;
 				int total = BsonWriter.SizeOfInt32;// code_w_s length field
@@ -533,7 +549,7 @@ namespace JsonFx.Bson
 				//TODO: this is currently broken.
 
 				// write scope
-				total += BsonFormatter.WriteDocument(writer, value.Scope);
+				total += this.WriteDocument(writer, value.Scope);
 
 				// seek back to write out code_w_s length
 				long end = writer.BaseStream.Position;
@@ -596,6 +612,10 @@ namespace JsonFx.Bson
 					}
 					default:
 					{
+						if (value is IBsonFormattable)
+						{
+							return ((IBsonFormattable)value).GetElementType();
+						}
 						if (value is TimeSpan)
 						{
 							return BsonElementType.TimeStamp;

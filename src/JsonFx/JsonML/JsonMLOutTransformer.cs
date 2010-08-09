@@ -133,14 +133,20 @@ namespace JsonFx.JsonML
 								stream.Pop();
 								token = stream.Peek();
 
-								if (token.TokenType != CommonTokenType.Primitive)
+								switch (token.TokenType)
 								{
-									throw new TokenException<CommonTokenType>(
-										token,
-										String.Format(JsonMLOutTransformer.ErrorInvalidAttributeValue, token.TokenType));
+									case CommonTokenType.Primitive:
+									{
+										yield return token.ChangeType(MarkupTokenType.Primitive);
+										break;
+									}
+									default:
+									{
+										throw new TokenException<CommonTokenType>(
+											token,
+											String.Format(JsonMLOutTransformer.ErrorInvalidAttributeValue, token.TokenType));
+									}
 								}
-
-								yield return this.TransformValue(token);
 
 								// consume attribute value token
 								stream.Pop();
@@ -169,7 +175,7 @@ namespace JsonFx.JsonML
 						}
 						case CommonTokenType.Primitive:
 						{
-							yield return this.TransformValue(token);
+							yield return token.ChangeType(MarkupTokenType.Primitive);
 
 							stream.Pop();
 							token = stream.Peek();
@@ -184,13 +190,6 @@ namespace JsonFx.JsonML
 						}
 					}
 				}
-			}
-
-			private Token<MarkupTokenType> TransformValue(Token<CommonTokenType> token)
-			{
-				MarkupTokenType valueType = (token.Name.IsEmpty) ? MarkupTokenType.Primitive : MarkupTokenType.UnparsedBlock;
-
-				return token.ChangeType(valueType);
 			}
 
 			#endregion IDataTransformer<MarkupTokenType,CommonTokenType> Members

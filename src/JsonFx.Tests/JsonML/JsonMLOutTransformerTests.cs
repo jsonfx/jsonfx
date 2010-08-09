@@ -882,11 +882,11 @@ namespace JsonFx.JsonML
 		{
 			var input = new[]
 			    {
-					 new Token<CommonTokenType>(CommonTokenType.Primitive, new DataName("?{0}?"), @"xml version=""1.0""")
+					 CommonGrammar.TokenPrimitive(new UnparsedBlock("?", "?", @"xml version=""1.0"""))
 			    };
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenUnparsed("?{0}?", @"xml version=""1.0""")
+			        MarkupGrammar.TokenUnparsed("?", "?", @"xml version=""1.0""")
 			    };
 
 			var converter = new JsonMLWriter.JsonMLOutTransformer();
@@ -901,11 +901,11 @@ namespace JsonFx.JsonML
 		{
 			var input = new[]
 			    {
-					 new Token<CommonTokenType>(CommonTokenType.Primitive, new DataName("!--{0}--"), @" a quick note ")
+					 CommonGrammar.TokenPrimitive(new UnparsedBlock("!--", "--", @" a quick note "))
 			    };
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenUnparsed("!--{0}--", @" a quick note ")
+			        MarkupGrammar.TokenUnparsed("!--", "--", @" a quick note ")
 			    };
 
 			var converter = new JsonMLWriter.JsonMLOutTransformer();
@@ -1017,14 +1017,14 @@ namespace JsonFx.JsonML
 		{
 			var input = new[]
 			    {
-					new Token<CommonTokenType>(CommonTokenType.Primitive, new DataName("!{0}"),
+					CommonGrammar.TokenPrimitive(new UnparsedBlock("!", "",
 @"DOCTYPE html PUBLIC
 	""-//W3C//DTD XHTML 1.1//EN""
-	""http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd""")
+	""http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"""))
 			    };
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenUnparsed("!{0}",
+			        MarkupGrammar.TokenUnparsed("!", "",
 @"DOCTYPE html PUBLIC
 	""-//W3C//DTD XHTML 1.1//EN""
 	""http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd""")
@@ -1042,11 +1042,11 @@ namespace JsonFx.JsonML
 		{
 			var input = new[]
 			    {
-					new Token<CommonTokenType>(CommonTokenType.Primitive, new DataName("%@{0}%"), @" Page Language=""C#"" AutoEventWireup=""true"" CodeBehind=""Default.aspx.cs"" Inherits=""Foo._Default"" ")
+					CommonGrammar.TokenPrimitive(new UnparsedBlock("%@", "%", @" Page Language=""C#"" AutoEventWireup=""true"" CodeBehind=""Default.aspx.cs"" Inherits=""Foo._Default"" "))
 			    };
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenUnparsed("%@{0}%", @" Page Language=""C#"" AutoEventWireup=""true"" CodeBehind=""Default.aspx.cs"" Inherits=""Foo._Default"" ")
+			        MarkupGrammar.TokenUnparsed("%@", "%", @" Page Language=""C#"" AutoEventWireup=""true"" CodeBehind=""Default.aspx.cs"" Inherits=""Foo._Default"" ")
 			    };
 
 			var converter = new JsonMLWriter.JsonMLOutTransformer();
@@ -1077,7 +1077,7 @@ namespace JsonFx.JsonML
 			        CommonGrammar.TokenArrayBeginUnnamed,
 			        CommonGrammar.TokenPrimitive(new DataName("body")),
 			        CommonGrammar.TokenPrimitive("\r\n\t\t"),
-			        new Token<CommonTokenType>(CommonTokenType.Primitive, new DataName("?{0}?"), @"php echo '<p>Hello World</p>'; "),
+					CommonGrammar.TokenPrimitive(new UnparsedBlock("?", "?", @"php echo '<p>Hello World</p>'; ")),
 			        CommonGrammar.TokenPrimitive("\r\n\t"),
 			        CommonGrammar.TokenArrayEnd,
 			        CommonGrammar.TokenPrimitive("\r\n"),
@@ -1097,7 +1097,7 @@ namespace JsonFx.JsonML
 			        MarkupGrammar.TokenPrimitive("\r\n\t"),
 			        MarkupGrammar.TokenElementBegin(new DataName("body")),
 			        MarkupGrammar.TokenPrimitive("\r\n\t\t"),
-			        MarkupGrammar.TokenUnparsed("?{0}?", @"php echo '<p>Hello World</p>'; "),
+			        MarkupGrammar.TokenUnparsed("?", "?", @"php echo '<p>Hello World</p>'; "),
 			        MarkupGrammar.TokenPrimitive("\r\n\t"),
 			        MarkupGrammar.TokenElementEnd,
 			        MarkupGrammar.TokenPrimitive("\r\n"),
@@ -1116,18 +1116,18 @@ namespace JsonFx.JsonML
 		{
 			var input = new[]
 			    {
-					new Token<CommonTokenType>(CommonTokenType.Primitive, new DataName("%--{0}--%"),
+					CommonGrammar.TokenPrimitive(new UnparsedBlock("%--", "--%",
 @"
 <html>
 	<body style=""color:lime"">
 		<!-- not much to say here -->
 	</body>
 </html>
-")
+"))
 			    };
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenUnparsed("%--{0}--%",
+			        MarkupGrammar.TokenUnparsed("%--", "--%",
 @"
 <html>
 	<body style=""color:lime"">

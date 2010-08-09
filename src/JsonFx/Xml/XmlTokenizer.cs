@@ -272,22 +272,22 @@ namespace JsonFx.Xml
 						case System.Xml.XmlNodeType.ProcessingInstruction:
 						case System.Xml.XmlNodeType.XmlDeclaration:
 						{
-							yield return MarkupGrammar.TokenUnparsed("?{0}?", reader.Name+" "+reader.Value);
+							yield return MarkupGrammar.TokenUnparsed("?", "?", reader.Name+" "+reader.Value);
 							break;
 						}
 						case System.Xml.XmlNodeType.Comment:
 						{
-							yield return MarkupGrammar.TokenUnparsed("!--{0}--", reader.Value);
+							yield return MarkupGrammar.TokenUnparsed("!--", "--", reader.Value);
 							break;
 						}
 						case System.Xml.XmlNodeType.DocumentType:
 						{
-							yield return MarkupGrammar.TokenUnparsed("!DOCTYPE {0}", reader.Value);
+							yield return MarkupGrammar.TokenUnparsed("!DOCTYPE ", "", reader.Value);
 							break;
 						}
 						case System.Xml.XmlNodeType.Notation:
 						{
-							yield return MarkupGrammar.TokenUnparsed("!NOTATION {0}", reader.Value);
+							yield return MarkupGrammar.TokenUnparsed("!NOTATION ", "", reader.Value);
 							break;
 						}
 						case System.Xml.XmlNodeType.None:

@@ -310,9 +310,7 @@ namespace JsonFx.Html
 							if (value != null)
 							{
 								// emit as an unparsed comment
-								return MarkupGrammar.TokenUnparsed(
-									String.Concat("!--{0}--"),
-									value);
+								return MarkupGrammar.TokenUnparsed("!--", "--", value);
 							}
 
 							// process as generic declaration
@@ -333,7 +331,7 @@ namespace JsonFx.Html
 						default:									// "<!", ">"			SGML declaration (e.g. DOCTYPE or server-side include)
 						{
 							return MarkupGrammar.TokenUnparsed(
-								"!{0}",
+								"!", "",
 								this.ScanUnparsedValue(scanner, String.Empty, String.Empty));
 						}
 					}
@@ -348,13 +346,15 @@ namespace JsonFx.Html
 						case MarkupGrammar.OperatorCodeExpression:	// "<?=", "?>"			PHP expression code block
 						{
 							return MarkupGrammar.TokenUnparsed(
-								"?={0}?",
+								MarkupGrammar.OperatorPhpExpressionBegin,
+								MarkupGrammar.OperatorProcessingInstructionEnd,
 								this.ScanUnparsedValue(scanner, MarkupGrammar.OperatorPhpExpressionBegin, MarkupGrammar.OperatorProcessingInstructionEnd));
 						}
 						default:									// "<?", "?>"			PHP code block / XML processing instruction (e.g. XML declaration)
 						{
 							return MarkupGrammar.TokenUnparsed(
-								"?{0}?",
+								MarkupGrammar.OperatorProcessingInstructionBegin,
+								MarkupGrammar.OperatorProcessingInstructionEnd,
 								this.ScanUnparsedValue(scanner, String.Empty, MarkupGrammar.OperatorProcessingInstructionEnd));
 						}
 					}
@@ -370,12 +370,12 @@ namespace JsonFx.Html
 						case MarkupGrammar.OperatorCommentDelim:		// "<%--", "--%>"		ASP/PSP/JSP-style code comment
 						{
 							return MarkupGrammar.TokenUnparsed(
-								"%--{0}--%",
+								"%--", "--%",
 								this.ScanUnparsedValue(scanner, MarkupGrammar.OperatorCommentBegin, String.Concat(MarkupGrammar.OperatorCommentEnd, MarkupGrammar.OperatorCode)));
 						}
 						case MarkupGrammar.OperatorCodeDirective:		// "<%@",  "%>"			ASP/PSP/JSP directive
-						case MarkupGrammar.OperatorCodeExpression:	// "<%=",  "%>"			ASP/PSP/JSP/JBST expression
-						case MarkupGrammar.OperatorCodeDeclaration:	// "<%!",  "%>"			JSP/JBST declaration
+						case MarkupGrammar.OperatorCodeExpression:		// "<%=",  "%>"			ASP/PSP/JSP/JBST expression
+						case MarkupGrammar.OperatorCodeDeclaration:		// "<%!",  "%>"			JSP/JBST declaration
 						case MarkupGrammar.OperatorCodeDataBind:		// "<%#",  "%>"			ASP.NET/JBST databind expression
 						case MarkupGrammar.OperatorCodeExtension:		// "<%$",  "%>"			ASP.NET/JBST extension
 						{
@@ -383,14 +383,16 @@ namespace JsonFx.Html
 							scanner.Pop();
 
 							return MarkupGrammar.TokenUnparsed(
-								String.Concat(MarkupGrammar.OperatorCode, ch, "{0}", MarkupGrammar.OperatorCode),
+								String.Concat(MarkupGrammar.OperatorCode, ch),
+								MarkupGrammar.OperatorCodeEnd,
 								this.ScanUnparsedValue(scanner, String.Empty, Char.ToString(MarkupGrammar.OperatorCode)));
 						}
 						default:									// "<%",   "%>"			ASP/PSP/JSP code block
 						{
 							// simple code block
 							return MarkupGrammar.TokenUnparsed(
-								"%{0}%",
+								MarkupGrammar.OperatorCodeBlockBegin,
+								MarkupGrammar.OperatorCodeEnd,
 								this.ScanUnparsedValue(scanner, String.Empty, Char.ToString(MarkupGrammar.OperatorCode)));
 						}
 					}

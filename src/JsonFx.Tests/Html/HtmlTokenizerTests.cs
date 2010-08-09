@@ -897,7 +897,7 @@ namespace JsonFx.Html
 			const string input = @"<?xml version=""1.0""?>";
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenUnparsed("?{0}?", @"xml version=""1.0""")
+			        MarkupGrammar.TokenUnparsed("?", "?", @"xml version=""1.0""")
 			    };
 
 			var tokenizer = new HtmlTokenizer();
@@ -913,7 +913,7 @@ namespace JsonFx.Html
 			const string input = @"<!-- a quick note -->";
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenUnparsed("!--{0}--", @" a quick note ")
+			        MarkupGrammar.TokenUnparsed("!--", "--", @" a quick note ")
 			    };
 
 			var tokenizer = new HtmlTokenizer();
@@ -999,7 +999,7 @@ namespace JsonFx.Html
 
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenUnparsed("!{0}",
+			        MarkupGrammar.TokenUnparsed("!", "",
 @"DOCTYPE html PUBLIC
 	""-//W3C//DTD XHTML 1.1//EN""
 	""http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd""")
@@ -1021,7 +1021,7 @@ namespace JsonFx.Html
 ]>";
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenUnparsed("!{0}",
+			        MarkupGrammar.TokenUnparsed("!", "",
 @"DOCTYPE doc [
 	<!ATTLIST normId id ID #IMPLIED>
 	<!ATTLIST normNames attr NMTOKENS #IMPLIED>
@@ -1042,7 +1042,7 @@ namespace JsonFx.Html
 
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenUnparsed("%@{0}%", @" Page Language=""C#"" AutoEventWireup=""true"" CodeBehind=""Default.aspx.cs"" Inherits=""Foo._Default"" ")
+			        MarkupGrammar.TokenUnparsed("%@", "%", @" Page Language=""C#"" AutoEventWireup=""true"" CodeBehind=""Default.aspx.cs"" Inherits=""Foo._Default"" ")
 			    };
 
 			var tokenizer = new HtmlTokenizer();
@@ -1079,7 +1079,7 @@ namespace JsonFx.Html
 			        MarkupGrammar.TokenPrimitive("\r\n\t"),
 			        MarkupGrammar.TokenElementBegin(new DataName("body")),
 			        MarkupGrammar.TokenPrimitive("\r\n\t\t"),
-			        MarkupGrammar.TokenUnparsed("?{0}?", @"php echo '<p>Hello World</p>'; "),
+			        MarkupGrammar.TokenUnparsed("?", "?", @"php echo '<p>Hello World</p>'; "),
 			        MarkupGrammar.TokenPrimitive("\r\n\t"),
 			        MarkupGrammar.TokenElementEnd,
 			        MarkupGrammar.TokenPrimitive("\r\n"),
@@ -1107,7 +1107,7 @@ namespace JsonFx.Html
 
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenUnparsed("%--{0}--%",
+			        MarkupGrammar.TokenUnparsed("%--", "--%",
 @"
 <html>
 	<body style=""color:lime"">

@@ -66,6 +66,7 @@ namespace JsonFx.Markup
 
 		public const char OperatorProcessingInstruction = '?';
 		public const string OperatorPhpExpressionBegin = "?=";
+		public const string OperatorProcessingInstructionBegin = "?";
 		public const string OperatorProcessingInstructionEnd = "?";
 
 		public const char OperatorCode = '%';
@@ -74,6 +75,8 @@ namespace JsonFx.Markup
 		public const char OperatorCodeDeclaration = '!';
 		public const char OperatorCodeDataBind = '#';
 		public const char OperatorCodeExtension = '$';
+		public const string OperatorCodeBlockBegin = "%";
+		public const string OperatorCodeEnd = "%";
 
 		#endregion Operators
 
@@ -82,9 +85,37 @@ namespace JsonFx.Markup
 		public static readonly Token<MarkupTokenType> TokenNone = new Token<MarkupTokenType>(MarkupTokenType.None);
 		public static readonly Token<MarkupTokenType> TokenElementEnd = new Token<MarkupTokenType>(MarkupTokenType.ElementEnd);
 
-		public static Token<MarkupTokenType> TokenUnparsed(string name, string text)
+		/// <summary>
+		/// Any of a number of unparsed tags which typically contain specialized processing instructions
+		/// </summary>
+		/// <remarks>
+		/// The name of the token is the beginning and ending delimiters as a format string (not including the '&lt;' or '&gt;')
+		/// Includes the following types:
+		/// 
+		///		"&lt;!--", "-->"	XML/HTML/SGML comment
+		///		"&lt;!", ">"		XML/SGML declaration (e.g. DOCTYPE or server-side includes)
+		/// 
+		///		"&lt;?=", "?>"		PHP expression
+		///		"&lt;?", "?>"		PHP code block /XML processing instruction (e.g. the XML declaration)
+		/// 
+		///		"&lt;%--", "--%>"	ASP/PSP/JSP-style code comment
+		///		"&lt;%@",  "%>"		ASP/PSP/JSP directive
+		///		"&lt;%=",  "%>"		ASP/PSP/JSP/JBST expression
+		///		"&lt;%!",  "%>"		JSP/JBST declaration
+		///		"&lt;%#",  "%>"		ASP.NET/JBST databind expression
+		///		"&lt;%$",  "%>"		ASP.NET/JBST extension
+		///		"&lt;%",   "%>"		ASP code block / JSP scriptlet / PSP code block
+		/// </remarks>
+		public static Token<MarkupTokenType> TokenUnparsed(string begin, string end, string value)
 		{
-			return new Token<MarkupTokenType>(MarkupTokenType.UnparsedBlock, new DataName(name), text);
+			return new Token<MarkupTokenType>(
+				MarkupTokenType.Primitive,
+				new UnparsedBlock
+				{
+					Begin = begin,
+					End = end,
+					Value = value
+				});
 		}
 
 		public static Token<MarkupTokenType> TokenElementBegin(DataName name)

@@ -121,11 +121,10 @@ namespace JsonFx.Xml
 				switch (token.TokenType)
 				{
 					case MarkupTokenType.Primitive:
-					case MarkupTokenType.UnparsedBlock:
 					{
 						input.Pop();
 
-						return new []
+						return new[]
 							{
 								token.ChangeType(CommonTokenType.Primitive)
 							};

@@ -628,7 +628,7 @@ namespace JsonFx.Xml
 			const string input = @"<?xml version=""1.0""?>";
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenUnparsed("?{0}?", @"xml version=""1.0""")
+			        MarkupGrammar.TokenUnparsed("?", "?", @"xml version=""1.0""")
 			    };
 
 			var tokenizer = new XmlReader.XmlTokenizer();
@@ -644,7 +644,7 @@ namespace JsonFx.Xml
 			const string input = @"<!-- a quick note -->";
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenUnparsed("!--{0}--", @" a quick note ")
+			        MarkupGrammar.TokenUnparsed("!--", "--", @" a quick note ")
 			    };
 
 			var tokenizer = new XmlReader.XmlTokenizer();
@@ -750,7 +750,7 @@ namespace JsonFx.Xml
 <root />";
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenUnparsed("!{0}",
+			        MarkupGrammar.TokenUnparsed("!", "",
 @"DOCTYPE doc [
 	<!ATTLIST normId id ID #IMPLIED>
 	<!ATTLIST normNames attr NMTOKENS #IMPLIED>
@@ -793,7 +793,7 @@ namespace JsonFx.Xml
 			        MarkupGrammar.TokenPrimitive("\n\t"),
 			        MarkupGrammar.TokenElementBegin(new DataName("body")),
 			        MarkupGrammar.TokenPrimitive("\n\t\t"),
-			        MarkupGrammar.TokenUnparsed("?{0}?", @"php echo '<p>Hello World</p>'; "),
+			        MarkupGrammar.TokenUnparsed("?", "?", @"php echo '<p>Hello World</p>'; "),
 			        MarkupGrammar.TokenPrimitive("\n\t"),
 			        MarkupGrammar.TokenElementEnd,
 			        MarkupGrammar.TokenPrimitive("\n"),

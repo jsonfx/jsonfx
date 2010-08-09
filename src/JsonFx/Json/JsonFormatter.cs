@@ -236,6 +236,13 @@ namespace JsonFx.Json
 								}
 								default:
 								{
+									IJsonFormattable formattable = token.Value as IJsonFormattable;
+									if (formattable != null)
+									{
+										formattable.Format(this, writer);
+										break;
+									}
+
 									if (token.Value is TimeSpan)
 									{
 										this.WriteNumber(writer, token, typeCode);
