@@ -1,5 +1,5 @@
-# [JsonFx][1] v2 - JSON Serialization Framework
-## Distributed under the terms of an MIT-style license
+# [JsonFx][1]- JSON Serialization Framework (v2)
+# Distributed under the terms of an [MIT-style license][2]
 
 ### Compatible Runtimes:
 - .NET Framework 2.0, 3.0, 3.5, and 4.0
@@ -8,7 +8,7 @@
 - Mono Framework 2.6
 
 ### Serialization Features:
-- Unified interface for reading / writing [JSON][2], [BSON][3], XML, [JsonML][4]
+- Unified interface for reading / writing [JSON][3], [BSON][4], XML, [JsonML][5]
 - Implements true LINQ-to-JSON (not simply LINQ-to-Objects over JSON types)
 - Naturally deserializes to standard CLR types, not JSON/XML-specific types
 - Supports reading/writing POCO classes
@@ -50,7 +50,7 @@
 	string json = writer.Write(output);
 	Console.WriteLine(json); // {"first":"Foo","middle":"Blah","last":"Bar"}
 
-#### Serialze to/from LINQ queries
+#### Serialze to/from custom types and LINQ queries
 
 	[DataContract]
 	public class Person
@@ -85,7 +85,7 @@
 
 #### Fully customizable name resolution strategies
 
-	// accept all variations! in order of priority
+	// accept all variations! list in order of priority
 	var resolver = new CombinedResolverStrategy(
 		new JsonResolverStrategy(),   															// simple JSON attributes
 		new DataContractResolverStrategy(),   													// DataContract attributes
@@ -93,7 +93,7 @@
 		new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.PascalCase),		// DotNetStyle
 		new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.CamelCase),		// jsonStyle
 		new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.Lowercase, "-"),	// xml-style
-		new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.Uppercase, "_"));	// UPPER_CASE
+		new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.Uppercase, "_"));	// CONST_STYLE
 
 	// pass the combined resolver strategy into the settings object
 	var reader = new JsonReader(new DataReaderSettings(resolver));
@@ -101,7 +101,7 @@
 	// link the settings objects to share resolver strategies and name lookup cache
 	var writer = new JsonWriter(new DataWriterSettings(reader.Settings) { PrettyPrint=true });
 
-#### Build REST services using dependency injection to configuring automatic serialization detection
+#### Build REST services using dependency injection to configure auto-serializer selection
 
 	// setup once for the lifespan of the application
 
@@ -150,7 +150,8 @@
 	}
 
   [1]: http://jsonfx.net
-  [2]: http://json.org
-  [3]: http://bsonspec.org
-  [4]: http://jsonml.org
+  [2]: http://jsonfx.net/license
+  [3]: http://json.org
+  [4]: http://bsonspec.org
+  [5]: http://jsonml.org
   
