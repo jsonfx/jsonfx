@@ -8,23 +8,23 @@
 - Mono Framework 2.6
 
 ### Serialization Features:
-- unified interface for reading / writing [JSON][2], [BSON][3], XML, [JsonML][4]
-- implements true LINQ-to-JSON (not simply LINQ-to-Objects over JSON types)
-- naturally deserializes to standard CLR types, not JSON/XML-specific types
-- supports reading/writing POCO classes
-- supports reading/writing using DataContract, XmlSerialization, JsonName, attributes
-- supports reading/writing using convention-based property renaming
-- supports reading/writing C# 4.0 dynamic types
-- supports reading/writing C# 3.0 Anonymous objects
-- supports reading/writing LINQ queries
-- supports custom reading/writing extensions & name resolution strategies
-- dependency-injection-friendly for extremely flexible custom configurations
-- stream-based serialization for reading/writing right off the wire
-- provider allows automatic selection of serializer from Content-Type and Accept-Types HTTP headers
+- Unified interface for reading / writing [JSON][2], [BSON][3], XML, [JsonML][4]
+- Implements true LINQ-to-JSON (not simply LINQ-to-Objects over JSON types)
+- Naturally deserializes to standard CLR types, not JSON/XML-specific types
+- Supports reading/writing POCO classes
+- Supports reading/writing using DataContract, XmlSerialization, JsonName, attributes
+- Supports reading/writing using convention-based property renaming
+- Supports reading/writing C# 4.0 dynamic types
+- Supports reading/writing C# 3.0 Anonymous objects
+- Supports reading/writing LINQ queries
+- Supports custom reading/writing extensions & name resolution strategies
+- Dependency-injection-friendly for extremely flexible custom configurations
+- Stream-based serialization for reading/writing right off the wire
+- Provider allows automatic selection of serializer from Content-Type and Accept-Types HTTP headers
 
 ### Basic Examples:
 
-#### serialize to/from dynamic types (default for .NET 4.0):
+#### Serialize to/from dynamic types (default for .NET 4.0):
 	var reader = new JsonReader(); var writer = new JsonWriter();
 
 	string input = @"{ ""foo"": true, ""array"": [ 42, false, ""Hello!"", null ] }";
@@ -33,7 +33,7 @@
 	string json = writer.Write(output);
 	Console.WriteLine(json); // {"foo":true,"array":[42,false,"Hello!",null]}
 
-#### serialize to/from standard CLR types (default for .NET 2.0/3.5):
+#### Serialize to/from standard CLR types (default for .NET 2.0/3.5):
 	string input = @"{ ""first"": ""Foo"", ""last"": ""Bar"" }";
 	var output = reader.Read<Dictionary<string, object>>(input);
 	Console.WriteLine(output["first"]); // Foo
@@ -41,7 +41,7 @@
 	string json = writer.Write(output);
 	Console.WriteLine(json); // {"first":"Foo","last":"Bar","middle":"Blah"}
 
-#### serialze to/from Anonymous types
+#### Serialze to/from Anonymous types
 	string input = @"{ ""first"": ""Foo"", ""last"": ""Bar"" }";
 	var template = new { first=String.Empty, middle=String.Empty, last=String.Empty };
 	var output = reader.Read(input, template);
@@ -50,7 +50,7 @@
 	string json = writer.Write(output);
 	Console.WriteLine(json); // {"first":"Foo","middle":"Blah","last":"Bar"}
 
-#### serialze to/from LINQ queries
+#### Serialze to/from LINQ queries
 
 	[DataContract]
 	public class Person
@@ -82,6 +82,72 @@
 	Console.WriteLine(query.Last().LastName); // Yada
 	string json = writer.Write(query);
 	Console.WriteLine(json); // [{"person-id":1,"first-name":"Foo","last-name":"Bar"},{"person-id":3,"first-name":"Blah","last-name":"Yada"}]
+
+#### Fully customizable name resolution strategies
+
+	// accept all variations! in order of priority
+	var resolver = new CombinedResolverStrategy(
+		new JsonResolverStrategy(),   															// simple JSON attributes
+		new DataContractResolverStrategy(),   													// DataContract attributes
+		new XmlResolverStrategy(),   															// XmlSerializer attributes
+		new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.PascalCase),		// DotNetStyle
+		new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.CamelCase),		// jsonStyle
+		new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.Lowercase, "-"),	// xml-style
+		new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.Uppercase, "_"));	// UPPER_CASE
+
+	// pass the combined resolver strategy into the settings object
+	var reader = new JsonReader(new DataReaderSettings(resolver));
+
+	// link the settings objects to share resolver strategies and name lookup cache
+	var writer = new JsonWriter(new DataWriterSettings(reader.Settings) { PrettyPrint=true });
+
+#### Build REST services using dependency injection to configuring automatic serialization detection
+
+	// setup once for the lifespan of the application
+
+	// POCO name resolution, share lookups among all instances
+	var readerSettings = new DataReaderSettings();				
+	var writerSettings = new DataWriterSettings(readerSettings);
+
+	var jsonReader = new JsonReader(readerSettings);
+	var jsonWriter = new JsonWriter(writerSettings);
+
+	var xmlReader = new XmlReader(readerSettings);
+	var xmlWriter = new XmlWriter(writerSettings);
+
+	// list all the readers
+	var readerProvider = new DataReaderProvider(
+		jsonReader,
+		xmlReader);
+
+	// list all the writers
+	var writerProvider = new DataWriterProvider(
+		jsonWriter,
+		xmlWriter);
+
+	// ...later on a request comes in
+
+	// incoming HTTP request headers
+	string contentTypeHeader = myRequest.Headers[HttpRequestHeader.ContentType];
+	string acceptHeader = myRequest.Headers[HttpRequestHeader.Accept];
+
+	IDataReader deserializer = readerProvider.Find(contentTypeHeader);
+
+	var requestData;
+	using (var textReader = new StreamReader(myRequest.GetRequestStream()))
+	{
+		requestData = deserializer.Read(textReader);
+	}
+	
+	// ...consume the data, generate a response
+	var myResponse = ...;
+	var responseData = ...;
+
+	IDataWriter serializer = writerProvider.Find(acceptHeader, contentTypeHeader);
+	using (var textWriter = new StreamWriter(myResponse.GetResponseStream()))
+	{
+		serializer.Write(responseData);
+	}
 
   [1]: http://jsonfx.net
   [2]: http://json.org
