@@ -60,21 +60,28 @@
 		[DataMember(Name="last")] public string LastName { get; set; }
 	}
 
+	// respect DataContracts on the way in
 	var reader = new JsonReader(new DataReaderSettings(new DataContractResolverStrategy()));
+	// use convention over configuration on the way out
 	var writer = new JsonWriter(new DataWriterSettings(new ConventionResolverStrategy("-", ConventionResolverStrategy.WordCasing.Lowercase)));
 
-	string input = @"[ { ""id"": 1, ""first"": ""Foo"", ""last"": ""Bar"" },  { ""id"": 2, ""first"": ""etc."", ""last"": ""et al."" }, { ""id"": 3, ""first"": ""Blah"", ""last"": ""Yada"" } ]";
+	string input =
+@"[
+	{ ""id"": 1, ""first"": ""Foo"", ""last"": ""Bar"" },
+	{ ""id"": 2, ""first"": ""etc."", ""last"": ""et al."" },
+	{ ""id"": 3, ""first"": ""Blah"", ""last"": ""Yada"" }
+]";
 
 	var people = reader.Query<Person>(input);
 	var query =
 		from person in people.ArrayItems()
-		where person.PersonID == 2 || person.FirstName == "Blah"
+		where person.PersonID == 1 || person.FirstName == "Blah"
 		orderby person.PersonID
 		select person;
 
 	Console.WriteLine(query.Last().LastName); // Yada
 	string json = writer.Write(query);
-	Console.WriteLine(json); // [{"person-id":2,"first-name":"etc.","last-name":"et al."},{"person-id":3,"first-name":"Blah","last-name":"Yada"}]
+	Console.WriteLine(json); // [{"person-id":1,"first-name":"Foo","last-name":"Bar"},{"person-id":3,"first-name":"Blah","last-name":"Yada"}]
 
   [1]: http://jsonfx.net
   [2]: http://json.org

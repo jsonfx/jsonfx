@@ -630,10 +630,17 @@ namespace JsonFx.Linq
 		[Trait(TraitName, TraitValue)]
 		public void QueryDescendants_OrderBy_ReturnsMultipleObjects()
 		{
+			// respect DataContracts on the way in
 			var reader = new JsonReader(new DataReaderSettings(new DataContractResolverStrategy()));
+			// use convention over configuration on the way out
 			var writer = new JsonWriter(new DataWriterSettings(new ConventionResolverStrategy("-", ConventionResolverStrategy.WordCasing.Lowercase)));
 
-			string input = @"[ { ""id"": 1, ""first"": ""Foo"", ""last"": ""Bar"" },  { ""id"": 2, ""first"": ""etc."", ""last"": ""et al."" }, { ""id"": 3, ""first"": ""Blah"", ""last"": ""Yada"" } ]";
+			string input =
+@"[
+	{ ""id"": 1, ""first"": ""Foo"", ""last"": ""Bar"" },
+	{ ""id"": 2, ""first"": ""etc."", ""last"": ""et al."" },
+	{ ""id"": 3, ""first"": ""Blah"", ""last"": ""Yada"" }
+]";
 
 			var people = reader.Query<Person>(input);
 			var query =
