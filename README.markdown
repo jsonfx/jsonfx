@@ -11,17 +11,18 @@
 - unified interface for reading / writing [JSON][2], [BSON][3], XML, [JsonML][4]
 - implements true LINQ-to-JSON (not simply LINQ-to-Objects over JSON types)
 - naturally deserializes to standard CLR types, not JSON/XML-specific types
-- supports serialzing to/from POCO classes
-- supports serializing using DataContract, XmlSerialization, JsonName, attributes
-- supports convention-based property renaming
-- supports reading/writing C# 4.0 dynamic keyword
+- supports reading/writing POCO classes
+- supports reading/writing using DataContract, XmlSerialization, JsonName, attributes
+- supports reading/writing using convention-based property renaming
+- supports reading/writing C# 4.0 dynamic types
 - supports reading/writing C# 3.0 Anonymous objects
 - supports reading/writing LINQ queries
-- supports custom reading/writing extensions
+- supports custom reading/writing extensions & name resolution strategies
 - dependency-injection-friendly for extremely flexible custom configurations
 - stream-based serialization for reading/writing right off the wire
+- provider allows automatic selection of serializer from Content-Type and Accept-Types HTTP headers
 
-### Basic Examples
+### Basic Examples:
 
 #### serialize to/from dynamic types (default for .NET 4.0):
 	var reader = new JsonReader(); var writer = new JsonWriter();
@@ -48,6 +49,24 @@
 	output = new { output.first, middle="Blah", output.last };
 	string json = writer.Write(output);
 	Console.WriteLine(json); // {"first":"Foo","middle":"Blah","last":"Bar"}
+
+#### serialze to/from LINQ queries
+
+	var reader = new JsonReader(new DataReaderSettings(new DataContractResolverStrategy()));
+	var writer = new JsonWriter(new DataWriterSettings(new ConventionResolverStrategy("-", ConventionResolverStrategy.WordCasing.Lowercase)));
+
+	string input = @"[ { ""personId"": 1, ""firstName"": ""Foo"", ""lastName"": ""Bar"" },  { ""personId"": 2, ""firstName"": ""etc."", ""lastName"": ""et al."" }, { ""personId"": 3, ""firstName"": ""Blah"", ""lastName"": ""Yada"" } ]";
+
+	var people = reader.Query<Person>(input);
+	var query =
+		from person in people.ArrayItems()
+		where person.PersonID == 2 || person.FirstName == "Blah"
+		orderby person.PersonID
+		select person;
+
+	Console.WriteLine(query.Last().LastName); // Yada
+	string json = writer.Write(query);
+	Console.WriteLine(json); // [{"person-id":2,"first-name":"etc.","last-name":"et al."},{"person-id":3,"first-name":"Blah","last-name":"Yada"}]
 
   [1]: http://jsonfx.net
   [2]: http://json.org
