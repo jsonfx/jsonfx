@@ -44,28 +44,30 @@ using System.Security;
 #endif
 
 [assembly: AssemblyConfiguration(
-#if SILVERLIGHT
-"Silverlight "+
+#if WINDOWS_PHONE
+"Windows Phone, .NET"+
+#elif SILVERLIGHT
+"Silverlight"+
 #else
-".NET "+
+".NET"+
 #endif
 
 #if NET40
-"4.0 "+
+" 4.0"+
 #elif NET35
-"3.5 "+
+" 3.5"+
 #elif NET30
-"3.0 "+
+" 3.0"+
 #elif NET20
-"2.0 "+
+" 2.0"+
 #endif
 
 #if DEBUG
-"Debug"
+" Debug"
 #elif STRONG
-"Signed"
+" Signed"
 #else
-"Release"
+" Release"
 #endif
 )]
 
