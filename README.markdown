@@ -1,5 +1,5 @@
-# [JsonFx v2.0][1]- JSON serialization framework for .NET
-# Distributed under the terms of an [MIT-style license][2]
+# [JsonFx v2.0][1] - JSON serialization framework for .NET
+## Distributed under the terms of an [MIT-style license][2]
 
 ### Compatible Runtimes:
 - .NET Framework 2.0, 3.0, 3.5, and 4.0
