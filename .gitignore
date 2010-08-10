@@ -1,0 +1,6 @@
+
+*.suo
+build
+keys
+
+*.lnk
