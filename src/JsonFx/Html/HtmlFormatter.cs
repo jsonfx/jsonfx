@@ -83,6 +83,114 @@ namespace JsonFx.Html
 
 		#endregion EmptyAttributeType
 
+		#region HtmlTaxonomy
+
+		/// <summary>
+		/// Defines a general taxonomy of tags
+		/// </summary>
+		/// <remarks>
+		/// http://www.w3.org/TR/xhtml-modularization/abstract_modules.html#sec_5.2.
+		/// </remarks>
+		[Flags]
+		public enum HtmlTaxonomy
+		{
+			/// <summary>
+			/// Plain text, no tag
+			/// </summary>
+			None = 0x0000,
+
+			/// <summary>
+			/// HTML comments
+			/// </summary>
+			Comment = 0x0001,
+
+			/// <summary>
+			/// textual elements
+			/// </summary>
+			/// <remarks>
+			/// http://www.w3.org/TR/html401/struct/text.html
+			/// </remarks>
+			Text = 0x0002,
+
+			/// <summary>
+			/// character level elements and text strings
+			/// </summary>
+			/// <remarks>
+			/// http://www.w3.org/TR/html401/struct/text.html
+			/// </remarks>
+			Inline = 0x0004,
+
+			/// <summary>
+			/// block-like elements
+			/// </summary>
+			/// <remarks>
+			/// http://www.w3.org/TR/html401/struct/text.html
+			/// </remarks>
+			Block = 0x0008,
+
+			/// <summary>
+			/// list elements
+			/// </summary>
+			/// <remarks>
+			/// http://www.w3.org/TR/html401/struct/lists.html
+			/// </remarks>
+			List = 0x0010,
+
+			/// <summary>
+			/// tabular elements
+			/// </summary>
+			/// <remarks>
+			/// http://www.w3.org/TR/html401/struct/tables.html
+			/// </remarks>
+			Table = 0x0020,
+
+			/// <summary>
+			/// style elements
+			/// </summary>
+			/// <remarks>
+			/// http://www.w3.org/TR/html401/present/styles.html
+			/// http://www.w3.org/TR/html401/present/graphics.html
+			/// http://www.w3.org/TR/xhtml-modularization/abstract_modules.html#s_presentationmodule
+			/// </remarks>
+			Style = 0x0040,
+
+			/// <summary>
+			/// form elements
+			/// </summary>
+			/// <remarks>
+			/// http://www.w3.org/TR/xhtml-modularization/abstract_modules.html#s_forms
+			/// </remarks>
+			Form = 0x0080,
+
+			/// <summary>
+			/// script elements
+			/// </summary>
+			Script = 0x0100,
+
+			/// <summary>
+			/// embedded elements
+			/// </summary>
+			/// <remarks>
+			/// http://www.w3.org/TR/html401/struct/objects.html
+			/// </remarks>
+			Embeded = 0x0200,
+
+			/// <summary>
+			/// document elements
+			/// </summary>
+			/// <remarks>
+			/// http://www.w3.org/TR/html401/struct/global.html
+			/// </remarks>
+			Document = 0x0400,
+
+			/// <summary>
+			/// unknown elements
+			/// </summary>
+			Unknown = 0x8000
+		}
+
+		#endregion HtmlTaxonomy
+
 		#region Constants
 
 		private const string ErrorUnexpectedToken = "Unexpected token ({0})";
@@ -154,6 +262,252 @@ namespace JsonFx.Html
 		}
 
 		#endregion Properties
+
+		#region HTML Tag Methods
+
+		/// <summary>
+		/// Determines if is full (i.e. empty) tag
+		/// </summary>
+		/// <param name="tag">lowercase tag name</param>
+		/// <returns>if is a full tag</returns>
+		/// <remarks>
+		/// http://www.w3.org/TR/html401/index/elements.html
+		/// http://www.w3.org/TR/xhtml-modularization/abstract_modules.html#sec_5.2.
+		/// http://www.w3.org/TR/WD-html40-970917/index/elements.html
+		/// </remarks>
+		private static bool FullTagRequired(string tag)
+		{
+			switch (tag)
+			{
+				case "area":
+				case "base":
+				case "basefont":
+				case "br":
+				case "col":
+				case "frame":
+				case "hr":
+				case "img":
+				case "input":
+				case "isindex":
+				case "link":
+				case "meta":
+				case "param":
+				case "wbr":
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
+		/// <summary>
+		/// Determines if the tag is required to be closed (in HTML 4.01)
+		/// </summary>
+		/// <param name="tag">lowercase tag name</param>
+		/// <returns></returns>
+		/// <remarks>
+		/// http://www.w3.org/TR/html401/index/elements.html
+		/// http://www.w3.org/TR/WD-html40-970917/index/elements.html
+		/// </remarks>
+		private static bool CloseTagRequired(string tag)
+		{
+			switch (tag)
+			{
+				case "body":
+				case "colgroup":
+				case "dd":
+				case "dt":
+				case "embed":
+				case "head":
+				case "html":
+				case "li":
+				case "option":
+				case "p":
+				case "tbody":
+				case "td":
+				case "tfoot":
+				case "th":
+				case "thead":
+				case "tr":
+				case "!--":
+				case "![CDATA[":
+				case "!":
+				case "?":
+				case "%":
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+
+		/// <summary>
+		/// Categorizes the tag for heuristics about markup type
+		/// </summary>
+		/// <param name="tag">lowercase tag name</param>
+		/// <returns>the box type for a particular element</returns>
+		private static HtmlTaxonomy GetTaxonomy(string tag)
+		{
+			// http://www.w3.org/TR/html401/
+			// http://www.w3.org/TR/xhtml-modularization/abstract_modules.html
+			// http://www.w3.org/html/wg/html5/#elements0
+			// non-standard: http://www.mountaindragon.com/html/text.htm
+			switch (tag)
+			{
+				case "!--":
+				{
+					return HtmlTaxonomy.Comment;
+				}
+
+				case "a":
+				case "abbr":
+				case "acronym":
+				case "address":
+				case "area":
+				case "bdo":
+				case "cite":
+				case "code":
+				case "dfn":
+				case "em":
+				case "img":
+				case "isindex":
+				case "kbd":
+				case "label":
+				case "legend":
+				case "map":
+				case "q":
+				case "samp":
+				case "span":
+				case "strong":
+				case "var":
+				case "wbr":
+				{
+					return HtmlTaxonomy.Text|HtmlTaxonomy.Inline;
+				}
+
+				case "b":
+				case "big":
+				case "blink":
+				case "font":
+				case "i":
+				case "marquee":
+				case "s":
+				case "small":
+				case "strike":
+				case "sub":
+				case "sup":
+				case "tt":
+				case "u":
+				{
+					return HtmlTaxonomy.Text|HtmlTaxonomy.Style|HtmlTaxonomy.Inline;
+				}
+
+				case "blockquote":
+				case "bq":
+				case "br":
+				case "center":
+				case "del":
+				case "div":
+				case "fieldset":
+				case "h1":
+				case "h2":
+				case "h3":
+				case "h4":
+				case "h5":
+				case "h6":
+				case "hr":
+				case "ins":
+				case "nobr":
+				case "p":
+				case "pre":
+				{
+					return HtmlTaxonomy.Text|HtmlTaxonomy.Block;
+				}
+
+				case "dl":
+				case "dd":
+				case "dir":
+				case "dt":
+				case "lh":
+				case "li":
+				case "menu":
+				case "ol":
+				case "ul":
+				{
+					return HtmlTaxonomy.List;
+				}
+
+				case "table":
+				case "tbody":
+				case "td":
+				case "th":
+				case "thead":
+				case "tfoot":
+				case "tr":
+				case "caption":
+				case "col":
+				case "colgroup":
+				{
+					return HtmlTaxonomy.Table;
+				}
+
+				case "button":
+				case "form":
+				case "input":
+				case "optgroup":
+				case "option":
+				case "select":
+				case "textarea":
+				{
+					return HtmlTaxonomy.Form;
+				}
+
+				case "applet":
+				case "bgsound":
+				case "embed":
+				case "noembed":
+				case "object":
+				case "param":
+				case "sound":
+				{
+					return HtmlTaxonomy.Embeded;
+				}
+
+				case "basefont":
+				case "style":
+				{
+					return HtmlTaxonomy.Style|HtmlTaxonomy.Document;
+				}
+
+				case "%":
+				case "noscript":
+				case "script":
+				{
+					return HtmlTaxonomy.Script|HtmlTaxonomy.Document;
+				}
+
+				case "!":
+				case "?":
+				case "![cdata[":
+				case "base":
+				case "body":
+				case "head":
+				case "html":
+				case "frameset":
+				case "frame":
+				case "iframe":
+				case "link":
+				case "meta":
+				case "noframes":
+				case "title":
+				{
+					return HtmlTaxonomy.Document;
+				}
+			}
+			return HtmlTaxonomy.Unknown;
+		}
+
+		#endregion HTML Tag Methods
 
 		#region ITextFormatter<T> Methods
 
