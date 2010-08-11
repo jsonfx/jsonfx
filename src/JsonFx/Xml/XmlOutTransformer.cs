@@ -243,22 +243,6 @@ namespace JsonFx.Xml
 							needsValueDelim = true;
 							break;
 						}
-						//case CommonTokenType.ValueDelim:
-						//{
-						//    input.Pop();
-
-						//    if (!needsValueDelim)
-						//    {
-						//        throw new TokenException<CommonTokenType>(token, "Missing array item");
-						//    }
-
-						//    if (this.Settings.PrettyPrint)
-						//    {
-						//        this.EmitNewLine(output);
-						//    }
-						//    needsValueDelim = false;
-						//    break;
-						//}
 						default:
 						{
 							throw new TokenException<CommonTokenType>(
