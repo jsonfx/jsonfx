@@ -108,14 +108,7 @@ namespace JsonFx.Markup
 		/// </remarks>
 		public static Token<MarkupTokenType> TokenUnparsed(string begin, string end, string value)
 		{
-			return new Token<MarkupTokenType>(
-				MarkupTokenType.Primitive,
-				new UnparsedBlock
-				{
-					Begin = begin,
-					End = end,
-					Value = value
-				});
+			return new Token<MarkupTokenType>(MarkupTokenType.Primitive, new UnparsedBlock(begin, end, value));
 		}
 
 		public static Token<MarkupTokenType> TokenElementBegin(DataName name)
