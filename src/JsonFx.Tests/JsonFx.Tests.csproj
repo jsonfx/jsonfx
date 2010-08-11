@@ -91,6 +91,7 @@
     <Compile Include="Common\CommonSubsequencerTests.cs" />
     <Compile Include="Html\HtmlFormatterTests.cs" />
     <Compile Include="Html\HtmlTokenizerTests.cs" />
+    <Compile Include="Html\HtmlOutTransformerTests.cs" />
     <Compile Include="IO\SequenceBufferTests.cs" />
     <Compile Include="IO\EnumerableStreamTests.cs" />
     <Compile Include="IO\ListStreamTests.cs" />
