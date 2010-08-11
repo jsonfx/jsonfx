@@ -112,6 +112,8 @@
     <Compile Include="Common\Filters\Iso8601DateFilter.cs" />
     <Compile Include="Common\Filters\MSAjaxDateFilter.cs" />
     <Compile Include="Common\CommonWriter.cs" />
+    <Compile Include="EcmaScript\EcmaScriptIdentifier.cs" />
+    <Compile Include="EcmaScript\EcmaScriptFormatter.cs" />
     <Compile Include="Html\HtmlFormatter.cs" />
     <Compile Include="Html\HtmlTokenizer.cs" />
     <Compile Include="IO\CharBuffer.cs" />

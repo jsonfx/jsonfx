@@ -85,6 +85,7 @@ namespace JsonFx.Json
 			/// Ctor
 			/// </summary>
 			/// <param name="settings"></param>
+			/// <param name="encodeLessThan"></param>
 			public JsonFormatter(DataWriterSettings settings, bool encodeLessThan)
 			{
 				if (settings == null)
@@ -225,7 +226,7 @@ namespace JsonFx.Json
 										goto default;
 									}
 
-									this.WriteNumber(writer, token, typeCode);
+									this.WriteNumber(writer, token.Value, typeCode);
 									break;
 								}
 								case TypeCode.DBNull:
@@ -243,21 +244,9 @@ namespace JsonFx.Json
 										break;
 									}
 
-									if (token.Value is TimeSpan)
-									{
-										this.WriteNumber(writer, token, typeCode);
-										break;
-									}
-
-									this.WriteString(writer, this.FormatString(token.Value));
+									this.WritePrimitive(writer, token.Value);
 									break;
 								}
-								// TODO: Literals?
-								//{
-								//    // emit without further introspection as this is a raw extension point
-								//    writer.Write(this.FormatString(token.Value));
-								//    break;
-								//}
 							}
 							needsValueDelim = true;
 							continue;
@@ -322,7 +311,7 @@ namespace JsonFx.Json
 
 							string propertyName = token.Name.LocalName;
 
-							this.WriteString(writer, this.FormatString(propertyName));
+							this.WritePropertyName(writer, propertyName);
 
 							if (prettyPrint)
 							{
@@ -352,7 +341,23 @@ namespace JsonFx.Json
 
 			#region Write Methods
 
-			protected virtual void WriteNumber(TextWriter writer, Token<CommonTokenType> token, TypeCode typeCode)
+			protected virtual void WritePrimitive(TextWriter writer, object value)
+			{
+				if (value is TimeSpan)
+				{
+					this.WriteNumber(writer, value, TypeCode.Object);
+					return;
+				}
+
+				this.WriteString(writer, this.FormatString(value));
+			}
+
+			protected virtual void WritePropertyName(TextWriter writer, string propertyName)
+			{
+				this.WriteString(writer, this.FormatString(propertyName));
+			}
+
+			protected virtual void WriteNumber(TextWriter writer, object value, TypeCode typeCode)
 			{
 				bool overflowsIEEE754 = false;
 
@@ -361,82 +366,128 @@ namespace JsonFx.Json
 				{
 					case TypeCode.Byte:
 					{
-						number = ((byte)token.Value).ToString("g", CultureInfo.InvariantCulture);
+						number = ((byte)value).ToString("g", CultureInfo.InvariantCulture);
 						break;
 					}
 					case TypeCode.Boolean:
 					{
-						number = true.Equals(token.Value) ? "1" : "0";
+						number = true.Equals(value) ? "1" : "0";
 						break;
 					}
 					case TypeCode.Decimal:
 					{
 						overflowsIEEE754 = true;
-						number = ((decimal)token.Value).ToString("g", CultureInfo.InvariantCulture);
+						number = ((decimal)value).ToString("g", CultureInfo.InvariantCulture);
 						break;
 					}
 					case TypeCode.Double:
 					{
-						number = ((double)token.Value).ToString("g", CultureInfo.InvariantCulture);
+						double doubleValue = (double)value;
+
+						if (Double.IsNaN(doubleValue))
+						{
+							this.WriteNaN(writer);
+							return;
+						}
+
+						if (Double.IsInfinity(doubleValue))
+						{
+							if (Double.IsNegativeInfinity(doubleValue))
+							{
+								this.WriteNegativeInfinity(writer);
+							}
+							else
+							{
+								this.WritePositiveInfinity(writer);
+							}
+							return;
+						}
+
+						// round-trip format has a few more digits than general
+						// http://msdn.microsoft.com/en-us/library/dwhawy9k.aspx#RFormatString
+						number = doubleValue.ToString("r", CultureInfo.InvariantCulture);
 						break;
 					}
 					case TypeCode.Int16:
 					{
-						number = ((short)token.Value).ToString("g", CultureInfo.InvariantCulture);
+						number = ((short)value).ToString("g", CultureInfo.InvariantCulture);
 						break;
 					}
 					case TypeCode.Int32:
 					{
-						number = ((int)token.Value).ToString("g", CultureInfo.InvariantCulture);
+						number = ((int)value).ToString("g", CultureInfo.InvariantCulture);
 						break;
 					}
 					case TypeCode.Int64:
 					{
 						overflowsIEEE754 = true;
-						number = ((long)token.Value).ToString("g", CultureInfo.InvariantCulture);
+						number = ((long)value).ToString("g", CultureInfo.InvariantCulture);
 						break;
 					}
 					case TypeCode.SByte:
 					{
-						number = ((sbyte)token.Value).ToString("g", CultureInfo.InvariantCulture);
+						number = ((sbyte)value).ToString("g", CultureInfo.InvariantCulture);
 						break;
 					}
 					case TypeCode.Single:
 					{
-						number = ((float)token.Value).ToString("g", CultureInfo.InvariantCulture);
+						float floatValue = (float)value;
+
+						if (Single.IsNaN(floatValue))
+						{
+							this.WriteNaN(writer);
+							return;
+						}
+
+						if (Single.IsInfinity(floatValue))
+						{
+							if (Single.IsNegativeInfinity(floatValue))
+							{
+								this.WriteNegativeInfinity(writer);
+							}
+							else
+							{
+								this.WritePositiveInfinity(writer);
+							}
+							return;
+						}
+
+						// round-trip format has a few more digits than general
+						// http://msdn.microsoft.com/en-us/library/dwhawy9k.aspx#RFormatString
+						number = floatValue.ToString("r", CultureInfo.InvariantCulture);
 						break;
 					}
 					case TypeCode.UInt16:
 					{
-						number = ((ushort)token.Value).ToString("g", CultureInfo.InvariantCulture);
+						number = ((ushort)value).ToString("g", CultureInfo.InvariantCulture);
 						break;
 					}
 					case TypeCode.UInt32:
 					{
 						overflowsIEEE754 = true;
-						number = ((uint)token.Value).ToString("g", CultureInfo.InvariantCulture);
+						number = ((uint)value).ToString("g", CultureInfo.InvariantCulture);
 						break;
 					}
 					case TypeCode.UInt64:
 					{
 						overflowsIEEE754 = true;
-						number = ((ulong)token.Value).ToString("g", CultureInfo.InvariantCulture);
+						number = ((ulong)value).ToString("g", CultureInfo.InvariantCulture);
 						break;
 					}
 					default:
 					{
-						if (token.Value is TimeSpan)
+						if (value is TimeSpan)
 						{
 							overflowsIEEE754 = true;
-							number = ((TimeSpan)token.Value).Ticks.ToString("g", CultureInfo.InvariantCulture);
+							number = ((TimeSpan)value).Ticks.ToString("g", CultureInfo.InvariantCulture);
 							break;
 						}
 
-						throw new TokenException<CommonTokenType>(token, "Invalid number token");
+						throw new TokenException<CommonTokenType>(CommonGrammar.TokenPrimitive(value), "Invalid number token");
 					}
 				}
 
-				if (overflowsIEEE754 && this.InvalidIEEE754(Convert.ToDecimal(token.Value)))
+				if (overflowsIEEE754 && this.InvalidIEEE754(Convert.ToDecimal(value)))
 				{
 					// checks for IEEE-754 overflow and emit as strings
 					this.WriteString(writer, number);
@@ -446,6 +497,21 @@ namespace JsonFx.Json
 					// fits within an IEEE-754 floating point so emit directly
 					writer.Write(number);
 				}
+			}
+
+			protected virtual void WriteNegativeInfinity(TextWriter writer)
+			{
+				writer.Write(JsonGrammar.KeywordNull);
+			}
+
+			protected virtual void WritePositiveInfinity(TextWriter writer)
+			{
+				writer.Write(JsonGrammar.KeywordNull);
+			}
+
+			protected virtual void WriteNaN(TextWriter writer)
+			{
+				writer.Write(JsonGrammar.KeywordNull);
 			}
 
 			protected virtual void WriteString(TextWriter writer, string value)
@@ -543,7 +609,7 @@ namespace JsonFx.Json
 			/// </summary>
 			/// <param name="value"></param>
 			/// <returns></returns>
-			private string FormatString(object value)
+			protected virtual string FormatString(object value)
 			{
 				if (value is Enum)
 				{
