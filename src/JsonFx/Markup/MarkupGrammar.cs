@@ -78,6 +78,13 @@ namespace JsonFx.Markup
 		public const string OperatorCodeBlockBegin = "%";
 		public const string OperatorCodeEnd = "%";
 
+		public const char OperatorT4 = '#';
+		public const char OperatorT4Directive = '@';
+		public const char OperatorT4Expression = '=';
+		public const char OperatorT4ClassFeature = '+';
+		public const string OperatorT4BlockBegin = "#";
+		public const string OperatorT4End = "#";
+
 		#endregion Operators
 
 		#region Reusable Tokens

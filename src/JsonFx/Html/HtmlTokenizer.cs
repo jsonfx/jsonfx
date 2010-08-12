@@ -64,6 +64,11 @@ namespace JsonFx.Html
 
 			public override string ToString()
 			{
+				if (String.IsNullOrEmpty(this.Prefix))
+				{
+					return this.Name;
+				}
+
 				return String.Concat(
 					this.Prefix,
 					MarkupGrammar.OperatorPrefixDelim,
@@ -228,7 +233,7 @@ namespace JsonFx.Html
 			if (scanner.IsCompleted)
 			{
 				// end of file, emit as text
-				tokens.Add(MarkupGrammar.TokenPrimitive(char.ToString(MarkupGrammar.OperatorElementBegin)));
+				tokens.Add(MarkupGrammar.TokenPrimitive(Char.ToString(MarkupGrammar.OperatorElementBegin)));
 				return;
 			}
 
@@ -385,15 +390,51 @@ namespace JsonFx.Html
 							return MarkupGrammar.TokenUnparsed(
 								String.Concat(MarkupGrammar.OperatorCode, ch),
 								MarkupGrammar.OperatorCodeEnd,
-								this.ScanUnparsedValue(scanner, String.Empty, Char.ToString(MarkupGrammar.OperatorCode)));
+								this.ScanUnparsedValue(scanner, String.Empty, MarkupGrammar.OperatorCodeEnd));
 						}
-						default:									// "<%",   "%>"			ASP/PSP/JSP code block
+						default:										// "<%",   "%>"			ASP/PSP/JSP code block
 						{
 							// simple code block
 							return MarkupGrammar.TokenUnparsed(
 								MarkupGrammar.OperatorCodeBlockBegin,
 								MarkupGrammar.OperatorCodeEnd,
-								this.ScanUnparsedValue(scanner, String.Empty, Char.ToString(MarkupGrammar.OperatorCode)));
+								this.ScanUnparsedValue(scanner, String.Empty, MarkupGrammar.OperatorCodeEnd));
+						}
+					}
+				}
+				case MarkupGrammar.OperatorT4:
+				{
+					// consume '#'
+					scanner.Pop();
+					ch = scanner.Peek();
+
+					switch (ch)
+					{
+						case MarkupGrammar.OperatorCommentDelim:		// "<#--", "--#>"		T4-style code comment
+						{
+							return MarkupGrammar.TokenUnparsed(
+								"#--", "--#",
+								this.ScanUnparsedValue(scanner, MarkupGrammar.OperatorCommentBegin, String.Concat(MarkupGrammar.OperatorCommentEnd, MarkupGrammar.OperatorT4)));
+						}
+						case MarkupGrammar.OperatorT4Directive:			// "<#@",  "#>"			T4 directive
+						case MarkupGrammar.OperatorT4Expression:		// "<#=",  "#>"			T4 expression
+						case MarkupGrammar.OperatorT4ClassFeature:		// "<#+",  "#>"			T4 ClassFeature blocks
+						{
+							// consume code block type differentiating char
+							scanner.Pop();
+
+							return MarkupGrammar.TokenUnparsed(
+								String.Concat(MarkupGrammar.OperatorT4, ch),
+								MarkupGrammar.OperatorT4End,
+								this.ScanUnparsedValue(scanner, String.Empty, MarkupGrammar.OperatorT4End));
+						}
+						default:										// "<#",   "#>"			T4 code block
+						{
+							// simple code block
+							return MarkupGrammar.TokenUnparsed(
+								MarkupGrammar.OperatorT4BlockBegin,
+								MarkupGrammar.OperatorT4End,
+								this.ScanUnparsedValue(scanner, String.Empty, MarkupGrammar.OperatorT4End));
 						}
 					}
 				}
@@ -504,7 +545,8 @@ namespace JsonFx.Html
 					{
 						ch = scanner.Peek();
 						while (!scanner.IsCompleted &&
-							!HtmlTokenizer.IsWhiteSpace(ch))
+							!HtmlTokenizer.IsWhiteSpace(ch) &&
+							ch != stringDelim)
 						{
 							// consume until ending delim
 							scanner.Pop();
@@ -814,10 +856,6 @@ namespace JsonFx.Html
 				if (this.ScopeChain.ContainsPrefix(String.Empty))
 				{
 					scope[qName.Prefix] = String.Empty;
-				}
-				else
-				{
-					qName.Prefix = null;
 				}
 			}
 

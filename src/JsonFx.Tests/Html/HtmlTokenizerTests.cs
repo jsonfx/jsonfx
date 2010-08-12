@@ -252,9 +252,9 @@ namespace JsonFx.Html
 			const string input = @"<a:one><b:two><c:three></d:three></e:two></f:one>";
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenElementBegin(new DataName("one")),
-			        MarkupGrammar.TokenElementBegin(new DataName("two")),
-			        MarkupGrammar.TokenElementBegin(new DataName("three")),
+			        MarkupGrammar.TokenElementBegin(new DataName("one", "a", null)),
+			        MarkupGrammar.TokenElementBegin(new DataName("two", "b", null)),
+			        MarkupGrammar.TokenElementBegin(new DataName("three", "c", null)),
 			        MarkupGrammar.TokenElementEnd,
 			        MarkupGrammar.TokenElementEnd,
 			        MarkupGrammar.TokenElementEnd
@@ -1036,13 +1036,54 @@ namespace JsonFx.Html
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void GetTokens_AspNetPageDeclaration_ReturnsUnparsed()
+		public void GetTokens_AspNetPage_ReturnsUnparsed()
 		{
-			const string input = @"<%@ Page Language=""C#"" AutoEventWireup=""true"" CodeBehind=""Default.aspx.cs"" Inherits=""Foo._Default"" %>";
+			const string input =
+@"<%@ Page Language=""C#"" AutoEventWireup=""true"" CodeBehind=""Default.aspx.cs"" Inherits=""Foo._Default"" %>
+<!DOCTYPE html>
+
+<html lang=""<%= System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName %>"">
+	<head runat=""server"">
+		<title>ASP.NET Test</title>
+	</head>
+	<body>
+		<asp:Literal runat=""server"" ID=""Example"" Text=""Hello world."" />
+	</body>
+</html>";
 
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenUnparsed("%@", "%", @" Page Language=""C#"" AutoEventWireup=""true"" CodeBehind=""Default.aspx.cs"" Inherits=""Foo._Default"" ")
+			        MarkupGrammar.TokenUnparsed("%@", "%", @" Page Language=""C#"" AutoEventWireup=""true"" CodeBehind=""Default.aspx.cs"" Inherits=""Foo._Default"" "),
+			        MarkupGrammar.TokenPrimitive("\r\n"),
+			        MarkupGrammar.TokenUnparsed("!", "", @"DOCTYPE html"),
+			        MarkupGrammar.TokenPrimitive("\r\n\r\n"),
+			        MarkupGrammar.TokenElementBegin(new DataName("html")),
+			        MarkupGrammar.TokenAttribute(new DataName("lang")),
+			        MarkupGrammar.TokenUnparsed("%=", "%", @" System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName "),
+			        MarkupGrammar.TokenPrimitive("\r\n\t"),
+			        MarkupGrammar.TokenElementBegin(new DataName("head")),
+			        MarkupGrammar.TokenAttribute(new DataName("runat")),
+			        MarkupGrammar.TokenPrimitive("server"),
+			        MarkupGrammar.TokenPrimitive("\r\n\t\t"),
+			        MarkupGrammar.TokenElementBegin(new DataName("title")),
+			        MarkupGrammar.TokenPrimitive("ASP.NET Test"),
+			        MarkupGrammar.TokenElementEnd,// title
+			        MarkupGrammar.TokenPrimitive("\r\n\t"),
+			        MarkupGrammar.TokenElementEnd,// head
+			        MarkupGrammar.TokenPrimitive("\r\n\t"),
+			        MarkupGrammar.TokenElementBegin(new DataName("body")),
+			        MarkupGrammar.TokenPrimitive("\r\n\t\t"),
+			        MarkupGrammar.TokenElementVoid(new DataName("Literal", "asp", null)),
+			        MarkupGrammar.TokenAttribute(new DataName("runat")),
+			        MarkupGrammar.TokenPrimitive("server"),
+			        MarkupGrammar.TokenAttribute(new DataName("ID")),
+			        MarkupGrammar.TokenPrimitive("Example"),
+			        MarkupGrammar.TokenAttribute(new DataName("Text")),
+			        MarkupGrammar.TokenPrimitive("Hello world."),
+			        MarkupGrammar.TokenPrimitive("\r\n\t"),
+			        MarkupGrammar.TokenElementEnd,// body
+			        MarkupGrammar.TokenPrimitive("\r\n"),
+			        MarkupGrammar.TokenElementEnd,// html
 			    };
 
 			var tokenizer = new HtmlTokenizer();
@@ -1114,6 +1155,79 @@ namespace JsonFx.Html
 		<!-- not much to say here -->
 	</body>
 </html>
+")
+			    };
+
+			var tokenizer = new HtmlTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void GetTokens_T4HelloWorld_ReturnsSequence()
+		{
+			const string input =
+@"<#@ template debug=""true"" hostspecific=""false"" language=""C#"" #>
+<#@ output extension="".cs"" #>
+using System;   
+
+public class <#= this.GetClassName() #>
+{
+	private readonly string Message;
+
+	public <# this.Write(this.GetClassName()); #>()
+	{
+		this.Message = ""Hello world."";
+	}
+
+	public string GetMessage()
+	{
+		return this.Message;
+	}
+}
+
+<#+
+	private string GetClassName
+	{
+		get { return ""HelloWorld""; }
+	}
+#>";
+
+			var expected = new[]
+			    {
+			        MarkupGrammar.TokenUnparsed("#@", "#", @" template debug=""true"" hostspecific=""false"" language=""C#"" "),
+			        MarkupGrammar.TokenPrimitive("\r\n"),
+			        MarkupGrammar.TokenUnparsed("#@", "#", @" output extension="".cs"" "),
+			        MarkupGrammar.TokenPrimitive(@"
+using System;   
+
+public class "),
+			        MarkupGrammar.TokenUnparsed("#=", "#", @" this.GetClassName() "),
+			        MarkupGrammar.TokenPrimitive(@"
+{
+	private readonly string Message;
+
+	public "),
+			        MarkupGrammar.TokenUnparsed("#", "#", @" this.Write(this.GetClassName()); "),
+			        MarkupGrammar.TokenPrimitive(@"()
+	{
+		this.Message = ""Hello world."";
+	}
+
+	public string GetMessage()
+	{
+		return this.Message;
+	}
+}
+
+"),
+			        MarkupGrammar.TokenUnparsed("#+", "#", @"
+	private string GetClassName
+	{
+		get { return ""HelloWorld""; }
+	}
 ")
 			    };
 
