@@ -493,48 +493,10 @@ namespace JsonFx.Markup
 
 		public string GeneratePrefix(string namespaceUri)
 		{
-			// emit standardized prefixes
-			switch (namespaceUri)
-			{
-				case "http://www.w3.org/XML/1998/namespace":
-				{
-					// standard for XML
-					return "xml";
-				}
-				case "http://www.w3.org/2001/XMLSchema":
-				{
-					// standard for XML Schema
-					return "xs";
-				}
-				case "http://www.w3.org/2001/XMLSchema-instance":
-				{
-					// standard for XML Schema Instance
-					return "xsi";
-				}
-				case "http://www.w3.org/1999/xhtml":
-				{
-					// standard for XHTML
-					return "html";
-				}
-				case "http://www.w3.org/2005/Atom":
-				{
-					// standard for Atom 1.0
-					return "atom";
-				}
-				case "http://purl.org/dc/elements/1.1/":
-				{
-					// standard for Dublin Core
-					return "dc";
-				}
-				case "http://purl.org/syndication/thread/1.0":
-				{
-					// standard for syndicationthreading
-					return "thr";
-				}
-			}
+			string prefix = DataName.GetStandardPrefix(namespaceUri);
 
 			// TODO: establish more aesthetically pleasing prefixes
-			return String.Concat('q', ++nsCounter);
+			return prefix ?? String.Concat('q', ++nsCounter);
 		}
 
 		#endregion Utility Methods

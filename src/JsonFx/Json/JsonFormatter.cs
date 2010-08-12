@@ -615,6 +615,11 @@ namespace JsonFx.Json
 				{
 					return this.FormatEnum((Enum)value);
 				}
+				if (value is DataName)
+				{
+					// for JsonML rendering
+					return ((DataName)value).ToPrefixedName();
+				}
 
 				return Token<CommonTokenType>.ToString(value);
 			}

@@ -41,8 +41,11 @@ namespace JsonFx.JsonML
 	public partial class JsonMLReader
 	{
 		/// <summary>
-		/// Transforms markup tokens into common data tokens using a JsonML model
+		/// Transforms markup tokens into common data tokens using the (lossless) JsonML model
 		/// </summary>
+		/// <remarks>
+		/// JsonML Grammer: http://jsonml.org
+		/// </remarks>
 		public class JsonMLInTransformer : IDataTransformer<MarkupTokenType, CommonTokenType>
 		{
 			#region Constants
