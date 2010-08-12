@@ -121,9 +121,9 @@ namespace JsonFx.Serialization
 		/// <summary>
 		/// Serializes the data to the given output
 		/// </summary>
-		/// <param name="output">the output writer</param>
 		/// <param name="data">the data to be serialized</param>
-		public virtual void Write(TextWriter output, object data)
+		/// <param name="output">the output writer</param>
+		public virtual void Write(object data, TextWriter output)
 		{
 			IObjectWalker<T> walker = this.GetWalker();
 			if (walker == null)

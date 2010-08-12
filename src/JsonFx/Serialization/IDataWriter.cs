@@ -83,7 +83,7 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="output">the output writer</param>
 		/// <param name="data">the data to be serialized</param>
-		void Write(TextWriter output, object data);
+		void Write(object data, TextWriter output);
 
 		/// <summary>
 		/// Serializes the data to the given output
