@@ -16,7 +16,7 @@
     <TargetFrameworkProfile Condition=" '$(TargetFrameworkIdentifier)' == '' ">Client</TargetFrameworkProfile>
     <OutputAssemblyLabel>$(Configuration)_$(TargetFrameworkVersion)</OutputAssemblyLabel>
     <OutputAssemblyLabel Condition=" '$(TargetFrameworkIdentifier)' != '' ">$(Configuration)_$(TargetFrameworkVersion)_$(TargetFrameworkIdentifier)</OutputAssemblyLabel>
-    <OutputAssemblyLabel Condition=" '$(TargetFrameworkProfile)' != '' && '$(TargetFrameworkProfile)' != 'Client' ">$(Configuration)_$(TargetFrameworkVersion)_$(TargetFrameworkProfile)</OutputAssemblyLabel>
+    <OutputAssemblyLabel Condition=" '$(TargetFrameworkProfile)' != '' And '$(TargetFrameworkProfile)' != 'Client' ">$(Configuration)_$(TargetFrameworkVersion)_$(TargetFrameworkProfile)</OutputAssemblyLabel>
     <OutputPath>..\..\build\$(OutputAssemblyLabel)</OutputPath>
     <DocumentationFile>$(OutputPath)\JsonFx.XML</DocumentationFile>
     <MapFileExtensions>true</MapFileExtensions>
