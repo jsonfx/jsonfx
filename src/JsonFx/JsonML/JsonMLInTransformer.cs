@@ -63,6 +63,18 @@ namespace JsonFx.JsonML
 			#region Properties
 
 			/// <summary>
+			/// Determines if whitespace nodes should be ommited
+			/// </summary>
+			/// <remarks>
+			/// True to keep whitespace
+			/// </remarks>
+			public bool PreserveWhitespace
+			{
+				get;
+				set;
+			}
+
+			/// <summary>
 			/// Gets the total number of characters read from the input
 			/// </summary>
 			public int Column
@@ -206,7 +218,10 @@ namespace JsonFx.JsonML
 								token = stream.Peek();
 							}
 
-							yield return CommonGrammar.TokenPrimitive(value);
+							if (this.PreserveWhitespace || !IsNullOrWhiteSpace(value))
+							{
+								yield return CommonGrammar.TokenPrimitive(value);
+							}
 							break;
 						}
 						case MarkupTokenType.Attribute:
@@ -227,6 +242,48 @@ namespace JsonFx.JsonML
 			}
 
 			#endregion IDataTransformer<CommonTokenType, MarkupTokenType> Members
+
+			#region Utility Methods
+
+			/// <summary>
+			/// Checks if string is null, empty or entirely made up of whitespace
+			/// </summary>
+			/// <param name="value"></param>
+			/// <returns></returns>
+			/// <remarks>
+			/// Essentially the same as String.IsNullOrWhiteSpace from .NET 4.0
+			/// with a simpler view of whitespace.
+			/// </remarks>
+			private static bool IsNullOrWhiteSpace(string value)
+			{
+				if (value != null)
+				{
+					for (int i=0, length=value.Length; i<length; i++)
+					{
+						if (!IsWhiteSpace(value[i]))
+						{
+							return false;
+						}
+					}
+				}
+				return true;
+			}
+
+			/// <summary>
+			/// Checks if character is line ending, tab or space
+			/// </summary>
+			/// <param name="ch"></param>
+			/// <returns></returns>
+			private static bool IsWhiteSpace(char ch)
+			{
+				return
+					(ch == ' ') |
+					(ch == '\n') ||
+					(ch == '\r') ||
+					(ch == '\t');
+			}
+
+			#endregion Utility Methods
 		}
 	}
 }
