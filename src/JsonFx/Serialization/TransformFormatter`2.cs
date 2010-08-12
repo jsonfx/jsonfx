@@ -74,11 +74,11 @@ namespace JsonFx.Serialization
 
 		#region ITextFormatter<CommonTokenType> Members
 
-		public void Format(TextWriter writer, IEnumerable<Token<TIn>> tokens)
+		public void Format(IEnumerable<Token<TIn>> tokens, TextWriter writer)
 		{
 			IEnumerable<Token<TOut>> markup = this.Transformer.Transform(tokens);
 
-			this.Formatter.Format(writer, markup);
+			this.Formatter.Format(markup, writer);
 		}
 
 		public string Format(IEnumerable<Token<TIn>> tokens)

@@ -109,7 +109,7 @@ namespace JsonFx.Json
 			{
 				using (StringWriter writer = new StringWriter())
 				{
-					this.Format(writer, tokens);
+					this.Format(tokens, writer);
 
 					return writer.GetStringBuilder().ToString();
 				}
@@ -120,7 +120,7 @@ namespace JsonFx.Json
 			/// </summary>
 			/// <param name="writer"></param>
 			/// <param name="tokens"></param>
-			public void Format(TextWriter writer, IEnumerable<Token<CommonTokenType>> tokens)
+			public void Format(IEnumerable<Token<CommonTokenType>> tokens, TextWriter writer)
 			{
 				if (tokens == null)
 				{

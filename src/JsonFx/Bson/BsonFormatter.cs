@@ -84,7 +84,7 @@ namespace JsonFx.Bson
 
 				using (MemoryStream stream = new MemoryStream())
 				{
-					this.Format(stream, tokens);
+					this.Format(tokens, stream);
 
 					return stream.ToArray();
 				}
@@ -95,7 +95,7 @@ namespace JsonFx.Bson
 			/// </summary>
 			/// <param name="writer"></param>
 			/// <param name="tokens"></param>
-			public void Format(Stream stream, IEnumerable<Token<CommonTokenType>> tokens)
+			public void Format(IEnumerable<Token<CommonTokenType>> tokens, Stream stream)
 			{
 				if (stream == null)
 				{

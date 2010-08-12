@@ -47,7 +47,7 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="writer"></param>
 		/// <param name="tokens"></param>
-		void Format(Stream stream, IEnumerable<Token<T>> tokens);
+		void Format(IEnumerable<Token<T>> tokens, Stream stream);
 
 		/// <summary>
 		/// Formats the token sequence as a string

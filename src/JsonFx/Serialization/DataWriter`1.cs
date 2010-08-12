@@ -140,7 +140,7 @@ namespace JsonFx.Serialization
 			try
 			{
 				// objects => tokens => characters
-				formatter.Format(output, walker.GetTokens(data));
+				formatter.Format(walker.GetTokens(data), output);
 			}
 			catch (SerializationException)
 			{

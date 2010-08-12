@@ -182,7 +182,7 @@ namespace JsonFx.Bson
 			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
 				delegate()
 				{
-					formatter.Format(null, input);
+					formatter.Format(input, null);
 				});
 
 			Assert.Equal("stream", ex.ParamName);
