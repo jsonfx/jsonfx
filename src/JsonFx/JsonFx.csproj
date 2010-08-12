@@ -13,14 +13,14 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>JsonFx</RootNamespace>
     <AssemblyName>JsonFx</AssemblyName>
+    <TargetFrameworkProfile Condition=" '$(TargetFrameworkIdentifier)' == '' ">Client</TargetFrameworkProfile>
     <OutputAssemblyLabel>$(Configuration)_$(TargetFrameworkVersion)</OutputAssemblyLabel>
     <OutputAssemblyLabel Condition=" '$(TargetFrameworkIdentifier)' != '' ">$(Configuration)_$(TargetFrameworkVersion)_$(TargetFrameworkIdentifier)</OutputAssemblyLabel>
-    <OutputAssemblyLabel Condition=" '$(TargetFrameworkProfile)' == 'WindowsPhone' ">$(Configuration)_$(TargetFrameworkVersion)_$(TargetFrameworkProfile)</OutputAssemblyLabel>
+    <OutputAssemblyLabel Condition=" '$(TargetFrameworkProfile)' != '' && '$(TargetFrameworkProfile)' != 'Client' ">$(Configuration)_$(TargetFrameworkVersion)_$(TargetFrameworkProfile)</OutputAssemblyLabel>
     <OutputPath>..\..\build\$(OutputAssemblyLabel)</OutputPath>
     <DocumentationFile>$(OutputPath)\JsonFx.XML</DocumentationFile>
     <MapFileExtensions>true</MapFileExtensions>
     <UseApplicationTrust>false</UseApplicationTrust>
-    <TargetFrameworkProfile Condition=" '$(TargetFrameworkIdentifier)' != 'Silverlight' ">Client</TargetFrameworkProfile>
     <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
     <SilverlightApplication>false</SilverlightApplication>
     <ValidateXaml>true</ValidateXaml>
