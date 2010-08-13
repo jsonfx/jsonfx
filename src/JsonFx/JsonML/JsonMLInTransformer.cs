@@ -194,9 +194,10 @@ namespace JsonFx.JsonML
 						}
 						case MarkupTokenType.Primitive:
 						{
-							if (token.Value is ITextFormattable<MarkupTokenType>)
+							if (token.Value is ITextFormattable<CommonTokenType> ||
+								token.Value is ITextFormattable<MarkupTokenType>)
 							{
-								yield return CommonGrammar.TokenPrimitive(token.Value);
+								yield return token.ChangeType(CommonTokenType.Primitive);
 
 								stream.Pop();
 								token = stream.Peek();
@@ -209,6 +210,7 @@ namespace JsonFx.JsonML
 							token = stream.Peek();
 							while (!stream.IsCompleted &&
 								(token.TokenType == MarkupTokenType.Primitive) &&
+								!(token.Value is ITextFormattable<CommonTokenType>) &&
 								!(token.Value is ITextFormattable<MarkupTokenType>))
 							{
 								// concatenate adjacent value nodes
