@@ -40,7 +40,7 @@ namespace JsonFx.EcmaScript
 	/// <summary>
 	/// Represents an ECMAScript identifier for serialization.
 	/// </summary>
-	public class EcmaScriptIdentifier : IJsonFormattable
+	public class EcmaScriptIdentifier : ITextFormattable<CommonTokenType>
 	{
 		#region Fields
 
@@ -310,9 +310,9 @@ namespace JsonFx.EcmaScript
 
 		#endregion Operators
 
-		#region IJsonFormattable Members
+		#region ITextFormattable<CommonTokenType> Members
 
-		void IJsonFormattable.Format(ITextFormatter<CommonTokenType> formatter, TextWriter writer)
+		void ITextFormattable<CommonTokenType>.Format(ITextFormatter<CommonTokenType> formatter, TextWriter writer)
 		{
 			if (String.IsNullOrEmpty(this.identifier))
 			{
@@ -325,7 +325,7 @@ namespace JsonFx.EcmaScript
 			}
 		}
 
-		#endregion IJsonFormattable Members
+		#endregion ITextFormattable<CommonTokenType> Members
 
 		#region Object Overrides
 

@@ -31,15 +31,18 @@
 using System;
 using System.IO;
 
-using JsonFx.Serialization;
-
-namespace JsonFx.Markup
+namespace JsonFx.Serialization
 {
 	/// <summary>
-	/// Designates a type as being able to format itself to raw markup text
+	/// Designates a type as being able to format itself to raw text
 	/// </summary>
-	internal interface IMarkupFormattable
+	public interface ITextFormattable<T>
 	{
-		void Format(ITextFormatter<MarkupTokenType> formatter, TextWriter writer);
+		/// <summary>
+		/// Writes custom format to the output using either tokens or text 
+		/// </summary>
+		/// <param name="formatter"></param>
+		/// <param name="writer"></param>
+		void Format(ITextFormatter<T> formatter, TextWriter writer);
 	}
 }

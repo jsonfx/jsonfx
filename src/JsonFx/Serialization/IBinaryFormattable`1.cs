@@ -31,16 +31,19 @@
 using System;
 using System.IO;
 
-using JsonFx.Common;
-using JsonFx.Serialization;
-
-namespace JsonFx.Json
+namespace JsonFx.Serialization
 {
 	/// <summary>
-	/// Designates a type as being able to format itself to raw JSON text
+	/// Designates a type as being able to format itself to raw bytes
 	/// </summary>
-	internal interface IJsonFormattable
+	public interface IBinaryFormattable<T>
 	{
-		void Format(ITextFormatter<CommonTokenType> formatter, TextWriter writer);
+		/// <summary>
+		/// Writes custom format to the output using either tokens or bytes
+		/// </summary>
+		/// <param name="formatter"></param>
+		/// <param name="writer"></param>
+		/// <returns>total number of bytes written</returns>
+		int Format(IBinaryFormatter<T> formatter, BinaryWriter writer);
 	}
 }

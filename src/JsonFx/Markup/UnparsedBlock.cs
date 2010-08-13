@@ -40,7 +40,7 @@ namespace JsonFx.Markup
 	/// <summary>
 	/// Designates a type as being able to format itself to raw JSON text.
 	/// </summary>
-	public class UnparsedBlock : IMarkupFormattable
+	public class UnparsedBlock : ITextFormattable<MarkupTokenType>
 	{
 		#region Init
 
@@ -94,7 +94,7 @@ namespace JsonFx.Markup
 
 		#endregion Properties
 
-		#region IMarkupFormattable Members
+		#region ITextFormattable<MarkupTokenType> Members
 
 		public void Format(ITextFormatter<MarkupTokenType> formatter, TextWriter writer)
 		{
@@ -105,7 +105,7 @@ namespace JsonFx.Markup
 			writer.Write(MarkupGrammar.OperatorElementEnd);
 		}
 
-		#endregion IMarkupFormattable Members
+		#endregion ITextFormattable<MarkupTokenType> Members
 
 		#region Object Overrides
 

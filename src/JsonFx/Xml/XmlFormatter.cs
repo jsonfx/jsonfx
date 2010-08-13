@@ -274,7 +274,7 @@ namespace JsonFx.Xml
 							}
 							case MarkupTokenType.Primitive:
 							{
-								IMarkupFormattable formattable = token.Value as IMarkupFormattable;
+								ITextFormattable<MarkupTokenType> formattable = token.Value as ITextFormattable<MarkupTokenType>;
 								if (formattable != null)
 								{
 									formattable.Format(this, new XmlWriterAdapter(writer));
@@ -321,7 +321,7 @@ namespace JsonFx.Xml
 				{
 					case MarkupTokenType.Primitive:
 					{
-						IMarkupFormattable formattable = token.Value as IMarkupFormattable;
+						ITextFormattable<MarkupTokenType> formattable = token.Value as ITextFormattable<MarkupTokenType>;
 						if (formattable != null)
 						{
 							formattable.Format(this, new XmlWriterAdapter(writer));

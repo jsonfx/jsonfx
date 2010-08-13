@@ -39,16 +39,8 @@ namespace JsonFx.Bson
 	/// <summary>
 	/// Designates a type as being able to format itself to raw BSON bytes
 	/// </summary>
-	internal interface IBsonFormattable
+	public interface IBsonFormattable : IBinaryFormattable<CommonTokenType>
 	{
-		/// <summary>
-		/// Writes raw BSON to the writer
-		/// </summary>
-		/// <param name="formatter"></param>
-		/// <param name="writer"></param>
-		/// <returns>total number of bytes written</returns>
-		int Format(IBinaryFormatter<CommonTokenType> formatter, BinaryWriter writer);
-
 		/// <summary>
 		/// Determines the corresponding BSON element type
 		/// </summary>

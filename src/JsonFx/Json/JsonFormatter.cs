@@ -237,7 +237,7 @@ namespace JsonFx.Json
 								}
 								default:
 								{
-									IJsonFormattable formattable = token.Value as IJsonFormattable;
+									ITextFormattable<CommonTokenType> formattable = token.Value as ITextFormattable<CommonTokenType>;
 									if (formattable != null)
 									{
 										formattable.Format(this, writer);

@@ -271,7 +271,7 @@ namespace JsonFx.Html
 					}
 					case MarkupTokenType.Primitive:
 					{
-						IMarkupFormattable formattable = token.Value as IMarkupFormattable;
+						ITextFormattable<MarkupTokenType> formattable = token.Value as ITextFormattable<MarkupTokenType>;
 						if (formattable != null)
 						{
 							formattable.Format(this, writer);
@@ -402,7 +402,7 @@ namespace JsonFx.Html
 			// local-name
 			this.WriteLocalName(writer, localName);
 
-			IMarkupFormattable formattable = value.Value as IMarkupFormattable;
+			ITextFormattable<MarkupTokenType> formattable = value.Value as ITextFormattable<MarkupTokenType>;
 			string attrValue = (formattable == null) ? value.ValueAsString() : null;
 
 			if ((formattable == null) &&

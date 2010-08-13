@@ -130,7 +130,6 @@
     <Compile Include="IO\Stream`1.cs" />
     <Compile Include="IO\StringStream.cs" />
     <Compile Include="IO\TextReaderStream.cs" />
-    <Compile Include="Json\IJsonFormattable.cs" />
     <Compile Include="Json\JsonFormatter.cs" />
     <Compile Include="Json\JsonGrammar.cs" />
     <Compile Include="Json\JsonIgnoreAttribute.cs" />
@@ -143,12 +142,13 @@
     <Compile Include="JsonML\JsonMLOutTransformer.cs" />
     <Compile Include="Json\Resolvers\JsonResolverStrategy.cs" />
     <Compile Include="Markup\UnparsedBlock.cs" />
-    <Compile Include="Markup\IMarkupFormattable.cs" />
     <Compile Include="Markup\MarkupGrammar.cs" />
     <Compile Include="Markup\MarkupTokenType.cs" />
     <Compile Include="Markup\PrefixScopeChain.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\AssemblyVersion.cs" />
+    <Compile Include="Serialization\IBinaryFormattable`1.cs" />
+    <Compile Include="Serialization\ITextFormattable`1.cs" />
     <Compile Include="Serialization\Resolvers\ConventionResolverStrategy.cs" />
     <Compile Include="Serialization\TransformTokenizer`2.cs" />
     <Compile Include="Serialization\TransformFormatter`2.cs" />
