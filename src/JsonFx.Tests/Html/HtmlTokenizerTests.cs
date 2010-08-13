@@ -587,8 +587,7 @@ namespace JsonFx.Html
 			const string input = @"leading&amp;";
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenPrimitive("leading"),
-			        MarkupGrammar.TokenPrimitive("&")
+			        MarkupGrammar.TokenPrimitive("leading&")
 			    };
 
 			var tokenizer = new HtmlTokenizer();
@@ -604,8 +603,7 @@ namespace JsonFx.Html
 			const string input = @"&amp;trailing";
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenPrimitive("&"),
-			        MarkupGrammar.TokenPrimitive("trailing")
+			        MarkupGrammar.TokenPrimitive("&trailing")
 			    };
 
 			var tokenizer = new HtmlTokenizer();
@@ -621,13 +619,7 @@ namespace JsonFx.Html
 			const string input = @"there should &lt;b&gt;e decoded chars &amp; inside this text";
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenPrimitive(@"there should "),
-			        MarkupGrammar.TokenPrimitive(@"<"),
-			        MarkupGrammar.TokenPrimitive(@"b"),
-			        MarkupGrammar.TokenPrimitive(@">"),
-			        MarkupGrammar.TokenPrimitive(@"e decoded chars "),
-			        MarkupGrammar.TokenPrimitive(@"&"),
-			        MarkupGrammar.TokenPrimitive(@" inside this text")
+			        MarkupGrammar.TokenPrimitive(@"there should <b>e decoded chars & inside this text")
 			    };
 
 			var tokenizer = new HtmlTokenizer();
@@ -643,14 +635,7 @@ namespace JsonFx.Html
 			const string input = @"there should &#xnot &Xltb&#gte decoded chars & inside this text";
 			var expected = new[]
 			    {
-			        MarkupGrammar.TokenPrimitive(@"there should "),
-			        MarkupGrammar.TokenPrimitive(@"&#x"),
-			        MarkupGrammar.TokenPrimitive(@"not "),
-			        MarkupGrammar.TokenPrimitive(@"&Xltb"),
-			        MarkupGrammar.TokenPrimitive(@"&#"),
-			        MarkupGrammar.TokenPrimitive(@"gte decoded chars "),
-			        MarkupGrammar.TokenPrimitive(@"&"),
-			        MarkupGrammar.TokenPrimitive(@" inside this text")
+			        MarkupGrammar.TokenPrimitive(@"there should &#xnot &Xltb&#gte decoded chars & inside this text")
 			    };
 
 			var tokenizer = new HtmlTokenizer();

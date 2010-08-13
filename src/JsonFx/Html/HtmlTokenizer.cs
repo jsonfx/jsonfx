@@ -232,8 +232,8 @@ namespace JsonFx.Html
 
 			if (scanner.IsCompleted)
 			{
-				// end of file, emit as text
-				tokens.Add(MarkupGrammar.TokenPrimitive(Char.ToString(MarkupGrammar.OperatorElementBegin)));
+				// end of file, just emit as text
+				this.EmitText(tokens, Char.ToString(MarkupGrammar.OperatorElementBegin));
 				return;
 			}
 
@@ -263,7 +263,7 @@ namespace JsonFx.Html
 					text += MarkupGrammar.OperatorElementClose;
 				}
 
-				tokens.Add(MarkupGrammar.TokenPrimitive(text));
+				this.EmitText(tokens, text);
 				return;
 			}
 
@@ -894,6 +894,22 @@ namespace JsonFx.Html
 				return;
 			}
 
+			int count = tokens.Count;
+
+			// get last token
+			var token = (count > 0) ? tokens[count-1] : null;
+			if (token != null &&
+				token.TokenType == MarkupTokenType.Primitive &&
+				token.Value is string &&
+				// prevent appending to attribute values
+				(count == 1 || tokens[count-2].TokenType != MarkupTokenType.Attribute))
+			{
+				// concatenate string literals into single value
+				tokens[count-1] = MarkupGrammar.TokenPrimitive(String.Concat(token.Value, value));
+				return;
+			}
+
+			// just append a new literal
 			tokens.Add(MarkupGrammar.TokenPrimitive(value));
 		}
 
