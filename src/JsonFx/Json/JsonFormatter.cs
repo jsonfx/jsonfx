@@ -66,7 +66,7 @@ namespace JsonFx.Json
 			private readonly DataWriterSettings Settings;
 
 			// TODO: find a way to generalize this setting
-			private readonly bool EncodeLessThan;
+			private bool encodeLessThan;
 
 			#endregion Fields
 
@@ -77,16 +77,6 @@ namespace JsonFx.Json
 			/// </summary>
 			/// <param name="settings"></param>
 			public JsonFormatter(DataWriterSettings settings)
-				: this(settings, false)
-			{
-			}
-
-			/// <summary>
-			/// Ctor
-			/// </summary>
-			/// <param name="settings"></param>
-			/// <param name="encodeLessThan"></param>
-			public JsonFormatter(DataWriterSettings settings, bool encodeLessThan)
 			{
 				if (settings == null)
 				{
@@ -94,10 +84,23 @@ namespace JsonFx.Json
 				}
 
 				this.Settings = settings;
-				this.EncodeLessThan = encodeLessThan;
 			}
 
 			#endregion Init
+
+			#region Properties
+
+			/// <summary>
+			/// Gets and sets if '&lt;' should be encoded in strings
+			/// Useful for when emitting directly into page
+			/// </summary>
+			public bool EncodeLessThan
+			{
+				get { return this.encodeLessThan; }
+				set { this.encodeLessThan = value; }
+			}
+
+			#endregion Properties
 
 			#region ITextFormatter<T> Methods
 
@@ -527,7 +530,7 @@ namespace JsonFx.Json
 
 					if (ch <= '\u001F' ||
 						ch >= '\u007F' ||
-						(this.EncodeLessThan && ch == '<') || // improves compatibility within script blocks
+						(this.encodeLessThan && ch == '<') || // improves compatibility within script blocks
 						ch == JsonGrammar.OperatorStringDelim ||
 						ch == JsonGrammar.OperatorCharEscape)
 					{

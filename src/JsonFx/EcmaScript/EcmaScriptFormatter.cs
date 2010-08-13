@@ -95,17 +95,7 @@ if (""undefined"" === typeof {0}) {{
 		/// Defaults to encoding &lt; chars for improved embedding within script blocks
 		/// </remarks>
 		public EcmaScriptFormatter(DataWriterSettings settings)
-			: base(settings, true)
-		{
-		}
-
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="settings"></param>
-		/// <param name="encodeLessThan"></param>
-		public EcmaScriptFormatter(DataWriterSettings settings, bool encodeLessThan)
-			: base(settings, encodeLessThan)
+			: base(settings)
 		{
 		}
 

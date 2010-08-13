@@ -95,7 +95,7 @@ namespace JsonFx.Linq
 				return String.Empty;
 			}
 
-			return new ExpressionWalker(new Json.JsonWriter.JsonFormatter(new DataWriterSettings { PrettyPrint=true }, false)).GetQueryText(expression);
+			return new ExpressionWalker(new Json.JsonWriter.JsonFormatter(new DataWriterSettings { PrettyPrint=true })).GetQueryText(expression);
 		}
 
 		#endregion QueryProvider Methods
