@@ -114,14 +114,14 @@ if (""undefined"" === typeof {0}) {{
 		#region Namespace Methods
 
 		/// <summary>
-		/// Returns a block of script for ensuring that a namespace is declared
+		/// Emits a block of script ensuring that a namespace is declared
 		/// </summary>
 		/// <param name="writer">the output writer</param>
 		/// <param name="ident">the namespace to ensure</param>
 		/// <param name="namespaces">list of namespaces already emitted</param>
 		/// <param name="debug">determines if should emit pretty-printed</param>
 		/// <returns>if was a namespaced identifier</returns>
-		public static bool WriteNamespaceDeclaration(TextWriter writer, string ident, List<string> namespaces, bool isDebug)
+		public static bool WriteNamespaceDeclaration(TextWriter writer, string ident, List<string> namespaces, bool prettyPrint)
 		{
 			if (String.IsNullOrEmpty(ident))
 			{
@@ -159,7 +159,7 @@ if (""undefined"" === typeof {0}) {{
 
 				if (i == 0)
 				{
-					if (isDebug)
+					if (prettyPrint)
 					{
 						writer.Write(EcmaScriptFormatter.RootDeclarationDebug, ns,
 							String.Join(NamespaceDelim, nsParts, 0, nsParts.Length-1));
@@ -170,7 +170,7 @@ if (""undefined"" === typeof {0}) {{
 					}
 				}
 
-				if (isDebug)
+				if (prettyPrint)
 				{
 					writer.WriteLine(EcmaScriptFormatter.NamespaceCheckDebug, ns);
 				}
@@ -180,7 +180,7 @@ if (""undefined"" === typeof {0}) {{
 				}
 			}
 
-			if (isDebug && isNested)
+			if (prettyPrint && isNested)
 			{
 				writer.WriteLine();
 			}
