@@ -312,9 +312,7 @@ namespace JsonFx.Json
 								pendingNewLine = false;
 							}
 
-							string propertyName = token.Name.LocalName;
-
-							this.WritePropertyName(writer, propertyName);
+							this.WritePropertyName(writer, token.Name.LocalName);
 
 							if (prettyPrint)
 							{
@@ -617,11 +615,6 @@ namespace JsonFx.Json
 				if (value is Enum)
 				{
 					return this.FormatEnum((Enum)value);
-				}
-				if (value is DataName)
-				{
-					// for JsonML rendering
-					return ((DataName)value).ToPrefixedName();
 				}
 
 				return Token<CommonTokenType>.ToString(value);

@@ -233,7 +233,8 @@ namespace JsonFx.Html
 								attrName = new DataName(attrName.LocalName, prefix, attrName.NamespaceUri, true);
 							}
 
-							if (!this.ScopeChain.ContainsNamespace(attrName.NamespaceUri) &&
+							if (prefix != null &&
+								!this.ScopeChain.ContainsNamespace(attrName.NamespaceUri) &&
 								(!String.IsNullOrEmpty(attrName.NamespaceUri) || this.ScopeChain.ContainsPrefix(String.Empty)))
 							{
 								scope[prefix] = attrName.NamespaceUri;

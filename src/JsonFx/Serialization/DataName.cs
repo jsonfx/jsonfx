@@ -296,10 +296,14 @@ namespace JsonFx.Serialization
 
 		#region ToString Methods
 
+		/// <summary>
+		/// Gets the prefixed name or simply local-name if is not a fully qualified name
+		/// </summary>
+		/// <param name="addPrefixIfQualifiedAndEmpty">true to generate a prefix if the prefix is empty but not the namespace</param>
+		/// <returns></returns>
 		public string ToPrefixedName()
 		{
-			if (String.IsNullOrEmpty(this.NamespaceUri) &&
-				String.IsNullOrEmpty(this.Prefix))
+			if (String.IsNullOrEmpty(this.Prefix))
 			{
 				return this.LocalName;
 			}
@@ -316,6 +320,10 @@ namespace JsonFx.Serialization
 				this.LocalName);
 		}
 
+		/// <summary>
+		/// Gets the namespaced name or simply local-name if is not a fully qualified name
+		/// </summary>
+		/// <returns></returns>
 		public string ToQualifiedName()
 		{
 			if (String.IsNullOrEmpty(this.NamespaceUri))
@@ -446,6 +454,10 @@ namespace JsonFx.Serialization
 					// standard for XML Schema Instance
 					return "xsi";
 				}
+				case "http://www.w3.org/2000/xmlns/":
+				{
+					return "xmlns";
+				}
 				case "http://www.w3.org/1999/xhtml":
 				{
 					// standard for XHTML
@@ -463,7 +475,7 @@ namespace JsonFx.Serialization
 				}
 				case "http://purl.org/syndication/thread/1.0":
 				{
-					// standard for syndicationthreading
+					// standard for syndication threading
 					return "thr";
 				}
 				default:

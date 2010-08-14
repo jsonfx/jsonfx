@@ -63,7 +63,7 @@ namespace JsonFx.JsonML
 			var expected = new[]
 			    {
 			        CommonGrammar.TokenArrayBeginUnnamed,
-			        CommonGrammar.TokenPrimitive(new DataName("root")),
+			        CommonGrammar.TokenPrimitive("root"),
 			        CommonGrammar.TokenArrayEnd
 			    };
 
@@ -84,7 +84,7 @@ namespace JsonFx.JsonML
 			var expected = new[]
 			    {
 			        CommonGrammar.TokenArrayBeginUnnamed,
-			        CommonGrammar.TokenPrimitive(new DataName("root")),
+			        CommonGrammar.TokenPrimitive("root"),
 			        CommonGrammar.TokenArrayEnd
 			    };
 
@@ -110,7 +110,11 @@ namespace JsonFx.JsonML
 			var expected = new[]
 				{
 					CommonGrammar.TokenArrayBeginUnnamed,
-					CommonGrammar.TokenPrimitive(new DataName("root", String.Empty, "http://example.com/schema")),
+					CommonGrammar.TokenPrimitive("root"),
+					CommonGrammar.TokenObjectBeginUnnamed,
+					CommonGrammar.TokenProperty("xmlns"),
+					CommonGrammar.TokenPrimitive("http://example.com/schema"),
+					CommonGrammar.TokenObjectEnd,
 					CommonGrammar.TokenArrayEnd
 				};
 
@@ -132,7 +136,11 @@ namespace JsonFx.JsonML
 			var expected = new[]
 				{
 					CommonGrammar.TokenArrayBeginUnnamed,
-					CommonGrammar.TokenPrimitive(new DataName("root", "prefix", "http://example.com/schema")),
+					CommonGrammar.TokenPrimitive("prefix:root"),
+					CommonGrammar.TokenObjectBeginUnnamed,
+					CommonGrammar.TokenProperty("xmlns:prefix"),
+					CommonGrammar.TokenPrimitive("http://example.com/schema"),
+					CommonGrammar.TokenObjectEnd,
 					CommonGrammar.TokenArrayEnd
 				};
 
@@ -157,9 +165,13 @@ namespace JsonFx.JsonML
 			var expected = new[]
 				{
 					CommonGrammar.TokenArrayBeginUnnamed,
-					CommonGrammar.TokenPrimitive(new DataName("foo")),
+					CommonGrammar.TokenPrimitive("foo"),
 					CommonGrammar.TokenArrayBeginUnnamed,
-					CommonGrammar.TokenPrimitive(new DataName("child", String.Empty, "http://example.com/schema")),
+					CommonGrammar.TokenPrimitive("child"),
+					CommonGrammar.TokenObjectBeginUnnamed,
+					CommonGrammar.TokenProperty("xmlns"),
+					CommonGrammar.TokenPrimitive("http://example.com/schema"),
+					CommonGrammar.TokenObjectEnd,
 					CommonGrammar.TokenPrimitive("value"),
 					CommonGrammar.TokenArrayEnd,
 					CommonGrammar.TokenArrayEnd
@@ -186,9 +198,13 @@ namespace JsonFx.JsonML
 			var expected = new[]
 				{
 					CommonGrammar.TokenArrayBeginUnnamed,
-					CommonGrammar.TokenPrimitive(new DataName("foo", String.Empty, "http://example.org")),
+					CommonGrammar.TokenPrimitive("foo"),
+					CommonGrammar.TokenObjectBeginUnnamed,
+					CommonGrammar.TokenProperty("xmlns"),
+					CommonGrammar.TokenPrimitive("http://example.org"),
+					CommonGrammar.TokenObjectEnd,
 					CommonGrammar.TokenArrayBeginUnnamed,
-					CommonGrammar.TokenPrimitive(new DataName("child", String.Empty, "http://example.org")),
+					CommonGrammar.TokenPrimitive("child"),
 					CommonGrammar.TokenPrimitive("value"),
 					CommonGrammar.TokenArrayEnd,
 					CommonGrammar.TokenArrayEnd
@@ -215,9 +231,13 @@ namespace JsonFx.JsonML
 			var expected = new[]
 				{
 					CommonGrammar.TokenArrayBeginUnnamed,
-					CommonGrammar.TokenPrimitive(new DataName("foo", "bar", "http://example.org")),
+					CommonGrammar.TokenPrimitive("bar:foo"),
+					CommonGrammar.TokenObjectBeginUnnamed,
+					CommonGrammar.TokenProperty("xmlns:bar"),
+					CommonGrammar.TokenPrimitive("http://example.org"),
+					CommonGrammar.TokenObjectEnd,
 					CommonGrammar.TokenArrayBeginUnnamed,
-					CommonGrammar.TokenPrimitive(new DataName("child", "bar", "http://example.org")),
+					CommonGrammar.TokenPrimitive("bar:child"),
 					CommonGrammar.TokenPrimitive("value"),
 					CommonGrammar.TokenArrayEnd,
 					CommonGrammar.TokenArrayEnd
@@ -244,9 +264,17 @@ namespace JsonFx.JsonML
 			var expected = new[]
 				{
 					CommonGrammar.TokenArrayBeginUnnamed,
-					CommonGrammar.TokenPrimitive(new DataName("foo", String.Empty, "http://json.org")),
+					CommonGrammar.TokenPrimitive("foo"),
+					CommonGrammar.TokenObjectBeginUnnamed,
+					CommonGrammar.TokenProperty("xmlns"),
+					CommonGrammar.TokenPrimitive("http://json.org"),
+					CommonGrammar.TokenObjectEnd,
 					CommonGrammar.TokenArrayBeginUnnamed,
-					CommonGrammar.TokenPrimitive(new DataName("child", String.Empty, "http://jsonfx.net")),
+					CommonGrammar.TokenPrimitive("child"),
+					CommonGrammar.TokenObjectBeginUnnamed,
+					CommonGrammar.TokenProperty("xmlns"),
+					CommonGrammar.TokenPrimitive("http://jsonfx.net"),
+					CommonGrammar.TokenObjectEnd,
 					CommonGrammar.TokenPrimitive("text value"),
 					CommonGrammar.TokenArrayEnd,
 					CommonGrammar.TokenArrayEnd
@@ -271,10 +299,14 @@ namespace JsonFx.JsonML
 			var expected = new[]
 				{
 					CommonGrammar.TokenArrayBeginUnnamed,
-					CommonGrammar.TokenPrimitive(new DataName("foo", String.Empty, "http://example.org")),
+					CommonGrammar.TokenPrimitive("foo"),
 					CommonGrammar.TokenObjectBeginUnnamed,
-					CommonGrammar.TokenProperty(new DataName("key", "blah", "http://example.org")),
+					CommonGrammar.TokenProperty("blah:key"),
 					CommonGrammar.TokenPrimitive("value"),
+					CommonGrammar.TokenProperty("xmlns"),
+					CommonGrammar.TokenPrimitive("http://example.org"),
+					CommonGrammar.TokenProperty("xmlns:blah"),
+					CommonGrammar.TokenPrimitive("http://example.org"),
 					CommonGrammar.TokenObjectEnd,
 					CommonGrammar.TokenArrayEnd
 				};
@@ -305,16 +337,24 @@ namespace JsonFx.JsonML
 			var expected = new[]
 				{
 					CommonGrammar.TokenArrayBeginUnnamed,
-					CommonGrammar.TokenPrimitive(new DataName("outer", String.Empty, "http://example.org/outer")),
+					CommonGrammar.TokenPrimitive("outer"),
+					CommonGrammar.TokenObjectBeginUnnamed,
+					CommonGrammar.TokenProperty("xmlns"),
+					CommonGrammar.TokenPrimitive("http://example.org/outer"),
+					CommonGrammar.TokenObjectEnd,
 					CommonGrammar.TokenArrayBeginUnnamed,
-					CommonGrammar.TokenPrimitive(new DataName("middle-1", String.Empty, "http://example.org/inner")),
+					CommonGrammar.TokenPrimitive("middle-1"),
+					CommonGrammar.TokenObjectBeginUnnamed,
+					CommonGrammar.TokenProperty("xmlns"),
+					CommonGrammar.TokenPrimitive("http://example.org/inner"),
+					CommonGrammar.TokenObjectEnd,
 					CommonGrammar.TokenArrayBeginUnnamed,
-					CommonGrammar.TokenPrimitive(new DataName("inner", String.Empty, "http://example.org/inner")),
+					CommonGrammar.TokenPrimitive("inner"),
 					CommonGrammar.TokenPrimitive("this should be inner"),
 					CommonGrammar.TokenArrayEnd,
 					CommonGrammar.TokenArrayEnd,
 					CommonGrammar.TokenArrayBeginUnnamed,
-					CommonGrammar.TokenPrimitive(new DataName("middle-2", String.Empty, "http://example.org/outer")),
+					CommonGrammar.TokenPrimitive("middle-2"),
 					CommonGrammar.TokenPrimitive("this should be outer"),
 					CommonGrammar.TokenArrayEnd,
 					CommonGrammar.TokenArrayEnd
@@ -342,11 +382,11 @@ namespace JsonFx.JsonML
 			var expected = new[]
 				{
 					CommonGrammar.TokenArrayBeginUnnamed,
-					CommonGrammar.TokenPrimitive(new DataName("one")),
+					CommonGrammar.TokenPrimitive("one"),
 					CommonGrammar.TokenArrayBeginUnnamed,
-					CommonGrammar.TokenPrimitive(new DataName("two")),
+					CommonGrammar.TokenPrimitive("two"),
 					CommonGrammar.TokenArrayBeginUnnamed,
-					CommonGrammar.TokenPrimitive(new DataName("three")),
+					CommonGrammar.TokenPrimitive("three"),
 					CommonGrammar.TokenArrayEnd,
 					CommonGrammar.TokenArrayEnd,
 					CommonGrammar.TokenArrayEnd
@@ -376,7 +416,7 @@ namespace JsonFx.JsonML
 			var expected = new[]
 				{
 					CommonGrammar.TokenArrayBeginUnnamed,
-					CommonGrammar.TokenPrimitive(new DataName("root")),
+					CommonGrammar.TokenPrimitive("root"),
 					CommonGrammar.TokenObjectBeginUnnamed,
 					CommonGrammar.TokenProperty(new DataName("attrName")),
 					CommonGrammar.TokenPrimitive("attrValue"),
@@ -404,7 +444,7 @@ namespace JsonFx.JsonML
 			var expected = new[]
 				{
 					CommonGrammar.TokenArrayBeginUnnamed,
-					CommonGrammar.TokenPrimitive(new DataName("root")),
+					CommonGrammar.TokenPrimitive("root"),
 					CommonGrammar.TokenObjectBeginUnnamed,
 					CommonGrammar.TokenProperty(new DataName("noValue")),
 					CommonGrammar.TokenPrimitive(String.Empty),
@@ -432,7 +472,7 @@ namespace JsonFx.JsonML
 			var expected = new[]
 				{
 					CommonGrammar.TokenArrayBeginUnnamed,
-					CommonGrammar.TokenPrimitive(new DataName("root")),
+					CommonGrammar.TokenPrimitive("root"),
 					CommonGrammar.TokenObjectBeginUnnamed,
 					CommonGrammar.TokenProperty(new DataName("noValue")),
 					CommonGrammar.TokenPrimitive(String.Empty),
@@ -460,7 +500,7 @@ namespace JsonFx.JsonML
 			var expected = new[]
 				{
 					CommonGrammar.TokenArrayBeginUnnamed,
-					CommonGrammar.TokenPrimitive(new DataName("root")),
+					CommonGrammar.TokenPrimitive("root"),
 					CommonGrammar.TokenObjectBeginUnnamed,
 					CommonGrammar.TokenProperty(new DataName("emptyValue")),
 					CommonGrammar.TokenPrimitive(String.Empty),
@@ -488,7 +528,7 @@ namespace JsonFx.JsonML
 			var expected = new[]
 				{
 					CommonGrammar.TokenArrayBeginUnnamed,
-					CommonGrammar.TokenPrimitive(new DataName("root")),
+					CommonGrammar.TokenPrimitive("root"),
 					CommonGrammar.TokenObjectBeginUnnamed,
 					CommonGrammar.TokenProperty(new DataName("white")),
 					CommonGrammar.TokenPrimitive(" extra whitespace around quote delims "),
@@ -520,7 +560,7 @@ namespace JsonFx.JsonML
 			var expected = new[]
 				{
 					CommonGrammar.TokenArrayBeginUnnamed,
-					CommonGrammar.TokenPrimitive(new DataName("root")),
+					CommonGrammar.TokenPrimitive("root"),
 					CommonGrammar.TokenObjectBeginUnnamed,
 					CommonGrammar.TokenProperty(new DataName("no-value")),
 					CommonGrammar.TokenPrimitive(String.Empty),
@@ -656,24 +696,24 @@ namespace JsonFx.JsonML
 			var expected = new[]
 				{
 					CommonGrammar.TokenArrayBeginUnnamed,
-					CommonGrammar.TokenPrimitive(new DataName("div")),
+					CommonGrammar.TokenPrimitive("div"),
 					CommonGrammar.TokenObjectBeginUnnamed,
 					CommonGrammar.TokenProperty(new DataName("class")),
 					CommonGrammar.TokenPrimitive("content"),
 					CommonGrammar.TokenObjectEnd,
 					CommonGrammar.TokenArrayBeginUnnamed,
-					CommonGrammar.TokenPrimitive(new DataName("p")),
+					CommonGrammar.TokenPrimitive("p"),
 					CommonGrammar.TokenObjectBeginUnnamed,
 					CommonGrammar.TokenProperty(new DataName("style")),
 					CommonGrammar.TokenPrimitive("color:red"),
 					CommonGrammar.TokenObjectEnd,
 					CommonGrammar.TokenArrayBeginUnnamed,
-					CommonGrammar.TokenPrimitive(new DataName("strong")),
+					CommonGrammar.TokenPrimitive("strong"),
 			        CommonGrammar.TokenPrimitive("Lorem ipsum"),
 					CommonGrammar.TokenArrayEnd,
 			        CommonGrammar.TokenPrimitive(" dolor sit amet, "),
 					CommonGrammar.TokenArrayBeginUnnamed,
-					CommonGrammar.TokenPrimitive(new DataName("i")),
+					CommonGrammar.TokenPrimitive("i"),
 			        CommonGrammar.TokenPrimitive("consectetur"),
 					CommonGrammar.TokenArrayEnd,
 			        CommonGrammar.TokenPrimitive(" adipiscing elit."),
@@ -716,26 +756,26 @@ namespace JsonFx.JsonML
 			var expected = new[]
 				{
 					CommonGrammar.TokenArrayBeginUnnamed,
-					CommonGrammar.TokenPrimitive(new DataName("div")),
+					CommonGrammar.TokenPrimitive("div"),
 					CommonGrammar.TokenObjectBeginUnnamed,
 					CommonGrammar.TokenProperty(new DataName("class")),
 					CommonGrammar.TokenPrimitive("content"),
 					CommonGrammar.TokenObjectEnd,
 			        CommonGrammar.TokenPrimitive("\r\n\t"),
 					CommonGrammar.TokenArrayBeginUnnamed,
-					CommonGrammar.TokenPrimitive(new DataName("p")),
+					CommonGrammar.TokenPrimitive("p"),
 					CommonGrammar.TokenObjectBeginUnnamed,
 					CommonGrammar.TokenProperty(new DataName("style")),
 					CommonGrammar.TokenPrimitive("color:red"),
 					CommonGrammar.TokenObjectEnd,
 			        CommonGrammar.TokenPrimitive("\r\n\t\t"),
 					CommonGrammar.TokenArrayBeginUnnamed,
-					CommonGrammar.TokenPrimitive(new DataName("strong")),
+					CommonGrammar.TokenPrimitive("strong"),
 			        CommonGrammar.TokenPrimitive("Lorem ipsum"),
 					CommonGrammar.TokenArrayEnd,
 			        CommonGrammar.TokenPrimitive(" dolor sit amet, "),
 					CommonGrammar.TokenArrayBeginUnnamed,
-					CommonGrammar.TokenPrimitive(new DataName("i")),
+					CommonGrammar.TokenPrimitive("i"),
 			        CommonGrammar.TokenPrimitive("consectetur"),
 					CommonGrammar.TokenArrayEnd,
 			        CommonGrammar.TokenPrimitive(" adipiscing elit.\r\n\t"),
@@ -770,11 +810,11 @@ namespace JsonFx.JsonML
 			var expected = new[]
 			    {
 			        CommonGrammar.TokenArrayBeginUnnamed,
-			        CommonGrammar.TokenPrimitive(new DataName("odd")),
+			        CommonGrammar.TokenPrimitive("odd"),
 			        CommonGrammar.TokenArrayBeginUnnamed,
-			        CommonGrammar.TokenPrimitive(new DataName("auto-closed")),
+			        CommonGrammar.TokenPrimitive("auto-closed"),
 			        CommonGrammar.TokenArrayBeginUnnamed,
-			        CommonGrammar.TokenPrimitive(new DataName("even")),
+			        CommonGrammar.TokenPrimitive("even"),
 			        CommonGrammar.TokenArrayEnd,
 			        CommonGrammar.TokenArrayEnd,
 			        CommonGrammar.TokenArrayEnd,
@@ -802,11 +842,23 @@ namespace JsonFx.JsonML
 			var expected = new[]
 			    {
 			        CommonGrammar.TokenArrayBeginUnnamed,
-			        CommonGrammar.TokenPrimitive(new DataName("odd", "a", "http://example.com/odd/a")),
+			        CommonGrammar.TokenPrimitive("a:odd"),
+					CommonGrammar.TokenObjectBeginUnnamed,
+					CommonGrammar.TokenProperty("xmlns:a"),
+					CommonGrammar.TokenPrimitive("http://example.com/odd/a"),
+					CommonGrammar.TokenObjectEnd,
 			        CommonGrammar.TokenArrayBeginUnnamed,
-			        CommonGrammar.TokenPrimitive(new DataName("auto-closed", "b", "http://example.com/auto-closed/b")),
+			        CommonGrammar.TokenPrimitive("b:auto-closed"),
+					CommonGrammar.TokenObjectBeginUnnamed,
+					CommonGrammar.TokenProperty("xmlns:b"),
+					CommonGrammar.TokenPrimitive("http://example.com/auto-closed/b"),
+					CommonGrammar.TokenObjectEnd,
 			        CommonGrammar.TokenArrayBeginUnnamed,
-			        CommonGrammar.TokenPrimitive(new DataName("even", "c", "http://example.com/even/c")),
+			        CommonGrammar.TokenPrimitive("c:even"),
+					CommonGrammar.TokenObjectBeginUnnamed,
+					CommonGrammar.TokenProperty("xmlns:c"),
+					CommonGrammar.TokenPrimitive("http://example.com/even/c"),
+					CommonGrammar.TokenObjectEnd,
 			        CommonGrammar.TokenArrayEnd,
 			        CommonGrammar.TokenArrayEnd,
 			        CommonGrammar.TokenArrayEnd,
@@ -832,12 +884,24 @@ namespace JsonFx.JsonML
 			var expected = new[]
 			    {
 			        CommonGrammar.TokenArrayBeginUnnamed,
-			        CommonGrammar.TokenPrimitive(new DataName("odd", "a", "http://example.com/odd/a")),
+			        CommonGrammar.TokenPrimitive("a:odd"),
+					CommonGrammar.TokenObjectBeginUnnamed,
+					CommonGrammar.TokenProperty("xmlns:a"),
+					CommonGrammar.TokenPrimitive("http://example.com/odd/a"),
+					CommonGrammar.TokenObjectEnd,
 			        CommonGrammar.TokenArrayBeginUnnamed,
-			        CommonGrammar.TokenPrimitive(new DataName("auto-closed", "b", "http://example.com/auto-closed/b")),
+			        CommonGrammar.TokenPrimitive("b:auto-closed"),
+					CommonGrammar.TokenObjectBeginUnnamed,
+					CommonGrammar.TokenProperty("xmlns:b"),
+					CommonGrammar.TokenPrimitive("http://example.com/auto-closed/b"),
+					CommonGrammar.TokenObjectEnd,
 			        CommonGrammar.TokenArrayEnd,
 			        CommonGrammar.TokenArrayBeginUnnamed,
-			        CommonGrammar.TokenPrimitive(new DataName("even", "c", "http://example.com/even/c")),
+			        CommonGrammar.TokenPrimitive("c:even"),
+					CommonGrammar.TokenObjectBeginUnnamed,
+					CommonGrammar.TokenProperty("xmlns:c"),
+					CommonGrammar.TokenPrimitive("http://example.com/even/c"),
+					CommonGrammar.TokenObjectEnd,
 			        CommonGrammar.TokenArrayEnd,
 			        CommonGrammar.TokenArrayEnd,
 			    };
@@ -946,35 +1010,35 @@ namespace JsonFx.JsonML
 			var expected = new[]
 			    {
 			        CommonGrammar.TokenArrayBeginUnnamed,
-			        CommonGrammar.TokenPrimitive(new DataName("p")),
+			        CommonGrammar.TokenPrimitive("p"),
 			        CommonGrammar.TokenPrimitive(@"You can add a string to a number, but this stringifies the number:"),
 			        CommonGrammar.TokenArrayEnd,
 			        CommonGrammar.TokenPrimitive("\r\n"),
 			        CommonGrammar.TokenArrayBeginUnnamed,
-			        CommonGrammar.TokenPrimitive(new DataName("math")),
+			        CommonGrammar.TokenPrimitive("math"),
 			        CommonGrammar.TokenPrimitive("\r\n\t"),
 			        CommonGrammar.TokenArrayBeginUnnamed,
-			        CommonGrammar.TokenPrimitive(new DataName("ms")),
+			        CommonGrammar.TokenPrimitive("ms"),
 			        CommonGrammar.TokenPrimitive(@"x<y"),
 			        CommonGrammar.TokenArrayEnd,
 			        CommonGrammar.TokenPrimitive("\r\n\t"),
 			        CommonGrammar.TokenArrayBeginUnnamed,
-			        CommonGrammar.TokenPrimitive(new DataName("mo")),
+			        CommonGrammar.TokenPrimitive("mo"),
 			        CommonGrammar.TokenPrimitive(@"+"),
 			        CommonGrammar.TokenArrayEnd,
 			        CommonGrammar.TokenPrimitive("\r\n\t"),
 			        CommonGrammar.TokenArrayBeginUnnamed,
-			        CommonGrammar.TokenPrimitive(new DataName("mn")),
+			        CommonGrammar.TokenPrimitive("mn"),
 			        CommonGrammar.TokenPrimitive(@"3"),
 			        CommonGrammar.TokenArrayEnd,
 			        CommonGrammar.TokenPrimitive("\r\n\t"),
 			        CommonGrammar.TokenArrayBeginUnnamed,
-			        CommonGrammar.TokenPrimitive(new DataName("mo")),
+			        CommonGrammar.TokenPrimitive("mo"),
 			        CommonGrammar.TokenPrimitive(@"="),
 			        CommonGrammar.TokenArrayEnd,
 			        CommonGrammar.TokenPrimitive("\r\n\t"),
 			        CommonGrammar.TokenArrayBeginUnnamed,
-			        CommonGrammar.TokenPrimitive(new DataName("ms")),
+			        CommonGrammar.TokenPrimitive("ms"),
 			        CommonGrammar.TokenPrimitive(@"x<y3"),
 			        CommonGrammar.TokenArrayEnd,
 			        CommonGrammar.TokenPrimitive("\r\n"),
@@ -1058,20 +1122,20 @@ namespace JsonFx.JsonML
 			var expected = new[]
 			    {
 					CommonGrammar.TokenArrayBeginUnnamed,
-			        CommonGrammar.TokenPrimitive(new DataName("html")),
+			        CommonGrammar.TokenPrimitive("html"),
 			        CommonGrammar.TokenPrimitive("\r\n\t"),
 			        CommonGrammar.TokenArrayBeginUnnamed,
-			        CommonGrammar.TokenPrimitive(new DataName("head")),
+			        CommonGrammar.TokenPrimitive("head"),
 			        CommonGrammar.TokenPrimitive("\r\n\t\t"),
 			        CommonGrammar.TokenArrayBeginUnnamed,
-			        CommonGrammar.TokenPrimitive(new DataName("title")),
+			        CommonGrammar.TokenPrimitive("title"),
 			        CommonGrammar.TokenPrimitive("PHP Test"),
 			        CommonGrammar.TokenArrayEnd,
 			        CommonGrammar.TokenPrimitive("\r\n\t"),
 			        CommonGrammar.TokenArrayEnd,
 			        CommonGrammar.TokenPrimitive("\r\n\t"),
 			        CommonGrammar.TokenArrayBeginUnnamed,
-			        CommonGrammar.TokenPrimitive(new DataName("body")),
+			        CommonGrammar.TokenPrimitive("body"),
 			        CommonGrammar.TokenPrimitive("\r\n\t\t"),
 					CommonGrammar.TokenPrimitive(new UnparsedBlock("?", "?", @"php echo '<p>Hello World</p>'; ")),
 			        CommonGrammar.TokenPrimitive("\r\n\t"),
