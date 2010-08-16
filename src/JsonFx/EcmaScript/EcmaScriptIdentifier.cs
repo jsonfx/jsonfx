@@ -67,7 +67,7 @@ namespace JsonFx.EcmaScript
 			this.identifier =
 				String.IsNullOrEmpty(ident) ?
 				String.Empty :
-				EcmaScriptIdentifier.EnsureValidIdentifier(ident, true);
+				EcmaScriptIdentifier.VerifyIdentifier(ident, true);
 		}
 
 		#endregion Init
@@ -87,46 +87,46 @@ namespace JsonFx.EcmaScript
 		#region Methods
 
 		/// <summary>
-		/// Ensures is a valid EcmaScript variable expression.
+		/// Verifies is a valid EcmaScript identifier
 		/// </summary>
-		/// <param name="varExpr">the variable expression</param>
-		/// <returns>varExpr</returns>
-		public static string EnsureValidIdentifier(string varExpr, bool nested)
+		/// <param name="ident">the identifier</param>
+		/// <returns>identifier</returns>
+		public static string VerifyIdentifier(string ident, bool nested)
 		{
-			return EcmaScriptIdentifier.EnsureValidIdentifier(varExpr, nested, true);
+			return EcmaScriptIdentifier.VerifyIdentifier(ident, nested, true);
 		}
 
 		/// <summary>
-		/// Ensures is a valid EcmaScript variable expression.
+		/// Verifies is a valid EcmaScript identifier
 		/// </summary>
-		/// <param name="varExpr">the variable expression</param>
-		/// <returns>varExpr</returns>
-		public static string EnsureValidIdentifier(string varExpr, bool nested, bool throwOnEmpty)
+		/// <param name="ident">the identifier</param>
+		/// <returns>identifier</returns>
+		public static string VerifyIdentifier(string ident, bool nested, bool throwOnEmpty)
 		{
-			if (String.IsNullOrEmpty(varExpr))
+			if (String.IsNullOrEmpty(ident))
 			{
 				if (throwOnEmpty)
 				{
-					throw new ArgumentException("Variable expression is empty.");
+					throw new ArgumentException("Identifier is empty.");
 				}
 				return String.Empty;
 			}
 
-			varExpr = varExpr.Replace(" ", "");
+			ident = ident.Replace(" ", "");
 
-			if (!EcmaScriptIdentifier.IsValidIdentifier(varExpr, nested))
+			if (!EcmaScriptIdentifier.IsValidIdentifier(ident, nested))
 			{
-				throw new ArgumentException("Variable expression \""+varExpr+"\" is not supported.");
+				throw new ArgumentException("Identifier \""+ident+"\" is not supported.");
 			}
 
-			return varExpr;
+			return ident;
 		}
 
 		/// <summary>
-		/// Verifies is a valid EcmaScript variable expression.
+		/// Verifies is a valid EcmaScript variable expression
 		/// </summary>
-		/// <param name="varExpr">the variable expression</param>
-		/// <returns>varExpr</returns>
+		/// <param name="ident">the identifier</param>
+		/// <returns>identifier</returns>
 		/// <remarks>
 		/// http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-262.pdf
 		/// 
@@ -137,16 +137,16 @@ namespace JsonFx.EcmaScript
 		/// IdentifierPart =
 		///		IdentifierStart | Digit
 		/// </remarks>
-		public static bool IsValidIdentifier(string varExpr, bool nested)
+		public static bool IsValidIdentifier(string ident, bool nested)
 		{
-			if (String.IsNullOrEmpty(varExpr))
+			if (String.IsNullOrEmpty(ident))
 			{
 				return false;
 			}
 
 			if (nested)
 			{
-				string[] parts = varExpr.Split('.');
+				string[] parts = ident.Split('.');
 				foreach (string part in parts)
 				{
 					if (!EcmaScriptIdentifier.IsValidIdentifier(part, false))
@@ -157,22 +157,25 @@ namespace JsonFx.EcmaScript
 				return true;
 			}
 
-			if (EcmaScriptIdentifier.IsReservedWord(varExpr))
+			if (EcmaScriptIdentifier.IsReservedWord(ident))
 			{
 				return false;
 			}
 
 			bool indentPart = false;
-			foreach (char ch in varExpr)
+			for (int i=0, length=ident.Length; i<length; i++)
 			{
-				if (indentPart && Char.IsDigit(ch))
+				char ch = ident[i];
+				if (indentPart && ((ch >= '0') && (ch <= '9')))
 				{
 					// digits are only allowed after first char
 					continue;
 				}
 
 				// can be start or part
-				if (Char.IsLetter(ch) || ch == '_' || ch == '$')
+				if (((ch >= 'a') && (ch <= 'z')) ||
+					((ch >= 'A') && (ch <= 'Z')) ||
+					(ch == '_') || (ch == '$'))
 				{
 					indentPart = true;
 					continue;
@@ -184,10 +187,10 @@ namespace JsonFx.EcmaScript
 			return true;
 		}
 
-		private static bool IsReservedWord(string varExpr)
+		private static bool IsReservedWord(string ident)
 		{
 			// TODO: investigate doing this like Rhino does (switch on length check first letter or two)
-			switch (varExpr)
+			switch (ident)
 			{
 				// literals
 				case "null":
