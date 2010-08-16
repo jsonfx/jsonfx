@@ -33,8 +33,68 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Security;
 
+#if NET40 && !WINDOWS_PHONE
+using System.Dynamic;
+#endif
+
 namespace JsonFx.CodeGen
 {
+	#region Dynamic Binders
+#if NET40 && !WINDOWS_PHONE
+
+	internal class DynamicGetter : GetMemberBinder
+	{
+		#region Init
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="name"></param>
+		public DynamicGetter(string name)
+			: base(name, false)
+		{
+		}
+
+		#endregion Init
+
+		#region GetMemberBinder Members
+
+		public override DynamicMetaObject FallbackGetMember(DynamicMetaObject target, DynamicMetaObject errorSuggestion)
+		{
+			throw new NotSupportedException();
+		}
+
+		#endregion GetMemberBinder Members
+	}
+
+	internal class DynamicSetter : SetMemberBinder
+	{
+		#region Init
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="name"></param>
+		public DynamicSetter(string name)
+			: base(name, false)
+		{
+		}
+
+		#endregion Init
+
+		#region SetMemberBinder Members
+
+		public override DynamicMetaObject FallbackSetMember(DynamicMetaObject target, DynamicMetaObject value, DynamicMetaObject errorSuggestion)
+		{
+			throw new NotSupportedException();
+		}
+
+		#endregion SetMemberBinder Members
+	}
+
+#endif
+	#endregion Dynamic Binders
+
 	/// <summary>
 	/// Generates delegates for getting/setting properties and field and invoking constructors
 	/// </summary>

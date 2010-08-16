@@ -35,6 +35,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 
+using JsonFx.CodeGen;
 using JsonFx.Serialization.Resolvers;
 
 #if !NET20 && !NET30 && !WINDOWS_PHONE
@@ -109,6 +110,39 @@ namespace JsonFx.Serialization
 		#endregion Init
 
 		#region Object Manipulation Methods
+
+		/// <summary>
+		/// Instantiates a new instance of objectType.
+		/// </summary>
+		/// <param name="objectType"></param>
+		/// <returns>objectType instance</returns>
+		internal object InstantiateObjectDefaultCtor(Type targetType)
+		{
+			if (targetType == null ||
+				targetType.IsValueType ||
+				targetType.IsAbstract ||
+				targetType == typeof(object) ||
+				targetType == typeof(string))
+			{
+				return new JsonObject();
+			}
+
+			targetType = TypeCoercionUtility.ResolveInterfaceType(targetType);
+
+			if (targetType.IsInterface)
+			{
+				return new JsonObject();
+			}
+
+			FactoryMap factory = this.ResolverCache.LoadFactory(targetType);
+			if ((factory == null) || (factory.Ctor == null) || ((factory.CtorArgs != null) && (factory.CtorArgs.Length > 0)))
+			{
+				return new JsonObject();
+			}
+
+			// default constructor
+			return factory.Ctor();
+		}
 
 		/// <summary>
 		/// Instantiates a new instance of objectType.
@@ -209,6 +243,13 @@ namespace JsonFx.Serialization
 			{
 				((IDictionary)target)[memberName] = memberValue;
 			}
+#if NET40 && !WINDOWS_PHONE
+			else if (target is System.Dynamic.DynamicObject)
+			{
+				// TODO: expand to all IDynamicMetaObjectProvider?
+				((System.Dynamic.DynamicObject)target).TrySetMember(new DynamicSetter(memberName), memberValue);
+			}
+#endif
 			else if (targetType != null && targetType.GetInterface(TypeCoercionUtility.TypeGenericIDictionary, false) != null)
 			{
 				throw new TypeCoercionException(String.Format(
@@ -692,6 +733,12 @@ namespace JsonFx.Serialization
 					// <rant>cannot use ExpandoObject here because it does not implement IDictionary</rant>
 					targetType = typeof(Dictionary<string, object>);
 				}
+#if NET40 && !WINDOWS_PHONE
+				else if (targetType == typeof(System.Dynamic.IDynamicMetaObjectProvider))
+				{
+					targetType = typeof(System.Dynamic.ExpandoObject);
+				}
+#endif
 			}
 			return targetType;
 		}

@@ -32,6 +32,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+using JsonFx.CodeGen;
 using JsonFx.Serialization;
 using JsonFx.Serialization.Filters;
 using JsonFx.Serialization.GraphCycles;
@@ -282,6 +283,15 @@ namespace JsonFx.Common
 					return;
 				}
 
+#if NET40 && !WINDOWS_PHONE
+				if (value is System.Dynamic.DynamicObject)
+				{
+					// TODO: expand to all IDynamicMetaObjectProvider?
+					this.GetObjectTokens(tokens, detector, type, (System.Dynamic.DynamicObject)value);
+					return;
+				}
+#endif
+
 				// all other structs and classes
 				this.GetObjectTokens(tokens, detector, type, value);
 			}
@@ -344,6 +354,28 @@ namespace JsonFx.Common
 
 			tokens.Add(CommonGrammar.TokenObjectEnd);
 		}
+
+#if NET40 && !WINDOWS_PHONE
+		private void GetObjectTokens(List<Token<CommonTokenType>> tokens, ICycleDetector detector, Type type, System.Dynamic.DynamicObject value)
+		{
+			DataName typeName = this.GetTypeName(value);
+			tokens.Add(CommonGrammar.TokenObjectBegin(typeName));
+
+			foreach (var memberName in value.GetDynamicMemberNames())
+			{
+				object propertyValue;
+				if (!value.TryGetMember(new DynamicGetter(memberName), out propertyValue))
+				{
+					continue;
+				}
+
+				tokens.Add(CommonGrammar.TokenProperty(memberName));
+				this.GetTokens(tokens, detector, propertyValue);
+			}
+
+			tokens.Add(CommonGrammar.TokenObjectEnd);
+		}
+#endif
 
 		private void GetObjectTokens(List<Token<CommonTokenType>> tokens, ICycleDetector detector, Type type, object value)
 		{

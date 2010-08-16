@@ -253,9 +253,7 @@ namespace JsonFx.Common
 			IDictionary<string, MemberMap> maps = this.Settings.Resolver.LoadMaps(targetType);
 
 			Type itemType = TypeCoercionUtility.GetDictionaryItemType(targetType);
-			object objectValue = (itemType != null) ?
-				this.Coercion.InstantiateObject(targetType, null) :
-				new JsonObject();
+			object objectValue = this.Coercion.InstantiateObjectDefaultCtor(targetType);
 
 			while (!tokens.IsCompleted)
 			{
