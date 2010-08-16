@@ -30,6 +30,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 
 using JsonFx.Common;
@@ -48,11 +49,49 @@ namespace JsonFx.Serialization
 
 		#endregion Constants
 
+		#region Test Types
+
+		public class Person
+		{
+			public string Name { get; set; }
+			public Person Father { get; set; }
+			public Person Mother { get; set; }
+			public Person[] Children { get; set; }
+		}
+
+		public class DynamicExample : DynamicObject
+		{
+			internal readonly Dictionary<string, object> Values = new Dictionary<string, object>();
+
+			public override IEnumerable<string> GetDynamicMemberNames()
+			{
+				return Values.Keys;
+			}
+
+			public override bool TryDeleteMember(DeleteMemberBinder binder)
+			{
+				return this.Values.Remove(binder.Name);
+			}
+
+			public override bool TryGetMember(GetMemberBinder binder, out object result)
+			{
+				return this.Values.TryGetValue(binder.Name, out result);
+			}
+
+			public override bool TrySetMember(SetMemberBinder binder, object value)
+			{
+				this.Values[binder.Name] = value;
+				return true;
+			}
+		}
+
+		#endregion Test Types
+
 		#region Array Tests
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Parse_ArrayEmpty_ReturnsEmptyArray()
+		public void Analyze_ArrayEmpty_ReturnsEmptyArray()
 		{
 			var input = new []
 			{
@@ -70,7 +109,7 @@ namespace JsonFx.Serialization
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Parse_ArrayOneItem_ReturnsExpectedArray()
+		public void Analyze_ArrayOneItem_ReturnsExpectedArray()
 		{
 			var input = new[]
 			{
@@ -89,7 +128,7 @@ namespace JsonFx.Serialization
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Parse_ArrayMultiItem_ReturnsExpectedArray()
+		public void Analyze_ArrayMultiItem_ReturnsExpectedArray()
 		{
 			var input = new[]
 			{
@@ -117,7 +156,7 @@ namespace JsonFx.Serialization
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Parse_ArrayNestedDeeply_ReturnsExpectedArray()
+		public void Analyze_ArrayNestedDeeply_ReturnsExpectedArray()
 		{
 			// input from pass2.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -230,7 +269,7 @@ namespace JsonFx.Serialization
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Parse_ArrayUnclosed_ThrowsAnalyzerException()
+		public void Analyze_ArrayUnclosed_ThrowsAnalyzerException()
 		{
 			// input from fail2.json in test suite at http://www.json.org/JSON_checker/
 			var input = new []
@@ -253,7 +292,7 @@ namespace JsonFx.Serialization
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Parse_PropertyInsideArray_ThrowsAnalyzerException()
+		public void Analyze_PropertyInsideArray_ThrowsAnalyzerException()
 		{
 			// input from fail22.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -278,7 +317,7 @@ namespace JsonFx.Serialization
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Parse_ArrayCloseMismatch_ThrowsAnalyzerException()
+		public void Analyze_ArrayCloseMismatch_ThrowsAnalyzerException()
 		{
 			// input from fail33.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -306,7 +345,7 @@ namespace JsonFx.Serialization
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Parse_ObjectEmpty_ReturnsEmptyObject()
+		public void Analyze_ObjectEmpty_ReturnsEmptyObject()
 		{
 			var input = new[]
 			{
@@ -324,7 +363,7 @@ namespace JsonFx.Serialization
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Parse_ObjectOneProperty_ReturnsSimpleObject()
+		public void Analyze_ObjectOneProperty_ReturnsSimpleObject()
 		{
 			var input = new[]
 			{
@@ -347,7 +386,7 @@ namespace JsonFx.Serialization
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Parse_ObjectNested_ReturnsNestedObject()
+		public void Analyze_ObjectNested_ReturnsNestedObject()
 		{
 			// input from pass3.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -383,7 +422,7 @@ namespace JsonFx.Serialization
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Parse_ObjectMissingColon_ThrowsAnalyzerException()
+		public void Analyze_ObjectMissingColon_ThrowsAnalyzerException()
 		{
 			// input from fail19.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -408,7 +447,7 @@ namespace JsonFx.Serialization
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Parse_ObjectDoubleColon_ThrowsAnalyzerException()
+		public void Analyze_ObjectDoubleColon_ThrowsAnalyzerException()
 		{
 			// input from fail20.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -434,7 +473,7 @@ namespace JsonFx.Serialization
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Parse_ValueInsteadOfProperty_ThrowsAnalyzerException()
+		public void Analyze_ValueInsteadOfProperty_ThrowsAnalyzerException()
 		{
 			// input from fail21.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -459,7 +498,7 @@ namespace JsonFx.Serialization
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Parse_ObjectUnterminated_ThrowsAnalyzerException()
+		public void Analyze_ObjectUnterminated_ThrowsAnalyzerException()
 		{
 			// input from fail32.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -483,7 +522,7 @@ namespace JsonFx.Serialization
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Parse_AnonymousObject_ReturnsAnonymousObject()
+		public void Analyze_AnonymousObject_ReturnsAnonymousObject()
 		{
 			// NOTE: order is important to ensure type equivalence
 
@@ -526,11 +565,45 @@ namespace JsonFx.Serialization
 
 		#endregion Object Tests
 
+		#region Dynamic Tests
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void Analyze_DynamicExample_ReturnsDynamicObject()
+		{
+			var input = new[]
+			{
+				CommonGrammar.TokenObjectBeginUnnamed,
+				CommonGrammar.TokenProperty("foo"),
+				CommonGrammar.TokenPrimitive("hello world"),
+				CommonGrammar.TokenProperty("number"),
+				CommonGrammar.TokenPrimitive(42),
+				CommonGrammar.TokenProperty("boolean"),
+				CommonGrammar.TokenPrimitive(false),
+				CommonGrammar.TokenProperty("null"),
+				CommonGrammar.TokenPrimitive(null),
+				CommonGrammar.TokenObjectEnd
+			};
+
+			dynamic expected = new DynamicExample();
+			expected.foo = "hello world";
+			expected.number = 42;
+			expected.boolean = false;
+			expected.@null = null;
+
+			var analyzer = new CommonAnalyzer(new DataReaderSettings());
+			var actual = analyzer.Analyze<DynamicExample>(input).Single();
+
+			Assert.Equal(expected.Values, actual.Values, false);
+		}
+
+		#endregion Dynamic Tests
+
 		#region Complex Graph Tests
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Parse_GraphComplex_ReturnsGraph()
+		public void Analyze_GraphComplex_ReturnsGraph()
 		{
 			// input from pass1.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
@@ -720,7 +793,7 @@ namespace JsonFx.Serialization
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Parse_EmptyInput_ReturnsNothing()
+		public void Analyze_EmptyInput_ReturnsNothing()
 		{
 			var input = Enumerable.Empty<Token<CommonTokenType>>();
 
@@ -730,7 +803,7 @@ namespace JsonFx.Serialization
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Parse_NullInput_ThrowsArgumentNullException()
+		public void Analyze_NullInput_ThrowsArgumentNullException()
 		{
 			var input = (IEnumerable<Token<CommonTokenType>>)null;
 

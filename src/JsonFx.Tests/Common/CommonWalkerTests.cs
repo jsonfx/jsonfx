@@ -60,6 +60,32 @@ namespace JsonFx.Serialization
 			public Person[] Children { get; set; }
 		}
 
+		public class DynamicExample : DynamicObject
+		{
+			internal readonly Dictionary<string, object> Values = new Dictionary<string, object>();
+
+			public override IEnumerable<string> GetDynamicMemberNames()
+			{
+				return Values.Keys;
+			}
+
+			public override bool TryDeleteMember(DeleteMemberBinder binder)
+			{
+				return this.Values.Remove(binder.Name);
+			}
+
+			public override bool TryGetMember(GetMemberBinder binder, out object result)
+			{
+				return this.Values.TryGetValue(binder.Name, out result);
+			}
+
+			public override bool TrySetMember(SetMemberBinder binder, object value)
+			{
+				this.Values[binder.Name] = value;
+				return true;
+			}
+		}
+
 		#endregion Test Types
 
 		#region Array Tests
@@ -294,33 +320,6 @@ namespace JsonFx.Serialization
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void GetTokens_ObjectDynamic_ReturnsObjectTokens()
-		{
-			dynamic input = new System.Dynamic.ExpandoObject();
-			input.One = 1;
-			input.Two = 2;
-			input.Three = 3;
-
-			var expected = new[]
-				{
-					CommonGrammar.TokenObjectBegin("object"),
-					CommonGrammar.TokenProperty("One"),
-					CommonGrammar.TokenPrimitive(1),
-					CommonGrammar.TokenProperty("Two"),
-					CommonGrammar.TokenPrimitive(2),
-					CommonGrammar.TokenProperty("Three"),
-					CommonGrammar.TokenPrimitive(3),
-					CommonGrammar.TokenObjectEnd
-				};
-
-			var walker = new CommonWalker(new DataWriterSettings());
-			var actual = walker.GetTokens((object)input).ToArray();
-
-			Assert.Equal(expected, actual);
-		}
-
-		[Fact]
-		[Trait(TraitName, TraitValue)]
 		public void GetTokens_ObjectDictionary_ReturnsObjectTokens()
 		{
 			var input = new Dictionary<string, object>
@@ -339,41 +338,6 @@ namespace JsonFx.Serialization
 					CommonGrammar.TokenPrimitive(2),
 					CommonGrammar.TokenProperty("Three"),
 					CommonGrammar.TokenPrimitive(3),
-					CommonGrammar.TokenObjectEnd
-				};
-
-			var walker = new CommonWalker(new DataWriterSettings());
-			var actual = walker.GetTokens(input).ToArray();
-
-			Assert.Equal(expected, actual);
-		}
-
-		[Fact]
-		[Trait(TraitName, TraitValue)]
-		public void GetTokens_ObjectExpando_ReturnsObjectTokens()
-		{
-			dynamic input = new ExpandoObject();
-
-			input.foo = true;
-			input.array = new object[]
-			{
-				false, 1, 2, Math.PI, null, "hello world."
-			};
-
-			var expected = new[]
-				{
-					CommonGrammar.TokenObjectBegin("object"),
-					CommonGrammar.TokenProperty("foo"),
-					CommonGrammar.TokenPrimitive(true),
-					CommonGrammar.TokenProperty("array"),
-					CommonGrammar.TokenArrayBegin("array"),
-					CommonGrammar.TokenPrimitive(false),
-					CommonGrammar.TokenPrimitive(1),
-					CommonGrammar.TokenPrimitive(2),
-					CommonGrammar.TokenPrimitive(Math.PI),
-					CommonGrammar.TokenPrimitive(null),
-					CommonGrammar.TokenPrimitive("hello world."),
-					CommonGrammar.TokenArrayEnd,
 					CommonGrammar.TokenObjectEnd
 				};
 
@@ -528,6 +492,102 @@ namespace JsonFx.Serialization
 		}
 
 		#endregion Number Tests
+
+		#region Dynamic Tests
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void GetTokens_ExpandoObject_ReturnsObjectTokens()
+		{
+			dynamic input = new ExpandoObject();
+			input.One = 1;
+			input.Two = 2;
+			input.Three = 3;
+
+			var expected = new[]
+				{
+					CommonGrammar.TokenObjectBegin("object"),
+					CommonGrammar.TokenProperty("One"),
+					CommonGrammar.TokenPrimitive(1),
+					CommonGrammar.TokenProperty("Two"),
+					CommonGrammar.TokenPrimitive(2),
+					CommonGrammar.TokenProperty("Three"),
+					CommonGrammar.TokenPrimitive(3),
+					CommonGrammar.TokenObjectEnd
+				};
+
+			var walker = new CommonWalker(new DataWriterSettings());
+			var actual = walker.GetTokens((object)input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void GetTokens_ExpandoObjectNested_ReturnsObjectTokens()
+		{
+			dynamic input = new ExpandoObject();
+
+			input.foo = true;
+			input.array = new object[]
+			{
+				false, 1, 2, Math.PI, null, "hello world."
+			};
+
+			var expected = new[]
+				{
+					CommonGrammar.TokenObjectBegin("object"),
+					CommonGrammar.TokenProperty("foo"),
+					CommonGrammar.TokenPrimitive(true),
+					CommonGrammar.TokenProperty("array"),
+					CommonGrammar.TokenArrayBegin("array"),
+					CommonGrammar.TokenPrimitive(false),
+					CommonGrammar.TokenPrimitive(1),
+					CommonGrammar.TokenPrimitive(2),
+					CommonGrammar.TokenPrimitive(Math.PI),
+					CommonGrammar.TokenPrimitive(null),
+					CommonGrammar.TokenPrimitive("hello world."),
+					CommonGrammar.TokenArrayEnd,
+					CommonGrammar.TokenObjectEnd
+				};
+
+			var walker = new CommonWalker(new DataWriterSettings());
+			var actual = walker.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void GetTokens_DynamicExample_ReturnsDynamicObject()
+		{
+			dynamic input = new DynamicExample();
+			input.foo = "hello world";
+			input.number = 42;
+			input.boolean = false;
+			input.@null = null;
+
+			var expected = new[]
+			{
+				CommonGrammar.TokenObjectBegin("DynamicExample"),
+				CommonGrammar.TokenProperty("foo"),
+				CommonGrammar.TokenPrimitive("hello world"),
+				CommonGrammar.TokenProperty("number"),
+				CommonGrammar.TokenPrimitive(42),
+				CommonGrammar.TokenProperty("boolean"),
+				CommonGrammar.TokenPrimitive(false),
+				CommonGrammar.TokenProperty("null"),
+				CommonGrammar.TokenPrimitive(null),
+				CommonGrammar.TokenObjectEnd
+			};
+
+			var walker = new CommonWalker(new DataWriterSettings());
+			var actual = walker.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual, false);
+		}
+
+		#endregion Dynamic Tests
 
 		#region Complex Graph Tests
 
