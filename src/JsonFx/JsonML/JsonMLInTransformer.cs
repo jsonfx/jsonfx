@@ -30,6 +30,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 using JsonFx.Common;
 using JsonFx.IO;
@@ -50,6 +51,14 @@ namespace JsonFx.JsonML
 		{
 			#region Constants
 
+			private static readonly Regex RegexWhitespace = new Regex(@"\s+",
+#if !SILVERLIGHT
+			RegexOptions.Compiled|
+#endif
+			RegexOptions.CultureInvariant|RegexOptions.ECMAScript);
+
+			private const string SingleSpace = " ";
+
 			private const string ErrorUnexpectedToken = "Unexpected token ({0})";
 
 			#endregion Constants
@@ -63,12 +72,9 @@ namespace JsonFx.JsonML
 			#region Properties
 
 			/// <summary>
-			/// Determines if whitespace nodes should be ommited
+			/// Determines how whitespace should be handled
 			/// </summary>
-			/// <remarks>
-			/// True to keep whitespace
-			/// </remarks>
-			public bool PreserveWhitespace
+			public WhitespaceType Whitespace
 			{
 				get;
 				set;
@@ -256,9 +262,28 @@ namespace JsonFx.JsonML
 								token = stream.Peek();
 							}
 
-							if (this.PreserveWhitespace || !IsNullOrWhiteSpace(value))
+							switch (this.Whitespace)
 							{
-								yield return CommonGrammar.TokenPrimitive(value);
+								case WhitespaceType.Normalize:
+								{
+									// replace whitespace chunks with single space (HTML-style normalization)
+									value = JsonMLInTransformer.RegexWhitespace.Replace(value, JsonMLInTransformer.SingleSpace);
+									goto default;
+								}
+								case WhitespaceType.None:
+								{
+									if (IsNullOrWhiteSpace(value))
+									{
+										break;
+									}
+									goto default;
+								}
+								case WhitespaceType.Preserve:
+								default:
+								{
+									yield return CommonGrammar.TokenPrimitive(value);
+									break;
+								}
 							}
 							break;
 						}

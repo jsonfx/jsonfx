@@ -141,6 +141,7 @@
     <Compile Include="JsonML\JsonMLInTransformer.cs" />
     <Compile Include="JsonML\JsonMLOutTransformer.cs" />
     <Compile Include="Json\Resolvers\JsonResolverStrategy.cs" />
+    <Compile Include="Markup\WhitespaceType.cs" />
     <Compile Include="Markup\UnparsedBlock.cs" />
     <Compile Include="Markup\MarkupGrammar.cs" />
     <Compile Include="Markup\MarkupTokenType.cs" />

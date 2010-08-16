@@ -784,7 +784,7 @@ namespace JsonFx.JsonML
 					CommonGrammar.TokenArrayEnd
 				};
 
-			var converter = new JsonMLReader.JsonMLInTransformer { PreserveWhitespace=true };
+			var converter = new JsonMLReader.JsonMLInTransformer { Whitespace=WhitespaceType.Preserve };
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -1045,7 +1045,7 @@ namespace JsonFx.JsonML
 			        CommonGrammar.TokenArrayEnd
 			    };
 
-			var converter = new JsonMLReader.JsonMLInTransformer { PreserveWhitespace=true };
+			var converter = new JsonMLReader.JsonMLInTransformer { Whitespace=WhitespaceType.Preserve };
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -1144,7 +1144,7 @@ namespace JsonFx.JsonML
 			        CommonGrammar.TokenArrayEnd,
 			    };
 
-			var converter = new JsonMLReader.JsonMLInTransformer { PreserveWhitespace=true };
+			var converter = new JsonMLReader.JsonMLInTransformer { Whitespace=WhitespaceType.Preserve };
 			var actual = converter.Transform(input).ToArray();
 
 			Assert.Equal(expected, actual);
