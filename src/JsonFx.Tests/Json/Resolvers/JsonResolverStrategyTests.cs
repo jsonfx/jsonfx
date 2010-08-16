@@ -31,7 +31,7 @@
 using System;
 using System.Linq;
 
-using JsonFx.Common;
+using JsonFx.Model;
 using JsonFx.Serialization;
 using Xunit;
 
@@ -74,12 +74,12 @@ namespace JsonFx.Json.Resolvers
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenPrimitive("Two")
+				ModelGrammar.TokenPrimitive("Two")
 			};
 
 			var expected = ExampleEnum.Two;
 
-			var analyzer = new CommonAnalyzer(new DataReaderSettings(new JsonResolverStrategy()));
+			var analyzer = new ModelAnalyzer(new DataReaderSettings(new JsonResolverStrategy()));
 			var actual = analyzer.Analyze<ExampleEnum>(input).Single();
 
 			Assert.Equal(expected, actual);
@@ -91,12 +91,12 @@ namespace JsonFx.Json.Resolvers
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenPrimitive("yellow")
+				ModelGrammar.TokenPrimitive("yellow")
 			};
 
 			var expected = ExampleEnum.Two;
 
-			var analyzer = new CommonAnalyzer(new DataReaderSettings(new JsonResolverStrategy()));
+			var analyzer = new ModelAnalyzer(new DataReaderSettings(new JsonResolverStrategy()));
 			var actual = analyzer.Analyze<ExampleEnum>(input).Single();
 
 			Assert.Equal(expected, actual);
@@ -108,12 +108,12 @@ namespace JsonFx.Json.Resolvers
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenPrimitive(3)
+				ModelGrammar.TokenPrimitive(3)
 			};
 
 			var expected = ExampleEnum.Three;
 
-			var analyzer = new CommonAnalyzer(new DataReaderSettings(new JsonResolverStrategy()));
+			var analyzer = new ModelAnalyzer(new DataReaderSettings(new JsonResolverStrategy()));
 			var actual = analyzer.Analyze<ExampleEnum>(input).Single();
 
 			Assert.Equal(expected, actual);
@@ -129,7 +129,7 @@ namespace JsonFx.Json.Resolvers
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenPrimitive(ExampleEnum.Zero)
+				ModelGrammar.TokenPrimitive(ExampleEnum.Zero)
 			};
 
 			var expected = @"""Zero""";
@@ -146,7 +146,7 @@ namespace JsonFx.Json.Resolvers
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenPrimitive(ExampleEnum.One)
+				ModelGrammar.TokenPrimitive(ExampleEnum.One)
 			};
 
 			var expected = @"""One""";
@@ -163,7 +163,7 @@ namespace JsonFx.Json.Resolvers
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenPrimitive(ExampleEnum.Two)
+				ModelGrammar.TokenPrimitive(ExampleEnum.Two)
 			};
 
 			var expected = @"""yellow""";
@@ -180,7 +180,7 @@ namespace JsonFx.Json.Resolvers
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenPrimitive(ExampleEnum.Three)
+				ModelGrammar.TokenPrimitive(ExampleEnum.Three)
 			};
 
 			var expected = @"""Three""";
@@ -197,7 +197,7 @@ namespace JsonFx.Json.Resolvers
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenPrimitive((int)ExampleEnum.Three)
+				ModelGrammar.TokenPrimitive((int)ExampleEnum.Three)
 			};
 
 			var expected = "3";

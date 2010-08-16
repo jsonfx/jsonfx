@@ -35,11 +35,11 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-using JsonFx.Common;
+using JsonFx.Model;
 using JsonFx.Serialization;
 using JsonFx.Serialization.Resolvers;
 
-using TokenSequence=System.Collections.Generic.IEnumerable<JsonFx.Serialization.Token<JsonFx.Common.CommonTokenType>>;
+using TokenSequence=System.Collections.Generic.IEnumerable<JsonFx.Serialization.Token<JsonFx.Model.ModelTokenType>>;
 
 namespace JsonFx.Linq
 {
@@ -66,7 +66,7 @@ namespace JsonFx.Linq
 		private static readonly MethodInfo MemberAccess;
 
 		private readonly ResolverCache Resolver;
-		private readonly ITokenAnalyzer<CommonTokenType> Analyzer;
+		private readonly ITokenAnalyzer<ModelTokenType> Analyzer;
 		private readonly IQueryable<TokenSequence> Source;
 
 		#endregion Fields
@@ -80,7 +80,7 @@ namespace JsonFx.Linq
 		{
 			// look this one up since doesn't change
 
-			QueryEngine.MemberAccess = typeof(CommonSubsequencer).GetMethod(
+			QueryEngine.MemberAccess = typeof(ModelSubsequencer).GetMethod(
 				"Property",
 				BindingFlags.Public|BindingFlags.Static|BindingFlags.FlattenHierarchy,
 				null,
@@ -93,7 +93,7 @@ namespace JsonFx.Linq
 		/// </summary>
 		/// <param name="analyzer"></param>
 		/// <param name="sequence"></param>
-		public QueryEngine(ITokenAnalyzer<CommonTokenType> analyzer, IQueryable<TokenSequence> input)
+		public QueryEngine(ITokenAnalyzer<ModelTokenType> analyzer, IQueryable<TokenSequence> input)
 		{
 			if (analyzer == null)
 			{
@@ -111,7 +111,7 @@ namespace JsonFx.Linq
 
 		#endregion Init
 
-		#region IQueryEngine<CommonTokenType> Members
+		#region IQueryEngine<ModelTokenType> Members
 
 		public Expression Translate(Expression expression)
 		{
@@ -145,7 +145,7 @@ namespace JsonFx.Linq
 			return translated;
 		}
 
-		#endregion IQueryEngine<CommonTokenType> Members
+		#endregion IQueryEngine<ModelTokenType> Members
 
 		#region Visit Methods
 
@@ -266,7 +266,7 @@ namespace JsonFx.Linq
 			ParameterExpression p = (ParameterExpression)m.Expression;
 
 			// expression is loosely translated to:
-			//		this.Analyzer.Analyze<targetType>(CommonSubsequencer.Property(value, map.DataName).FirstOrDefault());
+			//		this.Analyzer.Analyze<targetType>(ModelSubsequencer.Property(value, map.DataName).FirstOrDefault());
 
 			var memberAccess = Expression.Call(QueryEngine.MemberAccess, context.Parameters[p.Name], Expression.Constant(map.DataName));
 
@@ -285,7 +285,7 @@ namespace JsonFx.Linq
 			if (sequence.Type == typeof(IQueryable<TokenSequence>) ||
 				sequence.Type == typeof(IOrderedQueryable<TokenSequence>))
 			{
-				sequence = Expression.Call(typeof(Queryable), "DefaultIfEmpty", new[] { typeof(TokenSequence) }, sequence, Expression.Call(typeof(Enumerable), "Empty", new[] { typeof(Token<CommonTokenType>) }));
+				sequence = Expression.Call(typeof(Queryable), "DefaultIfEmpty", new[] { typeof(TokenSequence) }, sequence, Expression.Call(typeof(Enumerable), "Empty", new[] { typeof(Token<ModelTokenType>) }));
 
 				// lambda to analyze each sequence stream
 				ParameterExpression p = Expression.Parameter(typeof(TokenSequence), "sequence");
@@ -296,7 +296,7 @@ namespace JsonFx.Linq
 			}
 			else
 			{
-				sequence = Expression.Coalesce(sequence, Expression.Call(typeof(Enumerable), "Empty", new[] { typeof(Token<CommonTokenType>) }));
+				sequence = Expression.Coalesce(sequence, Expression.Call(typeof(Enumerable), "Empty", new[] { typeof(Token<ModelTokenType>) }));
 
 				// analyze sequence stream
 				analyze = Expression.Call(Expression.Constant(this.Analyzer), "Analyze", new[] { targetType }, sequence);

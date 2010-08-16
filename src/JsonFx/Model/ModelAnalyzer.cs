@@ -43,12 +43,12 @@ using JsonObject=System.Dynamic.ExpandoObject;
 using JsonObject=System.Collections.Generic.Dictionary<string, object>;
 #endif
 
-namespace JsonFx.Common
+namespace JsonFx.Model
 {
 	/// <summary>
 	/// Consumes a sequence of tokens to produce an object graph optionally coerced to a given type
 	/// </summary>
-	public class CommonAnalyzer : ITokenAnalyzer<CommonTokenType>
+	public class ModelAnalyzer : ITokenAnalyzer<ModelTokenType>
 	{
 		#region Constants
 
@@ -73,7 +73,7 @@ namespace JsonFx.Common
 
 		private readonly DataReaderSettings Settings;
 		private readonly TypeCoercionUtility Coercion;
-		private readonly IEnumerable<IDataFilter<CommonTokenType>> Filters;
+		private readonly IEnumerable<IDataFilter<ModelTokenType>> Filters;
 
 		#endregion Fields
 
@@ -84,8 +84,8 @@ namespace JsonFx.Common
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <param name="filters"></param>
-		public CommonAnalyzer(DataReaderSettings settings, params IDataFilter<CommonTokenType>[] filters)
-			: this(settings, (IEnumerable<IDataFilter<CommonTokenType>>)filters)
+		public ModelAnalyzer(DataReaderSettings settings, params IDataFilter<ModelTokenType>[] filters)
+			: this(settings, (IEnumerable<IDataFilter<ModelTokenType>>)filters)
 		{
 		}
 
@@ -93,7 +93,7 @@ namespace JsonFx.Common
 		/// Ctor
 		/// </summary>
 		/// <param name="settings"></param>
-		public CommonAnalyzer(DataReaderSettings settings, IEnumerable<IDataFilter<CommonTokenType>> filters)
+		public ModelAnalyzer(DataReaderSettings settings, IEnumerable<IDataFilter<ModelTokenType>> filters)
 		{
 			if (settings == null)
 			{
@@ -103,7 +103,7 @@ namespace JsonFx.Common
 
 			if (filters == null)
 			{
-				filters = new IDataFilter<CommonTokenType>[0];
+				filters = new IDataFilter<ModelTokenType>[0];
 			}
 			this.Filters = filters;
 
@@ -122,7 +122,7 @@ namespace JsonFx.Common
 
 		#region Properties
 
-		DataReaderSettings ITokenAnalyzer<CommonTokenType>.Settings
+		DataReaderSettings ITokenAnalyzer<ModelTokenType>.Settings
 		{
 			get { return this.Settings; }
 		}
@@ -136,7 +136,7 @@ namespace JsonFx.Common
 		/// </summary>
 		/// <param name="tokens"></param>
 		/// <returns></returns>
-		public IEnumerable Analyze(IEnumerable<Token<CommonTokenType>> tokens)
+		public IEnumerable Analyze(IEnumerable<Token<ModelTokenType>> tokens)
 		{
 			return this.Analyze(tokens, null);
 		}
@@ -147,14 +147,14 @@ namespace JsonFx.Common
 		/// <param name="tokens"></param>
 		/// <param name="targetType"></param>
 		/// <returns></returns>
-		public IEnumerable Analyze(IEnumerable<Token<CommonTokenType>> tokens, Type targetType)
+		public IEnumerable Analyze(IEnumerable<Token<ModelTokenType>> tokens, Type targetType)
 		{
 			if (tokens == null)
 			{
 				throw new ArgumentNullException("tokens");
 			}
 
-			IStream<Token<CommonTokenType>> stream = Stream<Token<CommonTokenType>>.Create(tokens);
+			IStream<Token<ModelTokenType>> stream = Stream<Token<ModelTokenType>>.Create(tokens);
 			while (!stream.IsCompleted)
 			{
 				yield return this.ConsumeValue(stream, targetType);
@@ -167,7 +167,7 @@ namespace JsonFx.Common
 		/// <typeparam name="TResult">the result target type</typeparam>
 		/// <param name="tokens"></param>
 		/// <returns></returns>
-		public IEnumerable<TResult> Analyze<TResult>(IEnumerable<Token<CommonTokenType>> tokens)
+		public IEnumerable<TResult> Analyze<TResult>(IEnumerable<Token<ModelTokenType>> tokens)
 		{
 			if (tokens == null)
 			{
@@ -176,7 +176,7 @@ namespace JsonFx.Common
 
 			Type resultType = typeof(TResult);
 
-			IStream<Token<CommonTokenType>> stream = Stream<Token<CommonTokenType>>.Create(tokens);
+			IStream<Token<ModelTokenType>> stream = Stream<Token<ModelTokenType>>.Create(tokens);
 			while (!stream.IsCompleted)
 			{
 				// cast each of the values accordingly
@@ -191,7 +191,7 @@ namespace JsonFx.Common
 		/// <param name="tokens"></param>
 		/// <param name="ignored">an example value used solely for Type inference</param>
 		/// <returns></returns>
-		public IEnumerable<TResult> Analyze<TResult>(IEnumerable<Token<CommonTokenType>> tokens, TResult ignored)
+		public IEnumerable<TResult> Analyze<TResult>(IEnumerable<Token<ModelTokenType>> tokens, TResult ignored)
 		{
 			return this.Analyze<TResult>(tokens);
 		}
@@ -200,7 +200,7 @@ namespace JsonFx.Common
 
 		#region Consume Methods
 
-		private object ConsumeValue(IStream<Token<CommonTokenType>> tokens, Type targetType)
+		private object ConsumeValue(IStream<Token<ModelTokenType>> tokens, Type targetType)
 		{
 			object result;
 			if (this.TryReadFilters(tokens, out result))
@@ -208,20 +208,20 @@ namespace JsonFx.Common
 				return result;
 			}
 
-			Token<CommonTokenType> token = tokens.Peek();
+			Token<ModelTokenType> token = tokens.Peek();
 			switch (token.TokenType)
 			{
-				case CommonTokenType.ArrayBegin:
+				case ModelTokenType.ArrayBegin:
 				{
 					// found array
 					return this.ConsumeArray(tokens, targetType);
 				}
-				case CommonTokenType.ObjectBegin:
+				case ModelTokenType.ObjectBegin:
 				{
 					// found object
 					return this.ConsumeObject(tokens, targetType);
 				}
-				case CommonTokenType.Primitive:
+				case ModelTokenType.Primitive:
 				{
 					// found primitive
 					tokens.Pop();
@@ -231,23 +231,23 @@ namespace JsonFx.Common
 				{
 					// these are invalid here
 					tokens.Pop();
-					throw new TokenException<CommonTokenType>(
+					throw new TokenException<ModelTokenType>(
 						token,
-						String.Format(CommonAnalyzer.ErrorUnexpectedToken, token.TokenType));
+						String.Format(ModelAnalyzer.ErrorUnexpectedToken, token.TokenType));
 				}
 			}
 		}
 
-		private object ConsumeObject(IStream<Token<CommonTokenType>> tokens, Type targetType)
+		private object ConsumeObject(IStream<Token<ModelTokenType>> tokens, Type targetType)
 		{
-			Token<CommonTokenType> token = tokens.Pop();
+			Token<ModelTokenType> token = tokens.Pop();
 
 			// verify correct starting state
-			if (token.TokenType != CommonTokenType.ObjectBegin)
+			if (token.TokenType != ModelTokenType.ObjectBegin)
 			{
-				throw new TokenException<CommonTokenType>(
+				throw new TokenException<ModelTokenType>(
 					token,
-					String.Format(CommonAnalyzer.ErrorExpectedObject, token.TokenType));
+					String.Format(ModelAnalyzer.ErrorExpectedObject, token.TokenType));
 			}
 
 			IDictionary<string, MemberMap> maps = this.Settings.Resolver.LoadMaps(targetType);
@@ -263,13 +263,13 @@ namespace JsonFx.Common
 				string propertyName;
 				switch (token.TokenType)
 				{
-					case CommonTokenType.Property:
+					case ModelTokenType.Property:
 					{
 						tokens.Pop();
 						propertyName = token.Name.LocalName;
 						break;
 					}
-					case CommonTokenType.ObjectEnd:
+					case ModelTokenType.ObjectEnd:
 					{
 						// end of the object loop
 						tokens.Pop();
@@ -279,9 +279,9 @@ namespace JsonFx.Common
 					{
 						// these are invalid here
 						tokens.Pop();
-						throw new TokenException<CommonTokenType>(
+						throw new TokenException<ModelTokenType>(
 							token,
-							String.Format(CommonAnalyzer.ErrorExpectedPropertyName, token.TokenType));
+							String.Format(ModelAnalyzer.ErrorExpectedPropertyName, token.TokenType));
 					}
 				}
 
@@ -312,21 +312,21 @@ namespace JsonFx.Common
 			}
 
 			// end of input
-			throw new TokenException<CommonTokenType>(
-				CommonGrammar.TokenNone,
-				CommonAnalyzer.ErrorUnterminatedObject);
+			throw new TokenException<ModelTokenType>(
+				ModelGrammar.TokenNone,
+				ModelAnalyzer.ErrorUnterminatedObject);
 		}
 
-		private object ConsumeArray(IStream<Token<CommonTokenType>> tokens, Type arrayType)
+		private object ConsumeArray(IStream<Token<ModelTokenType>> tokens, Type arrayType)
 		{
-			Token<CommonTokenType> token = tokens.Pop();
+			Token<ModelTokenType> token = tokens.Pop();
 
 			// verify correct starting state
-			if (token.TokenType != CommonTokenType.ArrayBegin)
+			if (token.TokenType != ModelTokenType.ArrayBegin)
 			{
-				throw new TokenException<CommonTokenType>(
+				throw new TokenException<ModelTokenType>(
 					token,
-					String.Format(CommonAnalyzer.ErrorExpectedArray, token.TokenType));
+					String.Format(ModelAnalyzer.ErrorExpectedArray, token.TokenType));
 			}
 
 			Type itemType = TypeCoercionUtility.GetElementType(arrayType);
@@ -343,25 +343,25 @@ namespace JsonFx.Common
 				object item;
 				switch (token.TokenType)
 				{
-					case CommonTokenType.ArrayBegin:
+					case ModelTokenType.ArrayBegin:
 					{
 						// array item
 						item = this.ConsumeArray(tokens, isItemTypeHint ? null : itemType);
 						break;
 					}
-					case CommonTokenType.ArrayEnd:
+					case ModelTokenType.ArrayEnd:
 					{
 						// end of the array loop
 						tokens.Pop();
 						return this.Coercion.CoerceCollection(arrayType, itemType, array);
 					}
-					case CommonTokenType.ObjectBegin:
+					case ModelTokenType.ObjectBegin:
 					{
 						// object item
 						item = this.ConsumeObject(tokens, isItemTypeHint ? null : itemType);
 						break;
 					}
-					case CommonTokenType.Primitive:
+					case ModelTokenType.Primitive:
 					{
 						// primitive item
 						if (!this.TryReadFilters(tokens, out item))
@@ -381,9 +381,9 @@ namespace JsonFx.Common
 					{
 						// these are invalid here
 						tokens.Pop();
-						throw new TokenException<CommonTokenType>(
+						throw new TokenException<ModelTokenType>(
 							token,
-							String.Format(CommonAnalyzer.ErrorExpectedArrayItem, token.TokenType));
+							String.Format(ModelAnalyzer.ErrorExpectedArrayItem, token.TokenType));
 					}
 				}
 
@@ -395,12 +395,12 @@ namespace JsonFx.Common
 			}
 
 			// end of input
-			throw new TokenException<CommonTokenType>(
-				CommonGrammar.TokenNone,
-				CommonAnalyzer.ErrorUnterminatedArray);
+			throw new TokenException<ModelTokenType>(
+				ModelGrammar.TokenNone,
+				ModelAnalyzer.ErrorUnterminatedArray);
 		}
 
-		private bool TryReadFilters(IStream<Token<CommonTokenType>> tokens, out object result)
+		private bool TryReadFilters(IStream<Token<ModelTokenType>> tokens, out object result)
 		{
 			if (!tokens.IsCompleted)
 			{

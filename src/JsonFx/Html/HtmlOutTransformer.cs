@@ -31,17 +31,17 @@
 using System;
 using System.Collections.Generic;
 
-using JsonFx.Common;
 using JsonFx.IO;
 using JsonFx.Markup;
+using JsonFx.Model;
 using JsonFx.Serialization;
 
 namespace JsonFx.Html
 {
 	/// <summary>
-	/// Renders common data tokens into a semantic HTML representation of the data structure
+	/// Renders Common Model Tokens into a semantic HTML representation of the data structure
 	/// </summary>
-	public class HtmlOutTransformer : IDataTransformer<CommonTokenType, MarkupTokenType>
+	public class HtmlOutTransformer : IDataTransformer<ModelTokenType, MarkupTokenType>
 	{
 		#region Constants
 
@@ -62,19 +62,19 @@ namespace JsonFx.Html
 
 		#endregion Constants
 
-		#region IDataTransformer<MarkupTokenType,CommonTokenType> Members
+		#region IDataTransformer<MarkupTokenType,ModelTokenType> Members
 
 		/// <summary>
 		/// Consumes a sequence of tokens and produces a token sequence of a different type
 		/// </summary>
-		public IEnumerable<Token<MarkupTokenType>> Transform(IEnumerable<Token<CommonTokenType>> input)
+		public IEnumerable<Token<MarkupTokenType>> Transform(IEnumerable<Token<ModelTokenType>> input)
 		{
 			if (input == null)
 			{
 				throw new ArgumentNullException("input");
 			}
 
-			IStream<Token<CommonTokenType>> stream = Stream<Token<CommonTokenType>>.Create(input);
+			IStream<Token<ModelTokenType>> stream = Stream<Token<ModelTokenType>>.Create(input);
 			List<Token<MarkupTokenType>> output = new List<Token<MarkupTokenType>>();
 
 			while (!stream.IsCompleted)
@@ -87,7 +87,7 @@ namespace JsonFx.Html
 			return output;
 		}
 
-		#endregion IDataTransformer<MarkupTokenType,CommonTokenType> Members
+		#endregion IDataTransformer<MarkupTokenType,ModelTokenType> Members
 
 		#region Transformation Methods
 
@@ -96,38 +96,38 @@ namespace JsonFx.Html
 		/// </summary>
 		/// <param name="output"></param>
 		/// <param name="input"></param>
-		private void TransformValue(List<Token<MarkupTokenType>> output, IStream<Token<CommonTokenType>> input)
+		private void TransformValue(List<Token<MarkupTokenType>> output, IStream<Token<ModelTokenType>> input)
 		{
-			Token<CommonTokenType> token = input.Peek();
+			Token<ModelTokenType> token = input.Peek();
 			switch (token.TokenType)
 			{
-				case CommonTokenType.ArrayBegin:
+				case ModelTokenType.ArrayBegin:
 				{
 					this.TransformArray(output, input);
 					break;
 				}
-				case CommonTokenType.ObjectBegin:
+				case ModelTokenType.ObjectBegin:
 				{
 					this.TransformObject(output, input);
 					break;
 				}
-				case CommonTokenType.Primitive:
+				case ModelTokenType.Primitive:
 				{
 					this.TransformPrimitive(output, input);
 					break;
 				}
 				default:
 				{
-					throw new TokenException<CommonTokenType>(
+					throw new TokenException<ModelTokenType>(
 						token,
 						String.Format(ErrorUnexpectedToken, token.TokenType));
 				}
 			}
 		}
 
-		private void TransformPrimitive(List<Token<MarkupTokenType>> output, IStream<Token<CommonTokenType>> input)
+		private void TransformPrimitive(List<Token<MarkupTokenType>> output, IStream<Token<ModelTokenType>> input)
 		{
-			Token<CommonTokenType> token = input.Pop();
+			Token<ModelTokenType> token = input.Pop();
 
 			bool hasName = !token.Name.IsEmpty;
 			if (hasName)
@@ -143,9 +143,9 @@ namespace JsonFx.Html
 			}
 		}
 
-		private void TransformArray(List<Token<MarkupTokenType>> output, IStream<Token<CommonTokenType>> input)
+		private void TransformArray(List<Token<MarkupTokenType>> output, IStream<Token<ModelTokenType>> input)
 		{
-			Token<CommonTokenType> token = input.Pop();
+			Token<ModelTokenType> token = input.Pop();
 
 			output.Add(MarkupGrammar.TokenElementBegin(HtmlOutTransformer.ArrayTagName));
 			if (!token.Name.IsEmpty)
@@ -159,16 +159,16 @@ namespace JsonFx.Html
 				token = input.Peek();
 				switch (token.TokenType)
 				{
-					case CommonTokenType.ArrayEnd:
+					case ModelTokenType.ArrayEnd:
 					{
 						input.Pop();
 
 						output.Add(MarkupGrammar.TokenElementEnd);
 						return;
 					}
-					case CommonTokenType.ArrayBegin:
-					case CommonTokenType.ObjectBegin:
-					case CommonTokenType.Primitive:
+					case ModelTokenType.ArrayBegin:
+					case ModelTokenType.ObjectBegin:
+					case ModelTokenType.Primitive:
 					{
 						output.Add(MarkupGrammar.TokenElementBegin(HtmlOutTransformer.ArrayItemTagName));
 						this.TransformValue(output, input);
@@ -177,7 +177,7 @@ namespace JsonFx.Html
 					}
 					default:
 					{
-						throw new TokenException<CommonTokenType>(
+						throw new TokenException<ModelTokenType>(
 							token,
 							String.Format(ErrorUnexpectedToken, token.TokenType));
 					}
@@ -185,9 +185,9 @@ namespace JsonFx.Html
 			}
 		}
 
-		private void TransformObject(List<Token<MarkupTokenType>> output, IStream<Token<CommonTokenType>> input)
+		private void TransformObject(List<Token<MarkupTokenType>> output, IStream<Token<ModelTokenType>> input)
 		{
-			Token<CommonTokenType> token = input.Pop();
+			Token<ModelTokenType> token = input.Pop();
 
 			output.Add(MarkupGrammar.TokenElementBegin(HtmlOutTransformer.ObjectTagName));
 			if (!token.Name.IsEmpty)
@@ -201,14 +201,14 @@ namespace JsonFx.Html
 				token = input.Peek();
 				switch (token.TokenType)
 				{
-					case CommonTokenType.ObjectEnd:
+					case ModelTokenType.ObjectEnd:
 					{
 						input.Pop();
 
 						output.Add(MarkupGrammar.TokenElementEnd);
 						return;
 					}
-					case CommonTokenType.Property:
+					case ModelTokenType.Property:
 					{
 						input.Pop();
 
@@ -223,7 +223,7 @@ namespace JsonFx.Html
 					}
 					default:
 					{
-						throw new TokenException<CommonTokenType>(
+						throw new TokenException<ModelTokenType>(
 							token,
 							String.Format(ErrorUnexpectedToken, token.TokenType));
 					}

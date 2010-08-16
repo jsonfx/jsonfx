@@ -72,7 +72,7 @@ namespace JsonFx.Serialization
 
 		#endregion Init
 
-		#region ITextFormatter<CommonTokenType> Members
+		#region ITextFormatter<ModelTokenType> Members
 
 		public void Format(IEnumerable<Token<TIn>> tokens, TextWriter writer)
 		{
@@ -88,6 +88,6 @@ namespace JsonFx.Serialization
 			return this.Formatter.Format(markup);
 		}
 
-		#endregion ITextFormatter<CommonTokenType> Members
+		#endregion ITextFormatter<ModelTokenType> Members
 	}
 }

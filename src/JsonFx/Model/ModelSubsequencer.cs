@@ -34,10 +34,10 @@ using System.Collections.Generic;
 using JsonFx.IO;
 using JsonFx.Serialization;
 
-using CommonToken=JsonFx.Serialization.Token<JsonFx.Common.CommonTokenType>;
-using TokenSequence=System.Collections.Generic.IEnumerable<JsonFx.Serialization.Token<JsonFx.Common.CommonTokenType>>;
+using ModelToken=JsonFx.Serialization.Token<JsonFx.Model.ModelTokenType>;
+using TokenSequence=System.Collections.Generic.IEnumerable<JsonFx.Serialization.Token<JsonFx.Model.ModelTokenType>>;
 
-namespace JsonFx.Common
+namespace JsonFx.Model
 {
 #if NET20 || NET30
     public delegate TResult Func<T, TResult>(T input);
@@ -46,11 +46,11 @@ namespace JsonFx.Common
 	/// <summary>
 	/// Extension methods for selecting subsequences of sequences of tokens
 	/// </summary>
-	public static class CommonSubsequencer
+	public static class ModelSubsequencer
 	{
 		#region Constants
 
-		private static readonly TokenSequence EmptySequence = new Token<CommonTokenType>[0];
+		private static readonly TokenSequence EmptySequence = new Token<ModelTokenType>[0];
 
 		private const string ErrorUnexpectedEndOfInput = "Unexpected end of token stream";
 		private const string ErrorInvalidPropertyValue = "Invalid property value token ({0})";
@@ -71,15 +71,15 @@ namespace JsonFx.Common
 				throw new ArgumentNullException("source");
 			}
 
-			IList<CommonToken> tokenList = source as IList<CommonToken>;
+			IList<ModelToken> tokenList = source as IList<ModelToken>;
 			if (tokenList != null)
 			{
-				return (tokenList.Count > 0) && (tokenList[0].TokenType == CommonTokenType.Primitive);
+				return (tokenList.Count > 0) && (tokenList[0].TokenType == ModelTokenType.Primitive);
 			}
 
 			foreach (var token in source)
 			{
-				return (token.TokenType == CommonTokenType.Primitive);
+				return (token.TokenType == ModelTokenType.Primitive);
 			}
 
 			return false;
@@ -101,15 +101,15 @@ namespace JsonFx.Common
 				throw new ArgumentNullException("source");
 			}
 
-			IList<CommonToken> tokenList = source as IList<CommonToken>;
+			IList<ModelToken> tokenList = source as IList<ModelToken>;
 			if (tokenList != null)
 			{
-				return (tokenList.Count > 0) && (tokenList[0].TokenType == CommonTokenType.ObjectBegin);
+				return (tokenList.Count > 0) && (tokenList[0].TokenType == ModelTokenType.ObjectBegin);
 			}
 
 			foreach (var token in source)
 			{
-				return (token.TokenType == CommonTokenType.ObjectBegin);
+				return (token.TokenType == ModelTokenType.ObjectBegin);
 			}
 
 			return false;
@@ -128,9 +128,9 @@ namespace JsonFx.Common
 				throw new ArgumentNullException("source");
 			}
 
-			IStream<CommonToken> stream = Stream<CommonToken>.Create(source);
+			IStream<ModelToken> stream = Stream<ModelToken>.Create(source);
 			if (stream.IsCompleted ||
-				stream.Pop().TokenType != CommonTokenType.ObjectBegin)
+				stream.Pop().TokenType != ModelTokenType.ObjectBegin)
 			{
 				return false;
 			}
@@ -139,23 +139,23 @@ namespace JsonFx.Common
 
 			while (!stream.IsCompleted)
 			{
-				CommonToken token = stream.Peek();
+				ModelToken token = stream.Peek();
 				switch (token.TokenType)
 				{
-					case CommonTokenType.ArrayBegin:
-					case CommonTokenType.ObjectBegin:
+					case ModelTokenType.ArrayBegin:
+					case ModelTokenType.ObjectBegin:
 					{
 						depth++;
 						stream.Pop();
 						continue;
 					}
-					case CommonTokenType.ArrayEnd:
+					case ModelTokenType.ArrayEnd:
 					{
 						depth--;
 						stream.Pop();
 						continue;
 					}
-					case CommonTokenType.ObjectEnd:
+					case ModelTokenType.ObjectEnd:
 					{
 						if (depth != 0)
 						{
@@ -167,7 +167,7 @@ namespace JsonFx.Common
 						// don't look beyond end of object
 						return false;
 					}
-					case CommonTokenType.Property:
+					case ModelTokenType.Property:
 					{
 						stream.Pop();
 
@@ -199,7 +199,7 @@ namespace JsonFx.Common
 		/// <returns>all properties for the object</returns>
 		public static TokenSequence Property(this TokenSequence source, DataName propertyName)
 		{
-			using (var enumerator = CommonSubsequencer.Properties(source, name => (name == propertyName)).GetEnumerator())
+			using (var enumerator = ModelSubsequencer.Properties(source, name => (name == propertyName)).GetEnumerator())
 			{
 				// effectively FirstOrDefault()
 				return enumerator.MoveNext() ? enumerator.Current.Value : null;
@@ -214,7 +214,7 @@ namespace JsonFx.Common
 		/// <returns>all properties for the object</returns>
 		public static IEnumerable<KeyValuePair<DataName, TokenSequence>> Properties(this TokenSequence source)
 		{
-			return CommonSubsequencer.Properties(source, null);
+			return ModelSubsequencer.Properties(source, null);
 		}
 
 		/// <summary>
@@ -230,13 +230,13 @@ namespace JsonFx.Common
 				throw new ArgumentNullException("source");
 			}
 
-			if (!(source is IList<CommonToken>))
+			if (!(source is IList<ModelToken>))
 			{
 				// ensure buffered
-				source = new SequenceBuffer<CommonToken>(source);
+				source = new SequenceBuffer<ModelToken>(source);
 			}
 
-			return CommonSubsequencer.PropertiesIterator(source, predicate);
+			return ModelSubsequencer.PropertiesIterator(source, predicate);
 		}
 
 		/// <summary>
@@ -247,9 +247,9 @@ namespace JsonFx.Common
 		/// <returns>matching properties for the root object</returns>
 		private static IEnumerable<KeyValuePair<DataName, TokenSequence>> PropertiesIterator(TokenSequence source, Func<DataName, bool> predicate)
 		{
-			IStream<CommonToken> stream = Stream<CommonToken>.Create(source);
+			IStream<ModelToken> stream = Stream<ModelToken>.Create(source);
 			if (stream.IsCompleted ||
-				stream.Pop().TokenType != CommonTokenType.ObjectBegin)
+				stream.Pop().TokenType != ModelTokenType.ObjectBegin)
 			{
 				yield break;
 			}
@@ -258,23 +258,23 @@ namespace JsonFx.Common
 
 			while (!stream.IsCompleted)
 			{
-				CommonToken token = stream.Peek();
+				ModelToken token = stream.Peek();
 				switch (token.TokenType)
 				{
-					case CommonTokenType.ArrayBegin:
-					case CommonTokenType.ObjectBegin:
+					case ModelTokenType.ArrayBegin:
+					case ModelTokenType.ObjectBegin:
 					{
 						depth++;
 						stream.Pop();
 						continue;
 					}
-					case CommonTokenType.ArrayEnd:
+					case ModelTokenType.ArrayEnd:
 					{
 						depth--;
 						stream.Pop();
 						continue;
 					}
-					case CommonTokenType.ObjectEnd:
+					case ModelTokenType.ObjectEnd:
 					{
 						if (depth != 0)
 						{
@@ -286,7 +286,7 @@ namespace JsonFx.Common
 						// don't look beyond end of object
 						yield break;
 					}
-					case CommonTokenType.Property:
+					case ModelTokenType.Property:
 					{
 						stream.Pop();
 
@@ -297,7 +297,7 @@ namespace JsonFx.Common
 						}
 
 						// return property value sequence
-						yield return new KeyValuePair<DataName, TokenSequence>(token.Name, CommonSubsequencer.SpliceNextValue(stream));
+						yield return new KeyValuePair<DataName, TokenSequence>(token.Name, ModelSubsequencer.SpliceNextValue(stream));
 						continue;
 					}
 					default:
@@ -325,15 +325,15 @@ namespace JsonFx.Common
 				throw new ArgumentNullException("source");
 			}
 
-			IList<CommonToken> tokenList = source as IList<CommonToken>;
+			IList<ModelToken> tokenList = source as IList<ModelToken>;
 			if (tokenList != null)
 			{
-				return (tokenList.Count > 0) && (tokenList[0].TokenType == CommonTokenType.ArrayBegin);
+				return (tokenList.Count > 0) && (tokenList[0].TokenType == ModelTokenType.ArrayBegin);
 			}
 
 			foreach (var token in source)
 			{
-				return (token.TokenType == CommonTokenType.ArrayBegin);
+				return (token.TokenType == ModelTokenType.ArrayBegin);
 			}
 
 			return false;
@@ -346,7 +346,7 @@ namespace JsonFx.Common
 		/// <returns>all items of the array</returns>
 		public static IEnumerable<TokenSequence> ArrayItems(this TokenSequence source)
 		{
-			return CommonSubsequencer.ArrayItems(source, null);
+			return ModelSubsequencer.ArrayItems(source, null);
 		}
 
 		/// <summary>
@@ -362,13 +362,13 @@ namespace JsonFx.Common
 				throw new ArgumentNullException("source");
 			}
 
-			if (!(source is IList<CommonToken>))
+			if (!(source is IList<ModelToken>))
 			{
 				// ensure buffered
-				source = new SequenceBuffer<CommonToken>(source);
+				source = new SequenceBuffer<ModelToken>(source);
 			}
 
-			return CommonSubsequencer.ArrayItemsIterator(source, predicate);
+			return ModelSubsequencer.ArrayItemsIterator(source, predicate);
 		}
 
 		/// <summary>
@@ -379,13 +379,13 @@ namespace JsonFx.Common
 		/// <returns></returns>
 		private static IEnumerable<TokenSequence> ArrayItemsIterator(TokenSequence source, Func<int, bool> predicate)
 		{
-			IStream<CommonToken> stream = Stream<CommonToken>.Create(source);
+			IStream<ModelToken> stream = Stream<ModelToken>.Create(source);
 			if (stream.IsCompleted)
 			{
 				yield break;
 			}
 
-			if (stream.Pop().TokenType != CommonTokenType.ArrayBegin)
+			if (stream.Pop().TokenType != ModelTokenType.ArrayBegin)
 			{
 				yield return source;
 				yield break;
@@ -394,19 +394,19 @@ namespace JsonFx.Common
 			int index = 0;
 			while (!stream.IsCompleted)
 			{
-				CommonToken token = stream.Peek();
-				if (token.TokenType == CommonTokenType.ArrayEnd)
+				ModelToken token = stream.Peek();
+				if (token.TokenType == ModelTokenType.ArrayEnd)
 				{
 					break;
 				}
 
 				if (predicate == null || predicate(index))
 				{
-					yield return CommonSubsequencer.SpliceNextValue(stream);
+					yield return ModelSubsequencer.SpliceNextValue(stream);
 				}
 				else
 				{
-					CommonSubsequencer.SkipNextValue(stream);
+					ModelSubsequencer.SkipNextValue(stream);
 				}
 				index++;
 			}
@@ -428,13 +428,13 @@ namespace JsonFx.Common
 				throw new ArgumentNullException("source");
 			}
 
-			if (!(source is IList<CommonToken>))
+			if (!(source is IList<ModelToken>))
 			{
 				// ensure buffered
-				source = new SequenceBuffer<CommonToken>(source);
+				source = new SequenceBuffer<ModelToken>(source);
 			}
 
-			return CommonSubsequencer.DescendantsIterator(source);
+			return ModelSubsequencer.DescendantsIterator(source);
 		}
 
 		/// <summary>
@@ -444,18 +444,18 @@ namespace JsonFx.Common
 		/// <returns></returns>
 		private static IEnumerable<TokenSequence> DescendantsIterator(TokenSequence source)
 		{
-			if (CommonSubsequencer.IsPrimitive(source))
+			if (ModelSubsequencer.IsPrimitive(source))
 			{
 				yield break;
 			}
 
-			if (CommonSubsequencer.IsObject(source))
+			if (ModelSubsequencer.IsObject(source))
 			{
-				foreach (KeyValuePair<DataName, TokenSequence> property in CommonSubsequencer.Properties(source, null))
+				foreach (KeyValuePair<DataName, TokenSequence> property in ModelSubsequencer.Properties(source, null))
 				{
 					yield return property.Value;
 
-					foreach (TokenSequence descendant in CommonSubsequencer.Descendants(property.Value))
+					foreach (TokenSequence descendant in ModelSubsequencer.Descendants(property.Value))
 					{
 						yield return descendant;
 					}
@@ -463,13 +463,13 @@ namespace JsonFx.Common
 				yield break;
 			}
 
-			if (CommonSubsequencer.IsArray(source))
+			if (ModelSubsequencer.IsArray(source))
 			{
-				foreach (TokenSequence item in CommonSubsequencer.ArrayItems(source, null))
+				foreach (TokenSequence item in ModelSubsequencer.ArrayItems(source, null))
 				{
 					yield return item;
 
-					foreach (TokenSequence descendant in CommonSubsequencer.Descendants(item))
+					foreach (TokenSequence descendant in ModelSubsequencer.Descendants(item))
 					{
 						yield return descendant;
 					}
@@ -490,13 +490,13 @@ namespace JsonFx.Common
 				throw new ArgumentNullException("source");
 			}
 
-			if (!(source is IList<CommonToken>))
+			if (!(source is IList<ModelToken>))
 			{
 				// ensure buffered
-				source = new SequenceBuffer<CommonToken>(source);
+				source = new SequenceBuffer<ModelToken>(source);
 			}
 
-			return CommonSubsequencer.DescendantsAndSelfIterator(source);
+			return ModelSubsequencer.DescendantsAndSelfIterator(source);
 		}
 
 		/// <summary>
@@ -509,7 +509,7 @@ namespace JsonFx.Common
 			// and self
 			yield return source;
 
-			foreach (TokenSequence descendant in CommonSubsequencer.DescendantsIterator(source))
+			foreach (TokenSequence descendant in ModelSubsequencer.DescendantsIterator(source))
 			{
 				yield return descendant;
 			}
@@ -531,22 +531,22 @@ namespace JsonFx.Common
 				return new TokenSequence[0];
 			}
 
-			if (!(source is IList<CommonToken>))
+			if (!(source is IList<ModelToken>))
 			{
 				// ensure buffered
-				source = new SequenceBuffer<CommonToken>(source);
+				source = new SequenceBuffer<ModelToken>(source);
 			}
 
-			return CommonSubsequencer.SplitValuesIterator(source);
+			return ModelSubsequencer.SplitValuesIterator(source);
 		}
 
 		private static IEnumerable<TokenSequence> SplitValuesIterator(TokenSequence source)
 		{
-			using (var stream = Stream<CommonToken>.Create(source))
+			using (var stream = Stream<ModelToken>.Create(source))
 			{
 				while (!stream.IsCompleted)
 				{
-					yield return CommonSubsequencer.SpliceNextValue(stream);
+					yield return ModelSubsequencer.SpliceNextValue(stream);
 				}
 			}
 		}
@@ -557,7 +557,7 @@ namespace JsonFx.Common
 		/// <param name="stream"></param>
 		/// <returns></returns>
 		[Obsolete("TODO: Lazy does not mix well with shared IStream<T>.", true)]
-		private static TokenSequence SpliceNextValueLazy(IStream<CommonToken> stream)
+		private static TokenSequence SpliceNextValueLazy(IStream<ModelToken> stream)
 		{
 			if (stream.IsCompleted)
 			{
@@ -565,16 +565,16 @@ namespace JsonFx.Common
 			}
 
 			int depth = 0;
-			CommonToken token = stream.Pop();
+			ModelToken token = stream.Pop();
 			switch (token.TokenType)
 			{
-				case CommonTokenType.Primitive:
+				case ModelTokenType.Primitive:
 				{
 					yield return token;
 					yield break;
 				}
-				case CommonTokenType.ArrayBegin:
-				case CommonTokenType.ObjectBegin:
+				case ModelTokenType.ArrayBegin:
+				case ModelTokenType.ObjectBegin:
 				{
 					depth++;
 					yield return token;
@@ -584,15 +584,15 @@ namespace JsonFx.Common
 						token = stream.Pop();
 						switch (token.TokenType)
 						{
-							case CommonTokenType.ArrayBegin:
-							case CommonTokenType.ObjectBegin:
+							case ModelTokenType.ArrayBegin:
+							case ModelTokenType.ObjectBegin:
 							{
 								depth++;
 								yield return token;
 								break;
 							}
-							case CommonTokenType.ArrayEnd:
-							case CommonTokenType.ObjectEnd:
+							case ModelTokenType.ArrayEnd:
+							case ModelTokenType.ObjectEnd:
 							{
 								depth--;
 								yield return token;
@@ -609,18 +609,18 @@ namespace JsonFx.Common
 
 					if (depth > 0)
 					{
-						throw new TokenException<CommonTokenType>(
-							CommonGrammar.TokenNone,
-							CommonSubsequencer.ErrorUnexpectedEndOfInput);
+						throw new TokenException<ModelTokenType>(
+							ModelGrammar.TokenNone,
+							ModelSubsequencer.ErrorUnexpectedEndOfInput);
 					}
 
 					yield break;
 				}
 				default:
 				{
-					throw new TokenException<CommonTokenType>(
+					throw new TokenException<ModelTokenType>(
 						token,
-						String.Format(CommonSubsequencer.ErrorInvalidPropertyValue, token.TokenType));
+						String.Format(ModelSubsequencer.ErrorInvalidPropertyValue, token.TokenType));
 				}
 			}
 		}
@@ -630,41 +630,41 @@ namespace JsonFx.Common
 		/// </summary>
 		/// <param name="stream"></param>
 		/// <returns></returns>
-		private static TokenSequence SpliceNextValue(IStream<CommonToken> stream)
+		private static TokenSequence SpliceNextValue(IStream<ModelToken> stream)
 		{
 			if (stream.IsCompleted)
 			{
-				throw new TokenException<CommonTokenType>(
-					CommonGrammar.TokenNone,
-					CommonSubsequencer.ErrorUnexpectedEndOfInput);
+				throw new TokenException<ModelTokenType>(
+					ModelGrammar.TokenNone,
+					ModelSubsequencer.ErrorUnexpectedEndOfInput);
 			}
 
 			stream.BeginChunk();
 
 			int depth = 0;
-			CommonToken token = stream.Pop();
+			ModelToken token = stream.Pop();
 			switch (token.TokenType)
 			{
-				case CommonTokenType.Primitive:
+				case ModelTokenType.Primitive:
 				{
 					return stream.EndChunk();
 				}
-				case CommonTokenType.ArrayBegin:
-				case CommonTokenType.ObjectBegin:
+				case ModelTokenType.ArrayBegin:
+				case ModelTokenType.ObjectBegin:
 				{
 					depth++;
 					while (!stream.IsCompleted && depth > 0)
 					{
 						switch (stream.Pop().TokenType)
 						{
-							case CommonTokenType.ArrayBegin:
-							case CommonTokenType.ObjectBegin:
+							case ModelTokenType.ArrayBegin:
+							case ModelTokenType.ObjectBegin:
 							{
 								depth++;
 								break;
 							}
-							case CommonTokenType.ArrayEnd:
-							case CommonTokenType.ObjectEnd:
+							case ModelTokenType.ArrayEnd:
+							case ModelTokenType.ObjectEnd:
 							{
 								depth--;
 								break;
@@ -674,17 +674,17 @@ namespace JsonFx.Common
 
 					if (depth > 0)
 					{
-						throw new TokenException<CommonTokenType>(
-							CommonGrammar.TokenNone,
-							CommonSubsequencer.ErrorUnexpectedEndOfInput);
+						throw new TokenException<ModelTokenType>(
+							ModelGrammar.TokenNone,
+							ModelSubsequencer.ErrorUnexpectedEndOfInput);
 					}
 					return stream.EndChunk();
 				}
 				default:
 				{
-					throw new TokenException<CommonTokenType>(
+					throw new TokenException<ModelTokenType>(
 						token,
-						String.Format(CommonSubsequencer.ErrorInvalidPropertyValue, token.TokenType));
+						String.Format(ModelSubsequencer.ErrorInvalidPropertyValue, token.TokenType));
 				}
 			}
 		}
@@ -694,7 +694,7 @@ namespace JsonFx.Common
 		/// </summary>
 		/// <param name="stream"></param>
 		/// <returns></returns>
-		private static void SkipNextValue(IStream<CommonToken> stream)
+		private static void SkipNextValue(IStream<ModelToken> stream)
 		{
 			if (stream.IsCompleted)
 			{
@@ -703,29 +703,29 @@ namespace JsonFx.Common
 
 			int depth = 0;
 
-			CommonToken token = stream.Pop();
+			ModelToken token = stream.Pop();
 			switch (token.TokenType)
 			{
-				case CommonTokenType.Primitive:
+				case ModelTokenType.Primitive:
 				{
 					return;
 				}
-				case CommonTokenType.ArrayBegin:
-				case CommonTokenType.ObjectBegin:
+				case ModelTokenType.ArrayBegin:
+				case ModelTokenType.ObjectBegin:
 				{
 					depth++;
 					while (!stream.IsCompleted && depth > 0)
 					{
 						switch (stream.Pop().TokenType)
 						{
-							case CommonTokenType.ArrayBegin:
-							case CommonTokenType.ObjectBegin:
+							case ModelTokenType.ArrayBegin:
+							case ModelTokenType.ObjectBegin:
 							{
 								depth++;
 								break;
 							}
-							case CommonTokenType.ArrayEnd:
-							case CommonTokenType.ObjectEnd:
+							case ModelTokenType.ArrayEnd:
+							case ModelTokenType.ObjectEnd:
 							{
 								depth--;
 								break;
@@ -735,17 +735,17 @@ namespace JsonFx.Common
 
 					if (depth > 0)
 					{
-						throw new TokenException<CommonTokenType>(
-							CommonGrammar.TokenNone,
-							CommonSubsequencer.ErrorUnexpectedEndOfInput);
+						throw new TokenException<ModelTokenType>(
+							ModelGrammar.TokenNone,
+							ModelSubsequencer.ErrorUnexpectedEndOfInput);
 					}
 					return;
 				}
 				default:
 				{
-					throw new TokenException<CommonTokenType>(
+					throw new TokenException<ModelTokenType>(
 						token,
-						String.Format(CommonSubsequencer.ErrorInvalidPropertyValue, token.TokenType));
+						String.Format(ModelSubsequencer.ErrorInvalidPropertyValue, token.TokenType));
 				}
 			}
 		}

@@ -35,9 +35,9 @@ using System.Linq;
 using JsonFx.Linq;
 using JsonFx.Serialization;
 
-using TokenSequence=System.Collections.Generic.IEnumerable<JsonFx.Serialization.Token<JsonFx.Common.CommonTokenType>>;
+using TokenSequence=System.Collections.Generic.IEnumerable<JsonFx.Serialization.Token<JsonFx.Model.ModelTokenType>>;
 
-namespace JsonFx.Common
+namespace JsonFx.Model
 {
 	/// <summary>
 	/// Represents a query across a data source
@@ -47,7 +47,7 @@ namespace JsonFx.Common
 	{
 		#region Fields
 
-		private readonly ITokenAnalyzer<CommonTokenType> Analyzer;
+		private readonly ITokenAnalyzer<ModelTokenType> Analyzer;
 		private readonly IEnumerable<TokenSequence> Sequences;
 
 		#endregion Fields
@@ -59,7 +59,7 @@ namespace JsonFx.Common
 		/// </summary>
 		/// <param name="analyzer"></param>
 		/// <param name="sequence"></param>
-		internal Query(ITokenAnalyzer<CommonTokenType> analyzer, TokenSequence sequence)
+		internal Query(ITokenAnalyzer<ModelTokenType> analyzer, TokenSequence sequence)
 			: this(analyzer, sequence.SplitValues())
 		{
 		}
@@ -69,7 +69,7 @@ namespace JsonFx.Common
 		/// </summary>
 		/// <param name="analyzer"></param>
 		/// <param name="sequences"></param>
-		internal Query(ITokenAnalyzer<CommonTokenType> analyzer, IEnumerable<TokenSequence> sequences)
+		internal Query(ITokenAnalyzer<ModelTokenType> analyzer, IEnumerable<TokenSequence> sequences)
 			: base(new QueryProvider(analyzer, sequences.AsQueryable()))
 		{
 			this.Analyzer = analyzer;

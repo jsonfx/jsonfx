@@ -32,8 +32,8 @@ using System;
 using System.Linq;
 using System.Runtime.Serialization;
 
-using JsonFx.Common;
 using JsonFx.Json;
+using JsonFx.Model;
 using Xunit;
 
 using Assert=JsonFx.AssertPatched;
@@ -76,12 +76,12 @@ namespace JsonFx.Serialization.Resolvers
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenPrimitive("Two")
+				ModelGrammar.TokenPrimitive("Two")
 			};
 
 			var expected = ExampleEnum.Two;
 
-			var analyzer = new CommonAnalyzer(new DataReaderSettings(new DataContractResolverStrategy()));
+			var analyzer = new ModelAnalyzer(new DataReaderSettings(new DataContractResolverStrategy()));
 			var actual = analyzer.Analyze<ExampleEnum>(input).Single();
 
 			Assert.Equal(expected, actual);
@@ -93,12 +93,12 @@ namespace JsonFx.Serialization.Resolvers
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenPrimitive("yellow")
+				ModelGrammar.TokenPrimitive("yellow")
 			};
 
 			var expected = ExampleEnum.Two;
 
-			var analyzer = new CommonAnalyzer(new DataReaderSettings(new DataContractResolverStrategy()));
+			var analyzer = new ModelAnalyzer(new DataReaderSettings(new DataContractResolverStrategy()));
 			var actual = analyzer.Analyze<ExampleEnum>(input).Single();
 
 			Assert.Equal(expected, actual);
@@ -110,12 +110,12 @@ namespace JsonFx.Serialization.Resolvers
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenPrimitive(3)
+				ModelGrammar.TokenPrimitive(3)
 			};
 
 			var expected = ExampleEnum.Three;
 
-			var analyzer = new CommonAnalyzer(new DataReaderSettings(new DataContractResolverStrategy()));
+			var analyzer = new ModelAnalyzer(new DataReaderSettings(new DataContractResolverStrategy()));
 			var actual = analyzer.Analyze<ExampleEnum>(input).Single();
 
 			Assert.Equal(expected, actual);
@@ -131,7 +131,7 @@ namespace JsonFx.Serialization.Resolvers
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenPrimitive(ExampleEnum.Zero)
+				ModelGrammar.TokenPrimitive(ExampleEnum.Zero)
 			};
 
 			var expected = @"""Zero""";
@@ -148,7 +148,7 @@ namespace JsonFx.Serialization.Resolvers
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenPrimitive(ExampleEnum.One)
+				ModelGrammar.TokenPrimitive(ExampleEnum.One)
 			};
 
 			var expected = @"""One""";
@@ -165,7 +165,7 @@ namespace JsonFx.Serialization.Resolvers
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenPrimitive(ExampleEnum.Two)
+				ModelGrammar.TokenPrimitive(ExampleEnum.Two)
 			};
 
 			var expected = @"""yellow""";
@@ -182,7 +182,7 @@ namespace JsonFx.Serialization.Resolvers
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenPrimitive(ExampleEnum.Three)
+				ModelGrammar.TokenPrimitive(ExampleEnum.Three)
 			};
 
 			var expected = @"""Three""";
@@ -199,7 +199,7 @@ namespace JsonFx.Serialization.Resolvers
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenPrimitive((int)ExampleEnum.Three)
+				ModelGrammar.TokenPrimitive((int)ExampleEnum.Three)
 			};
 
 			var expected = "3";

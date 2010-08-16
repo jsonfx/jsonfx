@@ -131,7 +131,7 @@ namespace JsonFx.Bson
 		public BsonJavaScriptCode Code { get; set; }
 
 		//TODO: this is currently broken.
-		public JsonFx.IO.IStream<JsonFx.Serialization.Token<JsonFx.Common.CommonTokenType>> Scope { get; set; }
+		public JsonFx.IO.IStream<JsonFx.Serialization.Token<JsonFx.Model.ModelTokenType>> Scope { get; set; }
 
 		#endregion Properties
 	}

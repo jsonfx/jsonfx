@@ -31,7 +31,7 @@
 using System;
 using System.Linq;
 
-using JsonFx.Common;
+using JsonFx.Model;
 using Xunit;
 
 using Assert=JsonFx.AssertPatched;
@@ -104,10 +104,10 @@ namespace JsonFx.Serialization.Resolvers
 
 			var expected = new[]
 			{
-				CommonGrammar.TokenObjectBegin("Naming Test"),
-				CommonGrammar.TokenProperty("Little BIT Of Everything 123456789 Mixed In"),
-				CommonGrammar.TokenPrimitive("Foo."),
-				CommonGrammar.TokenObjectEnd
+				ModelGrammar.TokenObjectBegin("Naming Test"),
+				ModelGrammar.TokenProperty("Little BIT Of Everything 123456789 Mixed In"),
+				ModelGrammar.TokenPrimitive("Foo."),
+				ModelGrammar.TokenObjectEnd
 			};
 
 			var resolver = new CombinedResolverStrategy(
@@ -117,7 +117,7 @@ namespace JsonFx.Serialization.Resolvers
 				new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.Lowercase, "-"),
 				new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.Uppercase, "_"));
 
-			var actual = new CommonWalker(new DataWriterSettings(resolver)).GetTokens(input).ToArray();
+			var actual = new ModelWalker(new DataWriterSettings(resolver)).GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual, false);
 		}

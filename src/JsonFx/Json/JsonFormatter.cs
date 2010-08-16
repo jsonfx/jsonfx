@@ -33,7 +33,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 
-using JsonFx.Common;
+using JsonFx.Model;
 using JsonFx.Serialization;
 
 namespace JsonFx.Json
@@ -49,7 +49,7 @@ namespace JsonFx.Json
 		/// <summary>
 		/// Outputs JSON text from an input stream of tokens
 		/// </summary>
-		public class JsonFormatter : ITextFormatter<CommonTokenType>
+		public class JsonFormatter : ITextFormatter<ModelTokenType>
 		{
 			#region Constants
 
@@ -108,7 +108,7 @@ namespace JsonFx.Json
 			/// Formats the token sequence as a string
 			/// </summary>
 			/// <param name="tokens"></param>
-			public string Format(IEnumerable<Token<CommonTokenType>> tokens)
+			public string Format(IEnumerable<Token<ModelTokenType>> tokens)
 			{
 				using (StringWriter writer = new StringWriter())
 				{
@@ -123,7 +123,7 @@ namespace JsonFx.Json
 			/// </summary>
 			/// <param name="writer"></param>
 			/// <param name="tokens"></param>
-			public void Format(IEnumerable<Token<CommonTokenType>> tokens, TextWriter writer)
+			public void Format(IEnumerable<Token<ModelTokenType>> tokens, TextWriter writer)
 			{
 				if (tokens == null)
 				{
@@ -137,11 +137,11 @@ namespace JsonFx.Json
 				bool needsValueDelim = false;
 				int depth = 0;
 
-				foreach (Token<CommonTokenType> token in tokens)
+				foreach (Token<ModelTokenType> token in tokens)
 				{
 					switch (token.TokenType)
 					{
-						case CommonTokenType.ArrayBegin:
+						case ModelTokenType.ArrayBegin:
 						{
 							if (needsValueDelim)
 							{
@@ -165,7 +165,7 @@ namespace JsonFx.Json
 							needsValueDelim = false;
 							continue;
 						}
-						case CommonTokenType.ArrayEnd:
+						case ModelTokenType.ArrayEnd:
 						{
 							if (pendingNewLine)
 							{
@@ -179,7 +179,7 @@ namespace JsonFx.Json
 							needsValueDelim = true;
 							continue;
 						}
-						case CommonTokenType.Primitive:
+						case ModelTokenType.Primitive:
 						{
 							if (needsValueDelim)
 							{
@@ -240,7 +240,7 @@ namespace JsonFx.Json
 								}
 								default:
 								{
-									ITextFormattable<CommonTokenType> formattable = token.Value as ITextFormattable<CommonTokenType>;
+									ITextFormattable<ModelTokenType> formattable = token.Value as ITextFormattable<ModelTokenType>;
 									if (formattable != null)
 									{
 										formattable.Format(this, writer);
@@ -254,7 +254,7 @@ namespace JsonFx.Json
 							needsValueDelim = true;
 							continue;
 						}
-						case CommonTokenType.ObjectBegin:
+						case ModelTokenType.ObjectBegin:
 						{
 							if (needsValueDelim)
 							{
@@ -278,7 +278,7 @@ namespace JsonFx.Json
 							needsValueDelim = false;
 							continue;
 						}
-						case CommonTokenType.ObjectEnd:
+						case ModelTokenType.ObjectEnd:
 						{
 							if (pendingNewLine)
 							{
@@ -292,7 +292,7 @@ namespace JsonFx.Json
 							needsValueDelim = true;
 							continue;
 						}
-						case CommonTokenType.Property:
+						case ModelTokenType.Property:
 						{
 							if (needsValueDelim)
 							{
@@ -327,10 +327,10 @@ namespace JsonFx.Json
 							needsValueDelim = false;
 							continue;
 						}
-						case CommonTokenType.None:
+						case ModelTokenType.None:
 						default:
 						{
-							throw new TokenException<CommonTokenType>(
+							throw new TokenException<ModelTokenType>(
 								token,
 								String.Format(ErrorUnexpectedToken, token.TokenType));
 						}
@@ -484,7 +484,7 @@ namespace JsonFx.Json
 							break;
 						}
 
-						throw new TokenException<CommonTokenType>(CommonGrammar.TokenPrimitive(value), "Invalid number token");
+						throw new TokenException<ModelTokenType>(ModelGrammar.TokenPrimitive(value), "Invalid number token");
 					}
 				}
 
@@ -617,7 +617,7 @@ namespace JsonFx.Json
 					return this.FormatEnum((Enum)value);
 				}
 
-				return Token<CommonTokenType>.ToString(value);
+				return Token<ModelTokenType>.ToString(value);
 			}
 
 			#endregion String Methods

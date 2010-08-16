@@ -38,7 +38,7 @@ using Xunit;
 
 using Assert=JsonFx.AssertPatched;
 
-namespace JsonFx.Common.Filters
+namespace JsonFx.Model.Filters
 {
 	public class MSAjaxDateFilterTests
 	{
@@ -55,9 +55,9 @@ namespace JsonFx.Common.Filters
 		[Trait(TraitName, TraitValue)]
 		public void TryRead_StandardTimeZone_ReadsAsUtc()
 		{
-			var input = Stream<Token<CommonTokenType>>.Create(new[]
+			var input = Stream<Token<ModelTokenType>>.Create(new[]
 				{
-					CommonGrammar.TokenPrimitive(@"\/Date(1204329599999)\/")
+					ModelGrammar.TokenPrimitive(@"\/Date(1204329599999)\/")
 				});
 
 			var expected = new DateTime(2008, 2, 29, 23, 59, 59, 999, DateTimeKind.Utc);
@@ -73,9 +73,9 @@ namespace JsonFx.Common.Filters
 		[Trait(TraitName, TraitValue)]
 		public void TryRead_DaylightSavingsTimeZone_ReadsAsUtc()
 		{
-			var input = Stream<Token<CommonTokenType>>.Create(new[]
+			var input = Stream<Token<ModelTokenType>>.Create(new[]
 				{
-					CommonGrammar.TokenPrimitive(@"\/Date(1278327077768)\/")
+					ModelGrammar.TokenPrimitive(@"\/Date(1278327077768)\/")
 				});
 
 			var expected = new DateTime(2010, 7, 5, 10, 51, 17, 768, DateTimeKind.Utc);
@@ -91,9 +91,9 @@ namespace JsonFx.Common.Filters
 		[Trait(TraitName, TraitValue)]
 		public void TryRead_FutureTimeZone_ReadsAsUtc()
 		{
-			var input = Stream<Token<CommonTokenType>>.Create(new[]
+			var input = Stream<Token<ModelTokenType>>.Create(new[]
 				{
-					CommonGrammar.TokenPrimitive(@"\/Date(4102444799999)\/")
+					ModelGrammar.TokenPrimitive(@"\/Date(4102444799999)\/")
 				});
 
 			var expected = new DateTime(2099, 12, 31, 23, 59, 59, 999, DateTimeKind.Utc);
@@ -111,9 +111,9 @@ namespace JsonFx.Common.Filters
 		{
 			var expected = DateTime.MinValue;
 
-			var input = Stream<Token<CommonTokenType>>.Create(new[]
+			var input = Stream<Token<ModelTokenType>>.Create(new[]
 				{
-					CommonGrammar.TokenPrimitive(@"\/Date(-62135596800000)\/")
+					ModelGrammar.TokenPrimitive(@"\/Date(-62135596800000)\/")
 				});
 
 			DateTime actual;
@@ -127,9 +127,9 @@ namespace JsonFx.Common.Filters
 		[Trait(TraitName, TraitValue)]
 		public void TryRead_DateTimeMaxValueUtc_ReadsAsDateTimeMaxValue()
 		{
-			var input = Stream<Token<CommonTokenType>>.Create(new[]
+			var input = Stream<Token<ModelTokenType>>.Create(new[]
 				{
-					CommonGrammar.TokenPrimitive(@"\/Date(253402300800000)\/")
+					ModelGrammar.TokenPrimitive(@"\/Date(253402300800000)\/")
 				});
 
 			var expected = DateTime.MaxValue;
@@ -153,10 +153,10 @@ namespace JsonFx.Common.Filters
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenPrimitive(@"\/Date(1204329599999)\/")
+					ModelGrammar.TokenPrimitive(@"\/Date(1204329599999)\/")
 				};
 
-			IEnumerable<Token<CommonTokenType>> actual;
+			IEnumerable<Token<ModelTokenType>> actual;
 			Assert.True(new MSAjaxDateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
@@ -174,10 +174,10 @@ namespace JsonFx.Common.Filters
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenPrimitive(@"\/Date(1204358399999)\/")
+					ModelGrammar.TokenPrimitive(@"\/Date(1204358399999)\/")
 				};
 
-			IEnumerable<Token<CommonTokenType>> actual;
+			IEnumerable<Token<ModelTokenType>> actual;
 			Assert.True(new MSAjaxDateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
@@ -194,10 +194,10 @@ namespace JsonFx.Common.Filters
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenPrimitive(@"\/Date(1204329599999)\/")
+					ModelGrammar.TokenPrimitive(@"\/Date(1204329599999)\/")
 				};
 
-			IEnumerable<Token<CommonTokenType>> actual;
+			IEnumerable<Token<ModelTokenType>> actual;
 			Assert.True(new MSAjaxDateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
@@ -214,10 +214,10 @@ namespace JsonFx.Common.Filters
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenPrimitive(@"\/Date(1278327077768)\/")
+					ModelGrammar.TokenPrimitive(@"\/Date(1278327077768)\/")
 				};
 
-			IEnumerable<Token<CommonTokenType>> actual;
+			IEnumerable<Token<ModelTokenType>> actual;
 			Assert.True(new MSAjaxDateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
@@ -235,10 +235,10 @@ namespace JsonFx.Common.Filters
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenPrimitive(@"\/Date(1278352277768)\/")
+					ModelGrammar.TokenPrimitive(@"\/Date(1278352277768)\/")
 				};
 
-			IEnumerable<Token<CommonTokenType>> actual;
+			IEnumerable<Token<ModelTokenType>> actual;
 			Assert.True(new MSAjaxDateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
@@ -255,10 +255,10 @@ namespace JsonFx.Common.Filters
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenPrimitive(@"\/Date(1278327077768)\/")
+					ModelGrammar.TokenPrimitive(@"\/Date(1278327077768)\/")
 				};
 
-			IEnumerable<Token<CommonTokenType>> actual;
+			IEnumerable<Token<ModelTokenType>> actual;
 			Assert.True(new MSAjaxDateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
@@ -275,10 +275,10 @@ namespace JsonFx.Common.Filters
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenPrimitive(@"\/Date(4102444799999)\/")
+					ModelGrammar.TokenPrimitive(@"\/Date(4102444799999)\/")
 				};
 
-			IEnumerable<Token<CommonTokenType>> actual;
+			IEnumerable<Token<ModelTokenType>> actual;
 			Assert.True(new MSAjaxDateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
@@ -296,10 +296,10 @@ namespace JsonFx.Common.Filters
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenPrimitive(@"\/Date(4102473599999)\/")
+					ModelGrammar.TokenPrimitive(@"\/Date(4102473599999)\/")
 				};
 
-			IEnumerable<Token<CommonTokenType>> actual;
+			IEnumerable<Token<ModelTokenType>> actual;
 			Assert.True(new MSAjaxDateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
@@ -316,10 +316,10 @@ namespace JsonFx.Common.Filters
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenPrimitive(@"\/Date(4102444799999)\/")
+					ModelGrammar.TokenPrimitive(@"\/Date(4102444799999)\/")
 				};
 
-			IEnumerable<Token<CommonTokenType>> actual;
+			IEnumerable<Token<ModelTokenType>> actual;
 			Assert.True(new MSAjaxDateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
@@ -336,10 +336,10 @@ namespace JsonFx.Common.Filters
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenPrimitive(@"\/Date(-62135596800000)\/")
+					ModelGrammar.TokenPrimitive(@"\/Date(-62135596800000)\/")
 				};
 
-			IEnumerable<Token<CommonTokenType>> actual;
+			IEnumerable<Token<ModelTokenType>> actual;
 			Assert.True(new MSAjaxDateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);
@@ -356,10 +356,10 @@ namespace JsonFx.Common.Filters
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenPrimitive(@"\/Date(253402300800000)\/")
+					ModelGrammar.TokenPrimitive(@"\/Date(253402300800000)\/")
 				};
 
-			IEnumerable<Token<CommonTokenType>> actual;
+			IEnumerable<Token<ModelTokenType>> actual;
 			Assert.True(new MSAjaxDateFilter().TryWrite(new DataWriterSettings(), input, out actual));
 
 			Assert.NotNull(actual);

@@ -35,7 +35,7 @@ using System.Reflection;
 
 using JsonFx.Linq;
 
-namespace JsonFx.Common
+namespace JsonFx.Model
 {
 	/// <summary>
 	/// Provides base implementation for standard deserializers
@@ -43,7 +43,7 @@ namespace JsonFx.Common
 	/// <remarks>
 	/// This partial class adds LINQ capabilities to the reader.
 	/// </remarks>
-	public abstract partial class CommonReader : IQueryableReader
+	public abstract partial class ModelReader : IQueryableReader
 	{
 		#region IQueryableReader Methods
 

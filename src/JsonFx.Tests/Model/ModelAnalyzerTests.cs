@@ -33,18 +33,18 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 
-using JsonFx.Common;
+using JsonFx.Model;
 using Xunit;
 
 using Assert=JsonFx.AssertPatched;
 
 namespace JsonFx.Serialization
 {
-	public class CommonAnalyzerTests
+	public class ModelAnalyzerTests
 	{
 		#region Constants
 
-		private const string TraitName = "Common";
+		private const string TraitName = "Common Model";
 		private const string TraitValue = "Analyzer";
 
 		#endregion Constants
@@ -95,13 +95,13 @@ namespace JsonFx.Serialization
 		{
 			var input = new []
 			{
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayEnd
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayEnd
 			};
 
 			var expected = new object[0];
 
-			var analyzer = new CommonAnalyzer(new DataReaderSettings());
+			var analyzer = new ModelAnalyzer(new DataReaderSettings());
 			var actual = analyzer.Analyze(input).Cast<object[]>().Single();
 
 			Assert.Equal(expected, actual);
@@ -113,14 +113,14 @@ namespace JsonFx.Serialization
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenNull,
-				CommonGrammar.TokenArrayEnd
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenNull,
+				ModelGrammar.TokenArrayEnd
 			};
 
 			var expected = new object[] { null };
 
-			var analyzer = new CommonAnalyzer(new DataReaderSettings());
+			var analyzer = new ModelAnalyzer(new DataReaderSettings());
 			var actual = analyzer.Analyze(input).Cast<object[]>().Single();
 
 			Assert.Equal(expected, actual);
@@ -132,12 +132,12 @@ namespace JsonFx.Serialization
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenPrimitive(0),
-				CommonGrammar.TokenNull,
-				CommonGrammar.TokenFalse,
-				CommonGrammar.TokenTrue,
-				CommonGrammar.TokenArrayEnd
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenPrimitive(0),
+				ModelGrammar.TokenNull,
+				ModelGrammar.TokenFalse,
+				ModelGrammar.TokenTrue,
+				ModelGrammar.TokenArrayEnd
 			};
 
 			var expected = new object[]
@@ -148,7 +148,7 @@ namespace JsonFx.Serialization
 				true
 			};
 
-			var analyzer = new CommonAnalyzer(new DataReaderSettings());
+			var analyzer = new ModelAnalyzer(new DataReaderSettings());
 			var actual = analyzer.Analyze(input).Cast<object[]>().Single();
 
 			Assert.Equal(expected, actual);
@@ -161,45 +161,45 @@ namespace JsonFx.Serialization
 			// input from pass2.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenPrimitive("Not too deep"),
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenPrimitive("Not too deep"),
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd
 			};
 
 			var expected = new []
@@ -261,7 +261,7 @@ namespace JsonFx.Serialization
 				}
 			};
 
-			var analyzer = new CommonAnalyzer(new DataReaderSettings());
+			var analyzer = new ModelAnalyzer(new DataReaderSettings());
 			var actual = analyzer.Analyze((input)).Cast<string[][][][][][][][][][][][][][][][][][][]>().Single();
 
 			Assert.Equal(expected, actual);
@@ -274,20 +274,20 @@ namespace JsonFx.Serialization
 			// input from fail2.json in test suite at http://www.json.org/JSON_checker/
 			var input = new []
 			{
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenPrimitive("Unclosed array")
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenPrimitive("Unclosed array")
 			};
 
-			var analyzer = new CommonAnalyzer(new DataReaderSettings());
+			var analyzer = new ModelAnalyzer(new DataReaderSettings());
 
-			TokenException<CommonTokenType> ex = Assert.Throws<TokenException<CommonTokenType>>(
+			TokenException<ModelTokenType> ex = Assert.Throws<TokenException<ModelTokenType>>(
 				delegate
 				{
 					var actual = analyzer.Analyze<object>(input).Single();
 				});
 
 			// verify exception is coming from expected token
-			Assert.Equal(CommonGrammar.TokenNone, ex.Token);
+			Assert.Equal(ModelGrammar.TokenNone, ex.Token);
 		}
 
 		[Fact]
@@ -297,22 +297,22 @@ namespace JsonFx.Serialization
 			// input from fail22.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenProperty("Colon instead of comma"),
-				CommonGrammar.TokenFalse,
-				CommonGrammar.TokenArrayEnd
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenProperty("Colon instead of comma"),
+				ModelGrammar.TokenFalse,
+				ModelGrammar.TokenArrayEnd
 			};
 
-			var analyzer = new CommonAnalyzer(new DataReaderSettings());
+			var analyzer = new ModelAnalyzer(new DataReaderSettings());
 
-			TokenException<CommonTokenType> ex = Assert.Throws<TokenException<CommonTokenType>>(
+			TokenException<ModelTokenType> ex = Assert.Throws<TokenException<ModelTokenType>>(
 				delegate
 				{
 					var actual = analyzer.Analyze<object>(input).Single();
 				});
 
 			// verify exception is coming from expected token
-			Assert.Equal(CommonGrammar.TokenProperty("Colon instead of comma"), ex.Token);
+			Assert.Equal(ModelGrammar.TokenProperty("Colon instead of comma"), ex.Token);
 		}
 
 		[Fact]
@@ -322,21 +322,21 @@ namespace JsonFx.Serialization
 			// input from fail33.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenPrimitive("mismatch"),
-				CommonGrammar.TokenObjectEnd
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenPrimitive("mismatch"),
+				ModelGrammar.TokenObjectEnd
 			};
 
-			var analyzer = new CommonAnalyzer(new DataReaderSettings());
+			var analyzer = new ModelAnalyzer(new DataReaderSettings());
 
-			TokenException<CommonTokenType> ex = Assert.Throws<TokenException<CommonTokenType>>(
+			TokenException<ModelTokenType> ex = Assert.Throws<TokenException<ModelTokenType>>(
 				delegate
 				{
 					var actual = analyzer.Analyze<object>(input).Single();
 				});
 
 			// verify exception is coming from expected token
-			Assert.Equal(CommonGrammar.TokenObjectEnd, ex.Token);
+			Assert.Equal(ModelGrammar.TokenObjectEnd, ex.Token);
 		}
 
 		#endregion Array Tests
@@ -349,13 +349,13 @@ namespace JsonFx.Serialization
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenObjectEnd
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenObjectEnd
 			};
 
 			var expected = new Dictionary<string, object>();
 
-			var analyzer = new CommonAnalyzer(new DataReaderSettings());
+			var analyzer = new ModelAnalyzer(new DataReaderSettings());
 			var actual = analyzer.Analyze(input).Cast<IDictionary<string, object>>().Single();
 
 			Assert.Equal(expected, actual, false);
@@ -367,10 +367,10 @@ namespace JsonFx.Serialization
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenProperty("key"),
-				CommonGrammar.TokenPrimitive("value"),
-				CommonGrammar.TokenObjectEnd
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenProperty("key"),
+				ModelGrammar.TokenPrimitive("value"),
+				ModelGrammar.TokenObjectEnd
 			};
 
 			var expected = new Dictionary<string, object>
@@ -378,7 +378,7 @@ namespace JsonFx.Serialization
 					{ "key", "value" }
 				};
 
-			var analyzer = new CommonAnalyzer(new DataReaderSettings());
+			var analyzer = new ModelAnalyzer(new DataReaderSettings());
 			var actual = analyzer.Analyze(input).Cast<IDictionary<string, object>>().Single();
 
 			Assert.Equal(expected, actual, false);
@@ -391,15 +391,15 @@ namespace JsonFx.Serialization
 			// input from pass3.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenProperty("JSON Test Pattern pass3"),
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenProperty("The outermost value"),
-				CommonGrammar.TokenPrimitive("must be an object or array."),
-				CommonGrammar.TokenProperty("In this test"),
-				CommonGrammar.TokenPrimitive("It is an object."),
-				CommonGrammar.TokenObjectEnd,
-				CommonGrammar.TokenObjectEnd
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenProperty("JSON Test Pattern pass3"),
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenProperty("The outermost value"),
+				ModelGrammar.TokenPrimitive("must be an object or array."),
+				ModelGrammar.TokenProperty("In this test"),
+				ModelGrammar.TokenPrimitive("It is an object."),
+				ModelGrammar.TokenObjectEnd,
+				ModelGrammar.TokenObjectEnd
 			};
 
 			var expected = new Dictionary<string, object>
@@ -414,7 +414,7 @@ namespace JsonFx.Serialization
 					}
 				};
 
-			var analyzer = new CommonAnalyzer(new DataReaderSettings());
+			var analyzer = new ModelAnalyzer(new DataReaderSettings());
 			var actual = analyzer.Analyze(input).Cast<IDictionary<string, object>>().Single();
 
 			Assert.Equal(expected, actual, false);
@@ -427,22 +427,22 @@ namespace JsonFx.Serialization
 			// input from fail19.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenPrimitive("Missing colon"),
-				CommonGrammar.TokenNull,
-				CommonGrammar.TokenObjectEnd
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenPrimitive("Missing colon"),
+				ModelGrammar.TokenNull,
+				ModelGrammar.TokenObjectEnd
 			};
 
-			var analyzer = new CommonAnalyzer(new DataReaderSettings());
+			var analyzer = new ModelAnalyzer(new DataReaderSettings());
 
-			TokenException<CommonTokenType> ex = Assert.Throws<TokenException<CommonTokenType>>(
+			TokenException<ModelTokenType> ex = Assert.Throws<TokenException<ModelTokenType>>(
 				delegate
 				{
 					var actual = analyzer.Analyze<object>(input).Single();
 				});
 
 			// verify exception is coming from expected token
-			Assert.Equal(CommonGrammar.TokenPrimitive("Missing colon"), ex.Token);
+			Assert.Equal(ModelGrammar.TokenPrimitive("Missing colon"), ex.Token);
 		}
 
 		[Fact]
@@ -452,23 +452,23 @@ namespace JsonFx.Serialization
 			// input from fail20.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenProperty("Double colon"),
-				CommonGrammar.TokenProperty(""),
-				CommonGrammar.TokenNull,
-				CommonGrammar.TokenObjectEnd
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenProperty("Double colon"),
+				ModelGrammar.TokenProperty(""),
+				ModelGrammar.TokenNull,
+				ModelGrammar.TokenObjectEnd
 			};
 
-			var analyzer = new CommonAnalyzer(new DataReaderSettings());
+			var analyzer = new ModelAnalyzer(new DataReaderSettings());
 
-			TokenException<CommonTokenType> ex = Assert.Throws<TokenException<CommonTokenType>>(
+			TokenException<ModelTokenType> ex = Assert.Throws<TokenException<ModelTokenType>>(
 				delegate
 				{
 					var actual = analyzer.Analyze<object>(input).Single();
 				});
 
 			// verify exception is coming from expected token
-			Assert.Equal(CommonTokenType.Property, ex.Token.TokenType);
+			Assert.Equal(ModelTokenType.Property, ex.Token.TokenType);
 		}
 
 		[Fact]
@@ -478,22 +478,22 @@ namespace JsonFx.Serialization
 			// input from fail21.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenPrimitive("Comma instead of colon"),
-				CommonGrammar.TokenNull,
-				CommonGrammar.TokenObjectEnd
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenPrimitive("Comma instead of colon"),
+				ModelGrammar.TokenNull,
+				ModelGrammar.TokenObjectEnd
 			};
 
-			var analyzer = new CommonAnalyzer(new DataReaderSettings());
+			var analyzer = new ModelAnalyzer(new DataReaderSettings());
 
-			TokenException<CommonTokenType> ex = Assert.Throws<TokenException<CommonTokenType>>(
+			TokenException<ModelTokenType> ex = Assert.Throws<TokenException<ModelTokenType>>(
 				delegate
 				{
 					var actual = analyzer.Analyze<object>(input).Single();
 				});
 
 			// verify exception is coming from expected token
-			Assert.Equal(CommonGrammar.TokenPrimitive("Comma instead of colon"), ex.Token);
+			Assert.Equal(ModelGrammar.TokenPrimitive("Comma instead of colon"), ex.Token);
 		}
 
 		[Fact]
@@ -503,21 +503,21 @@ namespace JsonFx.Serialization
 			// input from fail32.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenProperty("Comma instead if closing brace"),
-				CommonGrammar.TokenTrue
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenProperty("Comma instead if closing brace"),
+				ModelGrammar.TokenTrue
 			};
 
-			var analyzer = new CommonAnalyzer(new DataReaderSettings());
+			var analyzer = new ModelAnalyzer(new DataReaderSettings());
 
-			TokenException<CommonTokenType> ex = Assert.Throws<TokenException<CommonTokenType>>(
+			TokenException<ModelTokenType> ex = Assert.Throws<TokenException<ModelTokenType>>(
 				delegate
 				{
 					var actual = analyzer.Analyze<object>(input).Single();
 				});
 
 			// verify exception is coming from expected token
-			Assert.Equal(CommonGrammar.TokenNone, ex.Token);
+			Assert.Equal(ModelGrammar.TokenNone, ex.Token);
 		}
 
 		[Fact]
@@ -528,21 +528,21 @@ namespace JsonFx.Serialization
 
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenProperty("AString"),
-				CommonGrammar.TokenPrimitive("Hello world!"),
-				CommonGrammar.TokenProperty("AnInt32"),
-				CommonGrammar.TokenPrimitive(42),
-				CommonGrammar.TokenProperty("AnAnonymous"),
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenProperty("AnotherString"),
-				CommonGrammar.TokenPrimitive("Foo."),
-				CommonGrammar.TokenProperty("AnInt64"),
-				CommonGrammar.TokenPrimitive( ((long)Int32.MaxValue) * 2L ),
-				CommonGrammar.TokenObjectEnd,
-				CommonGrammar.TokenProperty("ADouble"),
-				CommonGrammar.TokenPrimitive(Math.PI),
-				CommonGrammar.TokenObjectEnd
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenProperty("AString"),
+				ModelGrammar.TokenPrimitive("Hello world!"),
+				ModelGrammar.TokenProperty("AnInt32"),
+				ModelGrammar.TokenPrimitive(42),
+				ModelGrammar.TokenProperty("AnAnonymous"),
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenProperty("AnotherString"),
+				ModelGrammar.TokenPrimitive("Foo."),
+				ModelGrammar.TokenProperty("AnInt64"),
+				ModelGrammar.TokenPrimitive( ((long)Int32.MaxValue) * 2L ),
+				ModelGrammar.TokenObjectEnd,
+				ModelGrammar.TokenProperty("ADouble"),
+				ModelGrammar.TokenPrimitive(Math.PI),
+				ModelGrammar.TokenObjectEnd
 			};
 
 			var expected = new
@@ -557,7 +557,7 @@ namespace JsonFx.Serialization
 				ADouble = Math.PI
 			};
 
-			var analyzer = new CommonAnalyzer(new DataReaderSettings());
+			var analyzer = new ModelAnalyzer(new DataReaderSettings());
 			var actual = analyzer.Analyze(input, expected).Single();
 
 			Assert.Equal(expected, actual, false);
@@ -573,16 +573,16 @@ namespace JsonFx.Serialization
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenProperty("foo"),
-				CommonGrammar.TokenPrimitive("hello world"),
-				CommonGrammar.TokenProperty("number"),
-				CommonGrammar.TokenPrimitive(42),
-				CommonGrammar.TokenProperty("boolean"),
-				CommonGrammar.TokenPrimitive(false),
-				CommonGrammar.TokenProperty("null"),
-				CommonGrammar.TokenPrimitive(null),
-				CommonGrammar.TokenObjectEnd
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenProperty("foo"),
+				ModelGrammar.TokenPrimitive("hello world"),
+				ModelGrammar.TokenProperty("number"),
+				ModelGrammar.TokenPrimitive(42),
+				ModelGrammar.TokenProperty("boolean"),
+				ModelGrammar.TokenPrimitive(false),
+				ModelGrammar.TokenProperty("null"),
+				ModelGrammar.TokenPrimitive(null),
+				ModelGrammar.TokenObjectEnd
 			};
 
 			dynamic expected = new DynamicExample();
@@ -591,7 +591,7 @@ namespace JsonFx.Serialization
 			expected.boolean = false;
 			expected.@null = null;
 
-			var analyzer = new CommonAnalyzer(new DataReaderSettings());
+			var analyzer = new ModelAnalyzer(new DataReaderSettings());
 			var actual = analyzer.Analyze<DynamicExample>(input).Single();
 
 			Assert.Equal(expected.Values, actual.Values, false);
@@ -608,118 +608,118 @@ namespace JsonFx.Serialization
 			// input from pass1.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenPrimitive("JSON Test Pattern pass1"),
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenProperty("object with 1 member"),
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenPrimitive("array with 1 element"),
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenObjectEnd,
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenObjectEnd,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenPrimitive(-42),
-				CommonGrammar.TokenTrue,
-				CommonGrammar.TokenFalse,
-				CommonGrammar.TokenNull,
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenProperty("integer"),
-				CommonGrammar.TokenPrimitive(1234567890),
-				CommonGrammar.TokenProperty("real"),
-				CommonGrammar.TokenPrimitive(-9876.543210),
-				CommonGrammar.TokenProperty("e"),
-				CommonGrammar.TokenPrimitive(0.123456789e-12),
-				CommonGrammar.TokenProperty("E"),
-				CommonGrammar.TokenPrimitive(1.234567890E+34),
-				CommonGrammar.TokenProperty(""),
-				CommonGrammar.TokenPrimitive(23456789012E66),
-				CommonGrammar.TokenProperty("zero"),
-				CommonGrammar.TokenPrimitive(0),
-				CommonGrammar.TokenProperty("one"),
-				CommonGrammar.TokenPrimitive(1),
-				CommonGrammar.TokenProperty("space"),
-				CommonGrammar.TokenPrimitive(" "),
-				CommonGrammar.TokenProperty("quote"),
-				CommonGrammar.TokenPrimitive("\""),
-				CommonGrammar.TokenProperty("backslash"),
-				CommonGrammar.TokenPrimitive("\\"),
-				CommonGrammar.TokenProperty("controls"),
-				CommonGrammar.TokenPrimitive("\b\f\n\r\t"),
-				CommonGrammar.TokenProperty("slash"),
-				CommonGrammar.TokenPrimitive("/ & /"),
-				CommonGrammar.TokenProperty("alpha"),
-				CommonGrammar.TokenPrimitive("abcdefghijklmnopqrstuvwyz"),
-				CommonGrammar.TokenProperty("ALPHA"),
-				CommonGrammar.TokenPrimitive("ABCDEFGHIJKLMNOPQRSTUVWYZ"),
-				CommonGrammar.TokenProperty("digit"),
-				CommonGrammar.TokenPrimitive("0123456789"),
-				CommonGrammar.TokenProperty("0123456789"),
-				CommonGrammar.TokenPrimitive("digit"),
-				CommonGrammar.TokenProperty("special"),
-				CommonGrammar.TokenPrimitive("`1~!@#$%^&*()_+-={':[,]}|;.</>?"),
-				CommonGrammar.TokenProperty("hex"),
-				CommonGrammar.TokenPrimitive("\u0123\u4567\u89AB\uCDEF\uabcd\uef4A"),
-				CommonGrammar.TokenProperty("true"),
-				CommonGrammar.TokenTrue,
-				CommonGrammar.TokenProperty("false"),
-				CommonGrammar.TokenFalse,
-				CommonGrammar.TokenProperty("null"),
-				CommonGrammar.TokenNull,
-				CommonGrammar.TokenProperty("array"),
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenProperty("object"),
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenObjectEnd,
-				CommonGrammar.TokenProperty("address"),
-				CommonGrammar.TokenPrimitive("50 St. James Street"),
-				CommonGrammar.TokenProperty("url"),
-				CommonGrammar.TokenPrimitive("http://www.JSON.org/"),
-				CommonGrammar.TokenProperty("comment"),
-				CommonGrammar.TokenPrimitive("// /* <!-- --"),
-				CommonGrammar.TokenProperty("# -- --> */"),
-				CommonGrammar.TokenPrimitive(" "),
-				CommonGrammar.TokenProperty(" s p a c e d "),
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenPrimitive(1),
-				CommonGrammar.TokenPrimitive(2),
-				CommonGrammar.TokenPrimitive(3),
-				CommonGrammar.TokenPrimitive(4),
-				CommonGrammar.TokenPrimitive(5),
-				CommonGrammar.TokenPrimitive(6),
-				CommonGrammar.TokenPrimitive(7),
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenProperty("compact"),
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenPrimitive(1),
-				CommonGrammar.TokenPrimitive(2),
-				CommonGrammar.TokenPrimitive(3),
-				CommonGrammar.TokenPrimitive(4),
-				CommonGrammar.TokenPrimitive(5),
-				CommonGrammar.TokenPrimitive(6),
-				CommonGrammar.TokenPrimitive(7),
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenProperty("jsontext"),
-				CommonGrammar.TokenPrimitive("{\"object with 1 member\":[\"array with 1 element\"]}"),
-				CommonGrammar.TokenProperty("quotes"),
-				CommonGrammar.TokenPrimitive("&#34; \u0022 %22 0x22 034 &#x22;"),
-				CommonGrammar.TokenProperty("/\\\"\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"),
-				CommonGrammar.TokenPrimitive("A key can be any string"),
-				CommonGrammar.TokenObjectEnd,
-				CommonGrammar.TokenPrimitive(0.5),
-				CommonGrammar.TokenPrimitive(98.6),
-				CommonGrammar.TokenPrimitive(99.44),
-				CommonGrammar.TokenPrimitive(1066),
-				CommonGrammar.TokenPrimitive(10.0),
-				CommonGrammar.TokenPrimitive(1.0),
-				CommonGrammar.TokenPrimitive(0.1),
-				CommonGrammar.TokenPrimitive(1.0),
-				CommonGrammar.TokenPrimitive(2.0),
-				CommonGrammar.TokenPrimitive(2.0),
-				CommonGrammar.TokenPrimitive("rosebud"),
-				CommonGrammar.TokenArrayEnd
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenPrimitive("JSON Test Pattern pass1"),
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenProperty("object with 1 member"),
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenPrimitive("array with 1 element"),
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenObjectEnd,
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenObjectEnd,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenPrimitive(-42),
+				ModelGrammar.TokenTrue,
+				ModelGrammar.TokenFalse,
+				ModelGrammar.TokenNull,
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenProperty("integer"),
+				ModelGrammar.TokenPrimitive(1234567890),
+				ModelGrammar.TokenProperty("real"),
+				ModelGrammar.TokenPrimitive(-9876.543210),
+				ModelGrammar.TokenProperty("e"),
+				ModelGrammar.TokenPrimitive(0.123456789e-12),
+				ModelGrammar.TokenProperty("E"),
+				ModelGrammar.TokenPrimitive(1.234567890E+34),
+				ModelGrammar.TokenProperty(""),
+				ModelGrammar.TokenPrimitive(23456789012E66),
+				ModelGrammar.TokenProperty("zero"),
+				ModelGrammar.TokenPrimitive(0),
+				ModelGrammar.TokenProperty("one"),
+				ModelGrammar.TokenPrimitive(1),
+				ModelGrammar.TokenProperty("space"),
+				ModelGrammar.TokenPrimitive(" "),
+				ModelGrammar.TokenProperty("quote"),
+				ModelGrammar.TokenPrimitive("\""),
+				ModelGrammar.TokenProperty("backslash"),
+				ModelGrammar.TokenPrimitive("\\"),
+				ModelGrammar.TokenProperty("controls"),
+				ModelGrammar.TokenPrimitive("\b\f\n\r\t"),
+				ModelGrammar.TokenProperty("slash"),
+				ModelGrammar.TokenPrimitive("/ & /"),
+				ModelGrammar.TokenProperty("alpha"),
+				ModelGrammar.TokenPrimitive("abcdefghijklmnopqrstuvwyz"),
+				ModelGrammar.TokenProperty("ALPHA"),
+				ModelGrammar.TokenPrimitive("ABCDEFGHIJKLMNOPQRSTUVWYZ"),
+				ModelGrammar.TokenProperty("digit"),
+				ModelGrammar.TokenPrimitive("0123456789"),
+				ModelGrammar.TokenProperty("0123456789"),
+				ModelGrammar.TokenPrimitive("digit"),
+				ModelGrammar.TokenProperty("special"),
+				ModelGrammar.TokenPrimitive("`1~!@#$%^&*()_+-={':[,]}|;.</>?"),
+				ModelGrammar.TokenProperty("hex"),
+				ModelGrammar.TokenPrimitive("\u0123\u4567\u89AB\uCDEF\uabcd\uef4A"),
+				ModelGrammar.TokenProperty("true"),
+				ModelGrammar.TokenTrue,
+				ModelGrammar.TokenProperty("false"),
+				ModelGrammar.TokenFalse,
+				ModelGrammar.TokenProperty("null"),
+				ModelGrammar.TokenNull,
+				ModelGrammar.TokenProperty("array"),
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenProperty("object"),
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenObjectEnd,
+				ModelGrammar.TokenProperty("address"),
+				ModelGrammar.TokenPrimitive("50 St. James Street"),
+				ModelGrammar.TokenProperty("url"),
+				ModelGrammar.TokenPrimitive("http://www.JSON.org/"),
+				ModelGrammar.TokenProperty("comment"),
+				ModelGrammar.TokenPrimitive("// /* <!-- --"),
+				ModelGrammar.TokenProperty("# -- --> */"),
+				ModelGrammar.TokenPrimitive(" "),
+				ModelGrammar.TokenProperty(" s p a c e d "),
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenPrimitive(1),
+				ModelGrammar.TokenPrimitive(2),
+				ModelGrammar.TokenPrimitive(3),
+				ModelGrammar.TokenPrimitive(4),
+				ModelGrammar.TokenPrimitive(5),
+				ModelGrammar.TokenPrimitive(6),
+				ModelGrammar.TokenPrimitive(7),
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenProperty("compact"),
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenPrimitive(1),
+				ModelGrammar.TokenPrimitive(2),
+				ModelGrammar.TokenPrimitive(3),
+				ModelGrammar.TokenPrimitive(4),
+				ModelGrammar.TokenPrimitive(5),
+				ModelGrammar.TokenPrimitive(6),
+				ModelGrammar.TokenPrimitive(7),
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenProperty("jsontext"),
+				ModelGrammar.TokenPrimitive("{\"object with 1 member\":[\"array with 1 element\"]}"),
+				ModelGrammar.TokenProperty("quotes"),
+				ModelGrammar.TokenPrimitive("&#34; \u0022 %22 0x22 034 &#x22;"),
+				ModelGrammar.TokenProperty("/\\\"\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"),
+				ModelGrammar.TokenPrimitive("A key can be any string"),
+				ModelGrammar.TokenObjectEnd,
+				ModelGrammar.TokenPrimitive(0.5),
+				ModelGrammar.TokenPrimitive(98.6),
+				ModelGrammar.TokenPrimitive(99.44),
+				ModelGrammar.TokenPrimitive(1066),
+				ModelGrammar.TokenPrimitive(10.0),
+				ModelGrammar.TokenPrimitive(1.0),
+				ModelGrammar.TokenPrimitive(0.1),
+				ModelGrammar.TokenPrimitive(1.0),
+				ModelGrammar.TokenPrimitive(2.0),
+				ModelGrammar.TokenPrimitive(2.0),
+				ModelGrammar.TokenPrimitive("rosebud"),
+				ModelGrammar.TokenArrayEnd
 			};
 
 			var expected = new object[] {
@@ -781,7 +781,7 @@ namespace JsonFx.Serialization
 				"rosebud"
 			};
 
-			var analyzer = new CommonAnalyzer(new DataReaderSettings());
+			var analyzer = new ModelAnalyzer(new DataReaderSettings());
 			var actual = analyzer.Analyze(input).Cast<object[]>().Single();
 
 			Assert.Equal(expected, actual, false);
@@ -795,9 +795,9 @@ namespace JsonFx.Serialization
 		[Trait(TraitName, TraitValue)]
 		public void Analyze_EmptyInput_ReturnsNothing()
 		{
-			var input = Enumerable.Empty<Token<CommonTokenType>>();
+			var input = Enumerable.Empty<Token<ModelTokenType>>();
 
-			var analyzer = new CommonAnalyzer(new DataReaderSettings());
+			var analyzer = new ModelAnalyzer(new DataReaderSettings());
 			Assert.False(analyzer.Analyze<object>(input).Any());
 		}
 
@@ -805,9 +805,9 @@ namespace JsonFx.Serialization
 		[Trait(TraitName, TraitValue)]
 		public void Analyze_NullInput_ThrowsArgumentNullException()
 		{
-			var input = (IEnumerable<Token<CommonTokenType>>)null;
+			var input = (IEnumerable<Token<ModelTokenType>>)null;
 
-			var analyzer = new CommonAnalyzer(new DataReaderSettings());
+			var analyzer = new ModelAnalyzer(new DataReaderSettings());
 
 			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
 				delegate
@@ -826,7 +826,7 @@ namespace JsonFx.Serialization
 			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
 				delegate
 				{
-					var analyzer = new CommonAnalyzer(null);
+					var analyzer = new ModelAnalyzer(null);
 				});
 
 			// verify exception is coming from expected param

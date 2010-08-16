@@ -31,8 +31,8 @@
 using System;
 using System.Collections.Generic;
 
-using JsonFx.Common;
 using JsonFx.Markup;
+using JsonFx.Model;
 using JsonFx.Serialization;
 using JsonFx.Serialization.Filters;
 
@@ -41,7 +41,7 @@ namespace JsonFx.Xml
 	/// <summary>
 	/// XML serializer
 	/// </summary>
-	public partial class XmlWriter : CommonWriter
+	public partial class XmlWriter : ModelWriter
 	{
 		#region Init
 
@@ -67,8 +67,8 @@ namespace JsonFx.Xml
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <param name="filters"></param>
-		public XmlWriter(DataWriterSettings settings, params IDataFilter<CommonTokenType>[] filters)
-			: base(settings, (IEnumerable<IDataFilter<CommonTokenType>>)filters)
+		public XmlWriter(DataWriterSettings settings, params IDataFilter<ModelTokenType>[] filters)
+			: base(settings, (IEnumerable<IDataFilter<ModelTokenType>>)filters)
 		{
 		}
 
@@ -77,7 +77,7 @@ namespace JsonFx.Xml
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <param name="filters"></param>
-		public XmlWriter(DataWriterSettings settings, IEnumerable<IDataFilter<CommonTokenType>> filters)
+		public XmlWriter(DataWriterSettings settings, IEnumerable<IDataFilter<ModelTokenType>> filters)
 			: base(settings, filters)
 		{
 		}
@@ -117,9 +117,9 @@ namespace JsonFx.Xml
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <returns></returns>
-		protected override ITextFormatter<CommonTokenType> GetFormatter()
+		protected override ITextFormatter<ModelTokenType> GetFormatter()
 		{
-			return new TransformFormatter<CommonTokenType, MarkupTokenType>(new XmlFormatter(this.Settings), new XmlOutTransformer(this.Settings));
+			return new TransformFormatter<ModelTokenType, MarkupTokenType>(new XmlFormatter(this.Settings), new XmlOutTransformer(this.Settings));
 		}
 
 		#endregion DataWriter<DataTokenType> Methods

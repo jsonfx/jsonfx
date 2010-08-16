@@ -35,19 +35,19 @@ using System.Text;
 using JsonFx.Serialization;
 using JsonFx.Serialization.Filters;
 
-namespace JsonFx.Common
+namespace JsonFx.Model
 {
 	/// <summary>
 	/// Provides base implementation for standard serializers
 	/// </summary>
-	public abstract partial class CommonWriter : DataWriter<CommonTokenType>
+	public abstract partial class ModelWriter : DataWriter<ModelTokenType>
 	{
 		#region Init
 
 		/// <summary>
 		/// Ctor
 		/// </summary>
-		public CommonWriter()
+		public ModelWriter()
 			: this(new DataWriterSettings())
 		{
 		}
@@ -56,7 +56,7 @@ namespace JsonFx.Common
 		/// Ctor
 		/// </summary>
 		/// <param name="settings"></param>
-		public CommonWriter(DataWriterSettings settings)
+		public ModelWriter(DataWriterSettings settings)
 			: base(settings, null)
 		{
 		}
@@ -66,8 +66,8 @@ namespace JsonFx.Common
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <param name="filters"></param>
-		public CommonWriter(DataWriterSettings settings, params IDataFilter<CommonTokenType>[] filters)
-			: base(settings, (IEnumerable<IDataFilter<CommonTokenType>>)filters)
+		public ModelWriter(DataWriterSettings settings, params IDataFilter<ModelTokenType>[] filters)
+			: base(settings, (IEnumerable<IDataFilter<ModelTokenType>>)filters)
 		{
 		}
 
@@ -76,7 +76,7 @@ namespace JsonFx.Common
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <param name="filters"></param>
-		public CommonWriter(DataWriterSettings settings, IEnumerable<IDataFilter<CommonTokenType>> filters)
+		public ModelWriter(DataWriterSettings settings, IEnumerable<IDataFilter<ModelTokenType>> filters)
 			: base(settings, filters)
 		{
 		}
@@ -102,9 +102,9 @@ namespace JsonFx.Common
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <returns></returns>
-		protected override IObjectWalker<CommonTokenType> GetWalker()
+		protected override IObjectWalker<ModelTokenType> GetWalker()
 		{
-			return new CommonWalker(this.Settings, this.Filters);
+			return new ModelWalker(this.Settings, this.Filters);
 		}
 
 		#endregion DataWriter<DataTokenType> Methods

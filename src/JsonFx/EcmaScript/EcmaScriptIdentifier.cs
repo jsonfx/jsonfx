@@ -31,8 +31,7 @@
 using System;
 using System.IO;
 
-using JsonFx.Common;
-using JsonFx.Json;
+using JsonFx.Model;
 using JsonFx.Serialization;
 
 namespace JsonFx.EcmaScript
@@ -40,7 +39,7 @@ namespace JsonFx.EcmaScript
 	/// <summary>
 	/// Represents an ECMAScript identifier for serialization.
 	/// </summary>
-	public class EcmaScriptIdentifier : ITextFormattable<CommonTokenType>
+	public class EcmaScriptIdentifier : ITextFormattable<ModelTokenType>
 	{
 		#region Fields
 
@@ -313,9 +312,9 @@ namespace JsonFx.EcmaScript
 
 		#endregion Operators
 
-		#region ITextFormattable<CommonTokenType> Members
+		#region ITextFormattable<ModelTokenType> Members
 
-		void ITextFormattable<CommonTokenType>.Format(ITextFormatter<CommonTokenType> formatter, TextWriter writer)
+		void ITextFormattable<ModelTokenType>.Format(ITextFormatter<ModelTokenType> formatter, TextWriter writer)
 		{
 			if (String.IsNullOrEmpty(this.identifier))
 			{
@@ -328,7 +327,7 @@ namespace JsonFx.EcmaScript
 			}
 		}
 
-		#endregion ITextFormattable<CommonTokenType> Members
+		#endregion ITextFormattable<ModelTokenType> Members
 
 		#region Object Overrides
 

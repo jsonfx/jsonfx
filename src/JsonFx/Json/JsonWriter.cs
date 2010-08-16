@@ -31,8 +31,8 @@
 using System;
 using System.Collections.Generic;
 
-using JsonFx.Common;
-using JsonFx.Common.Filters;
+using JsonFx.Model;
+using JsonFx.Model.Filters;
 using JsonFx.Serialization;
 using JsonFx.Serialization.Filters;
 
@@ -41,7 +41,7 @@ namespace JsonFx.Json
 	/// <summary>
 	/// JSON serializer
 	/// </summary>
-	public partial class JsonWriter : CommonWriter
+	public partial class JsonWriter : ModelWriter
 	{
 		#region Init
 
@@ -58,7 +58,7 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="settings"></param>
 		public JsonWriter(DataWriterSettings settings)
-			: base(settings, new IDataFilter<CommonTokenType>[] { new Iso8601DateFilter() })
+			: base(settings, new IDataFilter<ModelTokenType>[] { new Iso8601DateFilter() })
 		{
 		}
 
@@ -67,8 +67,8 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <param name="filters"></param>
-		public JsonWriter(DataWriterSettings settings, params IDataFilter<CommonTokenType>[] filters)
-			: base(settings, (IEnumerable<IDataFilter<CommonTokenType>>)filters)
+		public JsonWriter(DataWriterSettings settings, params IDataFilter<ModelTokenType>[] filters)
+			: base(settings, (IEnumerable<IDataFilter<ModelTokenType>>)filters)
 		{
 		}
 
@@ -77,7 +77,7 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <param name="filters"></param>
-		public JsonWriter(DataWriterSettings settings, IEnumerable<IDataFilter<CommonTokenType>> filters)
+		public JsonWriter(DataWriterSettings settings, IEnumerable<IDataFilter<ModelTokenType>> filters)
 			: base(settings, filters)
 		{
 		}
@@ -116,7 +116,7 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <returns></returns>
-		protected override ITextFormatter<CommonTokenType> GetFormatter()
+		protected override ITextFormatter<ModelTokenType> GetFormatter()
 		{
 			return new JsonWriter.JsonFormatter(this.Settings);
 		}

@@ -35,19 +35,19 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
-using JsonFx.Common;
+using JsonFx.Model;
 using JsonFx.Serialization;
 
 namespace JsonFx.Linq
 {
 	internal class ExpressionWalker :
-		ExpressionVisitor<List<Token<CommonTokenType>>>,
-		IObjectWalker<CommonTokenType>,
+		ExpressionVisitor<List<Token<ModelTokenType>>>,
+		IObjectWalker<ModelTokenType>,
 		IQueryTextProvider
 	{
 		#region Fields
 
-		private readonly ITextFormatter<CommonTokenType> Formatter;
+		private readonly ITextFormatter<ModelTokenType> Formatter;
 
 		#endregion Fields
 
@@ -57,7 +57,7 @@ namespace JsonFx.Linq
 		/// 
 		/// </summary>
 		/// <param name="formatter"></param>
-		public ExpressionWalker(ITextFormatter<CommonTokenType> formatter)
+		public ExpressionWalker(ITextFormatter<ModelTokenType> formatter)
 		{
 			if (formatter == null)
 			{
@@ -71,28 +71,28 @@ namespace JsonFx.Linq
 
 		#region Visit Methods
 
-		protected override Expression Visit(Expression expression, List<Token<CommonTokenType>> tokens)
+		protected override Expression Visit(Expression expression, List<Token<ModelTokenType>> tokens)
 		{
 			if (expression == null)
 			{
-				tokens.Add(CommonGrammar.TokenNull);
+				tokens.Add(ModelGrammar.TokenNull);
 			}
 
 			return base.Visit(expression, tokens);
 		}
 
-		protected override Expression VisitUnknown(Expression expression, List<Token<CommonTokenType>> tokens)
+		protected override Expression VisitUnknown(Expression expression, List<Token<ModelTokenType>> tokens)
 		{
-			tokens.Add(CommonGrammar.TokenPrimitive(expression.NodeType));
+			tokens.Add(ModelGrammar.TokenPrimitive(expression.NodeType));
 
 			return expression;
 		}
 
-		protected override ElementInit VisitElementInitializer(ElementInit init, List<Token<CommonTokenType>> tokens)
+		protected override ElementInit VisitElementInitializer(ElementInit init, List<Token<ModelTokenType>> tokens)
 		{
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
-			tokens.Add(CommonGrammar.TokenProperty("ElementInit"));
-			tokens.Add(CommonGrammar.TokenArrayBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenProperty("ElementInit"));
+			tokens.Add(ModelGrammar.TokenArrayBeginUnnamed);
 
 			try
 			{
@@ -103,26 +103,26 @@ namespace JsonFx.Linq
 			}
 			finally
 			{
-				tokens.Add(CommonGrammar.TokenArrayEnd);
-				tokens.Add(CommonGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenArrayEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
 			}
 		}
 
-		protected override Expression VisitUnary(UnaryExpression expression, List<Token<CommonTokenType>> tokens)
+		protected override Expression VisitUnary(UnaryExpression expression, List<Token<ModelTokenType>> tokens)
 		{
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
-			tokens.Add(CommonGrammar.TokenProperty(expression.NodeType));
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenProperty(expression.NodeType));
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
 
 			try
 			{
-				tokens.Add(CommonGrammar.TokenProperty("Type"));
-				tokens.Add(CommonGrammar.TokenPrimitive(ExpressionWalker.GetTypeName(expression.Type)));
+				tokens.Add(ModelGrammar.TokenProperty("Type"));
+				tokens.Add(ModelGrammar.TokenPrimitive(ExpressionWalker.GetTypeName(expression.Type)));
 
-				tokens.Add(CommonGrammar.TokenProperty("Method"));
-				tokens.Add(CommonGrammar.TokenPrimitive(ExpressionWalker.GetMemberName(expression.Method)));
+				tokens.Add(ModelGrammar.TokenProperty("Method"));
+				tokens.Add(ModelGrammar.TokenPrimitive(ExpressionWalker.GetMemberName(expression.Method)));
 
-				tokens.Add(CommonGrammar.TokenProperty("Operand"));
+				tokens.Add(ModelGrammar.TokenProperty("Operand"));
 				this.Visit(expression.Operand, tokens);
 
 				// no change
@@ -130,56 +130,56 @@ namespace JsonFx.Linq
 			}
 			finally
 			{
-				tokens.Add(CommonGrammar.TokenObjectEnd);
-				tokens.Add(CommonGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
 			}
 		}
 
-		protected override Expression VisitBinary(BinaryExpression expression, List<Token<CommonTokenType>> tokens)
+		protected override Expression VisitBinary(BinaryExpression expression, List<Token<ModelTokenType>> tokens)
 		{
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
-			tokens.Add(CommonGrammar.TokenProperty(expression.NodeType));
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenProperty(expression.NodeType));
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
 
 			try
 			{
-				tokens.Add(CommonGrammar.TokenProperty("Left"));
+				tokens.Add(ModelGrammar.TokenProperty("Left"));
 				this.Visit(expression.Left, tokens);
 
-				tokens.Add(CommonGrammar.TokenProperty("Right"));
+				tokens.Add(ModelGrammar.TokenProperty("Right"));
 				this.Visit(expression.Right, tokens);
 
-				tokens.Add(CommonGrammar.TokenProperty("Conversion"));
+				tokens.Add(ModelGrammar.TokenProperty("Conversion"));
 				this.Visit(expression.Conversion, tokens);
 
-				tokens.Add(CommonGrammar.TokenProperty("IsLiftedToNull"));
-				tokens.Add(CommonGrammar.TokenPrimitive(expression.IsLiftedToNull));
+				tokens.Add(ModelGrammar.TokenProperty("IsLiftedToNull"));
+				tokens.Add(ModelGrammar.TokenPrimitive(expression.IsLiftedToNull));
 
-				tokens.Add(CommonGrammar.TokenProperty("Method"));
-				tokens.Add(CommonGrammar.TokenPrimitive(ExpressionWalker.GetMemberName(expression.Method)));
+				tokens.Add(ModelGrammar.TokenProperty("Method"));
+				tokens.Add(ModelGrammar.TokenPrimitive(ExpressionWalker.GetMemberName(expression.Method)));
 
 				// no change
 				return expression;
 			}
 			finally
 			{
-				tokens.Add(CommonGrammar.TokenObjectEnd);
-				tokens.Add(CommonGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
 			}
 		}
 
-		protected override Expression VisitTypeIs(TypeBinaryExpression expression, List<Token<CommonTokenType>> tokens)
+		protected override Expression VisitTypeIs(TypeBinaryExpression expression, List<Token<ModelTokenType>> tokens)
 		{
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
-			tokens.Add(CommonGrammar.TokenProperty(expression.NodeType));
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenProperty(expression.NodeType));
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
 
 			try
 			{
-				tokens.Add(CommonGrammar.TokenProperty("TypeOperand"));
-				tokens.Add(CommonGrammar.TokenPrimitive(expression.TypeOperand));
+				tokens.Add(ModelGrammar.TokenProperty("TypeOperand"));
+				tokens.Add(ModelGrammar.TokenPrimitive(expression.TypeOperand));
 
-				tokens.Add(CommonGrammar.TokenProperty("Expression"));
+				tokens.Add(ModelGrammar.TokenProperty("Expression"));
 				this.Visit(expression.Expression, tokens);
 
 				// no change
@@ -187,37 +187,37 @@ namespace JsonFx.Linq
 			}
 			finally
 			{
-				tokens.Add(CommonGrammar.TokenObjectEnd);
-				tokens.Add(CommonGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
 			}
 		}
 
-		protected override Expression VisitConstant(ConstantExpression expression, List<Token<CommonTokenType>> tokens)
+		protected override Expression VisitConstant(ConstantExpression expression, List<Token<ModelTokenType>> tokens)
 		{
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
-			tokens.Add(CommonGrammar.TokenProperty(expression.NodeType));
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenProperty(expression.NodeType));
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
 
 			try
 			{
-				tokens.Add(CommonGrammar.TokenProperty("Type"));
-				tokens.Add(CommonGrammar.TokenPrimitive(ExpressionWalker.GetTypeName(expression.Type)));
+				tokens.Add(ModelGrammar.TokenProperty("Type"));
+				tokens.Add(ModelGrammar.TokenPrimitive(ExpressionWalker.GetTypeName(expression.Type)));
 
-				tokens.Add(CommonGrammar.TokenProperty("Value"));
+				tokens.Add(ModelGrammar.TokenProperty("Value"));
 				if (expression.Type == null || expression.Value == null)
 				{
-					tokens.Add(CommonGrammar.TokenNull);
+					tokens.Add(ModelGrammar.TokenNull);
 				}
 				else if (typeof(IQueryable).IsAssignableFrom(expression.Type))
 				{
 					// prevent recursively walking Query<T>
-					tokens.Add(CommonGrammar.TokenPrimitive("[ ... ]"));
+					tokens.Add(ModelGrammar.TokenPrimitive("[ ... ]"));
 				}
 				else
 				{
-					//var value = new CommonWalker(new DataWriterSettings()).GetTokens(expression.Value);
+					//var value = new ModelWalker(new DataWriterSettings()).GetTokens(expression.Value);
 					//tokens.AddRange(value);
-					tokens.Add(CommonGrammar.TokenPrimitive(Token<CommonTokenType>.ToString(expression.Value)));
+					tokens.Add(ModelGrammar.TokenPrimitive(Token<ModelTokenType>.ToString(expression.Value)));
 				}
 
 				// no change
@@ -225,26 +225,26 @@ namespace JsonFx.Linq
 			}
 			finally
 			{
-				tokens.Add(CommonGrammar.TokenObjectEnd);
-				tokens.Add(CommonGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
 			}
 		}
 
-		protected override Expression VisitConditional(ConditionalExpression expression, List<Token<CommonTokenType>> tokens)
+		protected override Expression VisitConditional(ConditionalExpression expression, List<Token<ModelTokenType>> tokens)
 		{
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
-			tokens.Add(CommonGrammar.TokenProperty(expression.NodeType));
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenProperty(expression.NodeType));
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
 
 			try
 			{
-				tokens.Add(CommonGrammar.TokenProperty("Test"));
+				tokens.Add(ModelGrammar.TokenProperty("Test"));
 				this.Visit(expression.Test, tokens);
 
-				tokens.Add(CommonGrammar.TokenProperty("IfTrue"));
+				tokens.Add(ModelGrammar.TokenProperty("IfTrue"));
 				this.Visit(expression.IfTrue, tokens);
 
-				tokens.Add(CommonGrammar.TokenProperty("IfFalse"));
+				tokens.Add(ModelGrammar.TokenProperty("IfFalse"));
 				this.Visit(expression.IfFalse, tokens);
 
 				// no change
@@ -252,38 +252,38 @@ namespace JsonFx.Linq
 			}
 			finally
 			{
-				tokens.Add(CommonGrammar.TokenObjectEnd);
-				tokens.Add(CommonGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
 			}
 		}
 
-		protected override ParameterExpression VisitParameter(ParameterExpression expression, List<Token<CommonTokenType>> tokens)
+		protected override ParameterExpression VisitParameter(ParameterExpression expression, List<Token<ModelTokenType>> tokens)
 		{
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
-			tokens.Add(CommonGrammar.TokenProperty(expression.NodeType));
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenProperty(expression.NodeType));
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
 
 			try
 			{
-				tokens.Add(CommonGrammar.TokenProperty("Type"));
-				tokens.Add(CommonGrammar.TokenPrimitive(ExpressionWalker.GetTypeName(expression.Type)));
+				tokens.Add(ModelGrammar.TokenProperty("Type"));
+				tokens.Add(ModelGrammar.TokenPrimitive(ExpressionWalker.GetTypeName(expression.Type)));
 
-				tokens.Add(CommonGrammar.TokenProperty("Name"));
-				tokens.Add(CommonGrammar.TokenPrimitive(expression.Name));
+				tokens.Add(ModelGrammar.TokenProperty("Name"));
+				tokens.Add(ModelGrammar.TokenPrimitive(expression.Name));
 
 				// no change
 				return expression;
 			}
 			finally
 			{
-				tokens.Add(CommonGrammar.TokenObjectEnd);
-				tokens.Add(CommonGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
 			}
 		}
 
-		protected override IEnumerable<ParameterExpression> VisitParameterList(IList<ParameterExpression> list, List<Token<CommonTokenType>> tokens)
+		protected override IEnumerable<ParameterExpression> VisitParameterList(IList<ParameterExpression> list, List<Token<ModelTokenType>> tokens)
 		{
-			tokens.Add(CommonGrammar.TokenArrayBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenArrayBeginUnnamed);
 			try
 			{
 				foreach (var item in list)
@@ -296,22 +296,22 @@ namespace JsonFx.Linq
 			}
 			finally
 			{
-				tokens.Add(CommonGrammar.TokenArrayEnd);
+				tokens.Add(ModelGrammar.TokenArrayEnd);
 			}
 		}
 
-		protected override Expression VisitMemberAccess(MemberExpression expression, List<Token<CommonTokenType>> tokens)
+		protected override Expression VisitMemberAccess(MemberExpression expression, List<Token<ModelTokenType>> tokens)
 		{
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
-			tokens.Add(CommonGrammar.TokenProperty(expression.NodeType));
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenProperty(expression.NodeType));
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
 
 			try
 			{
-				tokens.Add(CommonGrammar.TokenProperty("Member"));
-				tokens.Add(CommonGrammar.TokenPrimitive(ExpressionWalker.GetMemberName(expression.Member)));
+				tokens.Add(ModelGrammar.TokenProperty("Member"));
+				tokens.Add(ModelGrammar.TokenPrimitive(ExpressionWalker.GetMemberName(expression.Member)));
 
-				tokens.Add(CommonGrammar.TokenProperty("Expression"));
+				tokens.Add(ModelGrammar.TokenProperty("Expression"));
 				this.Visit(expression.Expression, tokens);
 
 				// no change
@@ -319,26 +319,26 @@ namespace JsonFx.Linq
 			}
 			finally
 			{
-				tokens.Add(CommonGrammar.TokenObjectEnd);
-				tokens.Add(CommonGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
 			}
 		}
 
-		protected override Expression VisitMethodCall(MethodCallExpression expression, List<Token<CommonTokenType>> tokens)
+		protected override Expression VisitMethodCall(MethodCallExpression expression, List<Token<ModelTokenType>> tokens)
 		{
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
-			tokens.Add(CommonGrammar.TokenProperty(expression.NodeType));
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenProperty(expression.NodeType));
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
 
 			try
 			{
-				tokens.Add(CommonGrammar.TokenProperty("Object"));
+				tokens.Add(ModelGrammar.TokenProperty("Object"));
 				this.Visit(expression.Object, tokens);
 
-				tokens.Add(CommonGrammar.TokenProperty("Method"));
-				tokens.Add(CommonGrammar.TokenPrimitive(ExpressionWalker.GetMemberName(expression.Method)));
+				tokens.Add(ModelGrammar.TokenProperty("Method"));
+				tokens.Add(ModelGrammar.TokenPrimitive(ExpressionWalker.GetMemberName(expression.Method)));
 
-				tokens.Add(CommonGrammar.TokenProperty("Arguments"));
+				tokens.Add(ModelGrammar.TokenProperty("Arguments"));
 
 				this.VisitExpressionList(expression.Arguments, tokens);
 
@@ -347,14 +347,14 @@ namespace JsonFx.Linq
 			}
 			finally
 			{
-				tokens.Add(CommonGrammar.TokenObjectEnd);
-				tokens.Add(CommonGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
 			}
 		}
 
-		protected override IEnumerable<Expression> VisitExpressionList(IList<Expression> list, List<Token<CommonTokenType>> tokens)
+		protected override IEnumerable<Expression> VisitExpressionList(IList<Expression> list, List<Token<ModelTokenType>> tokens)
 		{
-			tokens.Add(CommonGrammar.TokenArrayBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenArrayBeginUnnamed);
 
 			try
 			{
@@ -368,22 +368,22 @@ namespace JsonFx.Linq
 			}
 			finally
 			{
-				tokens.Add(CommonGrammar.TokenArrayEnd);
+				tokens.Add(ModelGrammar.TokenArrayEnd);
 			}
 		}
 
-		protected override MemberAssignment VisitMemberAssignment(MemberAssignment assignment, List<Token<CommonTokenType>> tokens)
+		protected override MemberAssignment VisitMemberAssignment(MemberAssignment assignment, List<Token<ModelTokenType>> tokens)
 		{
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
-			tokens.Add(CommonGrammar.TokenProperty("MemberAssignment"));
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenProperty("MemberAssignment"));
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
 
 			try
 			{
-				tokens.Add(CommonGrammar.TokenProperty("Member"));
-				tokens.Add(CommonGrammar.TokenPrimitive(ExpressionWalker.GetMemberName(assignment.Member)));
+				tokens.Add(ModelGrammar.TokenProperty("Member"));
+				tokens.Add(ModelGrammar.TokenPrimitive(ExpressionWalker.GetMemberName(assignment.Member)));
 
-				tokens.Add(CommonGrammar.TokenProperty("Expression"));
+				tokens.Add(ModelGrammar.TokenProperty("Expression"));
 				this.Visit(assignment.Expression, tokens);
 
 				// no change
@@ -391,23 +391,23 @@ namespace JsonFx.Linq
 			}
 			finally
 			{
-				tokens.Add(CommonGrammar.TokenObjectEnd);
-				tokens.Add(CommonGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
 			}
 		}
 
-		protected override MemberMemberBinding VisitMemberMemberBinding(MemberMemberBinding binding, List<Token<CommonTokenType>> tokens)
+		protected override MemberMemberBinding VisitMemberMemberBinding(MemberMemberBinding binding, List<Token<ModelTokenType>> tokens)
 		{
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
-			tokens.Add(CommonGrammar.TokenProperty("MemberMemberBinding"));
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenProperty("MemberMemberBinding"));
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
 
 			try
 			{
-				tokens.Add(CommonGrammar.TokenProperty("Member"));
-				tokens.Add(CommonGrammar.TokenPrimitive(ExpressionWalker.GetMemberName(binding.Member)));
+				tokens.Add(ModelGrammar.TokenProperty("Member"));
+				tokens.Add(ModelGrammar.TokenPrimitive(ExpressionWalker.GetMemberName(binding.Member)));
 
-				tokens.Add(CommonGrammar.TokenProperty("Bindings"));
+				tokens.Add(ModelGrammar.TokenProperty("Bindings"));
 				this.VisitBindingList(binding.Bindings, tokens);
 
 				// no change
@@ -415,23 +415,23 @@ namespace JsonFx.Linq
 			}
 			finally
 			{
-				tokens.Add(CommonGrammar.TokenObjectEnd);
-				tokens.Add(CommonGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
 			}
 		}
 
-		protected override MemberListBinding VisitMemberListBinding(MemberListBinding binding, List<Token<CommonTokenType>> tokens)
+		protected override MemberListBinding VisitMemberListBinding(MemberListBinding binding, List<Token<ModelTokenType>> tokens)
 		{
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
-			tokens.Add(CommonGrammar.TokenProperty("MemberListBinding"));
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenProperty("MemberListBinding"));
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
 
 			try
 			{
-				tokens.Add(CommonGrammar.TokenProperty("Member"));
-				tokens.Add(CommonGrammar.TokenPrimitive(ExpressionWalker.GetMemberName(binding.Member)));
+				tokens.Add(ModelGrammar.TokenProperty("Member"));
+				tokens.Add(ModelGrammar.TokenPrimitive(ExpressionWalker.GetMemberName(binding.Member)));
 
-				tokens.Add(CommonGrammar.TokenProperty("Initializers"));
+				tokens.Add(ModelGrammar.TokenProperty("Initializers"));
 				this.VisitElementInitializerList(binding.Initializers, tokens);
 
 				// no change
@@ -439,14 +439,14 @@ namespace JsonFx.Linq
 			}
 			finally
 			{
-				tokens.Add(CommonGrammar.TokenObjectEnd);
-				tokens.Add(CommonGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
 			}
 		}
 
-		protected override IEnumerable<MemberBinding> VisitBindingList(IList<MemberBinding> list, List<Token<CommonTokenType>> tokens)
+		protected override IEnumerable<MemberBinding> VisitBindingList(IList<MemberBinding> list, List<Token<ModelTokenType>> tokens)
 		{
-			tokens.Add(CommonGrammar.TokenArrayBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenArrayBeginUnnamed);
 
 			try
 			{
@@ -460,13 +460,13 @@ namespace JsonFx.Linq
 			}
 			finally
 			{
-				tokens.Add(CommonGrammar.TokenArrayEnd);
+				tokens.Add(ModelGrammar.TokenArrayEnd);
 			}
 		}
 
-		protected override IEnumerable<ElementInit> VisitElementInitializerList(IList<ElementInit> list, List<Token<CommonTokenType>> tokens)
+		protected override IEnumerable<ElementInit> VisitElementInitializerList(IList<ElementInit> list, List<Token<ModelTokenType>> tokens)
 		{
-			tokens.Add(CommonGrammar.TokenArrayBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenArrayBeginUnnamed);
 
 			try
 			{
@@ -480,66 +480,66 @@ namespace JsonFx.Linq
 			}
 			finally
 			{
-				tokens.Add(CommonGrammar.TokenArrayEnd);
+				tokens.Add(ModelGrammar.TokenArrayEnd);
 			}
 		}
 
-		protected override Expression VisitLambda(LambdaExpression expression, List<Token<CommonTokenType>> tokens)
+		protected override Expression VisitLambda(LambdaExpression expression, List<Token<ModelTokenType>> tokens)
 		{
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
-			tokens.Add(CommonGrammar.TokenProperty(expression.NodeType));
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenProperty(expression.NodeType));
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
 
 			try
 			{
-				tokens.Add(CommonGrammar.TokenProperty("Type"));
-				tokens.Add(CommonGrammar.TokenPrimitive(ExpressionWalker.GetTypeName(expression.Type)));
+				tokens.Add(ModelGrammar.TokenProperty("Type"));
+				tokens.Add(ModelGrammar.TokenPrimitive(ExpressionWalker.GetTypeName(expression.Type)));
 
-				tokens.Add(CommonGrammar.TokenProperty("Body"));
+				tokens.Add(ModelGrammar.TokenProperty("Body"));
 				Expression body = this.Visit(expression.Body, tokens);
 
-				tokens.Add(CommonGrammar.TokenProperty("Parameters"));
-				tokens.Add(CommonGrammar.TokenArrayBeginUnnamed);
+				tokens.Add(ModelGrammar.TokenProperty("Parameters"));
+				tokens.Add(ModelGrammar.TokenArrayBeginUnnamed);
 				foreach (ParameterExpression param in expression.Parameters)
 				{
 					this.VisitParameter(param, tokens);
 				}
-				tokens.Add(CommonGrammar.TokenArrayEnd);
+				tokens.Add(ModelGrammar.TokenArrayEnd);
 
 				// no change
 				return expression;
 			}
 			finally
 			{
-				tokens.Add(CommonGrammar.TokenObjectEnd);
-				tokens.Add(CommonGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
 			}
 		}
 
-		protected override NewExpression VisitNew(NewExpression expression, List<Token<CommonTokenType>> tokens)
+		protected override NewExpression VisitNew(NewExpression expression, List<Token<ModelTokenType>> tokens)
 		{
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
-			tokens.Add(CommonGrammar.TokenProperty(expression.NodeType));
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenProperty(expression.NodeType));
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
 
 			try
 			{
-				tokens.Add(CommonGrammar.TokenProperty("Arguments"));
+				tokens.Add(ModelGrammar.TokenProperty("Arguments"));
 				this.VisitExpressionList(expression.Arguments, tokens);
 
-				tokens.Add(CommonGrammar.TokenProperty("Members"));
+				tokens.Add(ModelGrammar.TokenProperty("Members"));
 				if (expression.Members == null)
 				{
-					tokens.Add(CommonGrammar.TokenNull);
+					tokens.Add(ModelGrammar.TokenNull);
 				}
 				else
 				{
-					tokens.Add(CommonGrammar.TokenArrayBeginUnnamed);
+					tokens.Add(ModelGrammar.TokenArrayBeginUnnamed);
 					foreach (var member in expression.Members)
 					{
-						tokens.Add(CommonGrammar.TokenPrimitive(ExpressionWalker.GetMemberName(member)));
+						tokens.Add(ModelGrammar.TokenPrimitive(ExpressionWalker.GetMemberName(member)));
 					}
-					tokens.Add(CommonGrammar.TokenArrayEnd);
+					tokens.Add(ModelGrammar.TokenArrayEnd);
 				}
 
 				// no change
@@ -547,23 +547,23 @@ namespace JsonFx.Linq
 			}
 			finally
 			{
-				tokens.Add(CommonGrammar.TokenObjectEnd);
-				tokens.Add(CommonGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
 			}
 		}
 
-		protected override Expression VisitMemberInit(MemberInitExpression expression, List<Token<CommonTokenType>> tokens)
+		protected override Expression VisitMemberInit(MemberInitExpression expression, List<Token<ModelTokenType>> tokens)
 		{
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
-			tokens.Add(CommonGrammar.TokenProperty(expression.NodeType));
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenProperty(expression.NodeType));
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
 
 			try
 			{
-				tokens.Add(CommonGrammar.TokenProperty("NewExpression"));
+				tokens.Add(ModelGrammar.TokenProperty("NewExpression"));
 				this.VisitNew(expression.NewExpression, tokens);
 
-				tokens.Add(CommonGrammar.TokenProperty("Bindings"));
+				tokens.Add(ModelGrammar.TokenProperty("Bindings"));
 				this.VisitBindingList(expression.Bindings, tokens);
 
 				// no change
@@ -571,23 +571,23 @@ namespace JsonFx.Linq
 			}
 			finally
 			{
-				tokens.Add(CommonGrammar.TokenObjectEnd);
-				tokens.Add(CommonGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
 			}
 		}
 
-		protected override Expression VisitListInit(ListInitExpression expression, List<Token<CommonTokenType>> tokens)
+		protected override Expression VisitListInit(ListInitExpression expression, List<Token<ModelTokenType>> tokens)
 		{
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
-			tokens.Add(CommonGrammar.TokenProperty(expression.NodeType));
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenProperty(expression.NodeType));
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
 
 			try
 			{
-				tokens.Add(CommonGrammar.TokenProperty("NewExpression"));
+				tokens.Add(ModelGrammar.TokenProperty("NewExpression"));
 				NewExpression ctor = this.VisitNew(expression.NewExpression, tokens);
 
-				tokens.Add(CommonGrammar.TokenProperty("Initializers"));
+				tokens.Add(ModelGrammar.TokenProperty("Initializers"));
 				this.VisitElementInitializerList(expression.Initializers, tokens);
 
 				// no change
@@ -595,23 +595,23 @@ namespace JsonFx.Linq
 			}
 			finally
 			{
-				tokens.Add(CommonGrammar.TokenObjectEnd);
-				tokens.Add(CommonGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
 			}
 		}
 
-		protected override Expression VisitNewArray(NewArrayExpression expression, List<Token<CommonTokenType>> tokens)
+		protected override Expression VisitNewArray(NewArrayExpression expression, List<Token<ModelTokenType>> tokens)
 		{
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
-			tokens.Add(CommonGrammar.TokenProperty(expression.NodeType));
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenProperty(expression.NodeType));
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
 
 			try
 			{
-				tokens.Add(CommonGrammar.TokenProperty("ElementType"));
-				tokens.Add(CommonGrammar.TokenPrimitive(expression.Type.GetElementType()));
+				tokens.Add(ModelGrammar.TokenProperty("ElementType"));
+				tokens.Add(ModelGrammar.TokenPrimitive(expression.Type.GetElementType()));
 
-				tokens.Add(CommonGrammar.TokenProperty("Expressions"));
+				tokens.Add(ModelGrammar.TokenProperty("Expressions"));
 				this.VisitExpressionList(expression.Expressions, tokens);
 
 				// no change
@@ -619,23 +619,23 @@ namespace JsonFx.Linq
 			}
 			finally
 			{
-				tokens.Add(CommonGrammar.TokenObjectEnd);
-				tokens.Add(CommonGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
 			}
 		}
 
-		protected override Expression VisitInvocation(InvocationExpression expression, List<Token<CommonTokenType>> tokens)
+		protected override Expression VisitInvocation(InvocationExpression expression, List<Token<ModelTokenType>> tokens)
 		{
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
-			tokens.Add(CommonGrammar.TokenProperty(expression.NodeType));
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenProperty(expression.NodeType));
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
 
 			try
 			{
-				tokens.Add(CommonGrammar.TokenProperty("Arguments"));
+				tokens.Add(ModelGrammar.TokenProperty("Arguments"));
 				this.VisitExpressionList(expression.Arguments, tokens);
 
-				tokens.Add(CommonGrammar.TokenProperty("Expression"));
+				tokens.Add(ModelGrammar.TokenProperty("Expression"));
 				Expression expr = this.Visit(expression.Expression, tokens);
 
 				// no change
@@ -643,24 +643,24 @@ namespace JsonFx.Linq
 			}
 			finally
 			{
-				tokens.Add(CommonGrammar.TokenObjectEnd);
-				tokens.Add(CommonGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
 			}
 		}
 
 #if NET40
-		protected override Expression VisitBlock(BlockExpression expression, List<Token<CommonTokenType>> tokens)
+		protected override Expression VisitBlock(BlockExpression expression, List<Token<ModelTokenType>> tokens)
 		{
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
-			tokens.Add(CommonGrammar.TokenProperty(expression.NodeType));
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenProperty(expression.NodeType));
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
 
 			try
 			{
-				tokens.Add(CommonGrammar.TokenProperty("Variables"));
+				tokens.Add(ModelGrammar.TokenProperty("Variables"));
 				this.VisitParameterList(expression.Variables, tokens);
 
-				tokens.Add(CommonGrammar.TokenProperty("Expressions"));
+				tokens.Add(ModelGrammar.TokenProperty("Expressions"));
 				this.VisitExpressionList(expression.Expressions, tokens);
 
 				// no change
@@ -668,53 +668,53 @@ namespace JsonFx.Linq
 			}
 			finally
 			{
-				tokens.Add(CommonGrammar.TokenObjectEnd);
-				tokens.Add(CommonGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
 			}
 		}
 
-		protected override Expression VisitDynamic(DynamicExpression expression, List<Token<CommonTokenType>> tokens)
+		protected override Expression VisitDynamic(DynamicExpression expression, List<Token<ModelTokenType>> tokens)
 		{
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
-			tokens.Add(CommonGrammar.TokenProperty(expression.NodeType));
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenProperty(expression.NodeType));
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
 
 			try
 			{
-				tokens.Add(CommonGrammar.TokenProperty("Arguments"));
+				tokens.Add(ModelGrammar.TokenProperty("Arguments"));
 				this.VisitExpressionList(expression.Arguments, tokens);
 
-				tokens.Add(CommonGrammar.TokenProperty("Binder"));
-				tokens.Add(CommonGrammar.TokenPrimitive(expression.Binder != null ? expression.Binder.GetType().Name : null));
+				tokens.Add(ModelGrammar.TokenProperty("Binder"));
+				tokens.Add(ModelGrammar.TokenPrimitive(expression.Binder != null ? expression.Binder.GetType().Name : null));
 
 				// no change
 				return expression;
 			}
 			finally
 			{
-				tokens.Add(CommonGrammar.TokenObjectEnd);
-				tokens.Add(CommonGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
 			}
 		}
 
-		protected override Expression VisitDefault(DefaultExpression expression, List<Token<CommonTokenType>> tokens)
+		protected override Expression VisitDefault(DefaultExpression expression, List<Token<ModelTokenType>> tokens)
 		{
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
-			tokens.Add(CommonGrammar.TokenProperty(expression.NodeType));
-			tokens.Add(CommonGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
+			tokens.Add(ModelGrammar.TokenProperty(expression.NodeType));
+			tokens.Add(ModelGrammar.TokenObjectBeginUnnamed);
 
 			try
 			{
-				tokens.Add(CommonGrammar.TokenProperty("Type"));
-				tokens.Add(CommonGrammar.TokenPrimitive(ExpressionWalker.GetTypeName(expression.Type)));
+				tokens.Add(ModelGrammar.TokenProperty("Type"));
+				tokens.Add(ModelGrammar.TokenPrimitive(ExpressionWalker.GetTypeName(expression.Type)));
 
 				// no change
 				return expression;
 			}
 			finally
 			{
-				tokens.Add(CommonGrammar.TokenObjectEnd);
-				tokens.Add(CommonGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
 			}
 		}
 #endif
@@ -742,28 +742,28 @@ namespace JsonFx.Linq
 
 		#endregion IQueryTextProvider Members
 
-		#region IObjectWalker<Token<CommonTokenType>> Members
+		#region IObjectWalker<Token<ModelTokenType>> Members
 
-		IEnumerable<Token<CommonTokenType>> IObjectWalker<CommonTokenType>.GetTokens(object value)
+		IEnumerable<Token<ModelTokenType>> IObjectWalker<ModelTokenType>.GetTokens(object value)
 		{
 			return this.GetTokens(value as Expression);
 		}
 
-		public IEnumerable<Token<CommonTokenType>> GetTokens(Expression expression)
+		public IEnumerable<Token<ModelTokenType>> GetTokens(Expression expression)
 		{
 			if (expression == null)
 			{
 				throw new InvalidOperationException("ExpressionWalker only walks expressions.");
 			}
 
-			var tokens = new List<Token<CommonTokenType>>();
+			var tokens = new List<Token<ModelTokenType>>();
 
 			this.Visit(expression, tokens);
 
 			return tokens;
 		}
 
-		#endregion IObjectWalker<Token<CommonTokenType>> Members
+		#endregion IObjectWalker<Token<ModelTokenType>> Members
 
 		#region Utility Methods
 

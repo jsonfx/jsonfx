@@ -34,7 +34,7 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
-using JsonFx.Common;
+using JsonFx.Model;
 using JsonFx.Serialization;
 
 namespace JsonFx.Bson
@@ -44,7 +44,7 @@ namespace JsonFx.Bson
 		/// <summary>
 		/// Generates a sequence of tokens from BSON bytes
 		/// </summary>
-		public class BsonTokenizer : IBinaryTokenizer<CommonTokenType>
+		public class BsonTokenizer : IBinaryTokenizer<ModelTokenType>
 		{
 			#region Constants
 
@@ -75,7 +75,7 @@ namespace JsonFx.Bson
 
 			#region Scanning Methods
 
-			private static void ReadDocument(List<Token<CommonTokenType>> tokens, BinaryReader reader, bool isArray)
+			private static void ReadDocument(List<Token<ModelTokenType>> tokens, BinaryReader reader, bool isArray)
 			{
 				if (reader.PeekChar() < 0)
 				{
@@ -85,7 +85,7 @@ namespace JsonFx.Bson
 				long start = reader.BaseStream.Position;
 				int size = reader.ReadInt32();
 
-				tokens.Add(isArray ? CommonGrammar.TokenArrayBeginUnnamed : CommonGrammar.TokenObjectBeginUnnamed);
+				tokens.Add(isArray ? ModelGrammar.TokenArrayBeginUnnamed : ModelGrammar.TokenObjectBeginUnnamed);
 
 				while (reader.BaseStream.Position-start < size-1)
 				{
@@ -97,17 +97,17 @@ namespace JsonFx.Bson
 					throw new DeserializationException(BsonWriter.ErrorUnterminated, start);
 				}
 
-				tokens.Add(isArray ? CommonGrammar.TokenArrayEnd : CommonGrammar.TokenObjectEnd);
+				tokens.Add(isArray ? ModelGrammar.TokenArrayEnd : ModelGrammar.TokenObjectEnd);
 			}
 
-			private static void ReadElement(List<Token<CommonTokenType>> tokens, BinaryReader reader, bool isArrayItem)
+			private static void ReadElement(List<Token<ModelTokenType>> tokens, BinaryReader reader, bool isArrayItem)
 			{
 				BsonElementType elemType = (BsonElementType)reader.ReadByte();
 
 				string ename = BsonTokenizer.ReadCString(reader);
 				if (!isArrayItem)
 				{
-					tokens.Add(CommonGrammar.TokenProperty(ename));
+					tokens.Add(ModelGrammar.TokenProperty(ename));
 				}
 
 				switch (elemType)
@@ -115,25 +115,25 @@ namespace JsonFx.Bson
 					case BsonElementType.Double:
 					{
 						double value = reader.ReadDouble();
-						tokens.Add(CommonGrammar.TokenPrimitive(value));
+						tokens.Add(ModelGrammar.TokenPrimitive(value));
 						break;
 					}
 					case BsonElementType.String:
 					{
 						string value = BsonTokenizer.ReadString(reader);
-						tokens.Add(CommonGrammar.TokenPrimitive(value));
+						tokens.Add(ModelGrammar.TokenPrimitive(value));
 						break;
 					}
 					case BsonElementType.JavaScriptCode:
 					{
 						BsonJavaScriptCode value = (BsonJavaScriptCode)BsonTokenizer.ReadString(reader);
-						tokens.Add(CommonGrammar.TokenPrimitive(value));
+						tokens.Add(ModelGrammar.TokenPrimitive(value));
 						break;
 					}
 					case BsonElementType.Symbol:
 					{
 						BsonSymbol value = (BsonSymbol)BsonTokenizer.ReadString(reader);
-						tokens.Add(CommonGrammar.TokenPrimitive(value));
+						tokens.Add(ModelGrammar.TokenPrimitive(value));
 						break;
 					}
 					case BsonElementType.Document:
@@ -154,19 +154,19 @@ namespace JsonFx.Bson
 					case BsonElementType.ObjectID:
 					{
 						byte[] value = reader.ReadBytes(BsonWriter.SizeOfObjectID);
-						tokens.Add(CommonGrammar.TokenPrimitive(new BsonObjectID(value)));
+						tokens.Add(ModelGrammar.TokenPrimitive(new BsonObjectID(value)));
 						break;
 					}
 					case BsonElementType.Boolean:
 					{
 						bool value = reader.ReadByte() != BsonWriter.FalseByte;
-						tokens.Add(value ? CommonGrammar.TokenTrue : CommonGrammar.TokenFalse);
+						tokens.Add(value ? ModelGrammar.TokenTrue : ModelGrammar.TokenFalse);
 						break;
 					}
 					case BsonElementType.DateTimeUtc:
 					{
 						DateTime value = BsonWriter.UnixEpoch.AddMilliseconds(reader.ReadInt64());
-						tokens.Add(CommonGrammar.TokenPrimitive(value));
+						tokens.Add(ModelGrammar.TokenPrimitive(value));
 						break;
 					}
 					case BsonElementType.RegExp:
@@ -203,7 +203,7 @@ namespace JsonFx.Bson
 
 						Regex regex = new Regex(pattern, options);
 
-						tokens.Add(CommonGrammar.TokenPrimitive(regex));
+						tokens.Add(ModelGrammar.TokenPrimitive(regex));
 						break;
 					}
 					case BsonElementType.DBPointer:
@@ -212,7 +212,7 @@ namespace JsonFx.Bson
 						byte[] value2 = reader.ReadBytes(BsonWriter.SizeOfObjectID);
 
 						BsonDBPointer pointer = new BsonDBPointer { Namespace=value1, ObjectID=new BsonObjectID(value2) };
-						tokens.Add(CommonGrammar.TokenPrimitive(pointer));
+						tokens.Add(ModelGrammar.TokenPrimitive(pointer));
 						break;
 					}
 					case BsonElementType.CodeWithScope:
@@ -220,7 +220,7 @@ namespace JsonFx.Bson
 						int size = reader.ReadInt32();
 						string value = BsonTokenizer.ReadString(reader);
 
-						tokens.Add(CommonGrammar.TokenPrimitive(value));
+						tokens.Add(ModelGrammar.TokenPrimitive(value));
 
 						BsonTokenizer.ReadDocument(tokens, reader, false);
 						break;
@@ -228,20 +228,20 @@ namespace JsonFx.Bson
 					case BsonElementType.Int32:
 					{
 						int value = reader.ReadInt32();
-						tokens.Add(CommonGrammar.TokenPrimitive(value));
+						tokens.Add(ModelGrammar.TokenPrimitive(value));
 						break;
 					}
 					case BsonElementType.TimeStamp:
 					{
 						long value = reader.ReadInt64();
 						// TODO: convert to TimeSpan?
-						tokens.Add(CommonGrammar.TokenPrimitive(value));
+						tokens.Add(ModelGrammar.TokenPrimitive(value));
 						break;
 					}
 					case BsonElementType.Int64:
 					{
 						long value = reader.ReadInt64();
-						tokens.Add(CommonGrammar.TokenPrimitive(value));
+						tokens.Add(ModelGrammar.TokenPrimitive(value));
 						break;
 					}
 					case BsonElementType.Undefined:
@@ -261,7 +261,7 @@ namespace JsonFx.Bson
 				}
 			}
 
-			private static void ReadBinary(List<Token<CommonTokenType>> tokens, BinaryReader reader)
+			private static void ReadBinary(List<Token<ModelTokenType>> tokens, BinaryReader reader)
 			{
 				int size = reader.ReadInt32();
 
@@ -316,7 +316,7 @@ namespace JsonFx.Bson
 					}
 				}
 
-				tokens.Add(CommonGrammar.TokenPrimitive(value));
+				tokens.Add(ModelGrammar.TokenPrimitive(value));
 			}
 
 			private static string ReadString(BinaryReader reader)
@@ -345,14 +345,14 @@ namespace JsonFx.Bson
 
 			#endregion Scanning Methods
 
-			#region IBinaryTokenizer<CommonTokenType> Members
+			#region IBinaryTokenizer<ModelTokenType> Members
 
 			/// <summary>
 			/// Gets a token sequence from the TextReader
 			/// </summary>
 			/// <param name="reader"></param>
 			/// <returns></returns>
-			public IEnumerable<Token<CommonTokenType>> GetTokens(Stream stream)
+			public IEnumerable<Token<ModelTokenType>> GetTokens(Stream stream)
 			{
 				if (stream == null)
 				{
@@ -367,7 +367,7 @@ namespace JsonFx.Bson
 			/// </summary>
 			/// <param name="text"></param>
 			/// <returns></returns>
-			public IEnumerable<Token<CommonTokenType>> GetTokens(byte[] bytes)
+			public IEnumerable<Token<ModelTokenType>> GetTokens(byte[] bytes)
 			{
 				if (bytes == null)
 				{
@@ -382,7 +382,7 @@ namespace JsonFx.Bson
 			/// </summary>
 			/// <param name="reader"></param>
 			/// <returns></returns>
-			protected IEnumerable<Token<CommonTokenType>> GetTokens(BinaryReader reader)
+			protected IEnumerable<Token<ModelTokenType>> GetTokens(BinaryReader reader)
 			{
 				if (reader == null)
 				{
@@ -392,7 +392,7 @@ namespace JsonFx.Bson
 				this.Reader = reader;
 				using (reader)
 				{
-					List<Token<CommonTokenType>> tokens = new List<Token<CommonTokenType>>();
+					List<Token<ModelTokenType>> tokens = new List<Token<ModelTokenType>>();
 
 					BsonTokenizer.ReadDocument(tokens, reader, false);
 
@@ -401,7 +401,7 @@ namespace JsonFx.Bson
 				};
 			}
 
-			#endregion IBinaryTokenizer<CommonTokenType> Members
+			#endregion IBinaryTokenizer<ModelTokenType> Members
 
 			#region IDisposable Members
 

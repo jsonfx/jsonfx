@@ -33,7 +33,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 
-using JsonFx.Common;
+using JsonFx.Model;
 using JsonFx.Serialization.GraphCycles;
 using Xunit;
 
@@ -41,11 +41,11 @@ using Assert=JsonFx.AssertPatched;
 
 namespace JsonFx.Serialization
 {
-	public class CommonWalkerTests
+	public class ModelWalkerTests
 	{
 		#region Constants
 
-		private const string TraitName = "Common";
+		private const string TraitName = "Common Model";
 		private const string TraitValue = "Walker";
 
 		#endregion Constants
@@ -98,11 +98,11 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenArrayBegin("array"),
-					CommonGrammar.TokenArrayEnd
+					ModelGrammar.TokenArrayBegin("array"),
+					ModelGrammar.TokenArrayEnd
 				};
 
-			var walker = new CommonWalker(new DataWriterSettings());
+			var walker = new ModelWalker(new DataWriterSettings());
 			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -116,11 +116,11 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenArrayBegin("array"),
-					CommonGrammar.TokenArrayEnd
+					ModelGrammar.TokenArrayBegin("array"),
+					ModelGrammar.TokenArrayEnd
 				};
 
-			var walker = new CommonWalker(new DataWriterSettings());
+			var walker = new ModelWalker(new DataWriterSettings());
 			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -137,12 +137,12 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenArrayBegin("array"),
-					CommonGrammar.TokenNull,
-					CommonGrammar.TokenArrayEnd
+					ModelGrammar.TokenArrayBegin("array"),
+					ModelGrammar.TokenNull,
+					ModelGrammar.TokenArrayEnd
 				};
 
-			var walker = new CommonWalker(new DataWriterSettings());
+			var walker = new ModelWalker(new DataWriterSettings());
 			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -167,20 +167,20 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenArrayBegin("array"),
-					CommonGrammar.TokenFalse,
-					CommonGrammar.TokenTrue,
-					CommonGrammar.TokenNull,
-					CommonGrammar.TokenPrimitive('a'),
-					CommonGrammar.TokenPrimitive('b'),
-					CommonGrammar.TokenPrimitive('c'),
-					CommonGrammar.TokenPrimitive(1),
-					CommonGrammar.TokenPrimitive(2),
-					CommonGrammar.TokenPrimitive(3),
-					CommonGrammar.TokenArrayEnd
+					ModelGrammar.TokenArrayBegin("array"),
+					ModelGrammar.TokenFalse,
+					ModelGrammar.TokenTrue,
+					ModelGrammar.TokenNull,
+					ModelGrammar.TokenPrimitive('a'),
+					ModelGrammar.TokenPrimitive('b'),
+					ModelGrammar.TokenPrimitive('c'),
+					ModelGrammar.TokenPrimitive(1),
+					ModelGrammar.TokenPrimitive(2),
+					ModelGrammar.TokenPrimitive(3),
+					ModelGrammar.TokenArrayEnd
 				};
 
-			var walker = new CommonWalker(new DataWriterSettings());
+			var walker = new ModelWalker(new DataWriterSettings());
 			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -211,24 +211,24 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenArrayBegin("array"),
-					CommonGrammar.TokenFalse,
-					CommonGrammar.TokenTrue,
-					CommonGrammar.TokenNull,
-					CommonGrammar.TokenArrayBegin("array"),
-					CommonGrammar.TokenPrimitive('a'),
-					CommonGrammar.TokenPrimitive('b'),
-					CommonGrammar.TokenPrimitive('c'),
-					CommonGrammar.TokenArrayEnd,
-					CommonGrammar.TokenArrayBegin("array"),
-					CommonGrammar.TokenPrimitive(1),
-					CommonGrammar.TokenPrimitive(2),
-					CommonGrammar.TokenPrimitive(3),
-					CommonGrammar.TokenArrayEnd,
-					CommonGrammar.TokenArrayEnd
+					ModelGrammar.TokenArrayBegin("array"),
+					ModelGrammar.TokenFalse,
+					ModelGrammar.TokenTrue,
+					ModelGrammar.TokenNull,
+					ModelGrammar.TokenArrayBegin("array"),
+					ModelGrammar.TokenPrimitive('a'),
+					ModelGrammar.TokenPrimitive('b'),
+					ModelGrammar.TokenPrimitive('c'),
+					ModelGrammar.TokenArrayEnd,
+					ModelGrammar.TokenArrayBegin("array"),
+					ModelGrammar.TokenPrimitive(1),
+					ModelGrammar.TokenPrimitive(2),
+					ModelGrammar.TokenPrimitive(3),
+					ModelGrammar.TokenArrayEnd,
+					ModelGrammar.TokenArrayEnd
 				};
 
-			var walker = new CommonWalker(new DataWriterSettings());
+			var walker = new ModelWalker(new DataWriterSettings());
 			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -246,11 +246,11 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenObjectBegin("object"),
-					CommonGrammar.TokenObjectEnd
+					ModelGrammar.TokenObjectBegin("object"),
+					ModelGrammar.TokenObjectEnd
 				};
 
-			var walker = new CommonWalker(new DataWriterSettings());
+			var walker = new ModelWalker(new DataWriterSettings());
 			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -264,11 +264,11 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenObjectBegin("object"),
-					CommonGrammar.TokenObjectEnd
+					ModelGrammar.TokenObjectBegin("object"),
+					ModelGrammar.TokenObjectEnd
 				};
 
-			var walker = new CommonWalker(new DataWriterSettings());
+			var walker = new ModelWalker(new DataWriterSettings());
 			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -293,26 +293,26 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenObjectBegin("object"),
-					CommonGrammar.TokenProperty("One"),
-					CommonGrammar.TokenPrimitive(1),
-					CommonGrammar.TokenProperty("Two"),
-					CommonGrammar.TokenPrimitive(2),
-					CommonGrammar.TokenProperty("Three"),
-					CommonGrammar.TokenPrimitive(3),
-					CommonGrammar.TokenProperty("Four"),
-					CommonGrammar.TokenObjectBegin("object"),
-					CommonGrammar.TokenProperty("A"),
-					CommonGrammar.TokenPrimitive('a'),
-					CommonGrammar.TokenProperty("B"),
-					CommonGrammar.TokenPrimitive('b'),
-					CommonGrammar.TokenProperty("C"),
-					CommonGrammar.TokenPrimitive('c'),
-					CommonGrammar.TokenObjectEnd,
-					CommonGrammar.TokenObjectEnd
+					ModelGrammar.TokenObjectBegin("object"),
+					ModelGrammar.TokenProperty("One"),
+					ModelGrammar.TokenPrimitive(1),
+					ModelGrammar.TokenProperty("Two"),
+					ModelGrammar.TokenPrimitive(2),
+					ModelGrammar.TokenProperty("Three"),
+					ModelGrammar.TokenPrimitive(3),
+					ModelGrammar.TokenProperty("Four"),
+					ModelGrammar.TokenObjectBegin("object"),
+					ModelGrammar.TokenProperty("A"),
+					ModelGrammar.TokenPrimitive('a'),
+					ModelGrammar.TokenProperty("B"),
+					ModelGrammar.TokenPrimitive('b'),
+					ModelGrammar.TokenProperty("C"),
+					ModelGrammar.TokenPrimitive('c'),
+					ModelGrammar.TokenObjectEnd,
+					ModelGrammar.TokenObjectEnd
 				};
 
-			var walker = new CommonWalker(new DataWriterSettings());
+			var walker = new ModelWalker(new DataWriterSettings());
 			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -331,17 +331,17 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenObjectBegin("object"),
-					CommonGrammar.TokenProperty("One"),
-					CommonGrammar.TokenPrimitive(1),
-					CommonGrammar.TokenProperty("Two"),
-					CommonGrammar.TokenPrimitive(2),
-					CommonGrammar.TokenProperty("Three"),
-					CommonGrammar.TokenPrimitive(3),
-					CommonGrammar.TokenObjectEnd
+					ModelGrammar.TokenObjectBegin("object"),
+					ModelGrammar.TokenProperty("One"),
+					ModelGrammar.TokenPrimitive(1),
+					ModelGrammar.TokenProperty("Two"),
+					ModelGrammar.TokenPrimitive(2),
+					ModelGrammar.TokenProperty("Three"),
+					ModelGrammar.TokenPrimitive(3),
+					ModelGrammar.TokenObjectEnd
 				};
 
-			var walker = new CommonWalker(new DataWriterSettings());
+			var walker = new ModelWalker(new DataWriterSettings());
 			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -359,10 +359,10 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenFalse
+					ModelGrammar.TokenFalse
 				};
 
-			var walker = new CommonWalker(new DataWriterSettings());
+			var walker = new ModelWalker(new DataWriterSettings());
 			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -376,10 +376,10 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenTrue
+					ModelGrammar.TokenTrue
 				};
 
-			var walker = new CommonWalker(new DataWriterSettings());
+			var walker = new ModelWalker(new DataWriterSettings());
 			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -397,10 +397,10 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenPrimitive(Double.NaN)
+					ModelGrammar.TokenPrimitive(Double.NaN)
 				};
 
-			var walker = new CommonWalker(new DataWriterSettings());
+			var walker = new ModelWalker(new DataWriterSettings());
 			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -414,10 +414,10 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenPrimitive(Double.PositiveInfinity)
+					ModelGrammar.TokenPrimitive(Double.PositiveInfinity)
 				};
 
-			var walker = new CommonWalker(new DataWriterSettings());
+			var walker = new ModelWalker(new DataWriterSettings());
 			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -431,10 +431,10 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenPrimitive(Double.NegativeInfinity)
+					ModelGrammar.TokenPrimitive(Double.NegativeInfinity)
 				};
 
-			var walker = new CommonWalker(new DataWriterSettings());
+			var walker = new ModelWalker(new DataWriterSettings());
 			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -448,10 +448,10 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenPrimitive(Double.NaN)
+					ModelGrammar.TokenPrimitive(Double.NaN)
 				};
 
-			var walker = new CommonWalker(new DataWriterSettings());
+			var walker = new ModelWalker(new DataWriterSettings());
 			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -465,10 +465,10 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenPrimitive(Double.PositiveInfinity)
+					ModelGrammar.TokenPrimitive(Double.PositiveInfinity)
 				};
 
-			var walker = new CommonWalker(new DataWriterSettings());
+			var walker = new ModelWalker(new DataWriterSettings());
 			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -482,10 +482,10 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenPrimitive(Double.NegativeInfinity)
+					ModelGrammar.TokenPrimitive(Double.NegativeInfinity)
 				};
 
-			var walker = new CommonWalker(new DataWriterSettings());
+			var walker = new ModelWalker(new DataWriterSettings());
 			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -506,17 +506,17 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenObjectBegin("object"),
-					CommonGrammar.TokenProperty("One"),
-					CommonGrammar.TokenPrimitive(1),
-					CommonGrammar.TokenProperty("Two"),
-					CommonGrammar.TokenPrimitive(2),
-					CommonGrammar.TokenProperty("Three"),
-					CommonGrammar.TokenPrimitive(3),
-					CommonGrammar.TokenObjectEnd
+					ModelGrammar.TokenObjectBegin("object"),
+					ModelGrammar.TokenProperty("One"),
+					ModelGrammar.TokenPrimitive(1),
+					ModelGrammar.TokenProperty("Two"),
+					ModelGrammar.TokenPrimitive(2),
+					ModelGrammar.TokenProperty("Three"),
+					ModelGrammar.TokenPrimitive(3),
+					ModelGrammar.TokenObjectEnd
 				};
 
-			var walker = new CommonWalker(new DataWriterSettings());
+			var walker = new ModelWalker(new DataWriterSettings());
 			var actual = walker.GetTokens((object)input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -536,22 +536,22 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenObjectBegin("object"),
-					CommonGrammar.TokenProperty("foo"),
-					CommonGrammar.TokenPrimitive(true),
-					CommonGrammar.TokenProperty("array"),
-					CommonGrammar.TokenArrayBegin("array"),
-					CommonGrammar.TokenPrimitive(false),
-					CommonGrammar.TokenPrimitive(1),
-					CommonGrammar.TokenPrimitive(2),
-					CommonGrammar.TokenPrimitive(Math.PI),
-					CommonGrammar.TokenPrimitive(null),
-					CommonGrammar.TokenPrimitive("hello world."),
-					CommonGrammar.TokenArrayEnd,
-					CommonGrammar.TokenObjectEnd
+					ModelGrammar.TokenObjectBegin("object"),
+					ModelGrammar.TokenProperty("foo"),
+					ModelGrammar.TokenPrimitive(true),
+					ModelGrammar.TokenProperty("array"),
+					ModelGrammar.TokenArrayBegin("array"),
+					ModelGrammar.TokenPrimitive(false),
+					ModelGrammar.TokenPrimitive(1),
+					ModelGrammar.TokenPrimitive(2),
+					ModelGrammar.TokenPrimitive(Math.PI),
+					ModelGrammar.TokenPrimitive(null),
+					ModelGrammar.TokenPrimitive("hello world."),
+					ModelGrammar.TokenArrayEnd,
+					ModelGrammar.TokenObjectEnd
 				};
 
-			var walker = new CommonWalker(new DataWriterSettings());
+			var walker = new ModelWalker(new DataWriterSettings());
 			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -569,19 +569,19 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 			{
-				CommonGrammar.TokenObjectBegin("DynamicExample"),
-				CommonGrammar.TokenProperty("foo"),
-				CommonGrammar.TokenPrimitive("hello world"),
-				CommonGrammar.TokenProperty("number"),
-				CommonGrammar.TokenPrimitive(42),
-				CommonGrammar.TokenProperty("boolean"),
-				CommonGrammar.TokenPrimitive(false),
-				CommonGrammar.TokenProperty("null"),
-				CommonGrammar.TokenPrimitive(null),
-				CommonGrammar.TokenObjectEnd
+				ModelGrammar.TokenObjectBegin("DynamicExample"),
+				ModelGrammar.TokenProperty("foo"),
+				ModelGrammar.TokenPrimitive("hello world"),
+				ModelGrammar.TokenProperty("number"),
+				ModelGrammar.TokenPrimitive(42),
+				ModelGrammar.TokenProperty("boolean"),
+				ModelGrammar.TokenPrimitive(false),
+				ModelGrammar.TokenProperty("null"),
+				ModelGrammar.TokenPrimitive(null),
+				ModelGrammar.TokenObjectEnd
 			};
 
-			var walker = new CommonWalker(new DataWriterSettings());
+			var walker = new ModelWalker(new DataWriterSettings());
 			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual, false);
@@ -656,121 +656,121 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 			{
-				CommonGrammar.TokenArrayBegin("array"),
-				CommonGrammar.TokenPrimitive("JSON Test Pattern pass1"),
-				CommonGrammar.TokenObjectBegin("object"),
-				CommonGrammar.TokenProperty("object with 1 member"),
-				CommonGrammar.TokenArrayBegin("array"),
-				CommonGrammar.TokenPrimitive("array with 1 element"),
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenObjectEnd,
-				CommonGrammar.TokenObjectBegin("object"),
-				CommonGrammar.TokenObjectEnd,
-				CommonGrammar.TokenArrayBegin("array"),
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenPrimitive(-42),
-				CommonGrammar.TokenTrue,
-				CommonGrammar.TokenFalse,
-				CommonGrammar.TokenNull,
-				CommonGrammar.TokenObjectBegin("object"),
-				CommonGrammar.TokenProperty("integer"),
-				CommonGrammar.TokenPrimitive(1234567890),
-				CommonGrammar.TokenProperty("real"),
-				CommonGrammar.TokenPrimitive(-9876.543210),
-				CommonGrammar.TokenProperty("e"),
-				CommonGrammar.TokenPrimitive(0.123456789e-12),
-				CommonGrammar.TokenProperty("E"),
-				CommonGrammar.TokenPrimitive(1.234567890E+34),
-				CommonGrammar.TokenProperty(""),
-				CommonGrammar.TokenPrimitive(23456789012E66),
-				CommonGrammar.TokenProperty("zero"),
-				CommonGrammar.TokenPrimitive(0),
-				CommonGrammar.TokenProperty("one"),
-				CommonGrammar.TokenPrimitive(1),
-				CommonGrammar.TokenProperty("space"),
-				CommonGrammar.TokenPrimitive(" "),
-				CommonGrammar.TokenProperty("quote"),
-				CommonGrammar.TokenPrimitive("\""),
-				CommonGrammar.TokenProperty("backslash"),
-				CommonGrammar.TokenPrimitive("\\"),
-				CommonGrammar.TokenProperty("controls"),
-				CommonGrammar.TokenPrimitive("\b\f\n\r\t"),
-				CommonGrammar.TokenProperty("slash"),
-				CommonGrammar.TokenPrimitive("/ & /"),
-				CommonGrammar.TokenProperty("alpha"),
-				CommonGrammar.TokenPrimitive("abcdefghijklmnopqrstuvwyz"),
-				CommonGrammar.TokenProperty("ALPHA"),
-				CommonGrammar.TokenPrimitive("ABCDEFGHIJKLMNOPQRSTUVWYZ"),
-				CommonGrammar.TokenProperty("digit"),
-				CommonGrammar.TokenPrimitive("0123456789"),
-				CommonGrammar.TokenProperty("0123456789"),
-				CommonGrammar.TokenPrimitive("digit"),
-				CommonGrammar.TokenProperty("special"),
-				CommonGrammar.TokenPrimitive("`1~!@#$%^&*()_+-={':[,]}|;.</>?"),
-				CommonGrammar.TokenProperty("hex"),
-				CommonGrammar.TokenPrimitive("\u0123\u4567\u89AB\uCDEF\uabcd\uef4A"),
-				CommonGrammar.TokenProperty("true"),
-				CommonGrammar.TokenTrue,
-				CommonGrammar.TokenProperty("false"),
-				CommonGrammar.TokenFalse,
-				CommonGrammar.TokenProperty("null"),
-				CommonGrammar.TokenNull,
-				CommonGrammar.TokenProperty("array"),
-				CommonGrammar.TokenArrayBegin("array"),
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenProperty("object"),
-				CommonGrammar.TokenObjectBegin("object"),
-				CommonGrammar.TokenObjectEnd,
-				CommonGrammar.TokenProperty("address"),
-				CommonGrammar.TokenPrimitive("50 St. James Street"),
-				CommonGrammar.TokenProperty("url"),
-				CommonGrammar.TokenPrimitive("http://www.JSON.org/"),
-				CommonGrammar.TokenProperty("comment"),
-				CommonGrammar.TokenPrimitive("// /* <!-- --"),
-				CommonGrammar.TokenProperty("# -- --> */"),
-				CommonGrammar.TokenPrimitive(" "),
-				CommonGrammar.TokenProperty(" s p a c e d "),
-				CommonGrammar.TokenArrayBegin("array"),
-				CommonGrammar.TokenPrimitive(1),
-				CommonGrammar.TokenPrimitive(2),
-				CommonGrammar.TokenPrimitive(3),
-				CommonGrammar.TokenPrimitive(4),
-				CommonGrammar.TokenPrimitive(5),
-				CommonGrammar.TokenPrimitive(6),
-				CommonGrammar.TokenPrimitive(7),
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenProperty("compact"),
-				CommonGrammar.TokenArrayBegin("array"),
-				CommonGrammar.TokenPrimitive(1),
-				CommonGrammar.TokenPrimitive(2),
-				CommonGrammar.TokenPrimitive(3),
-				CommonGrammar.TokenPrimitive(4),
-				CommonGrammar.TokenPrimitive(5),
-				CommonGrammar.TokenPrimitive(6),
-				CommonGrammar.TokenPrimitive(7),
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenProperty("jsontext"),
-				CommonGrammar.TokenPrimitive("{\"object with 1 member\":[\"array with 1 element\"]}"),
-				CommonGrammar.TokenProperty("quotes"),
-				CommonGrammar.TokenPrimitive("&#34; \u0022 %22 0x22 034 &#x22;"),
-				CommonGrammar.TokenProperty("/\\\"\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"),
-				CommonGrammar.TokenPrimitive("A key can be any string"),
-				CommonGrammar.TokenObjectEnd,
-				CommonGrammar.TokenPrimitive(0.5),
-				CommonGrammar.TokenPrimitive(98.6),
-				CommonGrammar.TokenPrimitive(99.44),
-				CommonGrammar.TokenPrimitive(1066),
-				CommonGrammar.TokenPrimitive(10.0),
-				CommonGrammar.TokenPrimitive(1.0),
-				CommonGrammar.TokenPrimitive(0.1),
-				CommonGrammar.TokenPrimitive(1.0),
-				CommonGrammar.TokenPrimitive(2.0),
-				CommonGrammar.TokenPrimitive(2.0),
-				CommonGrammar.TokenPrimitive("rosebud"),
-				CommonGrammar.TokenArrayEnd
+				ModelGrammar.TokenArrayBegin("array"),
+				ModelGrammar.TokenPrimitive("JSON Test Pattern pass1"),
+				ModelGrammar.TokenObjectBegin("object"),
+				ModelGrammar.TokenProperty("object with 1 member"),
+				ModelGrammar.TokenArrayBegin("array"),
+				ModelGrammar.TokenPrimitive("array with 1 element"),
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenObjectEnd,
+				ModelGrammar.TokenObjectBegin("object"),
+				ModelGrammar.TokenObjectEnd,
+				ModelGrammar.TokenArrayBegin("array"),
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenPrimitive(-42),
+				ModelGrammar.TokenTrue,
+				ModelGrammar.TokenFalse,
+				ModelGrammar.TokenNull,
+				ModelGrammar.TokenObjectBegin("object"),
+				ModelGrammar.TokenProperty("integer"),
+				ModelGrammar.TokenPrimitive(1234567890),
+				ModelGrammar.TokenProperty("real"),
+				ModelGrammar.TokenPrimitive(-9876.543210),
+				ModelGrammar.TokenProperty("e"),
+				ModelGrammar.TokenPrimitive(0.123456789e-12),
+				ModelGrammar.TokenProperty("E"),
+				ModelGrammar.TokenPrimitive(1.234567890E+34),
+				ModelGrammar.TokenProperty(""),
+				ModelGrammar.TokenPrimitive(23456789012E66),
+				ModelGrammar.TokenProperty("zero"),
+				ModelGrammar.TokenPrimitive(0),
+				ModelGrammar.TokenProperty("one"),
+				ModelGrammar.TokenPrimitive(1),
+				ModelGrammar.TokenProperty("space"),
+				ModelGrammar.TokenPrimitive(" "),
+				ModelGrammar.TokenProperty("quote"),
+				ModelGrammar.TokenPrimitive("\""),
+				ModelGrammar.TokenProperty("backslash"),
+				ModelGrammar.TokenPrimitive("\\"),
+				ModelGrammar.TokenProperty("controls"),
+				ModelGrammar.TokenPrimitive("\b\f\n\r\t"),
+				ModelGrammar.TokenProperty("slash"),
+				ModelGrammar.TokenPrimitive("/ & /"),
+				ModelGrammar.TokenProperty("alpha"),
+				ModelGrammar.TokenPrimitive("abcdefghijklmnopqrstuvwyz"),
+				ModelGrammar.TokenProperty("ALPHA"),
+				ModelGrammar.TokenPrimitive("ABCDEFGHIJKLMNOPQRSTUVWYZ"),
+				ModelGrammar.TokenProperty("digit"),
+				ModelGrammar.TokenPrimitive("0123456789"),
+				ModelGrammar.TokenProperty("0123456789"),
+				ModelGrammar.TokenPrimitive("digit"),
+				ModelGrammar.TokenProperty("special"),
+				ModelGrammar.TokenPrimitive("`1~!@#$%^&*()_+-={':[,]}|;.</>?"),
+				ModelGrammar.TokenProperty("hex"),
+				ModelGrammar.TokenPrimitive("\u0123\u4567\u89AB\uCDEF\uabcd\uef4A"),
+				ModelGrammar.TokenProperty("true"),
+				ModelGrammar.TokenTrue,
+				ModelGrammar.TokenProperty("false"),
+				ModelGrammar.TokenFalse,
+				ModelGrammar.TokenProperty("null"),
+				ModelGrammar.TokenNull,
+				ModelGrammar.TokenProperty("array"),
+				ModelGrammar.TokenArrayBegin("array"),
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenProperty("object"),
+				ModelGrammar.TokenObjectBegin("object"),
+				ModelGrammar.TokenObjectEnd,
+				ModelGrammar.TokenProperty("address"),
+				ModelGrammar.TokenPrimitive("50 St. James Street"),
+				ModelGrammar.TokenProperty("url"),
+				ModelGrammar.TokenPrimitive("http://www.JSON.org/"),
+				ModelGrammar.TokenProperty("comment"),
+				ModelGrammar.TokenPrimitive("// /* <!-- --"),
+				ModelGrammar.TokenProperty("# -- --> */"),
+				ModelGrammar.TokenPrimitive(" "),
+				ModelGrammar.TokenProperty(" s p a c e d "),
+				ModelGrammar.TokenArrayBegin("array"),
+				ModelGrammar.TokenPrimitive(1),
+				ModelGrammar.TokenPrimitive(2),
+				ModelGrammar.TokenPrimitive(3),
+				ModelGrammar.TokenPrimitive(4),
+				ModelGrammar.TokenPrimitive(5),
+				ModelGrammar.TokenPrimitive(6),
+				ModelGrammar.TokenPrimitive(7),
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenProperty("compact"),
+				ModelGrammar.TokenArrayBegin("array"),
+				ModelGrammar.TokenPrimitive(1),
+				ModelGrammar.TokenPrimitive(2),
+				ModelGrammar.TokenPrimitive(3),
+				ModelGrammar.TokenPrimitive(4),
+				ModelGrammar.TokenPrimitive(5),
+				ModelGrammar.TokenPrimitive(6),
+				ModelGrammar.TokenPrimitive(7),
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenProperty("jsontext"),
+				ModelGrammar.TokenPrimitive("{\"object with 1 member\":[\"array with 1 element\"]}"),
+				ModelGrammar.TokenProperty("quotes"),
+				ModelGrammar.TokenPrimitive("&#34; \u0022 %22 0x22 034 &#x22;"),
+				ModelGrammar.TokenProperty("/\\\"\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"),
+				ModelGrammar.TokenPrimitive("A key can be any string"),
+				ModelGrammar.TokenObjectEnd,
+				ModelGrammar.TokenPrimitive(0.5),
+				ModelGrammar.TokenPrimitive(98.6),
+				ModelGrammar.TokenPrimitive(99.44),
+				ModelGrammar.TokenPrimitive(1066),
+				ModelGrammar.TokenPrimitive(10.0),
+				ModelGrammar.TokenPrimitive(1.0),
+				ModelGrammar.TokenPrimitive(0.1),
+				ModelGrammar.TokenPrimitive(1.0),
+				ModelGrammar.TokenPrimitive(2.0),
+				ModelGrammar.TokenPrimitive(2.0),
+				ModelGrammar.TokenPrimitive("rosebud"),
+				ModelGrammar.TokenArrayEnd
 			};
 
-			var walker = new CommonWalker(new DataWriterSettings());
+			var walker = new ModelWalker(new DataWriterSettings());
 			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -803,49 +803,49 @@ namespace JsonFx.Serialization
 				input
 			};
 
-			var walker = new CommonWalker(new DataWriterSettings
+			var walker = new ModelWalker(new DataWriterSettings
 			{
 				GraphCycles = GraphCycleType.Ignore
 			});
 
 			var expected = new[]
 			{
-				CommonGrammar.TokenObjectBegin("Person"),
-				CommonGrammar.TokenProperty("Name"),
-				CommonGrammar.TokenPrimitive("John, Jr."),
+				ModelGrammar.TokenObjectBegin("Person"),
+				ModelGrammar.TokenProperty("Name"),
+				ModelGrammar.TokenPrimitive("John, Jr."),
 
-				CommonGrammar.TokenProperty("Father"),
-				CommonGrammar.TokenObjectBegin("Person"),
-				CommonGrammar.TokenProperty("Name"),
-				CommonGrammar.TokenPrimitive("John, Sr."),
-				CommonGrammar.TokenProperty("Father"),
-				CommonGrammar.TokenNull,
-				CommonGrammar.TokenProperty("Mother"),
-				CommonGrammar.TokenNull,
-				CommonGrammar.TokenProperty("Children"),
-				CommonGrammar.TokenArrayBegin("array"),
-				CommonGrammar.TokenNull,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenObjectEnd,
+				ModelGrammar.TokenProperty("Father"),
+				ModelGrammar.TokenObjectBegin("Person"),
+				ModelGrammar.TokenProperty("Name"),
+				ModelGrammar.TokenPrimitive("John, Sr."),
+				ModelGrammar.TokenProperty("Father"),
+				ModelGrammar.TokenNull,
+				ModelGrammar.TokenProperty("Mother"),
+				ModelGrammar.TokenNull,
+				ModelGrammar.TokenProperty("Children"),
+				ModelGrammar.TokenArrayBegin("array"),
+				ModelGrammar.TokenNull,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenObjectEnd,
 
-				CommonGrammar.TokenProperty("Mother"),
-				CommonGrammar.TokenObjectBegin("Person"),
-				CommonGrammar.TokenProperty("Name"),
-				CommonGrammar.TokenPrimitive("Sally"),
-				CommonGrammar.TokenProperty("Father"),
-				CommonGrammar.TokenNull,
-				CommonGrammar.TokenProperty("Mother"),
-				CommonGrammar.TokenNull,
-				CommonGrammar.TokenProperty("Children"),
-				CommonGrammar.TokenArrayBegin("array"),
-				CommonGrammar.TokenNull,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenObjectEnd,
+				ModelGrammar.TokenProperty("Mother"),
+				ModelGrammar.TokenObjectBegin("Person"),
+				ModelGrammar.TokenProperty("Name"),
+				ModelGrammar.TokenPrimitive("Sally"),
+				ModelGrammar.TokenProperty("Father"),
+				ModelGrammar.TokenNull,
+				ModelGrammar.TokenProperty("Mother"),
+				ModelGrammar.TokenNull,
+				ModelGrammar.TokenProperty("Children"),
+				ModelGrammar.TokenArrayBegin("array"),
+				ModelGrammar.TokenNull,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenObjectEnd,
 
-				CommonGrammar.TokenProperty("Children"),
-				CommonGrammar.TokenNull,
+				ModelGrammar.TokenProperty("Children"),
+				ModelGrammar.TokenNull,
 
-				CommonGrammar.TokenObjectEnd
+				ModelGrammar.TokenObjectEnd
 			};
 
 			var actual = walker.GetTokens(input).ToArray();
@@ -876,7 +876,7 @@ namespace JsonFx.Serialization
 				input
 			};
 
-			var walker = new CommonWalker(new DataWriterSettings
+			var walker = new ModelWalker(new DataWriterSettings
 			{
 				GraphCycles = GraphCycleType.Reference
 			});
@@ -913,7 +913,7 @@ namespace JsonFx.Serialization
 				input
 			};
 
-			var walker = new CommonWalker(new DataWriterSettings
+			var walker = new ModelWalker(new DataWriterSettings
 			{
 				GraphCycles = GraphCycleType.MaxDepth,
 				MaxDepth = 25
@@ -951,7 +951,7 @@ namespace JsonFx.Serialization
 				input
 			};
 
-			var walker = new CommonWalker(new DataWriterSettings
+			var walker = new ModelWalker(new DataWriterSettings
 			{
 				GraphCycles = GraphCycleType.MaxDepth,
 				MaxDepth = 0
@@ -1033,7 +1033,7 @@ namespace JsonFx.Serialization
 				}
 			};
 
-			var walker = new CommonWalker(new DataWriterSettings
+			var walker = new ModelWalker(new DataWriterSettings
 			{
 				GraphCycles = GraphCycleType.MaxDepth,
 				MaxDepth = 19
@@ -1060,10 +1060,10 @@ namespace JsonFx.Serialization
 
 			var expected = new[]
 				{
-					CommonGrammar.TokenNull
+					ModelGrammar.TokenNull
 				};
 
-			var walker = new CommonWalker(new DataWriterSettings());
+			var walker = new ModelWalker(new DataWriterSettings());
 			var actual = walker.GetTokens(input).ToArray();
 
 			Assert.Equal(expected, actual);
@@ -1076,7 +1076,7 @@ namespace JsonFx.Serialization
 			ArgumentNullException ex = Assert.Throws<ArgumentNullException>(
 				delegate
 				{
-					var walker = new CommonWalker(null);
+					var walker = new ModelWalker(null);
 				});
 
 			// verify exception is coming from expected param

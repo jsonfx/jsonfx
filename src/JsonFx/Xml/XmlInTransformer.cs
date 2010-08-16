@@ -31,9 +31,9 @@
 using System;
 using System.Collections.Generic;
 
-using JsonFx.Common;
 using JsonFx.IO;
 using JsonFx.Markup;
+using JsonFx.Model;
 using JsonFx.Serialization;
 
 namespace JsonFx.Xml
@@ -41,9 +41,9 @@ namespace JsonFx.Xml
 	public partial class XmlReader
 	{
 		/// <summary>
-		/// Transforms markup tokens into common data tokens using an XML-data model
+		/// Transforms markup tokens into Common Model tokens using an XML-data model
 		/// </summary>
-		public class XmlInTransformer : IDataTransformer<MarkupTokenType, CommonTokenType>
+		public class XmlInTransformer : IDataTransformer<MarkupTokenType, ModelTokenType>
 		{
 			#region Constants
 
@@ -82,12 +82,12 @@ namespace JsonFx.Xml
 
 			#endregion Init
 
-			#region IDataTransformer<CommonTokenType, MarkupTokenType> Members
+			#region IDataTransformer<ModelTokenType, MarkupTokenType> Members
 
 			/// <summary>
 			/// Consumes a sequence of tokens and produces a token sequence of a different type
 			/// </summary>
-			public IEnumerable<Token<CommonTokenType>> Transform(IEnumerable<Token<MarkupTokenType>> input)
+			public IEnumerable<Token<ModelTokenType>> Transform(IEnumerable<Token<MarkupTokenType>> input)
 			{
 				if (input == null)
 				{
@@ -106,16 +106,16 @@ namespace JsonFx.Xml
 				}
 			}
 
-			#endregion IDataTransformer<CommonTokenType, MarkupTokenType> Members
+			#endregion IDataTransformer<ModelTokenType, MarkupTokenType> Members
 
-			#region CommonTokenType to MarkupTokenType Transformation Methods
+			#region ModelTokenType to MarkupTokenType Transformation Methods
 
 			/// <summary>
 			/// Formats the token sequence to the output
 			/// </summary>
 			/// <param name="output"></param>
 			/// <param name="input"></param>
-			private IList<Token<CommonTokenType>> TransformValue(IStream<Token<MarkupTokenType>> input, bool isStandAlone)
+			private IList<Token<ModelTokenType>> TransformValue(IStream<Token<MarkupTokenType>> input, bool isStandAlone)
 			{
 				Token<MarkupTokenType> token = input.Peek();
 				switch (token.TokenType)
@@ -126,7 +126,7 @@ namespace JsonFx.Xml
 
 						return new[]
 							{
-								token.ChangeType(CommonTokenType.Primitive)
+								token.ChangeType(ModelTokenType.Primitive)
 							};
 					}
 					case MarkupTokenType.ElementBegin:
@@ -143,7 +143,7 @@ namespace JsonFx.Xml
 				}
 			}
 
-			private IList<Token<CommonTokenType>> TransformElement(IStream<Token<MarkupTokenType>> input, bool isStandAlone)
+			private IList<Token<ModelTokenType>> TransformElement(IStream<Token<MarkupTokenType>> input, bool isStandAlone)
 			{
 				Token<MarkupTokenType> token = input.Peek();
 
@@ -151,7 +151,7 @@ namespace JsonFx.Xml
 				bool isVoid = (token.TokenType == MarkupTokenType.ElementVoid);
 				input.Pop();
 
-				IDictionary<DataName, IList<IList<Token<CommonTokenType>>>> children = null;
+				IDictionary<DataName, IList<IList<Token<ModelTokenType>>>> children = null;
 				while (!input.IsCompleted)
 				{
 					token = input.Peek();
@@ -163,14 +163,14 @@ namespace JsonFx.Xml
 							input.Pop();
 						}
 
-						List<Token<CommonTokenType>> output = new List<Token<CommonTokenType>>();
+						List<Token<ModelTokenType>> output = new List<Token<ModelTokenType>>();
 
 						if ((children == null) ||
 							(children.Count <= 1) ||
 							elementName == XmlInTransformer.DefaultArrayName)
 						{
 							DataName childName = DataName.Empty;
-							IList<IList<Token<CommonTokenType>>> items = null;
+							IList<IList<Token<ModelTokenType>>> items = null;
 							if (children != null)
 							{
 								// grab the first
@@ -190,7 +190,7 @@ namespace JsonFx.Xml
 							{
 								// if only child has more than one grandchild
 								// then whole element is acutally an array
-								output.Add(elementName.IsEmpty ? CommonGrammar.TokenArrayBeginUnnamed : CommonGrammar.TokenArrayBegin(this.DecodeName(elementName, typeof(Array))));
+								output.Add(elementName.IsEmpty ? ModelGrammar.TokenArrayBeginUnnamed : ModelGrammar.TokenArrayBegin(this.DecodeName(elementName, typeof(Array))));
 
 								if (items != null)
 								{
@@ -200,14 +200,14 @@ namespace JsonFx.Xml
 									}
 								}
 
-								output.Add(CommonGrammar.TokenArrayEnd);
+								output.Add(ModelGrammar.TokenArrayEnd);
 								return output;
 							}
 						}
 
 						if (isStandAlone)
 						{
-							output.Add(elementName.IsEmpty ? CommonGrammar.TokenObjectBeginUnnamed : CommonGrammar.TokenObjectBegin(elementName));
+							output.Add(elementName.IsEmpty ? ModelGrammar.TokenObjectBeginUnnamed : ModelGrammar.TokenObjectBegin(elementName));
 						}
 
 						if (children != null)
@@ -220,7 +220,7 @@ namespace JsonFx.Xml
 									{
 										// if the parent is a stand alone object then child is a property
 										DataName name = this.DecodeName(property.Key, typeof(Object));
-										output.Add(name.IsEmpty ? CommonGrammar.TokenProperty(elementName) : CommonGrammar.TokenProperty(name));
+										output.Add(name.IsEmpty ? ModelGrammar.TokenProperty(elementName) : ModelGrammar.TokenProperty(name));
 									}
 									output.AddRange(property.Value[0]);
 									continue;
@@ -233,22 +233,22 @@ namespace JsonFx.Xml
 								}
 
 								// wrap values in array
-								output.Add(property.Key.IsEmpty ? CommonGrammar.TokenArrayBeginUnnamed : CommonGrammar.TokenArrayBegin(this.DecodeName(property.Key, typeof(Array))));
+								output.Add(property.Key.IsEmpty ? ModelGrammar.TokenArrayBeginUnnamed : ModelGrammar.TokenArrayBegin(this.DecodeName(property.Key, typeof(Array))));
 								foreach (var item in property.Value)
 								{
 									output.AddRange(item);
 								}
-								output.Add(CommonGrammar.TokenArrayEnd);
+								output.Add(ModelGrammar.TokenArrayEnd);
 							}
 						}
 						else if (!isStandAlone)
 						{
-							output.Add(CommonGrammar.TokenNull);
+							output.Add(ModelGrammar.TokenNull);
 						}
 
 						if (isStandAlone)
 						{
-							output.Add(CommonGrammar.TokenObjectEnd);
+							output.Add(ModelGrammar.TokenObjectEnd);
 						}
 
 						return output;
@@ -262,16 +262,16 @@ namespace JsonFx.Xml
 
 					if (children == null)
 					{
-						children = new Dictionary<DataName, IList<IList<Token<CommonTokenType>>>>();
+						children = new Dictionary<DataName, IList<IList<Token<ModelTokenType>>>>();
 					}
 					if (!children.ContainsKey(propertyName))
 					{
-						children[propertyName] = new List<IList<Token<CommonTokenType>>>();
+						children[propertyName] = new List<IList<Token<ModelTokenType>>>();
 					}
 
 					var child = this.TransformValue(input, !isStandAlone);
 					if (child.Count == 1 &&
-						child[0].TokenType == CommonTokenType.Primitive &&
+						child[0].TokenType == ModelTokenType.Primitive &&
 						child[0].Value != null &&
 						IsNullOrWhiteSpace(child[0].ValueAsString()))
 					{
@@ -287,7 +287,7 @@ namespace JsonFx.Xml
 					XmlInTransformer.ErrorUnterminatedObject);
 			}
 
-			#endregion CommonTokenType to MarkupTokenType Transformation Methods
+			#endregion ModelTokenType to MarkupTokenType Transformation Methods
 
 			#region Utility Methods
 

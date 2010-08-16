@@ -32,10 +32,10 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 
-using JsonFx.Common;
+using JsonFx.Model;
 using JsonFx.Serialization;
 
-using TokenSequence=System.Collections.Generic.IEnumerable<JsonFx.Serialization.Token<JsonFx.Common.CommonTokenType>>;
+using TokenSequence=System.Collections.Generic.IEnumerable<JsonFx.Serialization.Token<JsonFx.Model.ModelTokenType>>;
 
 namespace JsonFx.Linq
 {
@@ -54,7 +54,7 @@ namespace JsonFx.Linq
 		/// </summary>
 		/// <param name="analyzer"></param>
 		/// <param name="sequences"></param>
-		public QueryProvider(ITokenAnalyzer<CommonTokenType> analyzer, IQueryable<TokenSequence> sequences)
+		public QueryProvider(ITokenAnalyzer<ModelTokenType> analyzer, IQueryable<TokenSequence> sequences)
 		{
 			if (analyzer == null)
 			{

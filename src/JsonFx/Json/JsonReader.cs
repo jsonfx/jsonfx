@@ -31,8 +31,8 @@
 using System;
 using System.Collections.Generic;
 
-using JsonFx.Common;
-using JsonFx.Common.Filters;
+using JsonFx.Model;
+using JsonFx.Model.Filters;
 using JsonFx.Serialization;
 using JsonFx.Serialization.Filters;
 
@@ -41,7 +41,7 @@ namespace JsonFx.Json
 	/// <summary>
 	/// JSON deserializer
 	/// </summary>
-	public partial class JsonReader : CommonReader
+	public partial class JsonReader : ModelReader
 	{
 		#region Init
 
@@ -58,7 +58,7 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="settings"></param>
 		public JsonReader(DataReaderSettings settings)
-			: base(settings, new IDataFilter<CommonTokenType>[] { new Iso8601DateFilter() })
+			: base(settings, new IDataFilter<ModelTokenType>[] { new Iso8601DateFilter() })
 		{
 		}
 
@@ -67,8 +67,8 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <param name="filters"></param>
-		public JsonReader(DataReaderSettings settings, params IDataFilter<CommonTokenType>[] filters)
-			: base(settings, (IEnumerable<IDataFilter<CommonTokenType>>)filters)
+		public JsonReader(DataReaderSettings settings, params IDataFilter<ModelTokenType>[] filters)
+			: base(settings, (IEnumerable<IDataFilter<ModelTokenType>>)filters)
 		{
 		}
 
@@ -77,7 +77,7 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <param name="filters"></param>
-		public JsonReader(DataReaderSettings settings, IEnumerable<IDataFilter<CommonTokenType>> filters)
+		public JsonReader(DataReaderSettings settings, IEnumerable<IDataFilter<ModelTokenType>> filters)
 			: base(settings, filters)
 		{
 		}
@@ -103,7 +103,7 @@ namespace JsonFx.Json
 
 		#region IDataReader Methods
 
-		protected override ITextTokenizer<CommonTokenType> GetTokenizer()
+		protected override ITextTokenizer<ModelTokenType> GetTokenizer()
 		{
 			return new JsonReader.JsonTokenizer();
 		}

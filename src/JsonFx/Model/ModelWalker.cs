@@ -38,17 +38,17 @@ using JsonFx.Serialization.Filters;
 using JsonFx.Serialization.GraphCycles;
 using JsonFx.Serialization.Resolvers;
 
-namespace JsonFx.Common
+namespace JsonFx.Model
 {
 	/// <summary>
 	/// Generates a sequence of tokens from an object graph
 	/// </summary>
-	public class CommonWalker : IObjectWalker<CommonTokenType>
+	public class ModelWalker : IObjectWalker<ModelTokenType>
 	{
 		#region Fields
 
 		private readonly DataWriterSettings Settings;
-		private readonly IEnumerable<IDataFilter<CommonTokenType>> Filters;
+		private readonly IEnumerable<IDataFilter<ModelTokenType>> Filters;
 
 		#endregion Fields
 
@@ -59,8 +59,8 @@ namespace JsonFx.Common
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <param name="filters"></param>
-		public CommonWalker(DataWriterSettings settings, params IDataFilter<CommonTokenType>[] filters)
-			: this(settings, (IEnumerable<IDataFilter<CommonTokenType>>)filters)
+		public ModelWalker(DataWriterSettings settings, params IDataFilter<ModelTokenType>[] filters)
+			: this(settings, (IEnumerable<IDataFilter<ModelTokenType>>)filters)
 		{
 		}
 
@@ -69,7 +69,7 @@ namespace JsonFx.Common
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <param name="filters"></param>
-		public CommonWalker(DataWriterSettings settings, IEnumerable<IDataFilter<CommonTokenType>> filters)
+		public ModelWalker(DataWriterSettings settings, IEnumerable<IDataFilter<ModelTokenType>> filters)
 		{
 			if (settings == null)
 			{
@@ -79,7 +79,7 @@ namespace JsonFx.Common
 
 			if (filters == null)
 			{
-				filters = new IDataFilter<CommonTokenType>[0];
+				filters = new IDataFilter<ModelTokenType>[0];
 			}
 			this.Filters = filters;
 
@@ -101,7 +101,7 @@ namespace JsonFx.Common
 		/// </summary>
 		/// <param name="value"></param>
 		/// <returns></returns>
-		public IEnumerable<Token<CommonTokenType>> GetTokens(object value)
+		public IEnumerable<Token<ModelTokenType>> GetTokens(object value)
 		{
 			ICycleDetector detector;
 			switch (this.Settings.GraphCycles)
@@ -118,7 +118,7 @@ namespace JsonFx.Common
 				}
 			}
 
-			List<Token<CommonTokenType>> tokens = new List<Token<CommonTokenType>>();
+			List<Token<ModelTokenType>> tokens = new List<Token<ModelTokenType>>();
 			this.GetTokens(tokens, detector, value);
 			return tokens;
 		}
@@ -127,11 +127,11 @@ namespace JsonFx.Common
 
 		#region Walker Methods
 
-		private void GetTokens(List<Token<CommonTokenType>> tokens, ICycleDetector detector, object value)
+		private void GetTokens(List<Token<ModelTokenType>> tokens, ICycleDetector detector, object value)
 		{
 			if (value == null)
 			{
-				tokens.Add(CommonGrammar.TokenNull);
+				tokens.Add(ModelGrammar.TokenNull);
 				return;
 			}
 
@@ -154,7 +154,7 @@ namespace JsonFx.Common
 					{
 						// no need to remove value as was duplicate reference
 						// replace cycle with null
-						tokens.Add(CommonGrammar.TokenNull);
+						tokens.Add(ModelGrammar.TokenNull);
 						return;
 					}
 				}
@@ -164,7 +164,7 @@ namespace JsonFx.Common
 			{
 				foreach (var filter in this.Filters)
 				{
-					IEnumerable<Token<CommonTokenType>> filterResult;
+					IEnumerable<Token<ModelTokenType>> filterResult;
 					if (filter.TryWrite(this.Settings, value, out filterResult))
 					{
 						// found a successful match
@@ -178,7 +178,7 @@ namespace JsonFx.Common
 				// must test enumerations before other value types
 				if (type.IsEnum)
 				{
-					tokens.Add(CommonGrammar.TokenPrimitive((Enum)value));
+					tokens.Add(ModelGrammar.TokenPrimitive((Enum)value));
 					return;
 				}
 
@@ -187,7 +187,7 @@ namespace JsonFx.Common
 				{
 					case TypeCode.Boolean:
 					{
-						tokens.Add(true.Equals(value) ? CommonGrammar.TokenTrue : CommonGrammar.TokenFalse);
+						tokens.Add(true.Equals(value) ? ModelGrammar.TokenTrue : ModelGrammar.TokenFalse);
 						return;
 					}
 					case TypeCode.Byte:
@@ -200,7 +200,7 @@ namespace JsonFx.Common
 					case TypeCode.UInt32:
 					case TypeCode.UInt64:
 					{
-						tokens.Add(CommonGrammar.TokenPrimitive((ValueType)value));
+						tokens.Add(ModelGrammar.TokenPrimitive((ValueType)value));
 						return;
 					}
 					case TypeCode.Double:
@@ -209,19 +209,19 @@ namespace JsonFx.Common
 
 						if (Double.IsNaN(doubleVal))
 						{
-							tokens.Add(CommonGrammar.TokenNaN);
+							tokens.Add(ModelGrammar.TokenNaN);
 						}
 						else if (Double.IsPositiveInfinity(doubleVal))
 						{
-							tokens.Add(CommonGrammar.TokenPositiveInfinity);
+							tokens.Add(ModelGrammar.TokenPositiveInfinity);
 						}
 						else if (Double.IsNegativeInfinity(doubleVal))
 						{
-							tokens.Add(CommonGrammar.TokenNegativeInfinity);
+							tokens.Add(ModelGrammar.TokenNegativeInfinity);
 						}
 						else
 						{
-							tokens.Add(CommonGrammar.TokenPrimitive(doubleVal));
+							tokens.Add(ModelGrammar.TokenPrimitive(doubleVal));
 						}
 						return;
 					}
@@ -232,21 +232,21 @@ namespace JsonFx.Common
 						if (Single.IsNaN(floatVal))
 						{
 							// use the Double equivalent
-							tokens.Add(CommonGrammar.TokenNaN);
+							tokens.Add(ModelGrammar.TokenNaN);
 						}
 						else if (Single.IsPositiveInfinity(floatVal))
 						{
 							// use the Double equivalent
-							tokens.Add(CommonGrammar.TokenPositiveInfinity);
+							tokens.Add(ModelGrammar.TokenPositiveInfinity);
 						}
 						else if (Single.IsNegativeInfinity(floatVal))
 						{
 							// use the Double equivalent
-							tokens.Add(CommonGrammar.TokenNegativeInfinity);
+							tokens.Add(ModelGrammar.TokenNegativeInfinity);
 						}
 						else
 						{
-							tokens.Add(CommonGrammar.TokenPrimitive(floatVal));
+							tokens.Add(ModelGrammar.TokenPrimitive(floatVal));
 						}
 						return;
 					}
@@ -254,13 +254,13 @@ namespace JsonFx.Common
 					case TypeCode.DateTime:
 					case TypeCode.String:
 					{
-						tokens.Add(CommonGrammar.TokenPrimitive(value));
+						tokens.Add(ModelGrammar.TokenPrimitive(value));
 						return;
 					}
 					case TypeCode.DBNull:
 					case TypeCode.Empty:
 					{
-						tokens.Add(CommonGrammar.TokenNull);
+						tokens.Add(ModelGrammar.TokenNull);
 						return;
 					}
 				}
@@ -273,13 +273,13 @@ namespace JsonFx.Common
 
 				if (value is Guid || value is Uri || value is Version)
 				{
-					tokens.Add(CommonGrammar.TokenPrimitive(value));
+					tokens.Add(ModelGrammar.TokenPrimitive(value));
 					return;
 				}
 
 				if (value is TimeSpan)
 				{
-					tokens.Add(CommonGrammar.TokenPrimitive((TimeSpan)value));
+					tokens.Add(ModelGrammar.TokenPrimitive((TimeSpan)value));
 					return;
 				}
 
@@ -301,7 +301,7 @@ namespace JsonFx.Common
 			}
 		}
 
-		private void GetArrayTokens(List<Token<CommonTokenType>> tokens, ICycleDetector detector, IEnumerable value)
+		private void GetArrayTokens(List<Token<ModelTokenType>> tokens, ICycleDetector detector, IEnumerable value)
 		{
 			DataName typeName = this.GetTypeName(value);
 			IEnumerator enumerator = value.GetEnumerator();
@@ -318,48 +318,48 @@ namespace JsonFx.Common
 				return;
 			}
 
-			tokens.Add(CommonGrammar.TokenArrayBegin(typeName));
+			tokens.Add(ModelGrammar.TokenArrayBegin(typeName));
 
 			while (enumerator.MoveNext())
 			{
 				this.GetTokens(tokens, detector, enumerator.Current);
 			}
 
-			tokens.Add(CommonGrammar.TokenArrayEnd);
+			tokens.Add(ModelGrammar.TokenArrayEnd);
 		}
 
-		private void GetObjectTokens(List<Token<CommonTokenType>> tokens, ICycleDetector detector, DataName typeName, IDictionaryEnumerator enumerator)
+		private void GetObjectTokens(List<Token<ModelTokenType>> tokens, ICycleDetector detector, DataName typeName, IDictionaryEnumerator enumerator)
 		{
-			tokens.Add(CommonGrammar.TokenObjectBegin(typeName));
+			tokens.Add(ModelGrammar.TokenObjectBegin(typeName));
 
 			while (enumerator.MoveNext())
 			{
-				tokens.Add(CommonGrammar.TokenProperty(enumerator.Key));
+				tokens.Add(ModelGrammar.TokenProperty(enumerator.Key));
 				this.GetTokens(tokens, detector, enumerator.Value);
 			}
 
-			tokens.Add(CommonGrammar.TokenObjectEnd);
+			tokens.Add(ModelGrammar.TokenObjectEnd);
 		}
 
-		private void GetObjectTokens(List<Token<CommonTokenType>> tokens, ICycleDetector detector, DataName typeName, IEnumerator<KeyValuePair<string, object>> enumerator)
+		private void GetObjectTokens(List<Token<ModelTokenType>> tokens, ICycleDetector detector, DataName typeName, IEnumerator<KeyValuePair<string, object>> enumerator)
 		{
-			tokens.Add(CommonGrammar.TokenObjectBegin(typeName));
+			tokens.Add(ModelGrammar.TokenObjectBegin(typeName));
 
 			while (enumerator.MoveNext())
 			{
 				KeyValuePair<string, object> pair = enumerator.Current;
-				tokens.Add(CommonGrammar.TokenProperty(pair.Key));
+				tokens.Add(ModelGrammar.TokenProperty(pair.Key));
 				this.GetTokens(tokens, detector, pair.Value);
 			}
 
-			tokens.Add(CommonGrammar.TokenObjectEnd);
+			tokens.Add(ModelGrammar.TokenObjectEnd);
 		}
 
 #if NET40 && !WINDOWS_PHONE
-		private void GetObjectTokens(List<Token<CommonTokenType>> tokens, ICycleDetector detector, Type type, System.Dynamic.DynamicObject value)
+		private void GetObjectTokens(List<Token<ModelTokenType>> tokens, ICycleDetector detector, Type type, System.Dynamic.DynamicObject value)
 		{
 			DataName typeName = this.GetTypeName(value);
-			tokens.Add(CommonGrammar.TokenObjectBegin(typeName));
+			tokens.Add(ModelGrammar.TokenObjectBegin(typeName));
 
 			foreach (var memberName in value.GetDynamicMemberNames())
 			{
@@ -369,24 +369,24 @@ namespace JsonFx.Common
 					continue;
 				}
 
-				tokens.Add(CommonGrammar.TokenProperty(memberName));
+				tokens.Add(ModelGrammar.TokenProperty(memberName));
 				this.GetTokens(tokens, detector, propertyValue);
 			}
 
-			tokens.Add(CommonGrammar.TokenObjectEnd);
+			tokens.Add(ModelGrammar.TokenObjectEnd);
 		}
 #endif
 
-		private void GetObjectTokens(List<Token<CommonTokenType>> tokens, ICycleDetector detector, Type type, object value)
+		private void GetObjectTokens(List<Token<ModelTokenType>> tokens, ICycleDetector detector, Type type, object value)
 		{
 			DataName typeName = this.GetTypeName(value);
-			tokens.Add(CommonGrammar.TokenObjectBegin(typeName));
+			tokens.Add(ModelGrammar.TokenObjectBegin(typeName));
 
 			IDictionary<string, MemberMap> maps = this.Settings.Resolver.LoadMaps(type);
 			if (maps == null)
 			{
 				// TODO: verify no other valid situations here
-				tokens.Add(CommonGrammar.TokenObjectEnd);
+				tokens.Add(ModelGrammar.TokenObjectEnd);
 				return;
 			}
 
@@ -408,11 +408,11 @@ namespace JsonFx.Common
 					continue;
 				}
 
-				tokens.Add(CommonGrammar.TokenProperty(map.DataName));
+				tokens.Add(ModelGrammar.TokenProperty(map.DataName));
 				this.GetTokens(tokens, detector, propertyValue);
 			}
 
-			tokens.Add(CommonGrammar.TokenObjectEnd);
+			tokens.Add(ModelGrammar.TokenObjectEnd);
 		}
 
 		#endregion Walker Methods

@@ -34,12 +34,12 @@ using System.Collections.Generic;
 using JsonFx.Serialization;
 using JsonFx.Serialization.Filters;
 
-namespace JsonFx.Common
+namespace JsonFx.Model
 {
 	/// <summary>
 	/// Provides base implementation for standard deserializers
 	/// </summary>
-	public abstract partial class CommonReader : DataReader<CommonTokenType>
+	public abstract partial class ModelReader : DataReader<ModelTokenType>
 	{
 		#region Init
 
@@ -47,8 +47,8 @@ namespace JsonFx.Common
 		/// Ctor
 		/// </summary>
 		/// <param name="settings"></param>
-		public CommonReader(DataReaderSettings settings, params IDataFilter<CommonTokenType>[] filters)
-			: base(settings, (IEnumerable<IDataFilter<CommonTokenType>>)filters)
+		public ModelReader(DataReaderSettings settings, params IDataFilter<ModelTokenType>[] filters)
+			: base(settings, (IEnumerable<IDataFilter<ModelTokenType>>)filters)
 		{
 		}
 
@@ -57,7 +57,7 @@ namespace JsonFx.Common
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <param name="filters"></param>
-		public CommonReader(DataReaderSettings settings, IEnumerable<IDataFilter<CommonTokenType>> filters)
+		public ModelReader(DataReaderSettings settings, IEnumerable<IDataFilter<ModelTokenType>> filters)
 			: base(settings, filters)
 		{
 		}
@@ -66,9 +66,9 @@ namespace JsonFx.Common
 
 		#region IDataReader Methods
 
-		protected override ITokenAnalyzer<CommonTokenType> GetAnalyzer()
+		protected override ITokenAnalyzer<ModelTokenType> GetAnalyzer()
 		{
-			return new CommonAnalyzer(this.Settings, this.Filters);
+			return new ModelAnalyzer(this.Settings, this.Filters);
 		}
 
 		#endregion IDataReader Methods

@@ -35,8 +35,8 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
-using JsonFx.Common;
 using JsonFx.IO;
+using JsonFx.Model;
 using JsonFx.Serialization;
 
 namespace JsonFx.Bson
@@ -67,7 +67,7 @@ namespace JsonFx.Bson
 		/// <summary>
 		/// Outputs BSON bytes from an input stream of tokens
 		/// </summary>
-		public class BsonFormatter : IBinaryFormatter<CommonTokenType>
+		public class BsonFormatter : IBinaryFormatter<ModelTokenType>
 		{
 			#region Format Methods
 
@@ -75,7 +75,7 @@ namespace JsonFx.Bson
 			/// Formats the token sequence as a string
 			/// </summary>
 			/// <param name="tokens"></param>
-			public byte[] Format(IEnumerable<Token<CommonTokenType>> tokens)
+			public byte[] Format(IEnumerable<Token<ModelTokenType>> tokens)
 			{
 				if (tokens == null)
 				{
@@ -95,7 +95,7 @@ namespace JsonFx.Bson
 			/// </summary>
 			/// <param name="writer"></param>
 			/// <param name="tokens"></param>
-			public void Format(IEnumerable<Token<CommonTokenType>> tokens, Stream stream)
+			public void Format(IEnumerable<Token<ModelTokenType>> tokens, Stream stream)
 			{
 				if (stream == null)
 				{
@@ -108,7 +108,7 @@ namespace JsonFx.Bson
 
 				using (BinaryWriter writer = new BinaryWriter(stream, Encoding.UTF8))
 				{
-					IStream<Token<CommonTokenType>> tokenStream = Stream<Token<CommonTokenType>>.Create(tokens);
+					IStream<Token<ModelTokenType>> tokenStream = Stream<Token<ModelTokenType>>.Create(tokens);
 					if (!tokenStream.IsCompleted)
 					{
 						this.WriteDocument(writer, tokenStream);
@@ -126,27 +126,27 @@ namespace JsonFx.Bson
 			/// <param name="writer"></param>
 			/// <param name="tokens"></param>
 			/// <returns>number of bytes written</returns>
-			private int WriteDocument(BinaryWriter writer, IStream<Token<CommonTokenType>> tokens)
+			private int WriteDocument(BinaryWriter writer, IStream<Token<ModelTokenType>> tokens)
 			{
-				Token<CommonTokenType> token = tokens.Peek();
+				Token<ModelTokenType> token = tokens.Peek();
 				if (tokens.IsCompleted || token == null)
 				{
-					throw new TokenException<CommonTokenType>(token, BsonWriter.ErrorUnterminated);
+					throw new TokenException<ModelTokenType>(token, BsonWriter.ErrorUnterminated);
 				}
 
 				bool isArray;
-				if (token.TokenType == CommonTokenType.ArrayBegin)
+				if (token.TokenType == ModelTokenType.ArrayBegin)
 				{
 					isArray = true;
 				}
-				else if (token.TokenType == CommonTokenType.ObjectBegin)
+				else if (token.TokenType == ModelTokenType.ObjectBegin)
 				{
 					isArray = false;
 				}
 				else
 				{
 					// root must be a document
-					throw new TokenException<CommonTokenType>(token,
+					throw new TokenException<ModelTokenType>(token,
 						String.Format(BsonWriter.ErrorUnexpectedToken, token.TokenType));
 				}
 				tokens.Pop();
@@ -164,7 +164,7 @@ namespace JsonFx.Bson
 				{
 					if (isArray)
 					{
-						if (token.TokenType == CommonTokenType.ArrayEnd)
+						if (token.TokenType == ModelTokenType.ArrayEnd)
 						{
 							// consume closing
 							tokens.Pop();
@@ -173,7 +173,7 @@ namespace JsonFx.Bson
 					}
 					else
 					{
-						if (token.TokenType == CommonTokenType.ObjectEnd)
+						if (token.TokenType == ModelTokenType.ObjectEnd)
 						{
 							// consume closing
 							tokens.Pop();
@@ -188,9 +188,9 @@ namespace JsonFx.Bson
 					}
 					else
 					{
-						if (token.TokenType != CommonTokenType.Property)
+						if (token.TokenType != ModelTokenType.Property)
 						{
-							throw new TokenException<CommonTokenType>(token,
+							throw new TokenException<ModelTokenType>(token,
 								String.Format(BsonWriter.ErrorUnexpectedToken, token.TokenType));
 						}
 
@@ -226,28 +226,28 @@ namespace JsonFx.Bson
 			/// <param name="tokens"></param>
 			/// <param name="ename"></param>
 			/// <returns>number of bytes written</returns>
-			private int WriteElement(BinaryWriter writer, IStream<Token<CommonTokenType>> tokens, string ename)
+			private int WriteElement(BinaryWriter writer, IStream<Token<ModelTokenType>> tokens, string ename)
 			{
-				Token<CommonTokenType> token = tokens.Peek();
+				Token<ModelTokenType> token = tokens.Peek();
 				if (tokens.IsCompleted || token == null)
 				{
-					throw new TokenException<CommonTokenType>(token, BsonWriter.ErrorUnterminated);
+					throw new TokenException<ModelTokenType>(token, BsonWriter.ErrorUnterminated);
 				}
 
 				BsonElementType elemType;
 				switch (token.TokenType)
 				{
-					case CommonTokenType.ArrayBegin:
+					case ModelTokenType.ArrayBegin:
 					{
 						elemType = BsonElementType.Array;
 						break;
 					}
-					case CommonTokenType.ObjectBegin:
+					case ModelTokenType.ObjectBegin:
 					{
 						elemType = BsonElementType.Document;
 						break;
 					}
-					case CommonTokenType.Primitive:
+					case ModelTokenType.Primitive:
 					{
 						elemType = BsonFormatter.GetElementType(token.Value);
 						break;
@@ -255,7 +255,7 @@ namespace JsonFx.Bson
 					default:
 					{
 						// the rest are invalid states
-						throw new TokenException<CommonTokenType>(token,
+						throw new TokenException<ModelTokenType>(token,
 							String.Format(BsonWriter.ErrorUnexpectedToken, token.TokenType));
 					}
 				}
@@ -469,7 +469,7 @@ namespace JsonFx.Bson
 						default:
 						{
 							// the rest are invalid states
-							throw new TokenException<CommonTokenType>(token,
+							throw new TokenException<ModelTokenType>(token,
 								String.Format(BsonWriter.ErrorUnexpectedToken, token.TokenType));
 						}
 					}
@@ -512,7 +512,7 @@ namespace JsonFx.Bson
 			/// <param name="writer"></param>
 			/// <param name="tokens"></param>
 			/// <returns>number of bytes written</returns>
-			private static int WriteBinary(BinaryWriter writer, Token<CommonTokenType> token)
+			private static int WriteBinary(BinaryWriter writer, Token<ModelTokenType> token)
 			{
 				BsonBinary binary = BsonFormatter.GetBsonBinary(token.Value);
 

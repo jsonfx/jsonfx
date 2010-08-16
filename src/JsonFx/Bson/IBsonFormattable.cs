@@ -29,9 +29,8 @@
 #endregion License
 
 using System;
-using System.IO;
 
-using JsonFx.Common;
+using JsonFx.Model;
 using JsonFx.Serialization;
 
 namespace JsonFx.Bson
@@ -39,7 +38,7 @@ namespace JsonFx.Bson
 	/// <summary>
 	/// Designates a type as being able to format itself to raw BSON bytes
 	/// </summary>
-	public interface IBsonFormattable : IBinaryFormattable<CommonTokenType>
+	public interface IBsonFormattable : IBinaryFormattable<ModelTokenType>
 	{
 		/// <summary>
 		/// Determines the corresponding BSON element type

@@ -34,8 +34,8 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 
-using JsonFx.Common;
 using JsonFx.IO;
+using JsonFx.Model;
 using JsonFx.Serialization;
 
 namespace JsonFx.Json
@@ -45,7 +45,7 @@ namespace JsonFx.Json
 		/// <summary>
 		/// Generates a sequence of tokens from JSON text
 		/// </summary>
-		public class JsonTokenizer : ITextTokenizer<CommonTokenType>
+		public class JsonTokenizer : ITextTokenizer<ModelTokenType>
 		{
 			#region NeedsValueDelim
 
@@ -125,7 +125,7 @@ namespace JsonFx.Json
 			/// </summary>
 			/// <param name="scanner"></param>
 			/// <returns></returns>
-			protected IEnumerable<Token<CommonTokenType>> GetTokens(ITextStream scanner)
+			protected IEnumerable<Token<ModelTokenType>> GetTokens(ITextStream scanner)
 			{
 				if (scanner == null)
 				{
@@ -163,7 +163,7 @@ namespace JsonFx.Json
 								throw new DeserializationException(JsonTokenizer.ErrorMissingValueDelim, scanner.Index, scanner.Line, scanner.Column);
 							}
 
-							yield return CommonGrammar.TokenArrayBeginUnnamed;
+							yield return ModelGrammar.TokenArrayBeginUnnamed;
 							depth++;
 							needsValueDelim = NeedsValueDelim.Forbidden;
 							continue;
@@ -176,7 +176,7 @@ namespace JsonFx.Json
 								throw new DeserializationException(JsonTokenizer.ErrorExtraValueDelim, scanner.Index, scanner.Line, scanner.Column);
 							}
 
-							yield return CommonGrammar.TokenArrayEnd;
+							yield return ModelGrammar.TokenArrayEnd;
 
 							// resetting at zero allows streaming mode
 							depth--;
@@ -191,7 +191,7 @@ namespace JsonFx.Json
 								throw new DeserializationException(JsonTokenizer.ErrorMissingValueDelim, scanner.Index, scanner.Line, scanner.Column);
 							}
 
-							yield return CommonGrammar.TokenObjectBeginUnnamed;
+							yield return ModelGrammar.TokenObjectBeginUnnamed;
 							depth++;
 							needsValueDelim = NeedsValueDelim.Forbidden;
 							continue;
@@ -204,7 +204,7 @@ namespace JsonFx.Json
 								throw new DeserializationException(JsonTokenizer.ErrorExtraValueDelim, scanner.Index, scanner.Line, scanner.Column);
 							}
 
-							yield return CommonGrammar.TokenObjectEnd;
+							yield return ModelGrammar.TokenObjectEnd;
 
 							// resetting at zero allows streaming mode
 							depth--;
@@ -225,12 +225,12 @@ namespace JsonFx.Json
 							if (scanner.Peek() == JsonGrammar.OperatorPairDelim)
 							{
 								scanner.Pop();
-								yield return CommonGrammar.TokenProperty(new DataName(value));
+								yield return ModelGrammar.TokenProperty(new DataName(value));
 								needsValueDelim = NeedsValueDelim.Forbidden;
 								continue;
 							}
 
-							yield return CommonGrammar.TokenPrimitive(value);
+							yield return ModelGrammar.TokenPrimitive(value);
 							needsValueDelim = NeedsValueDelim.Required;
 							continue;
 						}
@@ -264,7 +264,7 @@ namespace JsonFx.Json
 					}
 
 					// scan for numbers
-					Token<CommonTokenType> token = JsonTokenizer.ScanNumber(scanner);
+					Token<ModelTokenType> token = JsonTokenizer.ScanNumber(scanner);
 					if (token != null)
 					{
 						yield return token;
@@ -392,7 +392,7 @@ namespace JsonFx.Json
 				}
 			}
 
-			private static Token<CommonTokenType> ScanNumber(ITextStream scanner)
+			private static Token<ModelTokenType> ScanNumber(ITextStream scanner)
 			{
 				// store for error cases
 				long numPos = scanner.Index+1;
@@ -538,17 +538,17 @@ namespace JsonFx.Json
 					if (number >= Int32.MinValue && number <= Int32.MaxValue)
 					{
 						// int most common
-						return CommonGrammar.TokenPrimitive((int)number);
+						return ModelGrammar.TokenPrimitive((int)number);
 					}
 
 					if (number >= Int64.MinValue && number <= Int64.MaxValue)
 					{
 						// long more flexible
-						return CommonGrammar.TokenPrimitive((long)number);
+						return ModelGrammar.TokenPrimitive((long)number);
 					}
 
 					// decimal most flexible
-					return CommonGrammar.TokenPrimitive(number);
+					return ModelGrammar.TokenPrimitive(number);
 				}
 				else
 				{
@@ -564,7 +564,7 @@ namespace JsonFx.Json
 					}
 
 					// native EcmaScript number (IEEE-754)
-					return CommonGrammar.TokenPrimitive(number);
+					return ModelGrammar.TokenPrimitive(number);
 				}
 			}
 
@@ -732,7 +732,7 @@ namespace JsonFx.Json
 				}
 			}
 
-			private static Token<CommonTokenType> ScanKeywords(ITextStream scanner, string ident, char unary, out NeedsValueDelim needsValueDelim)
+			private static Token<ModelTokenType> ScanKeywords(ITextStream scanner, string ident, char unary, out NeedsValueDelim needsValueDelim)
 			{
 				needsValueDelim = NeedsValueDelim.Required;
 
@@ -745,7 +745,7 @@ namespace JsonFx.Json
 							return null;
 						}
 
-						return CommonGrammar.TokenFalse;
+						return ModelGrammar.TokenFalse;
 					}
 					case JsonGrammar.KeywordTrue:
 					{
@@ -754,7 +754,7 @@ namespace JsonFx.Json
 							return null;
 						}
 
-						return CommonGrammar.TokenTrue;
+						return ModelGrammar.TokenTrue;
 					}
 					case JsonGrammar.KeywordNull:
 					{
@@ -763,7 +763,7 @@ namespace JsonFx.Json
 							return null;
 						}
 
-						return CommonGrammar.TokenNull;
+						return ModelGrammar.TokenNull;
 					}
 					case JsonGrammar.KeywordNaN:
 					{
@@ -772,18 +772,18 @@ namespace JsonFx.Json
 							return null;
 						}
 
-						return CommonGrammar.TokenNaN;
+						return ModelGrammar.TokenNaN;
 					}
 					case JsonGrammar.KeywordInfinity:
 					{
 						if (unary == default(char) || unary == JsonGrammar.OperatorUnaryPlus)
 						{
-							return CommonGrammar.TokenPositiveInfinity;
+							return ModelGrammar.TokenPositiveInfinity;
 						}
 
 						if (unary == JsonGrammar.OperatorUnaryMinus)
 						{
-							return CommonGrammar.TokenNegativeInfinity;
+							return ModelGrammar.TokenNegativeInfinity;
 						}
 
 						return null;
@@ -795,7 +795,7 @@ namespace JsonFx.Json
 							return null;
 						}
 
-						return CommonGrammar.TokenNull;
+						return ModelGrammar.TokenNull;
 					}
 				}
 
@@ -810,7 +810,7 @@ namespace JsonFx.Json
 					scanner.Pop();
 
 					needsValueDelim = NeedsValueDelim.Forbidden;
-					return CommonGrammar.TokenProperty(new DataName(ident));
+					return ModelGrammar.TokenProperty(new DataName(ident));
 				}
 
 				return null;
@@ -864,11 +864,11 @@ namespace JsonFx.Json
 			/// </summary>
 			/// <param name="reader"></param>
 			/// <returns></returns>
-			public IEnumerable<Token<CommonTokenType>> GetTokens(TextReader reader)
+			public IEnumerable<Token<ModelTokenType>> GetTokens(TextReader reader)
 			{
 				// buffer the output so multiple passes over the results can access it
 				// otherwise second pass would result in empty list since stream is used up
-				return new SequenceBuffer<Token<CommonTokenType>>(this.GetTokens(new TextReaderStream(reader)));
+				return new SequenceBuffer<Token<ModelTokenType>>(this.GetTokens(new TextReaderStream(reader)));
 			}
 
 			/// <summary>
@@ -876,11 +876,11 @@ namespace JsonFx.Json
 			/// </summary>
 			/// <param name="text"></param>
 			/// <returns></returns>
-			public IEnumerable<Token<CommonTokenType>> GetTokens(string text)
+			public IEnumerable<Token<ModelTokenType>> GetTokens(string text)
 			{
 				// buffer the output so multiple passes over the results can access it
 				// otherwise second pass would result in empty list since stream is used up
-				return new SequenceBuffer<Token<CommonTokenType>>(this.GetTokens(new StringStream(text)));
+				return new SequenceBuffer<Token<ModelTokenType>>(this.GetTokens(new StringStream(text)));
 			}
 
 			#endregion ITextTokenizer<DataTokenType> Members

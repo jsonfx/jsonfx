@@ -32,7 +32,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using JsonFx.Common;
+using JsonFx.Model;
 using JsonFx.Serialization;
 using Xunit;
 
@@ -57,8 +57,8 @@ namespace JsonFx.Json
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayEnd
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayEnd
 			};
 
 			const string expected = "[]";
@@ -75,8 +75,8 @@ namespace JsonFx.Json
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayEnd
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayEnd
 			};
 
 			const string expected = "[]";
@@ -93,9 +93,9 @@ namespace JsonFx.Json
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenNull,
-				CommonGrammar.TokenArrayEnd
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenNull,
+				ModelGrammar.TokenArrayEnd
 			};
 
 			const string expected = "[null]";
@@ -112,9 +112,9 @@ namespace JsonFx.Json
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenNull,
-				CommonGrammar.TokenArrayEnd
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenNull,
+				ModelGrammar.TokenArrayEnd
 			};
 
 			const string expected =
@@ -134,12 +134,12 @@ namespace JsonFx.Json
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenPrimitive(0),
-				CommonGrammar.TokenNull,
-				CommonGrammar.TokenFalse,
-				CommonGrammar.TokenTrue,
-				CommonGrammar.TokenArrayEnd
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenPrimitive(0),
+				ModelGrammar.TokenNull,
+				ModelGrammar.TokenFalse,
+				ModelGrammar.TokenTrue,
+				ModelGrammar.TokenArrayEnd
 			};
 
 			const string expected = "[0,null,false,true]";
@@ -156,12 +156,12 @@ namespace JsonFx.Json
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenPrimitive(0),
-				CommonGrammar.TokenNull,
-				CommonGrammar.TokenFalse,
-				CommonGrammar.TokenTrue,
-				CommonGrammar.TokenArrayEnd
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenPrimitive(0),
+				ModelGrammar.TokenNull,
+				ModelGrammar.TokenFalse,
+				ModelGrammar.TokenTrue,
+				ModelGrammar.TokenArrayEnd
 			};
 
 			const string expected =
@@ -185,45 +185,45 @@ namespace JsonFx.Json
 			// input from pass2.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenPrimitive("Not too deep"),
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenPrimitive("Not too deep"),
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd
 			};
 
 			const string expected = @"[[[[[[[[[[[[[[[[[[[""Not too deep""]]]]]]]]]]]]]]]]]]]";
@@ -241,45 +241,45 @@ namespace JsonFx.Json
 			// input from pass2.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenPrimitive("Not too deep"),
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenPrimitive("Not too deep"),
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd
 			};
 
 			const string expected =
@@ -339,8 +339,8 @@ namespace JsonFx.Json
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenObjectEnd
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenObjectEnd
 			};
 
 			const string expected = @"{}";
@@ -357,8 +357,8 @@ namespace JsonFx.Json
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenObjectEnd
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenObjectEnd
 			};
 
 			const string expected = @"{}";
@@ -375,10 +375,10 @@ namespace JsonFx.Json
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenProperty("key"),
-				CommonGrammar.TokenPrimitive("value"),
-				CommonGrammar.TokenObjectEnd
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenProperty("key"),
+				ModelGrammar.TokenPrimitive("value"),
+				ModelGrammar.TokenObjectEnd
 			};
 
 			const string expected = @"{""key"":""value""}";
@@ -395,10 +395,10 @@ namespace JsonFx.Json
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenProperty("key"),
-				CommonGrammar.TokenPrimitive("value"),
-				CommonGrammar.TokenObjectEnd
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenProperty("key"),
+				ModelGrammar.TokenPrimitive("value"),
+				ModelGrammar.TokenObjectEnd
 			};
 
 			const string expected =
@@ -419,15 +419,15 @@ namespace JsonFx.Json
 			// input from pass3.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenProperty("JSON Test Pattern pass3"),
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenProperty("The outermost value"),
-				CommonGrammar.TokenPrimitive("must be an object or array."),
-				CommonGrammar.TokenProperty("In this test"),
-				CommonGrammar.TokenPrimitive("It is an object."),
-				CommonGrammar.TokenObjectEnd,
-				CommonGrammar.TokenObjectEnd
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenProperty("JSON Test Pattern pass3"),
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenProperty("The outermost value"),
+				ModelGrammar.TokenPrimitive("must be an object or array."),
+				ModelGrammar.TokenProperty("In this test"),
+				ModelGrammar.TokenPrimitive("It is an object."),
+				ModelGrammar.TokenObjectEnd,
+				ModelGrammar.TokenObjectEnd
 			};
 
 			const string expected = @"{""JSON Test Pattern pass3"":{""The outermost value"":""must be an object or array."",""In this test"":""It is an object.""}}";
@@ -445,15 +445,15 @@ namespace JsonFx.Json
 			// input from pass3.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenProperty("JSON Test Pattern pass3"),
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenProperty("The outermost value"),
-				CommonGrammar.TokenPrimitive("must be an object or array."),
-				CommonGrammar.TokenProperty("In this test"),
-				CommonGrammar.TokenPrimitive("It is an object."),
-				CommonGrammar.TokenObjectEnd,
-				CommonGrammar.TokenObjectEnd
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenProperty("JSON Test Pattern pass3"),
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenProperty("The outermost value"),
+				ModelGrammar.TokenPrimitive("must be an object or array."),
+				ModelGrammar.TokenProperty("In this test"),
+				ModelGrammar.TokenPrimitive("It is an object."),
+				ModelGrammar.TokenObjectEnd,
+				ModelGrammar.TokenObjectEnd
 			};
 
 			const string expected =
@@ -480,7 +480,7 @@ namespace JsonFx.Json
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenPrimitive(String.Empty)
+				ModelGrammar.TokenPrimitive(String.Empty)
 			};
 
 			const string expected = "\"\"";
@@ -498,7 +498,7 @@ namespace JsonFx.Json
 			// input from fail1.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenPrimitive("A JSON payload should be an object or array, not a string.")
+				ModelGrammar.TokenPrimitive("A JSON payload should be an object or array, not a string.")
 			};
 
 			const string expected = @"""A JSON payload should be an object or array, not a string.""";
@@ -516,7 +516,7 @@ namespace JsonFx.Json
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenPrimitive("\\\b\f\n\r\t\u0123\u4567\u89AB\uCDEF\uabcd\uef4A\"")
+				ModelGrammar.TokenPrimitive("\\\b\f\n\r\t\u0123\u4567\u89AB\uCDEF\uabcd\uef4A\"")
 			};
 
 			const string expected = @"""\\\b\f\n\r\t\u0123\u4567\u89AB\uCDEF\uABCD\uEF4A\""""";
@@ -533,7 +533,7 @@ namespace JsonFx.Json
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenPrimitive("unescaped ' single quote"),
+				ModelGrammar.TokenPrimitive("unescaped ' single quote"),
 			};
 
 			const string expected = @"""unescaped ' single quote""";
@@ -551,9 +551,9 @@ namespace JsonFx.Json
 			// input from fail25.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenPrimitive("\ttab\tcharacter\tin\tstring\t"),
-				CommonGrammar.TokenArrayEnd
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenPrimitive("\ttab\tcharacter\tin\tstring\t"),
+				ModelGrammar.TokenArrayEnd
 			};
 
 			const string expected = @"[""\ttab\tcharacter\tin\tstring\t""]";
@@ -575,7 +575,7 @@ namespace JsonFx.Json
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenPrimitive(123456)
+				ModelGrammar.TokenPrimitive(123456)
 			};
 
 			const string expected = "123456";
@@ -592,7 +592,7 @@ namespace JsonFx.Json
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenPrimitive(1.23456)
+				ModelGrammar.TokenPrimitive(1.23456)
 			};
 
 			const string expected = "1.23456";
@@ -609,7 +609,7 @@ namespace JsonFx.Json
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenPrimitive(-0.123456)
+				ModelGrammar.TokenPrimitive(-0.123456)
 			};
 
 			const string expected = "-0.123456";
@@ -626,7 +626,7 @@ namespace JsonFx.Json
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenPrimitive(.123456)
+				ModelGrammar.TokenPrimitive(.123456)
 			};
 
 			const string expected = "0.123456";
@@ -643,7 +643,7 @@ namespace JsonFx.Json
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenPrimitive(.123456)
+				ModelGrammar.TokenPrimitive(.123456)
 			};
 
 			const string expected = "0.123456";
@@ -660,7 +660,7 @@ namespace JsonFx.Json
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenPrimitive(-.123456)
+				ModelGrammar.TokenPrimitive(-.123456)
 			};
 
 			const string expected = "-0.123456";
@@ -677,7 +677,7 @@ namespace JsonFx.Json
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenPrimitive(-123.456m)
+				ModelGrammar.TokenPrimitive(-123.456m)
 			};
 
 			const string expected = "-123.456";
@@ -694,7 +694,7 @@ namespace JsonFx.Json
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenPrimitive(-123.456f)
+				ModelGrammar.TokenPrimitive(-123.456f)
 			};
 
 			const string expected = "-123.456";
@@ -711,7 +711,7 @@ namespace JsonFx.Json
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenPrimitive(-34L)
+				ModelGrammar.TokenPrimitive(-34L)
 			};
 
 			const string expected = "-34";
@@ -728,7 +728,7 @@ namespace JsonFx.Json
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenPrimitive(Int64.MinValue)
+				ModelGrammar.TokenPrimitive(Int64.MinValue)
 			};
 
 			const string expected = @"""-9223372036854775808""";
@@ -745,7 +745,7 @@ namespace JsonFx.Json
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenPrimitive(Decimal.MaxValue)
+				ModelGrammar.TokenPrimitive(Decimal.MaxValue)
 			};
 
 			const string expected = @"""79228162514264337593543950335""";
@@ -767,118 +767,118 @@ namespace JsonFx.Json
 			// input from pass1.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenPrimitive("JSON Test Pattern pass1"),
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenProperty("object with 1 member"),
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenPrimitive("array with 1 element"),
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenObjectEnd,
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenObjectEnd,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenPrimitive(-42),
-				CommonGrammar.TokenTrue,
-				CommonGrammar.TokenFalse,
-				CommonGrammar.TokenNull,
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenProperty("integer"),
-				CommonGrammar.TokenPrimitive(1234567890),
-				CommonGrammar.TokenProperty("real"),
-				CommonGrammar.TokenPrimitive(-9876.543210),
-				CommonGrammar.TokenProperty("e"),
-				CommonGrammar.TokenPrimitive(0.123456789e-12),
-				CommonGrammar.TokenProperty("E"),
-				CommonGrammar.TokenPrimitive(1.234567890E+34),
-				CommonGrammar.TokenProperty(""),
-				CommonGrammar.TokenPrimitive(23456789012E66),
-				CommonGrammar.TokenProperty("zero"),
-				CommonGrammar.TokenPrimitive(0),
-				CommonGrammar.TokenProperty("one"),
-				CommonGrammar.TokenPrimitive(1),
-				CommonGrammar.TokenProperty("space"),
-				CommonGrammar.TokenPrimitive(" "),
-				CommonGrammar.TokenProperty("quote"),
-				CommonGrammar.TokenPrimitive("\""),
-				CommonGrammar.TokenProperty("backslash"),
-				CommonGrammar.TokenPrimitive("\\"),
-				CommonGrammar.TokenProperty("controls"),
-				CommonGrammar.TokenPrimitive("\b\f\n\r\t"),
-				CommonGrammar.TokenProperty("slash"),
-				CommonGrammar.TokenPrimitive("/ & /"),
-				CommonGrammar.TokenProperty("alpha"),
-				CommonGrammar.TokenPrimitive("abcdefghijklmnopqrstuvwyz"),
-				CommonGrammar.TokenProperty("ALPHA"),
-				CommonGrammar.TokenPrimitive("ABCDEFGHIJKLMNOPQRSTUVWYZ"),
-				CommonGrammar.TokenProperty("digit"),
-				CommonGrammar.TokenPrimitive("0123456789"),
-				CommonGrammar.TokenProperty("0123456789"),
-				CommonGrammar.TokenPrimitive("digit"),
-				CommonGrammar.TokenProperty("special"),
-				CommonGrammar.TokenPrimitive("`1~!@#$%^&*()_+-={':[,]}|;.</>?"),
-				CommonGrammar.TokenProperty("hex"),
-				CommonGrammar.TokenPrimitive("\u0123\u4567\u89AB\uCDEF\uabcd\uef4A"),
-				CommonGrammar.TokenProperty("true"),
-				CommonGrammar.TokenTrue,
-				CommonGrammar.TokenProperty("false"),
-				CommonGrammar.TokenFalse,
-				CommonGrammar.TokenProperty("null"),
-				CommonGrammar.TokenNull,
-				CommonGrammar.TokenProperty("array"),
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenProperty("object"),
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenObjectEnd,
-				CommonGrammar.TokenProperty("address"),
-				CommonGrammar.TokenPrimitive("50 St. James Street"),
-				CommonGrammar.TokenProperty("url"),
-				CommonGrammar.TokenPrimitive("http://www.JSON.org/"),
-				CommonGrammar.TokenProperty("comment"),
-				CommonGrammar.TokenPrimitive("// /* <!-- --"),
-				CommonGrammar.TokenProperty("# -- --> */"),
-				CommonGrammar.TokenPrimitive(" "),
-				CommonGrammar.TokenProperty(" s p a c e d "),
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenPrimitive(1),
-				CommonGrammar.TokenPrimitive(2),
-				CommonGrammar.TokenPrimitive(3),
-				CommonGrammar.TokenPrimitive(4),
-				CommonGrammar.TokenPrimitive(5),
-				CommonGrammar.TokenPrimitive(6),
-				CommonGrammar.TokenPrimitive(7),
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenProperty("compact"),
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenPrimitive(1),
-				CommonGrammar.TokenPrimitive(2),
-				CommonGrammar.TokenPrimitive(3),
-				CommonGrammar.TokenPrimitive(4),
-				CommonGrammar.TokenPrimitive(5),
-				CommonGrammar.TokenPrimitive(6),
-				CommonGrammar.TokenPrimitive(7),
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenProperty("jsontext"),
-				CommonGrammar.TokenPrimitive("{\"object with 1 member\":[\"array with 1 element\"]}"),
-				CommonGrammar.TokenProperty("quotes"),
-				CommonGrammar.TokenPrimitive("&#34; \u0022 %22 0x22 034 &#x22;"),
-				CommonGrammar.TokenProperty("/\\\"\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"),
-				CommonGrammar.TokenPrimitive("A key can be any string"),
-				CommonGrammar.TokenObjectEnd,
-				CommonGrammar.TokenPrimitive(0.5),
-				CommonGrammar.TokenPrimitive(98.6),
-				CommonGrammar.TokenPrimitive(99.44),
-				CommonGrammar.TokenPrimitive(1066),
-				CommonGrammar.TokenPrimitive(10.0),
-				CommonGrammar.TokenPrimitive(1.0),
-				CommonGrammar.TokenPrimitive(0.1),
-				CommonGrammar.TokenPrimitive(1.0),
-				CommonGrammar.TokenPrimitive(2.0),
-				CommonGrammar.TokenPrimitive(2.0),
-				CommonGrammar.TokenPrimitive("rosebud"),
-				CommonGrammar.TokenArrayEnd
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenPrimitive("JSON Test Pattern pass1"),
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenProperty("object with 1 member"),
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenPrimitive("array with 1 element"),
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenObjectEnd,
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenObjectEnd,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenPrimitive(-42),
+				ModelGrammar.TokenTrue,
+				ModelGrammar.TokenFalse,
+				ModelGrammar.TokenNull,
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenProperty("integer"),
+				ModelGrammar.TokenPrimitive(1234567890),
+				ModelGrammar.TokenProperty("real"),
+				ModelGrammar.TokenPrimitive(-9876.543210),
+				ModelGrammar.TokenProperty("e"),
+				ModelGrammar.TokenPrimitive(0.123456789e-12),
+				ModelGrammar.TokenProperty("E"),
+				ModelGrammar.TokenPrimitive(1.234567890E+34),
+				ModelGrammar.TokenProperty(""),
+				ModelGrammar.TokenPrimitive(23456789012E66),
+				ModelGrammar.TokenProperty("zero"),
+				ModelGrammar.TokenPrimitive(0),
+				ModelGrammar.TokenProperty("one"),
+				ModelGrammar.TokenPrimitive(1),
+				ModelGrammar.TokenProperty("space"),
+				ModelGrammar.TokenPrimitive(" "),
+				ModelGrammar.TokenProperty("quote"),
+				ModelGrammar.TokenPrimitive("\""),
+				ModelGrammar.TokenProperty("backslash"),
+				ModelGrammar.TokenPrimitive("\\"),
+				ModelGrammar.TokenProperty("controls"),
+				ModelGrammar.TokenPrimitive("\b\f\n\r\t"),
+				ModelGrammar.TokenProperty("slash"),
+				ModelGrammar.TokenPrimitive("/ & /"),
+				ModelGrammar.TokenProperty("alpha"),
+				ModelGrammar.TokenPrimitive("abcdefghijklmnopqrstuvwyz"),
+				ModelGrammar.TokenProperty("ALPHA"),
+				ModelGrammar.TokenPrimitive("ABCDEFGHIJKLMNOPQRSTUVWYZ"),
+				ModelGrammar.TokenProperty("digit"),
+				ModelGrammar.TokenPrimitive("0123456789"),
+				ModelGrammar.TokenProperty("0123456789"),
+				ModelGrammar.TokenPrimitive("digit"),
+				ModelGrammar.TokenProperty("special"),
+				ModelGrammar.TokenPrimitive("`1~!@#$%^&*()_+-={':[,]}|;.</>?"),
+				ModelGrammar.TokenProperty("hex"),
+				ModelGrammar.TokenPrimitive("\u0123\u4567\u89AB\uCDEF\uabcd\uef4A"),
+				ModelGrammar.TokenProperty("true"),
+				ModelGrammar.TokenTrue,
+				ModelGrammar.TokenProperty("false"),
+				ModelGrammar.TokenFalse,
+				ModelGrammar.TokenProperty("null"),
+				ModelGrammar.TokenNull,
+				ModelGrammar.TokenProperty("array"),
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenProperty("object"),
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenObjectEnd,
+				ModelGrammar.TokenProperty("address"),
+				ModelGrammar.TokenPrimitive("50 St. James Street"),
+				ModelGrammar.TokenProperty("url"),
+				ModelGrammar.TokenPrimitive("http://www.JSON.org/"),
+				ModelGrammar.TokenProperty("comment"),
+				ModelGrammar.TokenPrimitive("// /* <!-- --"),
+				ModelGrammar.TokenProperty("# -- --> */"),
+				ModelGrammar.TokenPrimitive(" "),
+				ModelGrammar.TokenProperty(" s p a c e d "),
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenPrimitive(1),
+				ModelGrammar.TokenPrimitive(2),
+				ModelGrammar.TokenPrimitive(3),
+				ModelGrammar.TokenPrimitive(4),
+				ModelGrammar.TokenPrimitive(5),
+				ModelGrammar.TokenPrimitive(6),
+				ModelGrammar.TokenPrimitive(7),
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenProperty("compact"),
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenPrimitive(1),
+				ModelGrammar.TokenPrimitive(2),
+				ModelGrammar.TokenPrimitive(3),
+				ModelGrammar.TokenPrimitive(4),
+				ModelGrammar.TokenPrimitive(5),
+				ModelGrammar.TokenPrimitive(6),
+				ModelGrammar.TokenPrimitive(7),
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenProperty("jsontext"),
+				ModelGrammar.TokenPrimitive("{\"object with 1 member\":[\"array with 1 element\"]}"),
+				ModelGrammar.TokenProperty("quotes"),
+				ModelGrammar.TokenPrimitive("&#34; \u0022 %22 0x22 034 &#x22;"),
+				ModelGrammar.TokenProperty("/\\\"\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"),
+				ModelGrammar.TokenPrimitive("A key can be any string"),
+				ModelGrammar.TokenObjectEnd,
+				ModelGrammar.TokenPrimitive(0.5),
+				ModelGrammar.TokenPrimitive(98.6),
+				ModelGrammar.TokenPrimitive(99.44),
+				ModelGrammar.TokenPrimitive(1066),
+				ModelGrammar.TokenPrimitive(10.0),
+				ModelGrammar.TokenPrimitive(1.0),
+				ModelGrammar.TokenPrimitive(0.1),
+				ModelGrammar.TokenPrimitive(1.0),
+				ModelGrammar.TokenPrimitive(2.0),
+				ModelGrammar.TokenPrimitive(2.0),
+				ModelGrammar.TokenPrimitive("rosebud"),
+				ModelGrammar.TokenArrayEnd
 			};
 
 			const string expected = @"[""JSON Test Pattern pass1"",{""object with 1 member"":[""array with 1 element""]},{},[],-42,true,false,null,{""integer"":1234567890,""real"":-9876.54321,""e"":1.23456789E-13,""E"":1.23456789E+34,"""":2.3456789012E+76,""zero"":0,""one"":1,""space"":"" "",""quote"":""\"""",""backslash"":""\\"",""controls"":""\b\f\n\r\t"",""slash"":""/ & /"",""alpha"":""abcdefghijklmnopqrstuvwyz"",""ALPHA"":""ABCDEFGHIJKLMNOPQRSTUVWYZ"",""digit"":""0123456789"",""0123456789"":""digit"",""special"":""`1~!@#$%^&*()_+-={':[,]}|;.</>?"",""hex"":""\u0123\u4567\u89AB\uCDEF\uABCD\uEF4A"",""true"":true,""false"":false,""null"":null,""array"":[],""object"":{},""address"":""50 St. James Street"",""url"":""http://www.JSON.org/"",""comment"":""// /* <!-- --"",""# -- --> */"":"" "","" s p a c e d "":[1,2,3,4,5,6,7],""compact"":[1,2,3,4,5,6,7],""jsontext"":""{\""object with 1 member\"":[\""array with 1 element\""]}"",""quotes"":""&#34; \"" %22 0x22 034 &#x22;"",""/\\\""\uCAFE\uBABE\uAB98\uFCDE\uBCDA\uEF4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"":""A key can be any string""},0.5,98.6,99.44,1066,10,1,0.1,1,2,2,""rosebud""]";
@@ -896,118 +896,118 @@ namespace JsonFx.Json
 			// input from pass1.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenPrimitive("JSON Test Pattern pass1"),
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenProperty("object with 1 member"),
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenPrimitive("array with 1 element"),
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenObjectEnd,
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenObjectEnd,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenPrimitive(-42),
-				CommonGrammar.TokenTrue,
-				CommonGrammar.TokenFalse,
-				CommonGrammar.TokenNull,
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenProperty("integer"),
-				CommonGrammar.TokenPrimitive(1234567890),
-				CommonGrammar.TokenProperty("real"),
-				CommonGrammar.TokenPrimitive(-9876.543210),
-				CommonGrammar.TokenProperty("e"),
-				CommonGrammar.TokenPrimitive(0.123456789e-12),
-				CommonGrammar.TokenProperty("E"),
-				CommonGrammar.TokenPrimitive(1.234567890E+34),
-				CommonGrammar.TokenProperty(""),
-				CommonGrammar.TokenPrimitive(23456789012E66),
-				CommonGrammar.TokenProperty("zero"),
-				CommonGrammar.TokenPrimitive(0),
-				CommonGrammar.TokenProperty("one"),
-				CommonGrammar.TokenPrimitive(1),
-				CommonGrammar.TokenProperty("space"),
-				CommonGrammar.TokenPrimitive(" "),
-				CommonGrammar.TokenProperty("quote"),
-				CommonGrammar.TokenPrimitive("\""),
-				CommonGrammar.TokenProperty("backslash"),
-				CommonGrammar.TokenPrimitive("\\"),
-				CommonGrammar.TokenProperty("controls"),
-				CommonGrammar.TokenPrimitive("\b\f\n\r\t"),
-				CommonGrammar.TokenProperty("slash"),
-				CommonGrammar.TokenPrimitive("/ & /"),
-				CommonGrammar.TokenProperty("alpha"),
-				CommonGrammar.TokenPrimitive("abcdefghijklmnopqrstuvwyz"),
-				CommonGrammar.TokenProperty("ALPHA"),
-				CommonGrammar.TokenPrimitive("ABCDEFGHIJKLMNOPQRSTUVWYZ"),
-				CommonGrammar.TokenProperty("digit"),
-				CommonGrammar.TokenPrimitive("0123456789"),
-				CommonGrammar.TokenProperty("0123456789"),
-				CommonGrammar.TokenPrimitive("digit"),
-				CommonGrammar.TokenProperty("special"),
-				CommonGrammar.TokenPrimitive("`1~!@#$%^&*()_+-={':[,]}|;.</>?"),
-				CommonGrammar.TokenProperty("hex"),
-				CommonGrammar.TokenPrimitive("\u0123\u4567\u89AB\uCDEF\uabcd\uef4A"),
-				CommonGrammar.TokenProperty("true"),
-				CommonGrammar.TokenTrue,
-				CommonGrammar.TokenProperty("false"),
-				CommonGrammar.TokenFalse,
-				CommonGrammar.TokenProperty("null"),
-				CommonGrammar.TokenNull,
-				CommonGrammar.TokenProperty("array"),
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenProperty("object"),
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenObjectEnd,
-				CommonGrammar.TokenProperty("address"),
-				CommonGrammar.TokenPrimitive("50 St. James Street"),
-				CommonGrammar.TokenProperty("url"),
-				CommonGrammar.TokenPrimitive("http://www.JSON.org/"),
-				CommonGrammar.TokenProperty("comment"),
-				CommonGrammar.TokenPrimitive("// /* <!-- --"),
-				CommonGrammar.TokenProperty("# -- --> */"),
-				CommonGrammar.TokenPrimitive(" "),
-				CommonGrammar.TokenProperty(" s p a c e d "),
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenPrimitive(1),
-				CommonGrammar.TokenPrimitive(2),
-				CommonGrammar.TokenPrimitive(3),
-				CommonGrammar.TokenPrimitive(4),
-				CommonGrammar.TokenPrimitive(5),
-				CommonGrammar.TokenPrimitive(6),
-				CommonGrammar.TokenPrimitive(7),
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenProperty("compact"),
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenPrimitive(1),
-				CommonGrammar.TokenPrimitive(2),
-				CommonGrammar.TokenPrimitive(3),
-				CommonGrammar.TokenPrimitive(4),
-				CommonGrammar.TokenPrimitive(5),
-				CommonGrammar.TokenPrimitive(6),
-				CommonGrammar.TokenPrimitive(7),
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenProperty("jsontext"),
-				CommonGrammar.TokenPrimitive("{\"object with 1 member\":[\"array with 1 element\"]}"),
-				CommonGrammar.TokenProperty("quotes"),
-				CommonGrammar.TokenPrimitive("&#34; \u0022 %22 0x22 034 &#x22;"),
-				CommonGrammar.TokenProperty("/\\\"\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"),
-				CommonGrammar.TokenPrimitive("A key can be any string"),
-				CommonGrammar.TokenObjectEnd,
-				CommonGrammar.TokenPrimitive(0.5),
-				CommonGrammar.TokenPrimitive(98.6),
-				CommonGrammar.TokenPrimitive(99.44),
-				CommonGrammar.TokenPrimitive(1066),
-				CommonGrammar.TokenPrimitive(10.0),
-				CommonGrammar.TokenPrimitive(1.0),
-				CommonGrammar.TokenPrimitive(0.1),
-				CommonGrammar.TokenPrimitive(1.0),
-				CommonGrammar.TokenPrimitive(2.0),
-				CommonGrammar.TokenPrimitive(2.0),
-				CommonGrammar.TokenPrimitive("rosebud"),
-				CommonGrammar.TokenArrayEnd
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenPrimitive("JSON Test Pattern pass1"),
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenProperty("object with 1 member"),
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenPrimitive("array with 1 element"),
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenObjectEnd,
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenObjectEnd,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenPrimitive(-42),
+				ModelGrammar.TokenTrue,
+				ModelGrammar.TokenFalse,
+				ModelGrammar.TokenNull,
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenProperty("integer"),
+				ModelGrammar.TokenPrimitive(1234567890),
+				ModelGrammar.TokenProperty("real"),
+				ModelGrammar.TokenPrimitive(-9876.543210),
+				ModelGrammar.TokenProperty("e"),
+				ModelGrammar.TokenPrimitive(0.123456789e-12),
+				ModelGrammar.TokenProperty("E"),
+				ModelGrammar.TokenPrimitive(1.234567890E+34),
+				ModelGrammar.TokenProperty(""),
+				ModelGrammar.TokenPrimitive(23456789012E66),
+				ModelGrammar.TokenProperty("zero"),
+				ModelGrammar.TokenPrimitive(0),
+				ModelGrammar.TokenProperty("one"),
+				ModelGrammar.TokenPrimitive(1),
+				ModelGrammar.TokenProperty("space"),
+				ModelGrammar.TokenPrimitive(" "),
+				ModelGrammar.TokenProperty("quote"),
+				ModelGrammar.TokenPrimitive("\""),
+				ModelGrammar.TokenProperty("backslash"),
+				ModelGrammar.TokenPrimitive("\\"),
+				ModelGrammar.TokenProperty("controls"),
+				ModelGrammar.TokenPrimitive("\b\f\n\r\t"),
+				ModelGrammar.TokenProperty("slash"),
+				ModelGrammar.TokenPrimitive("/ & /"),
+				ModelGrammar.TokenProperty("alpha"),
+				ModelGrammar.TokenPrimitive("abcdefghijklmnopqrstuvwyz"),
+				ModelGrammar.TokenProperty("ALPHA"),
+				ModelGrammar.TokenPrimitive("ABCDEFGHIJKLMNOPQRSTUVWYZ"),
+				ModelGrammar.TokenProperty("digit"),
+				ModelGrammar.TokenPrimitive("0123456789"),
+				ModelGrammar.TokenProperty("0123456789"),
+				ModelGrammar.TokenPrimitive("digit"),
+				ModelGrammar.TokenProperty("special"),
+				ModelGrammar.TokenPrimitive("`1~!@#$%^&*()_+-={':[,]}|;.</>?"),
+				ModelGrammar.TokenProperty("hex"),
+				ModelGrammar.TokenPrimitive("\u0123\u4567\u89AB\uCDEF\uabcd\uef4A"),
+				ModelGrammar.TokenProperty("true"),
+				ModelGrammar.TokenTrue,
+				ModelGrammar.TokenProperty("false"),
+				ModelGrammar.TokenFalse,
+				ModelGrammar.TokenProperty("null"),
+				ModelGrammar.TokenNull,
+				ModelGrammar.TokenProperty("array"),
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenProperty("object"),
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenObjectEnd,
+				ModelGrammar.TokenProperty("address"),
+				ModelGrammar.TokenPrimitive("50 St. James Street"),
+				ModelGrammar.TokenProperty("url"),
+				ModelGrammar.TokenPrimitive("http://www.JSON.org/"),
+				ModelGrammar.TokenProperty("comment"),
+				ModelGrammar.TokenPrimitive("// /* <!-- --"),
+				ModelGrammar.TokenProperty("# -- --> */"),
+				ModelGrammar.TokenPrimitive(" "),
+				ModelGrammar.TokenProperty(" s p a c e d "),
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenPrimitive(1),
+				ModelGrammar.TokenPrimitive(2),
+				ModelGrammar.TokenPrimitive(3),
+				ModelGrammar.TokenPrimitive(4),
+				ModelGrammar.TokenPrimitive(5),
+				ModelGrammar.TokenPrimitive(6),
+				ModelGrammar.TokenPrimitive(7),
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenProperty("compact"),
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenPrimitive(1),
+				ModelGrammar.TokenPrimitive(2),
+				ModelGrammar.TokenPrimitive(3),
+				ModelGrammar.TokenPrimitive(4),
+				ModelGrammar.TokenPrimitive(5),
+				ModelGrammar.TokenPrimitive(6),
+				ModelGrammar.TokenPrimitive(7),
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenProperty("jsontext"),
+				ModelGrammar.TokenPrimitive("{\"object with 1 member\":[\"array with 1 element\"]}"),
+				ModelGrammar.TokenProperty("quotes"),
+				ModelGrammar.TokenPrimitive("&#34; \u0022 %22 0x22 034 &#x22;"),
+				ModelGrammar.TokenProperty("/\\\"\uCAFE\uBABE\uAB98\uFCDE\ubcda\uef4A\b\f\n\r\t`1~!@#$%^&*()_+-=[]{}|;:',./<>?"),
+				ModelGrammar.TokenPrimitive("A key can be any string"),
+				ModelGrammar.TokenObjectEnd,
+				ModelGrammar.TokenPrimitive(0.5),
+				ModelGrammar.TokenPrimitive(98.6),
+				ModelGrammar.TokenPrimitive(99.44),
+				ModelGrammar.TokenPrimitive(1066),
+				ModelGrammar.TokenPrimitive(10.0),
+				ModelGrammar.TokenPrimitive(1.0),
+				ModelGrammar.TokenPrimitive(0.1),
+				ModelGrammar.TokenPrimitive(1.0),
+				ModelGrammar.TokenPrimitive(2.0),
+				ModelGrammar.TokenPrimitive(2.0),
+				ModelGrammar.TokenPrimitive("rosebud"),
+				ModelGrammar.TokenArrayEnd
 			};
 
 			const string expected =
@@ -1103,10 +1103,10 @@ namespace JsonFx.Json
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenProperty(new DataName("key", null, "http://json.org")),
-				CommonGrammar.TokenPrimitive("value"),
-				CommonGrammar.TokenObjectEnd
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenProperty(new DataName("key", null, "http://json.org")),
+				ModelGrammar.TokenPrimitive("value"),
+				ModelGrammar.TokenObjectEnd
 			};
 
 			const string expected = @"{""key"":""value""}";
@@ -1125,7 +1125,7 @@ namespace JsonFx.Json
 		[Trait(TraitName, TraitValue)]
 		public void Format_EmptyInput_ReturnsEmptyString()
 		{
-			var input = Enumerable.Empty<Token<CommonTokenType>>();
+			var input = Enumerable.Empty<Token<ModelTokenType>>();
 
 			const string expected = "";
 
@@ -1139,7 +1139,7 @@ namespace JsonFx.Json
 		[Trait(TraitName, TraitValue)]
 		public void Format_NullInput_ThrowsArgumentNullException()
 		{
-			var input = (IEnumerable<Token<CommonTokenType>>)null;
+			var input = (IEnumerable<Token<ModelTokenType>>)null;
 
 			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings());
 

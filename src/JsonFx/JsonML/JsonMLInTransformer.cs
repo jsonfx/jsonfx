@@ -32,9 +32,9 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-using JsonFx.Common;
 using JsonFx.IO;
 using JsonFx.Markup;
+using JsonFx.Model;
 using JsonFx.Serialization;
 
 namespace JsonFx.JsonML
@@ -42,12 +42,12 @@ namespace JsonFx.JsonML
 	public partial class JsonMLReader
 	{
 		/// <summary>
-		/// Transforms markup tokens into common data tokens using the (lossless) JsonML model
+		/// Transforms markup tokens into Common Model tokens using the (lossless) JsonML model
 		/// </summary>
 		/// <remarks>
 		/// JsonML Grammer: http://jsonml.org
 		/// </remarks>
-		public class JsonMLInTransformer : IDataTransformer<MarkupTokenType, CommonTokenType>
+		public class JsonMLInTransformer : IDataTransformer<MarkupTokenType, ModelTokenType>
 		{
 			#region Constants
 
@@ -106,12 +106,12 @@ namespace JsonFx.JsonML
 
 			#endregion Properties
 
-			#region IDataTransformer<CommonTokenType, MarkupTokenType> Members
+			#region IDataTransformer<ModelTokenType, MarkupTokenType> Members
 
 			/// <summary>
 			/// Consumes a sequence of tokens and produces a token sequence of a different type
 			/// </summary>
-			public IEnumerable<Token<CommonTokenType>> Transform(IEnumerable<Token<MarkupTokenType>> input)
+			public IEnumerable<Token<ModelTokenType>> Transform(IEnumerable<Token<MarkupTokenType>> input)
 			{
 				if (input == null)
 				{
@@ -134,9 +134,9 @@ namespace JsonFx.JsonML
 							bool isVoid = (token.TokenType == MarkupTokenType.ElementVoid);
 
 							DataName tagName = token.Name;
-							yield return CommonGrammar.TokenArrayBeginUnnamed;
+							yield return ModelGrammar.TokenArrayBeginUnnamed;
 							// NOTE: JSON doesn't support namespaces so resolve the name to prefix+':'+local-name
-							yield return CommonGrammar.TokenPrimitive(tagName.ToPrefixedName());
+							yield return ModelGrammar.TokenPrimitive(tagName.ToPrefixedName());
 
 							PrefixScopeChain.Scope scope = new PrefixScopeChain.Scope();
 							string prefix = scopeChain.GetPrefix(tagName.NamespaceUri, false);
@@ -147,7 +147,7 @@ namespace JsonFx.JsonML
 
 								// new namespace scope so need to emit xmlns
 								hasProperties = true;
-								yield return CommonGrammar.TokenObjectBeginUnnamed;
+								yield return ModelGrammar.TokenObjectBeginUnnamed;
 							}
 							scope.TagName = tagName;
 							scopeChain.Push(scope);
@@ -160,7 +160,7 @@ namespace JsonFx.JsonML
 								if (!hasProperties)
 								{
 									hasProperties = true;
-									yield return CommonGrammar.TokenObjectBeginUnnamed;
+									yield return ModelGrammar.TokenObjectBeginUnnamed;
 								}
 
 								DataName attrName = token.Name;
@@ -173,7 +173,7 @@ namespace JsonFx.JsonML
 								}
 
 								// NOTE: JSON doesn't support namespaces so resolve the name to prefix+':'+local-name
-								yield return CommonGrammar.TokenProperty(new DataName(attrName.ToPrefixedName()));
+								yield return ModelGrammar.TokenProperty(new DataName(attrName.ToPrefixedName()));
 
 								stream.Pop();
 								token = stream.Peek();
@@ -182,7 +182,7 @@ namespace JsonFx.JsonML
 								{
 									case MarkupTokenType.Primitive:
 									{
-										yield return token.ChangeType(CommonTokenType.Primitive);
+										yield return token.ChangeType(ModelTokenType.Primitive);
 										break;
 									}
 									default:
@@ -203,21 +203,21 @@ namespace JsonFx.JsonML
 								{
 									if (String.IsNullOrEmpty(xmlns.Key))
 									{
-										yield return CommonGrammar.TokenProperty("xmlns");
+										yield return ModelGrammar.TokenProperty("xmlns");
 									}
 									else
 									{
-										yield return CommonGrammar.TokenProperty(String.Concat("xmlns:", xmlns.Key));
+										yield return ModelGrammar.TokenProperty(String.Concat("xmlns:", xmlns.Key));
 									}
-									yield return CommonGrammar.TokenPrimitive(xmlns.Value);
+									yield return ModelGrammar.TokenPrimitive(xmlns.Value);
 								}
 
-								yield return CommonGrammar.TokenObjectEnd;
+								yield return ModelGrammar.TokenObjectEnd;
 							}
 
 							if (isVoid)
 							{
-								yield return CommonGrammar.TokenArrayEnd;
+								yield return ModelGrammar.TokenArrayEnd;
 								scopeChain.Pop();
 							}
 							break;
@@ -226,7 +226,7 @@ namespace JsonFx.JsonML
 						{
 							if (scopeChain.Count > 0)
 							{
-								yield return CommonGrammar.TokenArrayEnd;
+								yield return ModelGrammar.TokenArrayEnd;
 							}
 							scopeChain.Pop();
 
@@ -236,10 +236,10 @@ namespace JsonFx.JsonML
 						}
 						case MarkupTokenType.Primitive:
 						{
-							if (token.Value is ITextFormattable<CommonTokenType> ||
+							if (token.Value is ITextFormattable<ModelTokenType> ||
 								token.Value is ITextFormattable<MarkupTokenType>)
 							{
-								yield return token.ChangeType(CommonTokenType.Primitive);
+								yield return token.ChangeType(ModelTokenType.Primitive);
 
 								stream.Pop();
 								token = stream.Peek();
@@ -252,7 +252,7 @@ namespace JsonFx.JsonML
 							token = stream.Peek();
 							while (!stream.IsCompleted &&
 								(token.TokenType == MarkupTokenType.Primitive) &&
-								!(token.Value is ITextFormattable<CommonTokenType>) &&
+								!(token.Value is ITextFormattable<ModelTokenType>) &&
 								!(token.Value is ITextFormattable<MarkupTokenType>))
 							{
 								// concatenate adjacent value nodes
@@ -281,7 +281,7 @@ namespace JsonFx.JsonML
 								case WhitespaceType.Preserve:
 								default:
 								{
-									yield return CommonGrammar.TokenPrimitive(value);
+									yield return ModelGrammar.TokenPrimitive(value);
 									break;
 								}
 							}
@@ -300,11 +300,11 @@ namespace JsonFx.JsonML
 				while (scopeChain.Count > 0)
 				{
 					scopeChain.Pop();
-					yield return CommonGrammar.TokenArrayEnd;
+					yield return ModelGrammar.TokenArrayEnd;
 				}
 			}
 
-			#endregion IDataTransformer<CommonTokenType, MarkupTokenType> Members
+			#endregion IDataTransformer<ModelTokenType, MarkupTokenType> Members
 
 			#region Utility Methods
 

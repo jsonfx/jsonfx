@@ -368,7 +368,7 @@ namespace JsonFx.Serialization
 						return date;
 					}
 
-					if (JsonFx.Common.Filters.MSAjaxDateFilter.TryParseMSAjaxDate(
+					if (JsonFx.Model.Filters.MSAjaxDateFilter.TryParseMSAjaxDate(
 						(string)value,
 						out date))
 					{

@@ -31,8 +31,8 @@
 using System;
 using System.Collections.Generic;
 
-using JsonFx.Common;
 using JsonFx.Markup;
+using JsonFx.Model;
 using JsonFx.Serialization;
 using JsonFx.Serialization.Filters;
 
@@ -41,7 +41,7 @@ namespace JsonFx.Xml
 	/// <summary>
 	/// XML serializer
 	/// </summary>
-	public partial class XmlReader : CommonReader
+	public partial class XmlReader : ModelReader
 	{
 		#region Init
 
@@ -67,8 +67,8 @@ namespace JsonFx.Xml
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <param name="filters"></param>
-		public XmlReader(DataReaderSettings settings, params IDataFilter<CommonTokenType>[] filters)
-			: base(settings, (IEnumerable<IDataFilter<CommonTokenType>>)filters)
+		public XmlReader(DataReaderSettings settings, params IDataFilter<ModelTokenType>[] filters)
+			: base(settings, (IEnumerable<IDataFilter<ModelTokenType>>)filters)
 		{
 		}
 
@@ -77,7 +77,7 @@ namespace JsonFx.Xml
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <param name="filters"></param>
-		public XmlReader(DataReaderSettings settings, IEnumerable<IDataFilter<CommonTokenType>> filters)
+		public XmlReader(DataReaderSettings settings, IEnumerable<IDataFilter<ModelTokenType>> filters)
 			: base(settings, filters)
 		{
 		}
@@ -108,9 +108,9 @@ namespace JsonFx.Xml
 		/// Gets a tokenizer for XML
 		/// </summary>
 		/// <returns></returns>
-		protected override ITextTokenizer<CommonTokenType> GetTokenizer()
+		protected override ITextTokenizer<ModelTokenType> GetTokenizer()
 		{
-			return new TransformTokenizer<MarkupTokenType, CommonTokenType>(new XmlTokenizer(), new XmlInTransformer(this.Settings));
+			return new TransformTokenizer<MarkupTokenType, ModelTokenType>(new XmlTokenizer(), new XmlInTransformer(this.Settings));
 		}
 
 		#endregion DataReader<DataTokenType> Methods

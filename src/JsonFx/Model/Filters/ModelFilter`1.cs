@@ -32,13 +32,13 @@ using System;
 
 using JsonFx.Serialization.Filters;
 
-namespace JsonFx.Common.Filters
+namespace JsonFx.Model.Filters
 {
 	/// <summary>
 	/// Allows a mechanism for manipulating JSON serialization
 	/// </summary>
 	/// <typeparam name="T">Defines the type this filter reads/writes</typeparam>
-	public abstract class CommonFilter<T> : DataFilter<CommonTokenType, T>
+	public abstract class ModelFilter<T> : DataFilter<ModelTokenType, T>
 	{
 	}
 }

@@ -41,7 +41,7 @@ namespace JsonFx.Markup
 		/// No token
 		/// </summary>
 		/// <remarks>
-		/// The token <see cref="Token<CommonTokenType>.Value"/> and <see cref="Token<CommonTokenType>.Name"/> must be null.
+		/// The token <see cref="Token<ModelTokenType>.Value"/> and <see cref="Token<ModelTokenType>.Name"/> must be null.
 		/// Represents the absence of a token and is not represented in the document.
 		/// </remarks>
 		None,
@@ -50,7 +50,7 @@ namespace JsonFx.Markup
 		/// Marks the beginning of an element, the token contains the element Name
 		/// </summary>
 		/// <remarks>
-		/// The element <see cref="Token<CommonTokenType>.Name"/> is required.
+		/// The element <see cref="Token<ModelTokenType>.Name"/> is required.
 		/// Marks the beginning of an element and all its children including attributes.
 		/// </remarks>
 		ElementBegin,
@@ -59,7 +59,7 @@ namespace JsonFx.Markup
 		/// Marks the end of an element
 		/// </summary>
 		/// <remarks>
-		/// The token <see cref="Token<CommonTokenType>.Value"/> and <see cref="Token<CommonTokenType>.Name"/> must be left empty.
+		/// The token <see cref="Token<ModelTokenType>.Value"/> and <see cref="Token<ModelTokenType>.Name"/> must be left empty.
 		/// The element Name is determined by the <see cref="XmlTokenType.ElementBegin"/> token.
 		/// Marks the end of attributes/value pairs, children and the element itself.
 		/// </remarks>
@@ -69,7 +69,7 @@ namespace JsonFx.Markup
 		/// Marks an element which is self-closing, the token contains the element Name
 		/// </summary>
 		/// <remarks>
-		/// The element <see cref="Token<CommonTokenType>.Name"/> is required.
+		/// The element <see cref="Token<ModelTokenType>.Name"/> is required.
 		/// Marks an element which has no children but may have trailing attributes/value pairs.
 		/// </remarks>
 		ElementVoid,
@@ -78,10 +78,10 @@ namespace JsonFx.Markup
 		/// Marks the beginning of an attribute, the token contains the attribute Name. The value will be the next token.
 		/// </summary>
 		/// <remarks>
-		/// The property <see cref="Token<CommonTokenType>.Name"/> is required as all formats name their properties.
-		/// The <see cref="Token<CommonTokenType>.Value"/> is optional, i.e. null and whitespace are a valid values.
-		/// Typically <see cref="Token<CommonTokenType>.Value"/> is serialized directly as a string.
-		/// If the <see cref="Token<CommonTokenType>.Value"/> is not a CLR primitive, then the value must implement IConvertable, IFormatable or be meaningful when cast to a string.
+		/// The property <see cref="Token<ModelTokenType>.Name"/> is required as all formats name their properties.
+		/// The <see cref="Token<ModelTokenType>.Value"/> is optional, i.e. null and whitespace are a valid values.
+		/// Typically <see cref="Token<ModelTokenType>.Value"/> is serialized directly as a string.
+		/// If the <see cref="Token<ModelTokenType>.Value"/> is not a CLR primitive, then the value must implement IConvertable, IFormatable or be meaningful when cast to a string.
 		/// </remarks>
 		Attribute,
 
@@ -89,9 +89,9 @@ namespace JsonFx.Markup
 		/// A block of text, the token contains the text value
 		/// </summary>
 		/// <remarks>
-		/// The <see cref="Token<CommonTokenType>.Value"/> is optional, i.e. null and whitespace are a valid values.
-		/// Typically <see cref="Token<CommonTokenType>.Value"/> is serialized directly as a string.
-		/// If the <see cref="Token<CommonTokenType>.Value"/> is not a CLR primitive, then the value must implement IConvertable, IFormatable or be meaningful when cast to a string.
+		/// The <see cref="Token<ModelTokenType>.Value"/> is optional, i.e. null and whitespace are a valid values.
+		/// Typically <see cref="Token<ModelTokenType>.Value"/> is serialized directly as a string.
+		/// If the <see cref="Token<ModelTokenType>.Value"/> is not a CLR primitive, then the value must implement IConvertable, IFormatable or be meaningful when cast to a string.
 		/// </remarks>
 		Primitive
 	}

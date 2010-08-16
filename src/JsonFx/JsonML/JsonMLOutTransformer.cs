@@ -31,9 +31,9 @@
 using System;
 using System.Collections.Generic;
 
-using JsonFx.Common;
 using JsonFx.IO;
 using JsonFx.Markup;
+using JsonFx.Model;
 using JsonFx.Serialization;
 
 namespace JsonFx.JsonML
@@ -41,12 +41,12 @@ namespace JsonFx.JsonML
 	public partial class JsonMLWriter
 	{
 		/// <summary>
-		/// Transforms common data tokens into markup tokens using the (lossless) JsonML model
+		/// Transforms Common Model tokens into markup tokens using the (lossless) JsonML model
 		/// </summary>
 		/// <remarks>
 		/// JsonML Grammer: http://jsonml.org
 		/// </remarks>
-		public class JsonMLOutTransformer : IDataTransformer<CommonTokenType, MarkupTokenType>
+		public class JsonMLOutTransformer : IDataTransformer<ModelTokenType, MarkupTokenType>
 		{
 			#region Constants
 
@@ -57,34 +57,34 @@ namespace JsonFx.JsonML
 
 			#endregion Constants
 
-			#region IDataTransformer<MarkupTokenType,CommonTokenType> Members
+			#region IDataTransformer<MarkupTokenType,ModelTokenType> Members
 
 			/// <summary>
 			/// Consumes a sequence of tokens and produces a token sequence of a different type
 			/// </summary>
-			public IEnumerable<Token<MarkupTokenType>> Transform(IEnumerable<Token<CommonTokenType>> input)
+			public IEnumerable<Token<MarkupTokenType>> Transform(IEnumerable<Token<ModelTokenType>> input)
 			{
 				if (input == null)
 				{
 					throw new ArgumentNullException("input");
 				}
 
-				IStream<Token<CommonTokenType>> stream = Stream<Token<CommonTokenType>>.Create(input);
+				IStream<Token<ModelTokenType>> stream = Stream<Token<ModelTokenType>>.Create(input);
 
-				Token<CommonTokenType> token = stream.Peek();
+				Token<ModelTokenType> token = stream.Peek();
 				while (!stream.IsCompleted)
 				{
 					switch (token.TokenType)
 					{
-						case CommonTokenType.ArrayBegin:
+						case ModelTokenType.ArrayBegin:
 						{
 							// consume array begin token
 							stream.Pop();
 							token = stream.Peek();
 
-							if (token.TokenType != CommonTokenType.Primitive)
+							if (token.TokenType != ModelTokenType.Primitive)
 							{
-								throw new TokenException<CommonTokenType>(
+								throw new TokenException<ModelTokenType>(
 									token,
 									JsonMLOutTransformer.ErrorMissingTagName);
 							}
@@ -104,7 +104,7 @@ namespace JsonFx.JsonML
 							stream.Pop();
 							token = stream.Peek();
 
-							//if (token.TokenType == CommonTokenType.ArrayEnd)
+							//if (token.TokenType == ModelTokenType.ArrayEnd)
 							//{
 							//    // consume array end token
 							//    stream.Pop();
@@ -118,7 +118,7 @@ namespace JsonFx.JsonML
 							// TODO: evaluate if worth queuing up attributes for void tags with attribs
 							yield return MarkupGrammar.TokenElementBegin(tagName);
 
-							if (token.TokenType != CommonTokenType.ObjectBegin)
+							if (token.TokenType != ModelTokenType.ObjectBegin)
 							{
 								// no attributes, but has children
 								break;
@@ -128,7 +128,7 @@ namespace JsonFx.JsonML
 							stream.Pop();
 							token = stream.Peek();
 
-							while (token.TokenType == CommonTokenType.Property)
+							while (token.TokenType == ModelTokenType.Property)
 							{
 								yield return token.ChangeType(MarkupTokenType.Attribute);
 
@@ -138,14 +138,14 @@ namespace JsonFx.JsonML
 
 								switch (token.TokenType)
 								{
-									case CommonTokenType.Primitive:
+									case ModelTokenType.Primitive:
 									{
 										yield return token.ChangeType(MarkupTokenType.Primitive);
 										break;
 									}
 									default:
 									{
-										throw new TokenException<CommonTokenType>(
+										throw new TokenException<ModelTokenType>(
 											token,
 											String.Format(JsonMLOutTransformer.ErrorInvalidAttributeValue, token.TokenType));
 									}
@@ -156,9 +156,9 @@ namespace JsonFx.JsonML
 								token = stream.Peek();
 							}
 
-							if (token.TokenType != CommonTokenType.ObjectEnd)
+							if (token.TokenType != ModelTokenType.ObjectEnd)
 							{
-								throw new TokenException<CommonTokenType>(
+								throw new TokenException<ModelTokenType>(
 									token,
 									String.Format(JsonMLOutTransformer.ErrorUnterminatedAttributeBlock, token.TokenType));
 							}
@@ -168,7 +168,7 @@ namespace JsonFx.JsonML
 							token = stream.Peek();
 							break;
 						}
-						case CommonTokenType.ArrayEnd:
+						case ModelTokenType.ArrayEnd:
 						{
 							yield return MarkupGrammar.TokenElementEnd;
 
@@ -176,7 +176,7 @@ namespace JsonFx.JsonML
 							token = stream.Peek();
 							break;
 						}
-						case CommonTokenType.Primitive:
+						case ModelTokenType.Primitive:
 						{
 							yield return token.ChangeType(MarkupTokenType.Primitive);
 
@@ -187,7 +187,7 @@ namespace JsonFx.JsonML
 						default:
 						{
 							// the rest are invalid outside of attribute block
-							throw new TokenException<CommonTokenType>(
+							throw new TokenException<ModelTokenType>(
 								token,
 								String.Format(JsonMLOutTransformer.ErrorUnexpectedToken, token.TokenType));
 						}
@@ -195,7 +195,7 @@ namespace JsonFx.JsonML
 				}
 			}
 
-			#endregion IDataTransformer<MarkupTokenType,CommonTokenType> Members
+			#endregion IDataTransformer<MarkupTokenType,ModelTokenType> Members
 		}
 	}
 }

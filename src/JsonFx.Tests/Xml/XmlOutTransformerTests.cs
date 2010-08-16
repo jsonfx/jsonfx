@@ -32,8 +32,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using JsonFx.Common;
 using JsonFx.Markup;
+using JsonFx.Model;
 using JsonFx.Serialization;
 using Xunit;
 
@@ -58,8 +58,8 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayEnd
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayEnd
 			};
 
 			var expected = new[]
@@ -80,9 +80,9 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenNull,
-				CommonGrammar.TokenArrayEnd
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenNull,
+				ModelGrammar.TokenArrayEnd
 			};
 
 			var expected = new[]
@@ -104,12 +104,12 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenPrimitive(0),
-				CommonGrammar.TokenNull,
-				CommonGrammar.TokenFalse,
-				CommonGrammar.TokenTrue,
-				CommonGrammar.TokenArrayEnd
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenPrimitive(0),
+				ModelGrammar.TokenNull,
+				ModelGrammar.TokenFalse,
+				ModelGrammar.TokenTrue,
+				ModelGrammar.TokenArrayEnd
 			};
 
 			var expected = new[]
@@ -141,45 +141,45 @@ namespace JsonFx.Xml
 			// input from pass2.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenArrayBeginUnnamed,
-				CommonGrammar.TokenPrimitive("Not too deep"),
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd,
-				CommonGrammar.TokenArrayEnd
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenPrimitive("Not too deep"),
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenArrayEnd
 			};
 
 			var expected = new[]
@@ -243,8 +243,8 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenObjectEnd
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenObjectEnd
 			};
 
 			var expected = new[]
@@ -265,10 +265,10 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenProperty("key"),
-				CommonGrammar.TokenPrimitive("value"),
-				CommonGrammar.TokenObjectEnd
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenProperty("key"),
+				ModelGrammar.TokenPrimitive("value"),
+				ModelGrammar.TokenObjectEnd
 			};
 
 			var expected = new[]
@@ -292,10 +292,10 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBegin("Yada"),
-				CommonGrammar.TokenProperty("key"),
-				CommonGrammar.TokenPrimitive("value"),
-				CommonGrammar.TokenObjectEnd
+				ModelGrammar.TokenObjectBegin("Yada"),
+				ModelGrammar.TokenProperty("key"),
+				ModelGrammar.TokenPrimitive("value"),
+				ModelGrammar.TokenObjectEnd
 			};
 
 			var expected = new[]
@@ -320,15 +320,15 @@ namespace JsonFx.Xml
 			// input from pass3.json in test suite at http://www.json.org/JSON_checker/
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenProperty("JSON Test Pattern pass3"),
-				CommonGrammar.TokenObjectBeginUnnamed,
-				CommonGrammar.TokenProperty("The outermost value"),
-				CommonGrammar.TokenPrimitive("must be an object or array."),
-				CommonGrammar.TokenProperty("In this test"),
-				CommonGrammar.TokenPrimitive("It is an object."),
-				CommonGrammar.TokenObjectEnd,
-				CommonGrammar.TokenObjectEnd
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenProperty("JSON Test Pattern pass3"),
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenProperty("The outermost value"),
+				ModelGrammar.TokenPrimitive("must be an object or array."),
+				ModelGrammar.TokenProperty("In this test"),
+				ModelGrammar.TokenPrimitive("It is an object."),
+				ModelGrammar.TokenObjectEnd,
+				ModelGrammar.TokenObjectEnd
 			};
 
 			var expected = new[]
@@ -361,10 +361,10 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBegin("foo"),
-				CommonGrammar.TokenProperty(new DataName("key", String.Empty, "http://json.org")),
-				CommonGrammar.TokenPrimitive("value"),
-				CommonGrammar.TokenObjectEnd
+				ModelGrammar.TokenObjectBegin("foo"),
+				ModelGrammar.TokenProperty(new DataName("key", String.Empty, "http://json.org")),
+				ModelGrammar.TokenPrimitive("value"),
+				ModelGrammar.TokenObjectEnd
 			};
 
 			var expected = new[]
@@ -388,10 +388,10 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBegin(new DataName("foo", String.Empty, "http://json.org")),
-				CommonGrammar.TokenProperty(new DataName("key", String.Empty, "http://json.org")),
-				CommonGrammar.TokenPrimitive("value"),
-				CommonGrammar.TokenObjectEnd
+				ModelGrammar.TokenObjectBegin(new DataName("foo", String.Empty, "http://json.org")),
+				ModelGrammar.TokenProperty(new DataName("key", String.Empty, "http://json.org")),
+				ModelGrammar.TokenPrimitive("value"),
+				ModelGrammar.TokenObjectEnd
 			};
 
 			var expected = new[]
@@ -415,10 +415,10 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBegin(new DataName("foo", String.Empty, "http://json.org")),
-				CommonGrammar.TokenProperty("key"),
-				CommonGrammar.TokenPrimitive("value"),
-				CommonGrammar.TokenObjectEnd
+				ModelGrammar.TokenObjectBegin(new DataName("foo", String.Empty, "http://json.org")),
+				ModelGrammar.TokenProperty("key"),
+				ModelGrammar.TokenPrimitive("value"),
+				ModelGrammar.TokenObjectEnd
 			};
 
 			var expected = new[]
@@ -442,10 +442,10 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBegin(new DataName("foo", String.Empty, "http://json.org")),
-				CommonGrammar.TokenProperty(new DataName("key", String.Empty, "http://jsonfx.net")),
-				CommonGrammar.TokenPrimitive("value"),
-				CommonGrammar.TokenObjectEnd
+				ModelGrammar.TokenObjectBegin(new DataName("foo", String.Empty, "http://json.org")),
+				ModelGrammar.TokenProperty(new DataName("key", String.Empty, "http://jsonfx.net")),
+				ModelGrammar.TokenPrimitive("value"),
+				ModelGrammar.TokenObjectEnd
 			};
 
 			var expected = new[]
@@ -469,10 +469,10 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBegin(new DataName("foo", String.Empty, "http://json.org")),
-				CommonGrammar.TokenProperty(new DataName("key", String.Empty, "http://json.org", true)),
-				CommonGrammar.TokenPrimitive("value"),
-				CommonGrammar.TokenObjectEnd
+				ModelGrammar.TokenObjectBegin(new DataName("foo", String.Empty, "http://json.org")),
+				ModelGrammar.TokenProperty(new DataName("key", String.Empty, "http://json.org", true)),
+				ModelGrammar.TokenPrimitive("value"),
+				ModelGrammar.TokenObjectEnd
 			};
 
 			var expected = new[]
@@ -495,10 +495,10 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBegin(new DataName("foo", String.Empty, "http://json.org")),
-				CommonGrammar.TokenProperty(new DataName("key", String.Empty, "http://jsonfx.net", true)),
-				CommonGrammar.TokenPrimitive("value"),
-				CommonGrammar.TokenObjectEnd
+				ModelGrammar.TokenObjectBegin(new DataName("foo", String.Empty, "http://json.org")),
+				ModelGrammar.TokenProperty(new DataName("key", String.Empty, "http://jsonfx.net", true)),
+				ModelGrammar.TokenPrimitive("value"),
+				ModelGrammar.TokenObjectEnd
 			};
 
 			var expected = new[]
@@ -521,15 +521,15 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBegin(new DataName("foo1", String.Empty, "http://json.org")),
-				CommonGrammar.TokenProperty(new DataName("key1", String.Empty, "http://jsonfx.net")),
+				ModelGrammar.TokenObjectBegin(new DataName("foo1", String.Empty, "http://json.org")),
+				ModelGrammar.TokenProperty(new DataName("key1", String.Empty, "http://jsonfx.net")),
 
-				CommonGrammar.TokenObjectBegin(new DataName("foo2", String.Empty, "http://json.org")),
-				CommonGrammar.TokenProperty(new DataName("key2", String.Empty, "http://jsonfx.net")),
-				CommonGrammar.TokenPrimitive("value"),
-				CommonGrammar.TokenObjectEnd,
+				ModelGrammar.TokenObjectBegin(new DataName("foo2", String.Empty, "http://json.org")),
+				ModelGrammar.TokenProperty(new DataName("key2", String.Empty, "http://jsonfx.net")),
+				ModelGrammar.TokenPrimitive("value"),
+				ModelGrammar.TokenObjectEnd,
 
-				CommonGrammar.TokenObjectEnd
+				ModelGrammar.TokenObjectEnd
 			};
 
 			var expected = new[]
@@ -555,15 +555,15 @@ namespace JsonFx.Xml
 		{
 			var input = new[]
 			{
-				CommonGrammar.TokenObjectBegin(new DataName("foo1", String.Empty, "http://json.org")),
-				CommonGrammar.TokenProperty(new DataName("key1", String.Empty, "http://jsonfx.net")),
+				ModelGrammar.TokenObjectBegin(new DataName("foo1", String.Empty, "http://json.org")),
+				ModelGrammar.TokenProperty(new DataName("key1", String.Empty, "http://jsonfx.net")),
 
-				CommonGrammar.TokenObjectBegin(new DataName("foo2", String.Empty, "http://jsonfx.net")),
-				CommonGrammar.TokenProperty(new DataName("key2", String.Empty, "http://json.org")),
-				CommonGrammar.TokenPrimitive("value"),
-				CommonGrammar.TokenObjectEnd,
+				ModelGrammar.TokenObjectBegin(new DataName("foo2", String.Empty, "http://jsonfx.net")),
+				ModelGrammar.TokenProperty(new DataName("key2", String.Empty, "http://json.org")),
+				ModelGrammar.TokenPrimitive("value"),
+				ModelGrammar.TokenObjectEnd,
 
-				CommonGrammar.TokenObjectEnd
+				ModelGrammar.TokenObjectEnd
 			};
 
 			var expected = new[]
@@ -591,7 +591,7 @@ namespace JsonFx.Xml
 		[Trait(TraitName, TraitValue)]
 		public void Format_EmptyInput_RendersEmptyString()
 		{
-			var input = Enumerable.Empty<Token<CommonTokenType>>();
+			var input = Enumerable.Empty<Token<ModelTokenType>>();
 
 			var expected = Enumerable.Empty<Token<MarkupTokenType>>();
 
@@ -605,7 +605,7 @@ namespace JsonFx.Xml
 		[Trait(TraitName, TraitValue)]
 		public void Format_NullInput_ThrowsArgumentNullException()
 		{
-			var input = (IEnumerable<Token<CommonTokenType>>)null;
+			var input = (IEnumerable<Token<ModelTokenType>>)null;
 
 			var transformer = new XmlWriter.XmlOutTransformer(new DataWriterSettings());
 
