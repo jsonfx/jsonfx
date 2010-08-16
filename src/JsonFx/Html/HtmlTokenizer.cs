@@ -383,6 +383,7 @@ namespace JsonFx.Html
 						case MarkupGrammar.OperatorCodeDeclaration:		// "<%!",  "%>"			JSP/JBST declaration
 						case MarkupGrammar.OperatorCodeDataBind:		// "<%#",  "%>"			ASP.NET/JBST databind expression
 						case MarkupGrammar.OperatorCodeExtension:		// "<%$",  "%>"			ASP.NET/JBST extension
+						case MarkupGrammar.OperatorCodeEncoded:			// "<%:",  "%>"			ASP.NET 4 HTML-encoded expression
 						{
 							// consume code block type differentiating char
 							scanner.Pop();

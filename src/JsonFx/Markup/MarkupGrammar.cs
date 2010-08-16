@@ -73,6 +73,7 @@ namespace JsonFx.Markup
 		public const char OperatorCodeDirective = '@';
 		public const char OperatorCodeExpression = '=';
 		public const char OperatorCodeDeclaration = '!';
+		public const char OperatorCodeEncoded = ':';
 		public const char OperatorCodeDataBind = '#';
 		public const char OperatorCodeExtension = '$';
 		public const string OperatorCodeBlockBegin = "%";
