@@ -87,11 +87,11 @@
     <Compile Include="Bson\BsonFormatterTests.cs" />
     <Compile Include="Bson\BsonConverterTests.cs" />
     <Compile Include="CodeGen\DynamicMethodGeneratorTests.cs" />
-    <Compile Include="Common\CommonAnalyzerTests.cs" />
-    <Compile Include="Common\CommonWalkerTests.cs" />
-    <Compile Include="Common\Filters\Iso8601DateFilterTests.cs" />
-    <Compile Include="Common\Filters\MSAjaxDateFilterTests.cs" />
-    <Compile Include="Common\CommonSubsequencerTests.cs" />
+    <Compile Include="Model\ModelAnalyzerTests.cs" />
+    <Compile Include="Model\ModelWalkerTests.cs" />
+    <Compile Include="Model\Filters\Iso8601DateFilterTests.cs" />
+    <Compile Include="Model\Filters\MSAjaxDateFilterTests.cs" />
+    <Compile Include="Model\ModelSubsequencerTests.cs" />
     <Compile Include="Html\HtmlFormatterTests.cs" />
     <Compile Include="Html\HtmlTokenizerTests.cs" />
     <Compile Include="Html\HtmlOutTransformerTests.cs" />

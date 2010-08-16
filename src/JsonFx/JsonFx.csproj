@@ -102,16 +102,16 @@
     <Compile Include="Bson\BsonTypes.cs" />
     <Compile Include="Bson\IBsonFormattable.cs" />
     <Compile Include="CodeGen\Delegates.cs" />
-    <Compile Include="Common\CommonAnalyzer.cs" />
-    <Compile Include="Common\CommonGrammar.cs" />
-    <Compile Include="Common\CommonReader.cs" />
-    <Compile Include="Common\CommonSubsequencer.cs" />
-    <Compile Include="Common\CommonTokenType.cs" />
-    <Compile Include="Common\CommonWalker.cs" />
-    <Compile Include="Common\Filters\CommonFilter`1.cs" />
-    <Compile Include="Common\Filters\Iso8601DateFilter.cs" />
-    <Compile Include="Common\Filters\MSAjaxDateFilter.cs" />
-    <Compile Include="Common\CommonWriter.cs" />
+    <Compile Include="Model\ModelAnalyzer.cs" />
+    <Compile Include="Model\ModelGrammar.cs" />
+    <Compile Include="Model\ModelReader.cs" />
+    <Compile Include="Model\ModelSubsequencer.cs" />
+    <Compile Include="Model\ModelTokenType.cs" />
+    <Compile Include="Model\ModelWalker.cs" />
+    <Compile Include="Model\Filters\ModelFilter`1.cs" />
+    <Compile Include="Model\Filters\Iso8601DateFilter.cs" />
+    <Compile Include="Model\Filters\MSAjaxDateFilter.cs" />
+    <Compile Include="Model\ModelWriter.cs" />
     <Compile Include="EcmaScript\EcmaScriptIdentifier.cs" />
     <Compile Include="EcmaScript\EcmaScriptFormatter.cs" />
     <Compile Include="Html\IHtmlFilterStrategy.cs" />
@@ -206,8 +206,8 @@
     <Compile Include="CodeGen\DynamicMethodGenerator.cs" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFrameworkVersion)' != 'v2.0' And '$(TargetFrameworkVersion)' != 'v3.0' And '$(TargetFrameworkProfile)' != 'WindowsPhone' ">
-    <Compile Include="Common\CommonReader_Query.cs" />
-    <Compile Include="Common\Query`1.cs" />
+    <Compile Include="Model\ModelReader_Query.cs" />
+    <Compile Include="Model\Query`1.cs" />
     <Compile Include="Linq\BaseQueryProvider.cs" />
     <Compile Include="Linq\ExpressionVisitor.cs" />
     <Compile Include="Linq\ExpressionWalker.cs" />
