@@ -722,6 +722,195 @@ namespace JsonFx.Html
 
 		#endregion Mixed Content Tests
 
+		#region Script & Style Tests
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void GetTokens_HtmlScriptBlock_ReturnsCDataInside()
+		{
+			const string input =
+@"<div class=""content"">
+	<script type=""text/javascript"">
+		var text = ""<strong>Lorem ipsum</strong> dolor sit amet, <i>consectetur</i> adipiscing elit."";
+	</script>
+</div>";
+
+			var expected = new[]
+			    {
+			        MarkupGrammar.TokenElementBegin(new DataName("div")),
+			        MarkupGrammar.TokenAttribute(new DataName("class")),
+			        MarkupGrammar.TokenPrimitive("content"),
+			        MarkupGrammar.TokenPrimitive("\r\n\t"),
+			        MarkupGrammar.TokenElementBegin(new DataName("script")),
+			        MarkupGrammar.TokenAttribute(new DataName("type")),
+			        MarkupGrammar.TokenPrimitive("text/javascript"),
+			        MarkupGrammar.TokenPrimitive("\r\n\t\tvar text = \"<strong>Lorem ipsum</strong> dolor sit amet, <i>consectetur</i> adipiscing elit.\";\r\n\t"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenPrimitive("\r\n"),
+					MarkupGrammar.TokenElementEnd,
+			    };
+
+			var tokenizer = new HtmlTokenizer
+			{
+				UnparsedTags = new[] { "script", "style" }
+			};
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void GetTokens_HtmlScriptBlockCommentUnwrapUnparsedComments_ReturnsCommentTextInside()
+		{
+			const string input =
+@"<div class=""content"">
+	<script type=""text/javascript""><!--
+		var text = ""<strong>Lorem ipsum</strong> dolor sit amet, <i>consectetur</i> adipiscing elit."";
+	--></script>
+</div>";
+
+			var expected = new[]
+			    {
+			        MarkupGrammar.TokenElementBegin(new DataName("div")),
+			        MarkupGrammar.TokenAttribute(new DataName("class")),
+			        MarkupGrammar.TokenPrimitive("content"),
+			        MarkupGrammar.TokenPrimitive("\r\n\t"),
+			        MarkupGrammar.TokenElementBegin(new DataName("script")),
+			        MarkupGrammar.TokenAttribute(new DataName("type")),
+			        MarkupGrammar.TokenPrimitive("text/javascript"),
+			        MarkupGrammar.TokenPrimitive("\r\n\t\tvar text = \"<strong>Lorem ipsum</strong> dolor sit amet, <i>consectetur</i> adipiscing elit.\";\r\n\t"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenPrimitive("\r\n"),
+					MarkupGrammar.TokenElementEnd,
+			    };
+
+			var tokenizer = new HtmlTokenizer
+			{
+				UnparsedTags = new[] { "script", "style" },
+				UnwrapUnparsedComments = true
+			};
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void GetTokens_HtmlScriptBlockComment_ReturnsCommentBlock()
+		{
+			const string input =
+@"<div class=""content"">
+	<script type=""text/javascript""><!--
+		var text = ""<strong>Lorem ipsum</strong> dolor sit amet, <i>consectetur</i> adipiscing elit."";
+	--></script>
+</div>";
+
+			var expected = new[]
+			    {
+			        MarkupGrammar.TokenElementBegin(new DataName("div")),
+			        MarkupGrammar.TokenAttribute(new DataName("class")),
+			        MarkupGrammar.TokenPrimitive("content"),
+			        MarkupGrammar.TokenPrimitive("\r\n\t"),
+			        MarkupGrammar.TokenElementBegin(new DataName("script")),
+			        MarkupGrammar.TokenAttribute(new DataName("type")),
+			        MarkupGrammar.TokenPrimitive("text/javascript"),
+			        MarkupGrammar.TokenPrimitive(new UnparsedBlock("!--", "--", "\r\n\t\tvar text = \"<strong>Lorem ipsum</strong> dolor sit amet, <i>consectetur</i> adipiscing elit.\";\r\n\t")),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenPrimitive("\r\n"),
+					MarkupGrammar.TokenElementEnd,
+			    };
+
+			var tokenizer = new HtmlTokenizer
+			{
+				UnparsedTags = new[] { "script", "style" },
+				UnwrapUnparsedComments = false
+			};
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void GetTokens_HtmlScriptBlockNoUnparsedTags_ReturnsParsedContent()
+		{
+			const string input =
+@"<div class=""content"">
+	<script type=""text/javascript"">
+		var text = ""<strong>Lorem ipsum</strong> dolor sit amet, <i>consectetur</i> adipiscing elit."";
+	</script>
+</div>";
+
+			var expected = new[]
+			    {
+			        MarkupGrammar.TokenElementBegin(new DataName("div")),
+			        MarkupGrammar.TokenAttribute(new DataName("class")),
+			        MarkupGrammar.TokenPrimitive("content"),
+			        MarkupGrammar.TokenPrimitive("\r\n\t"),
+			        MarkupGrammar.TokenElementBegin(new DataName("script")),
+			        MarkupGrammar.TokenAttribute(new DataName("type")),
+			        MarkupGrammar.TokenPrimitive("text/javascript"),
+			        MarkupGrammar.TokenPrimitive("\r\n\t\tvar text = \""),
+			        MarkupGrammar.TokenElementBegin(new DataName("strong")),
+			        MarkupGrammar.TokenPrimitive("Lorem ipsum"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenPrimitive(" dolor sit amet, "),
+			        MarkupGrammar.TokenElementBegin(new DataName("i")),
+			        MarkupGrammar.TokenPrimitive("consectetur"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenPrimitive(" adipiscing elit.\";\r\n\t"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenPrimitive("\r\n"),
+					MarkupGrammar.TokenElementEnd,
+			    };
+
+			var tokenizer = new HtmlTokenizer
+			{
+				UnparsedTags = null
+			};
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void GetTokens_HtmlStyleBlock_ReturnsCDataInside()
+		{
+			const string input =
+@"<div class=""content"">
+	<style type=""text/css"">
+		<strong>Lorem ipsum</strong> dolor sit amet, <i>consectetur</i> adipiscing elit.
+	</style>
+</div>";
+
+			var expected = new[]
+			    {
+			        MarkupGrammar.TokenElementBegin(new DataName("div")),
+			        MarkupGrammar.TokenAttribute(new DataName("class")),
+			        MarkupGrammar.TokenPrimitive("content"),
+			        MarkupGrammar.TokenPrimitive("\r\n\t"),
+			        MarkupGrammar.TokenElementBegin(new DataName("style")),
+			        MarkupGrammar.TokenAttribute(new DataName("type")),
+			        MarkupGrammar.TokenPrimitive("text/css"),
+			        MarkupGrammar.TokenPrimitive("\r\n\t\t<strong>Lorem ipsum</strong> dolor sit amet, <i>consectetur</i> adipiscing elit.\r\n\t"),
+			        MarkupGrammar.TokenElementEnd,
+			        MarkupGrammar.TokenPrimitive("\r\n"),
+					MarkupGrammar.TokenElementEnd,
+			    };
+
+			var tokenizer = new HtmlTokenizer
+			{
+				UnparsedTags = new[] { "script", "style" }
+			};
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		#endregion Script & Style Tests
+
 		#region Error Recovery Tests
 
 		[Fact]

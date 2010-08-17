@@ -52,13 +52,74 @@ namespace JsonFx.Html
 
 		private class QName
 		{
+			#region Constants
+
+			private static readonly char[] NameDelim = new[] { MarkupGrammar.OperatorPrefixDelim };
+
+			#endregion Constants
+
+			#region Init
+
+			/// <summary>
+			/// Ctor
+			/// </summary>
+			public QName(string name)
+			{
+				if (String.IsNullOrEmpty(name))
+				{
+					throw new ArgumentNullException("name");
+				}
+
+				string[] nameParts = name.Split(':');
+				switch (nameParts.Length)
+				{
+					case 1:
+					{
+						this.Prefix = String.Empty;
+						this.Name = nameParts[0];
+						break;
+					}
+					case 2:
+					{
+						this.Prefix = nameParts[0];
+						this.Name = nameParts[1];
+						break;
+					}
+					default:
+					{
+						throw new ArgumentException("name");
+					}
+				}
+			}
+
+			#endregion Init
+
 			#region Properties
 
-			public string Prefix { get; set; }
+			public readonly string Prefix;
 
-			public string Name { get; set; }
+			public readonly string Name;
 
 			#endregion Properties
+
+			#region Operators
+
+			public static bool operator ==(QName a, QName b)
+			{
+				if (Object.ReferenceEquals(a, null))
+				{
+					return Object.ReferenceEquals(b, null);
+				}
+
+				return a.Equals(b);
+			}
+
+			public static bool operator !=(QName a, QName b)
+			{
+				return !(a == b);
+			}
+
+			#endregion Operators
 
 			#region Object Overrides
 
@@ -73,6 +134,41 @@ namespace JsonFx.Html
 					this.Prefix,
 					MarkupGrammar.OperatorPrefixDelim,
 					this.Name);
+			}
+
+			public override int GetHashCode()
+			{
+				int hash = 0x36294b26;
+
+				hash = (-1521134295 * hash) + StringComparer.Ordinal.GetHashCode(this.Name ?? String.Empty);
+				hash = (-1521134295 * hash) + StringComparer.Ordinal.GetHashCode(this.Prefix ?? String.Empty);
+
+				return hash;
+			}
+
+			public override bool Equals(object obj)
+			{
+				return this.Equals(obj as QName, null);
+			}
+
+			public bool Equals(QName that)
+			{
+				return this.Equals(that, null);
+			}
+
+			public bool Equals(QName that, IEqualityComparer<string> comparer)
+			{
+				if (comparer == null)
+				{
+					comparer = StringComparer.Ordinal;
+				}
+
+				if (that == null)
+				{
+					return false;
+				}
+
+				return comparer.Equals(this.Prefix, that.Prefix) && comparer.Equals(this.Name, that.Name);
 			}
 
 			#endregion Object Overrides
@@ -111,6 +207,7 @@ namespace JsonFx.Html
 		private readonly PrefixScopeChain ScopeChain = new PrefixScopeChain();
 
 		private ITextStream Scanner = TextReaderStream.Null;
+		private IList<QName> unparsedTags;
 		private bool autoBalanceTags;
 
 		#endregion Fields
@@ -118,12 +215,65 @@ namespace JsonFx.Html
 		#region Properties
 
 		/// <summary>
-		/// Gets and sets a value indicating if should attempt to auto-balance mismatched tags.
+		/// Gets and sets if should attempt to auto-balance mismatched tags.
 		/// </summary>
 		public bool AutoBalanceTags
 		{
 			get { return this.autoBalanceTags; }
 			set { this.autoBalanceTags = value; }
+		}
+
+		/// <summary>
+		/// Gets and sets if should unwrap comments inside <see cref="HtmlTokenizer.UnparsedTags"/>.
+		/// </summary>
+		/// <remarks>
+		/// For example, in HTML this would include "script" and "style" tags.
+		/// </remarks>
+		public bool UnwrapUnparsedComments
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// Gets and sets a set of tags which should not have their content parsed.
+		/// </summary>
+		/// <remarks>
+		/// For example, in HTML this would include "script" and "style" tags.
+		/// </remarks>
+		public IEnumerable<string> UnparsedTags
+		{
+			get
+			{
+				if (this.unparsedTags == null)
+				{
+					yield return null;
+				}
+
+				foreach (QName name in this.unparsedTags)
+				{
+					yield return name.ToString();
+				}
+			}
+			set
+			{
+				if (value == null)
+				{
+					this.unparsedTags = null;
+					return;
+				}
+
+				this.unparsedTags = new List<QName>();
+				foreach (string name in value)
+				{
+					this.unparsedTags.Add(new QName(name));
+				}
+
+				if (this.unparsedTags.Count < 1)
+				{
+					this.unparsedTags = null;
+				}
+			}
 		}
 
 		/// <summary>
@@ -160,6 +310,8 @@ namespace JsonFx.Html
 
 			try
 			{
+				QName unparseBlock = null;
+
 				scanner.BeginChunk();
 				while (!scanner.IsCompleted)
 				{
@@ -171,7 +323,20 @@ namespace JsonFx.Html
 							this.EmitText(tokens, scanner.EndChunk());
 
 							// process tag
-							this.ScanTag(tokens, scanner);
+							QName tagName = this.ScanTag(tokens, scanner, unparseBlock);
+							if (unparseBlock == null)
+							{
+								if (tagName != null)
+								{
+									// suspend parsing until matching tag
+									unparseBlock = tagName;
+								}
+							}
+							else if (tagName == unparseBlock)
+							{
+								// matching tag found, resume parsing
+								unparseBlock = null;
+							}
 
 							// resume chunking and capture
 							scanner.BeginChunk();
@@ -223,7 +388,7 @@ namespace JsonFx.Html
 			}
 		}
 
-		private void ScanTag(List<Token<MarkupTokenType>> tokens, ITextStream scanner)
+		private QName ScanTag(List<Token<MarkupTokenType>> tokens, ITextStream scanner, QName unparsedName)
 		{
 			if (scanner.Pop() != MarkupGrammar.OperatorElementBegin)
 			{
@@ -234,14 +399,24 @@ namespace JsonFx.Html
 			{
 				// end of file, just emit as text
 				this.EmitText(tokens, Char.ToString(MarkupGrammar.OperatorElementBegin));
-				return;
+				return null;
 			}
 
 			Token<MarkupTokenType> unparsed = this.ScanUnparsedBlock(scanner);
 			if (unparsed != null)
 			{
+				if (this.UnwrapUnparsedComments &&
+					unparsedName != null)
+				{
+					UnparsedBlock block = unparsed.Value as UnparsedBlock;
+					if (block != null && block.Begin == "!--")
+					{
+						// unwrap comments inside unparsed tags
+						unparsed = new Token<MarkupTokenType>(unparsed.TokenType, unparsed.Name, block.Value);
+					}
+				}
 				tokens.Add(unparsed);
-				return;
+				return null;
 			}
 
 			char ch = scanner.Peek();
@@ -264,7 +439,24 @@ namespace JsonFx.Html
 				}
 
 				this.EmitText(tokens, text);
-				return;
+				return null;
+			}
+
+			if (unparsedName != null)
+			{
+				if (tagName != unparsedName ||
+					tagType != MarkupTokenType.ElementEnd)
+				{
+					string text = Char.ToString(MarkupGrammar.OperatorElementBegin);
+					if (tagType == MarkupTokenType.ElementEnd)
+					{
+						text += MarkupGrammar.OperatorElementClose;
+					}
+					text += tagName.ToString();
+
+					this.EmitText(tokens, text);
+					return null;
+				}
 			}
 
 			List<Attrib> attributes = null;
@@ -295,6 +487,8 @@ namespace JsonFx.Html
 			}
 
 			this.EmitTag(tokens, tagType, tagName, attributes);
+
+			return (this.unparsedTags != null && this.unparsedTags.Contains(tagName)) ? tagName : null;
 		}
 
 		private Token<MarkupTokenType> ScanUnparsedBlock(ITextStream scanner)
@@ -662,39 +856,19 @@ namespace JsonFx.Html
 			} while (!scanner.IsCompleted && HtmlTokenizer.IsNameChar(ch));
 
 			string name = scanner.EndChunk();
-
-			QName qName;
-			string[] nameParts = name.Split(':');
-			switch (nameParts.Length)
+			try
 			{
-				case 1:
-				{
-					qName = new QName
-					{
-						Name = nameParts[0]
-					};
-					break;
-				}
-				case 2:
-				{
-					qName = new QName
-					{
-						Prefix = nameParts[0],
-						Name = nameParts[1]
-					};
-					break;
-				}
-				default:
-				{
-					throw new DeserializationException(
-						String.Format("Invalid element name {0}", name),
-						scanner.Index,
-						scanner.Line,
-						scanner.Column);
-				}
+				return new QName(name);
 			}
-
-			return qName;
+			catch (Exception ex)
+			{
+				throw new DeserializationException(
+					String.Format("Invalid element name ({0})", name),
+					scanner.Index,
+					scanner.Line,
+					scanner.Column,
+					ex);
+			}
 		}
 
 		private bool IsTagComplete(
