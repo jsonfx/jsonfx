@@ -63,12 +63,6 @@ namespace JsonFx.JsonML
 
 			#endregion Constants
 
-			#region Fields
-
-			private ITextStream Scanner = TextReaderStream.Null;
-
-			#endregion Fields
-
 			#region Properties
 
 			/// <summary>
@@ -78,30 +72,6 @@ namespace JsonFx.JsonML
 			{
 				get;
 				set;
-			}
-
-			/// <summary>
-			/// Gets the total number of characters read from the input
-			/// </summary>
-			public int Column
-			{
-				get { return this.Scanner.Column; }
-			}
-
-			/// <summary>
-			/// Gets the total number of lines read from the input
-			/// </summary>
-			public int Line
-			{
-				get { return this.Scanner.Line; }
-			}
-
-			/// <summary>
-			/// Gets the current position within the input
-			/// </summary>
-			public long Index
-			{
-				get { return this.Scanner.Index; }
 			}
 
 			#endregion Properties
