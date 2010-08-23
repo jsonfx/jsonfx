@@ -307,6 +307,8 @@ namespace JsonFx.Html
 			IDictionary<DataName, Token<MarkupTokenType>> attributes,
 			PrefixScopeChain.Scope prefixDeclarations)
 		{
+			// TODO: decide what to emit if local-name is empty
+
 			string tagPrefix = this.ScopeChain.EnsurePrefix(tagName.Prefix, tagName.NamespaceUri);
 
 			// "<"
