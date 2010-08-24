@@ -155,6 +155,18 @@ namespace JsonFx.Html
 
 		#endregion Properties
 
+		#region Scope Methods
+
+		/// <summary>
+		/// Resets the internal stack of elements
+		/// </summary>
+		public void ResetScopeChain()
+		{
+			this.ScopeChain.Clear();
+		}
+
+		#endregion Scope Methods
+
 		#region ITextFormatter<T> Methods
 
 		/// <summary>
@@ -307,7 +319,11 @@ namespace JsonFx.Html
 			IDictionary<DataName, Token<MarkupTokenType>> attributes,
 			PrefixScopeChain.Scope prefixDeclarations)
 		{
-			// TODO: decide what to emit if local-name is empty
+			if (String.IsNullOrEmpty(tagName.LocalName))
+			{
+				// represents a document fragment
+				return;
+			}
 
 			string tagPrefix = this.ScopeChain.EnsurePrefix(tagName.Prefix, tagName.NamespaceUri);
 
