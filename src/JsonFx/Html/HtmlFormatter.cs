@@ -291,7 +291,7 @@ namespace JsonFx.Html
 						}
 						else
 						{
-							this.WriteCharData(writer, token.ValueAsString());
+							HtmlFormatter.HtmlEncode(writer, token.ValueAsString(), this.encodeNonAscii, this.canonicalForm);
 						}
 
 						stream.Pop();
@@ -402,7 +402,7 @@ namespace JsonFx.Html
 			// ="value"
 			writer.Write(MarkupGrammar.OperatorPairDelim);
 			writer.Write(MarkupGrammar.OperatorStringDelim);
-			this.WriteAttributeValue(writer, namespaceUri);
+			HtmlFormatter.HtmlAttributeEncode(writer, namespaceUri, this.encodeNonAscii, this.canonicalForm);
 			writer.Write(MarkupGrammar.OperatorStringDelim);
 		}
 
@@ -459,7 +459,7 @@ namespace JsonFx.Html
 					}
 					else
 					{
-						this.WriteAttributeValue(writer, attrValue);
+						HtmlFormatter.HtmlAttributeEncode(writer, attrValue, this.encodeNonAscii, this.canonicalForm);
 					}
 					break;
 				}
@@ -582,7 +582,23 @@ namespace JsonFx.Html
 		///		"the XML processor must behave as if it normalized all line breaks in external parsed entities (including the document entity) on input, before parsing"
 		///	Therefore, this encodes all CR ('\r') chars to preserve them in the final output.
 		/// </remarks>
-		private void WriteCharData(TextWriter writer, string value)
+		public static void HtmlEncode(TextWriter writer, string value)
+		{
+			HtmlFormatter.HtmlEncode(writer, value, false, false);
+		}
+
+		/// <summary>
+		/// Emits valid XML character data
+		/// </summary>
+		/// <param name="writer"></param>
+		/// <param name="value"></param>
+		/// <param name="encodeNonAscii">encodes all non-ASCII chars</param>
+		public static void HtmlEncode(TextWriter writer, string value, bool encodeNonAscii)
+		{
+			HtmlFormatter.HtmlEncode(writer, value, encodeNonAscii, false);
+		}
+
+		private static void HtmlEncode(TextWriter writer, string value, bool encodeNonAscii, bool canonicalForm)
 		{
 			int start = 0,
 				length = value.Length;
@@ -611,7 +627,7 @@ namespace JsonFx.Html
 					}
 					case '\r':
 					{
-						if (!this.canonicalForm)
+						if (!canonicalForm)
 						{
 							continue;
 						}
@@ -624,7 +640,7 @@ namespace JsonFx.Html
 					default:
 					{
 						if (((ch < ' ') && (ch != '\n') && (ch != '\t')) ||
-							(this.encodeNonAscii && (ch >= 0x7F)) ||
+							(encodeNonAscii && (ch >= 0x7F)) ||
 							((ch >= 0x7F) && (ch <= 0x84)) ||
 							((ch >= 0x86) && (ch <= 0x9F)) ||
 							((ch >= 0xFDD0) && (ch <= 0xFDEF)))
@@ -667,7 +683,23 @@ namespace JsonFx.Html
 		///		Attributes should additionally encode double-quote ('"') and single-quote ('\'')
 		///	Rather than detect "]]>", this simply encodes all '>'.
 		/// </remarks>
-		private void WriteAttributeValue(TextWriter writer, string value)
+		public static void HtmlAttributeEncode(TextWriter writer, string value)
+		{
+			HtmlFormatter.HtmlAttributeEncode(writer, value, false, false);
+		}
+
+		/// <summary>
+		/// Emits valid XML attribute character data
+		/// </summary>
+		/// <param name="writer"></param>
+		/// <param name="value"></param>
+		/// <param name="encodeNonAscii">encodes all non-ASCII chars</param>
+		public static void HtmlAttributeEncode(TextWriter writer, string value, bool encodeNonAscii)
+		{
+			HtmlFormatter.HtmlAttributeEncode(writer, value, encodeNonAscii, false);
+		}
+
+		private static void HtmlAttributeEncode(TextWriter writer, string value, bool encodeNonAscii, bool canonicalForm)
 		{
 			if (String.IsNullOrEmpty(value))
 			{
@@ -691,7 +723,7 @@ namespace JsonFx.Html
 					}
 					case '>':
 					{
-						if (this.canonicalForm)
+						if (canonicalForm)
 						{
 							// http://www.w3.org/TR/xml-c14n#ProcessingModel
 							continue;
@@ -712,7 +744,7 @@ namespace JsonFx.Html
 					}
 					case '\'':
 					{
-						if (!this.canonicalForm)
+						if (!canonicalForm)
 						{
 							continue;
 						}
@@ -724,7 +756,7 @@ namespace JsonFx.Html
 					default:
 					{
 						if ((ch < ' ') ||
-							(this.encodeNonAscii && (ch >= 0x7F)) ||
+							(encodeNonAscii && (ch >= 0x7F)) ||
 							((ch >= 0x7F) && (ch <= 0x84)) ||
 							((ch >= 0x86) && (ch <= 0x9F)) ||
 							((ch >= 0xFDD0) && (ch <= 0xFDEF)))
