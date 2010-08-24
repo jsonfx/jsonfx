@@ -94,7 +94,7 @@ namespace JsonFx.Html
 		private readonly DataWriterSettings Settings;
 		private readonly PrefixScopeChain ScopeChain = new PrefixScopeChain();
 
-		public bool canonicalForm;
+		private bool canonicalForm;
 		private EmptyAttributeType emptyAttributes;
 		private bool encodeNonAscii;
 
