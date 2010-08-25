@@ -33,15 +33,9 @@ using System.Collections;
 using System.Collections.Generic;
 
 using JsonFx.IO;
-using JsonFx.Serialization.Resolvers;
-using JsonFx.Serialization.Filters;
 using JsonFx.Serialization;
-
-#if NET40 && !WINDOWS_PHONE
-using JsonObject=System.Dynamic.ExpandoObject;
-#else
-using JsonObject=System.Collections.Generic.Dictionary<string, object>;
-#endif
+using JsonFx.Serialization.Filters;
+using JsonFx.Serialization.Resolvers;
 
 namespace JsonFx.Model
 {
@@ -83,17 +77,7 @@ namespace JsonFx.Model
 		/// Ctor
 		/// </summary>
 		/// <param name="settings"></param>
-		/// <param name="filters"></param>
-		public ModelAnalyzer(DataReaderSettings settings, params IDataFilter<ModelTokenType>[] filters)
-			: this(settings, (IEnumerable<IDataFilter<ModelTokenType>>)filters)
-		{
-		}
-
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="settings"></param>
-		public ModelAnalyzer(DataReaderSettings settings, IEnumerable<IDataFilter<ModelTokenType>> filters)
+		public ModelAnalyzer(DataReaderSettings settings)
 		{
 			if (settings == null)
 			{
@@ -101,19 +85,18 @@ namespace JsonFx.Model
 			}
 			this.Settings = settings;
 
-			if (filters == null)
+			var filters = new List<IDataFilter<ModelTokenType>>();
+			if (settings.Filters != null)
 			{
-				filters = new IDataFilter<ModelTokenType>[0];
-			}
-			this.Filters = filters;
-
-			foreach (var filter in filters)
-			{
-				if (filter == null)
+				foreach (var filter in settings.Filters)
 				{
-					throw new ArgumentNullException("filters");
+					if (filter != null)
+					{
+						filters.Add(filter);
+					}
 				}
 			}
+			this.Filters = filters;
 
 			this.Coercion = new TypeCoercionUtility(settings, settings.AllowNullValueTypes);
 		}

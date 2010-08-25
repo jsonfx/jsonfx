@@ -29,8 +29,6 @@
 #endregion License
 
 using System;
-using System.Collections.Generic;
-using System.IO;
 
 using JsonFx.Model.Filters;
 using JsonFx.Serialization;
@@ -83,9 +81,7 @@ namespace JsonFx.Json
 			var expected = @"[""Normal string before"",""2008-02-29T23:59:59.999Z"",""2010-07-05T10:51:17.768Z"",""Normal string after""]";
 
 			var writer = new JsonWriter(
-				new DataWriterSettings(),
-				new Iso8601DateFilter(),
-				new MSAjaxDateFilter());
+				new DataWriterSettings(new Iso8601DateFilter(), new MSAjaxDateFilter()));
 
 			var actual = writer.Write(input);
 
@@ -106,9 +102,7 @@ namespace JsonFx.Json
 			var expected = @"[""Normal string before"",""\\/Date(1204329599999)\\/"",""\\/Date(1278327077768)\\/"",""Normal string after""]";
 
 			var writer = new JsonWriter(
-				new DataWriterSettings(),
-				new MSAjaxDateFilter(),
-				new Iso8601DateFilter());
+				new DataWriterSettings(new MSAjaxDateFilter(), new Iso8601DateFilter()));
 
 			var actual = writer.Write(input);
 

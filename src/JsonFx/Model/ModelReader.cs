@@ -29,10 +29,8 @@
 #endregion License
 
 using System;
-using System.Collections.Generic;
 
 using JsonFx.Serialization;
-using JsonFx.Serialization.Filters;
 
 namespace JsonFx.Model
 {
@@ -47,18 +45,8 @@ namespace JsonFx.Model
 		/// Ctor
 		/// </summary>
 		/// <param name="settings"></param>
-		public ModelReader(DataReaderSettings settings, params IDataFilter<ModelTokenType>[] filters)
-			: base(settings, (IEnumerable<IDataFilter<ModelTokenType>>)filters)
-		{
-		}
-
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="settings"></param>
-		/// <param name="filters"></param>
-		public ModelReader(DataReaderSettings settings, IEnumerable<IDataFilter<ModelTokenType>> filters)
-			: base(settings, filters)
+		public ModelReader(DataReaderSettings settings)
+			: base(settings)
 		{
 		}
 
@@ -68,7 +56,7 @@ namespace JsonFx.Model
 
 		protected override ITokenAnalyzer<ModelTokenType> GetAnalyzer()
 		{
-			return new ModelAnalyzer(this.Settings, this.Filters);
+			return new ModelAnalyzer(this.Settings);
 		}
 
 		#endregion IDataReader Methods

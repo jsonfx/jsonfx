@@ -29,11 +29,9 @@
 #endregion License
 
 using System;
-using System.Collections.Generic;
 using System.Text;
 
 using JsonFx.Serialization;
-using JsonFx.Serialization.Filters;
 
 namespace JsonFx.Model
 {
@@ -48,7 +46,7 @@ namespace JsonFx.Model
 		/// Ctor
 		/// </summary>
 		public ModelWriter()
-			: this(new DataWriterSettings())
+			: base(new DataWriterSettings())
 		{
 		}
 
@@ -57,27 +55,7 @@ namespace JsonFx.Model
 		/// </summary>
 		/// <param name="settings"></param>
 		public ModelWriter(DataWriterSettings settings)
-			: base(settings, null)
-		{
-		}
-
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="settings"></param>
-		/// <param name="filters"></param>
-		public ModelWriter(DataWriterSettings settings, params IDataFilter<ModelTokenType>[] filters)
-			: base(settings, (IEnumerable<IDataFilter<ModelTokenType>>)filters)
-		{
-		}
-
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="settings"></param>
-		/// <param name="filters"></param>
-		public ModelWriter(DataWriterSettings settings, IEnumerable<IDataFilter<ModelTokenType>> filters)
-			: base(settings, filters)
+			: base(settings)
 		{
 		}
 
@@ -104,7 +82,7 @@ namespace JsonFx.Model
 		/// <returns></returns>
 		protected override IObjectWalker<ModelTokenType> GetWalker()
 		{
-			return new ModelWalker(this.Settings, this.Filters);
+			return new ModelWalker(this.Settings);
 		}
 
 		#endregion DataWriter<DataTokenType> Methods

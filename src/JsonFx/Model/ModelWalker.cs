@@ -58,18 +58,7 @@ namespace JsonFx.Model
 		/// Ctor
 		/// </summary>
 		/// <param name="settings"></param>
-		/// <param name="filters"></param>
-		public ModelWalker(DataWriterSettings settings, params IDataFilter<ModelTokenType>[] filters)
-			: this(settings, (IEnumerable<IDataFilter<ModelTokenType>>)filters)
-		{
-		}
-
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="settings"></param>
-		/// <param name="filters"></param>
-		public ModelWalker(DataWriterSettings settings, IEnumerable<IDataFilter<ModelTokenType>> filters)
+		public ModelWalker(DataWriterSettings settings)
 		{
 			if (settings == null)
 			{
@@ -77,19 +66,18 @@ namespace JsonFx.Model
 			}
 			this.Settings = settings;
 
-			if (filters == null)
+			var filters = new List<IDataFilter<ModelTokenType>>();
+			if (settings.Filters != null)
 			{
-				filters = new IDataFilter<ModelTokenType>[0];
-			}
-			this.Filters = filters;
-
-			foreach (var filter in filters)
-			{
-				if (filter == null)
+				foreach (var filter in settings.Filters)
 				{
-					throw new ArgumentNullException("filters");
+					if (filter != null)
+					{
+						filters.Add(filter);
+					}
 				}
 			}
+			this.Filters = filters;
 		}
 
 		#endregion Init

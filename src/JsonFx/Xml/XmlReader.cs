@@ -34,7 +34,6 @@ using System.Collections.Generic;
 using JsonFx.Markup;
 using JsonFx.Model;
 using JsonFx.Serialization;
-using JsonFx.Serialization.Filters;
 
 namespace JsonFx.Xml
 {
@@ -58,27 +57,7 @@ namespace JsonFx.Xml
 		/// </summary>
 		/// <param name="settings"></param>
 		public XmlReader(DataReaderSettings settings)
-			: base(settings, null)
-		{
-		}
-
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="settings"></param>
-		/// <param name="filters"></param>
-		public XmlReader(DataReaderSettings settings, params IDataFilter<ModelTokenType>[] filters)
-			: base(settings, (IEnumerable<IDataFilter<ModelTokenType>>)filters)
-		{
-		}
-
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="settings"></param>
-		/// <param name="filters"></param>
-		public XmlReader(DataReaderSettings settings, IEnumerable<IDataFilter<ModelTokenType>> filters)
-			: base(settings, filters)
+			: base(settings)
 		{
 		}
 

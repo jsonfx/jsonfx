@@ -29,7 +29,11 @@
 #endregion License
 
 using System;
+using System.Collections.Generic;
 
+using JsonFx.Model;
+using JsonFx.Model.Filters;
+using JsonFx.Serialization.Filters;
 using JsonFx.Serialization.Resolvers;
 
 namespace JsonFx.Serialization
@@ -45,6 +49,7 @@ namespace JsonFx.Serialization
 		private bool allowNullValueTypes = true;
 		private bool allowTrailingContent = true;
 		private readonly ResolverCache ResolverCache;
+		private readonly IEnumerable<IDataFilter<ModelTokenType>> ModelFilters;
 
 		#endregion Fields
 
@@ -54,7 +59,23 @@ namespace JsonFx.Serialization
 		/// Ctor
 		/// </summary>
 		public DataReaderSettings()
-			: this(new PocoResolverStrategy())
+			: this(new PocoResolverStrategy(), new Iso8601DateFilter())
+		{
+		}
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		public DataReaderSettings(params IDataFilter<ModelTokenType>[] filters)
+			: this(new PocoResolverStrategy(), filters)
+		{
+		}
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		public DataReaderSettings(IEnumerable<IDataFilter<ModelTokenType>> filters)
+			: this(new PocoResolverStrategy(), filters)
 		{
 		}
 
@@ -62,8 +83,17 @@ namespace JsonFx.Serialization
 		/// Ctor
 		/// </summary>
 		/// <param name="strategy"></param>
-		public DataReaderSettings(IResolverStrategy strategy)
-			: this(new ResolverCache(strategy))
+		public DataReaderSettings(IResolverStrategy strategy, params IDataFilter<ModelTokenType>[] filters)
+			: this(new ResolverCache(strategy), filters)
+		{
+		}
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="strategy"></param>
+		public DataReaderSettings(IResolverStrategy strategy, IEnumerable<IDataFilter<ModelTokenType>> filters)
+			: this(new ResolverCache(strategy), filters)
 		{
 		}
 
@@ -71,9 +101,19 @@ namespace JsonFx.Serialization
 		/// Ctor
 		/// </summary>
 		/// <param name="resolverCache"></param>
-		public DataReaderSettings(ResolverCache resolverCache)
+		public DataReaderSettings(ResolverCache resolverCache, params IDataFilter<ModelTokenType>[] filters)
+			: this(resolverCache, (IEnumerable<IDataFilter<ModelTokenType>>) filters)
+		{
+		}
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="resolverCache"></param>
+		public DataReaderSettings(ResolverCache resolverCache, IEnumerable<IDataFilter<ModelTokenType>> filters)
 		{
 			this.ResolverCache = resolverCache;
+			this.ModelFilters = filters;
 		}
 
 		#endregion Init
@@ -113,6 +153,14 @@ namespace JsonFx.Serialization
 		public ResolverCache Resolver
 		{
 			get { return this.ResolverCache; }
+		}
+
+		/// <summary>
+		/// Gets the custom filters
+		/// </summary>
+		public IEnumerable<IDataFilter<ModelTokenType>> Filters
+		{
+			get { return this.ModelFilters; }
 		}
 
 		#endregion Properties

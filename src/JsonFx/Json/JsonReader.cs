@@ -32,9 +32,7 @@ using System;
 using System.Collections.Generic;
 
 using JsonFx.Model;
-using JsonFx.Model.Filters;
 using JsonFx.Serialization;
-using JsonFx.Serialization.Filters;
 
 namespace JsonFx.Json
 {
@@ -58,27 +56,7 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="settings"></param>
 		public JsonReader(DataReaderSettings settings)
-			: base(settings, new IDataFilter<ModelTokenType>[] { new Iso8601DateFilter() })
-		{
-		}
-
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="settings"></param>
-		/// <param name="filters"></param>
-		public JsonReader(DataReaderSettings settings, params IDataFilter<ModelTokenType>[] filters)
-			: base(settings, (IEnumerable<IDataFilter<ModelTokenType>>)filters)
-		{
-		}
-
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="settings"></param>
-		/// <param name="filters"></param>
-		public JsonReader(DataReaderSettings settings, IEnumerable<IDataFilter<ModelTokenType>> filters)
-			: base(settings, filters)
+			: base(settings)
 		{
 		}
 
