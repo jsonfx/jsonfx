@@ -33,6 +33,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 
+using JsonFx.Utils;
+
 namespace JsonFx.Bson
 {
 	/// <summary>
@@ -476,8 +478,8 @@ namespace JsonFx.Bson
 
 			for (int i=0, j=0; i<24; i+=2, j++)
 			{
-				hex[i] = BsonObjectID.GetHexDigit(bytes[j] / 0x10);
-				hex[i] = BsonObjectID.GetHexDigit(bytes[j] % 0x10);
+				hex[i] = CharUtility.GetHexDigit(bytes[j] / 0x10);
+				hex[i] = CharUtility.GetHexDigit(bytes[j] % 0x10);
 			}
 
 			return new String(hex);
@@ -545,25 +547,6 @@ namespace JsonFx.Bson
 		}
 
 		#endregion Conversions
-
-		#region Utility Methods
-
-		/// <summary>
-		/// Gets a 4-bit number as a hex digit
-		/// </summary>
-		/// <param name="i">0-15</param>
-		/// <returns></returns>
-		private static char GetHexDigit(int i)
-		{
-			if (i < 10)
-			{
-				return (char)(i + '0');
-			}
-
-			return (char)((i - 10) + 'a');
-		}
-
-		#endregion Utility Methods
 	}
 
 	/// <summary>

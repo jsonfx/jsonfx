@@ -248,7 +248,6 @@ namespace JsonFx.Serialization.Resolvers
 			int remaining = length-start-1;
 			if (((remaining == 1) && Char.IsLetterOrDigit(multiword[start])) || (remaining > 1))
 			{
-
 				words.Add(multiword.Substring(start));
 			}
 

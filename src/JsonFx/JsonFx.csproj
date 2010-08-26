@@ -188,6 +188,7 @@
     <Compile Include="Serialization\Resolvers\ResolverCache.cs" />
     <Compile Include="Serialization\Token`1.cs" />
     <Compile Include="Serialization\TypeCoercionUtility.cs" />
+    <Compile Include="Utils\CharUtility.cs" />
     <Compile Include="Xml\XmlInTransformer.cs" />
     <Compile Include="Xml\XmlOutTransformer.cs" />
     <Compile Include="Xml\XmlReader.cs" />

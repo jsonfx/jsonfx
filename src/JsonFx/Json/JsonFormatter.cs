@@ -35,6 +35,7 @@ using System.IO;
 
 using JsonFx.Model;
 using JsonFx.Serialization;
+using JsonFx.Utils;
 
 namespace JsonFx.Json
 {
@@ -575,7 +576,7 @@ namespace JsonFx.Json
 							default:
 							{
 								writer.Write("\\u");
-								writer.Write(ConvertToUtf32(value, i).ToString("X4"));
+								writer.Write(CharUtility.ConvertToUtf32(value, i).ToString("X4"));
 								continue;
 							}
 						}
@@ -743,18 +744,5 @@ namespace JsonFx.Json
 
 			#endregion Number Methods
 		}
-
-		#region Utility Methods
-
-		private static int ConvertToUtf32(string value, int i)
-		{
-#if SILVERLIGHT
-			return (int)value[i];
-#else
-			return Char.ConvertToUtf32(value, i);
-#endif
-		}
-
-		#endregion Utility Methods
 	}
 }

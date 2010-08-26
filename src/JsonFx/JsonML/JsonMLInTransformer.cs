@@ -36,6 +36,7 @@ using JsonFx.IO;
 using JsonFx.Markup;
 using JsonFx.Model;
 using JsonFx.Serialization;
+using JsonFx.Utils;
 
 namespace JsonFx.JsonML
 {
@@ -242,7 +243,7 @@ namespace JsonFx.JsonML
 								}
 								case WhitespaceType.None:
 								{
-									if (IsNullOrWhiteSpace(value))
+									if (CharUtility.IsNullOrWhiteSpace(value))
 									{
 										break;
 									}
@@ -275,48 +276,6 @@ namespace JsonFx.JsonML
 			}
 
 			#endregion IDataTransformer<ModelTokenType, MarkupTokenType> Members
-
-			#region Utility Methods
-
-			/// <summary>
-			/// Checks if string is null, empty or entirely made up of whitespace
-			/// </summary>
-			/// <param name="value"></param>
-			/// <returns></returns>
-			/// <remarks>
-			/// Essentially the same as String.IsNullOrWhiteSpace from .NET 4.0
-			/// with a simpler view of whitespace.
-			/// </remarks>
-			private static bool IsNullOrWhiteSpace(string value)
-			{
-				if (value != null)
-				{
-					for (int i=0, length=value.Length; i<length; i++)
-					{
-						if (!IsWhiteSpace(value[i]))
-						{
-							return false;
-						}
-					}
-				}
-				return true;
-			}
-
-			/// <summary>
-			/// Checks if character is line ending, tab or space
-			/// </summary>
-			/// <param name="ch"></param>
-			/// <returns></returns>
-			private static bool IsWhiteSpace(char ch)
-			{
-				return
-					(ch == ' ') |
-					(ch == '\n') ||
-					(ch == '\r') ||
-					(ch == '\t');
-			}
-
-			#endregion Utility Methods
 		}
 	}
 }

@@ -36,6 +36,7 @@ using System.IO;
 using JsonFx.IO;
 using JsonFx.Markup;
 using JsonFx.Serialization;
+using JsonFx.Utils;
 
 #if SILVERLIGHT
 using CanonicalList=System.Collections.Generic.Dictionary<JsonFx.Serialization.DataName, JsonFx.Serialization.Token<JsonFx.Markup.MarkupTokenType>>;
@@ -557,7 +558,7 @@ namespace JsonFx.Html
 
 				// use XmlSerializer-hex-style encoding of UTF-16
 				writer.Write("_x");
-				writer.Write(ConvertToUtf32(value, i).ToString("X4"));
+				writer.Write(CharUtility.ConvertToUtf32(value, i).ToString("X4"));
 				writer.Write("_");
 			}
 
@@ -646,7 +647,7 @@ namespace JsonFx.Html
 							((ch >= 0xFDD0) && (ch <= 0xFDEF)))
 						{
 							// encode all control chars except CRLF/Tab: http://www.w3.org/TR/xml/#charsets
-							int utf16 = ConvertToUtf32(value, i);
+							int utf16 = CharUtility.ConvertToUtf32(value, i);
 							entity = String.Concat("&#x", utf16.ToString("X", CultureInfo.InvariantCulture), ';');
 							break;
 						}
@@ -762,7 +763,7 @@ namespace JsonFx.Html
 							((ch >= 0xFDD0) && (ch <= 0xFDEF)))
 						{
 							// encode all control chars: http://www.w3.org/TR/xml/#charsets
-							int utf16 = ConvertToUtf32(value, i);
+							int utf16 = CharUtility.ConvertToUtf32(value, i);
 							entity = String.Concat("&#x", utf16.ToString("X", CultureInfo.InvariantCulture), ';');
 							break;
 						}
@@ -789,18 +790,5 @@ namespace JsonFx.Html
 		}
 
 		#endregion Write Methods
-
-		#region Utility Methods
-
-		private static int ConvertToUtf32(string value, int i)
-		{
-#if SILVERLIGHT
-			return (int)value[i];
-#else
-			return Char.ConvertToUtf32(value, i);
-#endif
-		}
-
-		#endregion Utility Methods
 	}
 }

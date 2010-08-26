@@ -37,6 +37,7 @@ using System.Text;
 using JsonFx.IO;
 using JsonFx.Model;
 using JsonFx.Serialization;
+using JsonFx.Utils;
 
 namespace JsonFx.Json
 {
@@ -386,7 +387,7 @@ namespace JsonFx.Json
 
 			private static void SkipWhitespace(ITextStream scanner)
 			{
-				while (!scanner.IsCompleted && IsWhiteSpace(scanner.Peek()))
+				while (!scanner.IsCompleted && CharUtility.IsWhiteSpace(scanner.Peek()))
 				{
 					scanner.Pop();
 				}
@@ -420,7 +421,7 @@ namespace JsonFx.Json
 					isNeg = true;
 				}
 
-				if (!IsDigit(ch) &&
+				if (!CharUtility.IsDigit(ch) &&
 					ch != JsonGrammar.OperatorDecimalPoint)
 				{
 					// possibly "-Infinity"
@@ -429,7 +430,7 @@ namespace JsonFx.Json
 				}
 
 				// integer part
-				while (!scanner.IsCompleted && IsDigit(ch))
+				while (!scanner.IsCompleted && CharUtility.IsDigit(ch))
 				{
 					// consume digit
 					scanner.Pop();
@@ -445,7 +446,7 @@ namespace JsonFx.Json
 					ch = scanner.Peek();
 
 					// fraction part
-					while (!scanner.IsCompleted && IsDigit(ch))
+					while (!scanner.IsCompleted && CharUtility.IsDigit(ch))
 					{
 						// consume digit
 						scanner.Pop();
@@ -497,7 +498,7 @@ namespace JsonFx.Json
 					}
 
 					// exp part
-					while (!scanner.IsCompleted && IsDigit(ch))
+					while (!scanner.IsCompleted && CharUtility.IsDigit(ch))
 					{
 						// consume digit
 						scanner.Pop();
@@ -514,7 +515,7 @@ namespace JsonFx.Json
 				}
 
 				// specifically check for 0x-style hex numbers
-				if (!scanner.IsCompleted && IsLetter(ch))
+				if (!scanner.IsCompleted && CharUtility.IsLetter(ch))
 				{
 					throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, numPos, numLine, numCol);
 				}
@@ -587,7 +588,7 @@ namespace JsonFx.Json
 				{
 					// look ahead
 					if (scanner.IsCompleted ||
-						IsControl(ch) && ch != '\t')
+						CharUtility.IsControl(ch) && ch != '\t')
 					{
 						// reached end or line break before string delim
 						throw new DeserializationException(JsonTokenizer.ErrorUnterminatedString, strPos, strLine, strCol);
@@ -622,7 +623,7 @@ namespace JsonFx.Json
 					ch = scanner.Peek();
 
 					if (scanner.IsCompleted ||
-						IsControl(ch) && ch != '\t')
+						CharUtility.IsControl(ch) && ch != '\t')
 					{
 						// reached end or line break before string delim
 						throw new DeserializationException(JsonTokenizer.ErrorUnterminatedString, strPos, strLine, strCol);
@@ -689,7 +690,7 @@ namespace JsonFx.Json
 							ch = scanner.Peek();
 
 							string escapeSeq = String.Empty;
-							for (int i=UnicodeEscapeLength; !scanner.IsCompleted && IsHexDigit(ch) && (i > 0); i--)
+							for (int i=UnicodeEscapeLength; !scanner.IsCompleted && CharUtility.IsHexDigit(ch) && (i > 0); i--)
 							{
 								escapeSeq += ch;
 								scanner.Pop();
@@ -705,7 +706,7 @@ namespace JsonFx.Json
 									NumberFormatInfo.InvariantInfo,
 									out utf16))
 							{
-								buffer.Append(ConvertFromUtf32(utf16));
+								buffer.Append(CharUtility.ConvertFromUtf32(utf16));
 							}
 							else
 							{
@@ -841,8 +842,8 @@ namespace JsonFx.Json
 
 					// digits are only allowed after first char
 					// rest can be in head or tail
-					if ((identPart && IsDigit(ch)) ||
-						IsLetter(ch) || (ch == '_') || (ch == '$'))
+					if ((identPart && CharUtility.IsDigit(ch)) ||
+						CharUtility.IsLetter(ch) || (ch == '_') || (ch == '$'))
 					{
 						identPart = true;
 						scanner.Pop();
@@ -884,87 +885,6 @@ namespace JsonFx.Json
 			}
 
 			#endregion ITextTokenizer<DataTokenType> Members
-
-			#region Utility Methods
-
-			/// <summary>
-			/// Checks if character matches [A-Za-z]
-			/// </summary>
-			/// <param name="ch"></param>
-			/// <returns></returns>
-			private static bool IsLetter(char ch)
-			{
-				return
-					((ch >= 'a') && (ch <= 'z')) ||
-					((ch >= 'A') && (ch <= 'Z'));
-			}
-
-			/// <summary>
-			/// Checks if character matches [0-9]
-			/// </summary>
-			/// <param name="ch"></param>
-			/// <returns></returns>
-			private static bool IsDigit(char ch)
-			{
-				return (ch >= '0') && (ch <= '9');
-			}
-
-			/// <summary>
-			/// Checks if character matches [0-9A-Fa-f]
-			/// </summary>
-			/// <param name="ch"></param>
-			/// <returns></returns>
-			private static bool IsHexDigit(char ch)
-			{
-				return
-					(ch >= '0' && ch <= '9') ||
-					(ch >= 'A' && ch <= 'F') ||
-					(ch >= 'a' && ch <= 'f');
-			}
-
-			/// <summary>
-			/// Checks if character is line ending, tab or space
-			/// </summary>
-			/// <param name="ch"></param>
-			/// <returns></returns>
-			private static bool IsWhiteSpace(char ch)
-			{
-				return
-					(ch == ' ') |
-					(ch == '\n') ||
-					(ch == '\r') ||
-					(ch == '\t');
-			}
-
-			private static bool IsControl(char ch)
-			{
-				return
-					(ch <= '\u001F') ||
-				    ((ch >= '\u007F') && (ch <= '\u009F'));
-			}
-
-			private static string ConvertFromUtf32(int utf32)
-			{
-#if SILVERLIGHT
-				if (utf32 <= 0xFFFF)
-				{
-					return new string((char)utf32, 1);
-				}
-
-				utf32 -= 0x10000;
-
-				return new string(
-					new char[]
-				{
-					(char)((utf32 / 0x400) + 0xD800),
-					(char)((utf32 % 0x400) + 0xDC00)
-				});
-#else
-			return Char.ConvertFromUtf32(utf32);
-#endif
-			}
-
-			#endregion Utility Methods
 
 			#region IDisposable Members
 
