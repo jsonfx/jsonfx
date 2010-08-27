@@ -234,6 +234,25 @@ namespace JsonFx.Html
 			Assert.Equal(expected, actual);
 		}
 
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void Format_PrefixWithoutNamespace_ReturnsPrefix()
+		{
+			var input = new[]
+			    {
+			        MarkupGrammar.TokenElementBegin(new DataName("div")),
+			        MarkupGrammar.TokenAttribute(new DataName("visible", "jbst", null)),
+			        MarkupGrammar.TokenPrimitive(false),
+			        MarkupGrammar.TokenElementEnd,
+			    };
+			const string expected = @"<div jbst:visible=""false""></div>";
+
+			var formatter = new HtmlFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
 		#endregion Namespace Tests
 
 		#region Simple Attribute Tests

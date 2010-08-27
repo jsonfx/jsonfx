@@ -241,16 +241,18 @@ namespace JsonFx.Html
 							DataName attrName = token.Name;
 
 							string prefix = this.ScopeChain.EnsurePrefix(attrName.Prefix, attrName.NamespaceUri);
-							if (prefix != attrName.Prefix)
+							if (prefix != null)
 							{
-								attrName = new DataName(attrName.LocalName, prefix, attrName.NamespaceUri, true);
-							}
+								if (prefix != attrName.Prefix)
+								{
+									attrName = new DataName(attrName.LocalName, prefix, attrName.NamespaceUri, true);
+								}
 
-							if (prefix != null &&
-								!this.ScopeChain.ContainsNamespace(attrName.NamespaceUri) &&
-								(!String.IsNullOrEmpty(attrName.NamespaceUri) || this.ScopeChain.ContainsPrefix(String.Empty)))
-							{
-								scope[prefix] = attrName.NamespaceUri;
+								if (!this.ScopeChain.ContainsNamespace(attrName.NamespaceUri) &&
+									(!String.IsNullOrEmpty(attrName.NamespaceUri) || this.ScopeChain.ContainsPrefix(String.Empty)))
+								{
+									scope[prefix] = attrName.NamespaceUri;
+								}
 							}
 
 							stream.Pop();
@@ -326,7 +328,7 @@ namespace JsonFx.Html
 				return;
 			}
 
-			string tagPrefix = this.ScopeChain.EnsurePrefix(tagName.Prefix, tagName.NamespaceUri);
+			string tagPrefix = this.ScopeChain.EnsurePrefix(tagName.Prefix, tagName.NamespaceUri) ?? tagName.Prefix;
 
 			// "<"
 			writer.Write(MarkupGrammar.OperatorElementBegin);
@@ -363,7 +365,7 @@ namespace JsonFx.Html
 					// "The attribute value in a default namespace declaration MAY be empty.
 					// This has the same effect, within the scope of the declaration, of there being no default namespace."
 					// http://www.w3.org/TR/xml-names/#defaulting
-					string attrPrefix = this.ScopeChain.EnsurePrefix(attribute.Key.Prefix, attribute.Key.NamespaceUri);
+					string attrPrefix = this.ScopeChain.EnsurePrefix(attribute.Key.Prefix, attribute.Key.NamespaceUri) ?? attribute.Key.Prefix;
 
 					this.WriteAttribute(writer, attrPrefix, attribute.Key.LocalName, attribute.Value);
 				}

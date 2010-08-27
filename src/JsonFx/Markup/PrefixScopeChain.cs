@@ -471,6 +471,12 @@ namespace JsonFx.Markup
 
 		#region Utility Methods
 
+		/// <summary>
+		/// Looks up the prefix for the given namespace
+		/// </summary>
+		/// <param name="preferredPrefix"></param>
+		/// <param name="namespaceUri"></param>
+		/// <returns>null if namespace is empty and no default prefix found</returns>
 		public string EnsurePrefix(string preferredPrefix, string namespaceUri)
 		{
 			string storedPrefix = this.GetPrefix(namespaceUri, false);
