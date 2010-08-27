@@ -51,9 +51,9 @@ using JsonObject=System.Collections.Generic.Dictionary<string, object>;
 namespace JsonFx.Serialization
 {
 	/// <summary>
-	/// Performs type coercion
+	/// Type Coercion Utility
 	/// </summary>
-	internal sealed class TypeCoercionUtility :
+	public sealed class TypeCoercionUtility :
 		IResolverCacheContainer
 	{
 		#region Constants
@@ -149,7 +149,7 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="objectType"></param>
 		/// <returns>objectType instance</returns>
-		public object InstantiateObject(Type targetType, object args)
+		internal object InstantiateObject(Type targetType, object args)
 		{
 			targetType = TypeCoercionUtility.ResolveInterfaceType(targetType);
 
@@ -191,26 +191,28 @@ namespace JsonFx.Serialization
 					}
 				}
 			}
-
-			IDictionary otherArgs = args as IDictionary;
-			if (otherArgs != null)
+			else
 			{
-				for (int i=0, length=ctorArgs.Length; i<length; i++)
+				IDictionary otherArgs = args as IDictionary;
+				if (otherArgs != null)
 				{
-					string name = factory.CtorArgs[i].Name;
-					Type type = factory.CtorArgs[i].ParameterType;
-
-					foreach (string key in otherArgs.Keys)
+					for (int i=0, length=ctorArgs.Length; i<length; i++)
 					{
-						try
+						string name = factory.CtorArgs[i].Name;
+						Type type = factory.CtorArgs[i].ParameterType;
+
+						foreach (string key in otherArgs.Keys)
 						{
-							if (StringComparer.OrdinalIgnoreCase.Equals(key, name))
+							try
 							{
-								ctorArgs[i] = this.CoerceType(type, otherArgs[key]);
-								break;
+								if (StringComparer.OrdinalIgnoreCase.Equals(key, name))
+								{
+									ctorArgs[i] = this.CoerceType(type, otherArgs[key]);
+									break;
+								}
 							}
+							catch { }
 						}
-						catch { }
 					}
 				}
 			}
@@ -269,7 +271,18 @@ namespace JsonFx.Serialization
 		#region Coercion Methods
 
 		/// <summary>
-		/// Coerces the object value to the Type targetType
+		/// Coerces the object value to Type <typeparamref name="T"/>
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		public T CoerceType<T>(object value)
+		{
+			return (T)this.CoerceType(typeof(T), value);
+		}
+
+		/// <summary>
+		/// Coerces the object value to Type of <paramref name="targetType"/>
 		/// </summary>
 		/// <param name="targetType"></param>
 		/// <param name="value"></param>
@@ -872,7 +885,7 @@ namespace JsonFx.Serialization
 		/// <param name="value"></param>
 		/// <typeparam name="T">Attribute Type</typeparam>
 		/// <returns>true if defined</returns>
-		public static bool HasAttribute<T>(MemberInfo info)
+		internal static bool HasAttribute<T>(MemberInfo info)
 			where T : Attribute
 		{
 			return (info != null && Attribute.IsDefined(info, typeof(T)));
@@ -883,7 +896,7 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="value"></param>
 		/// <returns>true if defined</returns>
-		public static bool HasAttribute(MemberInfo info, Type type)
+		internal static bool HasAttribute(MemberInfo info, Type type)
 		{
 			return (info != null && type != null && Attribute.IsDefined(info, type));
 		}
@@ -894,7 +907,7 @@ namespace JsonFx.Serialization
 		/// <param name="value"></param>
 		/// <typeparam name="T">Attribute Type</typeparam>
 		/// <returns>requested attribute or not if not defined</returns>
-		public static T GetAttribute<T>(MemberInfo info)
+		internal static T GetAttribute<T>(MemberInfo info)
 			where T : Attribute
 		{
 			if (info == null || !Attribute.IsDefined(info, typeof(T)))
@@ -909,7 +922,7 @@ namespace JsonFx.Serialization
 		/// </summary>
 		/// <param name="value"></param>
 		/// <returns>requested attribute or not if not defined</returns>
-		public static Attribute GetAttribute(MemberInfo info, Type type)
+		internal static Attribute GetAttribute(MemberInfo info, Type type)
 		{
 			if (info == null || type == null || !Attribute.IsDefined(info, type))
 			{
