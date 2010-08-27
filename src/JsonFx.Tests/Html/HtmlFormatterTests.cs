@@ -740,6 +740,23 @@ namespace JsonFx.Html
 			Assert.Equal(expected, actual);
 		}
 
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void Format_IncompleteTag_ReturnsEmptyAttrib()
+		{
+			var input = new[]
+			    {
+			        MarkupGrammar.TokenElementBegin(new DataName("div")),
+			        MarkupGrammar.TokenAttribute(new DataName("test")),
+			    };
+			const string expected = @"<div test>";
+
+			var formatter = new HtmlFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
 		#endregion Error Recovery Tests
 
 		#region Unparsed Block Tests Tests

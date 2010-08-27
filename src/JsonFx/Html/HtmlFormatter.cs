@@ -258,7 +258,7 @@ namespace JsonFx.Html
 							stream.Pop();
 							token = stream.Peek();
 
-							attributes[attrName] = token;
+							attributes[attrName] = token ?? MarkupGrammar.TokenNone;
 
 							stream.Pop();
 							token = stream.Peek();
