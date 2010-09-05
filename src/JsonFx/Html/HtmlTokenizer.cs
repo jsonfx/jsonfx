@@ -71,7 +71,7 @@ namespace JsonFx.Html
 					throw new ArgumentNullException("name");
 				}
 
-				string[] nameParts = name.Split(':');
+				string[] nameParts = name.Split(NameDelim, StringSplitOptions.RemoveEmptyEntries);
 				switch (nameParts.Length)
 				{
 					case 1:
