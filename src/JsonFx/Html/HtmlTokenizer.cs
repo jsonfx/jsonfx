@@ -1209,8 +1209,8 @@ namespace JsonFx.Html
 			}
 
 			chunk = scanner.EndChunk();
-			entity = HtmlTokenizer.DecodeEntityName(chunk);
-			if (String.IsNullOrEmpty(entity))
+			int codePoint = HtmlTokenizer.DecodeEntityName(chunk);
+			if (codePoint < 0)
 			{
 				return String.Concat(
 					MarkupGrammar.OperatorEntityBegin,
@@ -1222,7 +1222,7 @@ namespace JsonFx.Html
 			{
 				scanner.Pop();
 			}
-			return entity;
+			return CharUtility.ConvertFromUtf32(codePoint);
 		}
 
 		/// <summary>
@@ -1230,267 +1230,361 @@ namespace JsonFx.Html
 		/// </summary>
 		/// <param name="name"></param>
 		/// <returns></returns>
-		private static string DecodeEntityName(string name)
+		private static int DecodeEntityName(string name)
 		{
-			// http://www.w3.org/TR/REC-html40/sgml/entities.html
-			// http://www.bigbaer.com/sidebars/entities/
-			// NOTE: entity names are case-sensitive
-			switch (name)
+			if (String.IsNullOrEmpty(name))
 			{
-				case "quot": { return CharUtility.ConvertFromUtf32(34); }
-				case "amp": { return CharUtility.ConvertFromUtf32(38); }
-				case "lt": { return CharUtility.ConvertFromUtf32(60); }
-				case "gt": { return CharUtility.ConvertFromUtf32(62); }
-				case "nbsp": { return CharUtility.ConvertFromUtf32(160); }
-				case "iexcl": { return CharUtility.ConvertFromUtf32(161); }
-				case "cent": { return CharUtility.ConvertFromUtf32(162); }
-				case "pound": { return CharUtility.ConvertFromUtf32(163); }
-				case "curren": { return CharUtility.ConvertFromUtf32(164); }
-				case "yen": { return CharUtility.ConvertFromUtf32(165); }
-				case "euro": { return CharUtility.ConvertFromUtf32(8364); }
-				case "brvbar": { return CharUtility.ConvertFromUtf32(166); }
-				case "sect": { return CharUtility.ConvertFromUtf32(167); }
-				case "uml": { return CharUtility.ConvertFromUtf32(168); }
-				case "copy": { return CharUtility.ConvertFromUtf32(169); }
-				case "ordf": { return CharUtility.ConvertFromUtf32(170); }
-				case "laquo": { return CharUtility.ConvertFromUtf32(171); }
-				case "not": { return CharUtility.ConvertFromUtf32(172); }
-				case "shy": { return CharUtility.ConvertFromUtf32(173); }
-				case "reg": { return CharUtility.ConvertFromUtf32(174); }
-				case "trade": { return CharUtility.ConvertFromUtf32(8482); }
-				case "macr": { return CharUtility.ConvertFromUtf32(175); }
-				case "deg": { return CharUtility.ConvertFromUtf32(176); }
-				case "plusmn": { return CharUtility.ConvertFromUtf32(177); }
-				case "sup2": { return CharUtility.ConvertFromUtf32(178); }
-				case "sup3": { return CharUtility.ConvertFromUtf32(179); }
-				case "acute": { return CharUtility.ConvertFromUtf32(180); }
-				case "micro": { return CharUtility.ConvertFromUtf32(181); }
-				case "para": { return CharUtility.ConvertFromUtf32(182); }
-				case "middot": { return CharUtility.ConvertFromUtf32(183); }
-				case "cedil": { return CharUtility.ConvertFromUtf32(184); }
-				case "sup1": { return CharUtility.ConvertFromUtf32(185); }
-				case "ordm": { return CharUtility.ConvertFromUtf32(186); }
-				case "raquo": { return CharUtility.ConvertFromUtf32(187); }
-				case "frac14": { return CharUtility.ConvertFromUtf32(188); }
-				case "frac12": { return CharUtility.ConvertFromUtf32(189); }
-				case "frac34": { return CharUtility.ConvertFromUtf32(190); }
-				case "iquest": { return CharUtility.ConvertFromUtf32(191); }
-				case "times": { return CharUtility.ConvertFromUtf32(215); }
-				case "divide": { return CharUtility.ConvertFromUtf32(247); }
-				case "Agrave": { return CharUtility.ConvertFromUtf32(192); }
-				case "Aacute": { return CharUtility.ConvertFromUtf32(193); }
-				case "Acirc": { return CharUtility.ConvertFromUtf32(194); }
-				case "Atilde": { return CharUtility.ConvertFromUtf32(195); }
-				case "Auml": { return CharUtility.ConvertFromUtf32(196); }
-				case "Aring": { return CharUtility.ConvertFromUtf32(197); }
-				case "AElig": { return CharUtility.ConvertFromUtf32(198); }
-				case "Ccedil": { return CharUtility.ConvertFromUtf32(199); }
-				case "Egrave": { return CharUtility.ConvertFromUtf32(200); }
-				case "Eacute": { return CharUtility.ConvertFromUtf32(201); }
-				case "Ecirc": { return CharUtility.ConvertFromUtf32(202); }
-				case "Euml": { return CharUtility.ConvertFromUtf32(203); }
-				case "Igrave": { return CharUtility.ConvertFromUtf32(204); }
-				case "Iacute": { return CharUtility.ConvertFromUtf32(205); }
-				case "Icirc": { return CharUtility.ConvertFromUtf32(206); }
-				case "Iuml": { return CharUtility.ConvertFromUtf32(207); }
-				case "ETH": { return CharUtility.ConvertFromUtf32(208); }
-				case "Ntilde": { return CharUtility.ConvertFromUtf32(209); }
-				case "Ograve": { return CharUtility.ConvertFromUtf32(210); }
-				case "Oacute": { return CharUtility.ConvertFromUtf32(211); }
-				case "Ocirc": { return CharUtility.ConvertFromUtf32(212); }
-				case "Otilde": { return CharUtility.ConvertFromUtf32(213); }
-				case "Ouml": { return CharUtility.ConvertFromUtf32(214); }
-				case "Oslash": { return CharUtility.ConvertFromUtf32(216); }
-				case "Ugrave": { return CharUtility.ConvertFromUtf32(217); }
-				case "Uacute": { return CharUtility.ConvertFromUtf32(218); }
-				case "Ucirc": { return CharUtility.ConvertFromUtf32(219); }
-				case "Uuml": { return CharUtility.ConvertFromUtf32(220); }
-				case "Yacute": { return CharUtility.ConvertFromUtf32(221); }
-				case "THORN": { return CharUtility.ConvertFromUtf32(222); }
-				case "szlig": { return CharUtility.ConvertFromUtf32(223); }
-				case "agrave": { return CharUtility.ConvertFromUtf32(224); }
-				case "aacute": { return CharUtility.ConvertFromUtf32(225); }
-				case "acirc": { return CharUtility.ConvertFromUtf32(226); }
-				case "atilde": { return CharUtility.ConvertFromUtf32(227); }
-				case "auml": { return CharUtility.ConvertFromUtf32(228); }
-				case "aring": { return CharUtility.ConvertFromUtf32(229); }
-				case "aelig": { return CharUtility.ConvertFromUtf32(230); }
-				case "ccedil": { return CharUtility.ConvertFromUtf32(231); }
-				case "egrave": { return CharUtility.ConvertFromUtf32(232); }
-				case "eacute": { return CharUtility.ConvertFromUtf32(233); }
-				case "ecirc": { return CharUtility.ConvertFromUtf32(234); }
-				case "euml": { return CharUtility.ConvertFromUtf32(235); }
-				case "igrave": { return CharUtility.ConvertFromUtf32(236); }
-				case "iacute": { return CharUtility.ConvertFromUtf32(237); }
-				case "icirc": { return CharUtility.ConvertFromUtf32(238); }
-				case "iuml": { return CharUtility.ConvertFromUtf32(239); }
-				case "eth": { return CharUtility.ConvertFromUtf32(240); }
-				case "ntilde": { return CharUtility.ConvertFromUtf32(241); }
-				case "ograve": { return CharUtility.ConvertFromUtf32(242); }
-				case "oacute": { return CharUtility.ConvertFromUtf32(243); }
-				case "ocirc": { return CharUtility.ConvertFromUtf32(244); }
-				case "otilde": { return CharUtility.ConvertFromUtf32(245); }
-				case "ouml": { return CharUtility.ConvertFromUtf32(246); }
-				case "oslash": { return CharUtility.ConvertFromUtf32(248); }
-				case "ugrave": { return CharUtility.ConvertFromUtf32(249); }
-				case "uacute": { return CharUtility.ConvertFromUtf32(250); }
-				case "ucirc": { return CharUtility.ConvertFromUtf32(251); }
-				case "uuml": { return CharUtility.ConvertFromUtf32(252); }
-				case "yacute": { return CharUtility.ConvertFromUtf32(253); }
-				case "thorn": { return CharUtility.ConvertFromUtf32(254); }
-				case "yuml": { return CharUtility.ConvertFromUtf32(255); }
-				case "OElig": { return CharUtility.ConvertFromUtf32(338); }
-				case "oelig": { return CharUtility.ConvertFromUtf32(339); }
-				case "Scaron": { return CharUtility.ConvertFromUtf32(352); }
-				case "scaron": { return CharUtility.ConvertFromUtf32(353); }
-				case "Yuml": { return CharUtility.ConvertFromUtf32(376); }
-				case "circ": { return CharUtility.ConvertFromUtf32(710); }
-				case "tilde": { return CharUtility.ConvertFromUtf32(732); }
-				case "ensp": { return CharUtility.ConvertFromUtf32(8194); }
-				case "emsp": { return CharUtility.ConvertFromUtf32(8195); }
-				case "thinsp": { return CharUtility.ConvertFromUtf32(8201); }
-				case "zwnj": { return CharUtility.ConvertFromUtf32(8204); }
-				case "zwj": { return CharUtility.ConvertFromUtf32(8205); }
-				case "lrm": { return CharUtility.ConvertFromUtf32(8206); }
-				case "rlm": { return CharUtility.ConvertFromUtf32(8207); }
-				case "ndash": { return CharUtility.ConvertFromUtf32(8211); }
-				case "mdash": { return CharUtility.ConvertFromUtf32(8212); }
-				case "lsquo": { return CharUtility.ConvertFromUtf32(8216); }
-				case "rsquo": { return CharUtility.ConvertFromUtf32(8217); }
-				case "sbquo": { return CharUtility.ConvertFromUtf32(8218); }
-				case "ldquo": { return CharUtility.ConvertFromUtf32(8220); }
-				case "rdquo": { return CharUtility.ConvertFromUtf32(8221); }
-				case "bdquo": { return CharUtility.ConvertFromUtf32(8222); }
-				case "dagger": { return CharUtility.ConvertFromUtf32(8224); }
-				case "Dagger": { return CharUtility.ConvertFromUtf32(8225); }
-				case "permil": { return CharUtility.ConvertFromUtf32(8240); }
-				case "lsaquo": { return CharUtility.ConvertFromUtf32(8249); }
-				case "rsaquo": { return CharUtility.ConvertFromUtf32(8250); }
-				case "fnof": { return CharUtility.ConvertFromUtf32(402); }
-				case "bull": { return CharUtility.ConvertFromUtf32(8226); }
-				case "hellip": { return CharUtility.ConvertFromUtf32(8230); }
-				case "prime": { return CharUtility.ConvertFromUtf32(8242); }
-				case "Prime": { return CharUtility.ConvertFromUtf32(8243); }
-				case "oline": { return CharUtility.ConvertFromUtf32(8254); }
-				case "frasl": { return CharUtility.ConvertFromUtf32(8260); }
-				case "weierp": { return CharUtility.ConvertFromUtf32(8472); }
-				case "image": { return CharUtility.ConvertFromUtf32(8465); }
-				case "real": { return CharUtility.ConvertFromUtf32(8476); }
-				case "alefsym": { return CharUtility.ConvertFromUtf32(8501); }
-				case "larr": { return CharUtility.ConvertFromUtf32(8592); }
-				case "uarr": { return CharUtility.ConvertFromUtf32(8593); }
-				case "rarr": { return CharUtility.ConvertFromUtf32(8594); }
-				case "darr": { return CharUtility.ConvertFromUtf32(8495); }
-				case "harr": { return CharUtility.ConvertFromUtf32(8596); }
-				case "crarr": { return CharUtility.ConvertFromUtf32(8629); }
-				case "lArr": { return CharUtility.ConvertFromUtf32(8656); }
-				case "uArr": { return CharUtility.ConvertFromUtf32(8657); }
-				case "rArr": { return CharUtility.ConvertFromUtf32(8658); }
-				case "dArr": { return CharUtility.ConvertFromUtf32(8659); }
-				case "hArr": { return CharUtility.ConvertFromUtf32(8660); }
-				case "forall": { return CharUtility.ConvertFromUtf32(8704); }
-				case "part": { return CharUtility.ConvertFromUtf32(8706); }
-				case "exist": { return CharUtility.ConvertFromUtf32(8707); }
-				case "empty": { return CharUtility.ConvertFromUtf32(8709); }
-				case "nabla": { return CharUtility.ConvertFromUtf32(8711); }
-				case "isin": { return CharUtility.ConvertFromUtf32(8712); }
-				case "notin": { return CharUtility.ConvertFromUtf32(8713); }
-				case "ni": { return CharUtility.ConvertFromUtf32(8715); }
-				case "prod": { return CharUtility.ConvertFromUtf32(8719); }
-				case "sum": { return CharUtility.ConvertFromUtf32(8721); }
-				case "minus": { return CharUtility.ConvertFromUtf32(8722); }
-				case "lowast": { return CharUtility.ConvertFromUtf32(8727); }
-				case "radic": { return CharUtility.ConvertFromUtf32(8730); }
-				case "prop": { return CharUtility.ConvertFromUtf32(8733); }
-				case "infin": { return CharUtility.ConvertFromUtf32(8734); }
-				case "ang": { return CharUtility.ConvertFromUtf32(8736); }
-				case "and": { return CharUtility.ConvertFromUtf32(8743); }
-				case "or": { return CharUtility.ConvertFromUtf32(8744); }
-				case "cap": { return CharUtility.ConvertFromUtf32(8745); }
-				case "cup": { return CharUtility.ConvertFromUtf32(8746); }
-				case "int": { return CharUtility.ConvertFromUtf32(8747); }
-				case "there4": { return CharUtility.ConvertFromUtf32(8756); }
-				case "sim": { return CharUtility.ConvertFromUtf32(8764); }
-				case "cong": { return CharUtility.ConvertFromUtf32(8773); }
-				case "asymp": { return CharUtility.ConvertFromUtf32(8776); }
-				case "ne": { return CharUtility.ConvertFromUtf32(8800); }
-				case "equiv": { return CharUtility.ConvertFromUtf32(8801); }
-				case "le": { return CharUtility.ConvertFromUtf32(8804); }
-				case "ge": { return CharUtility.ConvertFromUtf32(8805); }
-				case "sub": { return CharUtility.ConvertFromUtf32(8834); }
-				case "sup": { return CharUtility.ConvertFromUtf32(8835); }
-				case "nsub": { return CharUtility.ConvertFromUtf32(8836); }
-				case "sube": { return CharUtility.ConvertFromUtf32(8838); }
-				case "supe": { return CharUtility.ConvertFromUtf32(8839); }
-				case "oplus": { return CharUtility.ConvertFromUtf32(8853); }
-				case "otimes": { return CharUtility.ConvertFromUtf32(8855); }
-				case "perp": { return CharUtility.ConvertFromUtf32(8869); }
-				case "sdot": { return CharUtility.ConvertFromUtf32(8901); }
-				case "lceil": { return CharUtility.ConvertFromUtf32(8968); }
-				case "rceil": { return CharUtility.ConvertFromUtf32(8969); }
-				case "lfloor": { return CharUtility.ConvertFromUtf32(8970); }
-				case "rfloor": { return CharUtility.ConvertFromUtf32(8971); }
-				case "lang": { return CharUtility.ConvertFromUtf32(9001); }
-				case "rang": { return CharUtility.ConvertFromUtf32(9002); }
-				case "loz": { return CharUtility.ConvertFromUtf32(9674); }
-				case "spades": { return CharUtility.ConvertFromUtf32(9824); }
-				case "clubs": { return CharUtility.ConvertFromUtf32(9827); }
-				case "hearts": { return CharUtility.ConvertFromUtf32(9829); }
-				case "diams": { return CharUtility.ConvertFromUtf32(9830); }
-				case "Alpha": { return CharUtility.ConvertFromUtf32(913); }
-				case "Beta": { return CharUtility.ConvertFromUtf32(914); }
-				case "Gamma": { return CharUtility.ConvertFromUtf32(915); }
-				case "Delta": { return CharUtility.ConvertFromUtf32(916); }
-				case "Epsilon": { return CharUtility.ConvertFromUtf32(917); }
-				case "Zeta": { return CharUtility.ConvertFromUtf32(918); }
-				case "Eta": { return CharUtility.ConvertFromUtf32(919); }
-				case "Theta": { return CharUtility.ConvertFromUtf32(920); }
-				case "Iota": { return CharUtility.ConvertFromUtf32(921); }
-				case "Kappa": { return CharUtility.ConvertFromUtf32(922); }
-				case "Lambda": { return CharUtility.ConvertFromUtf32(923); }
-				case "Mu": { return CharUtility.ConvertFromUtf32(924); }
-				case "Nu": { return CharUtility.ConvertFromUtf32(925); }
-				case "Xi": { return CharUtility.ConvertFromUtf32(926); }
-				case "Omicron": { return CharUtility.ConvertFromUtf32(927); }
-				case "Pi": { return CharUtility.ConvertFromUtf32(928); }
-				case "Rho": { return CharUtility.ConvertFromUtf32(929); }
-				case "Sigma": { return CharUtility.ConvertFromUtf32(931); }
-				case "Tau": { return CharUtility.ConvertFromUtf32(932); }
-				case "Upsilon": { return CharUtility.ConvertFromUtf32(933); }
-				case "Phi": { return CharUtility.ConvertFromUtf32(934); }
-				case "Chi": { return CharUtility.ConvertFromUtf32(935); }
-				case "Psi": { return CharUtility.ConvertFromUtf32(936); }
-				case "Omega": { return CharUtility.ConvertFromUtf32(937); }
-				case "alpha": { return CharUtility.ConvertFromUtf32(945); }
-				case "beta": { return CharUtility.ConvertFromUtf32(946); }
-				case "gamma": { return CharUtility.ConvertFromUtf32(947); }
-				case "delta": { return CharUtility.ConvertFromUtf32(948); }
-				case "epsilon": { return CharUtility.ConvertFromUtf32(949); }
-				case "zeta": { return CharUtility.ConvertFromUtf32(950); }
-				case "eta": { return CharUtility.ConvertFromUtf32(951); }
-				case "theta": { return CharUtility.ConvertFromUtf32(952); }
-				case "iota": { return CharUtility.ConvertFromUtf32(953); }
-				case "kappa": { return CharUtility.ConvertFromUtf32(954); }
-				case "lambda": { return CharUtility.ConvertFromUtf32(955); }
-				case "mu": { return CharUtility.ConvertFromUtf32(956); }
-				case "nu": { return CharUtility.ConvertFromUtf32(957); }
-				case "xi": { return CharUtility.ConvertFromUtf32(958); }
-				case "omicron": { return CharUtility.ConvertFromUtf32(959); }
-				case "pi": { return CharUtility.ConvertFromUtf32(960); }
-				case "rho": { return CharUtility.ConvertFromUtf32(961); }
-				case "sigmaf": { return CharUtility.ConvertFromUtf32(962); }
-				case "sigma": { return CharUtility.ConvertFromUtf32(963); }
-				case "tau": { return CharUtility.ConvertFromUtf32(964); }
-				case "upsilon": { return CharUtility.ConvertFromUtf32(965); }
-				case "phi": { return CharUtility.ConvertFromUtf32(966); }
-				case "chi": { return CharUtility.ConvertFromUtf32(967); }
-				case "psi": { return CharUtility.ConvertFromUtf32(968); }
-				case "omega": { return CharUtility.ConvertFromUtf32(969); }
-				case "thetasym": { return CharUtility.ConvertFromUtf32(977); }
-				case "upsih": { return CharUtility.ConvertFromUtf32(978); }
-				case "piv": { return CharUtility.ConvertFromUtf32(982); }
-				default: { return null; }
+				return -1;
 			}
+
+			// http://www.w3.org/TR/REC-html40/sgml/entities.html
+			// http://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references#Character_entity_references_in_HTML
+			// NOTE: entity names are case-sensitive
+			switch (name[0])
+			{
+				case 'A':
+					if (name.Equals("AElig")) { return 198; }
+					if (name.Equals("Aacute")) { return 193; }
+					if (name.Equals("Acirc")) { return 194; }
+					if (name.Equals("Agrave")) { return 192; }
+					if (name.Equals("Alpha")) { return 913; }
+					if (name.Equals("Aring")) { return 197; }
+					if (name.Equals("Atilde")) { return 195; }
+					if (name.Equals("Auml")) { return 196; }
+					break;
+				case 'B':
+					if (name.Equals("Beta")) { return 914; }
+					break;
+				case 'C':
+					if (name.Equals("Ccedil")) { return 199; }
+					if (name.Equals("Chi")) { return 935; }
+					break;
+				case 'D':
+					if (name.Equals("Dagger")) { return 8225; }
+					if (name.Equals("Delta")) { return 916; }
+					break;
+				case 'E':
+					if (name.Equals("ETH")) { return 208; }
+					if (name.Equals("Eacute")) { return 201; }
+					if (name.Equals("Ecirc")) { return 202; }
+					if (name.Equals("Egrave")) { return 200; }
+					if (name.Equals("Epsilon")) { return 917; }
+					if (name.Equals("Eta")) { return 919; }
+					if (name.Equals("Euml")) { return 203; }
+					break;
+				case 'G':
+					if (name.Equals("Gamma")) { return 915; }
+					break;
+				case 'I':
+					if (name.Equals("Iacute")) { return 205; }
+					if (name.Equals("Icirc")) { return 206; }
+					if (name.Equals("Igrave")) { return 204; }
+					if (name.Equals("Iota")) { return 921; }
+					if (name.Equals("Iuml")) { return 207; }
+					break;
+				case 'K':
+					if (name.Equals("Kappa")) { return 922; }
+					break;
+				case 'L':
+					if (name.Equals("Lambda")) { return 923; }
+					break;
+				case 'M':
+					if (name.Equals("Mu")) { return 924; }
+					break;
+				case 'N':
+					if (name.Equals("Ntilde")) { return 209; }
+					if (name.Equals("Nu")) { return 925; }
+					break;
+				case 'O':
+					if (name.Equals("OElig")) { return 338; }
+					if (name.Equals("Oacute")) { return 211; }
+					if (name.Equals("Ocirc")) { return 212; }
+					if (name.Equals("Ograve")) { return 210; }
+					if (name.Equals("Omega")) { return 937; }
+					if (name.Equals("Omicron")) { return 927; }
+					if (name.Equals("Oslash")) { return 216; }
+					if (name.Equals("Otilde")) { return 213; }
+					if (name.Equals("Ouml")) { return 214; }
+					break;
+				case 'P':
+					if (name.Equals("Phi")) { return 934; }
+					if (name.Equals("Pi")) { return 928; }
+					if (name.Equals("Prime")) { return 8243; }
+					if (name.Equals("Psi")) { return 936; }
+					break;
+				case 'R':
+					if (name.Equals("Rho")) { return 929; }
+					break;
+				case 'S':
+					if (name.Equals("Scaron")) { return 352; }
+					if (name.Equals("Sigma")) { return 931; }
+					break;
+				case 'T':
+					if (name.Equals("THORN")) { return 222; }
+					if (name.Equals("Tau")) { return 932; }
+					if (name.Equals("Theta")) { return 920; }
+					break;
+				case 'U':
+					if (name.Equals("Uacute")) { return 218; }
+					if (name.Equals("Ucirc")) { return 219; }
+					if (name.Equals("Ugrave")) { return 217; }
+					if (name.Equals("Upsilon")) { return 933; }
+					if (name.Equals("Uuml")) { return 220; }
+					break;
+				case 'X':
+					if (name.Equals("Xi")) { return 926; }
+					break;
+				case 'Y':
+					if (name.Equals("Yacute")) { return 221; }
+					if (name.Equals("Yuml")) { return 376; }
+					break;
+				case 'Z':
+					if (name.Equals("Zeta")) { return 918; }
+					break;
+				case 'a':
+					if (name.Equals("aacute")) { return 225; }
+					if (name.Equals("acirc")) { return 226; }
+					if (name.Equals("acute")) { return 180; }
+					if (name.Equals("aelig")) { return 230; }
+					if (name.Equals("agrave")) { return 224; }
+					if (name.Equals("alefsym")) { return 8501; }
+					if (name.Equals("alpha")) { return 945; }
+					if (name.Equals("amp")) { return 38; }
+					if (name.Equals("and")) { return 8743; }
+					if (name.Equals("ang")) { return 8736; }
+					if (name.Equals("apos")) { return 39; }
+					if (name.Equals("aring")) { return 229; }
+					if (name.Equals("asymp")) { return 8776; }
+					if (name.Equals("atilde")) { return 227; }
+					if (name.Equals("auml")) { return 228; }
+					break;
+				case 'b':
+					if (name.Equals("bdquo")) { return 8222; }
+					if (name.Equals("beta")) { return 946; }
+					if (name.Equals("brvbar")) { return 166; }
+					if (name.Equals("bull")) { return 8226; }
+					break;
+				case 'c':
+					if (name.Equals("cap")) { return 8745; }
+					if (name.Equals("ccedil")) { return 231; }
+					if (name.Equals("cedil")) { return 184; }
+					if (name.Equals("cent")) { return 162; }
+					if (name.Equals("chi")) { return 967; }
+					if (name.Equals("circ")) { return 710; }
+					if (name.Equals("clubs")) { return 9827; }
+					if (name.Equals("cong")) { return 8773; }
+					if (name.Equals("copy")) { return 169; }
+					if (name.Equals("crarr")) { return 8629; }
+					if (name.Equals("cup")) { return 8746; }
+					if (name.Equals("curren")) { return 164; }
+					break;
+				case 'd':
+					if (name.Equals("dArr")) { return 8659; }
+					if (name.Equals("dagger")) { return 8224; }
+					if (name.Equals("darr")) { return 8495; }
+					if (name.Equals("deg")) { return 176; }
+					if (name.Equals("delta")) { return 948; }
+					if (name.Equals("diams")) { return 9830; }
+					if (name.Equals("divide")) { return 247; }
+					break;
+				case 'e':
+					if (name.Equals("eacute")) { return 233; }
+					if (name.Equals("ecirc")) { return 234; }
+					if (name.Equals("egrave")) { return 232; }
+					if (name.Equals("empty")) { return 8709; }
+					if (name.Equals("emsp")) { return 8195; }
+					if (name.Equals("ensp")) { return 8194; }
+					if (name.Equals("epsilon")) { return 949; }
+					if (name.Equals("equiv")) { return 8801; }
+					if (name.Equals("eta")) { return 951; }
+					if (name.Equals("eth")) { return 240; }
+					if (name.Equals("euml")) { return 235; }
+					if (name.Equals("euro")) { return 8364; }
+					if (name.Equals("exist")) { return 8707; }
+					break;
+				case 'f':
+					if (name.Equals("fnof")) { return 402; }
+					if (name.Equals("forall")) { return 8704; }
+					if (name.Equals("frac12")) { return 189; }
+					if (name.Equals("frac14")) { return 188; }
+					if (name.Equals("frac34")) { return 190; }
+					if (name.Equals("frasl")) { return 8260; }
+					break;
+				case 'g':
+					if (name.Equals("gamma")) { return 947; }
+					if (name.Equals("ge")) { return 8805; }
+					if (name.Equals("gt")) { return 62; }
+					break;
+				case 'h':
+					if (name.Equals("hArr")) { return 8660; }
+					if (name.Equals("harr")) { return 8596; }
+					if (name.Equals("hearts")) { return 9829; }
+					if (name.Equals("hellip")) { return 8230; }
+					break;
+				case 'i':
+					if (name.Equals("iacute")) { return 237; }
+					if (name.Equals("icirc")) { return 238; }
+					if (name.Equals("iexcl")) { return 161; }
+					if (name.Equals("igrave")) { return 236; }
+					if (name.Equals("image")) { return 8465; }
+					if (name.Equals("infin")) { return 8734; }
+					if (name.Equals("int")) { return 8747; }
+					if (name.Equals("iota")) { return 953; }
+					if (name.Equals("iquest")) { return 191; }
+					if (name.Equals("isin")) { return 8712; }
+					if (name.Equals("iuml")) { return 239; }
+					break;
+				case 'k':
+					if (name.Equals("kappa")) { return 954; }
+					break;
+				case 'l':
+					if (name.Equals("lArr")) { return 8656; }
+					if (name.Equals("lambda")) { return 955; }
+					if (name.Equals("lang")) { return 9001; }
+					if (name.Equals("laquo")) { return 171; }
+					if (name.Equals("larr")) { return 8592; }
+					if (name.Equals("lceil")) { return 8968; }
+					if (name.Equals("ldquo")) { return 8220; }
+					if (name.Equals("le")) { return 8804; }
+					if (name.Equals("lfloor")) { return 8970; }
+					if (name.Equals("lowast")) { return 8727; }
+					if (name.Equals("loz")) { return 9674; }
+					if (name.Equals("lrm")) { return 8206; }
+					if (name.Equals("lsaquo")) { return 8249; }
+					if (name.Equals("lsquo")) { return 8216; }
+					if (name.Equals("lt")) { return 60; }
+					break;
+				case 'm':
+					if (name.Equals("macr")) { return 175; }
+					if (name.Equals("mdash")) { return 8212; }
+					if (name.Equals("micro")) { return 181; }
+					if (name.Equals("middot")) { return 183; }
+					if (name.Equals("minus")) { return 8722; }
+					if (name.Equals("mu")) { return 956; }
+					break;
+				case 'n':
+					if (name.Equals("nabla")) { return 8711; }
+					if (name.Equals("nbsp")) { return 160; }
+					if (name.Equals("ndash")) { return 8211; }
+					if (name.Equals("ne")) { return 8800; }
+					if (name.Equals("ni")) { return 8715; }
+					if (name.Equals("not")) { return 172; }
+					if (name.Equals("notin")) { return 8713; }
+					if (name.Equals("nsub")) { return 8836; }
+					if (name.Equals("ntilde")) { return 241; }
+					if (name.Equals("nu")) { return 957; }
+					break;
+				case 'o':
+					if (name.Equals("oacute")) { return 243; }
+					if (name.Equals("ocirc")) { return 244; }
+					if (name.Equals("oelig")) { return 339; }
+					if (name.Equals("ograve")) { return 242; }
+					if (name.Equals("oline")) { return 8254; }
+					if (name.Equals("omega")) { return 969; }
+					if (name.Equals("omicron")) { return 959; }
+					if (name.Equals("oplus")) { return 8853; }
+					if (name.Equals("or")) { return 8744; }
+					if (name.Equals("ordf")) { return 170; }
+					if (name.Equals("ordm")) { return 186; }
+					if (name.Equals("oslash")) { return 248; }
+					if (name.Equals("otilde")) { return 245; }
+					if (name.Equals("otimes")) { return 8855; }
+					if (name.Equals("ouml")) { return 246; }
+					break;
+				case 'p':
+					if (name.Equals("para")) { return 182; }
+					if (name.Equals("part")) { return 8706; }
+					if (name.Equals("permil")) { return 8240; }
+					if (name.Equals("perp")) { return 8869; }
+					if (name.Equals("phi")) { return 966; }
+					if (name.Equals("pi")) { return 960; }
+					if (name.Equals("piv")) { return 982; }
+					if (name.Equals("plusmn")) { return 177; }
+					if (name.Equals("pound")) { return 163; }
+					if (name.Equals("prime")) { return 8242; }
+					if (name.Equals("prod")) { return 8719; }
+					if (name.Equals("prop")) { return 8733; }
+					if (name.Equals("psi")) { return 968; }
+					break;
+				case 'q':
+					if (name.Equals("quot")) { return 34; }
+					break;
+				case 'r':
+					if (name.Equals("rArr")) { return 8658; }
+					if (name.Equals("radic")) { return 8730; }
+					if (name.Equals("rang")) { return 9002; }
+					if (name.Equals("raquo")) { return 187; }
+					if (name.Equals("rarr")) { return 8594; }
+					if (name.Equals("rceil")) { return 8969; }
+					if (name.Equals("rdquo")) { return 8221; }
+					if (name.Equals("real")) { return 8476; }
+					if (name.Equals("reg")) { return 174; }
+					if (name.Equals("rfloor")) { return 8971; }
+					if (name.Equals("rho")) { return 961; }
+					if (name.Equals("rlm")) { return 8207; }
+					if (name.Equals("rsaquo")) { return 8250; }
+					if (name.Equals("rsquo")) { return 8217; }
+					break;
+				case 's':
+					if (name.Equals("sbquo")) { return 8218; }
+					if (name.Equals("scaron")) { return 353; }
+					if (name.Equals("sdot")) { return 8901; }
+					if (name.Equals("sect")) { return 167; }
+					if (name.Equals("shy")) { return 173; }
+					if (name.Equals("sigma")) { return 963; }
+					if (name.Equals("sigmaf")) { return 962; }
+					if (name.Equals("sim")) { return 8764; }
+					if (name.Equals("spades")) { return 9824; }
+					if (name.Equals("sub")) { return 8834; }
+					if (name.Equals("sube")) { return 8838; }
+					if (name.Equals("sum")) { return 8721; }
+					if (name.Equals("sup")) { return 8835; }
+					if (name.Equals("sup1")) { return 185; }
+					if (name.Equals("sup2")) { return 178; }
+					if (name.Equals("sup3")) { return 179; }
+					if (name.Equals("supe")) { return 8839; }
+					if (name.Equals("szlig")) { return 223; }
+					break;
+				case 't':
+					if (name.Equals("tau")) { return 964; }
+					if (name.Equals("there4")) { return 8756; }
+					if (name.Equals("theta")) { return 952; }
+					if (name.Equals("thetasym")) { return 977; }
+					if (name.Equals("thinsp")) { return 8201; }
+					if (name.Equals("thorn")) { return 254; }
+					if (name.Equals("tilde")) { return 732; }
+					if (name.Equals("times")) { return 215; }
+					if (name.Equals("trade")) { return 8482; }
+					break;
+				case 'u':
+					if (name.Equals("uArr")) { return 8657; }
+					if (name.Equals("uacute")) { return 250; }
+					if (name.Equals("uarr")) { return 8593; }
+					if (name.Equals("ucirc")) { return 251; }
+					if (name.Equals("ugrave")) { return 249; }
+					if (name.Equals("uml")) { return 168; }
+					if (name.Equals("upsih")) { return 978; }
+					if (name.Equals("upsilon")) { return 965; }
+					if (name.Equals("uuml")) { return 252; }
+					break;
+				case 'w':
+					if (name.Equals("weierp")) { return 8472; }
+					break;
+				case 'x':
+					if (name.Equals("xi")) { return 958; }
+					break;
+				case 'y':
+					if (name.Equals("yacute")) { return 253; }
+					if (name.Equals("yen")) { return 165; }
+					if (name.Equals("yuml")) { return 255; }
+					break;
+				case 'z':
+					if (name.Equals("zeta")) { return 950; }
+					if (name.Equals("zwj")) { return 8205; }
+					if (name.Equals("zwnj")) { return 8204; }
+					break;
+			}
+			return -1;
 		}
 
 		/// <summary>
