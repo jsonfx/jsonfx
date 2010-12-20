@@ -724,7 +724,7 @@ namespace JsonFx.Json
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Format_NumberTokenOverflowLong_ReturnsString()
+		public void Format_NumberTokenOverflowMinLong_ReturnsString()
 		{
 			var input = new[]
 			{
@@ -741,7 +741,24 @@ namespace JsonFx.Json
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
-		public void Format_NumberTokenOverflowDecimal_ReturnsString()
+		public void Format_NumberTokenOverflowLong_ReturnsString()
+		{
+			var input = new[]
+			{
+				ModelGrammar.TokenPrimitive(9223372036854775800L)
+			};
+
+			const string expected = @"""9223372036854775800""";
+
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void Format_NumberTokenOverflowMinDecimal_ReturnsString()
 		{
 			var input = new[]
 			{
@@ -749,6 +766,23 @@ namespace JsonFx.Json
 			};
 
 			const string expected = @"""79228162514264337593543950335""";
+
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void Format_NumberTokenOverflowDecimal_ReturnsString()
+		{
+			var input = new[]
+			{
+				ModelGrammar.TokenPrimitive(79228162514264337593543950300m)
+			};
+
+			const string expected = @"""79228162514264337593543950300""";
 
 			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings());
 			var actual = formatter.Format(input);

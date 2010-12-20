@@ -723,7 +723,7 @@ namespace JsonFx.Json
 			#region Number Methods
 
 			/// <summary>
-			/// Determines if a numberic value cannot be represented as IEEE-754.
+			/// Determines if a numeric value cannot be represented as IEEE-754.
 			/// </summary>
 			/// <param name="value"></param>
 			/// <returns></returns>
