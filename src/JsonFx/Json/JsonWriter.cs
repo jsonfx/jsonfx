@@ -41,6 +41,12 @@ namespace JsonFx.Json
 	/// </summary>
 	public partial class JsonWriter : ModelWriter
 	{
+		#region Fields
+
+		private readonly string[] ContentTypes;
+
+		#endregion Fields
+
 		#region Init
 
 		/// <summary>
@@ -56,8 +62,26 @@ namespace JsonFx.Json
 		/// </summary>
 		/// <param name="settings"></param>
 		public JsonWriter(DataWriterSettings settings)
-			: base(settings)
+			: base(settings != null ? settings : new DataWriterSettings())
 		{
+		}
+
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="settings"></param>
+		/// <param name="contentTypes"></param>
+		public JsonWriter(DataWriterSettings settings, params string[] contentTypes)
+			: base(settings != null ? settings : new DataWriterSettings())
+		{
+			if (contentTypes == null)
+			{
+				throw new NullReferenceException("contentTypes");
+			}
+
+			// copy values so cannot be modified from outside
+			this.ContentTypes = new string[contentTypes.Length];
+			Array.Copy(contentTypes, this.ContentTypes, contentTypes.Length);
 		}
 
 		#endregion Init
@@ -71,6 +95,15 @@ namespace JsonFx.Json
 		{
 			get
 			{
+				if (this.ContentTypes != null)
+				{
+					foreach (string contentType in this.ContentTypes)
+					{
+						yield return contentType;
+					}
+					yield break;
+				}
+
 				yield return "application/json";
 				yield return "text/json";
 				yield return "text/x-json";

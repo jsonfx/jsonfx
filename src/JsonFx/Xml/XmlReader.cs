@@ -42,6 +42,12 @@ namespace JsonFx.Xml
 	/// </summary>
 	public partial class XmlReader : ModelReader
 	{
+		#region Fields
+
+		private readonly string[] ContentTypes;
+
+		#endregion Fields
+
 		#region Init
 
 		/// <summary>
@@ -57,8 +63,26 @@ namespace JsonFx.Xml
 		/// </summary>
 		/// <param name="settings"></param>
 		public XmlReader(DataReaderSettings settings)
-			: base(settings)
+			: base(settings != null ? settings : new DataReaderSettings())
 		{
+		}
+		
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="settings"></param>
+		/// <param name="contentTypes"></param>
+		public XmlReader(DataReaderSettings settings, params string[] contentTypes)
+			: base(settings != null ? settings : new DataReaderSettings())
+		{
+			if (contentTypes == null)
+			{
+				throw new NullReferenceException("contentTypes");
+			}
+
+			// copy values so cannot be modified from outside
+			this.ContentTypes = new string[contentTypes.Length];
+			Array.Copy(contentTypes, this.ContentTypes, contentTypes.Length);
 		}
 
 		#endregion Init
@@ -72,6 +96,15 @@ namespace JsonFx.Xml
 		{
 			get
 			{
+				if (this.ContentTypes != null)
+				{
+					foreach (string contentType in this.ContentTypes)
+					{
+						yield return contentType;
+					}
+					yield break;
+				}
+
 				yield return "application/xml";
 				yield return "application/xml+xhtml";
 				yield return "text/xml";

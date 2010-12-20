@@ -45,16 +45,8 @@ namespace JsonFx.Model
 		/// <summary>
 		/// Ctor
 		/// </summary>
-		public ModelWriter()
-			: base(new DataWriterSettings())
-		{
-		}
-
-		/// <summary>
-		/// Ctor
-		/// </summary>
 		/// <param name="settings"></param>
-		public ModelWriter(DataWriterSettings settings)
+		protected ModelWriter(DataWriterSettings settings)
 			: base(settings)
 		{
 		}

@@ -52,8 +52,12 @@ namespace JsonFx.Serialization
 		/// Ctor
 		/// </summary>
 		/// <param name="settings"></param>
-		public DataReader(DataReaderSettings settings)
+		protected DataReader(DataReaderSettings settings)
 		{
+			if (settings == null)
+			{
+				throw new NullReferenceException("settings");
+			}
 			this.settings = settings;
 		}
 

@@ -45,7 +45,7 @@ namespace JsonFx.Model
 		/// Ctor
 		/// </summary>
 		/// <param name="settings"></param>
-		public ModelReader(DataReaderSettings settings)
+		protected ModelReader(DataReaderSettings settings)
 			: base(settings)
 		{
 		}
