@@ -106,9 +106,7 @@ namespace JsonFx.Xml
 				}
 
 				yield return "application/xml";
-				yield return "application/xml+xhtml";
 				yield return "text/xml";
-				yield return "text/html";
 			}
 		}
 
