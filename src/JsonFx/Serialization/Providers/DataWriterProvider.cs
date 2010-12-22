@@ -86,7 +86,7 @@ namespace JsonFx.Serialization.Providers
 							continue;
 						}
 
-						string ext = DataWriterProvider.NormalizeExtension(fileExt);
+						string ext = DataProviderUtility.NormalizeExtension(fileExt);
 						this.WritersByExt[ext] = writer;
 					}
 				}
@@ -106,9 +106,9 @@ namespace JsonFx.Serialization.Providers
 
 		#region Methods
 
-		public IDataWriter Find(string extension)
+		public virtual IDataWriter Find(string extension)
 		{
-			extension = DataWriterProvider.NormalizeExtension(extension);
+			extension = DataProviderUtility.NormalizeExtension(extension);
 
 			IDataWriter writer;
 			if (this.WritersByExt.TryGetValue(extension, out writer))
@@ -119,10 +119,13 @@ namespace JsonFx.Serialization.Providers
 			return null;
 		}
 
-		public IDataWriter Find(string acceptHeader, string contentTypeHeader)
+		public virtual IDataWriter Find(string acceptHeader, string contentTypeHeader)
 		{
+			// TODO: implement this negotiation
+			// http://jsr311.java.net/nonav/releases/1.1/spec/spec3.html#x3-380003.8
+
 			IDataWriter writer;
-			foreach (string type in DataWriterProvider.ParseHeaders(acceptHeader, contentTypeHeader))
+			foreach (string type in DataProviderUtility.ParseHeaders(acceptHeader, contentTypeHeader))
 			{
 				if (this.WritersByMime.TryGetValue(type, out writer))
 				{
@@ -134,92 +137,5 @@ namespace JsonFx.Serialization.Providers
 		}
 
 		#endregion Methods
-
-		#region Utility Methods
-
-		/// <summary>
-		/// Parses HTTP headers for Media-Types
-		/// </summary>
-		/// <param name="accept">HTTP Accept header</param>
-		/// <param name="contentType">HTTP Content-Type header</param>
-		/// <returns>sequence of Media-Types</returns>
-		/// <remarks>
-		/// http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
-		/// </remarks>
-		public static IEnumerable<string> ParseHeaders(string accept, string contentType)
-		{
-			string mime;
-
-			// check for a matching accept type
-			foreach (string type in DataWriterProvider.SplitTrim(accept, ','))
-			{
-				mime = DataWriterProvider.ParseMediaType(type);
-				if (!String.IsNullOrEmpty(mime))
-				{
-					yield return mime;
-				}
-			}
-
-			// fallback on content-type
-			mime = DataWriterProvider.ParseMediaType(contentType);
-			if (!String.IsNullOrEmpty(mime))
-			{
-				yield return mime;
-			}
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="type"></param>
-		/// <returns></returns>
-		public static string ParseMediaType(string type)
-		{
-			foreach (string mime in DataWriterProvider.SplitTrim(type, ';'))
-			{
-				// only return first part
-				return mime;
-			}
-
-			// if no parts then was empty
-			return String.Empty;
-		}
-
-		private static IEnumerable<string> SplitTrim(string source, char ch)
-		{
-			if (String.IsNullOrEmpty(source))
-			{
-				yield break;
-			}
-
-			int length = source.Length;
-			for (int prev=0, next=0; prev<length && next>=0; prev=next+1)
-			{
-				next = source.IndexOf(ch, prev);
-				if (next < 0)
-				{
-					next = length;
-				}
-
-				string part = source.Substring(prev, next-prev).Trim();
-				if (part.Length > 0)
-				{
-					yield return part;
-				}
-			}
-		}
-
-		private static string NormalizeExtension(string extension)
-		{
-			if (String.IsNullOrEmpty(extension))
-			{
-				return String.Empty;
-			}
-
-			// ensure is only extension with leading dot
-			return Path.GetExtension(extension);
-		}
-
-		#endregion Utility Methods
 	}
 }

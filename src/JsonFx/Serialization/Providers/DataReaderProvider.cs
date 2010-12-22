@@ -79,9 +79,12 @@ namespace JsonFx.Serialization.Providers
 		/// </summary>
 		/// <param name="contentTypeHeader"></param>
 		/// <returns></returns>
-		public IDataReader Find(string contentTypeHeader)
+		public virtual IDataReader Find(string contentTypeHeader)
 		{
-			string type = DataWriterProvider.ParseMediaType(contentTypeHeader);
+			// TODO: implement this negotiation
+			// http://jsr311.java.net/nonav/releases/1.1/spec/spec3.html#x3-380003.8
+
+			string type = DataProviderUtility.ParseMediaType(contentTypeHeader);
 
 			IDataReader reader;
 			if (this.ReadersByMime.TryGetValue(type, out reader))
