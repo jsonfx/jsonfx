@@ -206,5 +206,49 @@ namespace JsonFx.Json
 		}
 
 		#endregion Object Tests
+
+		#region Enum Tests
+
+		public class Foo
+		{
+			public Bar Baz { get; set; }
+
+			public override bool Equals(object obj)
+			{
+				Foo that = obj as Foo;
+				if (that == null)
+				{
+					return false;
+				}
+
+				return this.Baz.Equals(that.Baz);
+			}
+
+			public override int GetHashCode()
+			{
+				return base.GetHashCode();
+			}
+		}
+
+		public enum Bar
+		{
+			First,
+			Second,
+			Third
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void Read_ObjectContainingEnum_DeserializesObject()
+		{
+			var input = "{\"Baz\":\"First\"}";
+			var expected = new Foo { Baz = Bar.First };
+
+			var actual = new JsonReader().Read<Foo>(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		#endregion Enum Tests
 	}
 }

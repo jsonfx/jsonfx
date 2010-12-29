@@ -824,7 +824,7 @@ namespace JsonFx.Serialization.Resolvers
 			{
 				hasName = false;
 				IEnumerable<DataName> names = this.Strategy.GetName(info);
-				if (typeNames != null)
+				if (names != null)
 				{
 					foreach (DataName name in names)
 					{

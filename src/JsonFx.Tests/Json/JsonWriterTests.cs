@@ -110,5 +110,49 @@ namespace JsonFx.Json
 		}
 
 		#endregion Array Tests
+
+		#region Enum Tests
+
+		public class Foo
+		{
+			public Bar Baz { get; set; }
+
+			public override bool Equals(object obj)
+			{
+				Foo that = obj as Foo;
+				if (that == null)
+				{
+					return false;
+				}
+
+				return this.Baz.Equals(that.Baz);
+			}
+
+			public override int GetHashCode()
+			{
+				return base.GetHashCode();
+			}
+		}
+
+		public enum Bar
+		{
+			First,
+			Second,
+			Third
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void Write_ObjectContainingEnum_SerializesObject()
+		{
+			var input = new Foo { Baz = Bar.First };
+			var expected = "{\"Baz\":\"First\"}";
+
+			var actual = new JsonWriter().Write(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		#endregion Enum Tests
 	}
 }
