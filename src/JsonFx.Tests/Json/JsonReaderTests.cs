@@ -53,6 +53,22 @@ namespace JsonFx.Json
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
+		public void Read_StringArrayDefaults_DeserializesArray()
+		{
+			var input = @"[""aaa"", ""bbb""]";
+			var expected = new string[]
+				{
+					"aaa",
+					"bbb"
+				};
+
+			var actual = new JsonReader().Read(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Read_OnlyDefaults_DeserializesIso8601DateTimeFormat()
 		{
 			var input = @"[ ""Normal string before"", ""2008-02-29T23:59:59.999Z"", ""2010-07-05T10:51:17.768"", ""Normal string after""]";

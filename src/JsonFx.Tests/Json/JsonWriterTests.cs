@@ -51,6 +51,22 @@ namespace JsonFx.Json
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
+		public void Write_StringArrayDefaults_SerializesArray()
+		{
+			var input = new string[]
+				{
+					"aaa",
+					"bbb"
+				};
+			var expected = @"[""aaa"",""bbb""]";
+
+			var actual = new JsonWriter().Write(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Write_OnlyDefaults_SerializesIso8601Dates()
 		{
 			var input = new object[]
