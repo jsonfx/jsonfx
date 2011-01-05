@@ -178,8 +178,11 @@ namespace JsonFx.Json
 
 		public class CustomNamedObject
 		{
-			[JsonName("lowerPropertyName")]
+			[JsonName("upperPropertyName")]
 			public string UpperPropertyName { get; set; }
+
+			[JsonName("arbitraryOther")]
+			public string OtherPropertyName { get; set; }
 		}
 
 		[Fact]
@@ -188,10 +191,11 @@ namespace JsonFx.Json
 		{
 			var input = new CustomNamedObject
 			{
-				UpperPropertyName = "Foo."
+				UpperPropertyName = "Foo.",
+				OtherPropertyName = "Bar."
 			};
 
-			var expected = "{\"lowerPropertyName\":\"Foo.\"}";
+			var expected = "{\"upperPropertyName\":\"Foo.\",\"arbitraryOther\":\"Bar.\"}";
 
 			var resolver = new CombinedResolverStrategy(
 				new JsonResolverStrategy(),

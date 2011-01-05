@@ -697,7 +697,7 @@ namespace JsonFx.Serialization.Resolvers
 
 				foreach (DataName name in names)
 				{
-					if (name.IsEmpty)
+					if (name.IsEmpty || maps.ContainsKey(name.LocalName))
 					{
 						continue;
 					}
@@ -744,7 +744,7 @@ namespace JsonFx.Serialization.Resolvers
 
 				foreach (DataName name in names)
 				{
-					if (name.IsEmpty)
+					if (name.IsEmpty || maps.ContainsKey(name.LocalName))
 					{
 						continue;
 					}
@@ -844,7 +844,7 @@ namespace JsonFx.Serialization.Resolvers
 
 				foreach (DataName name in names)
 				{
-					if (name.IsEmpty)
+					if (name.IsEmpty || maps.ContainsKey(name.LocalName))
 					{
 						continue;
 					}

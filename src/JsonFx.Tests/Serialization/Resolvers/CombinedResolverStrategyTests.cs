@@ -127,8 +127,11 @@ namespace JsonFx.Serialization.Resolvers
 
 		public class CustomNamedObject
 		{
-			[JsonName("lowerPropertyName")]
+			[JsonName("upperPropertyName")]
 			public string UpperPropertyName { get; set; }
+
+			[JsonName("arbitraryOther")]
+			public string OtherPropertyName { get; set; }
 		}
 
 		[Fact]
@@ -137,14 +140,17 @@ namespace JsonFx.Serialization.Resolvers
 		{
 			var input = new CustomNamedObject
 			{
-				UpperPropertyName = "Foo."
+				UpperPropertyName = "Foo.",
+				OtherPropertyName = "Bar."
 			};
 
 			var expected = new[]
 			{
 				ModelGrammar.TokenObjectBegin("CustomNamedObject"),
-				ModelGrammar.TokenProperty("lowerPropertyName"),
+				ModelGrammar.TokenProperty("upperPropertyName"),
 				ModelGrammar.TokenPrimitive("Foo."),
+				ModelGrammar.TokenProperty("arbitraryOther"),
+				ModelGrammar.TokenPrimitive("Bar."),
 				ModelGrammar.TokenObjectEnd
 			};
 
