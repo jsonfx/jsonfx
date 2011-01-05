@@ -30,8 +30,11 @@
 
 using System;
 
+using JsonFx.Json.Resolvers;
 using JsonFx.Model.Filters;
 using JsonFx.Serialization;
+using JsonFx.Serialization.Resolvers;
+using JsonFx.Xml.Resolvers;
 using Xunit;
 
 using Assert=JsonFx.AssertPatched;
@@ -170,5 +173,40 @@ namespace JsonFx.Json
 		}
 
 		#endregion Enum Tests
+
+		#region Resolver Tests
+
+		public class CustomNamedObject
+		{
+			[JsonName("lowerPropertyName")]
+			public string UpperPropertyName { get; set; }
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void GetTokens_MultipleConventions_ReturnsData()
+		{
+			var input = new CustomNamedObject
+			{
+				UpperPropertyName = "Foo."
+			};
+
+			var expected = "{\"lowerPropertyName\":\"Foo.\"}";
+
+			var resolver = new CombinedResolverStrategy(
+				new JsonResolverStrategy(),
+				new DataContractResolverStrategy(),
+				new XmlResolverStrategy(),
+				new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.PascalCase),
+				new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.CamelCase),
+				new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.Lowercase, "-"),
+				new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.Uppercase, "_"));
+
+			var actual = new JsonWriter(new DataWriterSettings(resolver)).Write(input);
+
+			Assert.Equal(expected, actual, false);
+		}
+
+		#endregion Resolver Tests
 	}
 }

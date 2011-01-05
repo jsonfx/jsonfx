@@ -31,7 +31,10 @@
 using System;
 using System.Linq;
 
+using JsonFx.Json;
+using JsonFx.Json.Resolvers;
 using JsonFx.Model;
+using JsonFx.Xml.Resolvers;
 using Xunit;
 
 using Assert=JsonFx.AssertPatched;
@@ -112,6 +115,43 @@ namespace JsonFx.Serialization.Resolvers
 
 			var resolver = new CombinedResolverStrategy(
 				new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.NoChange, " "),
+				new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.PascalCase),
+				new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.CamelCase),
+				new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.Lowercase, "-"),
+				new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.Uppercase, "_"));
+
+			var actual = new ModelWalker(new DataWriterSettings(resolver)).GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual, false);
+		}
+
+		public class CustomNamedObject
+		{
+			[JsonName("lowerPropertyName")]
+			public string UpperPropertyName { get; set; }
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void GetTokens_MultipleConventions_ReturnsTokens()
+		{
+			var input = new CustomNamedObject
+			{
+				UpperPropertyName = "Foo."
+			};
+
+			var expected = new[]
+			{
+				ModelGrammar.TokenObjectBegin("CustomNamedObject"),
+				ModelGrammar.TokenProperty("lowerPropertyName"),
+				ModelGrammar.TokenPrimitive("Foo."),
+				ModelGrammar.TokenObjectEnd
+			};
+
+			var resolver = new CombinedResolverStrategy(
+				new JsonResolverStrategy(),
+				new DataContractResolverStrategy(),
+				new XmlResolverStrategy(),
 				new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.PascalCase),
 				new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.CamelCase),
 				new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.Lowercase, "-"),
