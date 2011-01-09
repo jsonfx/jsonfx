@@ -51,6 +51,93 @@ namespace JsonFx.Json
 
 		#region Array Tests
 
+		public class Foo2
+		{
+			public List<Bar2> Bars { get; set; }
+
+			public override bool Equals(object obj)
+			{
+				Foo2 that = obj as Foo2;
+				if (that == null)
+				{
+					return false;
+				}
+
+				if (this.Bars == null ? that.Bars != null : that.Bars == null)
+				{
+					return false;
+				}
+
+				if (this.Bars != null)
+				{
+					int length = this.Bars.Count;
+					if (length != that.Bars.Count)
+					{
+						return false;
+					}
+					for (int i=0; i<length; i++)
+					{
+						Bar2 thisItem = this.Bars[i];
+						Bar2 thatItem = that.Bars[i];
+						if (thisItem == null ? thatItem != null : thatItem == null)
+						{
+							return false;
+						}
+						if (thisItem != null && !thisItem.Equals(thatItem))
+						{
+							return false;
+						}
+					}
+				}
+
+				return true;
+			}
+
+			public override int GetHashCode()
+			{
+				return base.GetHashCode();
+			}
+		}
+
+		public class Bar2
+		{
+			public string Baz { get; set; }
+
+			public override bool Equals(object obj)
+			{
+				Bar2 that = obj as Bar2;
+				if (that == null)
+				{
+					return false;
+				}
+
+				return String.Equals(this.Baz, that.Baz);
+			}
+
+			public override int GetHashCode()
+			{
+				return base.GetHashCode();
+			}
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void Read_NestedList_DeserializesList()
+		{
+			var input = @"{""Bars"":[{""Baz"":""Test""}]}";
+			var expected = new Foo2
+				{
+					Bars = new List<Bar2>
+					{
+						new Bar2 { Baz="Test"}
+					}
+				};
+
+			var actual = new JsonReader().Read<Foo2>(input);
+
+			Assert.Equal(expected, actual);
+		}
+
 		[Fact]
 		[Trait(TraitName, TraitValue)]
 		public void Read_StringArrayDefaults_DeserializesArray()

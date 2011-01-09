@@ -172,11 +172,12 @@ namespace JsonFx.CodeGen
 			}
 
 			MethodInfo methodInfo = propertyInfo.GetGetMethod(true);
-			if (methodInfo == null ||
-				methodInfo.IsAbstract)
+			if (methodInfo == null)
 			{
 				return null;
 			}
+
+			Module module = methodInfo.DeclaringType.Module;
 
 			// Create a dynamic method with a return type of object, and one parameter taking the instance.
 			DynamicMethod dynamicMethod = new DynamicMethod(
@@ -184,7 +185,7 @@ namespace JsonFx.CodeGen
 				typeof(object),
 				new Type[] { typeof(object) }
 #if !SILVERLIGHT
-				, propertyInfo.DeclaringType,
+				, module,
 				true
 #endif
 				);
@@ -232,11 +233,12 @@ namespace JsonFx.CodeGen
 			}
 
 			MethodInfo methodInfo = propertyInfo.GetSetMethod(true);
-			if (methodInfo == null ||
-				methodInfo.IsAbstract)
+			if (methodInfo == null)
 			{
 				return null;
 			}
+
+			Module module = methodInfo.DeclaringType.Module;
 
 			// Create a dynamic method with a return type of void, one parameter taking the instance and the other taking the new value.
 			DynamicMethod dynamicMethod = new DynamicMethod(
@@ -244,7 +246,7 @@ namespace JsonFx.CodeGen
 				null,
 				new Type[] { typeof(object), typeof(object) }
 #if !SILVERLIGHT
-				, propertyInfo.DeclaringType,
+				, module,
 				true
 #endif
 				);
@@ -294,13 +296,15 @@ namespace JsonFx.CodeGen
 				throw new ArgumentNullException("fieldInfo");
 			}
 
+			Module module = fieldInfo.DeclaringType.Module;
+
 			// Create a dynamic method with a return type of object, one parameter taking the instance.
 			DynamicMethod dynamicMethod = new DynamicMethod(
 				"",//fieldInfo.DeclaringType.FullName+".get_"+fieldInfo.Name,
 				typeof(object),
 				new Type[] { typeof(object) }
 #if !SILVERLIGHT
-				, fieldInfo.DeclaringType,
+				, module,
 				true
 #endif
 				);
@@ -424,6 +428,8 @@ namespace JsonFx.CodeGen
 				return null;
 			}
 
+			Module module = fieldInfo.DeclaringType.Module;
+
 			// Create a dynamic method with a return type of void, one parameter taking the instance and the other taking the new value.
 			// Create the method in the module that owns the instance type
 			DynamicMethod dynamicMethod = new DynamicMethod(
@@ -431,7 +437,7 @@ namespace JsonFx.CodeGen
 				null,
 				new Type[] { typeof(object), typeof(object) }
 #if !SILVERLIGHT
-				, fieldInfo.DeclaringType,
+				, module,
 				true
 #endif
 				);
@@ -529,19 +535,16 @@ namespace JsonFx.CodeGen
 				throw new ArgumentNullException("methodInfo");
 			}
 
-			if (methodInfo.IsAbstract)
-			{
-				return null;
-			}
+			Module module = methodInfo.DeclaringType.Module;
 
 			// Create a dynamic method with a return type of object and one parameter for each argument.
 			// Create the method in the module that owns the instance type
 			DynamicMethod dynamicMethod = new DynamicMethod(
-				"",//methodInfo.DeclaringType.FullName+"."+methodInfo.Name,,
+				"",//methodInfo.DeclaringType.FullName+"."+methodInfo.Name,
 				typeof(object),
 				new Type[] { typeof(object), typeof(object[]) }
 #if !SILVERLIGHT
-				, methodInfo.DeclaringType,
+				, module,
 				true
 #endif
 				);
@@ -699,13 +702,15 @@ namespace JsonFx.CodeGen
 			Type type = ctor.DeclaringType;
 			ParameterInfo[] args = ctor.GetParameters();
 
+			Module module = type.Module;
+
 			// Create a dynamic method with a return type of object and one parameter for each argument.
 			DynamicMethod dynamicMethod = new DynamicMethod(
 				"",//type.FullName+".ctor_"+args.Length,
 				typeof(object),
 				new Type[] { typeof(object[]) }
 #if !SILVERLIGHT
-				, type,
+				, module,
 				true
 #endif
 				);

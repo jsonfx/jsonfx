@@ -111,8 +111,7 @@ namespace JsonFx.CodeGen
 			}
 
 			MethodInfo methodInfo = propertyInfo.GetGetMethod(true);
-			if (methodInfo == null ||
-				methodInfo.IsAbstract)
+			if (methodInfo == null)
 			{
 				return null;
 			}
@@ -144,8 +143,7 @@ namespace JsonFx.CodeGen
 			}
 
 			MethodInfo methodInfo = propertyInfo.GetSetMethod(true);
-			if (methodInfo == null ||
-				methodInfo.IsAbstract)
+			if (methodInfo == null)
 			{
 				return null;
 			}
@@ -257,11 +255,6 @@ namespace JsonFx.CodeGen
 			if (methodInfo == null)
 			{
 				throw new ArgumentNullException("methodInfo");
-			}
-
-			if (methodInfo.IsAbstract)
-			{
-				return null;
 			}
 
 			return delegate(object instance, object[] args)

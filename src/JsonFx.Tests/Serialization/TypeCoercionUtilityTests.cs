@@ -87,7 +87,59 @@ namespace JsonFx.Serialization
 				};
 
 			var settings = new DataReaderSettings();
-			var actual = new TypeCoercionUtility(settings, settings.AllowNullValueTypes).CoerceType(typeof(List<string>), input);
+			var actual = new TypeCoercionUtility(settings, settings.AllowNullValueTypes).CoerceType(expected.GetType(), input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void CoerceType_ListToArray_CoercesViaListCtor()
+		{
+			var input = new List<string>
+				{
+					"One",
+					"Two",
+					"Three",
+					"Four"
+				};
+
+			var expected = new string[]
+				{
+					"One",
+					"Two",
+					"Three",
+					"Four"
+				};
+
+			var settings = new DataReaderSettings();
+			var actual = new TypeCoercionUtility(settings, settings.AllowNullValueTypes).CoerceType(expected.GetType(), input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void CoerceType_ObjectListToStringList_CoercesViaListCtor()
+		{
+			var input = new List<Object>
+				{
+					"One",
+					"Two",
+					"Three",
+					"Four"
+				};
+
+			var expected = new List<string>
+				{
+					"One",
+					"Two",
+					"Three",
+					"Four"
+				};
+
+			var settings = new DataReaderSettings();
+			var actual = new TypeCoercionUtility(settings, settings.AllowNullValueTypes).CoerceType(expected.GetType(), input);
 
 			Assert.Equal(expected, actual);
 		}
