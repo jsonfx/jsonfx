@@ -1085,6 +1085,58 @@ break""]";
 
 		#endregion Keyword Tests
 
+		#region Comment Tests
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void IgnoreMutipleSingleLineComments()
+		{
+			var input = "//comment1\r\n//comment2\r\n//comment3\r\n{ \"Bars\": [{\"Baz\": \"Test\"}]}";
+			var expected = new []
+			{
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenProperty("Bars"),
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenProperty("Baz"),
+				ModelGrammar.TokenPrimitive("Test"),
+				ModelGrammar.TokenObjectEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenObjectEnd
+			};
+
+			var tokenizer = new JsonReader.JsonTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void IgnoreMutilineComments()
+		{
+			var input = "/*comment1\r\ncomment2\r\ncomment3*/\r\n{ \"Bars\": [{\"Baz\": \"Test\"}]}";
+			var expected = new[]
+			{
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenProperty("Bars"),
+				ModelGrammar.TokenArrayBeginUnnamed,
+				ModelGrammar.TokenObjectBeginUnnamed,
+				ModelGrammar.TokenProperty("Baz"),
+				ModelGrammar.TokenPrimitive("Test"),
+				ModelGrammar.TokenObjectEnd,
+				ModelGrammar.TokenArrayEnd,
+				ModelGrammar.TokenObjectEnd
+			};
+
+			var tokenizer = new JsonReader.JsonTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		#endregion Comment Tests
+
 		#region Complex Graph Tests
 
 		[Fact]

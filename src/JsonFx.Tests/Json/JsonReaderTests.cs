@@ -353,45 +353,45 @@ namespace JsonFx.Json
 		}
 
 		#endregion Enum Tests
+		
+		#region Comment Tests
+		
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void IgnoreMutipleSingleLineComments()
+		{
+			var input = "//comment1\r\n//comment2\r\n//comment3\r\n{ \"Bars\": [{\"Baz\": \"Test\"}]}";
+			var expected = new Foo2
+			{
+				Bars = new List<Bar2>
+				{
+					new Bar2 { Baz="Test" }
+				}
+			};
 
-    #region Comment Tests
+			var actual = new JsonReader().Read<Foo2>(input);
+		
+			Assert.Equal(expected, actual);
+		}
 
-    [Fact]
-    [Trait(TraitName, TraitValue)]
-    public void IgnoreMutipleSingleLineComments()
-    {
-      var input = "//comment1\r\n//comment2\r\n//comment3\r\n{ \"Bars\": [{\"Baz\": \"Test\"}]}";
-      var expected = new Foo2
-      {
-        Bars = new List<Bar2>
-					{
-						new Bar2 { Baz="Test"}
-					}
-      };
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void IgnoreMutilineComments()
+		{
+			var input = "/*comment1\r\ncomment2\r\ncomment3*/\r\n{ \"Bars\": [{\"Baz\": \"Test\"}]}";
+			var expected = new Foo2
+			{
+				Bars = new List<Bar2>
+				{
+					new Bar2 { Baz="Test"}
+				}
+			};
 
-      var actual = new JsonReader().Read<Foo2>(input);
-
-      Assert.Equal(expected, actual);
-    }
-
-    [Fact]
-    [Trait(TraitName, TraitValue)]
-    public void IgnoreMutilineComments()
-    {
-      var input = "/*comment1\r\ncomment2\r\ncomment3*/\r\n{ \"Bars\": [{\"Baz\": \"Test\"}]}";
-      var expected = new Foo2
-      {
-        Bars = new List<Bar2>
-					{
-						new Bar2 { Baz="Test"}
-					}
-      };
-
-      var actual = new JsonReader().Read<Foo2>(input);
-
-      Assert.Equal(expected, actual);
-    }
-    
-    #endregion Comment Tests
-  }
+			var actual = new JsonReader().Read<Foo2>(input);
+			
+			Assert.Equal(expected, actual);
+		}
+		
+		#endregion Comment Tests
+	}
 }

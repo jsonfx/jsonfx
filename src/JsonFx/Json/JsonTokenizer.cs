@@ -302,87 +302,87 @@ namespace JsonFx.Json
 
 			private static void SkipCommentsAndWhitespace(ITextStream scanner)
 			{
-				// skip leading whitespace
-				JsonTokenizer.SkipWhitespace(scanner);
-
-				// check for block and line comments
-				if (scanner.IsCompleted || scanner.Peek() != JsonGrammar.OperatorCommentBegin[0])
+				while (true)
 				{
-					return;
-				}
+					// skip leading and trailing whitespace
+					JsonTokenizer.SkipWhitespace(scanner);
 
-				// read first char of comment start
-				scanner.Pop();
-
-				// store for unterminated case
-				long commentStart = scanner.Index;
-				int commentCol = scanner.Column;
-				int commentLine = scanner.Line;
-
-				if (scanner.IsCompleted)
-				{
-					throw new DeserializationException(JsonTokenizer.ErrorUnterminatedComment, commentStart, commentLine, commentCol);
-				}
-
-				// peek second char of comment start
-				char ch = scanner.Peek();
-				bool isBlockComment;
-				if (ch == JsonGrammar.OperatorCommentBegin[1])
-				{
-					isBlockComment = true;
-				}
-				else if (ch == JsonGrammar.OperatorCommentLine[1])
-				{
-					isBlockComment = false;
-				}
-				else
-				{
-					throw new DeserializationException(JsonTokenizer.ErrorUnterminatedComment, commentStart, commentLine, commentCol);
-				}
-
-				// start reading comment content
-				if (isBlockComment)
-				{
-					// skip over everything until reach block comment ending
-					while (true)
+					// check for block and line comments
+					if (scanner.IsCompleted || scanner.Peek() != JsonGrammar.OperatorCommentBegin[0])
 					{
-						do
+						return;
+					}
+
+					// read first char of comment start
+					scanner.Pop();
+
+					// store for unterminated case
+					long commentStart = scanner.Index;
+					int commentCol = scanner.Column;
+					int commentLine = scanner.Line;
+
+					if (scanner.IsCompleted)
+					{
+						throw new DeserializationException(JsonTokenizer.ErrorUnterminatedComment, commentStart, commentLine, commentCol);
+					}
+
+					// peek second char of comment start
+					char ch = scanner.Peek();
+					bool isBlockComment;
+					if (ch == JsonGrammar.OperatorCommentBegin[1])
+					{
+						isBlockComment = true;
+					}
+					else if (ch == JsonGrammar.OperatorCommentLine[1])
+					{
+						isBlockComment = false;
+					}
+					else
+					{
+						throw new DeserializationException(JsonTokenizer.ErrorUnterminatedComment, commentStart, commentLine, commentCol);
+					}
+
+					// start reading comment content
+					if (isBlockComment)
+					{
+						// skip over everything until reach block comment ending
+						while (true)
 						{
+							do
+							{
+								scanner.Pop();
+
+								if (scanner.IsCompleted)
+								{
+									throw new DeserializationException(JsonTokenizer.ErrorUnterminatedComment, commentStart, commentLine, commentCol);
+								}
+							} while (scanner.Peek() != JsonGrammar.OperatorCommentEnd[0]);
+
 							scanner.Pop();
 
 							if (scanner.IsCompleted)
 							{
 								throw new DeserializationException(JsonTokenizer.ErrorUnterminatedComment, commentStart, commentLine, commentCol);
 							}
-						} while (scanner.Peek() != JsonGrammar.OperatorCommentEnd[0]);
 
-						scanner.Pop();
-
-						if (scanner.IsCompleted)
-						{
-							throw new DeserializationException(JsonTokenizer.ErrorUnterminatedComment, commentStart, commentLine, commentCol);
-						}
-
-						if (scanner.Peek() == JsonGrammar.OperatorCommentEnd[1])
-						{
-							// move past block comment end token
-							scanner.Pop();
-							break;
+							if (scanner.Peek() == JsonGrammar.OperatorCommentEnd[1])
+							{
+								// move past block comment end token
+								scanner.Pop();
+								break;
+							}
 						}
 					}
-				}
-				else
-				{
-					// skip over everything until reach line ending or end of input
-					do
+					else
 					{
-						scanner.Pop();
-						ch = scanner.Peek();
-					} while (!scanner.IsCompleted && ('\r' != ch) && ('\n' != ch));
+						// skip over everything until reach line ending or end of input
+						do
+						{
+							scanner.Pop();
+							ch = scanner.Peek();
+						} while (!scanner.IsCompleted && ('\r' != ch) && ('\n' != ch));
+					}
 				}
-
-				// skip trailing whitespace
-				JsonTokenizer.SkipWhitespace(scanner);
 			}
 
 			private static void SkipWhitespace(ITextStream scanner)
