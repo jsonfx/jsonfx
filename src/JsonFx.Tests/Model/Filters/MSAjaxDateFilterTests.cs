@@ -141,6 +141,25 @@ namespace JsonFx.Model.Filters
 			Assert.Equal(expected.Ticks, actual.Ticks);
 		}
 
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void TryRead_DateTimeExplicitTimeZone_ReadsAsUtc()
+		{
+			var input = Stream<Token<ModelTokenType>>.Create(new[]
+				{
+					ModelGrammar.TokenPrimitive(@"\/Date(1262427133000+0100)\/")
+				});
+
+			// currently this just ignores the WCF time zone info
+			var expected = new DateTime(2010, 1, 2, 10, 12, 13, 0, DateTimeKind.Utc);
+
+			DateTime actual;
+			Assert.True(new MSAjaxDateFilter().TryRead(new DataReaderSettings(), input, out actual));
+
+			Assert.Equal(expected.Kind, actual.Kind);
+			Assert.Equal(expected.Ticks, actual.Ticks);
+		}
+
 		#endregion TryRead Tests
 
 		#region TryWrite Tests

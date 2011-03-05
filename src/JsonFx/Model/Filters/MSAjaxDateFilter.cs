@@ -46,16 +46,17 @@ namespace JsonFx.Model.Filters
 	///		http://weblogs.asp.net/bleroy/archive/2008/01/18/dates-and-json.aspx
 	///	
 	/// NOTE: This format is limited to expressing DateTime at the millisecond level as UTC only.
+	/// The WCF extension of adding a timezone is ignored as this returns UTC dates only.
 	/// </remarks>
 	public class MSAjaxDateFilter : ModelFilter<DateTime>
 	{
 		#region Constants
 
 		private static readonly DateTime EcmaScriptEpoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-		private static readonly long MinValueMilliseconds = -62135596800000L;
-		private static readonly long MaxValueMilliseconds = 253402300800000L;
+		private const long MinValueMilliseconds = -62135596800000L;
+		private const long MaxValueMilliseconds = 253402300800000L;
 
-		private const string MSAjaxDatePattern = @"^\\/Date\(([+\-]?\d+?)\)\\/$";
+		private const string MSAjaxDatePattern = @"^\\/Date\(([+\-]?\d+?)([+\-]\d{4})?\)\\/$";
 		private static readonly Regex MSAjaxDateRegex = new Regex(MSAjaxDatePattern,
 #if !SILVERLIGHT
 			RegexOptions.Compiled|
@@ -144,6 +145,7 @@ namespace JsonFx.Model.Filters
 			}
 			else
 			{
+				// currently this just ignores the WCF time zone info in match.Groups[2].Value
 				value = MSAjaxDateFilter.EcmaScriptEpoch.AddMilliseconds(ticks);
 			}
 			return true;
