@@ -2,5 +2,9 @@
 *.suo
 build
 keys
+_ReSharper.*
+*.csproj.user
+*.resharper.user
+*.resharper
 
 *.lnk

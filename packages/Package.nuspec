@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <id>JsonFx</id>
+    <version>2.0</version>
+    <authors>Stephen McKamey</authors>
+    <owners>Hadi Hariri, Stephen McKamey</owners>
+    <licenseUrl>https://github.com/jsonfx/jsonfx/blob/master/LICENSE.txt</licenseUrl>
+    <projectUrl>https://github.com/jsonfx/jsonfx</projectUrl>
+    <iconUrl>http://jsonfx.net/Images/FavIcon_128.png</iconUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>JsonFx Framework</description>
+    <tags>json, xml, serialization, deserialization</tags>
+  </metadata>
+</package>

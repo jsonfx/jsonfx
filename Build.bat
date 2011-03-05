@@ -74,5 +74,18 @@ FOR %%i IN (%WindowsPhoneVer%) DO "%MSBuild%" src/JsonFx/JsonFx.csproj /target:r
 
 REM FOR %%i IN (%WindowsPhoneVer%) DO "%MSBuild%" src/JsonFx/JsonFx.csproj /target:rebuild /property:TargetFrameworkVersion=%%i;TargetFrameworkIdentifier=Silverlight;TargetFrameworkProfile=WindowsPhone;Configuration=Debug
 
+ECHO Copying files for packages...
+
+xcopy build\Release_v2.0\*.* "packages\lib\.NetFramework 2.0\"
+xcopy build\Release_v3.5\*.* "packages\lib\.NetFramework 3.5\"
+xcopy build\Release_v4.0\*.* "packages\lib\.NetFramework 4.0\"
+xcopy build\Release_v3.5_Silverlight\*.* "packages\lib\Silverlight 3.5\"
+xcopy build\Release_v4.0_Silverlight\*.* "packages\lib\Silverlight 4.0\"
+
+ECHO Generating NuGet Package
+
+NuGet.exe pack packages\Package.nuspec -o build\
+
+
 :END
 POPD
