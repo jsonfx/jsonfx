@@ -345,12 +345,6 @@ namespace JsonFx.Json
 
 			protected virtual void WritePrimitive(TextWriter writer, object value)
 			{
-				if (value is TimeSpan)
-				{
-					this.WriteNumber(writer, value, TypeCode.Object);
-					return;
-				}
-
 				this.WriteString(writer, this.FormatString(value));
 			}
 
@@ -478,13 +472,6 @@ namespace JsonFx.Json
 					}
 					default:
 					{
-						if (value is TimeSpan)
-						{
-							overflowsIEEE754 = true;
-							number = ((TimeSpan)value).Ticks.ToString("g", CultureInfo.InvariantCulture);
-							break;
-						}
-
 						throw new TokenException<ModelTokenType>(ModelGrammar.TokenPrimitive(value), "Invalid number token");
 					}
 				}
