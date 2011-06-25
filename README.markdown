@@ -83,9 +83,9 @@
 	string json = writer.Write(query);
 	Console.WriteLine(json); // [{"person-id":1,"first-name":"Foo","last-name":"Bar"},{"person-id":3,"first-name":"Blah","last-name":"Yada"}]
 
-#### Serialize to/from TCP:
+#### Serialize to/from TCP socket:
 	TcpClient tcpClient = new TcpClient(server, port);
-	Stream tcpStream = tcpClient.getStream();
+	NetworkStream tcpStream = tcpClient.GetStream();
 
 	// read incrementally from incoming stream
 	TextReader tcpReader = new StreamReader(tcpStream);
