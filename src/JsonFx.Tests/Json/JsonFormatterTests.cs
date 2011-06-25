@@ -790,6 +790,74 @@ namespace JsonFx.Json
 			Assert.Equal(expected, actual);
 		}
 
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void Format_TimeSpanZero_ReturnsNumber()
+		{
+			var input = new[]
+			{
+				ModelGrammar.TokenPrimitive(new TimeSpan())
+			};
+
+			const string expected = @"0";
+
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void Format_TimeSpan_ReturnsNumber()
+		{
+			var input = new[]
+			{
+				ModelGrammar.TokenPrimitive(new TimeSpan(365, 23, 59, 59, 999))
+			};
+
+			const string expected = @"316223999990000";
+
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void Format_TimeSpanMinValue_ReturnsString()
+		{
+			var input = new[]
+			{
+				ModelGrammar.TokenPrimitive(TimeSpan.MinValue)
+			};
+
+			const string expected = @"""-9223372036854775808""";
+
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void Format_TimeSpanMaxValue_ReturnsString()
+		{
+			var input = new[]
+			{
+				ModelGrammar.TokenPrimitive(TimeSpan.MaxValue)
+			};
+
+			const string expected = @"""9223372036854775807""";
+
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
 		#endregion Number Tests
 
 		#region Complex Graph Tests

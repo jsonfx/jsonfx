@@ -413,6 +413,19 @@ namespace JsonFx.Serialization
 					// try-catch is pointless since will throw upon generic conversion
 					return new Version((string)value);
 				}
+				else if (targetType == typeof(TimeSpan))
+				{
+					long ticks;
+					if (Int64.TryParse((string)value, out ticks))
+					{
+						return TimeSpan.FromTicks(ticks);
+					}
+					TimeSpan timespan;
+					if (TimeSpan.TryParse((string)value, out timespan))
+					{
+						return timespan;
+					}
+				}
 			}
 			else if (targetType == typeof(TimeSpan))
 			{

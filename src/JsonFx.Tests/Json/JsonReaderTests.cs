@@ -262,6 +262,24 @@ namespace JsonFx.Json
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
+		public void Read_TimeSpans_DeserializesCorrectly()
+		{
+			var input = @"[ ""-9223372036854775808"", 0, 316223999990000, ""9223372036854775807""]";
+			var expected = new TimeSpan[]
+				{
+					TimeSpan.MinValue,
+					new TimeSpan(),
+					new TimeSpan(365, 23, 59, 59, 999),
+					TimeSpan.MaxValue
+				};
+
+			var actual = new JsonReader().Read<TimeSpan[]>(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Read_ObjectExtraValueAfterClose_ThrowsDeserializationException()
 		{
 			// input from fail10.json in test suite at http://www.json.org/JSON_checker/

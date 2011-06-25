@@ -347,7 +347,7 @@ namespace JsonFx.Json
 			{
 				if (value is TimeSpan)
 				{
-					this.WriteNumber(writer, value, TypeCode.Object);
+					this.WriteNumber(writer, ((TimeSpan)value).Ticks, TypeCode.Int64);
 					return;
 				}
 
@@ -478,13 +478,6 @@ namespace JsonFx.Json
 					}
 					default:
 					{
-						if (value is TimeSpan)
-						{
-							overflowsIEEE754 = true;
-							number = ((TimeSpan)value).Ticks.ToString("g", CultureInfo.InvariantCulture);
-							break;
-						}
-
 						throw new TokenException<ModelTokenType>(ModelGrammar.TokenPrimitive(value), "Invalid number token");
 					}
 				}
