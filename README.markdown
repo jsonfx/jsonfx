@@ -41,7 +41,7 @@
 	string json = writer.Write(output);
 	Console.WriteLine(json); // {"first":"Foo","last":"Bar","middle":"Blah"}
 
-#### Serialze to/from Anonymous types
+#### Serialize to/from Anonymous types
 	string input = @"{ ""first"": ""Foo"", ""last"": ""Bar"" }";
 	var template = new { first=String.Empty, middle=String.Empty, last=String.Empty };
 	var output = reader.Read(input, template);
@@ -50,7 +50,7 @@
 	string json = writer.Write(output);
 	Console.WriteLine(json); // {"first":"Foo","middle":"Blah","last":"Bar"}
 
-#### Serialze to/from custom types and LINQ queries
+#### Serialize to/from custom types and LINQ queries
 
 	[DataContract]
 	public class Person
@@ -82,6 +82,18 @@
 	Console.WriteLine(query.Last().LastName); // Yada
 	string json = writer.Write(query);
 	Console.WriteLine(json); // [{"person-id":1,"first-name":"Foo","last-name":"Bar"},{"person-id":3,"first-name":"Blah","last-name":"Yada"}]
+
+#### Serialize to/from TCP:
+	TcpClient tcpClient = new TcpClient(server, port);
+	Stream tcpStream = tcpClient.getStream();
+
+	// read incrementally from incoming stream
+	TextReader tcpReader = new StreamReader(tcpStream);
+	Foo myFoo = new JsonReader.Read<Foo>(tcpReader);
+
+	// write directly to output stream
+	TextWriter tcpWriter = new StreamWriter(tcpStream);
+	new JsonWriter.Write(myFoo, tcpWriter);
 
 #### Fully customizable name resolution strategies
 
