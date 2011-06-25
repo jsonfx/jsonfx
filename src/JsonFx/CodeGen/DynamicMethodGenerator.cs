@@ -199,7 +199,8 @@ namespace JsonFx.CodeGen
 				il.Emit(OpCodes.Ldarg_0);
 			}
 			// Call the method that returns void
-			il.Emit(methodInfo.IsVirtual ? OpCodes.Callvirt : OpCodes.Call, methodInfo);
+			//il.Emit(methodInfo.IsVirtual ? OpCodes.Callvirt : OpCodes.Call, methodInfo);
+			il.Emit(OpCodes.Call, methodInfo);
 			if (propertyInfo.PropertyType.IsValueType)
 			{
 				// Load the return value as a reference type
@@ -273,7 +274,8 @@ namespace JsonFx.CodeGen
 				il.Emit(OpCodes.Castclass, propertyInfo.PropertyType);
 			}
 			// Call the method that returns void
-			il.Emit(methodInfo.IsVirtual ? OpCodes.Callvirt : OpCodes.Call, methodInfo);
+			//il.Emit(methodInfo.IsVirtual ? OpCodes.Callvirt : OpCodes.Call, methodInfo);
+			il.Emit(OpCodes.Call, methodInfo);
 			// return (void) from the method
 			il.Emit(OpCodes.Ret);
 
@@ -608,7 +610,8 @@ namespace JsonFx.CodeGen
 
 			// Call the ctor, passing in the stack of args, result is put back on stack
 			// Call the method and return result
-			il.Emit(methodInfo.IsVirtual ? OpCodes.Callvirt : OpCodes.Call, methodInfo);
+			//il.Emit(methodInfo.IsVirtual ? OpCodes.Callvirt : OpCodes.Call, methodInfo);
+			il.Emit(OpCodes.Call, methodInfo);
 
 			if (methodInfo.ReturnType == typeof(void))
 			{
