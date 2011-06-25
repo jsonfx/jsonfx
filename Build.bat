@@ -74,18 +74,20 @@ FOR %%i IN (%WindowsPhoneVer%) DO "%MSBuild%" src/JsonFx/JsonFx.csproj /target:r
 
 REM FOR %%i IN (%WindowsPhoneVer%) DO "%MSBuild%" src/JsonFx/JsonFx.csproj /target:rebuild /property:TargetFrameworkVersion=%%i;TargetFrameworkIdentifier=Silverlight;TargetFrameworkProfile=WindowsPhone;Configuration=Debug
 
+REM http://docs.nuget.org/docs/creating-packages/creating-and-publishing-a-package#Supporting_Multiple_.NET_Framework_Versions_and_Profiles
+
+ECHO.
 ECHO Copying files for packages...
+xcopy build\%Configuration%_v4.0\*.* "packages\lib\net40\" /Y
+xcopy build\%Configuration%_v3.5\*.* "packages\lib\net35\" /Y
+xcopy build\%Configuration%_v2.0\*.* "packages\lib\net20\" /Y
+xcopy build\%Configuration%_v3.5_Silverlight\*.* "packages\lib\sl35\" /Y
+xcopy build\%Configuration%_v4.0_Silverlight\*.* "packages\lib\sl40\" /Y
+xcopy build\%Configuration%_v4.0_WindowsPhone\*.* "packages\lib\sl40-wp\" /Y
 
-xcopy build\Release_v2.0\*.* "packages\lib\.NetFramework 2.0\"
-xcopy build\Release_v3.5\*.* "packages\lib\.NetFramework 3.5\"
-xcopy build\Release_v4.0\*.* "packages\lib\.NetFramework 4.0\"
-xcopy build\Release_v3.5_Silverlight\*.* "packages\lib\Silverlight 3.5\"
-xcopy build\Release_v4.0_Silverlight\*.* "packages\lib\Silverlight 4.0\"
-
+ECHO.
 ECHO Generating NuGet Package
-
 NuGet.exe pack packages\Package.nuspec -o build\
-
 
 :END
 POPD
