@@ -1,10 +1,9 @@
-
 *.suo
 build
-keys
-_ReSharper.*
+external
 *.csproj.user
+*.lnk
+*.DS_Store
+_ReSharper.*
 *.resharper.user
 *.resharper
-
-*.lnk
