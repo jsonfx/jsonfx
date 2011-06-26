@@ -274,8 +274,7 @@ namespace JsonFx.CodeGen
 				il.Emit(OpCodes.Castclass, propertyInfo.PropertyType);
 			}
 			// Call the method that returns void
-			//il.Emit(methodInfo.IsVirtual ? OpCodes.Callvirt : OpCodes.Call, methodInfo);
-			il.Emit(OpCodes.Call, methodInfo);
+			il.Emit(methodInfo.IsVirtual ? OpCodes.Callvirt : OpCodes.Call, methodInfo);
 			// return (void) from the method
 			il.Emit(OpCodes.Ret);
 
