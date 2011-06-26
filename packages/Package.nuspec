@@ -3,7 +3,7 @@
 	<metadata>
 		<id>JsonFx</id>
 		<title>JsonFx</title>
-		<version>2.0.1106.2515</version>
+		<version>2.0.1106.2610</version>
 		<authors>Stephen McKamey</authors>
 		<owners>mckamey</owners>
 		<licenseUrl>https://raw.github.com/jsonfx/jsonfx/master/LICENSE.txt</licenseUrl>
@@ -11,6 +11,6 @@
 		<iconUrl>https://raw.github.com/jsonfx/jsonfx/master/Logo_128.png</iconUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
 		<description>JsonFx serialization framework</description>
-		<tags>json xml bson linq serialization deserialization</tags>
+		<tags>JSON XML BSON JsonML LINQ serialization deserialization </tags>
 	</metadata>
 </package>
