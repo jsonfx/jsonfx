@@ -69,6 +69,7 @@
     <Reference Include="System.XML" />
     <Reference Include="xunit">
       <HintPath>$(SolutionDir)\lib\xUnit.net\xunit.dll</HintPath>
+      <HintPath>..\..\lib\xUnit.net\xunit.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFrameworkVersion)' != 'v2.0' And '$(TargetFrameworkVersion)' != 'v3.0' ">
@@ -87,11 +88,17 @@
     <Compile Include="Bson\BsonFormatterTests.cs" />
     <Compile Include="Bson\BsonConverterTests.cs" />
     <Compile Include="CodeGen\DynamicMethodGeneratorTests.cs" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' != 'netcf'">
     <Compile Include="Model\ModelAnalyzerTests.cs" />
     <Compile Include="Model\ModelWalkerTests.cs" />
     <Compile Include="Model\Filters\Iso8601DateFilterTests.cs" />
     <Compile Include="Model\Filters\MSAjaxDateFilterTests.cs" />
     <Compile Include="Model\ModelSubsequencerTests.cs" />
+    <Compile Include="Serialization\TypeCoercionUtilityTests.cs" />
+    <Compile Include="Linq\QueryEngineTests.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="Html\HtmlFormatterTests.cs" />
     <Compile Include="Html\HtmlTokenizerTests.cs" />
     <Compile Include="Html\HtmlOutTransformerTests.cs" />
@@ -107,11 +114,9 @@
     <Compile Include="Json\JsonFormatterTests.cs" />
     <Compile Include="Json\JsonTokenizerTests.cs" />
     <Compile Include="Json\Resolvers\JsonResolverStrategyTests.cs" />
-    <Compile Include="Linq\QueryEngineTests.cs" />
     <Compile Include="Serialization\Resolvers\ConventionResolverStrategyTests.cs" />
     <Compile Include="Serialization\Resolvers\CombinedResolverStrategyTests.cs" />
     <Compile Include="Serialization\Resolvers\DataContractResolverStrategyTests.cs" />
-    <Compile Include="Serialization\TypeCoercionUtilityTests.cs" />
     <Compile Include="Xml\XmlConverterTests.cs" />
     <Compile Include="Xml\XmlFormatterTests.cs" />
     <Compile Include="Xml\XmlInTransformerTests.cs" />
