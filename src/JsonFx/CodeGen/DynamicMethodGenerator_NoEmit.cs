@@ -118,7 +118,13 @@ namespace JsonFx.CodeGen
 
 			return delegate(object instance)
 			{
-				return methodInfo.Invoke(instance, Type.EmptyTypes);
+				return methodInfo.Invoke(instance,
+#if NETCF
+	            new Type[]{}
+#else
+				Type.EmptyTypes
+#endif
+				);
 			};
 		}
 
@@ -282,7 +288,13 @@ namespace JsonFx.CodeGen
 				throw new ArgumentNullException("type");
 			}
 
-			ConstructorInfo ctor = type.GetConstructor(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.FlattenHierarchy, null, Type.EmptyTypes, null);
+			ConstructorInfo ctor = type.GetConstructor(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.FlattenHierarchy, null,
+#if NETCF
+            new Type[]{},
+#else
+			Type.EmptyTypes,
+#endif
+			null);
 			if (ctor == null)
 			{
 				return null;
