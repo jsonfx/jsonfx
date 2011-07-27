@@ -38,6 +38,7 @@ using Xunit.Sdk;
 
 namespace JsonFx
 {
+#if NET4
 	public class AssertPatchedTests
 	{
 		#region Constants
@@ -141,6 +142,7 @@ namespace JsonFx
 
 		#endregion AssertPatched Tests
 	}
+#endif
 
 	/// <summary>
 	/// Patches xunit.Assert to allow less strict comparisons (doesn't enforce exact type)
