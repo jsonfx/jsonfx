@@ -237,7 +237,10 @@ namespace JsonFx.Serialization.Resolvers
 
 				Type argType = paramList[0].ParameterType;
 				if ((argType == typeof(string)) ||
-					((argType.GetInterface(TypeCoercionUtility.TypeGenericIEnumerable, false) == null) &&
+					(
+#if !NETCF
+					(argType.GetInterface(TypeCoercionUtility.TypeGenericIEnumerable, false) == null) &&
+#endif
 					(typeof(IEnumerable).IsAssignableFrom(argType))))
 				{
 					continue;
@@ -268,7 +271,10 @@ namespace JsonFx.Serialization.Resolvers
 
 			// many collection types have an Add method
 			// which adds items one at a time
-			Type collectionType = type.GetInterface(TypeCoercionUtility.TypeGenericICollection, false);
+			Type collectionType = null;
+#if !NETCF
+			collectionType = type.GetInterface(TypeCoercionUtility.TypeGenericICollection, false);
+#endif
 			if (collectionType != null)
 			{
 				methodInfo = collectionType.GetMethod("Add");
@@ -302,7 +308,11 @@ namespace JsonFx.Serialization.Resolvers
 			{
 				if (this.CollectionCtors == null)
 				{
+#if NETCF
+					return new Type[]{ };
+#else
 					return Type.EmptyTypes;
+#endif
 				}
 
 				return this.CollectionCtors.Keys;
@@ -348,7 +358,15 @@ namespace JsonFx.Serialization.Resolvers
 			return
 				!type.IsInterface &&
 				!type.IsAbstract &&
-				(type.IsValueType || (type.GetConstructor(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.FlattenHierarchy, null, Type.EmptyTypes, null) == null));
+				(type.IsValueType ||
+				 (type.GetConstructor(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.FlattenHierarchy,
+				                      null,
+#if NETCF
+									  new Type[]{ },
+#else
+				                      Type.EmptyTypes,
+#endif
+				                      null) == null));
 		}
 
 		#endregion Utility Methods
