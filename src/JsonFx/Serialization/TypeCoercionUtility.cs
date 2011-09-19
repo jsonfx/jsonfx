@@ -252,7 +252,11 @@ namespace JsonFx.Serialization
 				((System.Dynamic.DynamicObject)target).TrySetMember(new DynamicSetter(memberName), memberValue);
 			}
 #endif
-			else if (targetType != null && targetType.GetInterface(TypeCoercionUtility.TypeGenericIDictionary, false) != null)
+			else if (targetType != null
+#if !NETCF
+			&& targetType.GetInterface(TypeCoercionUtility.TypeGenericIDictionary, false) != null
+#endif
+			)
 			{
 				throw new TypeCoercionException(String.Format(
 					TypeCoercionUtility.ErrorGenericIDictionary,
@@ -368,18 +372,17 @@ namespace JsonFx.Serialization
 				if (targetType == typeof(DateTime))
 				{
 					DateTime date;
-					if (DateTime.TryParse(
+					try{
+					    date = DateTime.Parse(
 						(string)value,
 						CultureInfo.InvariantCulture,
-						DateTimeStyles.RoundtripKind|DateTimeStyles.AllowWhiteSpaces|DateTimeStyles.NoCurrentDateDefault,
-						out date))
-					{
+						DateTimeStyles.RoundtripKind|DateTimeStyles.AllowWhiteSpaces|DateTimeStyles.NoCurrentDateDefault);
 						if (date.Kind == DateTimeKind.Local)
 						{
 							return date.ToUniversalTime();
 						}
 						return date;
-					}
+					}catch(Exception){}
 
 					if (JsonFx.Model.Filters.MSAjaxDateFilter.TryParseMSAjaxDate(
 						(string)value,
@@ -415,16 +418,12 @@ namespace JsonFx.Serialization
 				}
 				else if (targetType == typeof(TimeSpan))
 				{
-					long ticks;
-					if (Int64.TryParse((string)value, out ticks))
-					{
-						return TimeSpan.FromTicks(ticks);
-					}
-					TimeSpan timespan;
-					if (TimeSpan.TryParse((string)value, out timespan))
-					{
-						return timespan;
-					}
+					try{
+					    return TimeSpan.FromTicks(Int64.Parse((string)value));
+					}catch(Exception){}
+					try{
+					    return TimeSpan.Parse((string)value);
+					}catch(Exception){}
 				}
 			}
 			else if (targetType == typeof(TimeSpan))
@@ -781,7 +780,10 @@ namespace JsonFx.Serialization
 				return null;
 			}
 
-			Type dictionaryType = targetType.GetInterface(TypeCoercionUtility.TypeGenericIDictionary, false);
+			Type dictionaryType = null;
+#if !NETCF
+			dictionaryType = targetType.GetInterface(TypeCoercionUtility.TypeGenericIDictionary, false);
+#endif
 			if (dictionaryType == null)
 			{
 				// not an IDictionary<TKey, TVal>
@@ -821,7 +823,10 @@ namespace JsonFx.Serialization
 				return targetType.GetElementType();
 			}
 
-			Type arrayType = targetType.GetInterface(TypeCoercionUtility.TypeGenericIEnumerable, false);
+			Type arrayType = null;
+#if !NETCF
+			arrayType = targetType.GetInterface(TypeCoercionUtility.TypeGenericIEnumerable, false);
+#endif
 			if (arrayType == null)
 			{
 				// not an IEnumerable<T>

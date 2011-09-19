@@ -526,13 +526,13 @@ namespace JsonFx.Json
 				if (!hasDecimal && !hasExponent && precision < 19)
 				{
 					// Integer value
-					decimal number;
-					if (!Decimal.TryParse(
-						buffer,
-						NumberStyles.Integer,
-						NumberFormatInfo.InvariantInfo,
-						out number))
-					{
+					decimal number = 0;
+					try{
+					    Decimal.Parse(
+    						buffer,
+    						NumberStyles.Integer,
+    						NumberFormatInfo.InvariantInfo);
+					}catch(Exception){
 						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, numPos, numLine, numCol);
 					}
 
@@ -555,12 +555,12 @@ namespace JsonFx.Json
 				{
 					// Floating Point value
 					double number;
-					if (!Double.TryParse(
-						 buffer,
-						 NumberStyles.Float,
-						 NumberFormatInfo.InvariantInfo,
-						 out number))
-					{
+					try{
+					    number = Double.Parse(
+						    buffer,
+						    NumberStyles.Float,
+						    NumberFormatInfo.InvariantInfo);
+					}catch(Exception){
 						throw new DeserializationException(JsonTokenizer.ErrorIllegalNumber, numPos, numLine, numCol);
 					}
 
@@ -698,13 +698,15 @@ namespace JsonFx.Json
 							}
 
 							// unicode ordinal
-							int utf16;
-							if (escapeSeq.Length == UnicodeEscapeLength &&
-						        Int32.TryParse(
-									escapeSeq,
-									NumberStyles.AllowHexSpecifier,
-									NumberFormatInfo.InvariantInfo,
-									out utf16))
+							int utf16 = 0;
+							bool parsed = true;
+							try{
+						        utf16 = Int32.Parse(
+    								escapeSeq,
+    								NumberStyles.AllowHexSpecifier,
+    								NumberFormatInfo.InvariantInfo);
+    						}catch(Exception){ parsed = false; };
+							if (escapeSeq.Length == UnicodeEscapeLength && parsed)
 							{
 								buffer.Append(CharUtility.ConvertFromUtf32(utf16));
 							}
