@@ -528,7 +528,7 @@ namespace JsonFx.Json
 					// Integer value
 					decimal number = 0;
 					try{
-					    Decimal.Parse(
+					    number = Decimal.Parse(
     						buffer,
     						NumberStyles.Integer,
     						NumberFormatInfo.InvariantInfo);
