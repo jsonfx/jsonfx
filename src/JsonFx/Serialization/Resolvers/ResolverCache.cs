@@ -669,7 +669,10 @@ namespace JsonFx.Serialization.Resolvers
 			// load properties into property map
 			foreach (PropertyInfo info in objectType.GetProperties(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.FlattenHierarchy))
 			{
-				if (this.Strategy.IsPropertyIgnored(info, isImmutableType))
+				// Ignore indexer properties as aren't serialized
+				// https://bugzilla.xamarin.com/show_bug.cgi?id=6821#c5
+				if (info.GetIndexParameters().Length != 0 ||
+					this.Strategy.IsPropertyIgnored(info, isImmutableType))
 				{
 					continue;
 				}
