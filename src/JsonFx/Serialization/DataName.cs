@@ -257,7 +257,11 @@ namespace JsonFx.Serialization
 				}
 			}
 
-			if (typeof(IDictionary).IsAssignableFrom(type) || type.GetInterface(TypeCoercionUtility.TypeGenericIDictionary, false) != null)
+			if (typeof(IDictionary).IsAssignableFrom(type)
+#if !NETCF
+			 || type.GetInterface(TypeCoercionUtility.TypeGenericIDictionary, false) != null
+#endif
+			   )
 			{
 				// generic IDictionary or IDictionary<,>
 				return "object";

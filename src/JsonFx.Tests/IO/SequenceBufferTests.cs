@@ -37,6 +37,17 @@ using Xunit;
 
 namespace JsonFx.IO
 {
+
+#if !NET40
+	public static class SequenceBufferHelpers
+	{
+		public static void Clear(this StringBuilder sb)
+		{
+		    sb.Length = 0;
+		}
+	}
+#endif
+
 	public class SequenceBufferTests
 	{
 		#region Constants
