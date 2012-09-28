@@ -57,7 +57,7 @@ namespace JsonFx.Model.Filters
 		{
 			var input = Stream<Token<ModelTokenType>>.Create(new[]
 				{
-					ModelGrammar.TokenPrimitive(@"\/Date(1204329599999)\/")
+					ModelGrammar.TokenPrimitive(@"/Date(1204329599999)/")
 				});
 
 			var expected = new DateTime(2008, 2, 29, 23, 59, 59, 999, DateTimeKind.Utc);
@@ -75,7 +75,7 @@ namespace JsonFx.Model.Filters
 		{
 			var input = Stream<Token<ModelTokenType>>.Create(new[]
 				{
-					ModelGrammar.TokenPrimitive(@"\/Date(1278327077768)\/")
+					ModelGrammar.TokenPrimitive(@"/Date(1278327077768)/")
 				});
 
 			var expected = new DateTime(2010, 7, 5, 10, 51, 17, 768, DateTimeKind.Utc);
@@ -93,7 +93,7 @@ namespace JsonFx.Model.Filters
 		{
 			var input = Stream<Token<ModelTokenType>>.Create(new[]
 				{
-					ModelGrammar.TokenPrimitive(@"\/Date(4102444799999)\/")
+					ModelGrammar.TokenPrimitive(@"/Date(4102444799999)/")
 				});
 
 			var expected = new DateTime(2099, 12, 31, 23, 59, 59, 999, DateTimeKind.Utc);
@@ -113,7 +113,7 @@ namespace JsonFx.Model.Filters
 
 			var input = Stream<Token<ModelTokenType>>.Create(new[]
 				{
-					ModelGrammar.TokenPrimitive(@"\/Date(-62135596800000)\/")
+					ModelGrammar.TokenPrimitive(@"/Date(-62135596800000)/")
 				});
 
 			DateTime actual;
@@ -129,7 +129,7 @@ namespace JsonFx.Model.Filters
 		{
 			var input = Stream<Token<ModelTokenType>>.Create(new[]
 				{
-					ModelGrammar.TokenPrimitive(@"\/Date(253402300800000)\/")
+					ModelGrammar.TokenPrimitive(@"/Date(253402300800000)/")
 				});
 
 			var expected = DateTime.MaxValue;
@@ -147,7 +147,7 @@ namespace JsonFx.Model.Filters
 		{
 			var input = Stream<Token<ModelTokenType>>.Create(new[]
 				{
-					ModelGrammar.TokenPrimitive(@"\/Date(1262427133000+0100)\/")
+					ModelGrammar.TokenPrimitive(@"/Date(1262427133000+0100)/")
 				});
 
 			// currently this just ignores the WCF time zone info
@@ -172,7 +172,7 @@ namespace JsonFx.Model.Filters
 
 			var expected = new[]
 				{
-					ModelGrammar.TokenPrimitive(@"\/Date(1204329599999)\/")
+					ModelGrammar.TokenPrimitive(@"/Date(1204329599999)/")
 				};
 
 			IEnumerable<Token<ModelTokenType>> actual;
@@ -193,7 +193,7 @@ namespace JsonFx.Model.Filters
 
 			var expected = new[]
 				{
-					ModelGrammar.TokenPrimitive(@"\/Date(1204358399999)\/")
+					ModelGrammar.TokenPrimitive(@"/Date(1204358399999)/")
 				};
 
 			IEnumerable<Token<ModelTokenType>> actual;
@@ -213,7 +213,7 @@ namespace JsonFx.Model.Filters
 
 			var expected = new[]
 				{
-					ModelGrammar.TokenPrimitive(@"\/Date(1204329599999)\/")
+					ModelGrammar.TokenPrimitive(@"/Date(1204329599999)/")
 				};
 
 			IEnumerable<Token<ModelTokenType>> actual;
@@ -233,7 +233,7 @@ namespace JsonFx.Model.Filters
 
 			var expected = new[]
 				{
-					ModelGrammar.TokenPrimitive(@"\/Date(1278327077768)\/")
+					ModelGrammar.TokenPrimitive(@"/Date(1278327077768)/")
 				};
 
 			IEnumerable<Token<ModelTokenType>> actual;
@@ -254,7 +254,7 @@ namespace JsonFx.Model.Filters
 
 			var expected = new[]
 				{
-					ModelGrammar.TokenPrimitive(@"\/Date(1278352277768)\/")
+					ModelGrammar.TokenPrimitive(@"/Date(1278352277768)/")
 				};
 
 			IEnumerable<Token<ModelTokenType>> actual;
@@ -274,7 +274,7 @@ namespace JsonFx.Model.Filters
 
 			var expected = new[]
 				{
-					ModelGrammar.TokenPrimitive(@"\/Date(1278327077768)\/")
+					ModelGrammar.TokenPrimitive(@"/Date(1278327077768)/")
 				};
 
 			IEnumerable<Token<ModelTokenType>> actual;
@@ -294,7 +294,7 @@ namespace JsonFx.Model.Filters
 
 			var expected = new[]
 				{
-					ModelGrammar.TokenPrimitive(@"\/Date(4102444799999)\/")
+					ModelGrammar.TokenPrimitive(@"/Date(4102444799999)/")
 				};
 
 			IEnumerable<Token<ModelTokenType>> actual;
@@ -315,7 +315,7 @@ namespace JsonFx.Model.Filters
 
 			var expected = new[]
 				{
-					ModelGrammar.TokenPrimitive(@"\/Date(4102473599999)\/")
+					ModelGrammar.TokenPrimitive(@"/Date(4102473599999)/")
 				};
 
 			IEnumerable<Token<ModelTokenType>> actual;
@@ -335,7 +335,7 @@ namespace JsonFx.Model.Filters
 
 			var expected = new[]
 				{
-					ModelGrammar.TokenPrimitive(@"\/Date(4102444799999)\/")
+					ModelGrammar.TokenPrimitive(@"/Date(4102444799999)/")
 				};
 
 			IEnumerable<Token<ModelTokenType>> actual;
@@ -355,7 +355,7 @@ namespace JsonFx.Model.Filters
 
 			var expected = new[]
 				{
-					ModelGrammar.TokenPrimitive(@"\/Date(-62135596800000)\/")
+					ModelGrammar.TokenPrimitive(@"/Date(-62135596800000)/")
 				};
 
 			IEnumerable<Token<ModelTokenType>> actual;
@@ -375,7 +375,7 @@ namespace JsonFx.Model.Filters
 
 			var expected = new[]
 				{
-					ModelGrammar.TokenPrimitive(@"\/Date(253402300800000)\/")
+					ModelGrammar.TokenPrimitive(@"/Date(253402300800000)/")
 				};
 
 			IEnumerable<Token<ModelTokenType>> actual;

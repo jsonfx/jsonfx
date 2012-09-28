@@ -118,7 +118,7 @@ namespace JsonFx.Json
 					new DateTime(2010, 7, 5, 10, 51, 17, 768, DateTimeKind.Utc),
 					"Normal string after"
 				};
-			var expected = @"[""Normal string before"",""\\/Date(1204329599999)\\/"",""\\/Date(1278327077768)\\/"",""Normal string after""]";
+			var expected = @"[""Normal string before"",""/Date(1204329599999)/"",""/Date(1278327077768)/"",""Normal string after""]";
 
 			var writer = new JsonWriter(
 				new DataWriterSettings(new MSAjaxDateFilter(), new Iso8601DateFilter()));
