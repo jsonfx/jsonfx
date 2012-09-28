@@ -264,7 +264,17 @@ namespace JsonFx.Serialization
 			}
 			else if (memberMap != null && memberMap.Setter != null)
 			{
-				memberMap.Setter(target, this.CoerceType(memberMap.Type, memberValue));
+				if (memberValue == null)
+				{
+					memberMap.Setter(target,
+						memberMap.Type.IsValueType ?
+						Activator.CreateInstance(memberMap.Type, true) :
+						null);
+				}
+				else
+				{
+					memberMap.Setter(target, this.CoerceType(memberMap.Type, memberValue));
+				}
 			}
 
 			// ignore non-applicable members

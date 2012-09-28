@@ -335,14 +335,35 @@ namespace JsonFx.Json
 				.GetResponse()
 				.GetResponseStream())
 			{
-				TextReader input = new StreamReader(stream);
+				var input = new StreamReader(stream);
 
-				JsonReader reader = new JsonReader(new DataReaderSettings());
+				var reader = new JsonReader(new DataReaderSettings());
 
 				dynamic actual = reader.Read(input);
 
 				Assert.Equal(2, actual.Length);
 			}
+		}
+
+		class ClassA
+		{
+			public int a;
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void Read_NullValueTypes()
+		{
+			var input = "{a:null}";
+
+			var settings = new DataReaderSettings();
+			settings.AllowNullValueTypes = true;
+
+			var reader = new JsonReader(settings);
+
+			var actual = reader.Read<ClassA>(input);
+
+			Assert.Equal(default(int), actual.a);
 		}
 
 		#endregion Object Tests
