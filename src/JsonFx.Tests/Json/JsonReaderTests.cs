@@ -37,6 +37,7 @@ using JsonFx.Serialization;
 using Xunit;
 
 using Assert=JsonFx.AssertPatched;
+using System.Net;
 
 namespace JsonFx.Json
 {
@@ -324,6 +325,24 @@ namespace JsonFx.Json
 				enumerator.Current);
 
 			Assert.False(enumerator.MoveNext());
+		}
+
+		[Fact(Skip="Brittle test requires network access and external API")]
+		[Trait(TraitName, TraitValue)]
+		public void Read_DeserializesStreamOfObject()
+		{
+			using (var stream = WebRequest.Create("https://api.twitter.com/1/statuses/user_timeline.json?screen_name=jsonfx&count=2")
+				.GetResponse()
+				.GetResponseStream())
+			{
+				TextReader input = new StreamReader(stream);
+
+				JsonReader reader = new JsonReader(new DataReaderSettings());
+
+				dynamic actual = reader.Read(input);
+
+				Assert.Equal(2, actual.Length);
+			}
 		}
 
 		#endregion Object Tests

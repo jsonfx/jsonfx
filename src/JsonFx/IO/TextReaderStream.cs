@@ -234,8 +234,6 @@ namespace JsonFx.IO
 				return this.current;
 			}
 
-			// pop the previously peeked char
-			this.Reader.Read();
 			if (this.chunk != null)
 			{
 				this.chunk.Append(this.current);
@@ -260,14 +258,14 @@ namespace JsonFx.IO
 		private void EnsureReady()
 		{
 			// only execute when requested
-			if (this.isReady)
+			if (this.isReady || this.isCompleted)
 			{
 				return;
 			}
 			this.isReady = true;
 
 			// lazy execution of reader
-			int value = this.Reader.Peek();
+			int value = this.Reader.Read();
 			this.isCompleted = (value < 0);
 
 			// store the current item or null if complete
