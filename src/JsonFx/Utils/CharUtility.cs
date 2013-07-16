@@ -88,9 +88,7 @@ namespace JsonFx.Utils
 		/// <returns></returns>
 		public static bool IsControl(char ch)
 		{
-			return
-				(ch <= '\u001F') ||
-			    ((ch >= '\u007F') && (ch <= '\u009F'));
+			return (ch <= '\u001F');
 		}
 
 		/// <summary>

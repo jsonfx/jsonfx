@@ -427,6 +427,22 @@ namespace JsonFx.Json
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
+		public void GetTokens_HighControl_Accepted()
+		{
+			const string input = "\"\u0082\"";
+			var expected = new []
+			{
+				ModelGrammar.TokenPrimitive("\u0082")
+			};
+
+			var tokenizer = new JsonReader.JsonTokenizer();
+			var actual = tokenizer.GetTokens(input).ToArray();
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void GetTokens_StringImproperlyEscapedChars_ReturnsStringTokenWithSimpleChars()
 		{
 			const string input = @"""\u\u1\u12\u123\u12345""";
