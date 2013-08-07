@@ -529,6 +529,24 @@ namespace JsonFx.Json
 
 		[Fact]
 		[Trait(TraitName, TraitValue)]
+		public void Format_StringTokenSurrogatePair_ReturnsString()
+		{
+			var input = new[]
+			{
+				// 'BLUE HEART' (U+1F499)
+				ModelGrammar.TokenPrimitive("\uD83D\uDC99")
+			};
+
+			const string expected = @"""\u1F499""";
+
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		[Trait(TraitName, TraitValue)]
 		public void Format_StringTokenUnescapedSingleQuote_ReturnsString()
 		{
 			var input = new[]
