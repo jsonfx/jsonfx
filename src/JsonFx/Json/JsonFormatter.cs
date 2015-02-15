@@ -511,12 +511,14 @@ namespace JsonFx.Json
 
 			protected virtual void WriteString(TextWriter writer, string value)
 			{
-				int start = 0,
-					length = value.Length;
-
 				writer.Write(JsonGrammar.OperatorStringDelim);
 
-				for (int i=start; i<length; i++)
+				int[] combineCharIndex = StringInfo.ParseCombiningCharacters(value);
+
+				int start = 0,
+					length = combineCharIndex.Length;
+
+				foreach (int i in combineCharIndex)
 				{
 					char ch = value[i];
 
