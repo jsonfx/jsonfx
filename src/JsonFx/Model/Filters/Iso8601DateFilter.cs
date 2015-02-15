@@ -178,17 +178,16 @@ namespace JsonFx.Model.Filters
 		/// <returns>true if parsing was successful</returns>
 		private static bool TryParseIso8601(string date, out DateTime value)
 		{
-			try{
-			    value = DateTime.ParseExact(
-				date,
+			if (!DateTime.TryParseExact(date,
 				Iso8601DateFilter.FullFormat,
 				CultureInfo.InvariantCulture,
-				DateTimeStyles.RoundtripKind|DateTimeStyles.AllowWhiteSpaces|DateTimeStyles.NoCurrentDateDefault
-				);
-			}catch(Exception){
+				DateTimeStyles.RoundtripKind | DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.NoCurrentDateDefault,
+				out value))
+			{
 				value = default(DateTime);
 				return false;
 			}
+
 
 			if (value.Kind == DateTimeKind.Local)
 			{
