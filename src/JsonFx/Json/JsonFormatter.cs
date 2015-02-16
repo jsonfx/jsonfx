@@ -511,8 +511,8 @@ namespace JsonFx.Json
 
 			protected virtual void WriteString(TextWriter writer, string value)
 			{
-                                int start = 0,
- 					length = value.Length;
+				int start = 0,
+ 				length = value.Length;
  
   				writer.Write(JsonGrammar.OperatorStringDelim);
 
@@ -569,23 +569,22 @@ namespace JsonFx.Json
 							default:
 							{
 #if SILVERLIGHT
-                                                                if (((ch >= 55296)
-                                                                    && (ch <= 56319)) || ((ch >= 56320) && (ch <= 57343)))
-                                                                {
+								if (((ch >= 55296) && (ch <= 56319)) || ((ch >= 56320) && (ch <= 57343)))
+								{
 #else
-                                                                if (char.IsSurrogate(ch))
-                                                                {
+								if (char.IsSurrogate(ch))
+								{
 #endif
-                                                                    writer.Write("\\u");
-                                                                    writer.Write(((int)ch).ToString("x4"));
-                                                                    continue;
-                                                                }
-                                                                else
-                                                                {
-                                                                    writer.Write("\\u");
-                                                                    writer.Write(CharUtility.ConvertToUtf32(value, i).ToString("X4"));
-                                                                    continue;
-                                                                }
+									writer.Write("\\u");
+									writer.Write(((int)ch).ToString("x4"));
+									continue;
+								}
+								else
+								{
+									writer.Write("\\u");
+									writer.Write(CharUtility.ConvertToUtf32(value, i).ToString("X4"));
+									continue;
+								}
 							}
 						}
 					}
