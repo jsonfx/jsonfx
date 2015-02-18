@@ -568,23 +568,9 @@ namespace JsonFx.Json
 							}
 							default:
 							{
-#if SILVERLIGHT
-								if (((ch >= 55296) && (ch <= 56319)) || ((ch >= 56320) && (ch <= 57343)))
-								{
-#else
-								if (char.IsSurrogate(ch))
-								{
-#endif
-									writer.Write("\\u");
-									writer.Write(((int)ch).ToString("x4"));
-									continue;
-								}
-								else
-								{
-									writer.Write("\\u");
-									writer.Write(CharUtility.ConvertToUtf32(value, i).ToString("X4"));
-									continue;
-								}
+								writer.Write("\\u");
+								writer.Write(CharUtility.ConvertToUtf32(value, i).ToString("X4"));
+								continue;
 							}
 						}
 					}
