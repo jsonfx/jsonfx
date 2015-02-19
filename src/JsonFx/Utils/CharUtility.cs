@@ -169,7 +169,7 @@ namespace JsonFx.Utils
 #if SILVERLIGHT
 			return (int)value[index];
 #else
-			if (char.IsSurrogate(value[index]))
+			if (char.IsSurrogate(value, index))
 			{
 				return ((int)value[index]);
 			}

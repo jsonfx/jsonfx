@@ -512,11 +512,11 @@ namespace JsonFx.Json
 			protected virtual void WriteString(TextWriter writer, string value)
 			{
 				int start = 0,
- 				length = value.Length;
- 
-  				writer.Write(JsonGrammar.OperatorStringDelim);
+					length = value.Length;
 
- 				for (int i=start; i<length; i++)
+				writer.Write(JsonGrammar.OperatorStringDelim);
+
+				for (int i=start; i<length; i++)
 				{
 					char ch = value[i];
 
