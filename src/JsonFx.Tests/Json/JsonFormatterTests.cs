@@ -1270,5 +1270,24 @@ namespace JsonFx.Json
 		}
 
 		#endregion Input Edge Case Tests
+
+		#region Emoji Tests
+		[Fact]
+		[Trait(TraitName, TraitValue)]
+		public void Format_StringTokenWithEmoji_ReturnsStringWithEmoji()
+		{
+			var input = new[]
+			{
+				ModelGrammar.TokenPrimitive("Text with 😜 emoji 🎉"),
+			};
+
+			const string expected = @"""Text with \uD83D\uDE1C emoji \uD83C\uDF89""";
+
+			var formatter = new JsonWriter.JsonFormatter(new DataWriterSettings());
+			var actual = formatter.Format(input);
+
+			Assert.Equal(expected, actual);
+		}
+		#endregion
 	}
 }
