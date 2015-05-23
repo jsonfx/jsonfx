@@ -1,4 +1,5 @@
 ﻿#region License
+
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -26,60 +27,60 @@
 	THE SOFTWARE.
 
 \*---------------------------------------------------------------------------------*/
+
 #endregion License
 
-using System;
 using System.Text;
 
 namespace JsonFx.IO
 {
-	/// <summary>
-	/// Supports a simple iteration over a text input tracking line/column/position
-	/// </summary>
-	public interface ITextStream : IStream<char>
-	{
-		#region Properties
+    /// <summary>
+    /// Supports a simple iteration over a text input tracking line/column/position
+    /// </summary>
+    public interface ITextStream : IStream<char>
+    {
+        #region Properties
 
-		/// <summary>
-		/// Gets the total number of characters read from the input
-		/// </summary>
-		int Column
-		{
-			get;
-		}
+        /// <summary>
+        /// Gets the total number of characters read from the input
+        /// </summary>
+        int Column
+        {
+            get;
+        }
 
-		/// <summary>
-		/// Gets the total number of lines read from the input
-		/// </summary>
-		int Line
-		{
-			get;
-		}
+        /// <summary>
+        /// Gets the total number of lines read from the input
+        /// </summary>
+        int Line
+        {
+            get;
+        }
 
-		/// <summary>
-		/// Gets the current position within the input
-		/// </summary>
-		long Index
-		{
-			get;
-		}
+        /// <summary>
+        /// Gets the current position within the input
+        /// </summary>
+        long Index
+        {
+            get;
+        }
 
-		#endregion Properties
+        #endregion Properties
 
-		#region Methods
+        #region Methods
 
-		/// <summary>
-		/// Ends chunking at the current index and returns the buffered text chunk
-		/// </summary>
-		/// <returns></returns>
-		new string EndChunk();
+        /// <summary>
+        /// Ends chunking at the current index and returns the buffered text chunk
+        /// </summary>
+        /// <returns></returns>
+        new string EndChunk();
 
-		/// <summary>
-		/// Ends chunking at the current index and writes the buffered text chunk into the provided StringBuilder
-		/// </summary>
-		/// <returns></returns>
-		void EndChunk(StringBuilder buffer);
+        /// <summary>
+        /// Ends chunking at the current index and writes the buffered text chunk into the provided StringBuilder
+        /// </summary>
+        /// <returns></returns>
+        void EndChunk(StringBuilder buffer);
 
-		#endregion Methods
-	}
+        #endregion Methods
+    }
 }

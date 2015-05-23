@@ -1,4 +1,5 @@
 #region License
+
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -26,87 +27,87 @@
 	THE SOFTWARE.
 
 \*---------------------------------------------------------------------------------*/
+
 #endregion License
 
-using System;
 using System.Collections.Generic;
 using System.Reflection;
 
 namespace JsonFx.Serialization.Resolvers
 {
-	/// <summary>
-	/// Controls name resolution for IDataReader / IDataWriter using plain old CLR object (POCO) names
-	/// </summary>
-	public class PocoResolverStrategy : IResolverStrategy
-	{
-		#region Name Resolution Methods
+    /// <summary>
+    /// Controls name resolution for IDataReader / IDataWriter using plain old CLR object (POCO) names
+    /// </summary>
+    public class PocoResolverStrategy : IResolverStrategy
+    {
+        #region Name Resolution Methods
 
-		/// <summary>
-		/// Gets a value indicating if the property is to be serialized.
-		/// </summary>
-		/// <param name="member"></param>
-		/// <param name="isImmutableType"></param>
-		/// <returns></returns>
-		/// <remarks>default implementation is must be read/write properties, or immutable</remarks>
-		public virtual bool IsPropertyIgnored(PropertyInfo member, bool isImmutableType)
-		{
-			// must be public read/write (or anonymous object)
-			MethodInfo getter = member.CanRead ? member.GetGetMethod() : null;
-			MethodInfo setter = member.CanWrite ? member.GetSetMethod() : null;
+        /// <summary>
+        /// Gets a value indicating if the property is to be serialized.
+        /// </summary>
+        /// <param name="member"></param>
+        /// <param name="isImmutableType"></param>
+        /// <returns></returns>
+        /// <remarks>default implementation is must be read/write properties, or immutable</remarks>
+        public virtual bool IsPropertyIgnored(PropertyInfo member, bool isImmutableType)
+        {
+            // must be public read/write (or anonymous object)
+            MethodInfo getter = member.CanRead ? member.GetGetMethod() : null;
+            MethodInfo setter = member.CanWrite ? member.GetSetMethod() : null;
 
-			return
-				(getter == null || !getter.IsPublic) ||
-				(!isImmutableType && (setter == null || !setter.IsPublic));
-		}
+            return
+                (getter == null || !getter.IsPublic) ||
+                (!isImmutableType && (setter == null || !setter.IsPublic));
+        }
 
-		/// <summary>
-		/// Gets a value indicating if the field is to be serialized.
-		/// </summary>
-		/// <param name="member"></param>
-		/// <returns></returns>
-		/// <remarks>default implementation is must be public, non-readonly field</remarks>
-		public virtual bool IsFieldIgnored(FieldInfo member)
-		{
-			// must be public read/write
-			return (!member.IsPublic || member.IsInitOnly);
-		}
+        /// <summary>
+        /// Gets a value indicating if the field is to be serialized.
+        /// </summary>
+        /// <param name="member"></param>
+        /// <returns></returns>
+        /// <remarks>default implementation is must be public, non-readonly field</remarks>
+        public virtual bool IsFieldIgnored(FieldInfo member)
+        {
+            // must be public read/write
+            return (!member.IsPublic || member.IsInitOnly);
+        }
 
-		/// <summary>
-		/// Gets a delegate which determines if the property or field should not be serialized based upon its value.
-		/// </summary>
-		/// <param name="member"></param>
-		/// <returns>if has a value equivalent to the DefaultValueAttribute</returns>
-		/// <remarks>
-		/// This is useful when default values need not be serialized.
-		/// </remarks>
-		public virtual ValueIgnoredDelegate GetValueIgnoredCallback(MemberInfo member)
-		{
-			return null;
-		}
+        /// <summary>
+        /// Gets a delegate which determines if the property or field should not be serialized based upon its value.
+        /// </summary>
+        /// <param name="member"></param>
+        /// <returns>if has a value equivalent to the DefaultValueAttribute</returns>
+        /// <remarks>
+        /// This is useful when default values need not be serialized.
+        /// </remarks>
+        public virtual ValueIgnoredDelegate GetValueIgnoredCallback(MemberInfo member)
+        {
+            return null;
+        }
 
-		/// <summary>
-		/// Gets the serialized name for the member.
-		/// </summary>
-		/// <param name="member"></param>
-		/// <returns></returns>
-		public virtual IEnumerable<DataName> GetName(MemberInfo member)
-		{
-			return null;
-		}
+        /// <summary>
+        /// Gets the serialized name for the member.
+        /// </summary>
+        /// <param name="member"></param>
+        /// <returns></returns>
+        public virtual IEnumerable<DataName> GetName(MemberInfo member)
+        {
+            return null;
+        }
 
-		/// <summary>
-		/// Allows a strategy to perform a custom sort order to outputted members
-		/// </summary>
-		/// <param name="members"></param>
-		/// <returns></returns>
-		/// <remarks>
-		/// A common usage is to ensure that Attributes sort first
-		/// </remarks>
-		public virtual IEnumerable<MemberMap> SortMembers(IEnumerable<MemberMap> members)
-		{
-			return members;
-		}
+        /// <summary>
+        /// Allows a strategy to perform a custom sort order to outputted members
+        /// </summary>
+        /// <param name="members"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// A common usage is to ensure that Attributes sort first
+        /// </remarks>
+        public virtual IEnumerable<MemberMap> SortMembers(IEnumerable<MemberMap> members)
+        {
+            return members;
+        }
 
-		#endregion Name Resolution Methods
-	}
+        #endregion Name Resolution Methods
+    }
 }

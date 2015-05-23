@@ -1,4 +1,5 @@
 ﻿#region License
+
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -26,6 +27,7 @@
 	THE SOFTWARE.
 
 \*---------------------------------------------------------------------------------*/
+
 #endregion License
 
 using System;
@@ -34,277 +36,277 @@ using System.Collections.Generic;
 
 namespace JsonFx.IO
 {
-	/// <summary>
-	/// Lazily executes an enumerator exposing the results as an <see cref="IList<T>"/>
-	/// </summary>
-	internal class SequenceBuffer<T> : IList<T>
-	{
-		#region Enumerator
+    /// <summary>
+    /// Lazily executes an enumerator exposing the results as an <see cref="IList<T>"/>
+    /// </summary>
+    internal class SequenceBuffer<T> : IList<T>
+    {
+        #region Enumerator
 
-		private sealed class Enumerator : IEnumerator<T>
-		{
-			#region Fields
+        private sealed class Enumerator : IEnumerator<T>
+        {
+            #region Fields
 
-			private readonly SequenceBuffer<T> Sequence;
-			private int Index;
+            private readonly SequenceBuffer<T> Sequence;
+            private int Index;
 
-			#endregion Fields
+            #endregion Fields
 
-			#region Init
+            #region Init
 
-			/// <summary>
-			/// Ctor
-			/// </summary>
-			/// <param name="sequence"></param>
-			public Enumerator(SequenceBuffer<T> sequence)
-			{
-				this.Sequence = sequence;
-				this.Index = -1;
-			}
+            /// <summary>
+            /// Ctor
+            /// </summary>
+            /// <param name="sequence"></param>
+            public Enumerator(SequenceBuffer<T> sequence)
+            {
+                this.Sequence = sequence;
+                this.Index = -1;
+            }
 
-			#endregion Init
+            #endregion Init
 
-			#region IEnumerator<T> Members
+            #region IEnumerator<T> Members
 
-			public T Current
-			{
-				get
-				{
-					if (this.Index < 0)
-					{
-						throw new InvalidOperationException("Enumerator not started");
-					}
-					if (this.Index >= this.Sequence.Cache.Count)
-					{
-						throw new InvalidOperationException("Enumerator has ended");
-					}
+            public T Current
+            {
+                get
+                {
+                    if (this.Index < 0)
+                    {
+                        throw new InvalidOperationException("Enumerator not started");
+                    }
+                    if (this.Index >= this.Sequence.Cache.Count)
+                    {
+                        throw new InvalidOperationException("Enumerator has ended");
+                    }
 
-					return this.Sequence[this.Index];
-				}
-			}
+                    return this.Sequence[this.Index];
+                }
+            }
 
-			#endregion IEnumerator<T> Members
+            #endregion IEnumerator<T> Members
 
-			#region IEnumerator Members
+            #region IEnumerator Members
 
-			object IEnumerator.Current
-			{
-				get { return this.Current; }
-			}
+            object IEnumerator.Current
+            {
+                get { return this.Current; }
+            }
 
-			public bool MoveNext()
-			{
-				int next = this.Index+1;
-				if (this.Sequence.TryAdvance(next))
-				{
-					this.Index = next;
-					return true;
-				}
+            public bool MoveNext()
+            {
+                int next = this.Index + 1;
+                if (this.Sequence.TryAdvance(next))
+                {
+                    this.Index = next;
+                    return true;
+                }
 
-				return false;
-			}
+                return false;
+            }
 
-			public void Reset()
-			{
-				this.Index = -1;
-			}
+            public void Reset()
+            {
+                this.Index = -1;
+            }
 
-			#endregion IEnumerator Members
+            #endregion IEnumerator Members
 
-			#region IDisposable Members
+            #region IDisposable Members
 
-			void IDisposable.Dispose()
-			{
-			}
+            void IDisposable.Dispose()
+            {
+            }
 
-			#endregion IDisposable Members
-		}
+            #endregion IDisposable Members
+        }
 
-		#endregion Enumerator
+        #endregion Enumerator
 
-		#region Fields
+        #region Fields
 
-		private readonly List<T> Cache;
-		private readonly IEnumerator<T> Iterator;
-		private bool isComplete;
+        private readonly List<T> Cache;
+        private readonly IEnumerator<T> Iterator;
+        private bool isComplete;
 
-		#endregion Fields
+        #endregion Fields
 
-		#region Init
+        #region Init
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="sequence"></param>
-		public SequenceBuffer(IEnumerable<T> sequence)
-		{
-			if (sequence == null)
-			{
-				sequence = new T[0];
-			}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="sequence"></param>
+        public SequenceBuffer(IEnumerable<T> sequence)
+        {
+            if (sequence == null)
+            {
+                sequence = new T[0];
+            }
 
-			this.Cache = new List<T>();
-			this.Iterator = sequence.GetEnumerator();
-		}
+            this.Cache = new List<T>();
+            this.Iterator = sequence.GetEnumerator();
+        }
 
-		#endregion Init
+        #endregion Init
 
-		#region IList<T> Members
+        #region IList<T> Members
 
-		int IList<T>.IndexOf(T item)
-		{
-			int i = 0;
-			foreach (var element in this)
-			{
-				if (Object.Equals(element, item))
-				{
-					return i;
-				}
+        int IList<T>.IndexOf(T item)
+        {
+            int i = 0;
+            foreach (var element in this)
+            {
+                if (Object.Equals(element, item))
+                {
+                    return i;
+                }
 
-				i++;
-			}
+                i++;
+            }
 
-			return -1;
-		}
+            return -1;
+        }
 
-		void IList<T>.Insert(int index, T item)
-		{
-			throw new NotSupportedException();
-		}
+        void IList<T>.Insert(int index, T item)
+        {
+            throw new NotSupportedException();
+        }
 
-		void IList<T>.RemoveAt(int index)
-		{
-			throw new NotSupportedException();
-		}
+        void IList<T>.RemoveAt(int index)
+        {
+            throw new NotSupportedException();
+        }
 
-		public T this[int index]
-		{
-			get
-			{
-				this.TryAdvance(index);
-				return this.Cache[index];
-			}
-		}
+        public T this[int index]
+        {
+            get
+            {
+                this.TryAdvance(index);
+                return this.Cache[index];
+            }
+        }
 
-		T IList<T>.this[int index]
-		{
-			get
-			{
-				this.TryAdvance(index);
-				return this.Cache[index];
-			}
-			set
-			{
-				throw new NotImplementedException();
-			}
-		}
+        T IList<T>.this[int index]
+        {
+            get
+            {
+                this.TryAdvance(index);
+                return this.Cache[index];
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
 
-		#endregion IList<T> Members
+        #endregion IList<T> Members
 
-		#region ICollection<T> Members
+        #region ICollection<T> Members
 
-		void ICollection<T>.Add(T item)
-		{
-			throw new NotSupportedException();
-		}
+        void ICollection<T>.Add(T item)
+        {
+            throw new NotSupportedException();
+        }
 
-		void ICollection<T>.Clear()
-		{
-			throw new NotSupportedException();
-		}
+        void ICollection<T>.Clear()
+        {
+            throw new NotSupportedException();
+        }
 
-		bool ICollection<T>.Contains(T item)
-		{
-			foreach (var element in this)
-			{
-				if (Object.Equals(element, item))
-				{
-					return true;
-				}
-			}
+        bool ICollection<T>.Contains(T item)
+        {
+            foreach (var element in this)
+            {
+                if (Object.Equals(element, item))
+                {
+                    return true;
+                }
+            }
 
-			return false;
-		}
+            return false;
+        }
 
-		void ICollection<T>.CopyTo(T[] array, int arrayIndex)
-		{
-			this.SeekToEnd();
-			this.Cache.CopyTo(array, arrayIndex);
-		}
+        void ICollection<T>.CopyTo(T[] array, int arrayIndex)
+        {
+            this.SeekToEnd();
+            this.Cache.CopyTo(array, arrayIndex);
+        }
 
-		int ICollection<T>.Count
-		{
-			get
-			{
-				this.SeekToEnd();
-				return this.Cache.Count;
-			}
-		}
+        int ICollection<T>.Count
+        {
+            get
+            {
+                this.SeekToEnd();
+                return this.Cache.Count;
+            }
+        }
 
-		public bool IsReadOnly
-		{
-			get { return true; }
-		}
+        public bool IsReadOnly
+        {
+            get { return true; }
+        }
 
-		bool ICollection<T>.Remove(T item)
-		{
-			throw new NotSupportedException();
-		}
+        bool ICollection<T>.Remove(T item)
+        {
+            throw new NotSupportedException();
+        }
 
-		#endregion ICollection<T> Members
+        #endregion ICollection<T> Members
 
-		#region IEnumerable<T> Members
+        #region IEnumerable<T> Members
 
-		IEnumerator<T> IEnumerable<T>.GetEnumerator()
-		{
-			return new SequenceBuffer<T>.Enumerator(this);
-		}
+        IEnumerator<T> IEnumerable<T>.GetEnumerator()
+        {
+            return new SequenceBuffer<T>.Enumerator(this);
+        }
 
-		#endregion IEnumerable<T> Members
+        #endregion IEnumerable<T> Members
 
-		#region IEnumerable Members
+        #region IEnumerable Members
 
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return new SequenceBuffer<T>.Enumerator(this);
-		}
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return new SequenceBuffer<T>.Enumerator(this);
+        }
 
-		#endregion IEnumerable Members
+        #endregion IEnumerable Members
 
-		#region Methods
+        #region Methods
 
-		public bool TryAdvance(int index)
-		{
-			if (index < this.Cache.Count)
-			{
-				return true;
-			}
-			if (this.isComplete)
-			{
-				return false;
-			}
+        public bool TryAdvance(int index)
+        {
+            if (index < this.Cache.Count)
+            {
+                return true;
+            }
+            if (this.isComplete)
+            {
+                return false;
+            }
 
-			while ((index >= this.Cache.Count) &&
-				this.Iterator.MoveNext())
-			{
-				this.Cache.Add(this.Iterator.Current);
-			}
+            while ((index >= this.Cache.Count) &&
+                this.Iterator.MoveNext())
+            {
+                this.Cache.Add(this.Iterator.Current);
+            }
 
-			this.isComplete = (index >= this.Cache.Count);
+            this.isComplete = (index >= this.Cache.Count);
 
-			return !this.isComplete;
-		}
+            return !this.isComplete;
+        }
 
-		private void SeekToEnd()
-		{
-			while (this.Iterator.MoveNext())
-			{
-				this.Cache.Add(this.Iterator.Current);
-			}
+        private void SeekToEnd()
+        {
+            while (this.Iterator.MoveNext())
+            {
+                this.Cache.Add(this.Iterator.Current);
+            }
 
-			this.isComplete = true;
-		}
+            this.isComplete = true;
+        }
 
-		#endregion Methods
-	}
+        #endregion Methods
+    }
 }

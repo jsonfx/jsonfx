@@ -1,4 +1,5 @@
 ﻿#region License
+
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -26,6 +27,7 @@
 	THE SOFTWARE.
 
 \*---------------------------------------------------------------------------------*/
+
 #endregion License
 
 using System;
@@ -33,194 +35,194 @@ using System.Collections.Generic;
 
 namespace JsonFx.IO
 {
-	/// <summary>
-	/// Supports a simple iteration over a list with ability to capture a subsequence
-	/// </summary>
-	internal class ListStream<T> : Stream<T>
-	{
-		#region Fields
+    /// <summary>
+    /// Supports a simple iteration over a list with ability to capture a subsequence
+    /// </summary>
+    internal class ListStream<T> : Stream<T>
+    {
+        #region Fields
 
-		private bool isCompleted;
-		private bool isReady;
-		private T current;
+        private bool isCompleted;
+        private bool isReady;
+        private T current;
 
-		private readonly IList<T> Buffer;
-		private int index = -1;
-		private int start = -1;
+        private readonly IList<T> Buffer;
+        private int index = -1;
+        private int start = -1;
 
-		#endregion Fields
+        #endregion Fields
 
-		#region Init
+        #region Init
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="value"></param>
-		public ListStream(IList<T> value)
-		{
-			this.Buffer = value ?? new T[0];
-		}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="value"></param>
+        public ListStream(IList<T> value)
+        {
+            this.Buffer = value ?? new T[0];
+        }
 
-		#endregion Init
+        #endregion Init
 
-		#region Chunking Members
+        #region Chunking Members
 
-		/// <summary>
-		/// Gets the number of characters currently chunked
-		/// </summary>
-		public override int ChunkSize
-		{
-			get
-			{
-				if (this.start < 0)
-				{
-					throw new InvalidOperationException("Not currently chunking.");
-				}
+        /// <summary>
+        /// Gets the number of characters currently chunked
+        /// </summary>
+        public override int ChunkSize
+        {
+            get
+            {
+                if (this.start < 0)
+                {
+                    throw new InvalidOperationException("Not currently chunking.");
+                }
 
-				return (1+this.index-this.start);
-			}
-		}
+                return (1 + this.index - this.start);
+            }
+        }
 
-		/// <summary>
-		/// Gets a value indicating if the <see cref="ListStream<T>"/> is currently chunking
-		/// </summary>
-		public override bool IsChunking
-		{
-			get { return (this.start >= 0); }
-		}
+        /// <summary>
+        /// Gets a value indicating if the <see cref="ListStream<T>"/> is currently chunking
+        /// </summary>
+        public override bool IsChunking
+        {
+            get { return (this.start >= 0); }
+        }
 
-		/// <summary>
-		/// Begins chunking at the current index
-		/// </summary>
-		public override void BeginChunk()
-		{
-			this.start = this.index+1;
-		}
+        /// <summary>
+        /// Begins chunking at the current index
+        /// </summary>
+        public override void BeginChunk()
+        {
+            this.start = this.index + 1;
+        }
 
-		/// <summary>
-		/// Ends chunking at the current index and returns the buffered chunk
-		/// </summary>
-		/// <returns></returns>
-		public override IEnumerable<T> EndChunk()
-		{
-			if (this.start < 0)
-			{
-				throw new InvalidOperationException("Not currently chunking.");
-			}
+        /// <summary>
+        /// Ends chunking at the current index and returns the buffered chunk
+        /// </summary>
+        /// <returns></returns>
+        public override IEnumerable<T> EndChunk()
+        {
+            if (this.start < 0)
+            {
+                throw new InvalidOperationException("Not currently chunking.");
+            }
 
-			// build chunk value
-			IEnumerable<T> value = new Subsequence<T>(this.Buffer, this.start, (1+this.index-this.start));
+            // build chunk value
+            IEnumerable<T> value = new Subsequence<T>(this.Buffer, this.start, (1 + this.index - this.start));
 
-			// reset chunk start
-			this.start = -1;
+            // reset chunk start
+            this.start = -1;
 
-			return value;
-		}
+            return value;
+        }
 
-		#endregion Chunking Members
+        #endregion Chunking Members
 
-		#region IStream<T> Members
+        #region IStream<T> Members
 
-		/// <summary>
-		/// Determines if the input sequence has reached the end
-		/// </summary>
-		public override bool IsCompleted
-		{
-			get
-			{
-				this.EnsureReady();
+        /// <summary>
+        /// Determines if the input sequence has reached the end
+        /// </summary>
+        public override bool IsCompleted
+        {
+            get
+            {
+                this.EnsureReady();
 
-				return this.isCompleted;
-			}
-		}
+                return this.isCompleted;
+            }
+        }
 
-		/// <summary>
-		/// Returns but does not remove the item at the front of the sequence.
-		/// </summary>
-		/// <returns></returns>
-		public override T Peek()
-		{
-			this.EnsureReady();
+        /// <summary>
+        /// Returns but does not remove the item at the front of the sequence.
+        /// </summary>
+        /// <returns></returns>
+        public override T Peek()
+        {
+            this.EnsureReady();
 
-			// return the current item or null if complete
-			return this.current;
-		}
+            // return the current item or null if complete
+            return this.current;
+        }
 
-		/// <summary>
-		/// Returns and removes the item at the front of the sequence.
-		/// </summary>
-		/// <returns></returns>
-		public override T Pop()
-		{
-			this.EnsureReady();
+        /// <summary>
+        /// Returns and removes the item at the front of the sequence.
+        /// </summary>
+        /// <returns></returns>
+        public override T Pop()
+        {
+            this.EnsureReady();
 
-			if (this.isCompleted)
-			{
-				return this.current;
-			}
+            if (this.isCompleted)
+            {
+                return this.current;
+            }
 
-			// flag as needing to be iterated, but don't execute yet
-			this.isReady = false;
-			this.index++;
+            // flag as needing to be iterated, but don't execute yet
+            this.isReady = false;
+            this.index++;
 
-			return this.current;
-		}
+            return this.current;
+        }
 
-		#endregion IStream<T> Members
+        #endregion IStream<T> Members
 
-		#region Methods
+        #region Methods
 
-		/// <summary>
-		/// Deferred execution of iterator
-		/// </summary>
-		private void EnsureReady()
-		{
-			// only execute when requested
-			if (this.isReady || this.isCompleted)
-			{
-				return;
-			}
-			this.isReady = true;
+        /// <summary>
+        /// Deferred execution of iterator
+        /// </summary>
+        private void EnsureReady()
+        {
+            // only execute when requested
+            if (this.isReady || this.isCompleted)
+            {
+                return;
+            }
+            this.isReady = true;
 
-			// store the current item or null if complete
-			int next = this.index+1;
+            // store the current item or null if complete
+            int next = this.index + 1;
 
-			SequenceBuffer<T> sBuffer = this.Buffer as SequenceBuffer<T>;
-			if (sBuffer != null)
-			{
-				// avoid using SequenceBuffer<T>.Count as will need to enumerate entire sequence
-				if (sBuffer.TryAdvance(next))
-				{
-					this.current = this.Buffer[next];
-				}
-				else
-				{
-					this.isCompleted = true;
-					this.current = default(T);
-				}
-			}
-			else
-			{
-				if (next < this.Buffer.Count)
-				{
-					this.current = this.Buffer[next];
-				}
-				else
-				{
-					this.isCompleted = true;
-					this.current = default(T);
-				}
-			}
-		}
+            SequenceBuffer<T> sBuffer = this.Buffer as SequenceBuffer<T>;
+            if (sBuffer != null)
+            {
+                // avoid using SequenceBuffer<T>.Count as will need to enumerate entire sequence
+                if (sBuffer.TryAdvance(next))
+                {
+                    this.current = this.Buffer[next];
+                }
+                else
+                {
+                    this.isCompleted = true;
+                    this.current = default(T);
+                }
+            }
+            else
+            {
+                if (next < this.Buffer.Count)
+                {
+                    this.current = this.Buffer[next];
+                }
+                else
+                {
+                    this.isCompleted = true;
+                    this.current = default(T);
+                }
+            }
+        }
 
-		#endregion Methods
+        #endregion Methods
 
-		#region IDisposable Members
+        #region IDisposable Members
 
-		protected override void Dispose(bool disposing)
-		{
-		}
+        protected override void Dispose(bool disposing)
+        {
+        }
 
-		#endregion IDisposable Members
-	}
+        #endregion IDisposable Members
+    }
 }

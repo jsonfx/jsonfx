@@ -1,4 +1,5 @@
 ﻿#region License
+
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -26,17 +27,16 @@
 	THE SOFTWARE.
 
 \*---------------------------------------------------------------------------------*/
-#endregion License
 
-using System;
+#endregion License
 
 namespace JsonFx.Serialization.Providers
 {
-	/// <summary>
-	/// Provides lookup capabilities for finding matching IDataReader
-	/// </summary>
-	public interface IDataReaderProvider
-	{
-		IDataReader Find(string contentTypeHeader);
-	}
+    /// <summary>
+    /// Provides lookup capabilities for finding matching IDataReader
+    /// </summary>
+    public interface IDataReaderProvider
+    {
+        IDataReader Find(string contentTypeHeader);
+    }
 }

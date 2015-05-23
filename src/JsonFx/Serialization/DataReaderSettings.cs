@@ -1,4 +1,5 @@
 #region License
+
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -26,15 +27,14 @@
 	THE SOFTWARE.
 
 \*---------------------------------------------------------------------------------*/
-#endregion License
 
-using System;
-using System.Collections.Generic;
+#endregion License
 
 using JsonFx.Model;
 using JsonFx.Model.Filters;
 using JsonFx.Serialization.Filters;
 using JsonFx.Serialization.Resolvers;
+using System.Collections.Generic;
 
 namespace JsonFx.Serialization
 {

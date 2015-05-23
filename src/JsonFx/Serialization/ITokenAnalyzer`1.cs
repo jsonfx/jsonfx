@@ -1,4 +1,5 @@
 #region License
+
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -26,6 +27,7 @@
 	THE SOFTWARE.
 
 \*---------------------------------------------------------------------------------*/
+
 #endregion License
 
 using System;
@@ -34,55 +36,55 @@ using System.Collections.Generic;
 
 namespace JsonFx.Serialization
 {
-	/// <summary>
-	/// Consumes a sequence of tokens to produce a sequence of objects, optionally coerced to a given type
-	/// </summary>
-	/// <typeparam name="T">token type</typeparam>
-	public interface ITokenAnalyzer<T>
-	{
-		#region Properties
+    /// <summary>
+    /// Consumes a sequence of tokens to produce a sequence of objects, optionally coerced to a given type
+    /// </summary>
+    /// <typeparam name="T">token type</typeparam>
+    public interface ITokenAnalyzer<T>
+    {
+        #region Properties
 
-		DataReaderSettings Settings
-		{
-			get;
-		}
+        DataReaderSettings Settings
+        {
+            get;
+        }
 
-		#endregion Properties
+        #endregion Properties
 
-		#region Methods
+        #region Methods
 
-		/// <summary>
-		/// Parses the token sequence
-		/// </summary>
-		/// <param name="tokens"></param>
-		/// <returns></returns>
-		IEnumerable Analyze(IEnumerable<Token<T>> tokens);
+        /// <summary>
+        /// Parses the token sequence
+        /// </summary>
+        /// <param name="tokens"></param>
+        /// <returns></returns>
+        IEnumerable Analyze(IEnumerable<Token<T>> tokens);
 
-		/// <summary>
-		/// Parses the token sequence, optionally coercing the result to Type targetType
-		/// </summary>
-		/// <param name="tokens"></param>
-		/// <param name="targetType">optional type for coercion (null if not specified)</param>
-		/// <returns></returns>
-		IEnumerable Analyze(IEnumerable<Token<T>> tokens, Type targetType);
+        /// <summary>
+        /// Parses the token sequence, optionally coercing the result to Type targetType
+        /// </summary>
+        /// <param name="tokens"></param>
+        /// <param name="targetType">optional type for coercion (null if not specified)</param>
+        /// <returns></returns>
+        IEnumerable Analyze(IEnumerable<Token<T>> tokens, Type targetType);
 
-		/// <summary>
-		/// Parses the token sequence, coercing the result to Type TResult
-		/// </summary>
-		/// <typeparam name="TResult">optional type for coercion (null if not specified)</typeparam>
-		/// <param name="tokens"></param>
-		/// <returns></returns>
-		IEnumerable<TResult> Analyze<TResult>(IEnumerable<Token<T>> tokens);
+        /// <summary>
+        /// Parses the token sequence, coercing the result to Type TResult
+        /// </summary>
+        /// <typeparam name="TResult">optional type for coercion (null if not specified)</typeparam>
+        /// <param name="tokens"></param>
+        /// <returns></returns>
+        IEnumerable<TResult> Analyze<TResult>(IEnumerable<Token<T>> tokens);
 
-		/// <summary>
-		/// Parses the token stream coercing the result to TResult (type inferred from <paramref name="ignored"/>)
-		/// </summary>
-		/// <typeparam name="TResult"></typeparam>
-		/// <param name="tokens"></param>
-		/// <param name="ignored">an example value used solely for Type inference</param>
-		/// <returns></returns>
-		IEnumerable<TResult> Analyze<TResult>(IEnumerable<Token<T>> tokens, TResult ignored);
+        /// <summary>
+        /// Parses the token stream coercing the result to TResult (type inferred from <paramref name="ignored"/>)
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="tokens"></param>
+        /// <param name="ignored">an example value used solely for Type inference</param>
+        /// <returns></returns>
+        IEnumerable<TResult> Analyze<TResult>(IEnumerable<Token<T>> tokens, TResult ignored);
 
-		#endregion Methods
-	}
+        #endregion Methods
+    }
 }

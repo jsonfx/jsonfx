@@ -1,4 +1,5 @@
 #region License
+
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -26,17 +27,18 @@
 	THE SOFTWARE.
 
 \*---------------------------------------------------------------------------------*/
+
 #endregion License
 
 using System;
 
 namespace JsonFx.Json
 {
-	/// <summary>
-	/// Designates a property or field to not be serialized.
-	/// </summary>
-	[AttributeUsage(AttributeTargets.Field|AttributeTargets.Property, AllowMultiple=false)]
-	public sealed class JsonIgnoreAttribute : Attribute
-	{
-	}
+    /// <summary>
+    /// Designates a property or field to not be serialized.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false)]
+    public sealed class JsonIgnoreAttribute : Attribute
+    {
+    }
 }

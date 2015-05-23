@@ -1,4 +1,5 @@
 #region License
+
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -26,99 +27,99 @@
 	THE SOFTWARE.
 
 \*---------------------------------------------------------------------------------*/
-#endregion License
 
-using System;
-using System.Collections.Generic;
+#endregion License
 
 using JsonFx.Model;
 using JsonFx.Serialization;
+using System;
+using System.Collections.Generic;
 
 namespace JsonFx.Json
 {
-	/// <summary>
-	/// JSON deserializer
-	/// </summary>
-	public partial class JsonReader : ModelReader
-	{
-		#region Fields
+    /// <summary>
+    /// JSON deserializer
+    /// </summary>
+    public partial class JsonReader : ModelReader
+    {
+        #region Fields
 
-		private readonly string[] ContentTypes;
+        private readonly string[] ContentTypes;
 
-		#endregion Fields
+        #endregion Fields
 
-		#region Init
+        #region Init
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		public JsonReader()
-			: this(new DataReaderSettings())
-		{
-		}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        public JsonReader()
+            : this(new DataReaderSettings())
+        {
+        }
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="settings"></param>
-		public JsonReader(DataReaderSettings settings)
-			: base(settings != null ? settings : new DataReaderSettings())
-		{
-		}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="settings"></param>
+        public JsonReader(DataReaderSettings settings)
+            : base(settings != null ? settings : new DataReaderSettings())
+        {
+        }
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="settings"></param>
-		/// <param name="contentTypes"></param>
-		public JsonReader(DataReaderSettings settings, params string[] contentTypes)
-			: base(settings != null ? settings : new DataReaderSettings())
-		{
-			if (contentTypes == null)
-			{
-				throw new NullReferenceException("contentTypes");
-			}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="settings"></param>
+        /// <param name="contentTypes"></param>
+        public JsonReader(DataReaderSettings settings, params string[] contentTypes)
+            : base(settings != null ? settings : new DataReaderSettings())
+        {
+            if (contentTypes == null)
+            {
+                throw new NullReferenceException("contentTypes");
+            }
 
-			// copy values so cannot be modified from outside
-			this.ContentTypes = new string[contentTypes.Length];
-			Array.Copy(contentTypes, this.ContentTypes, contentTypes.Length);
-		}
+            // copy values so cannot be modified from outside
+            this.ContentTypes = new string[contentTypes.Length];
+            Array.Copy(contentTypes, this.ContentTypes, contentTypes.Length);
+        }
 
-		#endregion Init
+        #endregion Init
 
-		#region Properties
+        #region Properties
 
-		/// <summary>
-		/// Gets the supported content type of the serialized data
-		/// </summary>
-		public override IEnumerable<string> ContentType
-		{
-			get
-			{
-				if (this.ContentTypes != null)
-				{
-					foreach (string contentType in this.ContentTypes)
-					{
-						yield return contentType;
-					}
-					yield break;
-				}
+        /// <summary>
+        /// Gets the supported content type of the serialized data
+        /// </summary>
+        public override IEnumerable<string> ContentType
+        {
+            get
+            {
+                if (this.ContentTypes != null)
+                {
+                    foreach (string contentType in this.ContentTypes)
+                    {
+                        yield return contentType;
+                    }
+                    yield break;
+                }
 
-				yield return "application/json";
-				yield return "text/json";
-				yield return "text/x-json";
-			}
-		}
+                yield return "application/json";
+                yield return "text/json";
+                yield return "text/x-json";
+            }
+        }
 
-		#endregion Properties
+        #endregion Properties
 
-		#region IDataReader Methods
+        #region IDataReader Methods
 
-		protected override ITextTokenizer<ModelTokenType> GetTokenizer()
-		{
-			return new JsonReader.JsonTokenizer();
-		}
+        protected override ITextTokenizer<ModelTokenType> GetTokenizer()
+        {
+            return new JsonReader.JsonTokenizer();
+        }
 
-		#endregion IDataReader Methods
-	}
+        #endregion IDataReader Methods
+    }
 }

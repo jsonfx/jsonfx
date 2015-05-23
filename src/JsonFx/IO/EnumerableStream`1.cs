@@ -1,4 +1,5 @@
 ﻿#region License
+
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -26,6 +27,7 @@
 	THE SOFTWARE.
 
 \*---------------------------------------------------------------------------------*/
+
 #endregion License
 
 using System;
@@ -33,188 +35,188 @@ using System.Collections.Generic;
 
 namespace JsonFx.IO
 {
-	/// <summary>
-	/// Supports forward-only iteration over an input sequence of <typeparamref name="T"/>
-	/// </summary>
-	internal class EnumerableStream<T> : Stream<T>
-	{
-		#region Constants
+    /// <summary>
+    /// Supports forward-only iteration over an input sequence of <typeparamref name="T"/>
+    /// </summary>
+    internal class EnumerableStream<T> : Stream<T>
+    {
+        #region Constants
 
-		private const int InitialChunkCapacity = 0x10;
+        private const int InitialChunkCapacity = 0x10;
 
-		#endregion Constants
+        #endregion Constants
 
-		#region Fields
+        #region Fields
 
-		private readonly IEnumerator<T> Enumerator;
-		private bool isReady;
-		private bool isCompleted;
-		private T current;
+        private readonly IEnumerator<T> Enumerator;
+        private bool isReady;
+        private bool isCompleted;
+        private T current;
 
-		private List<T> chunk;
+        private List<T> chunk;
 
-		#endregion Fields
+        #endregion Fields
 
-		#region Init
+        #region Init
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="sequence"></param>
-		public EnumerableStream(IEnumerable<T> sequence)
-		{
-			if (sequence == null)
-			{
-				sequence = new T[0];
-			}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="sequence"></param>
+        public EnumerableStream(IEnumerable<T> sequence)
+        {
+            if (sequence == null)
+            {
+                sequence = new T[0];
+            }
 
-			this.Enumerator = sequence.GetEnumerator();
-		}
+            this.Enumerator = sequence.GetEnumerator();
+        }
 
-		#endregion Fields
+        #endregion Init
 
-		#region IStream<T> Properties
+        #region IStream<T> Properties
 
-		/// <summary>
-		/// Determines if the input sequence has reached the end
-		/// </summary>
-		public override bool IsCompleted
-		{
-			get
-			{
-				this.EnsureReady();
+        /// <summary>
+        /// Determines if the input sequence has reached the end
+        /// </summary>
+        public override bool IsCompleted
+        {
+            get
+            {
+                this.EnsureReady();
 
-				return this.isCompleted;
-			}
-		}
+                return this.isCompleted;
+            }
+        }
 
-		#endregion IStream<T> Properties
+        #endregion IStream<T> Properties
 
-		#region IStream<T> Methods
+        #region IStream<T> Methods
 
-		/// <summary>
-		/// Returns but does not remove the item at the front of the sequence.
-		/// </summary>
-		/// <returns></returns>
-		public override T Peek()
-		{
-			this.EnsureReady();
+        /// <summary>
+        /// Returns but does not remove the item at the front of the sequence.
+        /// </summary>
+        /// <returns></returns>
+        public override T Peek()
+        {
+            this.EnsureReady();
 
-			// return the current item or null if complete
-			return this.current;
-		}
+            // return the current item or null if complete
+            return this.current;
+        }
 
-		/// <summary>
-		/// Returns and removes the item at the front of the sequence.
-		/// </summary>
-		/// <returns></returns>
-		public override T Pop()
-		{
-			this.EnsureReady();
+        /// <summary>
+        /// Returns and removes the item at the front of the sequence.
+        /// </summary>
+        /// <returns></returns>
+        public override T Pop()
+        {
+            this.EnsureReady();
 
-			// flag as needing to be iterated, but don't execute yet
-			this.isReady = this.isCompleted;
+            // flag as needing to be iterated, but don't execute yet
+            this.isReady = this.isCompleted;
 
-			// return the current item
-			return this.current;
-		}
+            // return the current item
+            return this.current;
+        }
 
-		#endregion IStream<T> Methods
+        #endregion IStream<T> Methods
 
-		#region Chunking Members
+        #region Chunking Members
 
-		public override bool IsChunking
-		{
-			get { return (this.chunk != null); }
-		}
+        public override bool IsChunking
+        {
+            get { return (this.chunk != null); }
+        }
 
-		public override int ChunkSize
-		{
-			get
-			{
-				if (this.chunk == null)
-				{
-					throw new InvalidOperationException("Not currently chunking.");
-				}
+        public override int ChunkSize
+        {
+            get
+            {
+                if (this.chunk == null)
+                {
+                    throw new InvalidOperationException("Not currently chunking.");
+                }
 
-				return this.chunk.Count;
-			}
-		}
+                return this.chunk.Count;
+            }
+        }
 
-		public override void BeginChunk()
-		{
-			if (this.chunk == null)
-			{
-				this.chunk = new List<T>(EnumerableStream<T>.InitialChunkCapacity);
-			}
-			else
-			{
-				this.chunk.Clear();
-			}
-		}
+        public override void BeginChunk()
+        {
+            if (this.chunk == null)
+            {
+                this.chunk = new List<T>(EnumerableStream<T>.InitialChunkCapacity);
+            }
+            else
+            {
+                this.chunk.Clear();
+            }
+        }
 
-		public override IEnumerable<T> EndChunk()
-		{
-			if (this.chunk == null)
-			{
-				throw new InvalidOperationException("Not currently chunking.");
-			}
+        public override IEnumerable<T> EndChunk()
+        {
+            if (this.chunk == null)
+            {
+                throw new InvalidOperationException("Not currently chunking.");
+            }
 
-			// build chunk value
-			IEnumerable<T> value = this.chunk.AsReadOnly();
+            // build chunk value
+            IEnumerable<T> value = this.chunk.AsReadOnly();
 
-			// reset internal buffer
-			this.chunk = null;
+            // reset internal buffer
+            this.chunk = null;
 
-			return value;
-		}
+            return value;
+        }
 
-		#endregion Chunking Members
+        #endregion Chunking Members
 
-		#region Methods
+        #region Methods
 
-		/// <summary>
-		/// Deferred execution of iterator
-		/// </summary>
-		private void EnsureReady()
-		{
-			// only execute when requested
-			if (this.isReady)
-			{
-				return;
-			}
-			this.isReady = true;
+        /// <summary>
+        /// Deferred execution of iterator
+        /// </summary>
+        private void EnsureReady()
+        {
+            // only execute when requested
+            if (this.isReady)
+            {
+                return;
+            }
+            this.isReady = true;
 
-			// lazy execution of MoveNext
-			this.isCompleted = !this.Enumerator.MoveNext();
+            // lazy execution of MoveNext
+            this.isCompleted = !this.Enumerator.MoveNext();
 
-			// store the current item or null if complete
-			if (this.isCompleted)
-			{
-				this.current = default(T);
-			}
-			else
-			{
-				this.current = this.Enumerator.Current;
-				if (this.chunk != null)
-				{
-					this.chunk.Add(this.current);
-				}
-			}
-		}
+            // store the current item or null if complete
+            if (this.isCompleted)
+            {
+                this.current = default(T);
+            }
+            else
+            {
+                this.current = this.Enumerator.Current;
+                if (this.chunk != null)
+                {
+                    this.chunk.Add(this.current);
+                }
+            }
+        }
 
-		#endregion Methods
+        #endregion Methods
 
-		#region IDisposable Members
+        #region IDisposable Members
 
-		protected override void Dispose(bool disposing)
-		{
-			if (disposing)
-			{
-				((IDisposable)this.Enumerator).Dispose();
-			}
-		}
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                ((IDisposable)this.Enumerator).Dispose();
+            }
+        }
 
-		#endregion IDisposable Members
-	}
+        #endregion IDisposable Members
+    }
 }

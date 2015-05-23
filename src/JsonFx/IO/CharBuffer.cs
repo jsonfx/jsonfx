@@ -1,4 +1,5 @@
 ﻿#region License
+
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -26,6 +27,7 @@
 	THE SOFTWARE.
 
 \*---------------------------------------------------------------------------------*/
+
 #endregion License
 
 using System;
@@ -33,152 +35,152 @@ using System.Text;
 
 namespace JsonFx.IO
 {
-	/// <summary>
-	/// StringBuilder-like implementation built like List&lt;char&gt;
-	/// </summary>
-	internal class CharBuffer
-	{
-		#region Constants
+    /// <summary>
+    /// StringBuilder-like implementation built like List&lt;char&gt;
+    /// </summary>
+    internal class CharBuffer
+    {
+        #region Constants
 
-		private static readonly char[] EmptyBuffer = new char[0];
-		private const int DefaultCapacity = 0x20;
+        private static readonly char[] EmptyBuffer = new char[0];
+        private const int DefaultCapacity = 0x20;
 
-		#endregion Constants
+        #endregion Constants
 
-		#region Fields
+        #region Fields
 
-		private char[] buffer;
-		private int size;
+        private char[] buffer;
+        private int size;
 
-		#endregion Fields
+        #endregion Fields
 
-		#region Init
+        #region Init
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		public CharBuffer()
-		{
-			this.buffer = CharBuffer.EmptyBuffer;
-		}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        public CharBuffer()
+        {
+            this.buffer = CharBuffer.EmptyBuffer;
+        }
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="capacity"></param>
-		public CharBuffer(int capacity)
-		{
-			this.buffer = new char[capacity];
-		}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="capacity"></param>
+        public CharBuffer(int capacity)
+        {
+            this.buffer = new char[capacity];
+        }
 
-		#endregion Init
+        #endregion Init
 
-		#region Properties
+        #region Properties
 
-		/// <summary>
-		/// Gets the number of characters in the buffer
-		/// </summary>
-		public int Length
-		{
-			get { return this.size; }
-		}
+        /// <summary>
+        /// Gets the number of characters in the buffer
+        /// </summary>
+        public int Length
+        {
+            get { return this.size; }
+        }
 
-		#endregion Properties
+        #endregion Properties
 
-		#region Methods
+        #region Methods
 
-		/// <summary>
-		/// Resets the buffer to an empty state
-		/// </summary>
-		public void Clear()
-		{
-			this.size = 0;
-		}
+        /// <summary>
+        /// Resets the buffer to an empty state
+        /// </summary>
+        public void Clear()
+        {
+            this.size = 0;
+        }
 
-		/// <summary>
-		/// Appends a single char to the buffer
-		/// </summary>
-		/// <param name="value"></param>
-		/// <returns></returns>
-		public CharBuffer Append(char value)
-		{
-			if (this.size <= this.buffer.Length)
-			{
-				this.EnsureCapacity(this.size + 1);
-			}
+        /// <summary>
+        /// Appends a single char to the buffer
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public CharBuffer Append(char value)
+        {
+            if (this.size <= this.buffer.Length)
+            {
+                this.EnsureCapacity(this.size + 1);
+            }
 
-			this.buffer[this.size++] = value;
+            this.buffer[this.size++] = value;
 
-			return this;
-		}
+            return this;
+        }
 
-		/// <summary>
-		/// Appends a string value to the buffer
-		/// </summary>
-		/// <param name="value"></param>
-		/// <returns></returns>
-		public CharBuffer Append(string value)
-		{
-			if (String.IsNullOrEmpty(value))
-			{
-				return this;
-			}
+        /// <summary>
+        /// Appends a string value to the buffer
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public CharBuffer Append(string value)
+        {
+            if (String.IsNullOrEmpty(value))
+            {
+                return this;
+            }
 
-			int length = value.Length;
-			if (this.size <= this.buffer.Length)
-			{
-				this.EnsureCapacity(this.size + length);
-			}
+            int length = value.Length;
+            if (this.size <= this.buffer.Length)
+            {
+                this.EnsureCapacity(this.size + length);
+            }
 
-			for (int i=0; i<length; i++)
-			{
-				this.buffer[this.size++] = value[i];
-			}
+            for (int i = 0; i < length; i++)
+            {
+                this.buffer[this.size++] = value[i];
+            }
 
-			return this;
-		}
+            return this;
+        }
 
-		/// <summary>
-		/// Copies the buffer value into a <see cref="StringBuilder"/>
-		/// </summary>
-		/// <param name="buffer"></param>
-		public void CopyTo(StringBuilder buffer)
-		{
-			if (this.size < 1)
-			{
-				return;
-			}
+        /// <summary>
+        /// Copies the buffer value into a <see cref="StringBuilder"/>
+        /// </summary>
+        /// <param name="buffer"></param>
+        public void CopyTo(StringBuilder buffer)
+        {
+            if (this.size < 1)
+            {
+                return;
+            }
 
-			buffer.Append(this.buffer, 0, this.size);
-		}
+            buffer.Append(this.buffer, 0, this.size);
+        }
 
-		private void EnsureCapacity(int min)
-		{
-			int length = this.buffer.Length;
-			if (length >= min)
-			{
-				return;
-			}
+        private void EnsureCapacity(int min)
+        {
+            int length = this.buffer.Length;
+            if (length >= min)
+            {
+                return;
+            }
 
-			int capacity = Math.Max(Math.Max(CharBuffer.DefaultCapacity, (length * 2)), min);
+            int capacity = Math.Max(Math.Max(CharBuffer.DefaultCapacity, (length * 2)), min);
 
-			char[] temp = new char[capacity];
-			if (this.size > 0)
-			{
-				Array.Copy(this.buffer, 0, temp, 0, this.size);
-			}
-			this.buffer = temp;
-		}
+            char[] temp = new char[capacity];
+            if (this.size > 0)
+            {
+                Array.Copy(this.buffer, 0, temp, 0, this.size);
+            }
+            this.buffer = temp;
+        }
 
-		#endregion Methods
+        #endregion Methods
 
-		#region Object Overrides
+        #region Object Overrides
 
-		public override string ToString()
-		{
-			return new String(this.buffer, 0, this.size);
-		}
+        public override string ToString()
+        {
+            return new String(this.buffer, 0, this.size);
+        }
 
-		#endregion Object Overrides
-	}
+        #endregion Object Overrides
+    }
 }

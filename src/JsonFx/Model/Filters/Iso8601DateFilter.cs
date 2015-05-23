@@ -1,4 +1,5 @@
 #region License
+
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -26,193 +27,192 @@
 	THE SOFTWARE.
 
 \*---------------------------------------------------------------------------------*/
+
 #endregion License
 
+using JsonFx.IO;
+using JsonFx.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 
-using JsonFx.IO;
-using JsonFx.Serialization;
-
 namespace JsonFx.Model.Filters
 {
-	/// <summary>
-	/// Defines a filter for JSON-style serialization of DateTime into ISO-8601 string
-	/// </summary>
-	/// <remarks>
-	/// This is the format used by EcmaScript 5th edition Date.prototype.toJSON(...):
-	///		http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-262.pdf
-	///		http://www.w3.org/TR/NOTE-datetime
-	///		http://en.wikipedia.org/wiki/ISO_8601
-	///	
-	/// NOTE: This format limits expressing DateTime as either UTC or Unspecified. Local (i.e. Server Local) is converted to UTC.
-	/// </remarks>
-	public class Iso8601DateFilter : ModelFilter<DateTime>
-	{
-		#region Precision
+    /// <summary>
+    /// Defines a filter for JSON-style serialization of DateTime into ISO-8601 string
+    /// </summary>
+    /// <remarks>
+    /// This is the format used by EcmaScript 5th edition Date.prototype.toJSON(...):
+    ///		http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-262.pdf
+    ///		http://www.w3.org/TR/NOTE-datetime
+    ///		http://en.wikipedia.org/wiki/ISO_8601
+    ///
+    /// NOTE: This format limits expressing DateTime as either UTC or Unspecified. Local (i.e. Server Local) is converted to UTC.
+    /// </remarks>
+    public class Iso8601DateFilter : ModelFilter<DateTime>
+    {
+        #region Precision
 
-		/// <summary>
-		/// Defines the precision of fractional seconds in ISO-8601 dates
-		/// </summary>
-		public enum Precision
-		{
-			Seconds,
-			Milliseconds,
-			Ticks
-		}
+        /// <summary>
+        /// Defines the precision of fractional seconds in ISO-8601 dates
+        /// </summary>
+        public enum Precision
+        {
+            Seconds,
+            Milliseconds,
+            Ticks
+        }
 
-		#endregion Precision
+        #endregion Precision
 
-		#region Constants
+        #region Constants
 
-		private const string ShortFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ssK";
-		private const string LongFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fffK";
-		private const string FullFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'FFFFFFFK";
+        private const string ShortFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ssK";
+        private const string LongFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fffK";
+        private const string FullFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'FFFFFFFK";
 
-		#endregion Constants
+        #endregion Constants
 
-		#region Fields
+        #region Fields
 
-		private string iso8601Format = Iso8601DateFilter.LongFormat;
+        private string iso8601Format = Iso8601DateFilter.LongFormat;
 
-		#endregion Fields
+        #endregion Fields
 
-		#region Properties
+        #region Properties
 
-		/// <summary>
-		/// Determines the precision of fractional seconds.
-		/// Defaults to EcmaScript precision of milliseconds.
-		/// </summary>
-		public Precision Format
-		{
-			get
-			{
-				switch (this.iso8601Format)
-				{
-					case ShortFormat:
-					{
-						return Precision.Seconds;
-					}
-					case LongFormat:
-					{
-						return Precision.Milliseconds;
-					}
-					default:
-					case FullFormat:
-					{
-						return Precision.Ticks;
-					}
-				}
-			}
-			set
-			{
-				switch (value)
-				{
-					case Precision.Seconds:
-					{
-						this.iso8601Format = Iso8601DateFilter.ShortFormat;
-						break;
-					}
-					case Precision.Milliseconds:
-					{
-						this.iso8601Format = Iso8601DateFilter.LongFormat;
-						break;
-					}
-					default:
-					case Precision.Ticks:
-					{
-						this.iso8601Format = Iso8601DateFilter.FullFormat;
-						break;
-					}
-				}
-			}
-		}
+        /// <summary>
+        /// Determines the precision of fractional seconds.
+        /// Defaults to EcmaScript precision of milliseconds.
+        /// </summary>
+        public Precision Format
+        {
+            get
+            {
+                switch (this.iso8601Format)
+                {
+                    case ShortFormat:
+                        {
+                            return Precision.Seconds;
+                        }
+                    case LongFormat:
+                        {
+                            return Precision.Milliseconds;
+                        }
+                    default:
+                    case FullFormat:
+                        {
+                            return Precision.Ticks;
+                        }
+                }
+            }
+            set
+            {
+                switch (value)
+                {
+                    case Precision.Seconds:
+                        {
+                            this.iso8601Format = Iso8601DateFilter.ShortFormat;
+                            break;
+                        }
+                    case Precision.Milliseconds:
+                        {
+                            this.iso8601Format = Iso8601DateFilter.LongFormat;
+                            break;
+                        }
+                    default:
+                    case Precision.Ticks:
+                        {
+                            this.iso8601Format = Iso8601DateFilter.FullFormat;
+                            break;
+                        }
+                }
+            }
+        }
 
-		#endregion Properties
+        #endregion Properties
 
-		#region IDataFilter<DataTokenType,DateTime> Members
+        #region IDataFilter<DataTokenType,DateTime> Members
 
-		public override bool TryRead(DataReaderSettings settings, IStream<Token<ModelTokenType>> tokens, out DateTime value)
-		{
-			Token<ModelTokenType> token = tokens.Peek();
-			if (token == null ||
-				token.TokenType != ModelTokenType.Primitive ||
-				!(token.Value is string))
-			{
-				value = default(DateTime);
-				return false;
-			}
+        public override bool TryRead(DataReaderSettings settings, IStream<Token<ModelTokenType>> tokens, out DateTime value)
+        {
+            Token<ModelTokenType> token = tokens.Peek();
+            if (token == null ||
+                token.TokenType != ModelTokenType.Primitive ||
+                !(token.Value is string))
+            {
+                value = default(DateTime);
+                return false;
+            }
 
-			if (!Iso8601DateFilter.TryParseIso8601(
-				token.ValueAsString(),
-				out value))
-			{
-				value = default(DateTime);
-				return false;
-			}
+            if (!Iso8601DateFilter.TryParseIso8601(
+                token.ValueAsString(),
+                out value))
+            {
+                value = default(DateTime);
+                return false;
+            }
 
-			tokens.Pop();
-			return true;
-		}
+            tokens.Pop();
+            return true;
+        }
 
-		public override bool TryWrite(DataWriterSettings settings, DateTime value, out IEnumerable<Token<ModelTokenType>> tokens)
-		{
-			tokens = new Token<ModelTokenType>[]
+        public override bool TryWrite(DataWriterSettings settings, DateTime value, out IEnumerable<Token<ModelTokenType>> tokens)
+        {
+            tokens = new Token<ModelTokenType>[]
 				{
 					ModelGrammar.TokenPrimitive(this.FormatIso8601(value))
 				};
 
-			return true;
-		}
+            return true;
+        }
 
-		#endregion IDataFilter<DataTokenType,DateTime> Members
+        #endregion IDataFilter<DataTokenType,DateTime> Members
 
-		#region Utility Methods
+        #region Utility Methods
 
-		/// <summary>
-		/// Converts a ISO-8601 string to the corresponding DateTime representation
-		/// </summary>
-		/// <param name="date">ISO-8601 conformant date</param>
-		/// <param name="value">UTC or Unspecified DateTime</param>
-		/// <returns>true if parsing was successful</returns>
-		private static bool TryParseIso8601(string date, out DateTime value)
-		{
-			if (!DateTime.TryParseExact(date,
-				Iso8601DateFilter.FullFormat,
-				CultureInfo.InvariantCulture,
-				DateTimeStyles.RoundtripKind | DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.NoCurrentDateDefault,
-				out value))
-			{
-				value = default(DateTime);
-				return false;
-			}
+        /// <summary>
+        /// Converts a ISO-8601 string to the corresponding DateTime representation
+        /// </summary>
+        /// <param name="date">ISO-8601 conformant date</param>
+        /// <param name="value">UTC or Unspecified DateTime</param>
+        /// <returns>true if parsing was successful</returns>
+        private static bool TryParseIso8601(string date, out DateTime value)
+        {
+            if (!DateTime.TryParseExact(date,
+                Iso8601DateFilter.FullFormat,
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.RoundtripKind | DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.NoCurrentDateDefault,
+                out value))
+            {
+                value = default(DateTime);
+                return false;
+            }
 
+            if (value.Kind == DateTimeKind.Local)
+            {
+                value = value.ToUniversalTime();
+            }
 
-			if (value.Kind == DateTimeKind.Local)
-			{
-				value = value.ToUniversalTime();
-			}
+            return true;
+        }
 
-			return true;
-		}
+        /// <summary>
+        /// Converts a DateTime to the corresponding ISO-8601 string representation
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns>ISO-8601 conformant date</returns>
+        private string FormatIso8601(DateTime value)
+        {
+            if (value.Kind == DateTimeKind.Local)
+            {
+                value = value.ToUniversalTime();
+            }
 
-		/// <summary>
-		/// Converts a DateTime to the corresponding ISO-8601 string representation
-		/// </summary>
-		/// <param name="value"></param>
-		/// <returns>ISO-8601 conformant date</returns>
-		private string FormatIso8601(DateTime value)
-		{
-			if (value.Kind == DateTimeKind.Local)
-			{
-				value = value.ToUniversalTime();
-			}
+            // DateTime in ISO-8601
+            return value.ToString(this.iso8601Format);
+        }
 
-			// DateTime in ISO-8601
-			return value.ToString(this.iso8601Format);
-		}
-
-		#endregion Utility Methods
-	}
+        #endregion Utility Methods
+    }
 }

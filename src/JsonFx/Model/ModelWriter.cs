@@ -1,4 +1,5 @@
 #region License
+
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -26,57 +27,56 @@
 	THE SOFTWARE.
 
 \*---------------------------------------------------------------------------------*/
+
 #endregion License
 
-using System;
-using System.Text;
-
 using JsonFx.Serialization;
+using System.Text;
 
 namespace JsonFx.Model
 {
-	/// <summary>
-	/// Provides base implementation for standard serializers
-	/// </summary>
-	public abstract partial class ModelWriter : DataWriter<ModelTokenType>
-	{
-		#region Init
+    /// <summary>
+    /// Provides base implementation for standard serializers
+    /// </summary>
+    public abstract partial class ModelWriter : DataWriter<ModelTokenType>
+    {
+        #region Init
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="settings"></param>
-		protected ModelWriter(DataWriterSettings settings)
-			: base(settings)
-		{
-		}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="settings"></param>
+        protected ModelWriter(DataWriterSettings settings)
+            : base(settings)
+        {
+        }
 
-		#endregion Init
+        #endregion Init
 
-		#region Properties
+        #region Properties
 
-		/// <summary>
-		/// Gets the content encoding for the serialized data
-		/// </summary>
-		public override Encoding ContentEncoding
-		{
-			get { return Encoding.UTF8; }
-		}
+        /// <summary>
+        /// Gets the content encoding for the serialized data
+        /// </summary>
+        public override Encoding ContentEncoding
+        {
+            get { return Encoding.UTF8; }
+        }
 
-		#endregion Properties
+        #endregion Properties
 
-		#region DataWriter<DataTokenType> Methods
+        #region DataWriter<DataTokenType> Methods
 
-		/// <summary>
-		/// Gets a walker for JSON
-		/// </summary>
-		/// <param name="settings"></param>
-		/// <returns></returns>
-		protected override IObjectWalker<ModelTokenType> GetWalker()
-		{
-			return new ModelWalker(this.Settings);
-		}
+        /// <summary>
+        /// Gets a walker for JSON
+        /// </summary>
+        /// <param name="settings"></param>
+        /// <returns></returns>
+        protected override IObjectWalker<ModelTokenType> GetWalker()
+        {
+            return new ModelWalker(this.Settings);
+        }
 
-		#endregion DataWriter<DataTokenType> Methods
-	}
+        #endregion DataWriter<DataTokenType> Methods
+    }
 }

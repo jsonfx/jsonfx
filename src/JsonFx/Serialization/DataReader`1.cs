@@ -1,4 +1,5 @@
 #region License
+
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -26,6 +27,7 @@
 	THE SOFTWARE.
 
 \*---------------------------------------------------------------------------------*/
+
 #endregion License
 
 using System;
@@ -35,234 +37,234 @@ using System.IO;
 
 namespace JsonFx.Serialization
 {
-	/// <summary>
-	/// Provides base implementation for standard deserializers
-	/// </summary>
-	public abstract class DataReader<T> : IDataReader
-	{
-		#region Fields
+    /// <summary>
+    /// Provides base implementation for standard deserializers
+    /// </summary>
+    public abstract class DataReader<T> : IDataReader
+    {
+        #region Fields
 
-		private readonly DataReaderSettings settings;
+        private readonly DataReaderSettings settings;
 
-		#endregion Fields
+        #endregion Fields
 
-		#region Init
+        #region Init
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="settings"></param>
-		protected DataReader(DataReaderSettings settings)
-		{
-			if (settings == null)
-			{
-				throw new NullReferenceException("settings");
-			}
-			this.settings = settings;
-		}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="settings"></param>
+        protected DataReader(DataReaderSettings settings)
+        {
+            if (settings == null)
+            {
+                throw new NullReferenceException("settings");
+            }
+            this.settings = settings;
+        }
 
-		#endregion Init
+        #endregion Init
 
-		#region Properties
+        #region Properties
 
-		/// <summary>
-		/// Gets the supported content type of the serialized data
-		/// </summary>
-		public abstract IEnumerable<string> ContentType
-		{
-			get;
-		}
+        /// <summary>
+        /// Gets the supported content type of the serialized data
+        /// </summary>
+        public abstract IEnumerable<string> ContentType
+        {
+            get;
+        }
 
-		/// <summary>
-		/// Gets the settings used for deserialization
-		/// </summary>
-		public DataReaderSettings Settings
-		{
-			get { return this.settings; }
-		}
+        /// <summary>
+        /// Gets the settings used for deserialization
+        /// </summary>
+        public DataReaderSettings Settings
+        {
+            get { return this.settings; }
+        }
 
-		#endregion Properties
+        #endregion Properties
 
-		#region Read Methods
+        #region Read Methods
 
-		/// <summary>
-		/// Deserializes the data from the given input
-		/// </summary>
-		/// <param name="input">the input reader</param>
-		/// <param name="ignored">a value used to trigger Type inference for <typeparamref name="TResult"/> (e.g. for deserializing anonymous objects)</param>
-		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
-		public virtual TResult Read<TResult>(TextReader input, TResult ignored)
-		{
-			return this.Read<TResult>(input);
-		}
+        /// <summary>
+        /// Deserializes the data from the given input
+        /// </summary>
+        /// <param name="input">the input reader</param>
+        /// <param name="ignored">a value used to trigger Type inference for <typeparamref name="TResult"/> (e.g. for deserializing anonymous objects)</param>
+        /// <typeparam name="TResult">the expected type of the serialized data</typeparam>
+        public virtual TResult Read<TResult>(TextReader input, TResult ignored)
+        {
+            return this.Read<TResult>(input);
+        }
 
-		/// <summary>
-		/// Deserializes the data from the given input
-		/// </summary>
-		/// <param name="input">the input reader</param>
-		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
-		public virtual TResult Read<TResult>(TextReader input)
-		{
-			object value = this.Read(input, typeof(TResult));
+        /// <summary>
+        /// Deserializes the data from the given input
+        /// </summary>
+        /// <param name="input">the input reader</param>
+        /// <typeparam name="TResult">the expected type of the serialized data</typeparam>
+        public virtual TResult Read<TResult>(TextReader input)
+        {
+            object value = this.Read(input, typeof(TResult));
 
-			return (value is TResult) ? (TResult)value : default(TResult);
-		}
+            return (value is TResult) ? (TResult)value : default(TResult);
+        }
 
-		/// <summary>
-		/// Deserializes the data from the given input
-		/// </summary>
-		/// <param name="input">the input reader</param>
-		public virtual object Read(TextReader input)
-		{
-			return this.Read(input, null);
-		}
+        /// <summary>
+        /// Deserializes the data from the given input
+        /// </summary>
+        /// <param name="input">the input reader</param>
+        public virtual object Read(TextReader input)
+        {
+            return this.Read(input, null);
+        }
 
-		/// <summary>
-		/// Deserializes the data from the given input
-		/// </summary>
-		/// <param name="input">the input reader</param>
-		/// <param name="targetType">the expected type of the serialized data</param>
-		public virtual object Read(TextReader input, Type targetType)
-		{
-			ITextTokenizer<T> tokenizer = this.GetTokenizer();
-			if (tokenizer == null)
-			{
-				throw new InvalidOperationException("Tokenizer is invalid");
-			}
+        /// <summary>
+        /// Deserializes the data from the given input
+        /// </summary>
+        /// <param name="input">the input reader</param>
+        /// <param name="targetType">the expected type of the serialized data</param>
+        public virtual object Read(TextReader input, Type targetType)
+        {
+            ITextTokenizer<T> tokenizer = this.GetTokenizer();
+            if (tokenizer == null)
+            {
+                throw new InvalidOperationException("Tokenizer is invalid");
+            }
 
-			return this.ReadSingle(tokenizer, tokenizer.GetTokens(input), targetType);
-		}
+            return this.ReadSingle(tokenizer, tokenizer.GetTokens(input), targetType);
+        }
 
-		/// <summary>
-		/// Deserializes the data from the given input
-		/// </summary>
-		/// <param name="input">the input text</param>
-		/// <param name="ignored">a value used to trigger Type inference for <typeparamref name="TResult"/> (e.g. for deserializing anonymous objects)</param>
-		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
-		public virtual TResult Read<TResult>(string input, TResult ignored)
-		{
-			return this.Read<TResult>(input);
-		}
-	
-		/// <summary>
-		/// Deserializes the data from the given input
-		/// </summary>
-		/// <param name="input">the input text</param>
-		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
-		public virtual TResult Read<TResult>(string input)
-		{
-			object value = this.Read(input, typeof(TResult));
+        /// <summary>
+        /// Deserializes the data from the given input
+        /// </summary>
+        /// <param name="input">the input text</param>
+        /// <param name="ignored">a value used to trigger Type inference for <typeparamref name="TResult"/> (e.g. for deserializing anonymous objects)</param>
+        /// <typeparam name="TResult">the expected type of the serialized data</typeparam>
+        public virtual TResult Read<TResult>(string input, TResult ignored)
+        {
+            return this.Read<TResult>(input);
+        }
 
-			return (value is TResult) ? (TResult)value : default(TResult);
-		}
+        /// <summary>
+        /// Deserializes the data from the given input
+        /// </summary>
+        /// <param name="input">the input text</param>
+        /// <typeparam name="TResult">the expected type of the serialized data</typeparam>
+        public virtual TResult Read<TResult>(string input)
+        {
+            object value = this.Read(input, typeof(TResult));
 
-		/// <summary>
-		/// Deserializes the data from the given input
-		/// </summary>
-		/// <param name="input">the input text</param>
-		public virtual object Read(string input)
-		{
-			return this.Read(input, null);
-		}
+            return (value is TResult) ? (TResult)value : default(TResult);
+        }
 
-		/// <summary>
-		/// Deserializes the data from the given input
-		/// </summary>
-		/// <param name="input">the input text</param>
-		/// <param name="targetType">the expected type of the serialized data</param>
-		public virtual object Read(string input, Type targetType)
-		{
-			ITextTokenizer<T> tokenizer = this.GetTokenizer();
-			if (tokenizer == null)
-			{
-				throw new ArgumentNullException("tokenizer");
-			}
+        /// <summary>
+        /// Deserializes the data from the given input
+        /// </summary>
+        /// <param name="input">the input text</param>
+        public virtual object Read(string input)
+        {
+            return this.Read(input, null);
+        }
 
-			return this.ReadSingle(tokenizer, tokenizer.GetTokens(input), targetType);
-		}
+        /// <summary>
+        /// Deserializes the data from the given input
+        /// </summary>
+        /// <param name="input">the input text</param>
+        /// <param name="targetType">the expected type of the serialized data</param>
+        public virtual object Read(string input, Type targetType)
+        {
+            ITextTokenizer<T> tokenizer = this.GetTokenizer();
+            if (tokenizer == null)
+            {
+                throw new ArgumentNullException("tokenizer");
+            }
 
-		/// <summary>
-		/// Deserializes a potentially endless sequence of objects from a stream source
-		/// </summary>
-		/// <param name="input">a streamed source of objects</param>
-		/// <returns>a sequence of objects</returns>
-		/// <remarks>
-		/// character stream => token stream => object stream
-		/// </remarks>
-		public IEnumerable ReadMany(TextReader input)
-		{
-			ITextTokenizer<T> tokenizer = this.GetTokenizer();
-			if (tokenizer == null)
-			{
-				throw new ArgumentNullException("tokenizer");
-			}
+            return this.ReadSingle(tokenizer, tokenizer.GetTokens(input), targetType);
+        }
 
-			ITokenAnalyzer<T> analyzer = this.GetAnalyzer();
-			if (analyzer == null)
-			{
-				throw new ArgumentNullException("analyzer");
-			}
+        /// <summary>
+        /// Deserializes a potentially endless sequence of objects from a stream source
+        /// </summary>
+        /// <param name="input">a streamed source of objects</param>
+        /// <returns>a sequence of objects</returns>
+        /// <remarks>
+        /// character stream => token stream => object stream
+        /// </remarks>
+        public IEnumerable ReadMany(TextReader input)
+        {
+            ITextTokenizer<T> tokenizer = this.GetTokenizer();
+            if (tokenizer == null)
+            {
+                throw new ArgumentNullException("tokenizer");
+            }
 
-			try
-			{
-				// chars stream => token stream => object stream
-				return analyzer.Analyze(tokenizer.GetTokens(input));
-			}
-			catch (DeserializationException)
-			{
-				throw;
-			}
-			catch (Exception ex)
-			{
-				throw new DeserializationException(ex.Message, tokenizer.Index, tokenizer.Line, tokenizer.Column, ex);
-			}
-		}
+            ITokenAnalyzer<T> analyzer = this.GetAnalyzer();
+            if (analyzer == null)
+            {
+                throw new ArgumentNullException("analyzer");
+            }
 
-		private object ReadSingle(ITextTokenizer<T> tokenizer, IEnumerable<Token<T>> tokens, Type targetType)
-		{
-			ITokenAnalyzer<T> analyzer = this.GetAnalyzer();
-			if (analyzer == null)
-			{
-				throw new ArgumentNullException("analyzer");
-			}
+            try
+            {
+                // chars stream => token stream => object stream
+                return analyzer.Analyze(tokenizer.GetTokens(input));
+            }
+            catch (DeserializationException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new DeserializationException(ex.Message, tokenizer.Index, tokenizer.Line, tokenizer.Column, ex);
+            }
+        }
 
-			try
-			{
-				IEnumerator enumerator = analyzer.Analyze(tokens, targetType).GetEnumerator();
-				if (!enumerator.MoveNext())
-				{
-					return null;
-				}
+        private object ReadSingle(ITextTokenizer<T> tokenizer, IEnumerable<Token<T>> tokens, Type targetType)
+        {
+            ITokenAnalyzer<T> analyzer = this.GetAnalyzer();
+            if (analyzer == null)
+            {
+                throw new ArgumentNullException("analyzer");
+            }
 
-				// character stream => token stream => object stream
-				object value = enumerator.Current;
+            try
+            {
+                IEnumerator enumerator = analyzer.Analyze(tokens, targetType).GetEnumerator();
+                if (!enumerator.MoveNext())
+                {
+                    return null;
+                }
 
-				// enforce only one object in stream
-				if (!this.Settings.AllowTrailingContent && enumerator.MoveNext())
-				{
-					throw new DeserializationException("Invalid trailing content", tokenizer.Index, tokenizer.Line, tokenizer.Column);
-				}
+                // character stream => token stream => object stream
+                object value = enumerator.Current;
 
-				return value;
-			}
-			catch (DeserializationException)
-			{
-				throw;
-			}
-			catch (Exception ex)
-			{
-				throw new DeserializationException(ex.Message, tokenizer.Index, tokenizer.Line, tokenizer.Column, ex);
-			}
-		}
+                // enforce only one object in stream
+                if (!this.Settings.AllowTrailingContent && enumerator.MoveNext())
+                {
+                    throw new DeserializationException("Invalid trailing content", tokenizer.Index, tokenizer.Line, tokenizer.Column);
+                }
 
-		#endregion Read Methods
+                return value;
+            }
+            catch (DeserializationException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new DeserializationException(ex.Message, tokenizer.Index, tokenizer.Line, tokenizer.Column, ex);
+            }
+        }
 
-		#region Methods
+        #endregion Read Methods
 
-		protected abstract ITextTokenizer<T> GetTokenizer();
+        #region Methods
 
-		protected abstract ITokenAnalyzer<T> GetAnalyzer();
+        protected abstract ITextTokenizer<T> GetTokenizer();
 
-		#endregion Methods
-	}
+        protected abstract ITokenAnalyzer<T> GetAnalyzer();
+
+        #endregion Methods
+    }
 }

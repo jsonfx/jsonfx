@@ -1,4 +1,5 @@
 #region License
+
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -26,55 +27,56 @@
 	THE SOFTWARE.
 
 \*---------------------------------------------------------------------------------*/
+
 #endregion License
 
 using System;
 
 namespace JsonFx.Json
 {
-	/// <summary>
-	/// Specifies the naming to use for a property or field when serializing
-	/// </summary>
-	[AttributeUsage(AttributeTargets.Class|AttributeTargets.Enum|AttributeTargets.Field|AttributeTargets.Property|AttributeTargets.Struct, AllowMultiple=false)]
-	public class JsonNameAttribute : Attribute
-	{
-		#region Fields
+    /// <summary>
+    /// Specifies the naming to use for a property or field when serializing
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Enum | AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Struct, AllowMultiple = false)]
+    public class JsonNameAttribute : Attribute
+    {
+        #region Fields
 
-		private string name;
+        private string name;
 
-		#endregion Fields
+        #endregion Fields
 
-		#region Init
+        #region Init
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		public JsonNameAttribute()
-		{
-		}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        public JsonNameAttribute()
+        {
+        }
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="name"></param>
-		public JsonNameAttribute(string name)
-		{
-			this.Name = name;
-		}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="name"></param>
+        public JsonNameAttribute(string name)
+        {
+            this.Name = name;
+        }
 
-		#endregion Init
+        #endregion Init
 
-		#region Properties
+        #region Properties
 
-		/// <summary>
-		/// Gets and sets the name to be used in serialization
-		/// </summary>
-		public string Name
-		{
-			get { return this.name; }
-			set { this.name = value; }
-		}
+        /// <summary>
+        /// Gets and sets the name to be used in serialization
+        /// </summary>
+        public string Name
+        {
+            get { return this.name; }
+            set { this.name = value; }
+        }
 
-		#endregion Properties
-	}
+        #endregion Properties
+    }
 }

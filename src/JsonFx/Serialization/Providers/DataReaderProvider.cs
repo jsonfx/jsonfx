@@ -1,4 +1,5 @@
 ﻿#region License
+
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -26,6 +27,7 @@
 	THE SOFTWARE.
 
 \*---------------------------------------------------------------------------------*/
+
 #endregion License
 
 using System;
@@ -33,68 +35,68 @@ using System.Collections.Generic;
 
 namespace JsonFx.Serialization.Providers
 {
-	/// <summary>
-	/// Provides lookup capabilities for finding matching IDataReader
-	/// </summary>
-	public class DataReaderProvider : IDataReaderProvider
-	{
-		#region Fields
+    /// <summary>
+    /// Provides lookup capabilities for finding matching IDataReader
+    /// </summary>
+    public class DataReaderProvider : IDataReaderProvider
+    {
+        #region Fields
 
-		private readonly IDictionary<string, IDataReader> ReadersByMime = new Dictionary<string, IDataReader>(StringComparer.OrdinalIgnoreCase);
+        private readonly IDictionary<string, IDataReader> ReadersByMime = new Dictionary<string, IDataReader>(StringComparer.OrdinalIgnoreCase);
 
-		#endregion Fields
+        #endregion Fields
 
-		#region Init
+        #region Init
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="readers">inject with all possible readers</param>
-		public DataReaderProvider(IEnumerable<IDataReader> readers)
-		{
-			if (readers != null)
-			{
-				foreach (IDataReader reader in readers)
-				{
-					foreach (string contentType in reader.ContentType)
-					{
-						if (String.IsNullOrEmpty(contentType) ||
-							this.ReadersByMime.ContainsKey(contentType))
-						{
-							continue;
-						}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="readers">inject with all possible readers</param>
+        public DataReaderProvider(IEnumerable<IDataReader> readers)
+        {
+            if (readers != null)
+            {
+                foreach (IDataReader reader in readers)
+                {
+                    foreach (string contentType in reader.ContentType)
+                    {
+                        if (String.IsNullOrEmpty(contentType) ||
+                            this.ReadersByMime.ContainsKey(contentType))
+                        {
+                            continue;
+                        }
 
-						this.ReadersByMime[contentType] = reader;
-					}
-				}
-			}
-		}
+                        this.ReadersByMime[contentType] = reader;
+                    }
+                }
+            }
+        }
 
-		#endregion Init
+        #endregion Init
 
-		#region Methods
+        #region Methods
 
-		/// <summary>
-		/// Finds an IDataReader by content-type header
-		/// </summary>
-		/// <param name="contentTypeHeader"></param>
-		/// <returns></returns>
-		public virtual IDataReader Find(string contentTypeHeader)
-		{
-			// TODO: implement this negotiation
-			// http://jsr311.java.net/nonav/releases/1.1/spec/spec3.html#x3-380003.8
+        /// <summary>
+        /// Finds an IDataReader by content-type header
+        /// </summary>
+        /// <param name="contentTypeHeader"></param>
+        /// <returns></returns>
+        public virtual IDataReader Find(string contentTypeHeader)
+        {
+            // TODO: implement this negotiation
+            // http://jsr311.java.net/nonav/releases/1.1/spec/spec3.html#x3-380003.8
 
-			string type = DataProviderUtility.ParseMediaType(contentTypeHeader);
+            string type = DataProviderUtility.ParseMediaType(contentTypeHeader);
 
-			IDataReader reader;
-			if (this.ReadersByMime.TryGetValue(type, out reader))
-			{
-				return reader;
-			}
+            IDataReader reader;
+            if (this.ReadersByMime.TryGetValue(type, out reader))
+            {
+                return reader;
+            }
 
-			return null;
-		}
+            return null;
+        }
 
-		#endregion Methods
-	}
+        #endregion Methods
+    }
 }

@@ -1,4 +1,5 @@
 #region License
+
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -26,39 +27,38 @@
 	THE SOFTWARE.
 
 \*---------------------------------------------------------------------------------*/
-#endregion License
 
-using System;
+#endregion License
 
 using JsonFx.Serialization;
 
 namespace JsonFx.Model
 {
-	/// <summary>
-	/// Provides base implementation for standard deserializers
-	/// </summary>
-	public abstract partial class ModelReader : DataReader<ModelTokenType>
-	{
-		#region Init
+    /// <summary>
+    /// Provides base implementation for standard deserializers
+    /// </summary>
+    public abstract partial class ModelReader : DataReader<ModelTokenType>
+    {
+        #region Init
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="settings"></param>
-		protected ModelReader(DataReaderSettings settings)
-			: base(settings)
-		{
-		}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="settings"></param>
+        protected ModelReader(DataReaderSettings settings)
+            : base(settings)
+        {
+        }
 
-		#endregion Init
+        #endregion Init
 
-		#region IDataReader Methods
+        #region IDataReader Methods
 
-		protected override ITokenAnalyzer<ModelTokenType> GetAnalyzer()
-		{
-			return new ModelAnalyzer(this.Settings);
-		}
+        protected override ITokenAnalyzer<ModelTokenType> GetAnalyzer()
+        {
+            return new ModelAnalyzer(this.Settings);
+        }
 
-		#endregion IDataReader Methods
-	}
+        #endregion IDataReader Methods
+    }
 }

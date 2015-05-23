@@ -1,4 +1,5 @@
 #region License
+
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -26,51 +27,48 @@
 	THE SOFTWARE.
 
 \*---------------------------------------------------------------------------------*/
+
 #endregion License
-
-using System;
-
-using JsonFx.Serialization;
 
 namespace JsonFx.Json
 {
-	/// <summary>
-	/// Formal language of tokens and symbols for JSON
-	/// </summary>
-	internal class JsonGrammar
-	{
-		#region Keyword Literals
+    /// <summary>
+    /// Formal language of tokens and symbols for JSON
+    /// </summary>
+    internal class JsonGrammar
+    {
+        #region Keyword Literals
 
-		public const string KeywordUndefined = "undefined";
-		public const string KeywordNull = "null";
-		public const string KeywordFalse = "false";
-		public const string KeywordTrue = "true";
-		public const string KeywordNaN = "NaN";
-		public const string KeywordInfinity = "Infinity";
+        public const string KeywordUndefined = "undefined";
+        public const string KeywordNull = "null";
+        public const string KeywordFalse = "false";
+        public const string KeywordTrue = "true";
+        public const string KeywordNaN = "NaN";
+        public const string KeywordInfinity = "Infinity";
 
-		#endregion Keyword Literals
+        #endregion Keyword Literals
 
-		#region Operators
+        #region Operators
 
-		public const char OperatorArrayBegin = '[';
-		public const char OperatorArrayEnd = ']';
-		public const char OperatorObjectBegin = '{';
-		public const char OperatorObjectEnd = '}';
-		public const char OperatorValueDelim = ',';
-		public const char OperatorPairDelim = ':';
+        public const char OperatorArrayBegin = '[';
+        public const char OperatorArrayEnd = ']';
+        public const char OperatorObjectBegin = '{';
+        public const char OperatorObjectEnd = '}';
+        public const char OperatorValueDelim = ',';
+        public const char OperatorPairDelim = ':';
 
-		public const char OperatorStringDelim = '"';
-		public const char OperatorStringDelimAlt = '\'';
-		public const char OperatorCharEscape = '\\';
+        public const char OperatorStringDelim = '"';
+        public const char OperatorStringDelimAlt = '\'';
+        public const char OperatorCharEscape = '\\';
 
-		public const char OperatorUnaryMinus = '-';
-		public const char OperatorUnaryPlus = '+';
-		public const char OperatorDecimalPoint = '.';
+        public const char OperatorUnaryMinus = '-';
+        public const char OperatorUnaryPlus = '+';
+        public const char OperatorDecimalPoint = '.';
 
-		public const string OperatorCommentBegin = "/*";
-		public const string OperatorCommentEnd = "*/";
-		public const string OperatorCommentLine = "//";
+        public const string OperatorCommentBegin = "/*";
+        public const string OperatorCommentEnd = "*/";
+        public const string OperatorCommentLine = "//";
 
-		#endregion Operators
-	}
+        #endregion Operators
+    }
 }
