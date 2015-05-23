@@ -1,4 +1,5 @@
 #region License
+
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -26,177 +27,177 @@
 	THE SOFTWARE.
 
 \*---------------------------------------------------------------------------------*/
-#endregion License
 
-using System;
-using System.Collections.Generic;
+#endregion License
 
 using JsonFx.Model;
 using JsonFx.Model.Filters;
 using JsonFx.Serialization.Filters;
 using JsonFx.Serialization.GraphCycles;
 using JsonFx.Serialization.Resolvers;
+using System;
+using System.Collections.Generic;
 
 namespace JsonFx.Serialization
 {
-	/// <summary>
-	/// Controls the serialization settings for IDataWriter
-	/// </summary>
-	public sealed class DataWriterSettings :
-		IResolverCacheContainer
-	{
-		#region Fields
+    /// <summary>
+    /// Controls the serialization settings for IDataWriter
+    /// </summary>
+    public sealed class DataWriterSettings :
+        IResolverCacheContainer
+    {
+        #region Fields
 
-		private bool prettyPrint;
-		private GraphCycleType graphCycles = GraphCycleType.Ignore;
-		private string tab = "\t";
-		private int maxDepth;
-		private string newLine = Environment.NewLine;
-		private readonly ResolverCache ResolverCache;
-		private readonly IEnumerable<IDataFilter<ModelTokenType>> ModelFilters;
+        private bool prettyPrint;
+        private GraphCycleType graphCycles = GraphCycleType.Ignore;
+        private string tab = "\t";
+        private int maxDepth;
+        private string newLine = Environment.NewLine;
+        private readonly ResolverCache ResolverCache;
+        private readonly IEnumerable<IDataFilter<ModelTokenType>> ModelFilters;
 
-		#endregion Fields
+        #endregion Fields
 
-		#region Init
+        #region Init
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		public DataWriterSettings()
-			: this(new PocoResolverStrategy(), new Iso8601DateFilter())
-		{
-		}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        public DataWriterSettings()
+            : this(new PocoResolverStrategy(), new Iso8601DateFilter())
+        {
+        }
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		public DataWriterSettings(params IDataFilter<ModelTokenType>[] filters)
-			: this(new PocoResolverStrategy(), filters)
-		{
-		}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        public DataWriterSettings(params IDataFilter<ModelTokenType>[] filters)
+            : this(new PocoResolverStrategy(), filters)
+        {
+        }
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		public DataWriterSettings(IEnumerable<IDataFilter<ModelTokenType>> filters)
-			: this(new PocoResolverStrategy(), filters)
-		{
-		}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        public DataWriterSettings(IEnumerable<IDataFilter<ModelTokenType>> filters)
+            : this(new PocoResolverStrategy(), filters)
+        {
+        }
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="strategy"></param>
-		public DataWriterSettings(IResolverStrategy strategy, params IDataFilter<ModelTokenType>[] filters)
-			: this(new ResolverCache(strategy), filters)
-		{
-		}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="strategy"></param>
+        public DataWriterSettings(IResolverStrategy strategy, params IDataFilter<ModelTokenType>[] filters)
+            : this(new ResolverCache(strategy), filters)
+        {
+        }
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="strategy"></param>
-		public DataWriterSettings(IResolverStrategy strategy, IEnumerable<IDataFilter<ModelTokenType>> filters)
-			: this(new ResolverCache(strategy), filters)
-		{
-		}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="strategy"></param>
+        public DataWriterSettings(IResolverStrategy strategy, IEnumerable<IDataFilter<ModelTokenType>> filters)
+            : this(new ResolverCache(strategy), filters)
+        {
+        }
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="resolverCache"></param>
-		public DataWriterSettings(ResolverCache resolverCache, params IDataFilter<ModelTokenType>[] filters)
-			: this(resolverCache, (IEnumerable<IDataFilter<ModelTokenType>>) filters)
-		{
-		}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="resolverCache"></param>
+        public DataWriterSettings(ResolverCache resolverCache, params IDataFilter<ModelTokenType>[] filters)
+            : this(resolverCache, (IEnumerable<IDataFilter<ModelTokenType>>)filters)
+        {
+        }
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="resolverCache"></param>
-		public DataWriterSettings(ResolverCache resolverCache, IEnumerable<IDataFilter<ModelTokenType>> filters)
-		{
-			this.ResolverCache = resolverCache;
-			this.ModelFilters = filters;
-		}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="resolverCache"></param>
+        public DataWriterSettings(ResolverCache resolverCache, IEnumerable<IDataFilter<ModelTokenType>> filters)
+        {
+            this.ResolverCache = resolverCache;
+            this.ModelFilters = filters;
+        }
 
-		#endregion Init
+        #endregion Init
 
-		#region Properties
+        #region Properties
 
-		/// <summary>
-		/// Gets and sets what to do when graph cycles (repeated references) are encounted
-		/// </summary>
-		public GraphCycleType GraphCycles
-		{
-			get { return this.graphCycles; }
-			set { this.graphCycles = value; }
-		}
+        /// <summary>
+        /// Gets and sets what to do when graph cycles (repeated references) are encounted
+        /// </summary>
+        public GraphCycleType GraphCycles
+        {
+            get { return this.graphCycles; }
+            set { this.graphCycles = value; }
+        }
 
-		/// <summary>
-		/// Gets and sets the maximum nesting depth
-		/// </summary>
-		/// <remarks>
-		/// Depth is a fast and easy safegaurd against detecting graph cycles but may produce false positives
-		/// </remarks>
-		public int MaxDepth
-		{
-			get { return this.maxDepth; }
-			set { this.maxDepth = value; }
-		}
+        /// <summary>
+        /// Gets and sets the maximum nesting depth
+        /// </summary>
+        /// <remarks>
+        /// Depth is a fast and easy safegaurd against detecting graph cycles but may produce false positives
+        /// </remarks>
+        public int MaxDepth
+        {
+            get { return this.maxDepth; }
+            set { this.maxDepth = value; }
+        }
 
-		/// <summary>
-		/// Gets and sets if output will be formatted for human reading.
-		/// </summary>
-		public bool PrettyPrint
-		{
-			get { return this.prettyPrint; }
-			set { this.prettyPrint = value; }
-		}
+        /// <summary>
+        /// Gets and sets if output will be formatted for human reading.
+        /// </summary>
+        public bool PrettyPrint
+        {
+            get { return this.prettyPrint; }
+            set { this.prettyPrint = value; }
+        }
 
-		/// <summary>
-		/// Gets and sets the string to use for indentation
-		/// </summary>
-		public string Tab
-		{
-			get { return this.tab; }
-			set { this.tab = value; }
-		}
+        /// <summary>
+        /// Gets and sets the string to use for indentation
+        /// </summary>
+        public string Tab
+        {
+            get { return this.tab; }
+            set { this.tab = value; }
+        }
 
-		/// <summary>
-		/// Gets and sets the line terminator string
-		/// </summary>
-		public string NewLine
-		{
-			get { return this.newLine; }
-			set { this.newLine = value; }
-		}
+        /// <summary>
+        /// Gets and sets the line terminator string
+        /// </summary>
+        public string NewLine
+        {
+            get { return this.newLine; }
+            set { this.newLine = value; }
+        }
 
-		/// <summary>
-		/// Gets manager of name resolution for IDataReader
-		/// </summary>
-		public ResolverCache Resolver
-		{
-			get { return this.ResolverCache; }
-		}
+        /// <summary>
+        /// Gets manager of name resolution for IDataReader
+        /// </summary>
+        public ResolverCache Resolver
+        {
+            get { return this.ResolverCache; }
+        }
 
-		/// <summary>
-		/// Gets the custom filters
-		/// </summary>
-		public IEnumerable<IDataFilter<ModelTokenType>> Filters
-		{
-			get { return this.ModelFilters; }
-		}
+        /// <summary>
+        /// Gets the custom filters
+        /// </summary>
+        public IEnumerable<IDataFilter<ModelTokenType>> Filters
+        {
+            get { return this.ModelFilters; }
+        }
 
-		#endregion Properties
+        #endregion Properties
 
-		#region IResolverCacheContainer Members
+        #region IResolverCacheContainer Members
 
-		ResolverCache IResolverCacheContainer.ResolverCache
-		{
-			get { return this.ResolverCache; }
-		}
+        ResolverCache IResolverCacheContainer.ResolverCache
+        {
+            get { return this.ResolverCache; }
+        }
 
-		#endregion IResolverCacheContainer Members
-	}
+        #endregion IResolverCacheContainer Members
+    }
 }

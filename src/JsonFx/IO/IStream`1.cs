@@ -1,4 +1,5 @@
 ﻿#region License
+
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -26,6 +27,7 @@
 	THE SOFTWARE.
 
 \*---------------------------------------------------------------------------------*/
+
 #endregion License
 
 using System;
@@ -33,64 +35,64 @@ using System.Collections.Generic;
 
 namespace JsonFx.IO
 {
-	/// <summary>
-	/// Supports forward-only iteration over an input sequence
-	/// </summary>
-	public interface IStream<T> : IDisposable
-	{
-		#region Properties
+    /// <summary>
+    /// Supports forward-only iteration over an input sequence
+    /// </summary>
+    public interface IStream<T> : IDisposable
+    {
+        #region Properties
 
-		/// <summary>
-		/// Determines if the sequence has completed.
-		/// </summary>
-		bool IsCompleted
-		{
-			get;
-		}
+        /// <summary>
+        /// Determines if the sequence has completed.
+        /// </summary>
+        bool IsCompleted
+        {
+            get;
+        }
 
-		/// <summary>
-		/// Gets a value indicating if is currently capturing a sequence
-		/// </summary>
-		bool IsChunking
-		{
-			get;
-		}
+        /// <summary>
+        /// Gets a value indicating if is currently capturing a sequence
+        /// </summary>
+        bool IsChunking
+        {
+            get;
+        }
 
-		/// <summary>
-		/// Gets the number of items currently chunked
-		/// </summary>
-		int ChunkSize
-		{
-			get;
-		}
+        /// <summary>
+        /// Gets the number of items currently chunked
+        /// </summary>
+        int ChunkSize
+        {
+            get;
+        }
 
-		#endregion Properties
+        #endregion Properties
 
-		#region Methods
+        #region Methods
 
-		/// <summary>
-		/// Returns but does not remove the item at the front of the sequence.
-		/// </summary>
-		/// <returns></returns>
-		T Peek();
+        /// <summary>
+        /// Returns but does not remove the item at the front of the sequence.
+        /// </summary>
+        /// <returns></returns>
+        T Peek();
 
-		/// <summary>
-		/// Returns and removes the item at the front of the sequence.
-		/// </summary>
-		/// <returns></returns>
-		T Pop();
+        /// <summary>
+        /// Returns and removes the item at the front of the sequence.
+        /// </summary>
+        /// <returns></returns>
+        T Pop();
 
-		/// <summary>
-		/// Begins chunking at the current index
-		/// </summary>
-		void BeginChunk();
+        /// <summary>
+        /// Begins chunking at the current index
+        /// </summary>
+        void BeginChunk();
 
-		/// <summary>
-		/// Ends chunking at the current index and returns the buffered sequence chunk
-		/// </summary>
-		/// <returns></returns>
-		IEnumerable<T> EndChunk();
+        /// <summary>
+        /// Ends chunking at the current index and returns the buffered sequence chunk
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<T> EndChunk();
 
-		#endregion Methods
-	}
+        #endregion Methods
+    }
 }

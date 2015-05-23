@@ -1,4 +1,5 @@
 #region License
+
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -26,130 +27,130 @@
 	THE SOFTWARE.
 
 \*---------------------------------------------------------------------------------*/
+
 #endregion License
 
-using System;
 using System.Collections.Generic;
 using System.Reflection;
 
 namespace JsonFx.Serialization.Resolvers
 {
-	/// <summary>
-	/// Controls name resolution for IDataReader / IDataWriter by using pluggable delegate callbacks
-	/// </summary>
-	public sealed class CallbackResolverStrategy : IResolverStrategy
-	{
-		#region Properties
+    /// <summary>
+    /// Controls name resolution for IDataReader / IDataWriter by using pluggable delegate callbacks
+    /// </summary>
+    public sealed class CallbackResolverStrategy : IResolverStrategy
+    {
+        #region Properties
 
-		public delegate bool PropertyIgnoredDelegate(PropertyInfo propertyInfo, bool isAnonymous);
+        public delegate bool PropertyIgnoredDelegate(PropertyInfo propertyInfo, bool isAnonymous);
 
-		/// <summary>
-		/// Gets and sets the implementation for ignoring properties
-		/// </summary>
-		public PropertyIgnoredDelegate IsPropertyIgnored
-		{
-			get;
-			set;
-		}
+        /// <summary>
+        /// Gets and sets the implementation for ignoring properties
+        /// </summary>
+        public PropertyIgnoredDelegate IsPropertyIgnored
+        {
+            get;
+            set;
+        }
 
-		public delegate bool FieldIgnoredDelegate(FieldInfo fieldInfo);
+        public delegate bool FieldIgnoredDelegate(FieldInfo fieldInfo);
 
-		/// <summary>
-		/// Gets and sets the implementation for ignoring fields
-		/// </summary>
-		public FieldIgnoredDelegate IsFieldIgnored
-		{
-			get;
-			set;
-		}
+        /// <summary>
+        /// Gets and sets the implementation for ignoring fields
+        /// </summary>
+        public FieldIgnoredDelegate IsFieldIgnored
+        {
+            get;
+            set;
+        }
 
-		public delegate ValueIgnoredDelegate GetValueIgnoredDelegate(MemberInfo memberInfo);
+        public delegate ValueIgnoredDelegate GetValueIgnoredDelegate(MemberInfo memberInfo);
 
-		/// <summary>
-		/// Gets and sets the implementation for ignoring properties by value
-		/// </summary>
-		public GetValueIgnoredDelegate GetValueIgnored
-		{
-			get;
-			set;
-		}
+        /// <summary>
+        /// Gets and sets the implementation for ignoring properties by value
+        /// </summary>
+        public GetValueIgnoredDelegate GetValueIgnored
+        {
+            get;
+            set;
+        }
 
-		public delegate IEnumerable<DataName> GetNameDelegate(MemberInfo memberInfo);
+        public delegate IEnumerable<DataName> GetNameDelegate(MemberInfo memberInfo);
 
-		/// <summary>
-		/// Gets and sets the implementation for naming members
-		/// </summary>
-		public GetNameDelegate GetName
-		{
-			get;
-			set;
-		}
+        /// <summary>
+        /// Gets and sets the implementation for naming members
+        /// </summary>
+        public GetNameDelegate GetName
+        {
+            get;
+            set;
+        }
 
-		public delegate IEnumerable<MemberMap> SortMembersDelegate(IEnumerable<MemberMap> members);
+        public delegate IEnumerable<MemberMap> SortMembersDelegate(IEnumerable<MemberMap> members);
 
-		/// <summary>
-		/// Gets and sets the implementation for sorting members
-		/// </summary>
-		public SortMembersDelegate SortMembers
-		{
-			get;
-			set;
-		}
+        /// <summary>
+        /// Gets and sets the implementation for sorting members
+        /// </summary>
+        public SortMembersDelegate SortMembers
+        {
+            get;
+            set;
+        }
 
-		#endregion Properties
+        #endregion Properties
 
-		#region IResolverStrategy Members
+        #region IResolverStrategy Members
 
-		bool IResolverStrategy.IsPropertyIgnored(PropertyInfo member, bool isImmutableType)
-		{
-			if (this.IsPropertyIgnored == null)
-			{
-				return false;
-			}
+        bool IResolverStrategy.IsPropertyIgnored(PropertyInfo member, bool isImmutableType)
+        {
+            if (this.IsPropertyIgnored == null)
+            {
+                return false;
+            }
 
-			return this.IsPropertyIgnored(member, isImmutableType);
-		}
+            return this.IsPropertyIgnored(member, isImmutableType);
+        }
 
-		bool IResolverStrategy.IsFieldIgnored(FieldInfo member)
-		{
-			if (this.IsFieldIgnored == null)
-			{
-				return false;
-			}
+        bool IResolverStrategy.IsFieldIgnored(FieldInfo member)
+        {
+            if (this.IsFieldIgnored == null)
+            {
+                return false;
+            }
 
-			return this.IsFieldIgnored(member);
-		}
+            return this.IsFieldIgnored(member);
+        }
 
-		ValueIgnoredDelegate IResolverStrategy.GetValueIgnoredCallback(MemberInfo member)
-		{
-			if (this.GetValueIgnored == null)
-			{
-				return null;
-			}
+        ValueIgnoredDelegate IResolverStrategy.GetValueIgnoredCallback(MemberInfo member)
+        {
+            if (this.GetValueIgnored == null)
+            {
+                return null;
+            }
 
-			return this.GetValueIgnored(member);
-		}
+            return this.GetValueIgnored(member);
+        }
 
-		IEnumerable<DataName> IResolverStrategy.GetName(MemberInfo member)
-		{
-			if (this.GetName == null)
-			{
-				return null;
-			}
+        IEnumerable<DataName> IResolverStrategy.GetName(MemberInfo member)
+        {
+            if (this.GetName == null)
+            {
+                return null;
+            }
 
-			return this.GetName(member);
-		}
+            return this.GetName(member);
+        }
 
-		IEnumerable<MemberMap> IResolverStrategy.SortMembers(IEnumerable<MemberMap> members)
-		{
-			if (this.SortMembers == null)
-			{
-				return members;
-			}
+        IEnumerable<MemberMap> IResolverStrategy.SortMembers(IEnumerable<MemberMap> members)
+        {
+            if (this.SortMembers == null)
+            {
+                return members;
+            }
 
-			return this.SortMembers(members);
-		}
+            return this.SortMembers(members);
+        }
 
-		#endregion IResolverStrategy Members
-	}
+        #endregion IResolverStrategy Members
+    }
 }

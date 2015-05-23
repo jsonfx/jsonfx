@@ -1,4 +1,5 @@
 ﻿#region License
+
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -26,6 +27,7 @@
 	THE SOFTWARE.
 
 \*---------------------------------------------------------------------------------*/
+
 #endregion License
 
 using System;
@@ -34,102 +36,102 @@ using System.IO;
 
 namespace JsonFx.Serialization.Providers
 {
-	/// <summary>
-	/// Provides lookup capabilities for providers
-	/// </summary>
-	public static class DataProviderUtility
-	{
-		#region Constants
+    /// <summary>
+    /// Provides lookup capabilities for providers
+    /// </summary>
+    public static class DataProviderUtility
+    {
+        #region Constants
 
-		public const string DefaultContentType = "application/octet-stream";
+        public const string DefaultContentType = "application/octet-stream";
 
-		#endregion Constants
+        #endregion Constants
 
-		#region Utility Methods
+        #region Utility Methods
 
-		/// <summary>
-		/// Parses HTTP headers for Media-Types
-		/// </summary>
-		/// <param name="accept">HTTP Accept header</param>
-		/// <param name="contentType">HTTP Content-Type header</param>
-		/// <returns>sequence of Media-Types</returns>
-		/// <remarks>
-		/// http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
-		/// </remarks>
-		public static IEnumerable<string> ParseHeaders(string accept, string contentType)
-		{
-			string mime;
+        /// <summary>
+        /// Parses HTTP headers for Media-Types
+        /// </summary>
+        /// <param name="accept">HTTP Accept header</param>
+        /// <param name="contentType">HTTP Content-Type header</param>
+        /// <returns>sequence of Media-Types</returns>
+        /// <remarks>
+        /// http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
+        /// </remarks>
+        public static IEnumerable<string> ParseHeaders(string accept, string contentType)
+        {
+            string mime;
 
-			// check for a matching accept type
-			foreach (string type in DataProviderUtility.SplitTrim(accept, ','))
-			{
-				mime = DataProviderUtility.ParseMediaType(type);
-				if (!String.IsNullOrEmpty(mime))
-				{
-					yield return mime;
-				}
-			}
+            // check for a matching accept type
+            foreach (string type in DataProviderUtility.SplitTrim(accept, ','))
+            {
+                mime = DataProviderUtility.ParseMediaType(type);
+                if (!String.IsNullOrEmpty(mime))
+                {
+                    yield return mime;
+                }
+            }
 
-			// fallback on content-type
-			mime = DataProviderUtility.ParseMediaType(contentType);
-			if (!String.IsNullOrEmpty(mime))
-			{
-				yield return mime;
-			}
-		}
+            // fallback on content-type
+            mime = DataProviderUtility.ParseMediaType(contentType);
+            if (!String.IsNullOrEmpty(mime))
+            {
+                yield return mime;
+            }
+        }
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="type"></param>
-		/// <returns></returns>
-		public static string ParseMediaType(string type)
-		{
-			foreach (string mime in DataProviderUtility.SplitTrim(type, ';'))
-			{
-				// only return first part
-				return mime;
-			}
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static string ParseMediaType(string type)
+        {
+            foreach (string mime in DataProviderUtility.SplitTrim(type, ';'))
+            {
+                // only return first part
+                return mime;
+            }
 
-			// if no parts then was empty
-			return String.Empty;
-		}
+            // if no parts then was empty
+            return String.Empty;
+        }
 
-		private static IEnumerable<string> SplitTrim(string source, char ch)
-		{
-			if (String.IsNullOrEmpty(source))
-			{
-				yield break;
-			}
+        private static IEnumerable<string> SplitTrim(string source, char ch)
+        {
+            if (String.IsNullOrEmpty(source))
+            {
+                yield break;
+            }
 
-			int length = source.Length;
-			for (int prev=0, next=0; prev<length && next>=0; prev=next+1)
-			{
-				next = source.IndexOf(ch, prev);
-				if (next < 0)
-				{
-					next = length;
-				}
+            int length = source.Length;
+            for (int prev = 0, next = 0; prev < length && next >= 0; prev = next + 1)
+            {
+                next = source.IndexOf(ch, prev);
+                if (next < 0)
+                {
+                    next = length;
+                }
 
-				string part = source.Substring(prev, next-prev).Trim();
-				if (part.Length > 0)
-				{
-					yield return part;
-				}
-			}
-		}
+                string part = source.Substring(prev, next - prev).Trim();
+                if (part.Length > 0)
+                {
+                    yield return part;
+                }
+            }
+        }
 
-		public static string NormalizeExtension(string extension)
-		{
-			if (String.IsNullOrEmpty(extension))
-			{
-				return String.Empty;
-			}
+        public static string NormalizeExtension(string extension)
+        {
+            if (String.IsNullOrEmpty(extension))
+            {
+                return String.Empty;
+            }
 
-			// ensure is only extension with leading dot
-			return Path.GetExtension(extension);
-		}
+            // ensure is only extension with leading dot
+            return Path.GetExtension(extension);
+        }
 
-		#endregion Utility Methods
-	}
+        #endregion Utility Methods
+    }
 }

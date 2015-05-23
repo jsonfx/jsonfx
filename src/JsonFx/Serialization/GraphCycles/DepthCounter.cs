@@ -1,4 +1,5 @@
 ﻿#region License
+
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -26,64 +27,65 @@
 	THE SOFTWARE.
 
 \*---------------------------------------------------------------------------------*/
+
 #endregion License
 
 using System;
 
 namespace JsonFx.Serialization.GraphCycles
 {
-	/// <summary>
-	/// Detects graph cycles by tracking graph depth
-	/// </summary>
-	public class DepthCounter : ICycleDetector
-	{
-		#region Fields
+    /// <summary>
+    /// Detects graph cycles by tracking graph depth
+    /// </summary>
+    public class DepthCounter : ICycleDetector
+    {
+        #region Fields
 
-		private readonly int MaxDepth;
-		private int depth = 0;
+        private readonly int MaxDepth;
+        private int depth = 0;
 
-		#endregion Fields
+        #endregion Fields
 
-		#region Init
+        #region Init
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="maxDepth"></param>
-		public DepthCounter(int maxDepth)
-		{
-			if (maxDepth < 1)
-			{
-				throw new ArgumentException("MaxDepth must be a positive value", "maxDepth");
-			}
-			this.MaxDepth = maxDepth;
-		}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="maxDepth"></param>
+        public DepthCounter(int maxDepth)
+        {
+            if (maxDepth < 1)
+            {
+                throw new ArgumentException("MaxDepth must be a positive value", "maxDepth");
+            }
+            this.MaxDepth = maxDepth;
+        }
 
-		#endregion Init
+        #endregion Init
 
-		#region Methods
+        #region Methods
 
-		/// <summary>
-		/// Increments the depth
-		/// </summary>
-		/// <param name="item"></param>
-		/// <returns>true if MaxDepth has not been exceeded</returns>
-		public bool Add(object item)
-		{
-			this.depth++;
+        /// <summary>
+        /// Increments the depth
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns>true if MaxDepth has not been exceeded</returns>
+        public bool Add(object item)
+        {
+            this.depth++;
 
-			return (this.depth >= this.MaxDepth);
-		}
+            return (this.depth >= this.MaxDepth);
+        }
 
-		/// <summary>
-		/// Increments the depth
-		/// </summary>
-		/// <param name="item"></param>
-		public void Remove(object item)
-		{
-			this.depth--;
-		}
+        /// <summary>
+        /// Increments the depth
+        /// </summary>
+        /// <param name="item"></param>
+        public void Remove(object item)
+        {
+            this.depth--;
+        }
 
-		#endregion Methods
-	}
+        #endregion Methods
+    }
 }

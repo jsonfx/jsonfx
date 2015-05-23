@@ -1,4 +1,5 @@
 ﻿#region License
+
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -26,14 +27,13 @@
 	THE SOFTWARE.
 
 \*---------------------------------------------------------------------------------*/
-#endregion License
 
-using System;
+#endregion License
 
 namespace JsonFx.Serialization.Resolvers
 {
-	public interface IResolverCacheContainer
-	{
-		ResolverCache ResolverCache { get; }
-	}
+    public interface IResolverCacheContainer
+    {
+        ResolverCache ResolverCache { get; }
+    }
 }

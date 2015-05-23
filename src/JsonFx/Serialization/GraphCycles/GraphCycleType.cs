@@ -1,4 +1,5 @@
 ﻿#region License
+
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -26,27 +27,26 @@
 	THE SOFTWARE.
 
 \*---------------------------------------------------------------------------------*/
-#endregion License
 
-using System;
+#endregion License
 
 namespace JsonFx.Serialization.GraphCycles
 {
-	public enum GraphCycleType
-	{
-		/// <summary>
-		/// Graph cycles are detected with a reference tracking, any repeated reference results in a null value
-		/// </summary>
-		Ignore,
+    public enum GraphCycleType
+    {
+        /// <summary>
+        /// Graph cycles are detected with a reference tracking, any repeated reference results in a null value
+        /// </summary>
+        Ignore,
 
-		/// <summary>
-		/// Graph cycles are detected with a reference tracking, any repeated reference results in an error
-		/// </summary>
-		Reference,
+        /// <summary>
+        /// Graph cycles are detected with a reference tracking, any repeated reference results in an error
+        /// </summary>
+        Reference,
 
-		/// <summary>
-		/// Graph cycles are detected with a maximum depth count, exceeding depth results in an error
-		/// </summary>
-		MaxDepth
-	}
+        /// <summary>
+        /// Graph cycles are detected with a maximum depth count, exceeding depth results in an error
+        /// </summary>
+        MaxDepth
+    }
 }

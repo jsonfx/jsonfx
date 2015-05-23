@@ -1,4 +1,5 @@
 ﻿#region License
+
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -26,59 +27,58 @@
 	THE SOFTWARE.
 
 \*---------------------------------------------------------------------------------*/
+
 #endregion License
 
-using System;
-using System.Collections.Generic;
-
 using JsonFx.IO;
+using System.Collections.Generic;
 
 namespace JsonFx.Serialization.Filters
 {
-	/// <summary>
-	/// Allows a mechanism for manipulating serialization
-	/// </summary>
-	/// <typeparam name="TTokenType">Defines the type of token stream this filter understands</typeparam>
-	public interface IDataFilter<TTokenType>
-	{
-		/// <summary>
-		/// Allows a class to act as a factory for a type via input Token&lt;T&gt; sequence
-		/// </summary>
-		/// <param name="tokens">input tokens</param>
-		/// <param name="value"></param>
-		/// <returns>true if value was generated</returns>
-		bool TryRead(DataReaderSettings settings, IStream<Token<TTokenType>> tokens, out object value);
+    /// <summary>
+    /// Allows a mechanism for manipulating serialization
+    /// </summary>
+    /// <typeparam name="TTokenType">Defines the type of token stream this filter understands</typeparam>
+    public interface IDataFilter<TTokenType>
+    {
+        /// <summary>
+        /// Allows a class to act as a factory for a type via input Token&lt;T&gt; sequence
+        /// </summary>
+        /// <param name="tokens">input tokens</param>
+        /// <param name="value"></param>
+        /// <returns>true if value was generated</returns>
+        bool TryRead(DataReaderSettings settings, IStream<Token<TTokenType>> tokens, out object value);
 
-		/// <summary>
-		/// Allows a class to serialize a type as Token&lt;T&gt; sequence
-		/// </summary>
-		/// <param name="value"></param>
-		/// <param name="tokens"></param>
-		/// <returns>true if value was consumed</returns>
-		bool TryWrite(DataWriterSettings settings, object value, out IEnumerable<Token<TTokenType>> tokens);
-	}
+        /// <summary>
+        /// Allows a class to serialize a type as Token&lt;T&gt; sequence
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="tokens"></param>
+        /// <returns>true if value was consumed</returns>
+        bool TryWrite(DataWriterSettings settings, object value, out IEnumerable<Token<TTokenType>> tokens);
+    }
 
-	/// <summary>
-	/// Allows a mechanism for manipulating serialization
-	/// </summary>
-	/// <typeparam name="TTokenType">Defines the type of token stream this filter understands</typeparam>
-	/// <typeparam name="TResult">Defines the type this filter reads/writes</typeparam>
-	public interface IDataFilter<TTokenType, TResult> : IDataFilter<TTokenType>
-	{
-		/// <summary>
-		/// Allows a class to act as a factory for a type via input Token&lt;T&gt; sequence
-		/// </summary>
-		/// <param name="tokens">input tokens</param>
-		/// <param name="value"></param>
-		/// <returns>true if value was generated</returns>
-		bool TryRead(DataReaderSettings settings, IStream<Token<TTokenType>> tokens, out TResult value);
+    /// <summary>
+    /// Allows a mechanism for manipulating serialization
+    /// </summary>
+    /// <typeparam name="TTokenType">Defines the type of token stream this filter understands</typeparam>
+    /// <typeparam name="TResult">Defines the type this filter reads/writes</typeparam>
+    public interface IDataFilter<TTokenType, TResult> : IDataFilter<TTokenType>
+    {
+        /// <summary>
+        /// Allows a class to act as a factory for a type via input Token&lt;T&gt; sequence
+        /// </summary>
+        /// <param name="tokens">input tokens</param>
+        /// <param name="value"></param>
+        /// <returns>true if value was generated</returns>
+        bool TryRead(DataReaderSettings settings, IStream<Token<TTokenType>> tokens, out TResult value);
 
-		/// <summary>
-		/// Allows a class to serialize a type as Token&lt;T&gt; sequence
-		/// </summary>
-		/// <param name="value"></param>
-		/// <param name="tokens"></param>
-		/// <returns>true if value was consumed</returns>
-		bool TryWrite(DataWriterSettings settings, TResult value, out IEnumerable<Token<TTokenType>> tokens);
-	}
+        /// <summary>
+        /// Allows a class to serialize a type as Token&lt;T&gt; sequence
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="tokens"></param>
+        /// <returns>true if value was consumed</returns>
+        bool TryWrite(DataWriterSettings settings, TResult value, out IEnumerable<Token<TTokenType>> tokens);
+    }
 }

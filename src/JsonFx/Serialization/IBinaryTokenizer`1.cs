@@ -1,4 +1,5 @@
 #region License
+
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -26,6 +27,7 @@
 	THE SOFTWARE.
 
 \*---------------------------------------------------------------------------------*/
+
 #endregion License
 
 using System;
@@ -34,43 +36,43 @@ using System.IO;
 
 namespace JsonFx.Serialization
 {
-	/// <summary>
-	/// Generates a sequence of tokens from a sequence of characters
-	/// </summary>
-	/// <typeparam name="T">token type</typeparam>
-	public interface IBinaryTokenizer<T> : IDisposable
-	{
-		#region Properties
+    /// <summary>
+    /// Generates a sequence of tokens from a sequence of characters
+    /// </summary>
+    /// <typeparam name="T">token type</typeparam>
+    public interface IBinaryTokenizer<T> : IDisposable
+    {
+        #region Properties
 
-		/// <summary>
-		/// Gets the current position of the underlying input character sequence
-		/// </summary>
-		/// <remarks>
-		/// Tokenizers not tracking index should return -1.
-		/// </remarks>
-		long Index
-		{
-			get;
-		}
+        /// <summary>
+        /// Gets the current position of the underlying input character sequence
+        /// </summary>
+        /// <remarks>
+        /// Tokenizers not tracking index should return -1.
+        /// </remarks>
+        long Index
+        {
+            get;
+        }
 
-		#endregion Properties
+        #endregion Properties
 
-		#region Methods
+        #region Methods
 
-		/// <summary>
-		/// Tokenizes the input sequence into tokens
-		/// </summary>
-		/// <param name="reader"></param>
-		/// <returns></returns>
-		IEnumerable<Token<T>> GetTokens(Stream stream);
+        /// <summary>
+        /// Tokenizes the input sequence into tokens
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <returns></returns>
+        IEnumerable<Token<T>> GetTokens(Stream stream);
 
-		/// <summary>
-		/// Tokenizes the input sequence into tokens
-		/// </summary>
-		/// <param name="text"></param>
-		/// <returns></returns>
-		IEnumerable<Token<T>> GetTokens(byte[] bytes);
+        /// <summary>
+        /// Tokenizes the input sequence into tokens
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        IEnumerable<Token<T>> GetTokens(byte[] bytes);
 
-		#endregion Methods
-	}
+        #endregion Methods
+    }
 }

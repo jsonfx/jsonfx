@@ -1,4 +1,5 @@
 ﻿#region License
+
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -26,33 +27,32 @@
 	THE SOFTWARE.
 
 \*---------------------------------------------------------------------------------*/
-#endregion License
 
-using System;
+#endregion License
 
 namespace JsonFx.Serialization.GraphCycles
 {
-	/// <summary>
-	/// Defines an interface for detecting graph cycles
-	/// </summary>
-	public interface ICycleDetector
-	{
-		#region Methods
+    /// <summary>
+    /// Defines an interface for detecting graph cycles
+    /// </summary>
+    public interface ICycleDetector
+    {
+        #region Methods
 
-		/// <summary>
-		/// Begins tracking of the reference
-		/// </summary>
-		/// <param name="item"></param>
-		/// <returns>true if graph cycle was detected</returns>
-		bool Add(object item);
+        /// <summary>
+        /// Begins tracking of the reference
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns>true if graph cycle was detected</returns>
+        bool Add(object item);
 
-		/// <summary>
-		/// Ends tracking of the reference
-		/// </summary>
-		/// <param name="item"></param>
-		/// <returns>true if tracking was successfully completed</returns>
-		void Remove(object item);
+        /// <summary>
+        /// Ends tracking of the reference
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns>true if tracking was successfully completed</returns>
+        void Remove(object item);
 
-		#endregion Methods
-	}
+        #endregion Methods
+    }
 }

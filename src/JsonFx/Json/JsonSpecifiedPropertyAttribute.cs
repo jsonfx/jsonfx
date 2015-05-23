@@ -1,4 +1,5 @@
 #region License
+
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -26,60 +27,61 @@
 	THE SOFTWARE.
 
 \*---------------------------------------------------------------------------------*/
+
 #endregion License
 
 using System;
 
 namespace JsonFx.Json
 {
-	/// <summary>
-	/// Specifies the name of the property which specifies if member should be serialized.
-	/// </summary>
-	/// <remarks>
-	/// These properties can be marked private/protected/internal and it will still be recognized
-	/// </remarks>
-	[AttributeUsage(AttributeTargets.Field|AttributeTargets.Property, AllowMultiple=false)]
-	public class JsonSpecifiedPropertyAttribute : Attribute
-	{
-		#region Fields
+    /// <summary>
+    /// Specifies the name of the property which specifies if member should be serialized.
+    /// </summary>
+    /// <remarks>
+    /// These properties can be marked private/protected/internal and it will still be recognized
+    /// </remarks>
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false)]
+    public class JsonSpecifiedPropertyAttribute : Attribute
+    {
+        #region Fields
 
-		private string specifiedProperty;
+        private string specifiedProperty;
 
-		#endregion Fields
+        #endregion Fields
 
-		#region Init
+        #region Init
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="propertyName">the name of the property which controls serialization for this member</param>
-		public JsonSpecifiedPropertyAttribute()
-		{
-		}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="propertyName">the name of the property which controls serialization for this member</param>
+        public JsonSpecifiedPropertyAttribute()
+        {
+        }
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="propertyName">the name of the property which controls serialization for this member</param>
-		public JsonSpecifiedPropertyAttribute(string propertyName)
-		{
-			this.specifiedProperty = propertyName;
-		}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="propertyName">the name of the property which controls serialization for this member</param>
+        public JsonSpecifiedPropertyAttribute(string propertyName)
+        {
+            this.specifiedProperty = propertyName;
+        }
 
-		#endregion Init
+        #endregion Init
 
-		#region Properties
+        #region Properties
 
-		/// <summary>
-		/// Gets and sets the name of the property which
-		/// specifies if member should be serialized
-		/// </summary>
-		public string SpecifiedProperty
-		{
-			get { return this.specifiedProperty; }
-			set { this.specifiedProperty = value; }
-		}
+        /// <summary>
+        /// Gets and sets the name of the property which
+        /// specifies if member should be serialized
+        /// </summary>
+        public string SpecifiedProperty
+        {
+            get { return this.specifiedProperty; }
+            set { this.specifiedProperty = value; }
+        }
 
-		#endregion Properties
-	}
+        #endregion Properties
+    }
 }

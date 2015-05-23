@@ -1,4 +1,5 @@
 ﻿#region License
+
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -26,6 +27,7 @@
 	THE SOFTWARE.
 
 \*---------------------------------------------------------------------------------*/
+
 #endregion License
 
 using System;
@@ -34,292 +36,292 @@ using System.Text;
 
 namespace JsonFx.IO
 {
-	/// <summary>
-	/// Supports a simple iteration over a string tracking line/column/position
-	/// </summary>
-	public class StringStream : ITextStream
-	{
-		#region Constants
+    /// <summary>
+    /// Supports a simple iteration over a string tracking line/column/position
+    /// </summary>
+    public class StringStream : ITextStream
+    {
+        #region Constants
 
-		public static readonly StringStream Null = new StringStream(null);
+        public static readonly StringStream Null = new StringStream(null);
 
-		#endregion Constants
+        #endregion Constants
 
-		#region Fields
+        #region Fields
 
-		private bool isCompleted;
-		private bool isReady;
-		private char current;
+        private bool isCompleted;
+        private bool isReady;
+        private char current;
 
-		private int column;
-		private int line;
-		private int index = -1;
+        private int column;
+        private int line;
+        private int index = -1;
 
-		private readonly string Buffer;
-		private int start = -1;
+        private readonly string Buffer;
+        private int start = -1;
 
-		#endregion Fields
+        #endregion Fields
 
-		#region Init
+        #region Init
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="value"></param>
-		public StringStream(string value)
-		{
-			this.Buffer = value ?? String.Empty;
-		}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="value"></param>
+        public StringStream(string value)
+        {
+            this.Buffer = value ?? String.Empty;
+        }
 
-		#endregion Init
+        #endregion Init
 
-		#region ITextStream Members
+        #region ITextStream Members
 
-		/// <summary>
-		/// Gets the total number of characters read from the input
-		/// </summary>
-		public int Column
-		{
-			get { return this.column; }
-		}
+        /// <summary>
+        /// Gets the total number of characters read from the input
+        /// </summary>
+        public int Column
+        {
+            get { return this.column; }
+        }
 
-		/// <summary>
-		/// Gets the total number of lines read from the input
-		/// </summary>
-		public int Line
-		{
-			get { return this.line; }
-		}
+        /// <summary>
+        /// Gets the total number of lines read from the input
+        /// </summary>
+        public int Line
+        {
+            get { return this.line; }
+        }
 
-		/// <summary>
-		/// Gets the current position within the input
-		/// </summary>
-		public long Index
-		{
-			get { return this.index; }
-		}
+        /// <summary>
+        /// Gets the current position within the input
+        /// </summary>
+        public long Index
+        {
+            get { return this.index; }
+        }
 
-		#endregion ITextStream Members
+        #endregion ITextStream Members
 
-		#region Chunking Members
+        #region Chunking Members
 
-		/// <summary>
-		/// Gets the number of characters currently chunked
-		/// </summary>
-		public int ChunkSize
-		{
-			get
-			{
-				if (this.start < 0)
-				{
-					throw new InvalidOperationException("Not currently chunking.");
-				}
+        /// <summary>
+        /// Gets the number of characters currently chunked
+        /// </summary>
+        public int ChunkSize
+        {
+            get
+            {
+                if (this.start < 0)
+                {
+                    throw new InvalidOperationException("Not currently chunking.");
+                }
 
-				return (1+this.index-this.start);
-			}
-		}
+                return (1 + this.index - this.start);
+            }
+        }
 
-		/// <summary>
-		/// Gets a value indicating if the <see cref="StringStream"/> is currently chunking
-		/// </summary>
-		public bool IsChunking
-		{
-			get { return (this.start >= 0); }
-		}
+        /// <summary>
+        /// Gets a value indicating if the <see cref="StringStream"/> is currently chunking
+        /// </summary>
+        public bool IsChunking
+        {
+            get { return (this.start >= 0); }
+        }
 
-		/// <summary>
-		/// Begins chunking at the current index
-		/// </summary>
-		public void BeginChunk()
-		{
-			this.start = this.index+1;
-		}
+        /// <summary>
+        /// Begins chunking at the current index
+        /// </summary>
+        public void BeginChunk()
+        {
+            this.start = this.index + 1;
+        }
 
-		/// <summary>
-		/// Ends chunking at the current index and returns the buffered text chunk
-		/// </summary>
-		/// <returns></returns>
-		IEnumerable<char> IStream<char>.EndChunk()
-		{
-			return this.EndChunk();
-		}
+        /// <summary>
+        /// Ends chunking at the current index and returns the buffered text chunk
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<char> IStream<char>.EndChunk()
+        {
+            return this.EndChunk();
+        }
 
-		/// <summary>
-		/// Ends chunking at the current index and returns the buffered text chunk
-		/// </summary>
-		/// <returns></returns>
-		public string EndChunk()
-		{
-			if (this.start < 0)
-			{
-				throw new InvalidOperationException("Not currently chunking.");
-			}
+        /// <summary>
+        /// Ends chunking at the current index and returns the buffered text chunk
+        /// </summary>
+        /// <returns></returns>
+        public string EndChunk()
+        {
+            if (this.start < 0)
+            {
+                throw new InvalidOperationException("Not currently chunking.");
+            }
 
-			// build chunk value
-			string value = this.Buffer.Substring(this.start, (1+this.index-this.start));
+            // build chunk value
+            string value = this.Buffer.Substring(this.start, (1 + this.index - this.start));
 
-			// reset chunk start
-			this.start = -1;
+            // reset chunk start
+            this.start = -1;
 
-			return value;
-		}
+            return value;
+        }
 
-		/// <summary>
-		/// Ends chunking at the current index and returns the buffered text chunk
-		/// </summary>
-		/// <returns></returns>
-		public void EndChunk(StringBuilder buffer)
-		{
-			if (this.start < 0)
-			{
-				throw new InvalidOperationException("Not currently chunking.");
-			}
+        /// <summary>
+        /// Ends chunking at the current index and returns the buffered text chunk
+        /// </summary>
+        /// <returns></returns>
+        public void EndChunk(StringBuilder buffer)
+        {
+            if (this.start < 0)
+            {
+                throw new InvalidOperationException("Not currently chunking.");
+            }
 
-			// append chunk value
-			buffer.Append(this.Buffer, this.start, (1+this.index-this.start));
+            // append chunk value
+            buffer.Append(this.Buffer, this.start, (1 + this.index - this.start));
 
-			// reset chunk start
-			this.start = -1;
-		}
+            // reset chunk start
+            this.start = -1;
+        }
 
-		#endregion Chunking Members
+        #endregion Chunking Members
 
-		#region IStream<char> Members
+        #region IStream<char> Members
 
-		/// <summary>
-		/// Determines if the input sequence has reached the end
-		/// </summary>
-		public virtual bool IsCompleted
-		{
-			get
-			{
-				this.EnsureReady();
+        /// <summary>
+        /// Determines if the input sequence has reached the end
+        /// </summary>
+        public virtual bool IsCompleted
+        {
+            get
+            {
+                this.EnsureReady();
 
-				return this.isCompleted;
-			}
-		}
+                return this.isCompleted;
+            }
+        }
 
-		/// <summary>
-		/// Returns but does not remove the item at the front of the sequence.
-		/// </summary>
-		/// <returns></returns>
-		public virtual char Peek()
-		{
-			this.EnsureReady();
+        /// <summary>
+        /// Returns but does not remove the item at the front of the sequence.
+        /// </summary>
+        /// <returns></returns>
+        public virtual char Peek()
+        {
+            this.EnsureReady();
 
-			// return the current item or null if complete
-			return this.current;
-		}
+            // return the current item or null if complete
+            return this.current;
+        }
 
-		/// <summary>
-		/// Returns and removes the item at the front of the sequence.
-		/// </summary>
-		/// <returns></returns>
-		public virtual char Pop()
-		{
-			this.EnsureReady();
+        /// <summary>
+        /// Returns and removes the item at the front of the sequence.
+        /// </summary>
+        /// <returns></returns>
+        public virtual char Pop()
+        {
+            this.EnsureReady();
 
-			if (this.isCompleted)
-			{
-				return this.current;
-			}
+            if (this.isCompleted)
+            {
+                return this.current;
+            }
 
-			// flag as needing to be iterated, but don't execute yet
-			this.isReady = false;
+            // flag as needing to be iterated, but don't execute yet
+            this.isReady = false;
 
-			this.UpdateStats();
+            this.UpdateStats();
 
-			return this.current;
-		}
+            return this.current;
+        }
 
-		#endregion IStream<char> Members
+        #endregion IStream<char> Members
 
-		#region Methods
+        #region Methods
 
-		/// <summary>
-		/// Deferred execution of iterator
-		/// </summary>
-		private void EnsureReady()
-		{
-			// only execute when requested
-			if (this.isReady)
-			{
-				return;
-			}
-			this.isReady = true;
+        /// <summary>
+        /// Deferred execution of iterator
+        /// </summary>
+        private void EnsureReady()
+        {
+            // only execute when requested
+            if (this.isReady)
+            {
+                return;
+            }
+            this.isReady = true;
 
-			// store the current item or null if complete
-			int next = this.index+1;
-			if (next < this.Buffer.Length)
-			{
-				this.isCompleted = false;
-				this.current = this.Buffer[next];
-			}
-			else
-			{
-				this.isCompleted = true;
-				this.current = default(char);
-			}
-		}
+            // store the current item or null if complete
+            int next = this.index + 1;
+            if (next < this.Buffer.Length)
+            {
+                this.isCompleted = false;
+                this.current = this.Buffer[next];
+            }
+            else
+            {
+                this.isCompleted = true;
+                this.current = default(char);
+            }
+        }
 
-		/// <summary>
-		/// Calculates index, line, and column statistics
-		/// </summary>
-		private void UpdateStats()
-		{
-			if (this.index < 0)
-			{
-				this.line = this.column = 1;
-				this.index = 0;
-			}
-			else
-			{
-				// check for line endings
-				switch (this.current)
-				{
-					case '\n':
-					{
-						if (this.Buffer[this.index] == '\r')
-						{
-							// consider CRLF to be one line ending
-							break;
-						}
-						// fall through
-						goto case '\r';
-					}
-					case '\r':
-					{
-						this.line++;
-						this.column = 0;
-						break;
-					}
-					default:
-					{
-						this.column++;
-						break;
-					}
-				}
-				this.index++;
-			}
-		}
+        /// <summary>
+        /// Calculates index, line, and column statistics
+        /// </summary>
+        private void UpdateStats()
+        {
+            if (this.index < 0)
+            {
+                this.line = this.column = 1;
+                this.index = 0;
+            }
+            else
+            {
+                // check for line endings
+                switch (this.current)
+                {
+                    case '\n':
+                        {
+                            if (this.Buffer[this.index] == '\r')
+                            {
+                                // consider CRLF to be one line ending
+                                break;
+                            }
+                            // fall through
+                            goto case '\r';
+                        }
+                    case '\r':
+                        {
+                            this.line++;
+                            this.column = 0;
+                            break;
+                        }
+                    default:
+                        {
+                            this.column++;
+                            break;
+                        }
+                }
+                this.index++;
+            }
+        }
 
-		#endregion Methods
+        #endregion Methods
 
-		#region IDisposable Members
+        #region IDisposable Members
 
-		/// <summary>
-		/// Releases all resources used
-		/// </summary>
-		public void Dispose()
-		{
-			this.Dispose(true);
-			GC.SuppressFinalize(this);
-		}
+        /// <summary>
+        /// Releases all resources used
+        /// </summary>
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
-		protected virtual void Dispose(bool disposing)
-		{
-		}
+        protected virtual void Dispose(bool disposing)
+        {
+        }
 
-		#endregion IDisposable Members
-	}
+        #endregion IDisposable Members
+    }
 }

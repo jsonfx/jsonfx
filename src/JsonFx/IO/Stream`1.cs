@@ -1,4 +1,5 @@
 ﻿#region License
+
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -26,6 +27,7 @@
 	THE SOFTWARE.
 
 \*---------------------------------------------------------------------------------*/
+
 #endregion License
 
 using System;
@@ -33,104 +35,104 @@ using System.Collections.Generic;
 
 namespace JsonFx.IO
 {
-	/// <summary>
-	/// Supports forward-only iteration over an input sequence of <typeparamref name="T"/>
-	/// </summary>
-	public abstract class Stream<T> : IStream<T>
-	{
-		#region Constants
+    /// <summary>
+    /// Supports forward-only iteration over an input sequence of <typeparamref name="T"/>
+    /// </summary>
+    public abstract class Stream<T> : IStream<T>
+    {
+        #region Constants
 
-		public static readonly Stream<T> Null = new ListStream<T>(null);
+        public static readonly Stream<T> Null = new ListStream<T>(null);
 
-		#endregion Constants
+        #endregion Constants
 
-		#region Factory Method
+        #region Factory Method
 
-		public static IStream<T> Create(IEnumerable<T> sequence)
-		{
-			return Stream<T>.Create(sequence, false);
-		}
+        public static IStream<T> Create(IEnumerable<T> sequence)
+        {
+            return Stream<T>.Create(sequence, false);
+        }
 
-		/// <summary>
-		/// Factory method for generic streams
-		/// </summary>
-		/// <param name="sequence"></param>
-		/// <param name="buffered"></param>
-		/// <returns></returns>
-		public static IStream<T> Create(IEnumerable<T> sequence, bool buffered)
-		{
-			IList<T> list = sequence as IList<T>;
-			if (list != null)
-			{
-				return new ListStream<T>(list);
-			}
-			else if (buffered)
-			{
-				list = new SequenceBuffer<T>(sequence);
-				return new ListStream<T>(list);
-			}
+        /// <summary>
+        /// Factory method for generic streams
+        /// </summary>
+        /// <param name="sequence"></param>
+        /// <param name="buffered"></param>
+        /// <returns></returns>
+        public static IStream<T> Create(IEnumerable<T> sequence, bool buffered)
+        {
+            IList<T> list = sequence as IList<T>;
+            if (list != null)
+            {
+                return new ListStream<T>(list);
+            }
+            else if (buffered)
+            {
+                list = new SequenceBuffer<T>(sequence);
+                return new ListStream<T>(list);
+            }
 
-			return new EnumerableStream<T>(sequence);
-		}
+            return new EnumerableStream<T>(sequence);
+        }
 
-		#endregion Factory Method
+        #endregion Factory Method
 
-		#region IStream<T> Properties
+        #region IStream<T> Properties
 
-		/// <summary>
-		/// Determines if the input sequence has reached the end
-		/// </summary>
-		public abstract bool IsCompleted
-		{
-			get;
-		}
+        /// <summary>
+        /// Determines if the input sequence has reached the end
+        /// </summary>
+        public abstract bool IsCompleted
+        {
+            get;
+        }
 
-		#endregion IStream<T> Properties
+        #endregion IStream<T> Properties
 
-		#region IStream<T> Methods
+        #region IStream<T> Methods
 
-		/// <summary>
-		/// Returns but does not remove the item at the front of the sequence.
-		/// </summary>
-		/// <returns></returns>
-		public abstract T Peek();
+        /// <summary>
+        /// Returns but does not remove the item at the front of the sequence.
+        /// </summary>
+        /// <returns></returns>
+        public abstract T Peek();
 
-		/// <summary>
-		/// Returns and removes the item at the front of the sequence.
-		/// </summary>
-		/// <returns></returns>
-		public abstract T Pop();
+        /// <summary>
+        /// Returns and removes the item at the front of the sequence.
+        /// </summary>
+        /// <returns></returns>
+        public abstract T Pop();
 
-		#endregion IStream<T> Methods
+        #endregion IStream<T> Methods
 
-		#region Chunking Members
+        #region Chunking Members
 
-		public abstract bool IsChunking
-		{
-			get;
-		}
+        public abstract bool IsChunking
+        {
+            get;
+        }
 
-		public abstract int ChunkSize
-		{
-			get;
-		}
+        public abstract int ChunkSize
+        {
+            get;
+        }
 
-		public abstract void BeginChunk();
+        public abstract void BeginChunk();
 
-		public abstract IEnumerable<T> EndChunk();
+        public abstract IEnumerable<T> EndChunk();
 
-		#endregion Chunking Members
+        #endregion Chunking Members
 
-		#region IDisposable Members
+        #region IDisposable Members
 
-		public void Dispose()
-		{
-			this.Dispose(true);
-			GC.SuppressFinalize(this);
-		}
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
-		protected abstract void Dispose(bool disposing);
+        protected abstract void Dispose(bool disposing);
 
-		#endregion IDisposable Members
-	}
+        #endregion IDisposable Members
+    }
 }

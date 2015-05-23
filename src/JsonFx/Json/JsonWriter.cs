@@ -1,4 +1,5 @@
 #region License
+
 /*---------------------------------------------------------------------------------*\
 
 	Distributed under the terms of an MIT-style license:
@@ -26,112 +27,112 @@
 	THE SOFTWARE.
 
 \*---------------------------------------------------------------------------------*/
-#endregion License
 
-using System;
-using System.Collections.Generic;
+#endregion License
 
 using JsonFx.Model;
 using JsonFx.Serialization;
+using System;
+using System.Collections.Generic;
 
 namespace JsonFx.Json
 {
-	/// <summary>
-	/// JSON serializer
-	/// </summary>
-	public partial class JsonWriter : ModelWriter
-	{
-		#region Fields
+    /// <summary>
+    /// JSON serializer
+    /// </summary>
+    public partial class JsonWriter : ModelWriter
+    {
+        #region Fields
 
-		private readonly string[] ContentTypes;
+        private readonly string[] ContentTypes;
 
-		#endregion Fields
+        #endregion Fields
 
-		#region Init
+        #region Init
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		public JsonWriter()
-			: base(new DataWriterSettings())
-		{
-		}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        public JsonWriter()
+            : base(new DataWriterSettings())
+        {
+        }
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="settings"></param>
-		public JsonWriter(DataWriterSettings settings)
-			: base(settings != null ? settings : new DataWriterSettings())
-		{
-		}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="settings"></param>
+        public JsonWriter(DataWriterSettings settings)
+            : base(settings != null ? settings : new DataWriterSettings())
+        {
+        }
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="settings"></param>
-		/// <param name="contentTypes"></param>
-		public JsonWriter(DataWriterSettings settings, params string[] contentTypes)
-			: base(settings != null ? settings : new DataWriterSettings())
-		{
-			if (contentTypes == null)
-			{
-				throw new NullReferenceException("contentTypes");
-			}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="settings"></param>
+        /// <param name="contentTypes"></param>
+        public JsonWriter(DataWriterSettings settings, params string[] contentTypes)
+            : base(settings != null ? settings : new DataWriterSettings())
+        {
+            if (contentTypes == null)
+            {
+                throw new NullReferenceException("contentTypes");
+            }
 
-			// copy values so cannot be modified from outside
-			this.ContentTypes = new string[contentTypes.Length];
-			Array.Copy(contentTypes, this.ContentTypes, contentTypes.Length);
-		}
+            // copy values so cannot be modified from outside
+            this.ContentTypes = new string[contentTypes.Length];
+            Array.Copy(contentTypes, this.ContentTypes, contentTypes.Length);
+        }
 
-		#endregion Init
+        #endregion Init
 
-		#region Properties
+        #region Properties
 
-		/// <summary>
-		/// Gets the supported content type for the serialized data
-		/// </summary>
-		public override IEnumerable<string> ContentType
-		{
-			get
-			{
-				if (this.ContentTypes != null)
-				{
-					foreach (string contentType in this.ContentTypes)
-					{
-						yield return contentType;
-					}
-					yield break;
-				}
+        /// <summary>
+        /// Gets the supported content type for the serialized data
+        /// </summary>
+        public override IEnumerable<string> ContentType
+        {
+            get
+            {
+                if (this.ContentTypes != null)
+                {
+                    foreach (string contentType in this.ContentTypes)
+                    {
+                        yield return contentType;
+                    }
+                    yield break;
+                }
 
-				yield return "application/json";
-				yield return "text/json";
-				yield return "text/x-json";
-			}
-		}
+                yield return "application/json";
+                yield return "text/json";
+                yield return "text/x-json";
+            }
+        }
 
-		/// <summary>
-		/// Gets the supported file extension for the serialized data
-		/// </summary>
-		public override IEnumerable<string> FileExtension
-		{
-			get { yield return ".json"; }
-		}
+        /// <summary>
+        /// Gets the supported file extension for the serialized data
+        /// </summary>
+        public override IEnumerable<string> FileExtension
+        {
+            get { yield return ".json"; }
+        }
 
-		#endregion Properties
+        #endregion Properties
 
-		#region DataWriter<DataTokenType> Methods
+        #region DataWriter<DataTokenType> Methods
 
-		/// <summary>
-		/// Gets the formatter for JSON
-		/// </summary>
-		/// <param name="settings"></param>
-		/// <returns></returns>
-		protected override ITextFormatter<ModelTokenType> GetFormatter()
-		{
-			return new JsonWriter.JsonFormatter(this.Settings);
-		}
+        /// <summary>
+        /// Gets the formatter for JSON
+        /// </summary>
+        /// <param name="settings"></param>
+        /// <returns></returns>
+        protected override ITextFormatter<ModelTokenType> GetFormatter()
+        {
+            return new JsonWriter.JsonFormatter(this.Settings);
+        }
 
-		#endregion DataWriter<DataTokenType> Methods
-	}
+        #endregion DataWriter<DataTokenType> Methods
+    }
 }
