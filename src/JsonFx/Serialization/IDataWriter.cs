@@ -35,63 +35,63 @@ using System.Text;
 
 namespace JsonFx.Serialization
 {
-	/// <summary>
-	/// A common interface for data serializers
-	/// </summary>
-	public interface IDataWriter
-	{
-		#region Properties
+    /// <summary>
+    /// A common interface for data serializers
+    /// </summary>
+    public interface IDataWriter
+    {
+        #region Properties
 
-		/// <summary>
-		/// Gets the content encoding for the serialized data
-		/// </summary>
-		Encoding ContentEncoding
-		{
-			get;
-		}
+        /// <summary>
+        /// Gets the content encoding for the serialized data
+        /// </summary>
+        Encoding ContentEncoding
+        {
+            get;
+        }
 
-		/// <summary>
-		/// Gets the supported content types for the serialized data
-		/// </summary>
-		IEnumerable<string> ContentType
-		{
-			get;
-		}
+        /// <summary>
+        /// Gets the supported content types for the serialized data
+        /// </summary>
+        IEnumerable<string> ContentType
+        {
+            get;
+        }
 
-		/// <summary>
-		/// Gets the supported file extensions for the serialized data
-		/// </summary>
-		IEnumerable<string> FileExtension
-		{
-			get;
-		}
+        /// <summary>
+        /// Gets the supported file extensions for the serialized data
+        /// </summary>
+        IEnumerable<string> FileExtension
+        {
+            get;
+        }
 
-		/// <summary>
-		/// Gets the settings used for serialization
-		/// </summary>
-		DataWriterSettings Settings
-		{
-			get;
-		}
+        /// <summary>
+        /// Gets the settings used for serialization
+        /// </summary>
+        DataWriterSettings Settings
+        {
+            get;
+        }
 
-		#endregion Properties
+        #endregion Properties
 
-		#region Write Methods
+        #region Write Methods
 
-		/// <summary>
-		/// Serializes the data to the given output
-		/// </summary>
-		/// <param name="output">the output writer</param>
-		/// <param name="data">the data to be serialized</param>
-		void Write(object data, TextWriter output);
+        /// <summary>
+        /// Serializes the data to the given output
+        /// </summary>
+        /// <param name="output">the output writer</param>
+        /// <param name="data">the data to be serialized</param>
+        void Write(object data, TextWriter output);
 
-		/// <summary>
-		/// Serializes the data to the given output
-		/// </summary>
-		/// <param name="data">the data to be serialized</param>
-		/// <returns>the serialized data</returns>
-		string Write(object data);
+        /// <summary>
+        /// Serializes the data to the given output
+        /// </summary>
+        /// <param name="data">the data to be serialized</param>
+        /// <returns>the serialized data</returns>
+        string Write(object data);
 
-		#endregion Write Methods
-	}
+        #endregion Write Methods
+    }
 }

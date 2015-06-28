@@ -34,84 +34,84 @@ using System.IO;
 
 namespace JsonFx.Serialization
 {
-	/// <summary>
-	/// An <see cref="ITextTokenizer<T>"/> which after transforms tokens to a different type
-	/// </summary>
-	/// <typeparam name="TIn">input token type</typeparam>
-	/// <typeparam name="TOut">output token type</typeparam>
-	internal class TransformTokenizer<TIn, TOut> : ITextTokenizer<TOut>
-	{
-		#region Fields
+    /// <summary>
+    /// An <see cref="ITextTokenizer<T>"/> which after transforms tokens to a different type
+    /// </summary>
+    /// <typeparam name="TIn">input token type</typeparam>
+    /// <typeparam name="TOut">output token type</typeparam>
+    internal class TransformTokenizer<TIn, TOut> : ITextTokenizer<TOut>
+    {
+        #region Fields
 
-		private readonly ITextTokenizer<TIn> Tokenizer;
-		private readonly IDataTransformer<TIn, TOut> Transformer;
+        private readonly ITextTokenizer<TIn> Tokenizer;
+        private readonly IDataTransformer<TIn, TOut> Transformer;
 
-		#endregion Fields
+        #endregion Fields
 
-		#region Init
+        #region Init
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="tokenizer"></param>
-		/// <param name="transformer"></param>
-		public TransformTokenizer(ITextTokenizer<TIn> tokenizer, IDataTransformer<TIn, TOut> transformer)
-		{
-			if (tokenizer == null)
-			{
-				new ArgumentNullException("tokenizer");
-			}
-			if (transformer == null)
-			{
-				new ArgumentNullException("transformer");
-			}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="tokenizer"></param>
+        /// <param name="transformer"></param>
+        public TransformTokenizer(ITextTokenizer<TIn> tokenizer, IDataTransformer<TIn, TOut> transformer)
+        {
+            if (tokenizer == null)
+            {
+                new ArgumentNullException("tokenizer");
+            }
+            if (transformer == null)
+            {
+                new ArgumentNullException("transformer");
+            }
 
-			this.Tokenizer = tokenizer;
-			this.Transformer = transformer;
-		}
+            this.Tokenizer = tokenizer;
+            this.Transformer = transformer;
+        }
 
-		#endregion Init
+        #endregion Init
 
-		#region ITextTokenizer<TOut> Members
+        #region ITextTokenizer<TOut> Members
 
-		public int Column
-		{
-			get { return this.Tokenizer.Column; }
-		}
+        public int Column
+        {
+            get { return this.Tokenizer.Column; }
+        }
 
-		public int Line
-		{
-			get { return this.Tokenizer.Line; }
-		}
+        public int Line
+        {
+            get { return this.Tokenizer.Line; }
+        }
 
-		public long Index
-		{
-			get { return this.Tokenizer.Index; }
-		}
+        public long Index
+        {
+            get { return this.Tokenizer.Index; }
+        }
 
-		public IEnumerable<Token<TOut>> GetTokens(TextReader reader)
-		{
-			IEnumerable<Token<TIn>> tokens = this.Tokenizer.GetTokens(reader);
+        public IEnumerable<Token<TOut>> GetTokens(TextReader reader)
+        {
+            IEnumerable<Token<TIn>> tokens = this.Tokenizer.GetTokens(reader);
 
-			return this.Transformer.Transform(tokens);
-		}
+            return this.Transformer.Transform(tokens);
+        }
 
-		public IEnumerable<Token<TOut>> GetTokens(string text)
-		{
-			IEnumerable<Token<TIn>> tokens = this.Tokenizer.GetTokens(text);
+        public IEnumerable<Token<TOut>> GetTokens(string text)
+        {
+            IEnumerable<Token<TIn>> tokens = this.Tokenizer.GetTokens(text);
 
-			return this.Transformer.Transform(tokens);
-		}
+            return this.Transformer.Transform(tokens);
+        }
 
-		#endregion ITextTokenizer<TOut> Members
+        #endregion ITextTokenizer<TOut> Members
 
-		#region IDisposable Members
+        #region IDisposable Members
 
-		public void Dispose()
-		{
-			throw new NotImplementedException();
-		}
+        public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
 
-		#endregion IDisposable Members
-	}
+        #endregion IDisposable Members
+    }
 }

@@ -34,64 +34,64 @@ using System.Reflection;
 
 namespace JsonFx.Serialization.Resolvers
 {
-	/// <summary>
-	/// Gets a delegate which determines if the property or field should not be serialized based upon its value.
-	/// </summary>
-	/// <param name="value"></param>
-	/// <returns></returns>
-	public delegate bool ValueIgnoredDelegate(object instance, object memberValue);
+    /// <summary>
+    /// Gets a delegate which determines if the property or field should not be serialized based upon its value.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public delegate bool ValueIgnoredDelegate(object instance, object memberValue);
 
-	/// <summary>
-	/// Controls name resolution for IDataReader / IDataWriter
-	/// </summary>
-	/// <remarks>
-	/// Provides an extensibility point to control member naming and visibility at a very granular level.
-	/// </remarks>
-	public interface IResolverStrategy
-	{
-		#region Methods
+    /// <summary>
+    /// Controls name resolution for IDataReader / IDataWriter
+    /// </summary>
+    /// <remarks>
+    /// Provides an extensibility point to control member naming and visibility at a very granular level.
+    /// </remarks>
+    public interface IResolverStrategy
+    {
+        #region Methods
 
-		/// <summary>
-		/// Gets a value indicating if the property is to be serialized.
-		/// </summary>
-		/// <param name="member"></param>
-		/// <param name="isImmutableType"></param>
-		/// <returns></returns>
-		bool IsPropertyIgnored(PropertyInfo member, bool isImmutableType);
+        /// <summary>
+        /// Gets a value indicating if the property is to be serialized.
+        /// </summary>
+        /// <param name="member"></param>
+        /// <param name="isImmutableType"></param>
+        /// <returns></returns>
+        bool IsPropertyIgnored(PropertyInfo member, bool isImmutableType);
 
-		/// <summary>
-		/// Gets a value indicating if the field is to be serialized.
-		/// </summary>
-		/// <param name="member"></param>
-		/// <returns></returns>
-		bool IsFieldIgnored(FieldInfo member);
+        /// <summary>
+        /// Gets a value indicating if the field is to be serialized.
+        /// </summary>
+        /// <param name="member"></param>
+        /// <returns></returns>
+        bool IsFieldIgnored(FieldInfo member);
 
-		/// <summary>
-		/// Determines if the property or field should not be serialized.
-		/// </summary>
-		/// <param name="member"></param>
-		/// <param name="target"></param>
-		/// <param name="value"></param>
-		/// <returns></returns>
-		ValueIgnoredDelegate GetValueIgnoredCallback(MemberInfo member);
+        /// <summary>
+        /// Determines if the property or field should not be serialized.
+        /// </summary>
+        /// <param name="member"></param>
+        /// <param name="target"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        ValueIgnoredDelegate GetValueIgnoredCallback(MemberInfo member);
 
-		/// <summary>
-		/// Gets the serialized name for the member.
-		/// </summary>
-		/// <param name="value"></param>
-		/// <returns></returns>
-		IEnumerable<DataName> GetName(MemberInfo member);
+        /// <summary>
+        /// Gets the serialized name for the member.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        IEnumerable<DataName> GetName(MemberInfo member);
 
-		/// <summary>
-		/// Allows a strategy to perform a custom sort order to outputted members
-		/// </summary>
-		/// <param name="members"></param>
-		/// <returns></returns>
-		/// <remarks>
-		/// A common usage is to ensure that Attributes sort first
-		/// </remarks>
-		IEnumerable<MemberMap> SortMembers(IEnumerable<MemberMap> members);
+        /// <summary>
+        /// Allows a strategy to perform a custom sort order to outputted members
+        /// </summary>
+        /// <param name="members"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// A common usage is to ensure that Attributes sort first
+        /// </remarks>
+        IEnumerable<MemberMap> SortMembers(IEnumerable<MemberMap> members);
 
-		#endregion Methods
-	}
+        #endregion Methods
+    }
 }

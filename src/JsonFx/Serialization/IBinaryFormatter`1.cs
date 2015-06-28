@@ -34,27 +34,27 @@ using System.IO;
 
 namespace JsonFx.Serialization
 {
-	/// <summary>
-	/// Outputs text from an input stream of JSON tokens
-	/// </summary>
-	/// <typeparam name="T">token type</typeparam>
-	public interface IBinaryFormatter<T>
-	{
-		#region Methods
+    /// <summary>
+    /// Outputs text from an input stream of JSON tokens
+    /// </summary>
+    /// <typeparam name="T">token type</typeparam>
+    public interface IBinaryFormatter<T>
+    {
+        #region Methods
 
-		/// <summary>
-		/// Formats the token sequence to the output writer
-		/// </summary>
-		/// <param name="writer"></param>
-		/// <param name="tokens"></param>
-		void Format(IEnumerable<Token<T>> tokens, Stream stream);
+        /// <summary>
+        /// Formats the token sequence to the output writer
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="tokens"></param>
+        void Format(IEnumerable<Token<T>> tokens, Stream stream);
 
-		/// <summary>
-		/// Formats the token sequence as a string
-		/// </summary>
-		/// <param name="tokens"></param>
-		byte[] Format(IEnumerable<Token<T>> tokens);
+        /// <summary>
+        /// Formats the token sequence as a string
+        /// </summary>
+        /// <param name="tokens"></param>
+        byte[] Format(IEnumerable<Token<T>> tokens);
 
-		#endregion Methods
-	}
+        #endregion Methods
+    }
 }

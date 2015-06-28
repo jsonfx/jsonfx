@@ -32,302 +32,302 @@ using System;
 
 namespace JsonFx.Serialization
 {
-	/// <summary>
-	/// Indicates an error occurred during serialization
-	/// </summary>
-	public class SerializationException : InvalidOperationException
-	{
-		#region Init
+    /// <summary>
+    /// Indicates an error occurred during serialization
+    /// </summary>
+    public class SerializationException : InvalidOperationException
+    {
+        #region Init
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		public SerializationException() : base() { }
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        public SerializationException() : base() { }
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="message"></param>
-		public SerializationException(string message) : base(message) { }
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="message"></param>
+        public SerializationException(string message) : base(message) { }
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="message"></param>
-		/// <param name="innerException"></param>
-		public SerializationException(string message, Exception innerException) : base(message, innerException) { }
-
-#if !SILVERLIGHT
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="info"></param>
-		/// <param name="context"></param>
-		public SerializationException(
-			System.Runtime.Serialization.SerializationInfo info,
-			System.Runtime.Serialization.StreamingContext context)
-			: base(info, context)
-		{
-		}
-#endif
-		#endregion Init
-	}
-
-	/// <summary>
-	/// Indicates an error occurred during deserialization
-	/// </summary>
-	public class DeserializationException : SerializationException
-	{
-		#region Fields
-
-		private readonly int column = -1;
-		private readonly int line = -1;
-		private readonly long index = -1L;
-
-		#endregion Fields
-
-		#region Init
-
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="message"></param>
-		/// <param name="index"></param>
-		public DeserializationException(string message, long index)
-			: this(message, index, -1, -1)
-		{
-		}
-
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="message"></param>
-		/// <param name="index"></param>
-		/// <param name="line"></param>
-		/// <param name="column"></param>
-		public DeserializationException(string message, long index, int line, int column)
-			: base(message)
-		{
-			this.column = column;
-			this.line = line;
-			this.index = index;
-		}
-
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="message"></param>
-		/// <param name="index"></param>
-		/// <param name="innerException"></param>
-		public DeserializationException(string message, long index, Exception innerException)
-			: this(message, index, -1, -1, innerException)
-		{
-		}
-
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="message"></param>
-		/// <param name="index"></param>
-		/// <param name="innerException"></param>
-		public DeserializationException(string message, long index, int line, int column, Exception innerException)
-			: base(message, innerException)
-		{
-			this.column = column;
-			this.line = line;
-			this.index = index;
-		}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="innerException"></param>
+        public SerializationException(string message, Exception innerException) : base(message, innerException) { }
 
 #if !SILVERLIGHT
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="info"></param>
-		/// <param name="context"></param>
-		public DeserializationException(
-			System.Runtime.Serialization.SerializationInfo info,
-			System.Runtime.Serialization.StreamingContext context)
-			: base(info, context)
-		{
-		}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="info"></param>
+        /// <param name="context"></param>
+        public SerializationException(
+            System.Runtime.Serialization.SerializationInfo info,
+            System.Runtime.Serialization.StreamingContext context)
+            : base(info, context)
+        {
+        }
 #endif
-		#endregion Init
+        #endregion Init
+    }
 
-		#region Properties
+    /// <summary>
+    /// Indicates an error occurred during deserialization
+    /// </summary>
+    public class DeserializationException : SerializationException
+    {
+        #region Fields
 
-		/// <summary>
-		/// Gets the character column in the stream where the error occurred
-		/// </summary>
-		public int Column
-		{
-			get { return this.column; }
-		}
+        private readonly int column = -1;
+        private readonly int line = -1;
+        private readonly long index = -1L;
 
-		/// <summary>
-		/// Gets the character position in the stream where the error occurred
-		/// </summary>
-		public long Index
-		{
-			get { return this.index; }
-		}
+        #endregion Fields
 
-		/// <summary>
-		/// Gets the character line in the stream where the error occurred
-		/// </summary>
-		public int Line
-		{
-			get { return this.line; }
-		}
+        #region Init
 
-		#endregion Properties
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="index"></param>
+        public DeserializationException(string message, long index)
+            : this(message, index, -1, -1)
+        {
+        }
 
-		#region Methods
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="index"></param>
+        /// <param name="line"></param>
+        /// <param name="column"></param>
+        public DeserializationException(string message, long index, int line, int column)
+            : base(message)
+        {
+            this.column = column;
+            this.line = line;
+            this.index = index;
+        }
 
-		/// <summary>
-		/// Helper method which converts the index into Line and Column numbers
-		/// </summary>
-		/// <param name="source"></param>
-		/// <param name="line"></param>
-		/// <param name="col"></param>
-		public void GetLineAndColumn(string source, out int line, out int col)
-		{
-			if (source == null)
-			{
-				throw new ArgumentNullException();
-			}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="index"></param>
+        /// <param name="innerException"></param>
+        public DeserializationException(string message, long index, Exception innerException)
+            : this(message, index, -1, -1, innerException)
+        {
+        }
 
-			col = 1;
-			line = 1;
-
-			bool foundLF = false;
-			int i = Math.Min((int)this.index, source.Length);
-			for (; i>0; i--)
-			{
-				if (!foundLF)
-				{
-					col++;
-				}
-				if (source[i-1] == '\n')
-				{
-					line++;
-					foundLF = true;
-				}
-			}
-		}
-
-		#endregion Methods
-	}
-
-	/// <summary>
-	/// Indicates an error occurred during token consumption
-	/// </summary>
-	/// <typeparam name="T"></typeparam>
-	public class TokenException<T> : SerializationException
-	{
-		#region Fields
-
-		private readonly Token<T> token;
-
-		#endregion Fields
-
-		#region Init
-
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		public TokenException(Token<T> token)
-			: base()
-		{
-			this.token = token;
-		}
-
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="message"></param>
-		public TokenException(Token<T> token, string message)
-			: base(message)
-		{
-			this.token = token;
-		}
-
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="message"></param>
-		/// <param name="innerException"></param>
-		public TokenException(Token<T> token, string message, Exception innerException)
-			: base(message, innerException)
-		{
-			this.token = token;
-		}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="index"></param>
+        /// <param name="innerException"></param>
+        public DeserializationException(string message, long index, int line, int column, Exception innerException)
+            : base(message, innerException)
+        {
+            this.column = column;
+            this.line = line;
+            this.index = index;
+        }
 
 #if !SILVERLIGHT
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="info"></param>
-		/// <param name="context"></param>
-		public TokenException(
-			System.Runtime.Serialization.SerializationInfo info,
-			System.Runtime.Serialization.StreamingContext context)
-			: base(info, context)
-		{
-		}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="info"></param>
+        /// <param name="context"></param>
+        public DeserializationException(
+            System.Runtime.Serialization.SerializationInfo info,
+            System.Runtime.Serialization.StreamingContext context)
+            : base(info, context)
+        {
+        }
 #endif
-		#endregion Init
+        #endregion Init
 
-		#region Properties
+        #region Properties
 
-		/// <summary>
-		/// Gets the token in the sequence where the error occurred
-		/// </summary>
-		public Token<T> Token
-		{
-			get { return this.token; }
-		}
+        /// <summary>
+        /// Gets the character column in the stream where the error occurred
+        /// </summary>
+        public int Column
+        {
+            get { return this.column; }
+        }
 
-		#endregion Properties
-	}
+        /// <summary>
+        /// Gets the character position in the stream where the error occurred
+        /// </summary>
+        public long Index
+        {
+            get { return this.index; }
+        }
 
-	/// <summary>
-	/// Indicates an error occurred during type coercion
-	/// </summary>
-	public class TypeCoercionException : ArgumentException
-	{
-		#region Init
+        /// <summary>
+        /// Gets the character line in the stream where the error occurred
+        /// </summary>
+        public int Line
+        {
+            get { return this.line; }
+        }
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		public TypeCoercionException() : base() { }
+        #endregion Properties
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="message"></param>
-		public TypeCoercionException(string message) : base(message) { }
+        #region Methods
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="message"></param>
-		/// <param name="innerException"></param>
-		public TypeCoercionException(string message, Exception innerException) : base(message, innerException) { }
+        /// <summary>
+        /// Helper method which converts the index into Line and Column numbers
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="line"></param>
+        /// <param name="col"></param>
+        public void GetLineAndColumn(string source, out int line, out int col)
+        {
+            if (source == null)
+            {
+                throw new ArgumentNullException();
+            }
+
+            col = 1;
+            line = 1;
+
+            bool foundLF = false;
+            int i = Math.Min((int)this.index, source.Length);
+            for (; i > 0; i--)
+            {
+                if (!foundLF)
+                {
+                    col++;
+                }
+                if (source[i - 1] == '\n')
+                {
+                    line++;
+                    foundLF = true;
+                }
+            }
+        }
+
+        #endregion Methods
+    }
+
+    /// <summary>
+    /// Indicates an error occurred during token consumption
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class TokenException<T> : SerializationException
+    {
+        #region Fields
+
+        private readonly Token<T> token;
+
+        #endregion Fields
+
+        #region Init
+
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        public TokenException(Token<T> token)
+            : base()
+        {
+            this.token = token;
+        }
+
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="message"></param>
+        public TokenException(Token<T> token, string message)
+            : base(message)
+        {
+            this.token = token;
+        }
+
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="innerException"></param>
+        public TokenException(Token<T> token, string message, Exception innerException)
+            : base(message, innerException)
+        {
+            this.token = token;
+        }
 
 #if !SILVERLIGHT
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="info"></param>
-		/// <param name="context"></param>
-		public TypeCoercionException(
-			System.Runtime.Serialization.SerializationInfo info,
-			System.Runtime.Serialization.StreamingContext context)
-			: base(info, context)
-		{
-		}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="info"></param>
+        /// <param name="context"></param>
+        public TokenException(
+            System.Runtime.Serialization.SerializationInfo info,
+            System.Runtime.Serialization.StreamingContext context)
+            : base(info, context)
+        {
+        }
 #endif
-		#endregion Init
-	}
+        #endregion Init
+
+        #region Properties
+
+        /// <summary>
+        /// Gets the token in the sequence where the error occurred
+        /// </summary>
+        public Token<T> Token
+        {
+            get { return this.token; }
+        }
+
+        #endregion Properties
+    }
+
+    /// <summary>
+    /// Indicates an error occurred during type coercion
+    /// </summary>
+    public class TypeCoercionException : ArgumentException
+    {
+        #region Init
+
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        public TypeCoercionException() : base() { }
+
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="message"></param>
+        public TypeCoercionException(string message) : base(message) { }
+
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="innerException"></param>
+        public TypeCoercionException(string message, Exception innerException) : base(message, innerException) { }
+
+#if !SILVERLIGHT
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="info"></param>
+        /// <param name="context"></param>
+        public TypeCoercionException(
+            System.Runtime.Serialization.SerializationInfo info,
+            System.Runtime.Serialization.StreamingContext context)
+            : base(info, context)
+        {
+        }
+#endif
+        #endregion Init
+    }
 }

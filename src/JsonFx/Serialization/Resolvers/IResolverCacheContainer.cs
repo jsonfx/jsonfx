@@ -32,8 +32,8 @@ using System;
 
 namespace JsonFx.Serialization.Resolvers
 {
-	public interface IResolverCacheContainer
-	{
-		ResolverCache ResolverCache { get; }
-	}
+    public interface IResolverCacheContainer
+    {
+        ResolverCache ResolverCache { get; }
+    }
 }

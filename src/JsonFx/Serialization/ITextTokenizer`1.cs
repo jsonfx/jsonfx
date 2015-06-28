@@ -34,65 +34,65 @@ using System.IO;
 
 namespace JsonFx.Serialization
 {
-	/// <summary>
-	/// Generates a sequence of tokens from a sequence of characters
-	/// </summary>
-	/// <typeparam name="T">token type</typeparam>
-	public interface ITextTokenizer<T> : IDisposable
-	{
-		#region Properties
+    /// <summary>
+    /// Generates a sequence of tokens from a sequence of characters
+    /// </summary>
+    /// <typeparam name="T">token type</typeparam>
+    public interface ITextTokenizer<T> : IDisposable
+    {
+        #region Properties
 
-		/// <summary>
-		/// Gets the current column of the underlying input character sequence
-		/// </summary>
-		/// <remarks>
-		/// Tokenizers not tracking columns should return -1.
-		/// </remarks>
-		int Column
-		{
-			get;
-		}
+        /// <summary>
+        /// Gets the current column of the underlying input character sequence
+        /// </summary>
+        /// <remarks>
+        /// Tokenizers not tracking columns should return -1.
+        /// </remarks>
+        int Column
+        {
+            get;
+        }
 
-		/// <summary>
-		/// Gets the current line of the underlying input character sequence
-		/// </summary>
-		/// <remarks>
-		/// Tokenizers not tracking lines should return -1.
-		/// </remarks>
-		int Line
-		{
-			get;
-		}
+        /// <summary>
+        /// Gets the current line of the underlying input character sequence
+        /// </summary>
+        /// <remarks>
+        /// Tokenizers not tracking lines should return -1.
+        /// </remarks>
+        int Line
+        {
+            get;
+        }
 
-		/// <summary>
-		/// Gets the current position of the underlying input character sequence
-		/// </summary>
-		/// <remarks>
-		/// Tokenizers not tracking index should return -1.
-		/// </remarks>
-		long Index
-		{
-			get;
-		}
+        /// <summary>
+        /// Gets the current position of the underlying input character sequence
+        /// </summary>
+        /// <remarks>
+        /// Tokenizers not tracking index should return -1.
+        /// </remarks>
+        long Index
+        {
+            get;
+        }
 
-		#endregion Properties
+        #endregion Properties
 
-		#region Methods
+        #region Methods
 
-		/// <summary>
-		/// Tokenizes the input sequence into tokens
-		/// </summary>
-		/// <param name="reader"></param>
-		/// <returns></returns>
-		IEnumerable<Token<T>> GetTokens(TextReader reader);
+        /// <summary>
+        /// Tokenizes the input sequence into tokens
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <returns></returns>
+        IEnumerable<Token<T>> GetTokens(TextReader reader);
 
-		/// <summary>
-		/// Tokenizes the input sequence into tokens
-		/// </summary>
-		/// <param name="text"></param>
-		/// <returns></returns>
-		IEnumerable<Token<T>> GetTokens(string text);
+        /// <summary>
+        /// Tokenizes the input sequence into tokens
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        IEnumerable<Token<T>> GetTokens(string text);
 
-		#endregion Methods
-	}
+        #endregion Methods
+    }
 }

@@ -35,103 +35,103 @@ using System.IO;
 
 namespace JsonFx.Serialization
 {
-	/// <summary>
-	/// A common interface for data deserializers
-	/// </summary>
-	public interface IDataReader
-	{
-		#region Properties
+    /// <summary>
+    /// A common interface for data deserializers
+    /// </summary>
+    public interface IDataReader
+    {
+        #region Properties
 
-		/// <summary>
-		/// Gets the supported content type of the serialized data
-		/// </summary>
-		IEnumerable<string> ContentType
-		{
-			get;
-		}
+        /// <summary>
+        /// Gets the supported content type of the serialized data
+        /// </summary>
+        IEnumerable<string> ContentType
+        {
+            get;
+        }
 
-		/// <summary>
-		/// Gets the settings used for deserialization
-		/// </summary>
-		DataReaderSettings Settings
-		{
-			get;
-		}
+        /// <summary>
+        /// Gets the settings used for deserialization
+        /// </summary>
+        DataReaderSettings Settings
+        {
+            get;
+        }
 
-		#endregion Properties
+        #endregion Properties
 
-		#region Read Methods
+        #region Read Methods
 
-		/// <summary>
-		/// Deserializes a single object from the given input
-		/// </summary>
-		/// <param name="input">the input reader</param>
-		/// <param name="ignored">a value used to trigger Type inference for <typeparamref name="TResult"/> (e.g. for deserializing anonymous objects)</param>
-		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
-		TResult Read<TResult>(TextReader input, TResult ignored);
+        /// <summary>
+        /// Deserializes a single object from the given input
+        /// </summary>
+        /// <param name="input">the input reader</param>
+        /// <param name="ignored">a value used to trigger Type inference for <typeparamref name="TResult"/> (e.g. for deserializing anonymous objects)</param>
+        /// <typeparam name="TResult">the expected type of the serialized data</typeparam>
+        TResult Read<TResult>(TextReader input, TResult ignored);
 
-		/// <summary>
-		/// Deserializes a single object from the given input
-		/// </summary>
-		/// <param name="input">the input reader</param>
-		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
-		TResult Read<TResult>(TextReader input);
+        /// <summary>
+        /// Deserializes a single object from the given input
+        /// </summary>
+        /// <param name="input">the input reader</param>
+        /// <typeparam name="TResult">the expected type of the serialized data</typeparam>
+        TResult Read<TResult>(TextReader input);
 
-		/// <summary>
-		/// Serializes the data to the given output
-		/// </summary>
-		/// <param name="input">the input reader</param>
-		object Read(TextReader input);
+        /// <summary>
+        /// Serializes the data to the given output
+        /// </summary>
+        /// <param name="input">the input reader</param>
+        object Read(TextReader input);
 
-		/// <summary>
-		/// Deserializes a single object from the given input
-		/// </summary>
-		/// <param name="input">the input reader</param>
-		/// <param name="targetType">the expected type of the serialized data</param>
-		object Read(TextReader input, Type targetType);
+        /// <summary>
+        /// Deserializes a single object from the given input
+        /// </summary>
+        /// <param name="input">the input reader</param>
+        /// <param name="targetType">the expected type of the serialized data</param>
+        object Read(TextReader input, Type targetType);
 
-		/// <summary>
-		/// Deserializes a single object from the given input
-		/// </summary>
-		/// <param name="input">the input text</param>
-		/// <param name="ignored">a value used to trigger Type inference for <typeparamref name="TResult"/> (e.g. for deserializing anonymous objects)</param>
-		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
-		TResult Read<TResult>(string input, TResult ignored);
+        /// <summary>
+        /// Deserializes a single object from the given input
+        /// </summary>
+        /// <param name="input">the input text</param>
+        /// <param name="ignored">a value used to trigger Type inference for <typeparamref name="TResult"/> (e.g. for deserializing anonymous objects)</param>
+        /// <typeparam name="TResult">the expected type of the serialized data</typeparam>
+        TResult Read<TResult>(string input, TResult ignored);
 
-		/// <summary>
-		/// Deserializes a single object from the given input
-		/// </summary>
-		/// <param name="input">the input text</param>
-		/// <typeparam name="TResult">the expected type of the serialized data</typeparam>
-		TResult Read<TResult>(string input);
+        /// <summary>
+        /// Deserializes a single object from the given input
+        /// </summary>
+        /// <param name="input">the input text</param>
+        /// <typeparam name="TResult">the expected type of the serialized data</typeparam>
+        TResult Read<TResult>(string input);
 
-		/// <summary>
-		/// Deserializes a single object from the given input
-		/// </summary>
-		/// <param name="input">the input text</param>
-		object Read(string input);
+        /// <summary>
+        /// Deserializes a single object from the given input
+        /// </summary>
+        /// <param name="input">the input text</param>
+        object Read(string input);
 
-		/// <summary>
-		/// Deserializes a single object from the given input
-		/// </summary>
-		/// <param name="input">the input text</param>
-		/// <param name="targetType">the expected type of the serialized data</param>
-		object Read(string input, Type targetType);
+        /// <summary>
+        /// Deserializes a single object from the given input
+        /// </summary>
+        /// <param name="input">the input text</param>
+        /// <param name="targetType">the expected type of the serialized data</param>
+        object Read(string input, Type targetType);
 
-		#endregion Read Methods
+        #endregion Read Methods
 
-		#region ReadMany Methods
+        #region ReadMany Methods
 
-		/// <summary>
-		/// Deserializes a potentially endless sequence of objects from a stream source
-		/// </summary>
-		/// <param name="input"></param>
-		/// <returns></returns>
-		/// <remarks>
-		/// character stream => token stream => object stream
-		/// </remarks>
-		IEnumerable ReadMany(TextReader input);
+        /// <summary>
+        /// Deserializes a potentially endless sequence of objects from a stream source
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// character stream => token stream => object stream
+        /// </remarks>
+        IEnumerable ReadMany(TextReader input);
 
-		#endregion ReadMany Methods
-	}
+        #endregion ReadMany Methods
+    }
 }

@@ -33,17 +33,17 @@ using System.IO;
 
 namespace JsonFx.Serialization
 {
-	/// <summary>
-	/// Designates a type as being able to format itself to raw bytes
-	/// </summary>
-	public interface IBinaryFormattable<T>
-	{
-		/// <summary>
-		/// Writes custom format to the output using either tokens or bytes
-		/// </summary>
-		/// <param name="formatter"></param>
-		/// <param name="writer"></param>
-		/// <returns>total number of bytes written</returns>
-		int Format(IBinaryFormatter<T> formatter, BinaryWriter writer);
-	}
+    /// <summary>
+    /// Designates a type as being able to format itself to raw bytes
+    /// </summary>
+    public interface IBinaryFormattable<T>
+    {
+        /// <summary>
+        /// Writes custom format to the output using either tokens or bytes
+        /// </summary>
+        /// <param name="formatter"></param>
+        /// <param name="writer"></param>
+        /// <returns>total number of bytes written</returns>
+        int Format(IBinaryFormatter<T> formatter, BinaryWriter writer);
+    }
 }

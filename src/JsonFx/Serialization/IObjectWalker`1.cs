@@ -33,21 +33,21 @@ using System.Collections.Generic;
 
 namespace JsonFx.Serialization
 {
-	/// <summary>
-	/// Generates a sequence of tokens from an object graph
-	/// </summary>
-	/// <typeparam name="T">token type</typeparam>
-	public interface IObjectWalker<T>
-	{
-		#region Methods
+    /// <summary>
+    /// Generates a sequence of tokens from an object graph
+    /// </summary>
+    /// <typeparam name="T">token type</typeparam>
+    public interface IObjectWalker<T>
+    {
+        #region Methods
 
-		/// <summary>
-		/// Generates a sequence of tokens representing the value
-		/// </summary>
-		/// <param name="value"></param>
-		/// <returns></returns>
-		IEnumerable<Token<T>> GetTokens(object value);
+        /// <summary>
+        /// Generates a sequence of tokens representing the value
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        IEnumerable<Token<T>> GetTokens(object value);
 
-		#endregion Methods
-	}
+        #endregion Methods
+    }
 }

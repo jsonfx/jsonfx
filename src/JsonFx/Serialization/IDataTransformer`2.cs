@@ -33,22 +33,22 @@ using System.Collections.Generic;
 
 namespace JsonFx.Serialization
 {
-	/// <summary>
-	/// Consumes a sequence of tokens and produces a token sequence of a different type
-	/// </summary>
-	/// <typeparam name="TIn">input token type</typeparam>
-	/// <typeparam name="TOut">output token type</typeparam>
-	public interface IDataTransformer<TIn, TOut>
-	{
-		#region Methods
+    /// <summary>
+    /// Consumes a sequence of tokens and produces a token sequence of a different type
+    /// </summary>
+    /// <typeparam name="TIn">input token type</typeparam>
+    /// <typeparam name="TOut">output token type</typeparam>
+    public interface IDataTransformer<TIn, TOut>
+    {
+        #region Methods
 
-		/// <summary>
-		/// Transforms the token sequence from <typeparamref name="TIn"/> to <typeparamref name="TOut"/>
-		/// </summary>
-		/// <param name="tokens"></param>
-		/// <returns></returns>
-		IEnumerable<Token<TOut>> Transform(IEnumerable<Token<TIn>> input);
+        /// <summary>
+        /// Transforms the token sequence from <typeparamref name="TIn"/> to <typeparamref name="TOut"/>
+        /// </summary>
+        /// <param name="tokens"></param>
+        /// <returns></returns>
+        IEnumerable<Token<TOut>> Transform(IEnumerable<Token<TIn>> input);
 
-		#endregion Methods
-	}
+        #endregion Methods
+    }
 }

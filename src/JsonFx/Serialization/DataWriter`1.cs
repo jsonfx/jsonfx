@@ -37,154 +37,154 @@ using JsonFx.Serialization.Filters;
 
 namespace JsonFx.Serialization
 {
-	/// <summary>
-	/// Provides base implementation of standard serializers
-	/// </summary>
-	public abstract class DataWriter<T> : IDataWriter
-	{
-		#region Fields
+    /// <summary>
+    /// Provides base implementation of standard serializers
+    /// </summary>
+    public abstract class DataWriter<T> : IDataWriter
+    {
+        #region Fields
 
-		private readonly DataWriterSettings settings;
+        private readonly DataWriterSettings settings;
 
-		#endregion Fields
+        #endregion Fields
 
-		#region Init
+        #region Init
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="settings"></param>
-		protected DataWriter(DataWriterSettings settings)
-		{
-			if (settings == null)
-			{
-				throw new NullReferenceException("settings");
-			}
-			this.settings = settings;
-		}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="settings"></param>
+        protected DataWriter(DataWriterSettings settings)
+        {
+            if (settings == null)
+            {
+                throw new NullReferenceException("settings");
+            }
+            this.settings = settings;
+        }
 
-		#endregion Init
+        #endregion Init
 
-		#region Properties
+        #region Properties
 
-		/// <summary>
-		/// Gets the content encoding for the serialized data
-		/// </summary>
-		public abstract Encoding ContentEncoding
-		{
-			get;
-		}
+        /// <summary>
+        /// Gets the content encoding for the serialized data
+        /// </summary>
+        public abstract Encoding ContentEncoding
+        {
+            get;
+        }
 
-		/// <summary>
-		/// Gets the supported content types for the serialized data
-		/// </summary>
-		public abstract IEnumerable<string> ContentType
-		{
-			get;
-		}
+        /// <summary>
+        /// Gets the supported content types for the serialized data
+        /// </summary>
+        public abstract IEnumerable<string> ContentType
+        {
+            get;
+        }
 
-		/// <summary>
-		/// Gets the supported file extensions for the serialized data
-		/// </summary>
-		public abstract IEnumerable<string> FileExtension
-		{
-			get;
-		}
+        /// <summary>
+        /// Gets the supported file extensions for the serialized data
+        /// </summary>
+        public abstract IEnumerable<string> FileExtension
+        {
+            get;
+        }
 
-		/// <summary>
-		/// Gets the settings used for serialization
-		/// </summary>
-		public DataWriterSettings Settings
-		{
-			get { return this.settings; }
-		}
+        /// <summary>
+        /// Gets the settings used for serialization
+        /// </summary>
+        public DataWriterSettings Settings
+        {
+            get { return this.settings; }
+        }
 
-		#endregion Properties
+        #endregion Properties
 
-		#region Methods
+        #region Methods
 
-		/// <summary>
-		/// Serializes the data to the given output
-		/// </summary>
-		/// <param name="data">the data to be serialized</param>
-		/// <param name="output">the output writer</param>
-		public virtual void Write(object data, TextWriter output)
-		{
-			IObjectWalker<T> walker = this.GetWalker();
-			if (walker == null)
-			{
-				throw new ArgumentNullException("walker");
-			}
+        /// <summary>
+        /// Serializes the data to the given output
+        /// </summary>
+        /// <param name="data">the data to be serialized</param>
+        /// <param name="output">the output writer</param>
+        public virtual void Write(object data, TextWriter output)
+        {
+            IObjectWalker<T> walker = this.GetWalker();
+            if (walker == null)
+            {
+                throw new ArgumentNullException("walker");
+            }
 
-			ITextFormatter<T> formatter = this.GetFormatter();
-			if (formatter == null)
-			{
-				throw new ArgumentNullException("formatter");
-			}
+            ITextFormatter<T> formatter = this.GetFormatter();
+            if (formatter == null)
+            {
+                throw new ArgumentNullException("formatter");
+            }
 
-			try
-			{
-				// objects => tokens => characters
-				formatter.Format(walker.GetTokens(data), output);
-			}
-			catch (SerializationException)
-			{
-				throw;
-			}
-			catch (Exception ex)
-			{
-				throw new SerializationException(ex.Message, ex);
-			}
-		}
+            try
+            {
+                // objects => tokens => characters
+                formatter.Format(walker.GetTokens(data), output);
+            }
+            catch (SerializationException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new SerializationException(ex.Message, ex);
+            }
+        }
 
-		/// <summary>
-		/// Serializes the data to the given output
-		/// </summary>
-		/// <param name="data">the data to be serialized</param>
-		/// <returns>the serialized data</returns>
-		public virtual string Write(object data)
-		{
-			IObjectWalker<T> walker = this.GetWalker();
-			if (walker == null)
-			{
-				throw new ArgumentNullException("walker");
-			}
+        /// <summary>
+        /// Serializes the data to the given output
+        /// </summary>
+        /// <param name="data">the data to be serialized</param>
+        /// <returns>the serialized data</returns>
+        public virtual string Write(object data)
+        {
+            IObjectWalker<T> walker = this.GetWalker();
+            if (walker == null)
+            {
+                throw new ArgumentNullException("walker");
+            }
 
-			ITextFormatter<T> formatter = this.GetFormatter();
-			if (formatter == null)
-			{
-				throw new ArgumentNullException("formatter");
-			}
+            ITextFormatter<T> formatter = this.GetFormatter();
+            if (formatter == null)
+            {
+                throw new ArgumentNullException("formatter");
+            }
 
-			try
-			{
-				// objects => tokens => characters
-				return formatter.Format(walker.GetTokens(data));
-			}
-			catch (SerializationException)
-			{
-				throw;
-			}
-			catch (Exception ex)
-			{
-				throw new SerializationException(ex.Message, ex);
-			}
-		}
+            try
+            {
+                // objects => tokens => characters
+                return formatter.Format(walker.GetTokens(data));
+            }
+            catch (SerializationException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new SerializationException(ex.Message, ex);
+            }
+        }
 
-		/// <summary>
-		/// Gets the walker for this DataWriter
-		/// </summary>
-		/// <param name="dataWriterSettings"></param>
-		/// <returns></returns>
-		protected abstract IObjectWalker<T> GetWalker();
+        /// <summary>
+        /// Gets the walker for this DataWriter
+        /// </summary>
+        /// <param name="dataWriterSettings"></param>
+        /// <returns></returns>
+        protected abstract IObjectWalker<T> GetWalker();
 
-		/// <summary>
-		/// Gets the formatter for this DataWriter
-		/// </summary>
-		/// <param name="dataWriterSettings"></param>
-		/// <returns></returns>
-		protected abstract ITextFormatter<T> GetFormatter();
+        /// <summary>
+        /// Gets the formatter for this DataWriter
+        /// </summary>
+        /// <param name="dataWriterSettings"></param>
+        /// <returns></returns>
+        protected abstract ITextFormatter<T> GetFormatter();
 
-		#endregion Methods
-	}
+        #endregion Methods
+    }
 }

@@ -34,60 +34,60 @@ using System.IO;
 
 namespace JsonFx.Serialization
 {
-	/// <summary>
-	/// An <see cref="ITextFormatter<T>"/> which first transforms tokens of a different type
-	/// </summary>
-	/// <typeparam name="TIn">input token type</typeparam>
-	/// <typeparam name="TOut">output token type</typeparam>
-	internal class TransformFormatter<TIn, TOut> : ITextFormatter<TIn>
-	{
-		#region Fields
+    /// <summary>
+    /// An <see cref="ITextFormatter<T>"/> which first transforms tokens of a different type
+    /// </summary>
+    /// <typeparam name="TIn">input token type</typeparam>
+    /// <typeparam name="TOut">output token type</typeparam>
+    internal class TransformFormatter<TIn, TOut> : ITextFormatter<TIn>
+    {
+        #region Fields
 
-		private readonly ITextFormatter<TOut> Formatter;
-		private readonly IDataTransformer<TIn, TOut> Transformer;
+        private readonly ITextFormatter<TOut> Formatter;
+        private readonly IDataTransformer<TIn, TOut> Transformer;
 
-		#endregion Fields
+        #endregion Fields
 
-		#region Init
+        #region Init
 
-		/// <summary>
-		/// Ctor
-		/// </summary>
-		/// <param name="formatter"></param>
-		/// <param name="transformer"></param>
-		public TransformFormatter(ITextFormatter<TOut> formatter, IDataTransformer<TIn, TOut> transformer)
-		{
-			if (formatter == null)
-			{
-				new ArgumentNullException("formatter");
-			}
-			if (transformer == null)
-			{
-				new ArgumentNullException("transformer");
-			}
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="formatter"></param>
+        /// <param name="transformer"></param>
+        public TransformFormatter(ITextFormatter<TOut> formatter, IDataTransformer<TIn, TOut> transformer)
+        {
+            if (formatter == null)
+            {
+                new ArgumentNullException("formatter");
+            }
+            if (transformer == null)
+            {
+                new ArgumentNullException("transformer");
+            }
 
-			this.Formatter = formatter;
-			this.Transformer = transformer;
-		}
+            this.Formatter = formatter;
+            this.Transformer = transformer;
+        }
 
-		#endregion Init
+        #endregion Init
 
-		#region ITextFormatter<ModelTokenType> Members
+        #region ITextFormatter<ModelTokenType> Members
 
-		public void Format(IEnumerable<Token<TIn>> tokens, TextWriter writer)
-		{
-			IEnumerable<Token<TOut>> markup = this.Transformer.Transform(tokens);
+        public void Format(IEnumerable<Token<TIn>> tokens, TextWriter writer)
+        {
+            IEnumerable<Token<TOut>> markup = this.Transformer.Transform(tokens);
 
-			this.Formatter.Format(markup, writer);
-		}
+            this.Formatter.Format(markup, writer);
+        }
 
-		public string Format(IEnumerable<Token<TIn>> tokens)
-		{
-			IEnumerable<Token<TOut>> markup = this.Transformer.Transform(tokens);
+        public string Format(IEnumerable<Token<TIn>> tokens)
+        {
+            IEnumerable<Token<TOut>> markup = this.Transformer.Transform(tokens);
 
-			return this.Formatter.Format(markup);
-		}
+            return this.Formatter.Format(markup);
+        }
 
-		#endregion ITextFormatter<ModelTokenType> Members
-	}
+        #endregion ITextFormatter<ModelTokenType> Members
+    }
 }
