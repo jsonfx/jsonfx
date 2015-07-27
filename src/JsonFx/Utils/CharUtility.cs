@@ -151,7 +151,7 @@ namespace JsonFx.Utils
 			string hex = "";
 			while (i > 0)
 			{
-				hex = String.Concat(CharUtility.GetHexDigit((int)(i % 0x10)), hex);
+				hex = String.Concat(GetHexDigit((int)(i % 0x10)), hex);
 				i >>= 4;
 			}
 			return hex;
