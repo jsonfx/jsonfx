@@ -81,22 +81,22 @@ namespace JsonFx.Utils
 				(ch == '\t');
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="ch"></param>
-		/// <returns></returns>
-		public static bool IsControl(char ch)
-		{
-			return (ch <= '\u001F');
-		}
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ch"></param>
+        /// <returns></returns>
+        public static bool IsControl(char ch)
+        {
+            return (ch <= '\u001F') || (ch == '\u007F') || (ch >= '\u0080' && ch <= '\u009F');
+        }
 
-		/// <summary>
-		/// Checks if character matches [A-Za-z]
-		/// </summary>
-		/// <param name="ch"></param>
-		/// <returns></returns>
-		public static bool IsLetter(char ch)
+        /// <summary>
+        /// Checks if character matches [A-Za-z]
+        /// </summary>
+        /// <param name="ch"></param>
+        /// <returns></returns>
+        public static bool IsLetter(char ch)
 		{
 			return
 				((ch >= 'a') && (ch <= 'z')) ||
