@@ -75,7 +75,7 @@ namespace JsonFx.Utils
 		public static bool IsWhiteSpace(char ch)
 		{
 			return
-				(ch == ' ') |
+				(ch == ' ') ||
 				(ch == '\n') ||
 				(ch == '\r') ||
 				(ch == '\t');
