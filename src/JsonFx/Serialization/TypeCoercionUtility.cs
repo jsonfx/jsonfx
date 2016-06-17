@@ -737,6 +737,11 @@ namespace JsonFx.Serialization
 						Type[] genericArgs = targetType.GetGenericArguments();
 						targetType = typeof(List<>).MakeGenericType(genericArgs);
 					}
+					else if (genericType == typeof(ISet<>))
+					{
+						Type[] genericArgs = targetType.GetGenericArguments();
+						targetType = typeof(HashSet<>).MakeGenericType(genericArgs);
+					}
 					else if (genericType == typeof(IDictionary<,>))
 					{
 						Type[] genericArgs = targetType.GetGenericArguments();
