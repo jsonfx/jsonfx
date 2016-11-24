@@ -79,8 +79,8 @@ namespace JsonFx.Html
 
 			while (!stream.IsCompleted)
 			{
-				output.Add(MarkupGrammar.TokenElementBegin(HtmlOutTransformer.RootTagName));
-				this.TransformValue(output, stream);
+				output.Add(MarkupGrammar.TokenElementBegin(RootTagName));
+                TransformValue(output, stream);
 				output.Add(MarkupGrammar.TokenElementEnd);
 			}
 
@@ -132,8 +132,8 @@ namespace JsonFx.Html
 			bool hasName = !token.Name.IsEmpty;
 			if (hasName)
 			{
-				output.Add(MarkupGrammar.TokenElementBegin(HtmlOutTransformer.PrimitiveTagName));
-				output.Add(MarkupGrammar.TokenAttribute(HtmlOutTransformer.HintAttributeName));
+				output.Add(MarkupGrammar.TokenElementBegin(PrimitiveTagName));
+				output.Add(MarkupGrammar.TokenAttribute(HintAttributeName));
 				output.Add(MarkupGrammar.TokenPrimitive(token.Name));
 			}
 			output.Add(token.ChangeType(MarkupTokenType.Primitive));
@@ -147,10 +147,10 @@ namespace JsonFx.Html
 		{
 			Token<ModelTokenType> token = input.Pop();
 
-			output.Add(MarkupGrammar.TokenElementBegin(HtmlOutTransformer.ArrayTagName));
+			output.Add(MarkupGrammar.TokenElementBegin(ArrayTagName));
 			if (!token.Name.IsEmpty)
 			{
-				output.Add(MarkupGrammar.TokenAttribute(HtmlOutTransformer.HintAttributeName));
+				output.Add(MarkupGrammar.TokenAttribute(HintAttributeName));
 				output.Add(MarkupGrammar.TokenPrimitive(token.Name));
 			}
 
@@ -170,7 +170,7 @@ namespace JsonFx.Html
 					case ModelTokenType.ObjectBegin:
 					case ModelTokenType.Primitive:
 					{
-						output.Add(MarkupGrammar.TokenElementBegin(HtmlOutTransformer.ArrayItemTagName));
+						output.Add(MarkupGrammar.TokenElementBegin(ArrayItemTagName));
 						this.TransformValue(output, input);
 						output.Add(MarkupGrammar.TokenElementEnd);
 						break;
@@ -189,10 +189,10 @@ namespace JsonFx.Html
 		{
 			Token<ModelTokenType> token = input.Pop();
 
-			output.Add(MarkupGrammar.TokenElementBegin(HtmlOutTransformer.ObjectTagName));
+			output.Add(MarkupGrammar.TokenElementBegin(ObjectTagName));
 			if (!token.Name.IsEmpty)
 			{
-				output.Add(MarkupGrammar.TokenAttribute(HtmlOutTransformer.HintAttributeName));
+				output.Add(MarkupGrammar.TokenAttribute(HintAttributeName));
 				output.Add(MarkupGrammar.TokenPrimitive(token.Name));
 			}
 
@@ -212,11 +212,11 @@ namespace JsonFx.Html
 					{
 						input.Pop();
 
-						output.Add(MarkupGrammar.TokenElementBegin(HtmlOutTransformer.ObjectPropertyKeyTagName));
+						output.Add(MarkupGrammar.TokenElementBegin(ObjectPropertyKeyTagName));
 						output.Add(MarkupGrammar.TokenPrimitive(token.Name));
 						output.Add(MarkupGrammar.TokenElementEnd);
 
-						output.Add(MarkupGrammar.TokenElementBegin(HtmlOutTransformer.ObjectPropertyValueTagName));
+						output.Add(MarkupGrammar.TokenElementBegin(ObjectPropertyValueTagName));
 						this.TransformValue(output, input);
 						output.Add(MarkupGrammar.TokenElementEnd);
 						break;
