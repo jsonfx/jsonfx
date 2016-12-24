@@ -422,7 +422,7 @@ namespace JsonFx.Json
 					}
 					case TypeCode.Int64:
 					{
-						overflowsIEEE754 = true;
+						//overflowsIEEE754 = true;
 						number = ((long)value).ToString("g", CultureInfo.InvariantCulture);
 						break;
 					}
@@ -466,13 +466,12 @@ namespace JsonFx.Json
 					}
 					case TypeCode.UInt32:
 					{
-						overflowsIEEE754 = true;
 						number = ((uint)value).ToString("g", CultureInfo.InvariantCulture);
 						break;
 					}
 					case TypeCode.UInt64:
 					{
-						overflowsIEEE754 = true;
+						//overflowsIEEE754 = true;
 						number = ((ulong)value).ToString("g", CultureInfo.InvariantCulture);
 						break;
 					}

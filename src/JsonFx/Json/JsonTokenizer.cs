@@ -523,7 +523,7 @@ namespace JsonFx.Json
 				// by this point, we have the full number string and know its characteristics
 
 				string buffer = scanner.EndChunk();
-				if (!hasDecimal && !hasExponent && precision < 19)
+				if (!hasDecimal && !hasExponent && precision <= 20)
 				{
 					// Integer value
 					decimal number = 0;
